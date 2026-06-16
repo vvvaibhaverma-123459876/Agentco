@@ -1,0 +1,519 @@
+---
+# ============================================================
+# AgentCo Kubernetes Network Policies
+# ============================================================
+# Default posture: deny all ingress from other namespaces.
+# Explicit allow rules are added per-department below.
+#
+# Requires a CNI plugin that enforces NetworkPolicy
+# (Calico, Cilium, Weave, Antrea, etc.)
+#
+# Apply with: kubectl apply -f network-policies.yaml
+# ============================================================
+
+# ------------------------------------------------------------
+# DENY ALL cross-namespace ingress (applied to every namespace)
+# Each namespace gets a baseline deny-all that blocks ingress
+# from pods outside that namespace unless an explicit allow rule
+# also matches.
+# ------------------------------------------------------------
+
+{% set departments = [
+  "agentco-executive",
+  "agentco-engineering",
+  "agentco-product",
+  "agentco-sales",
+  "agentco-marketing",
+  "agentco-customer-experience",
+  "agentco-people-ops",
+  "agentco-legal",
+  "agentco-design",
+  "agentco-infrastructure"
+] %}
+
+# ---- agentco-executive: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-executive
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-engineering: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-engineering
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-product: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-product
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-sales: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-sales
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-marketing: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-marketing
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-customer-experience: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-customer-experience
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-people-ops: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-people-ops
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-legal: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-legal
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-design: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-design
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
+# ---- agentco-infrastructure: deny-all baseline ----
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: agentco-infrastructure
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+
+---
+# ============================================================
+# ALLOW intra-namespace traffic (pods talk to each other freely
+# within their own namespace)
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-executive
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-engineering
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-product
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-sales
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-marketing
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-customer-experience
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-people-ops
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-legal
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-same-namespace
+  namespace: agentco-design
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector: {}
+
+---
+# ============================================================
+# ALLOW all department namespaces → Kafka (port 9092)
+# in agentco-infrastructure
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-department-agents-to-kafka
+  namespace: agentco-infrastructure
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: kafka
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchExpressions:
+              - key: agentco/department
+                operator: In
+                values:
+                  - executive
+                  - engineering
+                  - product
+                  - sales
+                  - marketing
+                  - customer-experience
+                  - people-ops
+                  - legal
+                  - design
+      ports:
+        - protocol: TCP
+          port: 9092
+        - protocol: TCP
+          port: 29092
+
+---
+# ============================================================
+# ALLOW all department namespaces → PostgreSQL (port 5432)
+# in agentco-infrastructure
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-department-agents-to-postgres
+  namespace: agentco-infrastructure
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: postgresql
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchExpressions:
+              - key: agentco/department
+                operator: In
+                values:
+                  - executive
+                  - engineering
+                  - product
+                  - sales
+                  - marketing
+                  - customer-experience
+                  - people-ops
+                  - legal
+                  - design
+      ports:
+        - protocol: TCP
+          port: 5432
+
+---
+# ============================================================
+# ALLOW all department namespaces → Redis (port 6379)
+# in agentco-infrastructure
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-department-agents-to-redis
+  namespace: agentco-infrastructure
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: redis
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchExpressions:
+              - key: agentco/department
+                operator: In
+                values:
+                  - executive
+                  - engineering
+                  - product
+                  - sales
+                  - marketing
+                  - customer-experience
+                  - people-ops
+                  - legal
+                  - design
+      ports:
+        - protocol: TCP
+          port: 6379
+
+---
+# ============================================================
+# ALLOW executive namespace → all other department namespaces
+# Executive agents may push directives to every department.
+# ============================================================
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-engineering
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-product
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-sales
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-marketing
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-customer-experience
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-people-ops
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-legal
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-design
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-executive-ingress
+  namespace: agentco-infrastructure
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              agentco/department: executive

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "agentco-agents"
+version = "1.0.0"
+description = "AgentCo Python agent runtime"
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["core", "executive", "product", "engineering", "design", "sales", "marketing", "customer_experience", "people_ops", "legal"]
+omit = ["tests/*"]

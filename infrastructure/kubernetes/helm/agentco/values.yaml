@@ -1,0 +1,302 @@
+# ============================================================
+# AgentCo Helm Chart — Default Values
+# Override any value in your environment-specific values file:
+#   helm upgrade agentco ./agentco -f values.production.yaml
+# ============================================================
+
+# ------------------------------------------------------------
+# Global settings shared across all subcharts and templates
+# ------------------------------------------------------------
+global:
+  image:
+    registry: ghcr.io/agentco
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+  # Image pull secret name (pre-created in each namespace)
+  imagePullSecrets:
+    - name: agentco-registry-credentials
+
+  # Labels applied to every resource created by this chart
+  commonLabels:
+    app.kubernetes.io/part-of: agentco
+    app.kubernetes.io/managed-by: Helm
+
+  # Annotations applied to every resource
+  commonAnnotations: {}
+
+# ------------------------------------------------------------
+# Backend API Service
+# ------------------------------------------------------------
+backend:
+  enabled: true
+  image:
+    repository: ghcr.io/agentco/backend
+    # tag inherits from global.image.tag
+    pullPolicy: IfNotPresent
+
+  replicaCount: 2
+
+  # Horizontal Pod Autoscaler
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+
+  service:
+    type: ClusterIP
+    port: 3001
+    targetPort: 3001
+    protocol: TCP
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+
+  # Environment variables injected via ConfigMap / Secret references
+  env:
+    NODE_ENV: production
+    PORT: "3001"
+    LOG_LEVEL: info
+    OTEL_SERVICE_NAME: agentco-backend
+
+  # Secret name containing ANTHROPIC_API_KEY, JWT_SECRET, DATABASE_URL, etc.
+  existingSecret: agentco-backend-secrets
+
+  livenessProbe:
+    httpGet:
+      path: /health/live
+      port: 3001
+    initialDelaySeconds: 15
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /health/ready
+      port: 3001
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  podAnnotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3001"
+    prometheus.io/path: "/metrics"
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroup: 1001
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  nodeSelector: {}
+  tolerations: []
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/component: backend
+            topologyKey: kubernetes.io/hostname
+
+# ------------------------------------------------------------
+# Frontend Service
+# ------------------------------------------------------------
+frontend:
+  enabled: true
+  image:
+    repository: ghcr.io/agentco/frontend
+    pullPolicy: IfNotPresent
+
+  replicaCount: 2
+
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 8
+    targetCPUUtilizationPercentage: 70
+
+  service:
+    type: ClusterIP
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  env:
+    NODE_ENV: production
+    NEXT_PUBLIC_API_URL: https://agentco.example.com/api
+
+  livenessProbe:
+    httpGet:
+      path: /api/health
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  readinessProbe:
+    httpGet:
+      path: /api/health
+      port: 3000
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroup: 1001
+
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+# ------------------------------------------------------------
+# Ingress
+# ------------------------------------------------------------
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: agentco.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          service:
+            name: backend
+            port: 3001
+        - path: /
+          pathType: Prefix
+          service:
+            name: frontend
+            port: 3000
+  tls:
+    - secretName: agentco-tls
+      hosts:
+        - agentco.example.com
+
+# ------------------------------------------------------------
+# PostgreSQL (Bitnami subchart)
+# ------------------------------------------------------------
+postgresql:
+  enabled: true
+  auth:
+    username: agentco
+    password: ""                  # Set via --set or existingSecret in production
+    database: agentco
+    existingSecret: agentco-postgresql-secret
+    secretKeys:
+      userPasswordKey: password
+      adminPasswordKey: postgres-password
+  primary:
+    persistence:
+      enabled: true
+      size: 20Gi
+      storageClass: ""
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2000m
+        memory: 2Gi
+
+# ------------------------------------------------------------
+# Redis (Bitnami subchart)
+# ------------------------------------------------------------
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 5Gi
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+# ------------------------------------------------------------
+# Kafka (Bitnami subchart)
+# ------------------------------------------------------------
+kafka:
+  enabled: true
+  replicaCount: 1
+  persistence:
+    enabled: true
+    size: 10Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  zookeeper:
+    enabled: true
+    replicaCount: 1
+    persistence:
+      enabled: true
+      size: 5Gi
+
+# ------------------------------------------------------------
+# Service Account
+# ------------------------------------------------------------
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+# ------------------------------------------------------------
+# Pod Disruption Budgets
+# ------------------------------------------------------------
+podDisruptionBudget:
+  backend:
+    enabled: true
+    minAvailable: 1
+  frontend:
+    enabled: true
+    minAvailable: 1

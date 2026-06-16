@@ -1,0 +1,228 @@
+# ============================================================
+# AgentCo Kafka Topic Definitions
+# ============================================================
+# Apply with the Kafka topic provisioning tool or a Kubernetes
+# Job that calls kafka-topics.sh against the bootstrap server.
+#
+# Retention defaults (override per topic with retention.ms):
+#   - 7 days = 604800000 ms
+#   - 30 days = 2592000000 ms
+# ============================================================
+
+kafka:
+  bootstrapServers: "localhost:9092"
+
+topics:
+
+  # ----------------------------------------------------------
+  # Core Agent Lifecycle & Control
+  # ----------------------------------------------------------
+
+  - name: agent.events
+    partitions: 12
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+      max.message.bytes: "1048576"     # 1 MiB
+    description: >
+      High-throughput stream of all agent lifecycle and activity events.
+      Consumers: audit service, monitoring, analytics pipeline.
+
+  - name: agent.commands
+    partitions: 6
+    replicationFactor: 1
+    config:
+      retention.ms: "86400000"         # 1 day — commands are short-lived
+      cleanup.policy: delete
+      compression.type: lz4
+      max.message.bytes: "524288"      # 512 KiB
+    description: >
+      Commands dispatched to agents (start, stop, pause, resume, reconfigure).
+      Keyed by agent ID to preserve per-agent ordering.
+
+  - name: agent.state.changes
+    partitions: 6
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      State machine transitions for each agent instance.
+      Used by the orchestrator to track running vs. idle vs. error states.
+
+  - name: agent.audit.log
+    partitions: 3
+    replicationFactor: 1
+    config:
+      cleanup.policy: compact          # keep latest record per key forever
+      compression.type: gzip
+      min.cleanable.dirty.ratio: "0.1"
+      segment.ms: "86400000"          # compact daily
+      max.message.bytes: "2097152"    # 2 MiB — audit payloads can be large
+    description: >
+      Immutable, compacted audit trail of every agent action and decision.
+      Keyed by (agentId + sequenceNumber) to ensure exactly-once delivery semantics.
+
+  # ----------------------------------------------------------
+  # Department Event Streams
+  # ----------------------------------------------------------
+
+  - name: executive.decisions
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "2592000000"       # 30 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      Strategic decisions emitted by C-suite agent cluster (CEO, CFO, COO, CTO).
+      Consumed by all department agents for alignment and cascading instructions.
+
+  - name: engineering.deployments
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      Deployment events from the engineering agent cluster: build started,
+      artifact pushed, deployment triggered, rollback initiated, health confirmed.
+
+  - name: product.roadmap.updates
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "2592000000"       # 30 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      Roadmap mutations produced by the product agent: feature additions,
+      priority changes, milestone updates, and sprint planning outputs.
+
+  - name: sales.pipeline.events
+    partitions: 6
+    replicationFactor: 1
+    config:
+      retention.ms: "2592000000"       # 30 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      CRM-style pipeline events: lead created, qualified, demo scheduled,
+      proposal sent, negotiation, closed-won, closed-lost. Higher partition
+      count to support parallel territory processing.
+
+  - name: marketing.campaigns
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "2592000000"       # 30 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      Campaign lifecycle events: draft, review, approved, launched, paused,
+      completed. Includes performance metrics emitted periodically.
+
+  - name: customer.interactions
+    partitions: 12
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+      max.message.bytes: "2097152"    # 2 MiB — may carry transcript excerpts
+    description: >
+      Every customer touchpoint: support tickets, chat messages, email threads,
+      NPS responses, churn signals. High partition count for volume.
+
+  - name: finance.transactions
+    partitions: 6
+    replicationFactor: 1
+    config:
+      retention.ms: "31536000000"     # 365 days — regulatory requirement
+      cleanup.policy: delete
+      compression.type: gzip
+      max.message.bytes: "524288"
+    description: >
+      Financial transaction events: invoices raised, payments received,
+      expense approvals, budget variance alerts. Long retention for compliance.
+
+  - name: legal.alerts
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "31536000000"     # 365 days — legal hold
+      cleanup.policy: delete
+      compression.type: gzip
+    description: >
+      Compliance violations, contract anomalies, IP risk flags, and regulatory
+      watch-list hits raised by the legal agent cluster.
+
+  - name: people.ops.events
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "2592000000"       # 30 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      HR lifecycle events: headcount requests, offer letters, onboarding steps,
+      performance reviews initiated, offboarding milestones.
+
+  # ----------------------------------------------------------
+  # Human-in-the-Loop (HITL)
+  # ----------------------------------------------------------
+
+  - name: human.override.requests
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+      max.message.bytes: "524288"
+    description: >
+      Requests produced by agents when they require human approval before
+      proceeding with a high-risk or irreversible action. Consumed by the
+      HITL dashboard and notification service.
+
+  - name: human.override.responses
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      Approval / rejection responses entered by human operators via the
+      HITL dashboard. Consumed by the originating agent to resume execution.
+
+  # ----------------------------------------------------------
+  # System Operations
+  # ----------------------------------------------------------
+
+  - name: system.health
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "86400000"         # 1 day — rolling health window
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      Heartbeat and health-check payloads emitted by every agent and service.
+      Consumed by the monitoring agent to detect silent failures.
+
+  - name: incident.alerts
+    partitions: 3
+    replicationFactor: 1
+    config:
+      retention.ms: "604800000"        # 7 days
+      cleanup.policy: delete
+      compression.type: lz4
+    description: >
+      P0/P1/P2 incident events produced by the monitoring agent and the
+      engineering cluster. Consumed by the on-call router and the executive
+      decision stream for auto-escalation.
