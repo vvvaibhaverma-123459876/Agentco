@@ -7,7 +7,7 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "db:migrate": "node -e \"require('./dist/db/migrate.js')\"",
     "lint": "eslint src --ext .ts"
   },

@@ -18,7 +18,7 @@ export default function OverridePage() {
   const [resolving, setResolving] = useState<string | null>(null);
 
   const load = () => {
-    api.overrides.list().then(r => setItems(r.items)).catch(console.error).finally(() => setLoading(false));
+    api.overrides.list().then((r: { items: OverrideRequest[]; count: number }) => setItems(r.items)).catch(console.error).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); const t = setInterval(load, 15000); return () => clearInterval(t); }, []);
