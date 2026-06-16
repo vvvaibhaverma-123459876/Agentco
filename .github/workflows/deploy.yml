@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    needs: []
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure kubeconfig
+        run: echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+
+      - name: Build and push backend image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/backend:${{ github.sha }} ./backend
+          docker push ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+
+      - name: Build and push frontend image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/frontend:${{ github.sha }} ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+
+      - name: Deploy via Helm
+        run: |
+          helm upgrade --install agentco infrastructure/kubernetes/helm/agentco \
+            --kubeconfig kubeconfig.yaml \
+            --set backend.image.tag=${{ github.sha }} \
+            --set frontend.image.tag=${{ github.sha }} \
+            --namespace agentco \
+            --wait

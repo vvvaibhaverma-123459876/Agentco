@@ -1,0 +1,307 @@
+---
+# ============================================================
+# AgentCo Kubernetes Namespaces
+# ============================================================
+# Each department runs in its own namespace for isolation,
+# resource governance, and network policy enforcement.
+# Apply with: kubectl apply -f namespaces.yaml
+# ============================================================
+
+# ------------------------------------------------------------
+# Executive
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-executive
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: executive
+    agentco/tier: control-plane
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: executive-quota
+  namespace: agentco-executive
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    pods: "20"
+    services: "10"
+    persistentvolumeclaims: "5"
+    secrets: "30"
+    configmaps: "20"
+---
+
+# ------------------------------------------------------------
+# Engineering
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-engineering
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: engineering
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: engineering-quota
+  namespace: agentco-engineering
+spec:
+  hard:
+    requests.cpu: "16"
+    requests.memory: 32Gi
+    limits.cpu: "32"
+    limits.memory: 64Gi
+    pods: "50"
+    services: "20"
+    persistentvolumeclaims: "20"
+    secrets: "50"
+    configmaps: "30"
+---
+
+# ------------------------------------------------------------
+# Product
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-product
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: product
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: product-quota
+  namespace: agentco-product
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    pods: "20"
+    services: "10"
+    persistentvolumeclaims: "5"
+    secrets: "20"
+    configmaps: "15"
+---
+
+# ------------------------------------------------------------
+# Sales
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-sales
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: sales
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: sales-quota
+  namespace: agentco-sales
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 16Gi
+    limits.cpu: "16"
+    limits.memory: 32Gi
+    pods: "30"
+    services: "15"
+    persistentvolumeclaims: "10"
+    secrets: "30"
+    configmaps: "20"
+---
+
+# ------------------------------------------------------------
+# Marketing
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-marketing
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: marketing
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: marketing-quota
+  namespace: agentco-marketing
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    pods: "20"
+    services: "10"
+    persistentvolumeclaims: "5"
+    secrets: "20"
+    configmaps: "15"
+---
+
+# ------------------------------------------------------------
+# Customer Experience
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-customer-experience
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: customer-experience
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: customer-experience-quota
+  namespace: agentco-customer-experience
+spec:
+  hard:
+    requests.cpu: "8"
+    requests.memory: 16Gi
+    limits.cpu: "16"
+    limits.memory: 32Gi
+    pods: "40"
+    services: "15"
+    persistentvolumeclaims: "10"
+    secrets: "30"
+    configmaps: "20"
+---
+
+# ------------------------------------------------------------
+# People-Ops
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-people-ops
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: people-ops
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: people-ops-quota
+  namespace: agentco-people-ops
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    pods: "10"
+    services: "5"
+    persistentvolumeclaims: "5"
+    secrets: "20"
+    configmaps: "10"
+---
+
+# ------------------------------------------------------------
+# Legal
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-legal
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: legal
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: legal-quota
+  namespace: agentco-legal
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    pods: "10"
+    services: "5"
+    persistentvolumeclaims: "5"
+    secrets: "20"
+    configmaps: "10"
+---
+
+# ------------------------------------------------------------
+# Design
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-design
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: design
+    agentco/tier: operational
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: design-quota
+  namespace: agentco-design
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    pods: "15"
+    services: "10"
+    persistentvolumeclaims: "5"
+    secrets: "20"
+    configmaps: "10"
+---
+
+# ------------------------------------------------------------
+# Infrastructure (shared services: Kafka, Postgres, Redis, etc.)
+# ------------------------------------------------------------
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: agentco-infrastructure
+  labels:
+    app.kubernetes.io/part-of: agentco
+    agentco/department: infrastructure
+    agentco/tier: platform
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: infrastructure-quota
+  namespace: agentco-infrastructure
+spec:
+  hard:
+    requests.cpu: "32"
+    requests.memory: 64Gi
+    limits.cpu: "64"
+    limits.memory: 128Gi
+    pods: "100"
+    services: "30"
+    persistentvolumeclaims: "50"
+    secrets: "50"
+    configmaps: "40"
