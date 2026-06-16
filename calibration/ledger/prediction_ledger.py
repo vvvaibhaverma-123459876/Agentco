@@ -139,6 +139,9 @@ class PredictionLedger:
     def list_by_agent(self, agent_id: str) -> list[PredictionRecord]:
         return [r for r in self._in_memory.values() if r.producing_agent_id == agent_id]
 
+    def list_all(self) -> list[PredictionRecord]:
+        return list(self._in_memory.values())
+
     def _validate_registration(self, reg: PredictionRegistration) -> None:
         if not (0.0 <= reg.probability <= 1.0):
             raise ValueError(f"probability must be in [0,1], got {reg.probability}")
