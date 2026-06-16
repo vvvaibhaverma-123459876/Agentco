@@ -16,12 +16,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     api.agents.list()
-      .then(r => setAgents(r.agents))
+      .then((r: { agents: Agent[]; count: number }) => setAgents(r.agents))
       .catch(console.error)
       .finally(() => setLoading(false));
 
     const interval = setInterval(() => {
-      api.agents.list().then(r => setAgents(r.agents)).catch(console.error);
+      api.agents.list().then((r: { agents: Agent[]; count: number }) => setAgents(r.agents)).catch(console.error);
     }, 10000);
     return () => clearInterval(interval);
   }, []);

@@ -11,7 +11,7 @@ export default function AuditPage() {
 
   const load = () => {
     const params = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
-    api.audit.list(params).then(r => setEntries(r.entries)).catch(console.error).finally(() => setLoading(false));
+    api.audit.list(params).then((r: { entries: AuditEntry[]; count: number }) => setEntries(r.entries)).catch(console.error).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, [filters]);
@@ -24,7 +24,7 @@ export default function AuditPage() {
           <p className="text-gray-500 mt-1">Immutable record of every agent decision</p>
         </div>
         <button
-          onClick={() => api.audit.verifyIntegrity().then(r => alert(r.valid ? '✓ Chain integrity valid' : `⚠ Chain broken at: ${r.broken_at}`))}
+          onClick={() => api.audit.verifyIntegrity().then((r: { valid: boolean; broken_at?: string }) => alert(r.valid ? '✓ Chain integrity valid' : `⚠ Chain broken at: ${r.broken_at}`))}
           className="text-sm px-3 py-1.5 border border-gray-300 rounded-md hover:bg-gray-50"
         >
           Verify Chain

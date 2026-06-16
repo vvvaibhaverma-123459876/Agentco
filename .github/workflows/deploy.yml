@@ -22,19 +22,24 @@ jobs:
 
       - name: Build and push backend image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/backend:${{ github.sha }} ./backend
-          docker push ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+          IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/backend:${{ github.sha }}
+          docker build -t "$IMAGE" ./backend
+          docker push "$IMAGE"
 
       - name: Build and push frontend image
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/frontend:${{ github.sha }} ./frontend
-          docker push ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+          IMAGE=ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/frontend:${{ github.sha }}
+          docker build -t "$IMAGE" ./frontend
+          docker push "$IMAGE"
 
       - name: Deploy via Helm
         run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
           helm upgrade --install agentco infrastructure/kubernetes/helm/agentco \
             --kubeconfig kubeconfig.yaml \
+            --set backend.image.repository=ghcr.io/${REPO}/backend \
             --set backend.image.tag=${{ github.sha }} \
+            --set frontend.image.repository=ghcr.io/${REPO}/frontend \
             --set frontend.image.tag=${{ github.sha }} \
             --namespace agentco \
             --wait
