@@ -25,6 +25,9 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from calibration.ledger.prediction_ledger import PredictionRegistration
+from runtime.base_agent.llm_client import make_client
+from runtime.base_agent.model_tiers import model_for
+from runtime.base_agent.structured_output import get_validated_output
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +96,11 @@ class BaseAgentV2:
         self._confidence = ConfidenceV2(trust_controller=self._trust)
         self._gate = EscalationGate()
 
+        # LLM client — points at Ollama by default; override via LLM_BASE_URL env var
+        self._llm_client = make_client()
+        self._model = model_for(agent_id)
+        self.output_schema: dict = {}   # subclasses set this to enforce structured output shape
+
     @abstractmethod
     def run(self, task: dict) -> Any:
         """Agent-specific entrypoint. Must call execute_action() for each action."""
@@ -139,6 +147,21 @@ class BaseAgentV2:
             self.agent_id, prediction_id, probability, claim[:80]
         )
         return prediction_id
+
+    def act(self, messages: list[dict], schema: Optional[dict] = None) -> dict:
+        """
+        Call the local LLM with validate-and-retry.  Subclasses use this instead of
+        calling the model directly so malformed output never reaches the event bus.
+
+        Uses self.output_schema by default; pass schema to override for a single call.
+        """
+        return get_validated_output(
+            client=self._llm_client,
+            model=self._model,
+            messages=messages,
+            schema=schema if schema is not None else self.output_schema,
+            escalation=self._gate,
+        )
 
     def execute_action(
         self,
