@@ -57,6 +57,7 @@ class PredictionRecord:
     resolved: bool = False
     resolved_outcome: Optional[bool] = None
     resolved_at: Optional[datetime] = None
+    resolved_by_service: Optional[str] = None
     brier_score: Optional[float] = None
     log_score: Optional[float] = None
     was_surprise: bool = False
