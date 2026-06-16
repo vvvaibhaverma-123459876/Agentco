@@ -1,0 +1,197 @@
+"""
+Trust Controller — the single authoritative source of trusted confidence.
+
+Decision-weighting MUST call trusted_confidence() here.
+Agents' raw stated confidence is NEVER used directly for decisions.
+
+trusted_confidence(stated, subject, domain, claim_type, horizon)
+  → applies the reliability curve for (subject × domain × claim_type × horizon)
+  → returns a calibrated multiplied confidence value
+
+Mechanical downgrade propagation:
+  If subject X's track record degrades, ALL downstream consumers that weight
+  X's outputs must be notified — the downgrade propagates without requiring
+  any agent to manually update anything.
+"""
+from __future__ import annotations
+
+import logging
+import math
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Optional
+
+if TYPE_CHECKING:
+    from calibration.ledger.prediction_ledger import PredictionRecord
+
+logger = logging.getLogger(__name__)
+
+# Minimum ECE before we apply a trust penalty
+ECE_PENALTY_THRESHOLD = 0.10
+ECE_PENALTY_RATE = 0.5  # 50% penalty per 0.1 ECE above threshold
+
+
+@dataclass
+class TrustScore:
+    subject_type: str   # 'agent' | 'principle' | 'theory' | 'sim_model' | 'source'
+    subject_id: str
+    domain: str
+    claim_type: str
+    horizon_class: str
+    stated_to_real: dict[str, float] = field(default_factory=dict)  # bin -> realised accuracy
+    trusted_multiplier: float = 1.0
+    ece: float = 0.0
+    sample_count: int = 0
+    last_reality_contact: Optional[datetime] = None
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+class TrustController:
+    """
+    The trust authority. Downstream agents call trusted_confidence().
+    The Resolution Service calls ingest_resolution() after scoring.
+    """
+
+    MIN_SAMPLES_FOR_TRUST = 5  # below this, return stated confidence with a penalty
+
+    def __init__(self):
+        self._scores: dict[tuple, TrustScore] = {}
+        self._downgrade_callbacks: list[callable] = []
+
+    def trusted_confidence(
+        self,
+        stated: float,
+        subject_id: str,
+        subject_type: str,
+        domain: str,
+        claim_type: str = "general",
+        horizon_class: str = "medium",
+    ) -> float:
+        """
+        THE FUNCTION that decision-weighting must call. Never use stated confidence directly.
+
+        Returns a float in [0,1] representing calibrated trusted confidence.
+        """
+        key = (subject_type, subject_id, domain, claim_type, horizon_class)
+        score = self._scores.get(key)
+
+        if score is None or score.sample_count < self.MIN_SAMPLES_FOR_TRUST:
+            # Insufficient track record — apply a conservative penalty
+            penalty = 0.8 if score is None else (0.8 + 0.04 * min(score.sample_count, 5))
+            trusted = stated * penalty
+            logger.debug(
+                "TRUST: %s/%s insufficient track record (n=%d) — applying %.0f%% penalty → trusted=%.3f",
+                subject_id, domain, score.sample_count if score else 0, penalty * 100, trusted
+            )
+            return round(min(max(trusted, 0.0), 1.0), 4)
+
+        # Apply reliability curve: find the bin for the stated confidence
+        bin_key = f"{min(int(stated * 10) / 10, 0.9):.1f}"
+        realised = score.stated_to_real.get(bin_key, stated)
+
+        # Apply ECE penalty if calibration is poor
+        ece_penalty = 1.0
+        if score.ece > ECE_PENALTY_THRESHOLD:
+            excess = score.ece - ECE_PENALTY_THRESHOLD
+            ece_penalty = max(1.0 - (excess / 0.1) * ECE_PENALTY_RATE, 0.3)
+
+        trusted = realised * score.trusted_multiplier * ece_penalty
+        trusted = round(min(max(trusted, 0.0), 1.0), 4)
+
+        logger.debug(
+            "TRUST: %s/%s stated=%.3f realised=%.3f multiplier=%.3f ece_penalty=%.3f → trusted=%.3f",
+            subject_id, domain, stated, realised, score.trusted_multiplier, ece_penalty, trusted
+        )
+        return trusted
+
+    def ingest_resolution(self, record: "PredictionRecord") -> None:
+        """
+        Called by Resolution Service after scoring. Updates the reliability curve
+        and propagates downgrades to all registered consumers.
+        """
+        if record.post_hoc:
+            logger.warning("TRUST: skipping post_hoc resolution for trust update: %s", record.prediction_id)
+            return
+
+        key = ("agent", record.producing_agent_id, record.domain, record.claim_type, record.horizon_class)
+        score = self._scores.setdefault(key, TrustScore(
+            subject_type="agent", subject_id=record.producing_agent_id,
+            domain=record.domain, claim_type=record.claim_type, horizon_class=record.horizon_class,
+        ))
+
+        # Update reliability bin
+        bin_key = f"{min(int(record.probability * 10) / 10, 0.9):.1f}"
+        old_realised = score.stated_to_real.get(bin_key, record.probability)
+        n = score.sample_count
+        # Incremental mean update
+        score.stated_to_real[bin_key] = (old_realised * n + (1.0 if record.resolved_outcome else 0.0)) / (n + 1)
+        score.sample_count += 1
+        score.last_reality_contact = datetime.now(timezone.utc)
+        score.updated_at = datetime.now(timezone.utc)
+
+        # Recompute trusted_multiplier from ECE trend
+        self._recompute_multiplier(score)
+
+        # Propagate downgrade if multiplier dropped significantly
+        was = score.trusted_multiplier
+        if was - score.trusted_multiplier > 0.05:
+            self._propagate_downgrade(record.producing_agent_id, score.trusted_multiplier)
+
+        logger.info(
+            "TRUST UPDATE: agent=%s domain=%s n=%d multiplier=%.3f ece=%.4f",
+            record.producing_agent_id, record.domain, score.sample_count,
+            score.trusted_multiplier, score.ece
+        )
+
+    def _recompute_multiplier(self, score: TrustScore) -> None:
+        """Recompute trusted_multiplier from the reliability curve."""
+        if not score.stated_to_real:
+            return
+        mean_gap = sum(
+            abs(float(k) - v) for k, v in score.stated_to_real.items()
+        ) / len(score.stated_to_real)
+        score.ece = mean_gap
+        # Multiplier decreases as ECE increases above threshold
+        if mean_gap <= ECE_PENALTY_THRESHOLD:
+            score.trusted_multiplier = 1.0
+        else:
+            excess = mean_gap - ECE_PENALTY_THRESHOLD
+            score.trusted_multiplier = max(1.0 - excess * 3.0, 0.3)
+
+    def _propagate_downgrade(self, subject_id: str, new_multiplier: float) -> None:
+        """Mechanical downgrade: all registered downstream consumers are notified."""
+        logger.warning(
+            "DOWNGRADE PROPAGATION: subject=%s new_multiplier=%.3f — notifying %d consumers",
+            subject_id, new_multiplier, len(self._downgrade_callbacks)
+        )
+        for cb in self._downgrade_callbacks:
+            try:
+                cb(subject_id, new_multiplier)
+            except Exception:
+                logger.exception("Downgrade callback failed for subject=%s", subject_id)
+
+    def register_downgrade_callback(self, callback: callable) -> None:
+        """Register a consumer to be notified when a subject's trust is downgraded."""
+        self._downgrade_callbacks.append(callback)
+
+    def get_score(
+        self, subject_id: str, subject_type: str, domain: str,
+        claim_type: str = "general", horizon_class: str = "medium"
+    ) -> Optional[TrustScore]:
+        key = (subject_type, subject_id, domain, claim_type, horizon_class)
+        return self._scores.get(key)
+
+    def force_downgrade(self, subject_id: str, subject_type: str, reason: str, factor: float = 0.5) -> None:
+        """
+        Forced downgrade — e.g., when a ground truth source is disqualified.
+        Propagates immediately.
+        """
+        for key, score in self._scores.items():
+            if key[0] == subject_type and key[1] == subject_id:
+                old = score.trusted_multiplier
+                score.trusted_multiplier = max(score.trusted_multiplier * factor, 0.1)
+                logger.warning(
+                    "FORCED DOWNGRADE: %s=%s reason=%s multiplier: %.3f → %.3f",
+                    subject_type, subject_id, reason, old, score.trusted_multiplier
+                )
+        self._propagate_downgrade(subject_id, factor)
