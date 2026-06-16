@@ -181,6 +181,15 @@ class TrustController:
         key = (subject_type, subject_id, domain, claim_type, horizon_class)
         return self._scores.get(key)
 
+    def get_sample_count(
+        self, subject_id: str, domain: str, claim_type: str = "general", horizon_class: str = "short"
+    ) -> int:
+        """Return the number of resolved predictions that back the trust score for this agent/domain."""
+        for key, score in self._scores.items():
+            if key[1] == subject_id and key[2] == domain and key[3] == claim_type and key[4] == horizon_class:
+                return score.n_resolved
+        return 0
+
     def force_downgrade(self, subject_id: str, subject_type: str, reason: str, factor: float = 0.5) -> None:
         """
         Forced downgrade — e.g., when a ground truth source is disqualified.
