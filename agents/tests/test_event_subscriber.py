@@ -23,7 +23,7 @@ def test_valid_envelope_dispatches():
     sub = EventSubscriber("pm-agent")
     received = []
     sub.on("research.insight.published", lambda e: received.append(e))
-    asyncio.get_event_loop().run_until_complete(sub.dispatch(make_valid_event()))
+    asyncio.run(sub.dispatch(make_valid_event()))
     assert len(received) == 1
 
 
@@ -32,15 +32,15 @@ def test_missing_field_raises():
     event = make_valid_event()
     del event["confidence_score"]
     with pytest.raises(ValueError, match="missing fields"):
-        asyncio.get_event_loop().run_until_complete(sub.dispatch(event))
+        asyncio.run(sub.dispatch(event))
 
 
 def test_invalid_confidence_raises():
     sub = EventSubscriber("pm-agent")
     with pytest.raises(ValueError, match="confidence_score"):
-        asyncio.get_event_loop().run_until_complete(sub.dispatch(make_valid_event(confidence_score=1.5)))
+        asyncio.run(sub.dispatch(make_valid_event(confidence_score=1.5)))
 
 
 def test_no_handler_does_not_raise():
     sub = EventSubscriber("pm-agent")
-    asyncio.get_event_loop().run_until_complete(sub.dispatch(make_valid_event(event_type="unknown.event")))
+    asyncio.run(sub.dispatch(make_valid_event(event_type="unknown.event")))
