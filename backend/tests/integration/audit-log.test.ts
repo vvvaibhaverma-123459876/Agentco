@@ -44,11 +44,12 @@ const BASE_ENTRY: AuditEntry = {
 };
 
 beforeAll(async () => {
-  // Clean slate: remove any rows from previous test runs so the chain starts fresh.
-  // Superuser + trigger disabled is required because decision_log is append-only for normal ops.
+  // The hash chain spans ALL decision_log rows, so any partial delete would break it.
+  // For a deterministic test we reset the whole chain to a clean slate.
+  // Superuser + triggers disabled is required because decision_log is append-only.
   await superDb.query('ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete');
   try {
-    await superDb.query(`DELETE FROM decision_log WHERE agent_id LIKE 'test-audit-%'`);
+    await superDb.query('DELETE FROM decision_log');
   } finally {
     await superDb.query('ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete');
   }

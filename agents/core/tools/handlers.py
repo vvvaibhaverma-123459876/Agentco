@@ -41,7 +41,7 @@ async def handle_audit_log(inp: dict[str, Any]) -> dict:
         if f not in inp:
             raise ValueError(f"audit_log tool: missing required field '{f}'")
 
-    import hashlib, crypto_compat  # use stdlib hashlib
+    import hashlib  # stdlib
     conn = _conn()
     conn.autocommit = True
     with conn.cursor() as cur:
