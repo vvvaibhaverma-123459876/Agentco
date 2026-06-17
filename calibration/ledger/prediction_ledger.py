@@ -76,8 +76,18 @@ class PredictionLedger:
     })
 
     def __init__(self, db=None):
-        self._db = db  # In production: asyncpg/psycopg2 connection pool
-        self._in_memory: dict[str, PredictionRecord] = {}  # dev fallback
+        # db is an optional psycopg2-style connection (must expose .cursor()).
+        # When present, pre-registrations are durably INSERTed into the
+        # prediction_ledger table; the DB triggers in 011_prediction_ledger.sql
+        # enforce immutability. _in_memory stays as a write-through cache so the
+        # record object handed to the Resolution Service keeps stable identity
+        # (the service mutates it in place); persist_resolution() mirrors the
+        # resolution columns back to the DB. With db=None, behaviour is the
+        # original pure in-memory dev fallback.
+        self._db = db
+        self._in_memory: dict[str, PredictionRecord] = {}
+        if self._db is not None:
+            self._load_from_db()
 
     def pre_register(self, reg: PredictionRegistration) -> str:
         """
@@ -120,8 +130,9 @@ class PredictionLedger:
             post_hoc=post_hoc,
         )
 
-        # In production: INSERT into prediction_ledger; DB enforces immutability
         self._in_memory[prediction_id] = record
+        if self._db is not None:
+            self._insert_record(record)
         logger.info(
             "PREDICTION REGISTERED: id=%s agent=%s domain=%s probability=%.3f post_hoc=%s",
             prediction_id, reg.producing_agent_id, reg.domain, reg.probability, post_hoc
@@ -142,6 +153,102 @@ class PredictionLedger:
 
     def list_all(self) -> list[PredictionRecord]:
         return list(self._in_memory.values())
+
+    def persist_resolution(self, record: PredictionRecord) -> None:
+        """
+        Mirror a record's resolution columns to the DB. The Resolution Service
+        mutates the cached record object in place; calling this writes those
+        resolution columns through to prediction_ledger. The connection must be
+        authenticated as the resolution_service role — the DB trigger enforces
+        role, write-once, and the time gate regardless of what app code does.
+        No-op when running with the in-memory fallback (db=None).
+        """
+        if self._db is None:
+            return
+        with self._db.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE prediction_ledger
+                   SET resolved = %s,
+                       resolved_outcome = %s,
+                       resolved_at = %s,
+                       resolved_by_service = %s,
+                       brier_score = %s,
+                       log_score = %s,
+                       was_surprise = %s
+                 WHERE prediction_id = %s
+                """,
+                (
+                    record.resolved, record.resolved_outcome, record.resolved_at,
+                    record.resolved_by_service, record.brier_score,
+                    record.log_score, record.was_surprise, record.prediction_id,
+                ),
+            )
+        self._commit()
+
+    # ------------------------------------------------------------------ DB I/O
+
+    def _insert_record(self, record: PredictionRecord) -> None:
+        with self._db.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO prediction_ledger
+                    (prediction_id, claim, probability, confidence_basis,
+                     producing_agent_id, producing_prompt_version, resolution_criterion,
+                     resolution_date, ground_truth_source, horizon_class, domain,
+                     claim_type, correlation_id, created_at, post_hoc)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    record.prediction_id, record.claim, record.probability,
+                    self._json(record.confidence_basis), record.producing_agent_id,
+                    record.producing_prompt_version, record.resolution_criterion,
+                    record.resolution_date, record.ground_truth_source,
+                    record.horizon_class, record.domain, record.claim_type,
+                    record.correlation_id, record.created_at, record.post_hoc,
+                ),
+            )
+        self._commit()
+
+    def _load_from_db(self) -> None:
+        """Hydrate the cache from the durable ledger on startup."""
+        with self._db.cursor() as cur:
+            cur.execute(
+                """
+                SELECT prediction_id, claim, probability, confidence_basis,
+                       producing_agent_id, producing_prompt_version, resolution_criterion,
+                       resolution_date, ground_truth_source, horizon_class, domain,
+                       claim_type, correlation_id, created_at, post_hoc,
+                       resolved, resolved_outcome, resolved_at, brier_score,
+                       log_score, was_surprise
+                  FROM prediction_ledger
+                """
+            )
+            for row in cur.fetchall():
+                rec = PredictionRecord(
+                    prediction_id=str(row[0]), claim=row[1], probability=float(row[2]),
+                    confidence_basis=row[3] or {}, producing_agent_id=row[4],
+                    producing_prompt_version=row[5], resolution_criterion=row[6],
+                    resolution_date=row[7], ground_truth_source=row[8],
+                    horizon_class=row[9], domain=row[10], claim_type=row[11],
+                    correlation_id=str(row[12]) if row[12] else None,
+                    created_at=row[13], post_hoc=row[14], resolved=row[15],
+                    resolved_outcome=row[16], resolved_at=row[17],
+                    brier_score=float(row[18]) if row[18] is not None else None,
+                    log_score=float(row[19]) if row[19] is not None else None,
+                    was_surprise=row[20],
+                )
+                self._in_memory[rec.prediction_id] = rec
+
+    @staticmethod
+    def _json(value: Any) -> str:
+        import json
+        return json.dumps(value)
+
+    def _commit(self) -> None:
+        commit = getattr(self._db, "commit", None)
+        if callable(commit):
+            self._db.commit()
 
     def _validate_registration(self, reg: PredictionRegistration) -> None:
         if not (0.0 <= reg.probability <= 1.0):
