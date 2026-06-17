@@ -123,5 +123,8 @@ class ResolutionService:
                     f"DISQUALIFIED SOURCE: '{ground_truth_source}' is internal. "
                     "Ground truth must originate outside the reasoning system."
                 )
-        # Predicting agent cannot resolve their own prediction
-        # (enforced at service layer; DB role enforces at data layer)
+        # Predicting agents cannot resolve their own predictions: this is enforced
+        # architecturally (agents have no handle to ResolutionService) and at the
+        # data layer (only the resolution_service DB role may write resolution
+        # columns — see 011_prediction_ledger.sql). resolve() itself takes no
+        # resolver identity, so there is no in-method producer check to perform here.

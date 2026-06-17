@@ -10,7 +10,6 @@ CONTRACT_VALUE_HUMAN_THRESHOLD = float(100000)
 class ContractAgent(BaseAgent):
     AGENT_ID = "contract-agent"
     DEPARTMENT = "legal"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "legal/contract"
     COMPETENCY_AREAS = ["contract_review", "contract_generation", "renewal_tracking", "obligation_monitoring"]
 

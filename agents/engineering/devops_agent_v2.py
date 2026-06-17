@@ -1,5 +1,5 @@
 """
-DevOps-Agent V2 — deployment and incident response. claude-sonnet-4-6.
+DevOps-Agent V2 — deployment and incident response.
 
 V2: pre-registers deployment success claims, uses trusted_confidence().
 Auto-rollback thresholds are hardcoded. Novel incidents → hard pause.
@@ -21,7 +21,6 @@ class DevOpsAgentV2(BaseAgentV2):
 
     AGENT_ID = "devops-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "engineering"
 
     # Hardcoded — cannot be configured via prompts or config

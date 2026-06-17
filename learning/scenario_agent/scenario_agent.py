@@ -42,7 +42,6 @@ class ScenarioAgent(BaseAgentV2):
 
     AGENT_ID = "scenario-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "learning"
 
     MAX_HYPOTHESES_PER_CYCLE = 5

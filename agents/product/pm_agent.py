@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class PMAgent(BaseAgent):
     AGENT_ID = "pm-agent"
     DEPARTMENT = "product"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "product/pm"
     COMPETENCY_AREAS = ["spec_generation", "stakeholder_synthesis", "sprint_planning", "changelog"]
 

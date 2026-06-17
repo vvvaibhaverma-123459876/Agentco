@@ -16,7 +16,6 @@ RUNWAY_ALERT_MONTHS = int(os.environ.get("CFO_RUNWAY_ALERT_MONTHS", "6"))
 class CFOAgent(BaseAgent):
     AGENT_ID = "cfo-agent"
     DEPARTMENT = "executive"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "executive/cfo"
     COMPETENCY_AREAS = ["financial_monitoring", "spend_approval", "forecasting", "runway"]
     AUTONOMY_LEVEL = "medium"

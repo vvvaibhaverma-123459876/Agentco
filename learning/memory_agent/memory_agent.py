@@ -42,7 +42,6 @@ class MemoryAgent(BaseAgentV2):
 
     AGENT_ID = "memory-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-haiku-4-5-20251001"   # high-frequency writes → Haiku
     DEPARTMENT = "learning"
 
     def __init__(self, calibration_engine: Optional[dict] = None):

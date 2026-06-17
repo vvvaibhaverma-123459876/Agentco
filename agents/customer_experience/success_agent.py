@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class SuccessAgent(BaseAgent):
     AGENT_ID = "success-agent"
     DEPARTMENT = "customer_experience"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "cx/success"
     COMPETENCY_AREAS = ["health_monitoring", "churn_intervention", "onboarding", "expansion"]
 

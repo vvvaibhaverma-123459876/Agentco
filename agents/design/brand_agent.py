@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class BrandAgent(BaseAgent):
     AGENT_ID = "brand-agent"
     DEPARTMENT = "design"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "design/brand"
     COMPETENCY_AREAS = ["design_system", "brand_compliance", "tone_of_voice"]
 

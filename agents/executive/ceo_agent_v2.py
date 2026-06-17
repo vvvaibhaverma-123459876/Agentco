@@ -1,5 +1,5 @@
 """
-CEO-Agent V2 — Strategic direction. claude-opus-4-8.
+CEO-Agent V2 — Strategic direction.
 
 V2 additions: pre-registers forward claims, uses trusted_confidence(),
 strategic pivots require human approval (unchanged from V1) + now also
@@ -21,7 +21,6 @@ class CEOAgentV2(BaseAgentV2):
 
     AGENT_ID = "ceo-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-opus-4-8"
     DEPARTMENT = "executive"
 
     def __init__(self, calibration_engine: Optional[dict] = None):

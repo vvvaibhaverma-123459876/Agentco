@@ -12,7 +12,6 @@ STRATEGIC_DEAL_THRESHOLD = float(os.environ.get("AE_STRATEGIC_DEAL_ARR", "100000
 class AEAgent(BaseAgent):
     AGENT_ID = "ae-agent"
     DEPARTMENT = "sales"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "sales/ae"
     COMPETENCY_AREAS = ["discovery", "proposals", "negotiation", "deal_analysis"]
 

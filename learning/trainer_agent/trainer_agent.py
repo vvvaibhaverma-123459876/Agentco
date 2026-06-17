@@ -27,7 +27,6 @@ class TrainerAgent(BaseAgentV2):
 
     AGENT_ID = "trainer-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "learning"
 
     # Minimum backtest improvement to include in proposal

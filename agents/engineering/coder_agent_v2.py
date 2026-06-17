@@ -1,5 +1,5 @@
 """
-Coder-Agent V2 — writes code, never merges. claude-sonnet-4-6.
+Coder-Agent V2 — writes code, never merges.
 
 V2: pre-registers code quality claims, uses trusted_confidence().
 CAN_MERGE = False is hardcoded. Scope changes require PM-Agent approval.
@@ -21,7 +21,6 @@ class CoderAgentV2(BaseAgentV2):
 
     AGENT_ID = "coder-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "engineering"
 
     CAN_MERGE = False   # Hardcoded. Reviewer-Agent is the sole merge authority.

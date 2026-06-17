@@ -121,6 +121,41 @@ class EscalationGate:
         )
         raise HumanApprovalRequired(override_id, risk_level, action_summary)
 
+    def route(self, reason: str, detail: str = "", risk_level: str = "medium") -> dict:
+        """
+        Escalate a non-action signal (e.g. repeated structured-output failure) to a human.
+
+        Used by the structured-output validate-and-retry layer: when a small model
+        cannot produce schema-valid output after MAX_RETRIES, the failure is itself a
+        signal — we record a pending human-review item rather than emit malformed output.
+        Returns a structured escalation result (never raises).
+        """
+        override_id = str(uuid.uuid4())
+        pending = PendingApproval(
+            override_id=override_id,
+            agent_id="<system>",
+            action_summary=f"{reason}: {detail}"[:500],
+            risk_level=risk_level,
+            trusted_confidence=0.0,
+            stated_confidence=0.0,
+            domain="system",
+            claim_type=reason,
+            payload={"reason": reason, "detail": detail},
+        )
+        self._pending[override_id] = pending
+        logger.warning(
+            "ESCALATION ROUTED: override_id=%s reason=%s risk=%s detail=%s",
+            override_id, reason, risk_level, detail[:200],
+        )
+        return {
+            "status": "escalated",
+            "escalated": True,
+            "override_id": override_id,
+            "reason": reason,
+            "detail": detail,
+            "risk_level": risk_level,
+        }
+
     def approve(self, override_id: str, approver_id: str) -> str:
         """Human approves a pending action. Returns approval token."""
         pending = self._pending.get(override_id)

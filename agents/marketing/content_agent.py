@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class ContentAgent(BaseAgent):
     AGENT_ID = "content-agent"
     DEPARTMENT = "marketing"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "marketing/content"
     COMPETENCY_AREAS = ["blog_writing", "email_copy", "product_copy", "seo_writing"]
 

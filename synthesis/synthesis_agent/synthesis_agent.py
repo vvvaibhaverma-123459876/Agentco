@@ -1,5 +1,5 @@
 """
-Synthesis-Agent — cross-domain pattern discovery. claude-opus-4-8.
+Synthesis-Agent — cross-domain pattern discovery.
 
 Reads principles from multiple domains and identifies cross-domain patterns.
 All synthesis outputs enter the Principle Library as provisional.
@@ -24,7 +24,6 @@ class SynthesisAgent(BaseAgentV2):
 
     AGENT_ID = "synthesis-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-opus-4-8"
     DEPARTMENT = "synthesis"
 
     def __init__(

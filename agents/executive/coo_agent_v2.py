@@ -1,5 +1,5 @@
 """
-COO-Agent V2 — Operations and execution. claude-sonnet-4-6.
+COO-Agent V2 — Operations and execution.
 
 V2: pre-registers operational targets, uses trusted_confidence() for risk decisions.
 Structural changes still require CEO-Agent approval (unchanged from V1).
@@ -20,7 +20,6 @@ class COOAgentV2(BaseAgentV2):
 
     AGENT_ID = "coo-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "executive"
 
     def __init__(self, calibration_engine: Optional[dict] = None):

@@ -10,7 +10,6 @@ from core.types import AgentOutput, RiskLevel
 class CEOAgent(BaseAgent):
     AGENT_ID = "ceo-agent"
     DEPARTMENT = "executive"
-    MODEL = "claude-opus-4-8"  # Highest capability — strategic reasoning
     MEMORY_NAMESPACE = "executive/ceo"
     COMPETENCY_AREAS = ["strategy", "goal_setting", "conflict_resolution", "board_reporting"]
     AUTONOMY_LEVEL = "high"

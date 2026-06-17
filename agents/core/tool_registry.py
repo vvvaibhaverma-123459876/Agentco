@@ -50,7 +50,7 @@ def register_tool(name: str, definition: dict, handler: Callable) -> None:
 
 
 def get_tools_for_agent(agent_id: str) -> list[dict]:
-    """Returns Anthropic tool definitions filtered to agent's permissions."""
+    """Returns tool definitions (OpenAI-compatible schema) filtered to agent permissions."""
     allowed = AGENT_TOOL_PERMISSIONS.get(agent_id, set())
     return [_TOOL_REGISTRY[t] for t in allowed if t in _TOOL_REGISTRY]
 

@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class COOAgent(BaseAgent):
     AGENT_ID = "coo-agent"
     DEPARTMENT = "executive"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "executive/coo"
     COMPETENCY_AREAS = ["orchestration", "okr_tracking", "dependency_resolution", "capacity_monitoring"]
     AUTONOMY_LEVEL = "high"

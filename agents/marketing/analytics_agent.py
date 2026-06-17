@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class AnalyticsAgent(BaseAgent):
     AGENT_ID = "analytics-agent"
     DEPARTMENT = "marketing"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "marketing/analytics"
     COMPETENCY_AREAS = ["attribution", "funnel_analysis", "data_quality", "dashboards"]
 

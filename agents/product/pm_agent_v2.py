@@ -1,5 +1,5 @@
 """
-PM-Agent V2 — product prioritization and scope approval. claude-sonnet-4-6.
+PM-Agent V2 — product prioritization and scope approval.
 
 V2: pre-registers feature delivery claims, uses trusted_confidence().
 Scope approvals for engineering agents go through escalation gate.
@@ -20,7 +20,6 @@ class PMAgentV2(BaseAgentV2):
 
     AGENT_ID = "pm-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "product"
 
     def __init__(self, calibration_engine: Optional[dict] = None):

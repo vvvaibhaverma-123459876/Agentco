@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class VoiceAgent(BaseAgent):
     AGENT_ID = "voice-agent"
     DEPARTMENT = "customer_experience"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "cx/voice"
     COMPETENCY_AREAS = ["transcript_analysis", "pain_point_synthesis", "voc_reporting"]
 

@@ -293,7 +293,7 @@ class TestTrustController:
         tc.ingest_resolution(record)
         score = tc.get_score("pm-agent", "agent", record.domain, record.claim_type, record.horizon_class)
         assert score is not None
-        assert score.sample_count == 1
+        assert score.n_resolved == 1
 
     def test_post_hoc_resolution_not_ingested(self):
         tc = TrustController()

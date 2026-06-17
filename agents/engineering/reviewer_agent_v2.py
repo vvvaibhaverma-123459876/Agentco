@@ -1,5 +1,5 @@
 """
-Reviewer-Agent V2 — sole merge authority. claude-sonnet-4-6.
+Reviewer-Agent V2 — sole merge authority.
 
 V2: pre-registers safety claims, uses trusted_confidence().
 IS_SOLE_MERGE_AUTHORITY = True hardcoded. Zero tolerance for critical vulns.
@@ -20,7 +20,6 @@ class ReviewerAgentV2(BaseAgentV2):
 
     AGENT_ID = "reviewer-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "engineering"
 
     IS_SOLE_MERGE_AUTHORITY = True

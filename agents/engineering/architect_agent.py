@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class ArchitectAgent(BaseAgent):
     AGENT_ID = "architect-agent"
     DEPARTMENT = "engineering"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "engineering/architect"
     COMPETENCY_AREAS = ["system_design", "adr", "tech_debt", "standards"]
 

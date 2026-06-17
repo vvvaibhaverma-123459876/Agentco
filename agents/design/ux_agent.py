@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class UXAgent(BaseAgent):
     AGENT_ID = "ux-agent"
     DEPARTMENT = "design"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "design/ux"
     COMPETENCY_AREAS = ["user_flows", "wireframing", "accessibility", "design_handoff"]
 

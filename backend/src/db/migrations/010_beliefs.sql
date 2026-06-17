@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS beliefs (
     domain             TEXT NOT NULL,
     claim_type         TEXT NOT NULL DEFAULT 'general',
     validation_status  TEXT NOT NULL DEFAULT 'provisional'
-                           CHECK (validation_status IN ('provisional','simulation_supported','reality_validated','quarantined')),
+                           CHECK (validation_status IN ('provisional','simulation_supported','reality_validated','quarantined','retired')),
     sim_support_count  INTEGER NOT NULL DEFAULT 0,
     reality_prediction_ids UUID[] NOT NULL DEFAULT '{}',  -- prediction_ids that backed promotion
     promoted_at        TIMESTAMPTZ,                        -- when reality_validated was reached

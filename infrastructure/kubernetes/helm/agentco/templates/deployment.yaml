@@ -124,12 +124,14 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-            # Sensitive values from the pre-existing secret
-            - name: ANTHROPIC_API_KEY
+            # LLM endpoint (OpenAI-compatible; Ollama by default, no cloud key needed)
+            - name: LLM_BASE_URL
+              value: {{ .Values.backend.llmBaseUrl | default "http://ollama:11434/v1" | quote }}
+            - name: LLM_API_KEY
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
-                  key: ANTHROPIC_API_KEY
+                  key: LLM_API_KEY
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

@@ -10,7 +10,6 @@ HEALTH_SCORE_CHURN_THRESHOLD = 40  # below this fires churn risk event
 class RevOpsAgent(BaseAgent):
     AGENT_ID = "revops-agent"
     DEPARTMENT = "sales"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "sales/revops"
     COMPETENCY_AREAS = ["pipeline_analytics", "revenue_forecasting", "churn_detection"]
 

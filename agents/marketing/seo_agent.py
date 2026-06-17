@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class SEOAgent(BaseAgent):
     AGENT_ID = "seo-agent"
     DEPARTMENT = "marketing"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "marketing/seo"
     COMPETENCY_AREAS = ["keyword_research", "technical_seo", "content_gap_analysis"]
 

@@ -8,7 +8,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class PerformanceAgent(BaseAgent):
     AGENT_ID = "performance-agent"
     DEPARTMENT = "people_ops"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "people_ops/performance"
     COMPETENCY_AREAS = ["metrics_monitoring", "anomaly_detection", "recommendations"]
 

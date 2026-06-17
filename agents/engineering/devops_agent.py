@@ -15,7 +15,6 @@ MEMORY_THRESHOLD = float(os.environ.get("DEVOPS_MEMORY_THRESHOLD", "0.90"))  # 9
 class DevOpsAgent(BaseAgent):
     AGENT_ID = "devops-agent"
     DEPARTMENT = "engineering"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "engineering/devops"
     COMPETENCY_AREAS = ["deployment", "monitoring", "incident_response", "rollback"]
 

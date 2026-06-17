@@ -9,7 +9,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Optional
 
-import anthropic
+from runtime.base_agent.llm_client import make_client
+from runtime.base_agent.model_tiers import model_for
 
 from .confidence_scorer import compute_risk_level, validate_confidence_attached
 from .types import (
@@ -40,7 +41,9 @@ class BaseAgent(ABC):
 
     AGENT_ID: str = ""
     DEPARTMENT: str = ""
-    MODEL: str = "claude-sonnet-4-6"
+    # MODEL is resolved from the local model-tier map (model_for(AGENT_ID)) unless
+    # a subclass overrides it. No cloud model ids are hardcoded anywhere.
+    MODEL: str = ""
     MEMORY_NAMESPACE: str = ""
     COMPETENCY_AREAS: list[str] = []
     AUTONOMY_LEVEL: str = "medium"
@@ -49,7 +52,10 @@ class BaseAgent(ABC):
         if not self.AGENT_ID:
             raise ValueError(f"{self.__class__.__name__} must define AGENT_ID")
 
-        self.client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+        # Local-first LLM client (Ollama / any OpenAI-compatible endpoint).
+        # Model resolves from the tier map unless the subclass sets MODEL.
+        self.client = make_client()
+        self.model = self.MODEL or model_for(self.AGENT_ID)
         self.session_id = str(uuid.uuid4())
         self.lifecycle_state = AgentLifecycle.PRODUCTION
 
@@ -69,7 +75,7 @@ class BaseAgent(ABC):
 
     @abstractmethod
     def get_tools(self) -> list[dict]:
-        """Return Anthropic tool definitions available to this agent."""
+        """Return tool definitions (OpenAI-compatible schema) available to this agent."""
 
     @abstractmethod
     async def execute_task(self, task: dict[str, Any]) -> AgentOutput:
@@ -108,29 +114,34 @@ class BaseAgent(ABC):
         tools: Optional[list[dict]] = None,
         max_tokens: int = 4096,
     ) -> str:
-        """Single LLM call with tool support."""
+        """Single LLM call with tool support (OpenAI-compatible / Ollama)."""
+        chat_messages = [{"role": "system", "content": self.get_system_prompt()}] + messages
         kwargs: dict[str, Any] = {
-            "model": self.MODEL,
+            "model": self.model,
             "max_tokens": max_tokens,
-            "system": self.get_system_prompt(),
-            "messages": messages,
+            "messages": chat_messages,
         }
         if tools:
             kwargs["tools"] = tools
 
-        response = self.client.messages.create(**kwargs)
+        response = self.client.chat.completions.create(**kwargs)
+        choice = response.choices[0].message
 
-        # Handle tool use blocks
-        for block in response.content:
-            if block.type == "tool_use":
-                tool_result = await self._execute_tool(block.name, block.input)
-                messages = messages + [
-                    {"role": "assistant", "content": response.content},
-                    {"role": "user", "content": [{"type": "tool_result", "tool_use_id": block.id, "content": str(tool_result)}]},
-                ]
-                return await self.llm_call(messages, tools, max_tokens)
+        # Handle tool calls (OpenAI-style)
+        tool_calls = getattr(choice, "tool_calls", None)
+        if tool_calls:
+            follow_up = messages + [choice.model_dump()]
+            for call in tool_calls:
+                args = json.loads(call.function.arguments or "{}")
+                tool_result = await self._execute_tool(call.function.name, args)
+                follow_up.append({
+                    "role": "tool",
+                    "tool_call_id": call.id,
+                    "content": str(tool_result),
+                })
+            return await self.llm_call(follow_up, tools, max_tokens)
 
-        return response.content[0].text if response.content else ""
+        return choice.content or ""
 
     # ──────────────────────────────────────────────────────────────
     # Trust evaluation of incoming signals

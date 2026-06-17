@@ -10,7 +10,6 @@ SENTIMENT_ALERT_THRESHOLD = -0.3  # fires cx.sentiment.alert below this
 class SupportAgent(BaseAgent):
     AGENT_ID = "support-agent"
     DEPARTMENT = "customer_experience"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "cx/support"
     COMPETENCY_AREAS = ["ticket_triage", "tier1_resolution", "bug_identification", "sla_monitoring"]
 

@@ -41,7 +41,7 @@ class TrustScore:
     stated_to_real: dict[str, float] = field(default_factory=dict)  # bin -> realised accuracy
     trusted_multiplier: float = 1.0
     ece: float = 0.0
-    sample_count: int = 0
+    n_resolved: int = 0
     last_reality_contact: Optional[datetime] = None
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -75,13 +75,13 @@ class TrustController:
         key = (subject_type, subject_id, domain, claim_type, horizon_class)
         score = self._scores.get(key)
 
-        if score is None or score.sample_count < self.MIN_SAMPLES_FOR_TRUST:
+        if score is None or score.n_resolved < self.MIN_SAMPLES_FOR_TRUST:
             # Insufficient track record — apply a conservative penalty
-            penalty = 0.8 if score is None else (0.8 + 0.04 * min(score.sample_count, 5))
+            penalty = 0.8 if score is None else (0.8 + 0.04 * min(score.n_resolved, 5))
             trusted = stated * penalty
             logger.debug(
                 "TRUST: %s/%s insufficient track record (n=%d) — applying %.0f%% penalty → trusted=%.3f",
-                subject_id, domain, score.sample_count if score else 0, penalty * 100, trusted
+                subject_id, domain, score.n_resolved if score else 0, penalty * 100, trusted
             )
             return round(min(max(trusted, 0.0), 1.0), 4)
 
@@ -122,24 +122,26 @@ class TrustController:
         # Update reliability bin
         bin_key = f"{min(int(record.probability * 10) / 10, 0.9):.1f}"
         old_realised = score.stated_to_real.get(bin_key, record.probability)
-        n = score.sample_count
+        n = score.n_resolved
         # Incremental mean update
         score.stated_to_real[bin_key] = (old_realised * n + (1.0 if record.resolved_outcome else 0.0)) / (n + 1)
-        score.sample_count += 1
+        score.n_resolved += 1
         score.last_reality_contact = datetime.now(timezone.utc)
         score.updated_at = datetime.now(timezone.utc)
+
+        # Capture multiplier BEFORE recompute so we can detect a real drop.
+        was = score.trusted_multiplier
 
         # Recompute trusted_multiplier from ECE trend
         self._recompute_multiplier(score)
 
         # Propagate downgrade if multiplier dropped significantly
-        was = score.trusted_multiplier
         if was - score.trusted_multiplier > 0.05:
             self._propagate_downgrade(record.producing_agent_id, score.trusted_multiplier)
 
         logger.info(
             "TRUST UPDATE: agent=%s domain=%s n=%d multiplier=%.3f ece=%.4f",
-            record.producing_agent_id, record.domain, score.sample_count,
+            record.producing_agent_id, record.domain, score.n_resolved,
             score.trusted_multiplier, score.ece
         )
 

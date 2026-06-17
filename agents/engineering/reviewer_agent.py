@@ -8,7 +8,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class ReviewerAgent(BaseAgent):
     AGENT_ID = "reviewer-agent"
     DEPARTMENT = "engineering"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "engineering/reviewer"
     COMPETENCY_AREAS = ["code_review", "security_scanning", "test_coverage", "merge_approval"]
 

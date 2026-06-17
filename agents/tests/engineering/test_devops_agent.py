@@ -3,6 +3,7 @@ import pytest
 import asyncio
 from unittest.mock import AsyncMock, patch
 from core.types import RiskLevel
+from runtime.base_agent.model_tiers import model_for
 
 
 @pytest.mark.asyncio
@@ -10,7 +11,7 @@ async def test_deploy_without_reviewer_approval_blocked():
     from engineering.devops_agent import DevOpsAgent
     agent = DevOpsAgent.__new__(DevOpsAgent)
     agent.AGENT_ID = "devops-agent"
-    agent.MODEL = "claude-sonnet-4-6"
+    agent.model = model_for(agent.AGENT_ID)
     agent.session_id = "test"
 
     result = await agent._deploy({"reviewer_approved": False})
@@ -23,7 +24,7 @@ async def test_rollback_triggered_by_error_rate():
     from engineering.devops_agent import DevOpsAgent
     agent = DevOpsAgent.__new__(DevOpsAgent)
     agent.AGENT_ID = "devops-agent"
-    agent.MODEL = "claude-sonnet-4-6"
+    agent.model = model_for(agent.AGENT_ID)
     agent.session_id = "test"
     agent.client = None
 
@@ -47,7 +48,7 @@ async def test_no_rollback_when_metrics_healthy():
     from engineering.devops_agent import DevOpsAgent
     agent = DevOpsAgent.__new__(DevOpsAgent)
     agent.AGENT_ID = "devops-agent"
-    agent.MODEL = "claude-sonnet-4-6"
+    agent.model = model_for(agent.AGENT_ID)
     agent.session_id = "test"
     agent.publish_event = AsyncMock()
 

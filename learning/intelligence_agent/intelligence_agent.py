@@ -42,7 +42,6 @@ class IntelligenceAgent(BaseAgentV2):
 
     AGENT_ID = "intelligence-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-sonnet-4-6"
     DEPARTMENT = "learning"
 
     def __init__(self, calibration_engine: Optional[dict] = None):
