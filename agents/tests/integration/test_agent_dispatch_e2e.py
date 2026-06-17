@@ -66,12 +66,22 @@ def _ensure_prediction_ledger(c):
     from pathlib import Path
     with c.cursor() as cur:
         cur.execute("SELECT to_regclass('public.prediction_ledger')")
+        root = Path(__file__).resolve().parents[3]
         if cur.fetchone()[0] is None:
-            migration = (
-                Path(__file__).resolve().parents[3]
-                / "backend" / "src" / "db" / "migrations" / "011_prediction_ledger.sql"
-            )
+            migration = root / "backend" / "src" / "db" / "migrations" / "011_prediction_ledger.sql"
             cur.execute(migration.read_text())
+            # Reserve extension adds hardness + consequence columns (required by _insert_record).
+            reserve_ext = root / "reserve" / "migrations" / "001_reserve_extension.sql"
+            cur.execute(reserve_ext.read_text())
+        else:
+            # Table exists but may be missing hardness column (e.g. created by an older fixture).
+            cur.execute(
+                "SELECT 1 FROM information_schema.columns "
+                "WHERE table_name='prediction_ledger' AND column_name='hardness'"
+            )
+            if cur.fetchone() is None:
+                reserve_ext = root / "reserve" / "migrations" / "001_reserve_extension.sql"
+                cur.execute(reserve_ext.read_text())
 
 
 @pytest.fixture(scope="module")

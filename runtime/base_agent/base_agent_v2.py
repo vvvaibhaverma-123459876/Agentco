@@ -90,6 +90,8 @@ class BaseAgentV2:
         self._trust = self._cal.get("trust")
         self._resolution = self._cal.get("resolution")
         self._audit_log: list[AuditEntryV2] = []
+        # Reserve engine — wired lazily when a DB-backed ledger is present.
+        self._reserve = None
 
         from runtime.confidence.confidence_v2 import ConfidenceV2
         from runtime.escalation.escalation_gate import EscalationGate
@@ -147,6 +149,36 @@ class BaseAgentV2:
             self.agent_id, prediction_id, probability, claim[:80]
         )
         return prediction_id
+
+    def refresh_reserve_credential(self):
+        """
+        Recompute and persist a Proof-of-Calibration credential for this agent
+        from their current resolved prediction_ledger rows.
+
+        Returns the credential, or None if no DB-backed ledger is wired.
+        Requires the Reserve schema (001_reserve_extension.sql) to be applied.
+        """
+        if self._ledger is None or getattr(self._ledger, "_db", None) is None:
+            logger.warning(
+                "BaseAgentV2(%s): no DB-backed ledger wired; cannot issue Reserve credential",
+                self.agent_id,
+            )
+            return None
+        if self._reserve is None:
+            try:
+                from reserve import create_reserve_engine
+                self._reserve = create_reserve_engine(
+                    ledger=self._ledger, db=self._ledger._db
+                )
+            except Exception as exc:
+                logger.warning("BaseAgentV2(%s): Reserve not available — %s", self.agent_id, exc)
+                return None
+        cred = self._reserve.refresh_credential(self.agent_id)
+        logger.info(
+            "RESERVE CREDENTIAL ISSUED: agent=%s credential=%s sample_count=%d overall_log=%.4f",
+            self.agent_id, cred.credential_id, cred.sample_count, cred.overall_log_score,
+        )
+        return cred
 
     def act(self, messages: list[dict], schema: Optional[dict] = None) -> dict:
         """

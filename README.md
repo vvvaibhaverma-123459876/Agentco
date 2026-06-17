@@ -231,4 +231,71 @@ cd backend && SUPERUSER_DATABASE_URL='postgresql://postgres:password@localhost:5
 
 ---
 
+## Epistemic Reserve
+
+The Epistemic Reserve is a standalone settlement layer built on top of AgentCo's
+`calibration/` engine. Its governing invariant: **only demonstrated, externally-resolved
+contact with reality earns calibration credit.** No operator discretion over any score,
+ever. Every credential is independently recomputable from the public prediction ledger.
+
+AgentCo's agents are the first participants.
+
+### Reserve currency
+
+`stake_weight = max(0, exp(cell_log_score) − 0.5)`
+
+- Agents scoring above the random-binary baseline earn positive weight.
+- Agents at or below baseline earn 0.
+- Fresh identities (no resolved predictions) earn 0.
+- Weight is non-transferable and non-forgeable (bound to `agent_id` via HMAC).
+
+### Three Phases — all proven against real Postgres (14/14 tests)
+
+| Phase | Deliverable | Core property proven |
+|---|---|---|
+| 1 — Proof-of-Calibration | Signed credential vector per (domain × horizon) | Deterministic; non-transferable; independently recomputable |
+| 2 — Staking + Weighted Decision | Belief market; outcome = weighted majority | Reality-Contact Weight Bound (RCWB): Sybil agents earn weight=0 |
+| 3 — Recursive Resolution | Credentialed oracles; self-correcting via contradiction | Mechanical ground truth is bedrock; contradicted oracle loses standing |
+
+### Scoring algorithm (published — anyone may recompute)
+
+```
+hardness(p)     = 2 · p · (1 − p)                          # ∈ [0, 0.5]
+weight(p, c)    = hardness(p) · (2 if consequence else 1)   # consequence doubles credit
+log_score(p, o) = log(p) if o else log(1−p)                 # clipped ε
+brier(p, o)     = (p − o)²
+
+cell_log_score  = Σ(weight · log_score) / Σweight
+
+credential HMAC = HMAC-SHA256(canonical_json, RESERVE_SIGNING_KEY)
+stake_weight    = max(0, exp(cell_log_score) − 0.5)
+```
+
+### Reserve test suite
+
+```bash
+AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5433/agentco?host=/tmp \
+  python3 -m pytest reserve/tests/ -v
+# Expected: 14 passed (Phase 1: 4, Phase 2: 5, Phase 3: 5)
+```
+
+Acceptance traces:
+- [`evals/acceptance/proof_of_calibration_trace.md`](evals/acceptance/proof_of_calibration_trace.md) — Phase 1
+- [`evals/acceptance/staking_and_decisions_trace.md`](evals/acceptance/staking_and_decisions_trace.md) — Phase 2
+- [`evals/acceptance/oracle_layer_trace.md`](evals/acceptance/oracle_layer_trace.md) — Phase 3
+
+### Collusion-Resistance Property: Reality-Contact Weight Bound (RCWB)
+
+> The total voting weight a coalition of k agents can contribute is bounded by
+> Σᵢ max(0, exp(cell_log_score_i) − 0.5), where each term is derived solely from
+> that agent's independently verified, externally-resolved prediction history.
+> Creating Sybil identities contributes weight=0 per identity — no resolved
+> predictions means no cell, means no weight.
+
+Proven structurally in `reserve/staking/staking.py` and demonstrated by test 2 of
+`reserve/tests/test_staking_and_decisions.py`: 10 zero-weight agents cannot override
+1 credentialed agent.
+
+---
+
 *V2 · Calibrated Epistemic Architecture · Local-Model Edition*

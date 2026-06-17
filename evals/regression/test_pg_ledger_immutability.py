@@ -53,10 +53,18 @@ def _admin_conn():
 def pg():
     """Apply the migration and create the app / resolution_service roles."""
     admin = _admin_conn()
+    reserve_ext = (
+        Path(__file__).resolve().parents[2]
+        / "reserve" / "migrations" / "001_reserve_extension.sql"
+    )
     with admin.cursor() as cur:
         # Clean slate so the suite is repeatable.
+        cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE;")
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE;")
         cur.execute(MIGRATION.read_text())
+        # Reserve extension adds hardness + consequence columns (required by _insert_record).
+        cur.execute(reserve_ext.read_text())
 
         # An ordinary application writer: gets only PUBLIC privileges, so the
         # REVOKE DELETE/UPDATE FROM PUBLIC actually bites (the table owner would
@@ -79,6 +87,8 @@ def pg():
         )
     yield admin
     with admin.cursor() as cur:
+        cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE;")
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE;")
     admin.close()
 

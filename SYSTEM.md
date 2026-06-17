@@ -43,6 +43,13 @@ Layer 3 — Cross-Domain Synthesis      synthesis/
   Theory Engine
 
 Layer 4 — Digital Twin + Governor UI  simulation/ + dashboard/
+
+Layer 5 — Epistemic Reserve             reserve/
+  Scoring Function (deterministic)      reserve/scoring/
+  Proof-of-Calibration Credential       reserve/credentials/
+  Staking + Weighted Decision           reserve/staking/ + reserve/decisions/
+  Recursive Resolution (oracles)        reserve/oracle/
+  Schema migrations                     reserve/migrations/
 ```
 
 ## Key Data Flows
@@ -76,6 +83,34 @@ BaseAgentV2.execute_action(action)
   → EscalationGate.check_and_gate()  [block if risk≥high or trusted_conf<0.50]
   → emit signed envelope with producer_prompt_version
   → write immutable audit entry
+```
+
+## Epistemic Reserve Data Flows
+
+**Proof-of-Calibration issuance:**
+```
+score_agent(ledger.list_by_agent(agent_id))
+  → ReserveScore per (domain × horizon) cell
+  → issue_credential(score, last_contacts)   [HMAC-signed, non-transferable]
+  → persist_credential(cred, db)             [append-only calibration_credentials]
+```
+
+**Belief market resolution:**
+```
+register_question()
+  → place_stake(agent, credential, position)  [weight = max(0, exp(log_score) − 0.5)]
+  → resolve_question(stakes)                  [weighted majority; sybil_filtered_count auditable]
+  → persist_decision(decision, db)
+```
+
+**Oracle contradiction chain:**
+```
+resolve_as_oracle(pred, outcome, credential)  [authority = stake_weight; round=0]
+  → [if stronger source contradicts]
+  → resolve_as_oracle/mechanical(…, prior_resolution_id)  [round N+1]
+  → _mark_contradicted(prior)
+  → _record_standing_event(prior.agent, standing_delta = −PENALTY × authority)
+  # Mechanical source = bedrock; cannot be contradicted
 ```
 
 ## Acceptance Test (§7 — must always pass)
