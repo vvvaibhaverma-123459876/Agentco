@@ -41,6 +41,8 @@ def fresh_table():
             "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='resolution_service') "
             "THEN CREATE ROLE resolution_service LOGIN PASSWORD 'test'; END IF; END $$;"
         )
+        # PG15+ requires explicit schema USAGE for non-owner roles to see the table.
+        cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
     yield admin
     with admin.cursor() as cur:

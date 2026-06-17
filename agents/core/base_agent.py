@@ -11,6 +11,7 @@ from typing import Any, Optional
 
 from runtime.base_agent.llm_client import make_client
 from runtime.base_agent.model_tiers import model_for
+from .tools import register_all_tools
 
 from .confidence_scorer import compute_risk_level, validate_confidence_attached
 from .types import (
@@ -57,6 +58,8 @@ class BaseAgent(ABC):
         self.client = make_client()
         self.model = self.MODEL or model_for(self.AGENT_ID)
         self.session_id = str(uuid.uuid4())
+        # Register real tool handlers on first agent instantiation
+        register_all_tools()
         self.lifecycle_state = AgentLifecycle.PRODUCTION
 
         # Lazy imports to avoid circular deps at module level
@@ -174,38 +177,81 @@ class BaseAgent(ABC):
     # ──────────────────────────────────────────────────────────────
 
     async def _write_audit(self, task: dict, output: AgentOutput) -> None:
-        entry = AuditEntry(
-            agent_id=self.AGENT_ID,
-            action_type=ActionType.DECISION,
-            input_summary=json.dumps(task)[:500],
-            output_summary=str(output.content)[:500],
-            confidence_score=output.confidence_score,
-            risk_level=output.risk_level,
-            human_approved=output.requires_human_approval,
-            session_id=self.session_id,
-        )
-        logger.info("[AUDIT] %s: %s (confidence=%.2f, risk=%s)", self.AGENT_ID, entry.action_type, entry.confidence_score, entry.risk_level)
-        # In production: POST to audit log service
-        # await self._audit_log.append(entry)
+        from .tools.handlers import handle_audit_log
+        logger.info("[AUDIT] %s: %s (confidence=%.2f, risk=%s)",
+                    self.AGENT_ID, ActionType.DECISION, output.confidence_score, output.risk_level)
+        try:
+            await handle_audit_log({
+                "agent_id": self.AGENT_ID,
+                "action_type": ActionType.DECISION,
+                "input_summary": json.dumps(task)[:500],
+                "output_summary": str(output.content)[:500],
+                "confidence_score": output.confidence_score,
+                "risk_level": output.risk_level,
+                "human_approved": output.requires_human_approval,
+                "session_id": self.session_id,
+            })
+        except Exception as e:
+            logger.error("[AUDIT_FAILURE] %s: %s", self.AGENT_ID, e)
 
     async def _request_human_approval(self, task: dict, output: AgentOutput) -> None:
-        req = OverrideRequest(
-            agent_id=self.AGENT_ID,
-            action=task.get("type", "unknown"),
-            risk_score=output.confidence_score,
-            context={"task": task, "rationale": output.rationale, "escalation_reason": output.escalation_reason},
-        )
-        logger.warning("[OVERRIDE] %s requires human approval: %s", self.AGENT_ID, req.request_id)
-        # In production: POST to override queue; PAUSE until response received
-        # await self._override_queue.enqueue(req)
+        from .tools.handlers import handle_human_override
+        try:
+            result = await handle_human_override({
+                "agent_id": self.AGENT_ID,
+                "action": task.get("type", "unknown"),
+                "risk_level": output.risk_level,
+                "risk_score": output.confidence_score,
+                "context": {
+                    "task": task,
+                    "rationale": output.rationale,
+                    "escalation_reason": output.escalation_reason,
+                },
+            })
+            logger.warning("[OVERRIDE] %s queued request_id=%s — action BLOCKED",
+                           self.AGENT_ID, result.get("request_id"))
+        except Exception as e:
+            logger.error("[OVERRIDE_FAILURE] %s: %s", self.AGENT_ID, e)
 
     async def publish_event(self, event: AgentEvent) -> None:
         validate_confidence_attached({"confidence_score": event.confidence_score})
         logger.info("[EVENT] %s published %s (risk=%s)", self.AGENT_ID, event.event_type, event.risk_level)
-        # In production: await self._event_bus.publish(event)
+        from .tools.handlers import handle_event_bus
+        try:
+            await handle_event_bus({
+                "event_id": event.event_id,
+                "event_type": event.event_type,
+                "producer_agent_id": self.AGENT_ID,
+                "payload": event.payload if isinstance(event.payload, dict) else {"data": str(event.payload)},
+                "confidence_score": event.confidence_score,
+                "risk_level": event.risk_level,
+                "requires_ack": event.requires_ack if hasattr(event, "requires_ack") else False,
+                "correlation_id": event.correlation_id if hasattr(event, "correlation_id") else None,
+            })
+        except Exception as e:
+            logger.error("[EVENT_PUBLISH_FAILURE] %s: %s", self.AGENT_ID, e)
 
     async def _execute_tool(self, tool_name: str, tool_input: dict) -> Any:
         logger.info("[TOOL] %s calling %s", self.AGENT_ID, tool_name)
-        # Tool registry resolves and executes; returns result
-        # In production: return await self._tool_registry.execute(self.AGENT_ID, tool_name, tool_input)
-        return {"status": "ok", "tool": tool_name, "input": tool_input}
+        from .tool_registry import execute_tool
+        # Inject agent_id so handlers can use it without trusting the LLM's input
+        enriched = {**tool_input, "agent_id": self.AGENT_ID}
+        try:
+            return await execute_tool(self.AGENT_ID, tool_name, enriched)
+        except PermissionError as e:
+            logger.warning("[TOOL_DENIED] %s → %s: %s", self.AGENT_ID, tool_name, e)
+            # Write a real audit entry for the denied attempt
+            try:
+                from .tools.handlers import handle_audit_log
+                await handle_audit_log({
+                    "agent_id": self.AGENT_ID,
+                    "action_type": "decision",
+                    "input_summary": f"TOOL_DENIED: {tool_name}",
+                    "output_summary": str(e)[:500],
+                    "confidence_score": 0.0,
+                    "risk_level": "high",
+                    "session_id": self.session_id,
+                })
+            except Exception:
+                pass
+            raise

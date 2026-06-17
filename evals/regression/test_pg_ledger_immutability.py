@@ -67,6 +67,11 @@ def pg():
                 f"IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='{role}') THEN "
                 f"CREATE ROLE {role} LOGIN PASSWORD 'test'; END IF; END $$;"
             )
+        # PG15+ no longer grants schema-level privileges to non-owner roles by
+        # default, so a bare GRANT on the table is not enough — the role also needs
+        # USAGE on the schema to resolve the relation name at all.
+        for role in ("ledger_app_writer", "resolution_service"):
+            cur.execute(f"GRANT USAGE ON SCHEMA public TO {role};")
         cur.execute("GRANT INSERT, SELECT ON prediction_ledger TO ledger_app_writer;")
         # resolution_service is the only role allowed to write resolution columns.
         cur.execute(

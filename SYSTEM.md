@@ -9,7 +9,7 @@
 5. **Decisions run on trusted confidence, not stated confidence.** `TrustController.trusted_confidence()` is the only function that may produce a confidence value used in a decision. Stated confidence is an input, not an output.
 6. **Human-approval gates block execution.** No auto-approve on timeout. `HumanApprovalRequired` must be resolved by a human. The action does not proceed otherwise.
 7. **All outputs carry confidence scores.** Every event envelope must include `confidence_score`, `risk_level`, `producer_prompt_version`, and a valid HMAC signature. The event bus rejects envelopes missing any of these.
-8. **100% immutable audit log.** `decision_log` has `REVOKE UPDATE, DELETE`. The audit-log service chain-hashes entries with SHA-256.
+8. **100% immutable audit log.** `decision_log` is append-only, enforced by `BEFORE UPDATE`/`BEFORE DELETE` triggers that raise unconditionally (migration `014` — `REVOKE` alone is insufficient because the table owner/superuser bypasses it). The audit-log service chain-hashes entries with SHA-256 over a canonical row form; `verifyChainIntegrity()` re-derives the chain from the DB and detects any tampering. Proven by `backend/tests/integration/audit-log.test.ts`.
 9. **Config-Agent cannot modify its own prompt.** `EVERY_ACTION_REQUIRES_HUMAN_APPROVAL = True` is hardcoded.
 10. **Ground truth must originate outside the reasoning system.** Internal sources (`self`, `internal`, `simulation`, `agent`, `agentco_system`, `twin`, `sandbox`) are disqualified from backing calibration scores.
 

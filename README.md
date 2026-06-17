@@ -180,6 +180,55 @@ cd agents && pytest ../calibration ../runtime ../learning ../synthesis -v
 | Internal ground truth sources rejected | `TestInvariant10_GroundTruthExternal` |
 | All outputs carry confidence + HMAC signature | `TestInvariant7_AllOutputsCarryConfidence` |
 
+## Real-Infrastructure Integration Status (Phase 1)
+
+Every component below is backed by a test that exercises it against a **real**
+dependency (real Postgres / real Kafka / real pgvector). A component is only
+marked **Proven** when such a test passes; tests against mocks do not count.
+
+| # | Component | Status | Real dependency proven | Test |
+|---|---|---|---|---|
+| 1 | Audit Log | ✅ Proven | Postgres append-only writes, SHA-256 hash chain, tamper detection, UPDATE/DELETE rejected by trigger | `backend/tests/integration/audit-log.test.ts` (8) |
+| 2 | Prediction Ledger | ✅ Proven | Postgres durable INSERT, cache hydration, immutable pre-reg columns, write-once + role-gated + time-gated resolution | `evals/regression/test_pg_ledger_immutability.py`, `test_pg_ledger_persistence.py` (8) |
+| 3 | Event Bus | ✅ Proven | Kafka produce/consume, HMAC sign+verify, idempotent `event_history` persist | `backend/tests/integration/event-bus.test.ts` (7) |
+| 4 | Memory Store | ✅ Proven | Postgres namespaced read/write, TTL expiry, namespace isolation, pgvector + full-text shared knowledge, writer gating | `backend/tests/integration/memory-store.test.ts` (6) |
+| 5 | Override Queue | ✅ Proven | Postgres persistence, SLA expiry → `expired` (never auto-approve), write-once resolution | `backend/tests/integration/override-queue.test.ts` (7) |
+| 6 | Tool Execution + Permissions | ✅ Proven | Runtime permission enforcement, real DB side-effect on permitted call, denial audited to Postgres before handler runs | `agents/tests/integration/test_tool_execution_real.py` (3) |
+| 7 | Agent Task Dispatch (end-to-end) | ⚠️ Partial | audit → ledger → Kafka legs all proven against real infra in one task flow; **live LLM-inference leg is UNVERIFIED in this sandbox** (egress to model hosts blocked — see note) | `agents/tests/integration/test_agent_dispatch_e2e.py` (1) |
+| 8 | Local Model Cleanup | ✅ Proven | No cloud model IDs anywhere; `model_for()` resolves a local Ollama tier map | `runtime/tests/test_local_model_setup.py`, `runtime/base_agent/model_tiers.py` |
+
+**Master gate (real infra):** `158 passed` (Python: evals/calibration/runtime/synthesis/learning/agents)
+and `28 passed` (backend integration). Acceptance trace:
+[`evals/acceptance/seeded_false_belief_trace.md`](evals/acceptance/seeded_false_belief_trace.md).
+
+> **Note on Component 7 (honest scope):** the orchestration path an agent task
+> runs — registering a real prediction in Postgres, writing a hash-chained audit
+> entry, and publishing a signed event consumed back off Kafka — is fully proven
+> against real infrastructure. The agent's OpenAI-compatible client makes a
+> **real** provider call when `LLM_BASE_URL` points at a reachable model endpoint
+> (e.g. local Ollama); the e2e test performs that call when reachable and skips
+> **only** that sub-assertion otherwise. In this build environment no model host
+> is reachable (Hugging Face, ollama.com, Azure blob, modelscope all return 403;
+> only pypi/npm/github-web egress is open), so the live-inference leg is reported
+> as **unverified here**, not claimed. It is wired to run unchanged in an
+> environment with a reachable local model.
+
+**Reproduce the master gate:**
+
+```bash
+# infra: Postgres :5433 (socket /tmp), Kafka :9092, Redis :6379, pgvector enabled
+export DATABASE_URL='postgresql://agentco:password@localhost:5433/agentco?host=/tmp'
+export AGENTCO_TEST_DATABASE_URL="$DATABASE_URL"
+export KAFKA_BROKERS='localhost:9092'
+
+# Python master gate
+python3 -m pytest evals/ calibration/ runtime/ synthesis/ learning/ agents/tests/ -q
+
+# Backend integration (real Postgres + Kafka)
+cd backend && SUPERUSER_DATABASE_URL='postgresql://postgres:password@localhost:5433/agentco?host=/tmp' \
+  npx jest tests/integration/ --runInBand --forceExit
+```
+
 ---
 
 *V2 · Calibrated Epistemic Architecture · Local-Model Edition*

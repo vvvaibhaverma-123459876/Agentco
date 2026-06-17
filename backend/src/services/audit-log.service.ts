@@ -1,8 +1,16 @@
 /**
  * Audit Log Service — immutable, append-only, hash-chained.
- * No agent has DELETE permission. This is the legal record of every AgentCo decision.
+ *
+ * Real implementation: writes to decision_log (Postgres).
+ * DB enforces append-only via triggers on decision_log.
+ * Hash chain: each row stores SHA-256(prev_hash || canonicalContent(row)).
+ * verifyChainIntegrity() re-derives the chain from the DB and detects any tampering.
+ *
+ * Canonical content: a fixed set of fields with normalised types so that
+ * verifyChainIntegrity() can re-derive the same hash from the stored DB values.
  */
 import crypto from 'crypto';
+import { query } from '../db/client';
 
 export interface AuditEntry {
   agent_id: string;
@@ -20,15 +28,37 @@ export interface AuditEntry {
 export interface AuditRecord extends AuditEntry {
   log_id: string;
   timestamp: string;
-  chain_hash: string;  // SHA-256 of previous entry + this entry content
+  chain_hash: string;
+  prev_hash: string;
 }
 
-let lastHash = '0000000000000000000000000000000000000000000000000000000000000000';
+/**
+ * Build the canonical string that is hashed for a given row.
+ * Fields are listed in a fixed order with normalised types.
+ * This function is the single source of truth used by both append() and verifyChainIntegrity().
+ */
+function canonicalContent(fields: {
+  log_id: string;
+  timestamp: string;
+  prev_hash: string;
+  agent_id: string;
+  action_type: string;
+  input_summary: string;
+  output_summary: string;
+  confidence_score: number;
+  risk_level: string;
+  human_approved: boolean;
+  human_approver_id: string | null;
+  downstream_events: string[];
+  session_id: string | null;
+}): string {
+  return JSON.stringify(fields);
+}
 
 export class AuditLogService {
   /**
    * Append an immutable audit entry. Returns the log_id.
-   * Never throws — audit failures are logged to stderr but do not block agent operation.
+   * Throws on failure — callers must know when an entry was NOT persisted.
    */
   async append(entry: AuditEntry): Promise<string> {
     this.validateEntry(entry);
@@ -36,21 +66,63 @@ export class AuditLogService {
     const log_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
 
-    const content = JSON.stringify({ log_id, timestamp, ...entry });
-    const chain_hash = crypto.createHash('sha256').update(lastHash + content).digest('hex');
-    lastHash = chain_hash;
-
-    const record: AuditRecord = { ...entry, log_id, timestamp, chain_hash };
-
     try {
-      // In production: await db.execute('INSERT INTO decision_log ...', record)
-      console.log('[AUDIT]', JSON.stringify(record));
-    } catch (err) {
-      // Audit failures are always reported — never silently swallowed
-      console.error('[AUDIT_FAILURE]', err, record);
-    }
+      // Fetch the last *chained* row's hash (skip pre-migration rows with empty chain_hash)
+      const rows = await query<{ chain_hash: string }>(
+        `SELECT chain_hash FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp DESC, log_id DESC LIMIT 1`
+      );
+      const prev_hash = rows.length > 0 ? rows[0].chain_hash
+        : '0000000000000000000000000000000000000000000000000000000000000000';
 
-    return log_id;
+      const human_approved = entry.human_approved ?? false;
+      const human_approver_id = entry.human_approver_id ?? null;
+      const downstream_events = entry.downstream_events ?? [];
+      const session_id = entry.session_id ?? null;
+
+      const content = canonicalContent({
+        log_id, timestamp, prev_hash,
+        agent_id: entry.agent_id,
+        action_type: entry.action_type,
+        input_summary: entry.input_summary,
+        output_summary: entry.output_summary,
+        confidence_score: entry.confidence_score,
+        risk_level: entry.risk_level,
+        human_approved,
+        human_approver_id,
+        downstream_events,
+        session_id,
+      });
+      const chain_hash = crypto.createHash('sha256').update(prev_hash + content).digest('hex');
+
+      await query(
+        `INSERT INTO decision_log
+           (log_id, agent_id, action_type, input_summary, output_summary,
+            confidence_score, risk_level, human_approved, human_approver_id,
+            downstream_events, session_id, timestamp, chain_hash, prev_hash)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
+        [
+          log_id,
+          entry.agent_id,
+          entry.action_type,
+          entry.input_summary,
+          entry.output_summary,
+          entry.confidence_score,
+          entry.risk_level,
+          human_approved,
+          human_approver_id,
+          downstream_events,
+          session_id,
+          timestamp,
+          chain_hash,
+          prev_hash,
+        ]
+      );
+
+      return log_id;
+    } catch (err) {
+      console.error('[AUDIT_FAILURE]', err, entry);
+      throw err;
+    }
   }
 
   async query(filters: {
@@ -62,12 +134,80 @@ export class AuditLogService {
     limit?: number;
     offset?: number;
   }): Promise<AuditRecord[]> {
-    // In production: SELECT * FROM decision_log WHERE ... ORDER BY timestamp DESC
-    return [];
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    let p = 1;
+
+    if (filters.agent_id)      { conditions.push(`agent_id = $${p++}`);      params.push(filters.agent_id); }
+    if (filters.risk_level)    { conditions.push(`risk_level = $${p++}`);     params.push(filters.risk_level); }
+    if (filters.human_approved !== undefined) {
+      conditions.push(`human_approved = $${p++}`); params.push(filters.human_approved);
+    }
+    if (filters.from) { conditions.push(`timestamp >= $${p++}`); params.push(filters.from); }
+    if (filters.to)   { conditions.push(`timestamp <= $${p++}`); params.push(filters.to); }
+
+    const where = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+    const limit  = Math.min(filters.limit ?? 100, 1000);
+    const offset = filters.offset ?? 0;
+
+    return query<AuditRecord>(
+      `SELECT * FROM decision_log ${where} ORDER BY timestamp DESC LIMIT $${p++} OFFSET $${p++}`,
+      [...params, limit, offset]
+    );
   }
 
+  /**
+   * Re-derives the hash chain from the DB (oldest→newest) and verifies each
+   * row's stored chain_hash matches the re-computed value.
+   * Returns { valid: true } or { valid: false, broken_at: log_id }.
+   */
   async verifyChainIntegrity(): Promise<{ valid: boolean; broken_at?: string }> {
-    // In production: re-compute chain hashes from first entry and verify each matches stored hash
+    // Only verify rows that participate in the hash chain (skip pre-migration rows with empty hashes)
+    const rows = await query<{
+      log_id: string; timestamp: string; prev_hash: string; chain_hash: string;
+      agent_id: string; action_type: string; input_summary: string; output_summary: string;
+      confidence_score: string | number; risk_level: string;
+      human_approved: boolean; human_approver_id: string | null;
+      downstream_events: string[]; session_id: string | null;
+    }>(
+      `SELECT log_id, agent_id, action_type, input_summary, output_summary,
+              confidence_score, risk_level, human_approved, human_approver_id,
+              downstream_events, session_id, timestamp, chain_hash, prev_hash
+       FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp ASC, log_id ASC`
+    );
+
+    // Bootstrap expected_prev from the first row's stored prev_hash
+    let expected_prev = rows.length > 0 ? rows[0].prev_hash : '';
+
+    for (const row of rows) {
+      if (row.prev_hash !== expected_prev) {
+        return { valid: false, broken_at: row.log_id };
+      }
+
+      const content = canonicalContent({
+        log_id: row.log_id,
+        timestamp: row.timestamp,
+        prev_hash: row.prev_hash,
+        agent_id: row.agent_id,
+        action_type: row.action_type,
+        input_summary: row.input_summary,
+        output_summary: row.output_summary,
+        // Postgres NUMERIC comes back as a string; normalise to number for canonical form
+        confidence_score: Number(row.confidence_score),
+        risk_level: row.risk_level,
+        human_approved: row.human_approved,
+        human_approver_id: row.human_approver_id,
+        downstream_events: row.downstream_events ?? [],
+        session_id: row.session_id,
+      });
+
+      const computed = crypto.createHash('sha256').update(row.prev_hash + content).digest('hex');
+      if (computed !== row.chain_hash) {
+        return { valid: false, broken_at: row.log_id };
+      }
+      expected_prev = row.chain_hash;
+    }
+
     return { valid: true };
   }
 
