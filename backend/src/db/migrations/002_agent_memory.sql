@@ -6,15 +6,30 @@ CREATE TABLE IF NOT EXISTS agent_memory (
     key         VARCHAR(256) NOT NULL,
     value       JSONB NOT NULL,
     ttl_seconds INTEGER,
-    expires_at  TIMESTAMPTZ GENERATED ALWAYS AS (
-                    CASE WHEN ttl_seconds IS NOT NULL
-                    THEN created_at + (ttl_seconds * INTERVAL '1 second')
-                    ELSE NULL END
-                ) STORED,
+    -- expires_at is derived from created_at + ttl_seconds, but
+    -- (timestamptz + interval) is STABLE, not IMMUTABLE, so it cannot be a
+    -- GENERATED column on PostgreSQL. It is maintained by the trigger below.
+    expires_at  TIMESTAMPTZ,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE (agent_id, namespace, key)
 );
+
+-- Keep expires_at consistent with created_at + ttl_seconds on every write.
+CREATE OR REPLACE FUNCTION set_agent_memory_expires_at() RETURNS trigger AS $$
+BEGIN
+    IF NEW.ttl_seconds IS NOT NULL THEN
+        NEW.expires_at := NEW.created_at + (NEW.ttl_seconds * INTERVAL '1 second');
+    ELSE
+        NEW.expires_at := NULL;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_agent_memory_expires_at
+    BEFORE INSERT OR UPDATE ON agent_memory
+    FOR EACH ROW EXECUTE FUNCTION set_agent_memory_expires_at();
 
 -- Namespace isolation enforced at DB level
 ALTER TABLE agent_memory ENABLE ROW LEVEL SECURITY;
