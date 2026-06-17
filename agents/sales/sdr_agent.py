@@ -8,7 +8,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class SDRAgent(BaseAgent):
     AGENT_ID = "sdr-agent"
     DEPARTMENT = "sales"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "sales/sdr"
     COMPETENCY_AREAS = ["prospecting", "outreach", "qualification", "crm"]
 

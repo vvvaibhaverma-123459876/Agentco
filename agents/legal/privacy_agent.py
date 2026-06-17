@@ -14,7 +14,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class PrivacyAgent(BaseAgent):
     AGENT_ID = "privacy-agent"
     DEPARTMENT = "legal"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "legal/privacy"
     COMPETENCY_AREAS = ["gdpr_compliance", "data_flow_mapping", "pia", "breach_detection"]
 

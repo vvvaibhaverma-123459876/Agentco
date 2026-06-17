@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class RiskAgent(BaseAgent):
     AGENT_ID = "risk-agent"
     DEPARTMENT = "legal"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "legal/risk"
     COMPETENCY_AREAS = ["risk_register", "regulatory_monitoring", "risk_reporting"]
 

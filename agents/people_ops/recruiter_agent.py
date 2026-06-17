@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class RecruiterAgent(BaseAgent):
     AGENT_ID = "recruiter-agent"
     DEPARTMENT = "people_ops"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "people_ops/recruiter"
     COMPETENCY_AREAS = ["model_benchmarking", "eval_running", "upgrade_proposals"]
 

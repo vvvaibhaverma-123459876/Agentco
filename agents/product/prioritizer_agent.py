@@ -8,7 +8,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class PrioritizerAgent(BaseAgent):
     AGENT_ID = "prioritizer-agent"
     DEPARTMENT = "product"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "product/prioritizer"
     COMPETENCY_AREAS = ["feature_scoring", "priority_management", "trade_off_analysis"]
 

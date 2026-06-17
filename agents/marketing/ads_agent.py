@@ -8,7 +8,6 @@ from core.types import AgentOutput, RiskLevel
 class AdsAgent(BaseAgent):
     AGENT_ID = "ads-agent"
     DEPARTMENT = "marketing"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "marketing/ads"
     COMPETENCY_AREAS = ["campaign_management", "budget_optimisation", "bid_management"]
 

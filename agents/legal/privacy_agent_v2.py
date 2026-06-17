@@ -1,5 +1,5 @@
 """
-Privacy-Agent V2 — data protection and breach response. claude-opus-4-8.
+Privacy-Agent V2 — data protection and breach response.
 
 V2: pre-registers compliance claims, uses trusted_confidence().
 AUTONOMOUS_REMEDIATION = False hardcoded. Breach response ALWAYS blocks.
@@ -20,7 +20,6 @@ class PrivacyAgentV2(BaseAgentV2):
 
     AGENT_ID = "privacy-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-opus-4-8"
     DEPARTMENT = "legal"
 
     AUTONOMOUS_REMEDIATION = False   # Hardcoded. Never auto-remediate a breach.

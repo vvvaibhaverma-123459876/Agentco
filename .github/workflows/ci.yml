@@ -24,7 +24,9 @@ jobs:
 
       - name: Run tests
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Local-first: tests mock the LLM, but the client reads these at import.
+          LLM_BASE_URL: http://localhost:11434/v1
+          LLM_API_KEY: test
         run: |
           cd agents
           pytest tests/ -v --cov=core --cov=executive --cov=engineering --cov-report=term-missing

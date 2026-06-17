@@ -13,7 +13,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class ConfigAgent(BaseAgent):
     AGENT_ID = "config-agent"
     DEPARTMENT = "people_ops"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "people_ops/config"
     COMPETENCY_AREAS = ["prompt_management", "permission_management", "staged_rollout", "rollback"]
 

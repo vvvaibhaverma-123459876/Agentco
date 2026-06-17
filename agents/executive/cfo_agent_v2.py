@@ -1,5 +1,5 @@
 """
-CFO-Agent V2 — Financial governance. claude-opus-4-8.
+CFO-Agent V2 — Financial governance.
 
 V2: pre-registers financial forecast claims, uses trusted_confidence() for spend decisions.
 V1 thresholds preserved: auto-approve < $10k, human required > $50k.
@@ -21,7 +21,6 @@ class CFOAgentV2(BaseAgentV2):
 
     AGENT_ID = "cfo-agent"
     PROMPT_VERSION = "2.0.0"
-    MODEL = "claude-opus-4-8"
     DEPARTMENT = "executive"
 
     CFO_AUTO_APPROVE_THRESHOLD = 10_000

@@ -9,7 +9,6 @@ from core.types import AgentEvent, AgentOutput, RiskLevel
 class ResearchAgent(BaseAgent):
     AGENT_ID = "research-agent"
     DEPARTMENT = "product"
-    MODEL = "claude-sonnet-4-6"
     MEMORY_NAMESPACE = "product/research"
     COMPETENCY_AREAS = ["user_research", "competitor_analysis", "market_signals", "survey_analysis"]
 

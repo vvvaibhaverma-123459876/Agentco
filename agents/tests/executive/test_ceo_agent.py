@@ -2,6 +2,7 @@
 import pytest
 from unittest.mock import AsyncMock
 from core.types import RiskLevel
+from runtime.base_agent.model_tiers import model_for
 
 
 @pytest.mark.asyncio
@@ -9,7 +10,7 @@ async def test_strategic_pivot_requires_human_approval():
     from executive.ceo_agent import CEOAgent
     agent = CEOAgent.__new__(CEOAgent)
     agent.AGENT_ID = "ceo-agent"
-    agent.MODEL = "claude-opus-4-8"
+    agent.model = model_for(agent.AGENT_ID)
     agent.session_id = "test"
     agent.client = None
     agent.llm_call = AsyncMock(return_value="Strategic analysis...")
@@ -29,7 +30,7 @@ async def test_routine_goal_setting_autonomous():
     from executive.ceo_agent import CEOAgent
     agent = CEOAgent.__new__(CEOAgent)
     agent.AGENT_ID = "ceo-agent"
-    agent.MODEL = "claude-opus-4-8"
+    agent.model = model_for(agent.AGENT_ID)
     agent.session_id = "test"
     agent.client = None
     agent.llm_call = AsyncMock(return_value="Q3 goals: ...")
