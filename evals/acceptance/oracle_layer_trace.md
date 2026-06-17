@@ -31,7 +31,7 @@ This is the bedrock.
 
 ```
 >>> test_1_oracle_resolution: START
->>> test_1: resolution_id=8bb8a2d4 authority=0.2005 standing_resolutions=1
+>>> test_1: resolution_id=3327eb9e authority=0.2005 standing_resolutions=1
 >>> test_1_oracle_resolution: PASS
 >>> test_2_oracle_contradiction: START
 >>> test_2: oracle_a resolved TRUE with authority=0.1703

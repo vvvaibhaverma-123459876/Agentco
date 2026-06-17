@@ -31,12 +31,18 @@ MIGRATION_REL = "backend/src/db/migrations/011_prediction_ledger.sql"
 @pytest.fixture()
 def fresh_table():
     from pathlib import Path
+    root = Path(__file__).resolve().parents[2]
     admin = psycopg2.connect(DSN)
     admin.autocommit = True
-    sql = (Path(__file__).resolve().parents[2] / MIGRATION_REL).read_text()
+    sql = (root / MIGRATION_REL).read_text()
+    reserve_sql = (root / "reserve" / "migrations" / "001_reserve_extension.sql").read_text()
     with admin.cursor() as cur:
+        cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE;")
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE;")
         cur.execute(sql)
+        # Reserve extension adds hardness + consequence columns (required by _insert_record).
+        cur.execute(reserve_sql)
         cur.execute(
             "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='resolution_service') "
             "THEN CREATE ROLE resolution_service LOGIN PASSWORD 'test'; END IF; END $$;"
@@ -46,6 +52,8 @@ def fresh_table():
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
     yield admin
     with admin.cursor() as cur:
+        cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE;")
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE;")
     admin.close()
 
