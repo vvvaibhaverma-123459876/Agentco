@@ -24,8 +24,8 @@
 >>> test_2_two_agents: START
 >>> test_2: agent_a log_score=-0.356675 brier=0.090000 n=3
 >>> test_2: agent_b log_score=-2.302585 brier=0.810000 n=3
->>> test_2: cred_a.credential_id=9e6ba637 hmac=e02bfc5cba4b5a4f... verified=True
->>> test_2: cred_b.credential_id=8958f4e7 hmac=f40a7bc2d26450fc... verified=True
+>>> test_2: cred_a.credential_id=d2f2cc16 hmac=dc0e012e59f89709... verified=True
+>>> test_2: cred_b.credential_id=7ff92ae2 hmac=a9f7cb1f7ce1c369... verified=True
 >>> test_2: persisted cred_a → DB row confirmed agent_id=calibrated-agent-alpha
 >>> test_2: persisted cred_b → DB row confirmed agent_id=overconfident-agent-beta
 >>> test_2: tampered credential (wrong agent_id) correctly rejected by HMAC
