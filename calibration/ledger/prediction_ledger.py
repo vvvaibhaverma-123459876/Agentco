@@ -189,6 +189,7 @@ class PredictionLedger:
     # ------------------------------------------------------------------ DB I/O
 
     def _insert_record(self, record: PredictionRecord) -> None:
+        hardness = 2.0 * record.probability * (1.0 - record.probability)
         with self._db.cursor() as cur:
             cur.execute(
                 """
@@ -196,8 +197,8 @@ class PredictionLedger:
                     (prediction_id, claim, probability, confidence_basis,
                      producing_agent_id, producing_prompt_version, resolution_criterion,
                      resolution_date, ground_truth_source, horizon_class, domain,
-                     claim_type, correlation_id, created_at, post_hoc)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                     claim_type, correlation_id, created_at, post_hoc, hardness)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     record.prediction_id, record.claim, record.probability,
@@ -206,6 +207,7 @@ class PredictionLedger:
                     record.resolution_date, record.ground_truth_source,
                     record.horizon_class, record.domain, record.claim_type,
                     record.correlation_id, record.created_at, record.post_hoc,
+                    hardness,
                 ),
             )
         self._commit()
