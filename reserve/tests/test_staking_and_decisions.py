@@ -64,6 +64,9 @@ def _apply_migrations(cur):
     reserve_sql = (
         MIGRATION_ROOT / "reserve" / "migrations" / "001_reserve_extension.sql"
     ).read_text()
+    ed25519_sql = (
+        MIGRATION_ROOT / "reserve" / "migrations" / "004_ed25519_signature.sql"
+    ).read_text()
     staking_sql = (
         MIGRATION_ROOT / "reserve" / "migrations" / "002_staking.sql"
     ).read_text()
@@ -73,6 +76,7 @@ def _apply_migrations(cur):
         cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
     cur.execute(ledger_sql)
     cur.execute(reserve_sql)
+    cur.execute(ed25519_sql)
     cur.execute(staking_sql)
 
     cur.execute(

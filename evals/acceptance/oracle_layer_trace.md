@@ -2,7 +2,7 @@
 
 **Status:** PASS
 **Run against:** REAL Postgres (`oracle_resolutions`, `oracle_standing_history`) — no mocks.
-**Date captured:** 2026-06-17
+**Date captured:** 2026-06-18
 
 ## Self-Correction Invariant
 
@@ -31,7 +31,7 @@ This is the bedrock.
 
 ```
 >>> test_1_oracle_resolution: START
->>> test_1: resolution_id=3327eb9e authority=0.2005 standing_resolutions=1
+>>> test_1: resolution_id=577ec227 authority=0.2005 standing_resolutions=1
 >>> test_1_oracle_resolution: PASS
 >>> test_2_oracle_contradiction: START
 >>> test_2: oracle_a resolved TRUE with authority=0.1703

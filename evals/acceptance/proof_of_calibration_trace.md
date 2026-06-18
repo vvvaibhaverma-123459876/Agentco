@@ -2,7 +2,7 @@
 
 **Status:** PASS
 **Run against:** REAL Postgres (`prediction_ledger`, `calibration_credentials`) — no mocks.
-**Date captured:** 2026-06-17
+**Date captured:** 2026-06-18
 
 ## What is proven
 
@@ -24,8 +24,8 @@
 >>> test_2_two_agents: START
 >>> test_2: agent_a log_score=-0.356675 brier=0.090000 n=3
 >>> test_2: agent_b log_score=-2.302585 brier=0.810000 n=3
->>> test_2: cred_a.credential_id=2a4545c7 hmac=4fde0a1186c36b30... verified=True
->>> test_2: cred_b.credential_id=8a21ae6e hmac=90b1b685f5d5f9bd... verified=True
+>>> test_2: cred_a.credential_id=14d3a83f hmac=ded66197db3754f0... verified=True
+>>> test_2: cred_b.credential_id=0397f99f hmac=e51a109f2c044a06... verified=True
 >>> test_2: persisted cred_a → DB row confirmed agent_id=calibrated-agent-alpha
 >>> test_2: persisted cred_b → DB row confirmed agent_id=overconfident-agent-beta
 >>> test_2: tampered credential (wrong agent_id) correctly rejected by HMAC

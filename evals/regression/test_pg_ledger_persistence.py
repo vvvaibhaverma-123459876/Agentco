@@ -36,6 +36,7 @@ def fresh_table():
     admin.autocommit = True
     sql = (root / MIGRATION_REL).read_text()
     reserve_sql = (root / "reserve" / "migrations" / "001_reserve_extension.sql").read_text()
+    ed25519_sql = (root / "reserve" / "migrations" / "004_ed25519_signature.sql").read_text()
     with admin.cursor() as cur:
         cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE;")
         cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE;")
@@ -43,6 +44,7 @@ def fresh_table():
         cur.execute(sql)
         # Reserve extension adds hardness + consequence columns (required by _insert_record).
         cur.execute(reserve_sql)
+        cur.execute(ed25519_sql)
         cur.execute(
             "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='resolution_service') "
             "THEN CREATE ROLE resolution_service LOGIN PASSWORD 'test'; END IF; END $$;"

@@ -73,6 +73,7 @@ def _ensure_prediction_ledger(c):
             # Reserve extension adds hardness + consequence columns (required by _insert_record).
             reserve_ext = root / "reserve" / "migrations" / "001_reserve_extension.sql"
             cur.execute(reserve_ext.read_text())
+            cur.execute((root / "reserve" / "migrations" / "004_ed25519_signature.sql").read_text())
         else:
             # Table exists but may be missing hardness column (e.g. created by an older fixture).
             cur.execute(
@@ -82,6 +83,13 @@ def _ensure_prediction_ledger(c):
             if cur.fetchone() is None:
                 reserve_ext = root / "reserve" / "migrations" / "001_reserve_extension.sql"
                 cur.execute(reserve_ext.read_text())
+            # Apply migration 004 if ed25519_signature column is missing.
+            cur.execute(
+                "SELECT 1 FROM information_schema.columns "
+                "WHERE table_name='calibration_credentials' AND column_name='ed25519_signature'"
+            )
+            if cur.fetchone() is None:
+                cur.execute((root / "reserve" / "migrations" / "004_ed25519_signature.sql").read_text())
 
 
 @pytest.fixture(scope="module")

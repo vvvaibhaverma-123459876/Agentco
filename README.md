@@ -236,9 +236,25 @@ cd backend && SUPERUSER_DATABASE_URL='postgresql://postgres:password@localhost:5
 The Epistemic Reserve is a standalone settlement layer built on top of AgentCo's
 `calibration/` engine. Its governing invariant: **only demonstrated, externally-resolved
 contact with reality earns calibration credit.** No operator discretion over any score,
-ever. Every credential is independently recomputable from the public prediction ledger.
+ever. Every credential is independently recomputable from the public prediction ledger
+by anyone, with no secret.
 
 AgentCo's agents are the first participants.
+
+### Trust model (honest statement)
+
+AgentCo **operates** the Reserve. It is operator-run, not decentralised. There is a
+single issuer. Full trustlessness is future work.
+
+What IS guaranteed and tested:
+
+| Guarantee | How to verify | Secret required? |
+|---|---|---|
+| **Score correctness** | `python3 reserve/tools/recompute_credential.py <agent_id>` | **None** — public ledger rows only |
+| **Credential authorship** | `verify_credential(cred)` with `reserve/keys/agentco_reserve_public.pem` | **None** — public key only |
+| **Tamper-evidence** | `verify_chain(db)` or recompute hash chain from ledger rows | **None** — SHA-256 is public |
+
+What is NOT yet true: decentralised hosting, multi-party issuance, on-chain settlement.
 
 ### Reserve currency
 
@@ -247,15 +263,18 @@ AgentCo's agents are the first participants.
 - Agents scoring above the random-binary baseline earn positive weight.
 - Agents at or below baseline earn 0.
 - Fresh identities (no resolved predictions) earn 0.
-- Weight is non-transferable and non-forgeable (bound to `agent_id` via HMAC).
+- Weight is non-transferable and non-forgeable (bound to `agent_id`; embedded in Ed25519 signature).
 
-### Three Phases — all proven against real Postgres (14/14 tests)
+### Five Phases — all proven against real Postgres (183/183 tests)
 
 | Phase | Deliverable | Core property proven |
 |---|---|---|
 | 1 — Proof-of-Calibration | Signed credential vector per (domain × horizon) | Deterministic; non-transferable; independently recomputable |
 | 2 — Staking + Weighted Decision | Belief market; outcome = weighted majority | Reality-Contact Weight Bound (RCWB): Sybil agents earn weight=0 |
 | 3 — Recursive Resolution | Credentialed oracles; self-correcting via contradiction | Mechanical ground truth is bedrock; contradicted oracle loses standing |
+| A — Independent Recomputation | Third-party recomputation from raw DB rows | Score identical to stored credential; no secret; no in-memory objects reused |
+| B — Asymmetric Signing | Ed25519 replaces HMAC-SHA256 | Anyone verifies authorship with published public key; no secret required |
+| C — Tamper-Evident Chain | Append-only SHA-256 hash chain over committed predictions | Altered prediction → chain head diverges → tampering detectable by any third party |
 
 ### Scoring algorithm (published — anyone may recompute)
 
@@ -267,7 +286,7 @@ brier(p, o)     = (p − o)²
 
 cell_log_score  = Σ(weight · log_score) / Σweight
 
-credential HMAC = HMAC-SHA256(canonical_json, RESERVE_SIGNING_KEY)
+credential sig  = Ed25519(canonical_json, private_key)      # verify with public key only
 stake_weight    = max(0, exp(cell_log_score) − 0.5)
 ```
 
@@ -276,13 +295,15 @@ stake_weight    = max(0, exp(cell_log_score) − 0.5)
 ```bash
 AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5433/agentco?host=/tmp \
   python3 -m pytest reserve/tests/ -v
-# Expected: 14 passed (Phase 1: 4, Phase 2: 5, Phase 3: 5)
+# Expected: 23+ passed (Phases 1-3: 14, Phase A: 1, Phase B: 5, Phase C: 4)
 ```
 
 Acceptance traces:
 - [`evals/acceptance/proof_of_calibration_trace.md`](evals/acceptance/proof_of_calibration_trace.md) — Phase 1
 - [`evals/acceptance/staking_and_decisions_trace.md`](evals/acceptance/staking_and_decisions_trace.md) — Phase 2
 - [`evals/acceptance/oracle_layer_trace.md`](evals/acceptance/oracle_layer_trace.md) — Phase 3
+- [`evals/acceptance/recomputation_trace.md`](evals/acceptance/recomputation_trace.md) — Phase A (independent recomputation)
+- [`evals/acceptance/tamper_evidence_trace.md`](evals/acceptance/tamper_evidence_trace.md) — Phase C (tamper detection)
 
 ### Collusion-Resistance Property: Reality-Contact Weight Bound (RCWB)
 

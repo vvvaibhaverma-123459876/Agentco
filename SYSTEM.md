@@ -47,10 +47,104 @@ Layer 4 — Digital Twin + Governor UI  simulation/ + dashboard/
 Layer 5 — Epistemic Reserve             reserve/
   Scoring Function (deterministic)      reserve/scoring/
   Proof-of-Calibration Credential       reserve/credentials/
+  Commitment Chain (tamper-evident)     reserve/chain/
   Staking + Weighted Decision           reserve/staking/ + reserve/decisions/
   Recursive Resolution (oracles)        reserve/oracle/
   Schema migrations                     reserve/migrations/
+  Published public key                  reserve/keys/agentco_reserve_public.pem
 ```
+
+## Epistemic Reserve — Trust Model (honest statement)
+
+AgentCo **operates** the Reserve. This is an operator-run system, not a
+decentralised protocol. There is a single issuer. Full trustlessness (no single
+operator) is **future work** and is not claimed.
+
+What IS true and tested as of this version:
+
+### 1. Any score is independently recomputable (no secret, no operator trust)
+
+Any party with read access to the public `prediction_ledger` can run:
+
+```
+python3 reserve/tools/recompute_credential.py <agent_id>
+```
+
+and obtain the identical score embedded in any stored credential. The scoring
+function is published in `reserve/scoring/scoring_function.py` and is a pure,
+deterministic function of resolved ledger rows. If the recomputed score
+differs from the stored credential, the operator embedded a false score.
+
+**Proven by:** `reserve/tests/test_independent_recomputation.py`
+
+### 2. Credential authorship is publicly verifiable (public key, no secret)
+
+Credentials are signed with Ed25519. The operator holds the private key
+(`RESERVE_PRIVATE_KEY` env var, never committed). The public key is published at:
+
+```
+reserve/keys/agentco_reserve_public.pem
+```
+
+Anyone can verify a credential's authorship using only the public key:
+
+```python
+from reserve.credentials.proof_of_calibration import verify_credential
+assert verify_credential(cred)   # uses public key from reserve/keys/ — no secret
+```
+
+Key rotation: when the private key changes, a new public key file is added
+(never deleted), so older credentials remain verifiable with their issuing key.
+
+**Proven by:** `reserve/tests/test_ed25519_signing.py`
+
+### 3. Correctness is verifiable without the signature
+
+The two guarantees above are independent:
+- **Authorship** (Ed25519): "AgentCo attests this snapshot was issued by us"
+- **Correctness** (recomputation): "the scores are what the ledger rows dictate"
+
+Correctness requires no key at all. If you strip the signature entirely, you
+can still verify correctness by recomputing from ledger rows. A credential
+whose signature fails but whose scores match the recomputed values means the
+credential was re-signed with a different key (key rotation), not that the
+scores were rigged.
+
+### 4. The operator cannot rig a score undetected (tamper-evident chain)
+
+All resolved predictions that feed scores are committed to an append-only
+hash chain (`prediction_chain_log`). The chain design mirrors
+Certificate Transparency:
+
+```
+row_hash = SHA-256(prev_hash || prediction_id || agent_id ||
+                   probability || resolved_outcome || resolved_at ||
+                   domain || horizon_class || consequence)
+```
+
+Any third party can recompute the chain head from raw ledger rows and compare
+to the published head. Alteration of any committed prediction field changes
+every subsequent hash — the divergence is detectable without any secret.
+
+```python
+from reserve.chain.commitment_chain import verify_chain, recompute_chain_head
+assert verify_chain(db)   # True = chain intact; False = tampering detected
+```
+
+**Proven by:** `reserve/tests/test_tamper_evidence.py`
+
+### What is NOT yet true (explicit under-claim)
+
+- **Not decentralised.** A single operator controls the private key and the DB.
+  A malicious operator could shut down the system; they cannot silently rig
+  scores without detection, but they could refuse to issue credentials.
+- **Chain is operator-hosted.** Third parties must have read access to the DB
+  or a published snapshot to audit the chain. External log shipping (e.g. to
+  a transparency log server) is future work.
+- **No on-chain settlement.** Staking and weighted decisions are recorded
+  on-DB, not on a public blockchain. Finality depends on operator uptime.
+- **Single issuer.** There is no multi-party credential issuance or threshold
+  signing. Future work: federated reserve with multiple independent signers.
 
 ## Key Data Flows
 
@@ -91,8 +185,9 @@ BaseAgentV2.execute_action(action)
 ```
 score_agent(ledger.list_by_agent(agent_id))
   → ReserveScore per (domain × horizon) cell
-  → issue_credential(score, last_contacts)   [HMAC-signed, non-transferable]
+  → issue_credential(score, last_contacts)   [Ed25519-signed, non-transferable]
   → persist_credential(cred, db)             [append-only calibration_credentials]
+  → commit_prediction(pid, db) per row       [append-only hash chain]
 ```
 
 **Belief market resolution:**
