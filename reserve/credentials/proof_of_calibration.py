@@ -1,38 +1,88 @@
 """
 Epistemic Reserve — Proof-of-Calibration Credential.
 
-A Proof-of-Calibration (PoC) credential is:
-  - A VECTOR across (domain × horizon_class) cells, not a single number.
-  - NON-TRANSFERABLE: bound to the producing_agent_id; the HMAC embeds agent_id.
-  - INDEPENDENTLY RECOMPUTABLE: anyone with access to the public prediction_ledger
-    and this module can recompute and verify any credential.
-  - SIGNED: HMAC-SHA256 over a canonical, deterministic JSON payload.
-  - APPEND-ONLY: stored in calibration_credentials (immutable by DB trigger).
+A Proof-of-Calibration (PoC) credential provides TWO INDEPENDENT guarantees:
 
-Cross-domain transfer is NOT assumed. A strong finance credential does NOT imply
-competence in engineering. Each cell must be earned independently.
+  1. CORRECTNESS (recomputable by anyone, no key required):
+     The score embedded in the credential is identical to what you get by
+     fetching the agent's resolved prediction_ledger rows and running the
+     published scoring function. Use reserve/tools/recompute_credential.py.
+     This guarantee requires no trust in the operator.
 
+  2. AUTHORSHIP (verifiable by anyone with the published public key):
+     The credential carries an Ed25519 signature over the canonical payload,
+     signed by AgentCo's private key. Anyone can verify this signature using
+     the published public key at reserve/keys/agentco_reserve_public.key.
+     This proves the credential was issued by AgentCo, not altered in transit.
+     Verification requires NO SECRET — only the public key.
+
+These two guarantees are DISTINCT:
+  - Correctness: verifiable by recomputation alone (no key at all).
+  - Authorship: verifiable by the public key (no secret).
+  - Neither requires trusting the operator's private state.
+
+Trust model (honest statement):
+  AgentCo OPERATES the Reserve and issues credentials with its private key.
+  This is operator-run, not decentralised. There is a single issuer. Full
+  trustlessness is future work. What IS true now: any score is independently
+  recomputable; authorship is publicly verifiable; the resolved-prediction log
+  is tamper-evident (Phase C). The operator cannot rig a score undetected.
+
+Cross-domain transfer is NOT assumed. Each cell must be earned independently.
 Fresh identities start at neutral-low standing (no cells, overall_score = None).
+
+Signing key env vars:
+  RESERVE_PRIVATE_KEY  — base64-encoded Ed25519 private key (operator-held, secret)
+  RESERVE_SIGNING_KEY  — legacy HMAC key (deprecated; kept for test compat only)
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import hmac
 import json
 import os
 import uuid
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Optional
 
 from calibration.decay.decay_tracker import DEFAULT_HALF_LIVES_DAYS
 from reserve.scoring.scoring_function import CellScore, ReserveScore, score_agent
 
-# Key used for HMAC signing. In production this must be a securely managed secret.
-# The verifier must use the same key. The key is NOT part of the public ledger.
-_SIGNING_KEY = os.environ.get("RESERVE_SIGNING_KEY", "dev-insecure-key").encode()
+# ---------------------------------------------------------------------------
+# Ed25519 signing (asymmetric — anyone verifies with the published public key)
+# ---------------------------------------------------------------------------
+_PRIVATE_KEY_B64 = os.environ.get("RESERVE_PRIVATE_KEY", "")
+_PUBLIC_KEY_FILE = Path(__file__).resolve().parents[1] / "keys" / "agentco_reserve_public.pem"
+
+# Legacy HMAC key retained only for backward compat in unit tests.
+_LEGACY_HMAC_KEY = os.environ.get("RESERVE_SIGNING_KEY", "dev-insecure-key").encode()
 
 CREDENTIAL_TTL_DAYS = 30  # credentials expire and must be refreshed
+
+
+def _get_private_key():
+    """Load Ed25519 private key from env. Returns None if not configured."""
+    if not _PRIVATE_KEY_B64:
+        return None
+    try:
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+        from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption
+        raw = base64.b64decode(_PRIVATE_KEY_B64)
+        return Ed25519PrivateKey.from_private_bytes(raw)
+    except Exception:
+        return None
+
+
+def _get_public_key_bytes() -> Optional[bytes]:
+    """Load published Ed25519 public key from the well-known file. No secret required."""
+    try:
+        raw_b64 = _PUBLIC_KEY_FILE.read_text().strip()
+        return base64.b64decode(raw_b64)
+    except Exception:
+        return None
 
 
 @dataclass
@@ -54,23 +104,31 @@ class ProofOfCalibration:
     """
     A signed, non-transferable Proof-of-Calibration credential.
 
-    To verify independently:
+    Two independent verification paths:
+
+    CORRECTNESS (no key required):
       1. Fetch all resolved, non-post-hoc prediction_ledger rows for agent_id.
-      2. Call score_agent(records, agent_id).
-      3. Call issue_credential(score, last_contacts) with the same records.
-      4. Compare hmac_sha256 using constant-time comparison.
-         If it matches, the credential is authentic and recomputable.
+      2. Run: python3 reserve/tools/recompute_credential.py <agent_id>
+      3. Compare recomputed scores against this credential's numeric fields.
+         Mismatch means the operator embedded a different score than the ledger
+         rows dictate — i.e., the score was rigged.
+
+    AUTHORSHIP (public key required, no secret):
+      1. Load reserve/keys/agentco_reserve_public.key
+      2. Call verify_credential(cred) — uses only the published public key.
+         Returns True if signature matches; False if the credential was altered.
     """
     credential_id: str
     agent_id: str
-    issued_at: str           # ISO-8601 UTC
-    expires_at: str          # ISO-8601 UTC
+    issued_at: str            # ISO-8601 UTC
+    expires_at: str           # ISO-8601 UTC
     cells: list[CredentialCell]
     overall_log_score: float
     overall_brier_score: float
     sample_count: int
     algorithm: str
-    hmac_sha256: str         # HMAC-SHA256(canonical_payload, RESERVE_SIGNING_KEY)
+    hmac_sha256: str          # DEPRECATED: legacy HMAC; kept for compat. Use ed25519_signature.
+    ed25519_signature: str = ""  # Ed25519 signature over canonical payload (hex). Verify with public key.
 
 
 def _canonical_payload(cred: "ProofOfCalibration") -> str:
@@ -109,8 +167,22 @@ def _canonical_payload(cred: "ProofOfCalibration") -> str:
     return json.dumps(payload, sort_keys=True, separators=(",", ":"))
 
 
-def _sign(payload: str) -> str:
-    return hmac.new(_SIGNING_KEY, payload.encode(), hashlib.sha256).hexdigest()
+def _legacy_hmac(payload: str) -> str:
+    """Deprecated HMAC-SHA256 signature. Kept for unit-test backward compat."""
+    return hmac.new(_LEGACY_HMAC_KEY, payload.encode(), hashlib.sha256).hexdigest()
+
+
+def _ed25519_sign(payload: str) -> str:
+    """
+    Sign payload with the operator's Ed25519 private key.
+    Returns hex-encoded signature, or "" if RESERVE_PRIVATE_KEY is not set
+    (dev / test environments without a configured key).
+    """
+    priv = _get_private_key()
+    if priv is None:
+        return ""
+    sig_bytes = priv.sign(payload.encode())
+    return sig_bytes.hex()
 
 
 def issue_credential(
@@ -153,23 +225,52 @@ def issue_credential(
         overall_brier_score=score.overall_brier_score,
         sample_count=score.total_sample_count,
         algorithm=score.algorithm,
-        hmac_sha256="",  # placeholder; filled below
+        hmac_sha256="",       # placeholder; filled below (legacy)
+        ed25519_signature="", # placeholder; filled below
     )
     payload = _canonical_payload(cred)
-    cred = ProofOfCalibration(**{**cred.__dict__, "hmac_sha256": _sign(payload)})
+    cred = ProofOfCalibration(**{
+        **cred.__dict__,
+        "hmac_sha256": _legacy_hmac(payload),
+        "ed25519_signature": _ed25519_sign(payload),
+    })
     return cred
 
 
 def verify_credential(cred: ProofOfCalibration) -> bool:
     """
-    Verify that the credential's HMAC matches its payload.
-    Returns True if authentic, False if tampered.
+    Verify credential authorship using the published Ed25519 public key.
+    No secret is required — only the public key at reserve/keys/agentco_reserve_public.key.
+
+    Returns True if the signature is valid.
+    Returns False if the credential was tampered with or the public key is unavailable.
+
+    Falls back to HMAC verification if no Ed25519 signature is present (legacy credentials).
+
+    NOTE: This verifies AUTHORSHIP (the credential was signed by AgentCo), not
+    CORRECTNESS (the scores are consistent with the ledger rows). To verify
+    correctness, use reserve/tools/recompute_credential.py — no key needed.
     """
-    saved_hmac = cred.hmac_sha256
-    cred_without_hmac = ProofOfCalibration(**{**cred.__dict__, "hmac_sha256": ""})
-    payload = _canonical_payload(cred_without_hmac)
-    expected = _sign(payload)
-    return hmac.compare_digest(saved_hmac, expected)
+    # Canonical payload does not include the signatures.
+    bare = ProofOfCalibration(**{**cred.__dict__, "hmac_sha256": "", "ed25519_signature": ""})
+    payload = _canonical_payload(bare)
+
+    if cred.ed25519_signature:
+        # Preferred path: asymmetric verification, no secret required.
+        pub_bytes = _get_public_key_bytes()
+        if pub_bytes is None:
+            return False
+        try:
+            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+            pub = Ed25519PublicKey.from_public_bytes(pub_bytes)
+            pub.verify(bytes.fromhex(cred.ed25519_signature), payload.encode())
+            return True
+        except Exception:
+            return False
+
+    # Legacy path: HMAC (requires shared secret; deprecated).
+    expected = _legacy_hmac(payload)
+    return hmac.compare_digest(cred.hmac_sha256, expected)
 
 
 def persist_credential(cred: ProofOfCalibration, db) -> str:
@@ -200,8 +301,9 @@ def persist_credential(cred: ProofOfCalibration, db) -> str:
             """
             INSERT INTO calibration_credentials
                 (credential_id, agent_id, issued_at, expires_at, domain_cells,
-                 overall_score, sample_count, algorithm, hmac_sha256)
-            VALUES (%s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s)
+                 overall_score, sample_count, algorithm, hmac_sha256,
+                 ed25519_signature)
+            VALUES (%s, %s, %s, %s, %s::jsonb, %s, %s, %s, %s, %s)
             """,
             (
                 cred.credential_id,
@@ -213,6 +315,7 @@ def persist_credential(cred: ProofOfCalibration, db) -> str:
                 cred.sample_count,
                 cred.algorithm,
                 cred.hmac_sha256,
+                cred.ed25519_signature or None,
             ),
         )
     _commit(db)

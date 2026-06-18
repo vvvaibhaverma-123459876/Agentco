@@ -58,11 +58,15 @@ def _apply_migrations(cur):
     reserve_sql = (
         MIGRATION_ROOT / "reserve" / "migrations" / "001_reserve_extension.sql"
     ).read_text()
+    ed25519_sql = (
+        MIGRATION_ROOT / "reserve" / "migrations" / "004_ed25519_signature.sql"
+    ).read_text()
     cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE")
     cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE")
     cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE")
     cur.execute(ledger_sql)
     cur.execute(reserve_sql)
+    cur.execute(ed25519_sql)
     # Grant resolution_service role access
     cur.execute(
         "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='resolution_service') "

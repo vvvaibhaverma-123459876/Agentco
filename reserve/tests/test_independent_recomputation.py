@@ -43,6 +43,7 @@ def db():
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE")
         cur.execute((ROOT / "backend/src/db/migrations/011_prediction_ledger.sql").read_text())
         cur.execute((ROOT / "reserve/migrations/001_reserve_extension.sql").read_text())
+        cur.execute((ROOT / "reserve/migrations/004_ed25519_signature.sql").read_text())
         cur.execute(
             "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='resolution_service') "
             "THEN CREATE ROLE resolution_service LOGIN PASSWORD 'test'; END IF; END $$;"

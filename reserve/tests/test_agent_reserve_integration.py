@@ -34,10 +34,12 @@ MIGRATION_ROOT = Path(__file__).resolve().parents[2]
 def _apply_migrations(cur):
     ledger_sql = (MIGRATION_ROOT / "backend/src/db/migrations/011_prediction_ledger.sql").read_text()
     reserve_sql = (MIGRATION_ROOT / "reserve/migrations/001_reserve_extension.sql").read_text()
+    ed25519_sql = (MIGRATION_ROOT / "reserve/migrations/004_ed25519_signature.sql").read_text()
     for tbl in ("calibration_credentials", "credential_domains", "prediction_ledger"):
         cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
     cur.execute(ledger_sql)
     cur.execute(reserve_sql)
+    cur.execute(ed25519_sql)
     cur.execute(
         "DO $$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname='resolution_service') "
         "THEN CREATE ROLE resolution_service LOGIN PASSWORD 'test'; END IF; END $$;"

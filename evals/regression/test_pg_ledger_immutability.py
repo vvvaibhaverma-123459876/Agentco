@@ -57,6 +57,10 @@ def pg():
         Path(__file__).resolve().parents[2]
         / "reserve" / "migrations" / "001_reserve_extension.sql"
     )
+    ed25519_ext = (
+        Path(__file__).resolve().parents[2]
+        / "reserve" / "migrations" / "004_ed25519_signature.sql"
+    )
     with admin.cursor() as cur:
         # Clean slate so the suite is repeatable.
         cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE;")
@@ -65,6 +69,7 @@ def pg():
         cur.execute(MIGRATION.read_text())
         # Reserve extension adds hardness + consequence columns (required by _insert_record).
         cur.execute(reserve_ext.read_text())
+        cur.execute(ed25519_ext.read_text())
 
         # An ordinary application writer: gets only PUBLIC privileges, so the
         # REVOKE DELETE/UPDATE FROM PUBLIC actually bites (the table owner would

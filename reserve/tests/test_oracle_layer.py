@@ -64,6 +64,9 @@ def _apply_migrations(cur):
         (MIGRATION_ROOT / "reserve/migrations/001_reserve_extension.sql").read_text()
     )
     cur.execute(
+        (MIGRATION_ROOT / "reserve/migrations/004_ed25519_signature.sql").read_text()
+    )
+    cur.execute(
         (MIGRATION_ROOT / "reserve/migrations/002_staking.sql").read_text()
     )
     cur.execute(

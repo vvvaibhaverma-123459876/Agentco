@@ -100,6 +100,8 @@ pyrightconfig.json
 .env.*.local
 *.pem
 *.key
+# Exception: published public key (safe to commit — no secret)
+!reserve/keys/agentco_reserve_public.pem
 *.cert
 *.p12
 *.pfx
