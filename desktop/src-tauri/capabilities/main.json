@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.tauri.app/config/2/capability.json",
+  "identifier": "main-capability",
+  "description": "Capability file for the main application window",
+  "local": true,
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "shell:allow-spawn",
+    "shell:allow-kill",
+    "process:allow-exit",
+    "dialog:default",
+    "notification:default",
+    "http:default",
+    "store:allow-load",
+    "store:allow-save",
+    "store:allow-get",
+    "store:allow-set",
+    "store:allow-delete"
+  ]
+}

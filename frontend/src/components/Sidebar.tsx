@@ -4,14 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const NAV = [
-  { href: '/dashboard', label: 'Agent Status', icon: '⚡' },
-  { href: '/override', label: 'Override Queue', icon: '🔒' },
-  { href: '/audit', label: 'Audit Log', icon: '📋' },
-  { href: '/events', label: 'Event Stream', icon: '📡' },
-  { href: '/performance', label: 'Performance', icon: '📊' },
-  { href: '/config', label: 'Config History', icon: '⚙️' },
-  { href: '/finance', label: 'Finance', icon: '💰' },
-  { href: '/incidents', label: 'Incidents', icon: '🚨' },
+  { href: '/',            label: 'Home',             icon: '◉' },
+  { href: '/dashboard',   label: 'Agents',           icon: '⚡' },
+  { href: '/run',         label: 'Live Run',         icon: '▶' },
+  { href: '/ledger',      label: 'Prediction Ledger',icon: '📖' },
+  { href: '/calibration', label: 'Calibration',      icon: '🎯' },
+  { href: '/reserve',     label: 'Epistemic Reserve',icon: '🔐' },
+  { href: '/memory',      label: 'Agent Memory',     icon: '🧠' },
+  { href: '/civilization',label: 'Civilization',     icon: '🏛' },
+  { href: '/override',    label: 'Override Queue',   icon: '🔒' },
+  { href: '/audit',       label: 'Audit Log',        icon: '⛓' },
+  { href: '/events',      label: 'Event Stream',     icon: '📡' },
+  { href: '/settings',    label: 'Settings',         icon: '⚙️' },
 ];
 
 export function Sidebar() {
@@ -21,9 +25,9 @@ export function Sidebar() {
     <aside className="w-56 bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
         <div className="font-bold text-lg">AgentCo</div>
-        <div className="text-gray-400 text-xs mt-0.5">Control Dashboard</div>
+        <div className="text-gray-400 text-xs mt-0.5">Epistemic Governance</div>
       </div>
-      <nav className="flex-1 p-3">
+      <nav className="flex-1 p-3 overflow-y-auto">
         {NAV.map(({ href, label, icon }) => (
           <Link
             key={href}

@@ -405,3 +405,77 @@ AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5433/agentco?h
 ---
 
 *V2 · Calibrated Epistemic Architecture · Local-Model Edition*
+
+---
+
+## Desktop App
+
+AgentCo is packaged as a cross-platform desktop application using Tauri 2.0.
+One download, one install — no Docker knowledge, no terminals, no configuration files.
+
+### Download
+
+Installers are published as [GitHub Release](https://github.com/vvvaibhaverma-123459876/Agentco/releases) assets on every version tag.
+
+| Platform | Installer | Requirements |
+|----------|-----------|-------------|
+| **macOS** (Apple Silicon + Intel) | `.dmg` | macOS 12+, Docker Desktop, Ollama |
+| **Windows** (x64) | `.exe` (NSIS) | Windows 10+, Docker Desktop, Ollama |
+| **Linux** (x86_64) | `.AppImage` or `.deb` | Docker Desktop or Podman, Ollama |
+
+> Minimum: 8 GB RAM. Recommended: 16 GB RAM for qwen2.5:14b or larger models.
+
+### What's required (guided install)
+
+The desktop app checks for these on first launch and shows download dialogs if missing:
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)** — runs Postgres, Kafka, Redis
+- **[Ollama](https://ollama.com/download)** — runs AI models locally (default: `qwen2.5:7b`)
+
+### First-run wizard
+
+On first launch a 6-step wizard runs automatically:
+1. Welcome & explanation
+2. Docker Desktop check (install dialog if missing)
+3. Ollama check (install dialog if missing)
+4. Model selection (qwen2.5:7b default; pull progress shown)
+5. Infrastructure startup (`docker compose up -d` + migrations)
+6. Done → lands on the Home screen
+
+### Build from source
+
+```bash
+# Install Tauri CLI
+npm install -g @tauri-apps/cli@^2
+
+# Build frontend
+cd frontend && npm ci && npm run build && cd ..
+
+# Build desktop app
+cd desktop && tauri build
+```
+
+### Release pipeline
+
+Pushing a version tag builds all three platforms in parallel via GitHub Actions:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+# → .github/workflows/release.yml triggers
+# → Mac .dmg, Windows .exe, Linux .AppImage + .deb published to GitHub Releases
+```
+
+### UI screens (all backed by real data)
+
+| Screen | Path | Data source |
+|--------|------|-------------|
+| Home / Live Overview | `/` | `/api/stats`, `/api/events/recent` |
+| Live Run | `/run` | `/api/predictions`, `/api/agents/tasks` |
+| Prediction Ledger | `/ledger` | `/api/predictions` (searchable, filterable) |
+| Calibration | `/calibration` | `/api/trust-scores`, calibration curve |
+| Epistemic Reserve | `/reserve` | `/api/reserve/credentials`, verify endpoint |
+| Agent Memory | `/memory` | `/api/memory/:agent_id` |
+| Civilization | `/civilization` | `/api/civilization/*` |
+| Audit Log | `/audit` | `/api/audit`, integrity verification |
+| Override Queue | `/override` | `/api/overrides` |
+| Settings | `/settings` | localStorage / OS keychain (desktop) |

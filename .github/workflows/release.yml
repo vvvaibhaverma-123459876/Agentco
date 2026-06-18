@@ -1,0 +1,336 @@
+name: Release — Desktop App
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  # ────────────────────────────────────────────────────────────────────
+  # Build the Next.js frontend (shared artifact used by all three platform builds)
+  # ────────────────────────────────────────────────────────────────────
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Next.js (standalone)
+        working-directory: frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: 'http://localhost:3001'
+
+      - name: Upload frontend build
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-standalone
+          path: frontend/.next/
+          retention-days: 1
+
+  # ────────────────────────────────────────────────────────────────────
+  # Build the Node backend into a standalone binary (via pkg)
+  # ────────────────────────────────────────────────────────────────────
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Compile TypeScript
+        working-directory: backend
+        run: npx tsc
+
+      - name: Bundle with pkg (Linux target, used by all platform builds)
+        working-directory: backend
+        run: |
+          npx pkg dist/server.js \
+            --target node20-linux-x64 \
+            --output node-backend-linux-x64 \
+            --compress GZip
+          npx pkg dist/server.js \
+            --target node20-macos-x64 \
+            --output node-backend-macos-x64 \
+            --compress GZip
+          npx pkg dist/server.js \
+            --target node20-macos-arm64 \
+            --output node-backend-macos-arm64 \
+            --compress GZip
+          npx pkg dist/server.js \
+            --target node20-win-x64 \
+            --output node-backend-win-x64.exe \
+            --compress GZip
+
+      - name: Upload backend binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-binaries
+          path: backend/node-backend-*
+          retention-days: 1
+
+  # ────────────────────────────────────────────────────────────────────
+  # macOS — universal binary (.dmg)
+  # ────────────────────────────────────────────────────────────────────
+  build-mac:
+    needs: [build-frontend, build-backend]
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-standalone
+          path: frontend/.next/
+
+      - name: Download backend binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-binaries
+          path: desktop/src-tauri/binaries/
+
+      - name: Stage backend binaries (Tauri sidecar naming)
+        working-directory: desktop/src-tauri/binaries
+        run: |
+          cp node-backend-macos-x64 "node-backend-x86_64-apple-darwin"
+          cp node-backend-macos-arm64 "node-backend-aarch64-apple-darwin"
+          chmod +x node-backend-*
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli@^2
+
+      - name: Build Tauri app (universal macOS)
+        working-directory: desktop
+        run: |
+          tauri build --target universal-apple-darwin
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ''
+
+      - name: Upload macOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentco-macos
+          path: |
+            desktop/src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg
+          retention-days: 7
+
+  # ────────────────────────────────────────────────────────────────────
+  # Windows — x64 installer (.exe via NSIS)
+  # ────────────────────────────────────────────────────────────────────
+  build-windows:
+    needs: [build-frontend, build-backend]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-standalone
+          path: frontend/.next/
+
+      - name: Download backend binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-binaries
+          path: desktop/src-tauri/binaries/
+
+      - name: Stage backend binary (Tauri sidecar naming)
+        working-directory: desktop/src-tauri/binaries
+        shell: pwsh
+        run: |
+          Copy-Item "node-backend-win-x64.exe" "node-backend-x86_64-pc-windows-msvc.exe"
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli@^2
+
+      - name: Build Tauri app (Windows x64)
+        working-directory: desktop
+        run: tauri build --target x86_64-pc-windows-msvc
+
+      - name: Upload Windows artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentco-windows
+          path: |
+            desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+          retention-days: 7
+
+  # ────────────────────────────────────────────────────────────────────
+  # Linux — AppImage + .deb
+  # ────────────────────────────────────────────────────────────────────
+  build-linux:
+    needs: [build-frontend, build-backend]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libappindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libglib2.0-dev \
+            libgtk-3-dev \
+            libsoup-3.0-dev \
+            libjavascriptcoregtk-4.1-dev
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download frontend build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-standalone
+          path: frontend/.next/
+
+      - name: Download backend binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-binaries
+          path: desktop/src-tauri/binaries/
+
+      - name: Stage backend binary (Tauri sidecar naming)
+        working-directory: desktop/src-tauri/binaries
+        run: |
+          cp node-backend-linux-x64 "node-backend-x86_64-unknown-linux-gnu"
+          chmod +x node-backend-*
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli@^2
+
+      - name: Build Tauri app (Linux x86_64)
+        working-directory: desktop
+        run: tauri build --target x86_64-unknown-linux-gnu
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: agentco-linux
+          path: |
+            desktop/src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/appimage/*.AppImage
+            desktop/src-tauri/target/x86_64-unknown-linux-gnu/release/bundle/deb/*.deb
+          retention-days: 7
+
+  # ────────────────────────────────────────────────────────────────────
+  # Create GitHub Release with all three installers
+  # ────────────────────────────────────────────────────────────────────
+  create-release:
+    needs: [build-mac, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts/
+
+      - name: List artifacts
+        run: find release-artifacts/ -type f | sort
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "AgentCo ${{ github.ref_name }}"
+          body: |
+            ## AgentCo ${{ github.ref_name }} — Desktop App
+
+            AgentCo makes AI earn the right to be believed — by predicting before it knows,
+            and letting reality be the judge.
+
+            This desktop app packages the entire system — 29 AI agents, an immutable
+            prediction ledger, calibration tracking, epistemic reserve credentials, and
+            multi-institution governance — into a single installable application.
+
+            ### Requirements
+            - **Docker Desktop** must be installed and running ([download](https://www.docker.com/products/docker-desktop/))
+            - **Ollama** for local AI models ([download](https://ollama.com/download))
+            - 8GB RAM minimum (16GB recommended for larger models)
+
+            ### Install
+
+            | Platform | File | Size |
+            |----------|------|------|
+            | macOS (Apple Silicon + Intel) | `AgentCo_${{ github.ref_name }}_universal.dmg` | ~45MB |
+            | Windows (x64) | `AgentCo_${{ github.ref_name }}_x64-setup.exe` | ~35MB |
+            | Linux (x86_64 AppImage) | `AgentCo_${{ github.ref_name }}_amd64.AppImage` | ~90MB |
+            | Linux (.deb) | `AgentCo_${{ github.ref_name }}_amd64.deb` | ~35MB |
+
+            ### First Launch
+            On first launch, a setup wizard guides you through:
+            1. Docker Desktop check
+            2. Ollama install check
+            3. Model selection (default: qwen2.5:7b — runs on 8GB RAM)
+            4. Automatic infrastructure startup
+            5. Database migration
+            6. Dashboard
+
+            ### What's Inside
+            - **Prediction Ledger** — immutable, hash-chained, tamper-evident record of all AI predictions
+            - **Calibration & Trust Scores** — per-agent accuracy tracking with calibration curves
+            - **Epistemic Reserve** — publicly verifiable Proof-of-Calibration credentials
+            - **Agent Memory** — episodic and semantic memory timeline per agent
+            - **Civilization Layer** — multi-institution governance with self-cert ban
+            - **Audit Log** — hash-chained decision log with integrity verification
+            - **Human Override Queue** — governance control point for high-risk actions
+
+            ### Source
+            Built from commit ${{ github.sha }}
+          files: |
+            release-artifacts/**/*.dmg
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.AppImage
+            release-artifacts/**/*.deb
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

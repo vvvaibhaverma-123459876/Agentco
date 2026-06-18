@@ -4,6 +4,13 @@ import websocket from '@fastify/websocket';
 import { agentRoutes } from './routes/agents.routes';
 import { overrideRoutes } from './routes/override.routes';
 import { auditRoutes } from './routes/audit.routes';
+import { statsRoutes } from './routes/stats.routes';
+import { predictionsRoutes } from './routes/predictions.routes';
+import { trustRoutes } from './routes/trust.routes';
+import { reserveRoutes } from './routes/reserve.routes';
+import { memoryRoutes } from './routes/memory.routes';
+import { civilizationRoutes } from './routes/civilization.routes';
+import { eventsRoutes } from './routes/events.routes';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -17,6 +24,13 @@ async function build() {
   await app.register(agentRoutes);
   await app.register(overrideRoutes);
   await app.register(auditRoutes);
+  await app.register(statsRoutes);
+  await app.register(predictionsRoutes);
+  await app.register(trustRoutes);
+  await app.register(reserveRoutes);
+  await app.register(memoryRoutes);
+  await app.register(civilizationRoutes);
+  await app.register(eventsRoutes);
 
   app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 
