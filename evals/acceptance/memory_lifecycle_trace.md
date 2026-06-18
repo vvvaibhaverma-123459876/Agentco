@@ -1,9 +1,9 @@
 # Memory Lifecycle Trace
 
 First run prompt contained: No previous experience.
-First episodic memory: `1bca73f1-2fec-43da-8710-408d355334d3`.
+First episodic memory: `a09780e1-5041-480c-9354-20113c01b08f`.
 Second run prompt contained prior finding: Example launch claim.
-Prediction lesson memory: `2d8a11f9-959d-4b49-9e0e-84a83b5fba7f`.
+Prediction lesson memory: `fd83c9e5-f3e9-4b55-9aa9-b011531cf1c3`.
 Third run prompt contained prediction lesson: Well-sourced launch claims.
 Semantic memories extracted: 4.
 Shared memories written for ceo-agent: 1.
