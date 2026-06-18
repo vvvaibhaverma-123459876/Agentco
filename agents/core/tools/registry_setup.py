@@ -15,6 +15,7 @@ from .handlers import (
     handle_prompt_registry_read,
     handle_human_override,
 )
+from .web_scraper import handle_web_scraper, handle_claim_extractor
 
 _TOOL_SCHEMAS: dict[str, dict] = {
     "audit_log": {
@@ -126,6 +127,30 @@ _TOOL_SCHEMAS: dict[str, dict] = {
             "required": ["action","risk_level","context"],
         },
     },
+    "web_scraper": {
+        "name": "web_scraper",
+        "description": "Fetch a public URL and return cleaned text (≤5000 chars). Respects robots.txt.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "url":     {"type": "string", "description": "Fully-qualified URL to fetch"},
+                "timeout": {"type": "integer", "default": 10},
+            },
+            "required": ["url"],
+        },
+    },
+    "claim_extractor": {
+        "name": "claim_extractor",
+        "description": "Extract 3–5 verifiable claims from page text using the LLM.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "text":       {"type": "string", "description": "Cleaned page text"},
+                "source_url": {"type": "string", "description": "URL the text came from"},
+            },
+            "required": ["text", "source_url"],
+        },
+    },
 }
 
 
@@ -139,3 +164,5 @@ def register_all_tools() -> None:
     register_tool("memory_write",          _TOOL_SCHEMAS["memory_write"],          handle_memory_write)
     register_tool("prompt_registry",       _TOOL_SCHEMAS["prompt_registry"],       handle_prompt_registry_read)
     register_tool("human_override_interface", _TOOL_SCHEMAS["human_override_interface"], handle_human_override)
+    register_tool("web_scraper",             _TOOL_SCHEMAS["web_scraper"],             handle_web_scraper)
+    register_tool("claim_extractor",         _TOOL_SCHEMAS["claim_extractor"],         handle_claim_extractor)

@@ -16,7 +16,7 @@ AGENT_TOOL_PERMISSIONS: dict[str, set[str]] = {
     "cfo-agent": {"financial_monitor", "spend_approver", "budget_allocator", "event_bus", "audit_log", "human_override_interface"},
     "coo-agent": {"okr_registry", "workflow_orchestrator", "capacity_monitor", "event_bus", "audit_log"},
     "pm-agent": {"spec_registry", "research_reader", "okr_registry", "event_bus", "audit_log"},
-    "research-agent": {"web_search", "transcript_analyzer", "survey_tool", "competitor_monitor", "event_bus", "audit_log"},
+    "research-agent": {"web_search", "web_scraper", "claim_extractor", "transcript_analyzer", "survey_tool", "competitor_monitor", "event_bus", "audit_log"},
     "prioritizer-agent": {"priority_stack", "feature_scorer", "roadmap_registry", "event_bus", "audit_log"},
     "architect-agent": {"code_repository", "adr_registry", "tech_debt_registry", "event_bus", "audit_log"},
     "coder-agent": {"code_repository", "test_runner", "event_bus", "audit_log"},
