@@ -147,6 +147,12 @@ async def handle_event_bus(inp: dict[str, Any]) -> dict:
         )
     conn.close()
     logger.info("TOOL event_bus: published event_id=%s type=%s", event_id, inp["event_type"])
+    domain = inp["event_type"].split(".")[0]
+    _topic_map = {
+        "research": "agentco.research", "product": "agentco.product",
+        "engineering": "agentco.events", "audit": "agentco.audit",
+    }
+    topic = _topic_map.get(domain, "agentco.events")
     return {"event_id": event_id, "topic": topic, "signature": signature[:16] + "..."}
 
 

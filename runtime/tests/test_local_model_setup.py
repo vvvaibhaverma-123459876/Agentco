@@ -8,7 +8,7 @@ import json
 import pytest
 from unittest.mock import MagicMock, patch
 
-from runtime.base_agent.model_tiers import model_for, MODEL_TIERS, AGENT_TIER
+from runtime.base_agent.model_tiers import model_for, MODEL_TIERS, AGENT_TIER, tier_for
 from runtime.base_agent.structured_output import get_validated_output, _extract_json
 
 
@@ -17,17 +17,25 @@ from runtime.base_agent.structured_output import get_validated_output, _extract_
 # ---------------------------------------------------------------------------
 
 class TestModelTiers:
-    def test_known_agent_returns_correct_model(self):
+    def test_known_agent_returns_tier_model(self):
+        # Each agent resolves to the model of its tier — both sides read from config
         assert model_for("ceo-agent") == MODEL_TIERS["frontier"]
         assert model_for("coder-agent") == MODEL_TIERS["coder"]
         assert model_for("support-agent") == MODEL_TIERS["monitor"]
 
     def test_unknown_agent_defaults_to_standard(self):
         assert model_for("some-new-agent") == MODEL_TIERS["standard"]
+        assert tier_for("some-new-agent") == "standard"
 
     def test_all_tier_values_are_non_empty_strings(self):
         for tier, model in MODEL_TIERS.items():
             assert isinstance(model, str) and model, f"Empty model for tier {tier}"
+
+    def test_tier_for_known_agents(self):
+        assert tier_for("ceo-agent") == "frontier"
+        assert tier_for("coder-agent") == "coder"
+        assert tier_for("support-agent") == "monitor"
+        assert tier_for("pm-agent") == "standard"
 
 
 # ---------------------------------------------------------------------------
@@ -125,10 +133,11 @@ class TestBaseAgentV2LocalModel:
             PROMPT_VERSION = "test-1.0"
             def run(self, task): pass
 
-        with patch("runtime.base_agent.base_agent_v2.make_client") as mc:
+        with patch("runtime.base_agent.base_agent_v2.client_for") as mc:
             mc.return_value = MagicMock()
             agent = ConcreteAgent("ceo-agent")
 
+        # model resolves from config (both sides read same env/defaults)
         assert agent._model == MODEL_TIERS["frontier"]
         assert agent._llm_client is not None
 
@@ -139,7 +148,7 @@ class TestBaseAgentV2LocalModel:
             PROMPT_VERSION = "test-1.0"
             def run(self, task): pass
 
-        with patch("runtime.base_agent.base_agent_v2.make_client") as mc:
+        with patch("runtime.base_agent.base_agent_v2.client_for") as mc:
             mc.return_value = MagicMock()
             agent = ConcreteAgent("support-agent")
 

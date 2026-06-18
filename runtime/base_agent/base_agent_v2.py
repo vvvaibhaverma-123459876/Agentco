@@ -25,8 +25,9 @@ from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
 from calibration.ledger.prediction_ledger import PredictionRegistration
-from runtime.base_agent.llm_client import make_client
+from runtime.base_agent.llm_client import client_for
 from runtime.base_agent.model_tiers import model_for
+from runtime.base_agent.spend_guardrail import SpendGuardrail
 from runtime.base_agent.structured_output import get_validated_output
 
 logger = logging.getLogger(__name__)
@@ -98,10 +99,13 @@ class BaseAgentV2:
         self._confidence = ConfidenceV2(trust_controller=self._trust)
         self._gate = EscalationGate()
 
-        # LLM client — points at Ollama by default; override via LLM_BASE_URL env var
-        self._llm_client = make_client()
+        # LLM client — tier-specific; provider+model resolved from env config
+        self._llm_client = client_for(agent_id)
         self._model = model_for(agent_id)
         self.output_schema: dict = {}   # subclasses set this to enforce structured output shape
+
+        # Spend guardrail — halts LLM calls if token/rate cap exceeded
+        self._spend = SpendGuardrail(agent_id=agent_id, escalation=self._gate)
 
     @abstractmethod
     def run(self, task: dict) -> Any:
@@ -193,6 +197,7 @@ class BaseAgentV2:
             messages=messages,
             schema=schema if schema is not None else self.output_schema,
             escalation=self._gate,
+            guardrail=self._spend,
         )
 
     def execute_action(

@@ -1,15 +1,21 @@
 """
 Validate-and-retry layer for structured LLM output.
 
-Small local models break JSON schema more often than frontier models.
-This module absorbs that noise: validate, retry with corrective feedback,
-and escalate on repeated failure — never emit malformed output to the event bus.
+Provider-agnostic: works with any client that exposes
+  client.chat.completions.create(model, messages, temperature)
+and returns response.choices[0].message.content.
+
+Escalates on repeated structured-output failure; never emits malformed output
+to the event bus.
+
+If a SpendGuardrail is passed, it is checked BEFORE each attempt and updated
+AFTER (with token usage from response.usage.total_tokens when available).
 """
 from __future__ import annotations
 
 import json
 import logging
-from typing import Any
+from typing import Any, Optional
 
 from jsonschema import ValidationError, validate
 
@@ -24,20 +30,35 @@ def get_validated_output(
     messages: list[dict],
     schema: dict,
     escalation: Any,
+    guardrail: Optional[Any] = None,
 ) -> dict:
     """
-    Call the local model; validate against schema; retry with corrective feedback;
+    Call the model; validate against schema; retry with corrective feedback;
     escalate on repeated failure. Never returns malformed structured output.
+
+    guardrail — optional SpendGuardrail; checked before each call and updated
+                after with token usage.  Raises SpendCapExceeded if over limit.
     """
     last_error: Exception | None = None
     current_messages = list(messages)
 
     for attempt in range(MAX_RETRIES):
+        if guardrail is not None:
+            guardrail.check_before_call()  # raises SpendCapExceeded if over limit
+
         resp = client.chat.completions.create(
             model=model,
             messages=current_messages,
             temperature=0.2,
         )
+
+        if guardrail is not None:
+            usage = getattr(resp, "usage", None)
+            if usage is not None:
+                total = getattr(usage, "total_tokens", 0) or 0
+                if isinstance(total, int):
+                    guardrail.record_usage(total)
+
         raw = resp.choices[0].message.content or ""
         try:
             parsed = json.loads(_extract_json(raw))

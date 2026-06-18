@@ -212,7 +212,7 @@ marked **Proven** when such a test passes; tests against mocks do not count.
 | 7 | Agent Task Dispatch (end-to-end) | ⚠️ Partial | audit → ledger → Kafka legs all proven against real infra in one task flow; **live LLM-inference leg is UNVERIFIED in this sandbox** (egress to model hosts blocked — see note) | `agents/tests/integration/test_agent_dispatch_e2e.py` (1) |
 | 8 | Local Model Cleanup | ✅ Proven | No cloud model IDs anywhere; `model_for()` resolves a local Ollama tier map | `runtime/tests/test_local_model_setup.py`, `runtime/base_agent/model_tiers.py` |
 
-**Master gate (real infra):** `180 passed` (Python: evals/calibration/runtime/synthesis/learning/agents/civilization/e2e — includes 22 civilization tests and 1 Phase 7 end-to-end operating loop)
+**Master gate (real infra):** `205 passed` (Python: evals + calibration + runtime + synthesis + learning + agents/tests + reserve/tests + tests/civilization + tests/e2e)
 and `28 passed` (backend integration). Acceptance trace:
 [`evals/acceptance/seeded_false_belief_trace.md`](evals/acceptance/seeded_false_belief_trace.md).
 
@@ -231,17 +231,25 @@ and `28 passed` (backend integration). Acceptance trace:
 **Reproduce the master gate:**
 
 ```bash
-# infra: Postgres :5433 (socket /tmp), Kafka :9092, Redis :6379, pgvector enabled
+# First: apply migrations to a fresh database
 export DATABASE_URL='postgresql://agentco:password@localhost:5433/agentco?host=/tmp'
 export AGENTCO_TEST_DATABASE_URL="$DATABASE_URL"
 export KAFKA_BROKERS='localhost:9092'
 
-# Python master gate
-python3 -m pytest evals/ calibration/ runtime/ synthesis/ learning/ agents/tests/ -q
+# Apply backend migrations (creates all 14 backend tables)
+cd backend && npm run db:migrate && cd ..
+
+# Python master gate (all directories)
+python3 -m pytest \
+  evals/ calibration/ runtime/ synthesis/ learning/ \
+  agents/tests/ reserve/tests/ tests/ \
+  -q
+# Expected: 205 passed
 
 # Backend integration (real Postgres + Kafka)
 cd backend && SUPERUSER_DATABASE_URL='postgresql://postgres:password@localhost:5433/agentco?host=/tmp' \
-  npx jest tests/integration/ --runInBand --forceExit
+  npx jest tests/ --runInBand --forceExit
+# Expected: 28 passed
 ```
 
 ---
@@ -280,7 +288,7 @@ What is NOT yet true: decentralised hosting, multi-party issuance, on-chain sett
 - Fresh identities (no resolved predictions) earn 0.
 - Weight is non-transferable and non-forgeable (bound to `agent_id`; embedded in Ed25519 signature).
 
-### Five Phases — all proven against real Postgres (183/183 tests)
+### Five Phases — all proven against real Postgres (25/25 tests)
 
 | Phase | Deliverable | Core property proven |
 |---|---|---|
@@ -310,7 +318,12 @@ stake_weight    = max(0, exp(cell_log_score) − 0.5)
 ```bash
 AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5433/agentco?host=/tmp \
   python3 -m pytest reserve/tests/ -v
-# Expected: 23+ passed (Phases 1-3: 14, Phase A: 1, Phase B: 5, Phase C: 4)
+# Expected: 25 passed
+#   agent_reserve_integration: 1
+#   Phases 1-3 (proof_of_calibration + staking + oracle): 4+5+5 = 14
+#   Phase A (independent_recomputation): 1
+#   Phase B (ed25519_signing): 5
+#   Phase C (tamper_evidence): 4
 ```
 
 Acceptance traces:
