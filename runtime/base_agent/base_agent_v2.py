@@ -440,11 +440,14 @@ class BaseAgentV2:
         return injected
 
     @staticmethod
-    def _run_async(coro):
+    def _run_async(result_or_coro):
+        import inspect
+        if not inspect.iscoroutine(result_or_coro):
+            return result_or_coro
         try:
             asyncio.get_running_loop()
         except RuntimeError:
-            return asyncio.run(coro)
+            return asyncio.run(result_or_coro)
         raise RuntimeError("BaseAgentV2 memory sync helpers cannot run inside an active event loop")
 
     def get_audit_log(self) -> list[dict]:
