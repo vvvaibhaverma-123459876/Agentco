@@ -1,0 +1,17 @@
+institution_name: Security
+accepted_inputs:
+  - software_artifact
+  - architecture_decision
+  - threat_model
+produced_outputs:
+  - security_review_report
+  - vulnerability_assessment
+  - security_approval
+verification_required: true
+required_external_reviewer: Engineering
+failure_conditions:
+  - missed_critical_vulnerability
+  - false_positive_rate_exceeds_threshold
+  - unresolved_challenge_past_timeout
+escalation_target: governance
+reputation_metric: overall_log_score

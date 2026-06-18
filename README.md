@@ -6,19 +6,27 @@ AgentCo is a fully autonomous, AI-operated company. Every business function is e
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Synthesis Layer        PrincipleLibrary · TheoryEngine          │
+│  Civilization Substrate  Institution · Department · Agent        │
+│                          Review FSM · Reputation Propagation     │
+│                          Governance · Anti-Chaos Controls        │
 ├─────────────────────────────────────────────────────────────────┤
-│  Learning Loop          Intelligence → Scenario → Trainer        │
-│                         → [Human gate] → Memory  (6h cycle)     │
+│  Epistemic Reserve       Proof-of-Calibration · Staking          │
+│                          Recursive Resolution · Ed25519 Signing  │
+│                          Independent Recomputation · Hash Chain  │
 ├─────────────────────────────────────────────────────────────────┤
-│  Calibration Engine     PredictionLedger · ResolutionService     │
-│                         TrustController · RealityFirewall        │
-│                         SurpriseRegister · DecayTracker          │
+│  Synthesis Layer         PrincipleLibrary · TheoryEngine         │
 ├─────────────────────────────────────────────────────────────────┤
-│  Agent Layer (29)       BaseAgentV2 · EscalationGate             │
-│                         ConfidenceV2 · AuditLog                  │
+│  Learning Loop           Intelligence → Scenario → Trainer       │
+│                          → [Human gate] → Memory  (6h cycle)    │
 ├─────────────────────────────────────────────────────────────────┤
-│  Infrastructure         PostgreSQL · Kafka · Redis · K8s         │
+│  Calibration Engine      PredictionLedger · ResolutionService    │
+│                          TrustController · RealityFirewall       │
+│                          SurpriseRegister · DecayTracker         │
+├─────────────────────────────────────────────────────────────────┤
+│  Agent Layer (29)        BaseAgentV2 · EscalationGate            │
+│                          ConfidenceV2 · AuditLog                 │
+├─────────────────────────────────────────────────────────────────┤
+│  Infrastructure          PostgreSQL · Kafka · Redis · K8s        │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -94,6 +102,13 @@ To swap providers, set `LLM_BASE_URL` and `LLM_API_KEY` in `.env` — no code ch
 
 ```
 agentco/
+├── civilization/              # Civilization Substrate (multi-institution layer)
+│   ├── domain/entities.py     # Institution, Department, AgentMembershipEdge dataclasses
+│   ├── services/              # institution_service, review_service, reputation_service,
+│   │                          #   governance_service, memory_service
+│   ├── contracts/             # Institution YAML contracts (engineering.yaml, security.yaml)
+│   ├── controls.yaml          # Anti-chaos controls (emergency shutdown, duplicate detector, …)
+│   └── reputation_weights.yaml # Department weights for institution score aggregation
 ├── agents/                    # Python agent runtime (all 29 agents)
 │   ├── core/                  # BaseAgent, confidence scoring, event subscriber, memory client
 │   ├── executive/             # CEO, CFO, COO agents
@@ -197,7 +212,7 @@ marked **Proven** when such a test passes; tests against mocks do not count.
 | 7 | Agent Task Dispatch (end-to-end) | ⚠️ Partial | audit → ledger → Kafka legs all proven against real infra in one task flow; **live LLM-inference leg is UNVERIFIED in this sandbox** (egress to model hosts blocked — see note) | `agents/tests/integration/test_agent_dispatch_e2e.py` (1) |
 | 8 | Local Model Cleanup | ✅ Proven | No cloud model IDs anywhere; `model_for()` resolves a local Ollama tier map | `runtime/tests/test_local_model_setup.py`, `runtime/base_agent/model_tiers.py` |
 
-**Master gate (real infra):** `158 passed` (Python: evals/calibration/runtime/synthesis/learning/agents)
+**Master gate (real infra):** `180 passed` (Python: evals/calibration/runtime/synthesis/learning/agents/civilization/e2e — includes 22 civilization tests and 1 Phase 7 end-to-end operating loop)
 and `28 passed` (backend integration). Acceptance trace:
 [`evals/acceptance/seeded_false_belief_trace.md`](evals/acceptance/seeded_false_belief_trace.md).
 
@@ -316,6 +331,63 @@ Acceptance traces:
 Proven structurally in `reserve/staking/staking.py` and demonstrated by test 2 of
 `reserve/tests/test_staking_and_decisions.py`: 10 zero-weight agents cannot override
 1 credentialed agent.
+
+---
+
+## Civilization Substrate
+
+The Civilization Substrate adds a multi-institution coordination layer on top of the Epistemic Reserve. Agent credentials flow upward; reputation propagates only from recomputable Reserve evidence. Full specification: [`SYSTEM_CIVILIZATION.md`](SYSTEM_CIVILIZATION.md).
+
+### Three-Level Hierarchy
+
+```
+Institution  (top — parent_id must be NULL, enforced by DB CHECK)
+  └─ Department  (five mandatory per institution; parent_id NOT NULL)
+       └─ Agent  (leaf, via agent_membership_edges)
+```
+
+No Society or Civilization entities exist. The hierarchy stops at Institution.
+
+### Five Mandatory Departments
+
+Every institution is created atomically with: **Production · Verification · Audit · Adversarial · Improvement**
+
+### Key Invariants (all DB-enforced)
+
+| Invariant | Enforcement |
+|---|---|
+| Self-certification ban | `CHECK (producing_institution_id <> reviewer_institution_id)` on `institution_output_reviews` |
+| Reputation guard | BEFORE UPDATE trigger — `SET LOCAL civilization.reputation_update_authorized = 'true'` required |
+| Institution parent null | `CHECK (parent_id IS NULL)` on `institutions` |
+| Department parent not null | `NOT NULL` FK on `departments.parent_id` |
+
+### Review State Machine
+
+```
+proposed → under_review → challenged → approved → archived
+                        ↘ rejected  ↗         ↘ archived
+```
+
+`approved` is only reachable after `under_review` — direct `proposed → approved` raises `ReviewTransitionError`.
+
+### Reputation Propagation Formula
+
+```
+agent_score(a)      = Reserve credential overall_log_score
+dept_score(d)       = Σ(sample_count(a) × agent_score(a)) / Σ sample_count(a)
+institution_score(i)= Σ(W(d) × dept_score(d)) / Σ W(d)    # W from reputation_weights.yaml
+```
+
+Empty groups → NULL (not 0). Score write requires a `reputation_updated` memory event in the same transaction.
+
+### Civilization Test Suite
+
+```bash
+AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5433/agentco?host=/tmp \
+  python3 -m pytest tests/civilization/ tests/e2e/ -v
+# Expected: 22 passed (T3.1-T3.4 migration, 9 contract, T5.1-T5.4 review+reputation,
+#           4 governance, 1 Phase 7 end-to-end operating loop)
+```
 
 ---
 

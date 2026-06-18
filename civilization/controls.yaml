@@ -1,0 +1,6 @@
+institution_creation_budget: 10
+duplicate_institution_detector: true
+unresolved_challenge_blocker: true
+review_timeout_hours: 48
+reputation_floor: -2.0
+emergency_shutdown_flag: false
