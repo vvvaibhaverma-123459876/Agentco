@@ -30,6 +30,7 @@ Layer 1 — V2 Runtime                  runtime/
   BaseAgentV2                         runtime/base_agent/
   ConfidenceV2                        runtime/confidence/
   EscalationGate                      runtime/escalation/
+  Experiential Memory Hooks           agents/core/memory/
 
 Layer 2 — Continuous Learning Loop    learning/
   Intelligence-Agent (6h cycle)
@@ -178,6 +179,30 @@ BaseAgentV2.execute_action(action)
   → emit signed envelope with producer_prompt_version
   → write immutable audit entry
 ```
+
+**Experiential memory lifecycle (proven append-only path):**
+```
+BaseAgentV2.prepare_memory_context(task, domain)
+  → MemoryReader.retrieve_relevant()  [best-effort, 500ms budget]
+  → MemoryReader.get_agent_track_record_summary()
+  → inject concise memory context into act() messages
+
+BaseAgentV2.complete_task_memory(...)
+  → MemoryWriter.write_episodic()     [append-only agent_memories row]
+
+BaseAgentV2.remember_prediction_lesson(...)
+  → MemoryWriter.write_prediction_lesson()
+
+LearningLoop.extract_lessons_from_recent()
+  → MemoryWriter.write_semantic()
+  → consolidate/share through superseded_by and shared namespace
+```
+
+`agent_memories` rows are immutable once written: summary/content and identity
+columns cannot be updated, and deletes are rejected by trigger. Corrections and
+consolidations write new rows and link old rows through `superseded_by`.
+
+**Proven by:** `tests/e2e/test_memory_lifecycle.py`
 
 ## Epistemic Reserve Data Flows
 

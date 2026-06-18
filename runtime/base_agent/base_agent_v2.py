@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import asyncio
 import json
 import logging
 import os
@@ -107,6 +108,22 @@ class BaseAgentV2:
         # Spend guardrail — halts LLM calls if token/rate cap exceeded
         self._spend = SpendGuardrail(agent_id=agent_id, escalation=self._gate)
 
+        # Experiential memory is optional and non-blocking. It enriches prompts
+        # only when the append-only memory schema is available.
+        self._memory_context: str = ""
+        self._memory_reader = None
+        self._memory_writer = None
+        self._memory_enabled = os.environ.get("AGENTCO_MEMORY_ENABLED", "1") != "0"
+        if self._memory_enabled:
+            try:
+                db_url = os.environ.get("AGENTCO_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
+                if db_url:
+                    from agents.core.memory import MemoryReader, MemoryWriter
+                    self._memory_reader = MemoryReader(db_url)
+                    self._memory_writer = MemoryWriter(db_url)
+            except Exception as exc:
+                logger.warning("BaseAgentV2(%s): memory unavailable — %s", self.agent_id, exc)
+
     @abstractmethod
     def run(self, task: dict) -> Any:
         """Agent-specific entrypoint. Must call execute_action() for each action."""
@@ -191,6 +208,7 @@ class BaseAgentV2:
 
         Uses self.output_schema by default; pass schema to override for a single call.
         """
+        messages = self._inject_memory_context(messages)
         return get_validated_output(
             client=self._llm_client,
             model=self._model,
@@ -304,6 +322,130 @@ class BaseAgentV2:
             outcome=outcome,
         )
         self._audit_log.append(entry)
+
+    def prepare_memory_context(
+        self,
+        task_description: str,
+        domain: str = "general",
+        timeout_ms: int = 500,
+    ) -> str:
+        """
+        Retrieve memories and track record for the next task.
+
+        This method is deliberately best-effort: DB failures and timeout failures
+        result in an empty or first-run context, never in a blocked agent run.
+        """
+        if not self._memory_reader:
+            self._memory_context = ""
+            return self._memory_context
+        try:
+            memories = self._run_async(
+                self._memory_reader.retrieve_relevant(
+                    self.agent_id, task_description, domain=domain, timeout_ms=timeout_ms
+                )
+            )
+            track_record = self._run_async(
+                self._memory_reader.get_agent_track_record_summary(self.agent_id, domain=domain)
+            )
+            self._memory_context = self._memory_reader.format_for_system_prompt(memories, track_record)
+            return self._memory_context
+        except Exception as exc:
+            logger.warning("BaseAgentV2(%s): memory retrieval failed — %s", self.agent_id, exc)
+            self._memory_context = ""
+            return self._memory_context
+
+    def complete_task_memory(
+        self,
+        task_id: str,
+        task_type: str,
+        task_input: str,
+        task_output_summary: str,
+        predictions_registered: Optional[list[str]] = None,
+        sources_consulted: Optional[list[str]] = None,
+        key_findings: Optional[list[str]] = None,
+        errors_encountered: Optional[list[str]] = None,
+        confidence_in_output: float = 0.5,
+        duration_seconds: float = 0.0,
+        tokens_used: int = 0,
+        domain: str = "general",
+    ) -> Optional[str]:
+        """Append an episodic memory for a completed task."""
+        if not self._memory_writer:
+            return None
+        try:
+            return self._run_async(
+                self._memory_writer.write_episodic(
+                    agent_id=self.agent_id,
+                    task_id=task_id,
+                    task_type=task_type,
+                    task_input=task_input,
+                    task_output_summary=task_output_summary,
+                    predictions_registered=predictions_registered or [],
+                    sources_consulted=sources_consulted or [],
+                    key_findings=key_findings or [],
+                    errors_encountered=errors_encountered or [],
+                    confidence_in_output=confidence_in_output,
+                    duration_seconds=duration_seconds,
+                    tokens_used=tokens_used,
+                    domain=domain,
+                )
+            )
+        except Exception as exc:
+            logger.warning("BaseAgentV2(%s): episodic memory write failed — %s", self.agent_id, exc)
+            return None
+
+    def remember_prediction_lesson(
+        self,
+        prediction_id: str,
+        claim: str,
+        stated_confidence: float,
+        actual_outcome: bool,
+        log_score: float,
+        lesson: str,
+        domain_insight: str,
+        calibration_adjustment: str,
+        domain: str,
+    ) -> Optional[str]:
+        """Append a prediction lesson after external resolution."""
+        if not self._memory_writer:
+            return None
+        try:
+            return self._run_async(
+                self._memory_writer.write_prediction_lesson(
+                    agent_id=self.agent_id,
+                    prediction_id=prediction_id,
+                    claim=claim,
+                    stated_confidence=stated_confidence,
+                    actual_outcome=actual_outcome,
+                    log_score=log_score,
+                    lesson=lesson,
+                    domain_insight=domain_insight,
+                    calibration_adjustment=calibration_adjustment,
+                    domain=domain,
+                )
+            )
+        except Exception as exc:
+            logger.warning("BaseAgentV2(%s): prediction lesson write failed — %s", self.agent_id, exc)
+            return None
+
+    def _inject_memory_context(self, messages: list[dict]) -> list[dict]:
+        if not self._memory_context:
+            return messages
+        memory_block = {"role": "system", "content": self._memory_context}
+        if not messages:
+            return [memory_block]
+        injected = list(messages)
+        insert_at = 1 if injected[0].get("role") == "system" else 0
+        injected.insert(insert_at, memory_block)
+        return injected
+
+    @staticmethod
+    def _run_async(coro):
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return asyncio.run(coro)
+        raise RuntimeError("BaseAgentV2 memory sync helpers cannot run inside an active event loop")
 
     def get_audit_log(self) -> list[dict]:
         return [asdict(e) for e in self._audit_log]
