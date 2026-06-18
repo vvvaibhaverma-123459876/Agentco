@@ -218,3 +218,61 @@ Run all Phase 0 tests:
 ```
 python -m pytest calibration/tests/ runtime/tests/ -v
 ```
+
+---
+
+## LLM Provider Model (Config-Driven)
+
+Every agent tier resolves its provider and model **entirely from environment
+variables** — no code change is required to switch providers or models.
+
+### Tier → Agent mapping
+
+| Tier       | Agents                      | Env prefix          |
+|------------|-----------------------------|---------------------|
+| `frontier` | ceo-agent                   | `LLM_*_FRONTIER`    |
+| `standard` | pm-agent, research-agent, … | `LLM_*_STANDARD`    |
+| `monitor`  | support-agent               | `LLM_*_MONITOR`     |
+| `coder`    | coder-agent                 | `LLM_*_CODER`       |
+
+### Resolution order (per tier T)
+
+```
+LLM_PROVIDER_T  →  LLM_PROVIDER       →  "openai"
+LLM_BASE_URL_T  →  LLM_BASE_URL       →  provider default
+LLM_API_KEY_T   →  LLM_API_KEY        →  "" (fails validation for non-ollama)
+LLM_MODEL_T     →  LLM_MODEL_DEFAULT  →  provider tier default
+```
+
+### Supported providers
+
+**OpenAI-compatible** (OpenAI SDK with `base_url`): `openai`, `ollama`,
+`groq`, `together`, `fireworks`, `openrouter`, `deepseek`, `mistral`,
+`anyscale`.
+
+**Native adapter**: `anthropic` — thin wrapper around `anthropic.Anthropic`;
+requires `pip install anthropic>=0.40`.
+
+**Unsupported**: `google` — raises `ConfigurationError` at startup.
+
+### Spend guardrail
+
+`SpendGuardrail` is checked **before** every LLM call in `act()`.
+
+- `LLM_MAX_TOKENS_PER_RUN` (default 100 000): token cap per agent run.
+- `LLM_RATE_LIMIT_RPM` (default 60): call-rate cap per minute per run.
+
+When exceeded: `escalation.route(reason="spend_cap_exceeded", risk_level="critical")`
+fires **first**, then `SpendCapExceeded` is raised. The LLM call is never made.
+No silent throttling — the agent stops and escalates.
+
+### Startup validation
+
+`validate_all_tiers()` raises `ConfigurationError` naming the missing variable
+and tier if any non-ollama tier has no api_key. Call at process start.
+
+### Smoke test
+
+`scripts/smoke_one_task.py` — verifies config, calibration engine, LLM call,
+Postgres audit log, and Kafka event bus in one run. Kafka is optional (dev);
+calibration + LLM + DB are required (exit 1 if any fail).
