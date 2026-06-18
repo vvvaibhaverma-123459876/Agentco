@@ -90,6 +90,34 @@ def run():
     print("AUTONOMOUS PREDICTION LOOP — registering 5 real predictions")
     print(f"{'='*64}\n")
 
+    # ── Memory: load prior experience ──────────────────────────────────────
+    prior_context = ""
+    prior_claims: list[str] = []
+    try:
+        from agents.core.memory.memory_reader import MemoryReader
+        from agents.core.memory.memory_writer import MemoryWriter
+        _mem_reader = MemoryReader(DB_URL)
+        _mem_writer = MemoryWriter(DB_URL)
+        prior_mems = _mem_reader.retrieve_relevant(
+            "research-agent", "internet prediction scan tech news claims",
+            domain="technology", timeout_ms=500,
+        )
+        track = _mem_reader.get_agent_track_record_summary("research-agent", "technology")
+        prior_context = _mem_reader.format_for_system_prompt(prior_mems, track)
+        # Extract previously registered claims so we don't re-register them
+        for m in prior_mems:
+            content = m.get("content", {})
+            prior_claims.extend(content.get("predictions_registered_claims", []))
+        if prior_context:
+            print(f"  [MEMORY] Prior context loaded ({len(prior_context)} chars)")
+            print(f"  [MEMORY] Prior claims to skip: {len(prior_claims)}")
+        else:
+            print(f"  [MEMORY] No previous experience in this domain.")
+    except Exception as exc:
+        logger.warning("Memory unavailable (non-blocking): %s", exc)
+        _mem_reader = None
+        _mem_writer = None
+
     # Trust baseline BEFORE any registrations
     trust_before = trust.trusted_confidence(
         stated=0.80, subject_id="research-agent", subject_type="agent",
@@ -110,12 +138,13 @@ def run():
 
         print(f"    → fetched {len(page['text'])} chars  (title: {page.get('title','')[:60]})")
 
-        # Extract claims via LLM
+        # Extract claims via LLM (inject memory context so agent doesn't repeat prior work)
         try:
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            memory_section = f"\n\n{prior_context}\n\nIMPORTANT: Do NOT re-register claims you have already registered in prior runs (listed above under PREVIOUS EXPERIENCE).\n" if prior_context else ""
             prompt = f"""You are a prediction-calibration assistant. Extract 3–5 specific, verifiable factual claims
 from the news text below.
-
+{memory_section}
 Rules:
 - Each claim must be binary (TRUE or FALSE, unambiguous)
 - Prefer claims already confirmed by this article (set resolution_date to today {today})
@@ -152,6 +181,10 @@ Return ONLY JSON (no prose, no code fences):
             import re
             raw = resp.choices[0].message.content or ""
             raw = re.sub(r"```(?:json)?", "", raw).strip().strip("`").strip()
+            # Extract JSON object even when the model adds preamble text
+            m = re.search(r'\{.*\}', raw, re.DOTALL)
+            if m:
+                raw = m.group(0)
             parsed = json.loads(raw)
             claims = parsed.get("claims", [])
         except Exception as exc:
@@ -233,6 +266,29 @@ Return ONLY JSON (no prose, no code fences):
                 continue
 
     conn.close()
+
+    # ── Memory: write episodic record of this run ──────────────────────────
+    if '_mem_writer' in dir() and _mem_writer is not None:
+        try:
+            key_findings = [r["claim"][:100] for r in registered]
+            mid = _mem_writer.write_episodic(
+                agent_id="research-agent",
+                task_id=f"prediction-loop-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}",
+                task_type="internet_prediction_scan",
+                task_input=f"scan {SOURCES}",
+                task_output_summary=f"registered {len(registered)} predictions from {len(SOURCES)} sources",
+                predictions_registered=[r["prediction_id"] for r in registered],
+                sources_consulted=SOURCES,
+                key_findings=key_findings,
+                errors_encountered=[],
+                confidence_in_output=0.8 if registered else 0.3,
+                duration_seconds=0.0,
+                tokens_used=token_usage["total"],
+                domain="technology",
+            )
+            print(f"\n  [MEMORY] Episodic memory written: {mid}")
+        except Exception as exc:
+            logger.warning("Memory write failed (non-blocking): %s", exc)
 
     print(f"\n{'='*64}")
     print(f"REGISTERED {len(registered)}/5 PREDICTIONS")

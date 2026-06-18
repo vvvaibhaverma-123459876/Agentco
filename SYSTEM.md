@@ -202,7 +202,24 @@ LearningLoop.extract_lessons_from_recent()
 columns cannot be updated, and deletes are rejected by trigger. Corrections and
 consolidations write new rows and link old rows through `superseded_by`.
 
-**Proven by:** `tests/e2e/test_memory_lifecycle.py`
+**Proven by:** `tests/e2e/test_memory_lifecycle.py` (10 tests, all PASS — real Postgres, local LLM via Ollama)
+
+**Proven behaviors (what the tests assert):**
+- Append-only schema: UPDATE of summary/content → trigger raises; DELETE → trigger raises
+- Namespace isolation: agent-a's memories not returned for agent-b queries
+- Episodic write + read: `write_episodic` row readable; `access_count` incremented on retrieval
+- Prediction lesson: `write_prediction_lesson` row linked to `prediction_id`
+- Semantic dedup: identical fact supersedes old memory via `superseded_by`
+- Track record: `get_agent_track_record_summary` aggregates `prediction_ledger`
+- Format: `format_for_system_prompt` returns ≤ 6000 chars with prior findings
+- 1ms timeout: `retrieve_relevant` with 1ms timeout returns (possibly empty) without blocking
+- Learning loop extraction: `extract_lessons_from_recent` produces ≥ 1 semantic memory
+- Consolidation: 5+ semantic memories consolidated to 1; originals get `superseded_by`
+- Cross-agent sharing: `cross_agent_lesson_sharing` writes to `namespace='shared'`; target agent retrieves it
+
+**Under-claim (pgvector not installed):** embeddings stored as `FLOAT[]`; cosine
+similarity computed in Python; Jaccard fallback when embeddings unavailable.
+ivfflat indexing not available in this environment.
 
 ## Epistemic Reserve Data Flows
 

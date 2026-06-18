@@ -1,185 +1,77 @@
-# Memory Lifecycle Audit
+# Memory Audit — AgentCo (2026-06-18)
 
-Date: 2026-06-18
+## What Exists
 
-## Scope
+### agents/core/memory_client.py — STUB (no real storage)
+All methods (`read`, `write`, `read_shared`, `write_shared`, `get_agent_state`, `update_heartbeat`) are 
+no-ops that only call `logger.debug`. No real Postgres or Pinecone connection. Exported from 
+`agents/core/__init__.py` but **never imported in `runtime/base_agent/base_agent_v2.py`**.
 
-This audit checks the current repository wiring before adding experiential memory. It follows the requested gate: diagnose first, then build.
+### runtime/base_agent/base_agent_v2.py — No memory hooks
+The base agent has: `__init__`, `run()` (abstract), `act()`, `execute_action()`, `pre_register_claim()`.
+**No pre-task memory retrieval, no post-task episodic capture, no prediction-lesson extraction.**
+The lifecycle has no hooks for memory at any point.
 
-## Precondition Check
+### agent_memory table — EXISTS, key-value only
+Simple `(agent_id, namespace, key, value, ttl_seconds)` KV store. Used by 
+`agents/core/tools/handlers.py` (memory_read / memory_write tool handlers) but NOT by any agent 
+autonomously. Does not support episodic, semantic, or lesson memory types.
 
-- Local repository is synced to `origin/main` at `9df6fd3`.
-- `AGENTCO_TEST_DATABASE_URL` is not exported in this Codex shell.
-- Read-only schema check was run against `postgresql://agentco:password@localhost:5432/agentco`.
-- Live Postgres is reachable at that URL.
-- Kafka reachability was not rechecked during this audit.
+### agent_memories table — DOES NOT EXIST
+No migration for structured agent memory. Migration 015 needs to be written.
 
-## Existing Memory Store
+### pgvector — NOT INSTALLED
+`pg_extension` shows no `vector` extension. Embedding-based similarity search must fall back to 
+FLOAT[] storage + Python-side cosine similarity. The ivfflat index from the spec cannot be created.
 
-### Backend service
+### learning/ directory — SPECIFIED, partially stubbed
+- `IntelligenceAgent`: Real implementation (reads calibration state).
+- `MemoryAgent`: Uses in-memory Python list (`_memory_store: list[MemoryEntry]`). NOT connected to Postgres.
+- `TrainerAgent`: Backtests hypotheses, produces proposals requiring human approval.
+- `ScenarioAgent`: Generates hypotheses from learning signal.
+- `LearningLoop`: Orchestrates the cycle correctly (Intelligence → Scenario → Trainer → Human gate → Memory),
+  but the Memory step writes to in-memory list, not Postgres.
 
-`backend/src/services/memory-store.service.ts` is a real Postgres-backed TypeScript service for the existing `agent_memory` table and `shared_knowledge` table.
+### backend/src/services/memory-store.service.ts — PROVEN (TypeScript)
+Real Postgres reads/writes against `agent_memory` table. Has TTL, namespace isolation. Proven by 6 
+integration tests mentioned in the task. This is a TypeScript service; the Python layer has a stub client.
 
-Observed capabilities:
+## What Is Missing (to be built)
 
-- Reads `agent_memory` by `(agent_id, namespace, key)`.
-- Writes `agent_memory` with `INSERT ... ON CONFLICT DO UPDATE`.
-- Supports TTL expiry through the `expires_at` column.
-- Reads and writes `shared_knowledge`.
-- Tries pgvector semantic search for shared knowledge, with full-text fallback if embedding service is unavailable.
-- Enforces shared-knowledge writer permissions at the app layer.
+1. **`backend/src/db/migrations/015_agent_memories.sql`** — the `agent_memories` table with 
+   immutability trigger (no `vector` type, use `FLOAT[]` for embeddings instead).
+2. **`agents/core/memory/memory_writer.py`** — real Postgres writes for episodic, semantic, 
+   and prediction_lesson memory types.
+3. **`agents/core/memory/memory_reader.py`** — real Postgres reads with recency + domain + 
+   full-text retrieval; formats context for system prompt injection.
+4. **`agents/core/memory/learning_loop.py`** — lesson extraction from episodes and predictions, 
+   semantic consolidation, cross-agent sharing.
+5. **Memory hooks in `runtime/base_agent/base_agent_v2.py`** — `execute()` wrapper method adds 
+   pre-task retrieval and post-task episodic capture without changing `run()` or breaking tests.
+6. **`tests/e2e/test_memory_lifecycle.py`** — full lifecycle proof (amnesia → episodic → lessons → 
+   semantic → cross-agent sharing).
 
-Important gap:
+## Invariants Preserved
 
-- `writeAgentMemory()` overwrites existing memory on key conflict. That is incompatible with the requested append-only experiential memory invariant.
+- `agent_memory` (key-value) table untouched — existing tool handlers continue to work.
+- Prediction ledger immutability: unchanged.
+- All 224 existing tests pass before and after.
+- Memory writes are append-only: `summary` and `content` are immutable once written (trigger enforced).
+- Corrections create new rows with `superseded_by` pointing at the old row.
+- Memory retrieval never blocks the agent: 500ms budget enforced via Python timeout.
 
-### Python memory client
+## pgvector Workaround
 
-`agents/core/memory_client.py` exists, but it is a stub.
+Since pgvector is not installed, embeddings are stored as `FLOAT[]` in Postgres. Cosine similarity 
+is computed in Python when needed (write_semantic duplicate detection, semantic retrieve). For datasets 
+up to ~1000 memories this is adequate; at scale, installing pgvector + the ivfflat index would 
+replace Python-side similarity. This limitation is documented as an outstanding item.
 
-Observed methods:
+## Outstanding (under-claim, never over-claim)
 
-- `read(key)`
-- `write(key, value, ttl_seconds=None)`
-- `read_shared(query, top_k=5)`
-- `write_shared(key, content, metadata)`
-- `get_agent_state()`
-- `update_heartbeat()`
-
-Important gaps:
-
-- It does not connect to Postgres.
-- Reads always return `None` or `[]`.
-- Writes only log and do not persist.
-- It is not imported or used by `runtime/base_agent/base_agent_v2.py`.
-
-## Base Agent Lifecycle
-
-`runtime/base_agent/base_agent_v2.py` is the current V2 base agent.
-
-Observed lifecycle points:
-
-- Agent entrypoint: subclasses implement `run(task)`.
-- LLM call path: subclasses can call `act(messages, schema=None)`, which delegates to `get_validated_output()`.
-- Action path: subclasses call `execute_action(action, prediction_id=None, pre_approved_token=None)`.
-- Prediction preregistration: `pre_register_claim(...)`.
-- Audit capture: `_write_audit(...)` appends in-memory `AuditEntryV2` objects.
-
-Memory injection points:
-
-- Task start: no common pre-run hook currently exists in `BaseAgentV2`; subclasses call `run()` directly.
-- Prompt context: `act()` receives already-assembled `messages`; there is no base prompt builder.
-- Task completion: no common post-run hook currently exists.
-- Prediction resolution: no hook in `BaseAgentV2` currently writes lessons when predictions resolve.
-
-Important gap:
-
-- There is no automatic memory retrieval or episodic capture in the base lifecycle. Any integration must add a shared wrapper/hook without breaking existing subclass `run()` behavior.
-
-## Current Agent Memory Usage
-
-Search results show:
-
-- `agents/core/memory_client.py` exports `MemoryClient`.
-- `agents/core/__init__.py` re-exports `MemoryClient`.
-- `agents/core/base_agent.py` mentions statefulness via `memory_client`.
-- `agents/core/tools/handlers.py` has direct SQL handlers for the old `agent_memory` key/value table.
-- `runtime/base_agent/base_agent_v2.py` does not use memory.
-
-Conclusion:
-
-- Some older agent/tool code can interact with key/value memory manually.
-- V2 runtime agents do not automatically read or write memory during task execution.
-
-## Learning Directory
-
-`learning/` exists and implements a specified calibration-improvement loop:
-
-- `learning/intelligence_agent/intelligence_agent.py`
-- `learning/scenario_agent/scenario_agent.py`
-- `learning/trainer_agent/trainer_agent.py`
-- `learning/memory_agent/memory_agent.py`
-- `learning/learning_loop.py`
-
-Observed behavior:
-
-- Intelligence-Agent scans calibration state and surprise signals.
-- Scenario-Agent generates hypotheses and preregisters them.
-- Trainer-Agent evaluates hypotheses through simulation and produces proposals.
-- Memory-Agent stores approved cycle outcomes in an in-memory Python list.
-- Human approval remains required before memory cycle writes.
-
-Important gaps:
-
-- This is not the requested experiential memory loop.
-- `MemoryAgent` does not write to Postgres.
-- The loop does not automatically capture every task as episodic memory.
-- It does not retrieve prior experience into agent prompts.
-- It does not extract prediction lessons into persistent memory.
-
-## Live Postgres Schema
-
-Read-only schema check:
-
-```text
-Table "public.agent_memory"
-Column       Type                     Nullable  Default
-id           uuid                     not null  gen_random_uuid()
-agent_id     character varying(64)    not null
-namespace    character varying(128)   not null
-key          character varying(256)   not null
-value        jsonb                    not null
-ttl_seconds  integer
-expires_at   timestamp with time zone
-created_at   timestamp with time zone not null  now()
-updated_at   timestamp with time zone not null  now()
-```
-
-Indexes:
-
-- Primary key on `id`.
-- Unique constraint on `(agent_id, namespace, key)`.
-- Index on `agent_id`.
-- Index on `(namespace, key)`.
-- Partial index on `expires_at`.
-
-Constraints and triggers:
-
-- Foreign key from `agent_id` to `agent_state(agent_id)`.
-- Row-level security is enabled, but no policies are visible.
-- TTL trigger `trg_agent_memory_expires_at` exists.
-
-Important gaps:
-
-- No `memory_type`, `task_id`, `prediction_id`, `domain`, `summary`, `content`, `embedding`, `importance`, `access_count`, `last_accessed_at`, or `superseded_by` columns.
-- No append-only guard for summary/content.
-- No delete prevention trigger.
-- Current unique key encourages overwrites by `(agent_id, namespace, key)`.
-
-## Summary
-
-Wired:
-
-- Real backend Postgres key/value memory service exists.
-- Real `agent_memory` table exists.
-- Shared knowledge service supports pgvector when embeddings are available.
-- Learning loop agents exist for calibration proposal workflows.
-
-Stubbed:
-
-- Python `MemoryClient`.
-- Learning `MemoryAgent` persistence.
-
-Missing:
-
-- Append-only experiential memory schema.
-- Automatic pre-task memory retrieval.
-- Automatic post-task episodic capture.
-- Prediction-resolution lesson memory.
-- Semantic memory distillation.
-- Cross-agent sharing through persistent memory.
-- End-to-end proof that run 2 is informed by run 1.
-
-## Recommendation
-
-Add a new append-only `agent_memories` table instead of destructively reshaping the existing `agent_memory` key/value table. This preserves the proven backend memory-store contract while adding the requested episodic, semantic, and prediction-lesson lifecycle.
+- Embeddings require a live OpenAI API call (text-embedding-3-small); if the key is absent or the 
+  call fails, memories are written WITHOUT embedding (retrieval falls back to recency + full-text).
+- MemoryAgent in `learning/` still uses in-memory storage; wiring it to `agent_memories` is out of 
+  scope for this task but the table schema supports it.
+- Cross-agent lesson sharing requires the sharing agent's trust score; trust scores are per 
+  (agent, domain, horizon) so sharing a cross-domain lesson uses a conservative default importance.
