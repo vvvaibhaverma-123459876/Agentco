@@ -1,0 +1,9 @@
+# Department weights for institution_score aggregation.
+# W_d for each of the five mandatory departments.
+# Default: equal weight (1.0 each). Governance decisions may change these.
+department_weights:
+  Production:    1.0
+  Verification:  1.0
+  Audit:         1.0
+  Adversarial:   1.0
+  Improvement:   1.0

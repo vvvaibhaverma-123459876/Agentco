@@ -1,0 +1,17 @@
+institution_name: Engineering
+accepted_inputs:
+  - requirements_doc
+  - design_spec
+  - bug_report
+produced_outputs:
+  - software_artifact
+  - technical_report
+  - architecture_decision
+verification_required: true
+required_external_reviewer: Security
+failure_conditions:
+  - output_fails_security_review
+  - critical_bug_in_production
+  - unresolved_challenge_past_timeout
+escalation_target: governance
+reputation_metric: overall_log_score
