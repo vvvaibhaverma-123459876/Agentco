@@ -21,6 +21,7 @@ ALTER TABLE customer_data ENABLE ROW LEVEL SECURITY;
 
 -- Only CX, Sales, Legal agents may read customer PII
 -- (agent_id injected via session variable set by the API layer)
+DROP POLICY IF EXISTS customer_data_access ON customer_data;
 CREATE POLICY customer_data_access ON customer_data
     USING (
         current_setting('app.agent_id', true) IN (
@@ -31,6 +32,6 @@ CREATE POLICY customer_data_access ON customer_data
         )
     );
 
-CREATE INDEX idx_customer_health ON customer_data(health_score);
-CREATE INDEX idx_customer_arr ON customer_data(arr);
-CREATE INDEX idx_customer_contract_end ON customer_data(contract_end);
+CREATE INDEX IF NOT EXISTS idx_customer_health ON customer_data(health_score);
+CREATE INDEX IF NOT EXISTS idx_customer_arr ON customer_data(arr);
+CREATE INDEX IF NOT EXISTS idx_customer_contract_end ON customer_data(contract_end);

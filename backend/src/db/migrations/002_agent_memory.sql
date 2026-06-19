@@ -27,6 +27,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_agent_memory_expires_at ON agent_memory;
 CREATE TRIGGER trg_agent_memory_expires_at
     BEFORE INSERT OR UPDATE ON agent_memory
     FOR EACH ROW EXECUTE FUNCTION set_agent_memory_expires_at();
@@ -34,9 +35,9 @@ CREATE TRIGGER trg_agent_memory_expires_at
 -- Namespace isolation enforced at DB level
 ALTER TABLE agent_memory ENABLE ROW LEVEL SECURITY;
 
-CREATE INDEX idx_agent_memory_agent ON agent_memory(agent_id);
-CREATE INDEX idx_agent_memory_ns_key ON agent_memory(namespace, key);
-CREATE INDEX idx_agent_memory_expires ON agent_memory(expires_at) WHERE expires_at IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_agent_memory_agent ON agent_memory(agent_id);
+CREATE INDEX IF NOT EXISTS idx_agent_memory_ns_key ON agent_memory(namespace, key);
+CREATE INDEX IF NOT EXISTS idx_agent_memory_expires ON agent_memory(expires_at) WHERE expires_at IS NOT NULL;
 
 -- Auto-cleanup expired entries
 CREATE OR REPLACE FUNCTION cleanup_expired_memory() RETURNS void AS $$

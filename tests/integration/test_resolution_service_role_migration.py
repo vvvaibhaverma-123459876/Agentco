@@ -40,12 +40,24 @@ def _get_migration_files() -> list[Path]:
 def _substitute_env_vars(sql_text: str) -> str:
     """Substitute environment variables in SQL (same as run_migrations.py)."""
     if ":RESOLUTION_SERVICE_PASSWORD" in sql_text:
-        password = os.environ.get("RESOLUTION_SERVICE_PASSWORD")
-        if not password:
-            password = str(uuid.uuid4())
+        password = os.environ.get(
+            "RESOLUTION_SERVICE_PASSWORD",
+            "resolution-service-dev-password",
+        )
         password_escaped = password.replace("'", "''")
-        sql_text = sql_text.replace(":RESOLUTION_SERVICE_PASSWORD", f"'{password_escaped}'")
+        sql_text = sql_text.replace("':RESOLUTION_SERVICE_PASSWORD'", f"'{password_escaped}'")
     return sql_text
+
+
+def _drop_resolution_service_role(cur) -> None:
+    """Drop the test role without unsupported DROP ROLE CASCADE syntax."""
+    cur.execute("SELECT 1 FROM pg_roles WHERE rolname = 'resolution_service'")
+    if cur.fetchone() is None:
+        return
+
+    cur.execute("REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM resolution_service")
+    cur.execute("REVOKE ALL PRIVILEGES ON SCHEMA public FROM resolution_service")
+    cur.execute("DROP ROLE resolution_service")
 
 
 @pytest.fixture(scope="module")
@@ -77,8 +89,7 @@ def fresh_db():
         for tbl in tables_to_drop:
             cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
 
-        # Drop roles
-        cur.execute("DROP ROLE IF EXISTS resolution_service CASCADE")
+        _drop_resolution_service_role(cur)
 
     # Apply all migrations in order
     with conn.cursor() as cur:
@@ -98,7 +109,7 @@ def fresh_db():
     with conn.cursor() as cur:
         for tbl in tables_to_drop:
             cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
-        cur.execute("DROP ROLE IF EXISTS resolution_service CASCADE")
+        _drop_resolution_service_role(cur)
 
     conn.close()
 

@@ -2,7 +2,7 @@
 
 **Status:** PASS
 **Run against:** REAL Postgres (`belief_questions`, `belief_stakes`, `calibration_credentials`) — no mocks.
-**Date captured:** 2026-06-18
+**Date captured:** 2026-06-19
 
 ## Collusion-Resistance Property: Reality-Contact Weight Bound (RCWB)
 
@@ -26,11 +26,11 @@ adds weight ≈ 0 per identity (no resolved predictions → cell score = 0 → w
 
 ```
 >>> test_1_weighted_decision: START
->>> test_1: question registered: a856aa80
+>>> test_1: question registered: 988a81ed
 >>> test_1: weight_for_true=0.0000 weight_for_false=0.2005 outcome=False
 >>> test_1_weighted_decision: PASS
 >>> test_2_sybil_resistance: START
->>> test_2: question registered: 01cec6ae, real_weight=0.1703
+>>> test_2: question registered: d2e48e89, real_weight=0.1703
 >>> test_2: stake_count=11 effective=1 sybil_filtered=10 outcome=False
 >>> test_2: RCWB proven — 10 Sybil votes (weight=0) overridden by 1 credentialed vote
 >>> test_2_sybil_resistance: PASS

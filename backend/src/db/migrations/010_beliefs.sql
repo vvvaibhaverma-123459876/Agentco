@@ -41,6 +41,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS beliefs_reality_firewall ON beliefs;
 CREATE TRIGGER beliefs_reality_firewall
     BEFORE UPDATE ON beliefs
     FOR EACH ROW

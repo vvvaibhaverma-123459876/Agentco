@@ -10,7 +10,7 @@ import sys
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import quote, urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -38,7 +38,12 @@ def _resolution_dsn(db_url: str) -> str:
     host = parsed.hostname or "localhost"
     port = parsed.port or 5432
     db = parsed.path.lstrip("/") or "agentco"
-    return f"postgresql://resolution_service:resolution-service-dev-password@{host}:{port}/{db}"
+    password = os.environ.get("RESOLUTION_SERVICE_PASSWORD")
+    if not password:
+        if os.environ.get("AGENTCO_ENV") == "production":
+            raise RuntimeError("RESOLUTION_SERVICE_PASSWORD must be set in production")
+        password = "resolution-service-dev-password"
+    return f"postgresql://resolution_service:{quote(password, safe='')}@{host}:{port}/{db}"
 
 
 def _entry_hash(prediction_id: str, claim: str) -> str:

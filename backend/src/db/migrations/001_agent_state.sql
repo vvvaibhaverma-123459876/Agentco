@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS agent_state (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_agent_state_dept ON agent_state(department);
-CREATE INDEX idx_agent_state_lifecycle ON agent_state(lifecycle_state);
+CREATE INDEX IF NOT EXISTS idx_agent_state_dept ON agent_state(department);
+CREATE INDEX IF NOT EXISTS idx_agent_state_lifecycle ON agent_state(lifecycle_state);
 
 -- Seed all 29 agents
 INSERT INTO agent_state (agent_id, department, lifecycle_state, model, prompt_version) VALUES

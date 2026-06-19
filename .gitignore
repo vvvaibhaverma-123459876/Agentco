@@ -45,6 +45,8 @@ develop-eggs/
 eggs/
 .eggs/
 lib/
+!frontend/src/lib/
+!frontend/src/lib/**
 lib64/
 parts/
 sdist/
@@ -98,6 +100,7 @@ pyrightconfig.json
 .env.test.local
 .env.production.local
 .env.*.local
+.codex.env
 *.pem
 *.key
 # Exception: published public key (safe to commit — no secret)

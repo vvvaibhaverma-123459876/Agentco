@@ -77,8 +77,6 @@ services:
       start_period: 10s
 
   # ----------------------------------------------------------
-  # Zookeeper (required by Kafka)
-  # ----------------------------------------------------------
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
     container_name: agentco-zookeeper
@@ -87,6 +85,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_4LW_COMMANDS_WHITELIST: "ruok,stat,mntr,conf"
     ports:
       - "2181:2181"
     volumes:
@@ -94,15 +93,12 @@ services:
     networks:
       - agentco-net
     healthcheck:
-      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+      test: ["CMD-SHELL", "bash -ec 'cat < /dev/null > /dev/tcp/localhost/2181'"]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 15s
+      retries: 10
+      start_period: 30s
 
-  # ----------------------------------------------------------
-  # Apache Kafka
-  # ----------------------------------------------------------
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     container_name: agentco-kafka

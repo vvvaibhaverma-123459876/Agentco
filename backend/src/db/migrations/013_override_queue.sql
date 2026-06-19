@@ -39,6 +39,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS override_immutability ON override_queue;
 CREATE TRIGGER override_immutability
     BEFORE UPDATE ON override_queue
     FOR EACH ROW EXECUTE FUNCTION enforce_override_immutability();
@@ -46,7 +47,7 @@ CREATE TRIGGER override_immutability
 -- No physical deletes — overrides are a permanent record
 REVOKE DELETE ON override_queue FROM PUBLIC;
 
-CREATE INDEX idx_override_queue_status    ON override_queue(status);
-CREATE INDEX idx_override_queue_agent     ON override_queue(agent_id);
-CREATE INDEX idx_override_queue_expires   ON override_queue(expires_at) WHERE status='pending';
-CREATE INDEX idx_override_queue_created   ON override_queue(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_override_queue_status    ON override_queue(status);
+CREATE INDEX IF NOT EXISTS idx_override_queue_agent     ON override_queue(agent_id);
+CREATE INDEX IF NOT EXISTS idx_override_queue_expires   ON override_queue(expires_at) WHERE status='pending';
+CREATE INDEX IF NOT EXISTS idx_override_queue_created   ON override_queue(created_at DESC);

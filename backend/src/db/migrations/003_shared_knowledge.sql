@@ -12,7 +12,17 @@ CREATE TABLE IF NOT EXISTS shared_knowledge (
     updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+DO $$
+BEGIN
+    EXECUTE 'CREATE EXTENSION IF NOT EXISTS vector';
+    EXECUTE 'ALTER TABLE shared_knowledge ADD COLUMN IF NOT EXISTS embedding vector(384)';
+EXCEPTION
+    WHEN OTHERS THEN
+        ALTER TABLE shared_knowledge ADD COLUMN IF NOT EXISTS embedding TEXT;
+END
+$$;
+
 -- Only permitted agents may write to shared knowledge (enforced at app layer via tool_registry)
-CREATE INDEX idx_shared_knowledge_tags ON shared_knowledge USING GIN(tags);
-CREATE INDEX idx_shared_knowledge_source ON shared_knowledge(source_agent_id);
-CREATE INDEX idx_shared_knowledge_confidence ON shared_knowledge(confidence_score);
+CREATE INDEX IF NOT EXISTS idx_shared_knowledge_tags ON shared_knowledge USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_shared_knowledge_source ON shared_knowledge(source_agent_id);
+CREATE INDEX IF NOT EXISTS idx_shared_knowledge_confidence ON shared_knowledge(confidence_score);

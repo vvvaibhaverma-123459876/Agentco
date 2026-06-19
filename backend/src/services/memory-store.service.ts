@@ -119,10 +119,10 @@ export class MemoryStoreService {
     await query(
       `INSERT INTO shared_knowledge
          (key, content, tags, source_agent_id, confidence_score, embedding)
-       VALUES ($1,$2,$3,$4,$5,$6::vector)
+       VALUES ($1,$2,$3,$4,$5,$6)
        ON CONFLICT (key) DO UPDATE
          SET content=$2, tags=$3, confidence_score=$5,
-             embedding=$6::vector, updated_at=NOW()`,
+             embedding=$6, updated_at=NOW()`,
       [
         entry.key, entry.content,
         entry.tags ?? [],

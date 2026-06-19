@@ -99,6 +99,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS prediction_ledger_immutability ON prediction_ledger;
 CREATE TRIGGER prediction_ledger_immutability
     BEFORE UPDATE ON prediction_ledger
     FOR EACH ROW

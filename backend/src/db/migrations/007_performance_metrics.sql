@@ -24,6 +24,6 @@ CREATE TABLE IF NOT EXISTS performance_metrics (
     created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_perf_metrics_agent ON performance_metrics(agent_id);
-CREATE INDEX idx_perf_metrics_period ON performance_metrics(period_start DESC);
-CREATE INDEX idx_perf_metrics_error_rate ON performance_metrics(error_rate);
+CREATE INDEX IF NOT EXISTS idx_perf_metrics_agent ON performance_metrics(agent_id);
+CREATE INDEX IF NOT EXISTS idx_perf_metrics_period ON performance_metrics(period_start DESC);
+CREATE INDEX IF NOT EXISTS idx_perf_metrics_error_rate ON performance_metrics(error_rate);

@@ -20,6 +20,6 @@ CREATE TABLE IF NOT EXISTS prompt_registry (
 );
 
 -- Config-Agent is the only writer — enforced at app layer
-CREATE INDEX idx_prompt_registry_agent ON prompt_registry(agent_id);
-CREATE INDEX idx_prompt_registry_active ON prompt_registry(agent_id, is_active) WHERE is_active = TRUE;
-CREATE INDEX idx_prompt_registry_created ON prompt_registry(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_prompt_registry_agent ON prompt_registry(agent_id);
+CREATE INDEX IF NOT EXISTS idx_prompt_registry_active ON prompt_registry(agent_id, is_active) WHERE is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_prompt_registry_created ON prompt_registry(created_at DESC);

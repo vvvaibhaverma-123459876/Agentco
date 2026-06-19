@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS event_history (
 REVOKE DELETE ON event_history FROM PUBLIC;
 REVOKE UPDATE ON event_history FROM PUBLIC;
 
-CREATE INDEX idx_event_history_type ON event_history(event_type);
-CREATE INDEX idx_event_history_producer ON event_history(producer_agent_id);
-CREATE INDEX idx_event_history_timestamp ON event_history(timestamp DESC);
-CREATE INDEX idx_event_history_correlation ON event_history(correlation_id);
-CREATE INDEX idx_event_history_risk ON event_history(risk_level);
+CREATE INDEX IF NOT EXISTS idx_event_history_type ON event_history(event_type);
+CREATE INDEX IF NOT EXISTS idx_event_history_producer ON event_history(producer_agent_id);
+CREATE INDEX IF NOT EXISTS idx_event_history_timestamp ON event_history(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_event_history_correlation ON event_history(correlation_id);
+CREATE INDEX IF NOT EXISTS idx_event_history_risk ON event_history(risk_level);

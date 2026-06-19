@@ -7,9 +7,15 @@ a stable property of the agent. This module owns the deployment question: which
 provider+model serves a tier.
 
 Resolution order (highest priority first) for tier T:
-  1. LLM_PROVIDER_<T>    / LLM_BASE_URL_<T>    / LLM_API_KEY_<T>    / LLM_MODEL_<T>
-  2. LLM_PROVIDER        / LLM_BASE_URL        / LLM_API_KEY        / LLM_MODEL_DEFAULT
+  1. LLM_PROVIDER_<T> / LLM_BASE_URL_<T> / LLM_API_KEY_<T>
+  2. LLM_PROVIDER     / LLM_BASE_URL     / LLM_API_KEY
   3. built-in defaults per provider
+
+Model resolution follows the selected provider scope:
+  LLM_MODEL_<T> -> LLM_MODEL_DEFAULT -> provider tier default
+  If a leaked tier model is clearly incompatible with the selected provider
+  (for example, ollama-style "mistral:7b" with provider "openai"), the global
+  default wins.
 
 OpenAI-compatible providers (use OpenAI SDK with base_url, no adapter):
   openai, ollama, together, fireworks, groq, openrouter, deepseek, mistral, anyscale
@@ -83,22 +89,28 @@ class TierConfig:
         return self.provider in OPENAI_COMPATIBLE_PROVIDERS
 
 
+def _model_is_compatible(provider: str, model: str) -> bool:
+    """Reject only obvious cross-provider leftovers from the local shell."""
+    if provider == "openai" and ":" in model:
+        return False
+    return True
+
+
 def resolve_tier_config(tier: str) -> TierConfig:
     """
     Resolve the (provider, base_url, api_key, model) for *tier* from environment variables.
 
     Resolution order:
-      LLM_<FIELD>_<TIER>  →  LLM_<FIELD>  →  built-in default
+      provider/base_url/api_key: LLM_<FIELD>_<TIER> → LLM_<FIELD> → built-in default
+      model: LLM_MODEL_<TIER> → LLM_MODEL_DEFAULT → provider tier default
     """
     if tier not in _VALID_TIERS:
         raise ValueError(f"Unknown tier '{tier}'. Valid: {_VALID_TIERS}")
     T = tier.upper()
 
-    provider = (
-        os.environ.get(f"LLM_PROVIDER_{T}")
-        or os.environ.get("LLM_PROVIDER")
-        or "openai"
-    )
+    tier_provider = os.environ.get(f"LLM_PROVIDER_{T}")
+    global_provider = os.environ.get("LLM_PROVIDER")
+    provider = tier_provider or global_provider or "openai"
 
     if provider in UNSUPPORTED_PROVIDERS:
         raise ConfigurationError(
@@ -120,11 +132,12 @@ def resolve_tier_config(tier: str) -> TierConfig:
     )
 
     provider_defaults = _DEFAULT_MODELS.get(provider, _DEFAULT_MODELS_FALLBACK)
-    model = (
-        os.environ.get(f"LLM_MODEL_{T}")
-        or os.environ.get("LLM_MODEL_DEFAULT")
-        or provider_defaults.get(tier, "gpt-4o-mini")
-    )
+    tier_model = os.environ.get(f"LLM_MODEL_{T}")
+    global_model = os.environ.get("LLM_MODEL_DEFAULT")
+    if tier_model and _model_is_compatible(provider, tier_model):
+        model = tier_model
+    else:
+        model = global_model or provider_defaults.get(tier, "gpt-4o-mini")
 
     return TierConfig(tier=tier, provider=provider, base_url=base_url, api_key=api_key, model=model)
 

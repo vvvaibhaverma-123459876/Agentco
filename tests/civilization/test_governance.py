@@ -28,9 +28,12 @@ def db():
     conn.autocommit = True
     with conn.cursor() as cur:
         for tbl in CIVI_TABLES + ["prediction_chain_log", "calibration_credentials",
-                                   "credential_domains", "prediction_ledger"]:
+                                   "credential_domains", "prediction_ledger",
+                                   "decision_log"]:
             cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
         for mig in [
+            "backend/src/db/migrations/004_decision_log.sql",
+            "backend/src/db/migrations/012_decision_log_chain.sql",
             "backend/src/db/migrations/011_prediction_ledger.sql",
             "reserve/migrations/001_reserve_extension.sql",
             "reserve/migrations/004_ed25519_signature.sql",
@@ -41,7 +44,8 @@ def db():
     yield conn
     with conn.cursor() as cur:
         for tbl in CIVI_TABLES + ["prediction_chain_log", "calibration_credentials",
-                                   "credential_domains", "prediction_ledger"]:
+                                   "credential_domains", "prediction_ledger",
+                                   "decision_log"]:
             cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
     conn.close()
 

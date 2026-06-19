@@ -22,8 +22,8 @@ REVOKE DELETE ON decision_log FROM PUBLIC;
 REVOKE UPDATE ON decision_log FROM PUBLIC;
 
 -- Indexes for audit log viewer queries
-CREATE INDEX idx_decision_log_agent ON decision_log(agent_id);
-CREATE INDEX idx_decision_log_timestamp ON decision_log(timestamp DESC);
-CREATE INDEX idx_decision_log_risk ON decision_log(risk_level);
-CREATE INDEX idx_decision_log_session ON decision_log(session_id);
-CREATE INDEX idx_decision_log_human_approved ON decision_log(human_approved);
+CREATE INDEX IF NOT EXISTS idx_decision_log_agent ON decision_log(agent_id);
+CREATE INDEX IF NOT EXISTS idx_decision_log_timestamp ON decision_log(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_decision_log_risk ON decision_log(risk_level);
+CREATE INDEX IF NOT EXISTS idx_decision_log_session ON decision_log(session_id);
+CREATE INDEX IF NOT EXISTS idx_decision_log_human_approved ON decision_log(human_approved);
