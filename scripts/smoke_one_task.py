@@ -41,7 +41,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 def _check_env():
-    provider = os.environ.get("LLM_PROVIDER", "openai")
+    provider = os.environ.get("LLM_PROVIDER", "ollama")
     api_key = os.environ.get("LLM_API_KEY", "")
     if provider != "ollama" and not api_key:
         print("[SMOKE] ERROR: LLM_API_KEY not set (required for non-ollama providers).")

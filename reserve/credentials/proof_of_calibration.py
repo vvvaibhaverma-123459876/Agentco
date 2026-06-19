@@ -49,11 +49,13 @@ from pathlib import Path
 from typing import Optional
 
 from calibration.decay.decay_tracker import DEFAULT_HALF_LIVES_DAYS
+from agentco_security.env_guard import assert_production_secrets
 from reserve.scoring.scoring_function import CellScore, ReserveScore, score_agent
 
 # ---------------------------------------------------------------------------
 # Ed25519 signing (asymmetric — anyone verifies with the published public key)
 # ---------------------------------------------------------------------------
+assert_production_secrets()
 _PRIVATE_KEY_B64 = os.environ.get("RESERVE_PRIVATE_KEY", "")
 _PUBLIC_KEY_FILE = Path(__file__).resolve().parents[1] / "keys" / "agentco_reserve_public.pem"
 

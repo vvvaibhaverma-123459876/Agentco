@@ -30,9 +30,11 @@ from runtime.base_agent.llm_client import client_for
 from runtime.base_agent.model_tiers import model_for
 from runtime.base_agent.spend_guardrail import SpendGuardrail
 from runtime.base_agent.structured_output import get_validated_output
+from agentco_security.env_guard import assert_production_secrets
 
 logger = logging.getLogger(__name__)
 
+assert_production_secrets()
 _HMAC_KEY = os.environ.get("EVENT_BUS_HMAC_KEY", "dev-insecure-key").encode()
 
 

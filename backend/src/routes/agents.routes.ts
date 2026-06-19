@@ -3,6 +3,7 @@ import { memoryStore } from '../services/memory-store.service';
 import { auditLog } from '../services/audit-log.service';
 import { eventBus } from '../services/event-bus.service';
 import { query } from '../db/client';
+import { requireApiKey } from '../security';
 import crypto from 'crypto';
 
 // Model resolved from local model-tier map (matches runtime/base_agent/model_tiers.py).
@@ -91,7 +92,7 @@ export async function agentRoutes(fastify: FastifyInstance) {
   });
 
   // ── GET /api/agents/:id/heartbeat ────────────────────────────────────
-  fastify.get<{ Params: { id: string } }>('/api/agents/:id/heartbeat', async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>('/api/agents/:id/heartbeat', { preHandler: requireApiKey }, async (req, reply) => {
     await memoryStore.updateHeartbeat(req.params.id);
     return reply.send({ ok: true });
   });
@@ -102,7 +103,7 @@ export async function agentRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { id: string };
     Body: { task_type: string; payload?: Record<string, unknown> };
-  }>('/api/agents/:id/dispatch', async (req, reply) => {
+  }>('/api/agents/:id/dispatch', { preHandler: requireApiKey }, async (req, reply) => {
     const { id } = req.params;
     const agent = ALL_AGENTS.find(a => a.id === id);
     if (!agent) return reply.status(404).send({ error: 'Agent not found' });

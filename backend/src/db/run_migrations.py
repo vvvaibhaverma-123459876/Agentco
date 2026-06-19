@@ -43,17 +43,18 @@ def substitute_env_vars(sql_text: str) -> str:
     E.g. ':RESOLUTION_SERVICE_PASSWORD' gets replaced with the password value
     The placeholder is already inside quotes in the SQL, so we replace just the placeholder.
 
-    If an env var is missing, defaults are provided:
-      - RESOLUTION_SERVICE_PASSWORD: random UUID (generated at runtime)
+    If an env var is missing in development, defaults are provided:
+      - RESOLUTION_SERVICE_PASSWORD: resolution-service-dev-password
+    In production, defaults fail closed.
     """
     # Handle RESOLUTION_SERVICE_PASSWORD
     if ":RESOLUTION_SERVICE_PASSWORD" in sql_text:
         password = os.environ.get("RESOLUTION_SERVICE_PASSWORD")
         if not password:
-            # Generate a random password if not provided
-            import uuid
-            password = str(uuid.uuid4())
-            print(f"⚠️  RESOLUTION_SERVICE_PASSWORD not set; using generated UUID", file=sys.stderr)
+            if os.environ.get("AGENTCO_ENV") == "production":
+                raise RuntimeError("RESOLUTION_SERVICE_PASSWORD must be set in production")
+            password = "resolution-service-dev-password"
+            print("⚠️  RESOLUTION_SERVICE_PASSWORD not set; using dev-only password", file=sys.stderr)
         # Escape single quotes for SQL (password is placed inside quotes in the SQL)
         password_escaped = password.replace("'", "''")
         # Replace placeholder (which is already surrounded by single quotes in SQL)
@@ -76,6 +77,9 @@ def run_migrations(db_url: Optional[str] = None) -> bool:
         print("ERROR: psycopg2 not installed. Install with: pip install psycopg2-binary", file=sys.stderr)
         return False
 
+    from agentco_security.env_guard import assert_production_secrets
+
+    assert_production_secrets()
     db_url = db_url or os.environ.get("DATABASE_URL", "postgresql://agentco:password@localhost:5432/agentco")
 
     try:

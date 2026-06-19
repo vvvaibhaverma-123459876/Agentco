@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { overrideQueue } from '../services/override-queue.service';
+import { requireApiKey } from '../security';
 
 export async function overrideRoutes(fastify: FastifyInstance) {
   // List all pending override requests
@@ -19,7 +20,7 @@ export async function overrideRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { request_id: string };
     Body: { resolution: 'approved' | 'rejected'; resolved_by: string; notes?: string };
-  }>('/api/overrides/:request_id/resolve', async (req, reply) => {
+  }>('/api/overrides/:request_id/resolve', { preHandler: requireApiKey }, async (req, reply) => {
     const { request_id } = req.params;
     const { resolution, resolved_by, notes } = req.body;
 
@@ -34,7 +35,7 @@ export async function overrideRoutes(fastify: FastifyInstance) {
   // Enqueue a new override request (called by agents, not humans)
   fastify.post<{
     Body: { agent_id: string; action: string; risk_level: 'high' | 'critical'; context: Record<string, unknown> };
-  }>('/api/overrides', async (req, reply) => {
+  }>('/api/overrides', { preHandler: requireApiKey }, async (req, reply) => {
     const { agent_id, action, risk_level, context } = req.body;
     const request = await overrideQueue.enqueue(agent_id, action, risk_level, context);
     return reply.status(201).send(request);

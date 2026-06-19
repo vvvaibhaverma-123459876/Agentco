@@ -30,6 +30,10 @@ from openai import OpenAI
 
 from calibration import create_calibration_engine
 from calibration.ledger.prediction_ledger import PredictionRegistration
+from calibration.resolution.source_independence import (
+    CircularResolutionError,
+    validate_independent_sources,
+)
 from agents.core.tools.web_scraper import (
     fetch_page, find_resolvable_claims, discover_sources, current_date_context, register_prediction_safe,
     is_duplicate_claim, _is_js_shell_page, SourceReliabilityTracker, CURATED_FALLBACK_SOURCES
@@ -185,7 +189,7 @@ from the news text below.
 Rules:
 - Each claim must be binary (TRUE or FALSE, unambiguous)
 - Prefer claims already confirmed by this article (set resolution_date to today {today})
-- resolution_url MUST be: {source_url}
+- resolution_url MUST be an independent URL, not the same URL as the article text below
 - domain: technology | business | science | politics | finance | general
 - confidence: probability that claim is TRUE (0.0–1.0)
 
@@ -259,6 +263,12 @@ Return ONLY JSON (no prose, no code fences):
             src_lower = resolution_url.lower()
             if any(d in src_lower for d in DISQUALIFIED):
                 resolution_url = source_url
+
+            try:
+                validate_independent_sources(source_url, resolution_url)
+            except CircularResolutionError as exc:
+                print(f"      ⚠ Skipped circular verification: {exc}")
+                continue
 
             resolution_date = _parse_resolution_date(resolution_date_str)
 

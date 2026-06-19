@@ -28,6 +28,10 @@ import psycopg2
 from openai import OpenAI
 
 from calibration import create_calibration_engine
+from calibration.resolution.source_independence import (
+    CircularResolutionError,
+    validate_independent_sources,
+)
 from agents.core.tools.web_scraper import fetch_page
 
 logging.basicConfig(level=logging.WARNING)
@@ -141,6 +145,27 @@ def run(agent_filter: str = "research-agent", min_confidence: float = 0.8):
     for pred in eligible:
         print(f"  Checking: {pred.prediction_id[:8]}… — {pred.claim[:70]}")
         resolution_url = pred.ground_truth_source
+        claim_source_url = ""
+        if isinstance(pred.confidence_basis, dict):
+            claim_source_url = str(pred.confidence_basis.get("source") or "")
+
+        try:
+            validate_independent_sources(claim_source_url, resolution_url)
+        except CircularResolutionError as exc:
+            print(f"    → circular_resolution_rejected: {exc}")
+            results.append({
+                "prediction_id": pred.prediction_id,
+                "claim": pred.claim,
+                "stated_confidence": pred.probability,
+                "outcome": None,
+                "llm_confidence": 0.0,
+                "evidence": str(exc),
+                "resolved": False,
+                "status": "circular_resolution_rejected",
+                "log_score": None,
+                "brier_score": None,
+            })
+            continue
 
         # Fetch resolution URL
         page = fetch_page(resolution_url, timeout=15)

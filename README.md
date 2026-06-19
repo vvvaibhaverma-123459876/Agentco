@@ -1,3 +1,44 @@
+# AgentCo
+
+## What is AgentCo?
+
+AgentCo is verifiable calibration: proof that an AI agent's claim was checked against something outside itself, not merely made to look checked.
+
+## Who is this for?
+
+Teams evaluating autonomous agents that need audit-grade evidence of what agents claimed, when they claimed it, how reality resolved it, and whether confidence was earned.
+
+## Install in 5 minutes
+
+```bash
+git clone https://github.com/vvvaibhaverma-123459876/Agentco.git
+cd Agentco
+make dev
+make smoke
+```
+
+## Run the demo
+
+```bash
+make demo
+```
+
+## What you just saw, and why it's hard
+
+The demo pre-registers a claim, resolves it against an independent source, updates trust, exports a recomputable credential, and rejects a circular same-source "verification." The hard part is catching failures that look fine in logs.
+
+## Security model
+
+Local development uses explicit dev defaults; `AGENTCO_ENV=production` refuses to start with those defaults. Write endpoints use minimal API-key auth; full RBAC is roadmap. Details live in `docs/launch_readiness_audit.md` and `SYSTEM.md`.
+
+## What this is NOT
+
+This is not yet a full company and not yet a civilization layer. Those ambitions are future work, tracked honestly in `ROADMAP.md`, not claimed as launch-ready product.
+
+---
+
+# Previous Architecture Notes
+
 # AgentCo — Autonomous AI Company
 
 AgentCo is a fully autonomous, AI-operated company. Every business function is executed by specialised AI agents operating on a shared infrastructure. Humans exist only at the governance layer: they audit, veto, and reconfigure — but do not initiate or perform operational work.
