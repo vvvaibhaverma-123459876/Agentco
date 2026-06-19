@@ -61,6 +61,28 @@ class TestConfigOnlySwitching:
         assert resolve_tier_config("standard").model == "gpt-4o-mini"
         assert resolve_tier_config("monitor").model == "gpt-4o-mini"
 
+    def test_openai_ignores_ollama_style_global_default(self, monkeypatch):
+        monkeypatch.setenv("LLM_PROVIDER", "openai")
+        monkeypatch.setenv("LLM_API_KEY", "sk-test")
+        monkeypatch.setenv("LLM_BASE_URL", "https://api.openai.com/v1")
+        monkeypatch.setenv("LLM_MODEL_DEFAULT", "mistral:7b")
+        monkeypatch.delenv("LLM_MODEL_STANDARD", raising=False)
+
+        from runtime.base_agent.provider_config import resolve_tier_config
+        cfg = resolve_tier_config("standard")
+
+        assert cfg.model == "gpt-4o-mini"
+
+    def test_ollama_keeps_local_default_models(self, monkeypatch):
+        monkeypatch.setenv("LLM_PROVIDER", "ollama")
+        monkeypatch.delenv("LLM_MODEL_DEFAULT", raising=False)
+        monkeypatch.delenv("LLM_MODEL_STANDARD", raising=False)
+
+        from runtime.base_agent.provider_config import resolve_tier_config
+        cfg = resolve_tier_config("standard")
+
+        assert cfg.model == "qwen2.5:7b"
+
     def test_model_for_agent_reflects_env_change(self, monkeypatch):
         monkeypatch.setenv("LLM_PROVIDER", "openai")
         monkeypatch.setenv("LLM_API_KEY", "sk-test")

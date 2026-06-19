@@ -38,6 +38,12 @@ def _cosine(a: list[float], b: list[float]) -> float:
     return dot / (na * nb) if na and nb else 0.0
 
 
+def _jaccard_words(a_text: str, b_text: str) -> float:
+    a = set(re.findall(r"\w+", a_text.lower()))
+    b = set(re.findall(r"\w+", b_text.lower()))
+    return len(a & b) / max(len(a | b), 1)
+
+
 class MemoryWriter:
 
     def __init__(self, db_url: str):
@@ -301,11 +307,12 @@ class MemoryWriter:
         for row_id, row_summary, row_content, row_emb in rows:
             if new_emb and row_emb:
                 score = _cosine(new_emb, row_emb)
+                lexical_score = _jaccard_words(text, row_summary)
+                if lexical_score < threshold:
+                    score = 0.0
             else:
                 # Fallback: Jaccard on words
-                a = set(text.lower().split())
-                b = set(row_summary.lower().split())
-                score = len(a & b) / max(len(a | b), 1)
+                score = _jaccard_words(text, row_summary)
 
             if score > best_score:
                 best_score = score

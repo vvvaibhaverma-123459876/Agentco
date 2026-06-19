@@ -136,8 +136,10 @@ def resolve_tier_config(tier: str) -> TierConfig:
     global_model = os.environ.get("LLM_MODEL_DEFAULT")
     if tier_model and _model_is_compatible(provider, tier_model):
         model = tier_model
+    elif global_model and _model_is_compatible(provider, global_model):
+        model = global_model
     else:
-        model = global_model or provider_defaults.get(tier, "gpt-4o-mini")
+        model = provider_defaults.get(tier, "gpt-4o-mini")
 
     return TierConfig(tier=tier, provider=provider, base_url=base_url, api_key=api_key, model=model)
 

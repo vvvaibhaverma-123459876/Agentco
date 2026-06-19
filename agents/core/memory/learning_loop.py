@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
@@ -19,17 +18,18 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 from agents.core.memory.memory_writer import MemoryWriter
+from runtime.base_agent.llm_client import client_for_tier
+from runtime.base_agent.provider_config import resolve_tier_config
 
 logger = logging.getLogger(__name__)
 
-_EXTRACTION_MODEL = os.environ.get("LLM_MODEL_EXTRACTION", "gpt-4o-mini")
-
 
 def _llm_client() -> Any:
-    from openai import OpenAI
-    api_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY") or "ollama"
-    base_url = os.environ.get("LLM_BASE_URL", "https://api.openai.com/v1")
-    return OpenAI(api_key=api_key, base_url=base_url)
+    return client_for_tier("standard")
+
+
+def _extraction_model() -> str:
+    return resolve_tier_config("standard").model
 
 
 class LearningLoop:
@@ -131,7 +131,7 @@ Return ONLY JSON:
         confidence = 0.7
         try:
             resp = client.chat.completions.create(
-                model=_EXTRACTION_MODEL,
+                model=_extraction_model(),
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.2,
             )
@@ -343,7 +343,7 @@ or
 
         try:
             resp = client.chat.completions.create(
-                model=_EXTRACTION_MODEL,
+                model=_extraction_model(),
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.2,
             )
@@ -393,7 +393,7 @@ Return ONLY JSON:
 
         try:
             resp = client.chat.completions.create(
-                model=_EXTRACTION_MODEL,
+                model=_extraction_model(),
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.2,
             )
