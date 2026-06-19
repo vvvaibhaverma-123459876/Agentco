@@ -25,7 +25,13 @@ except ImportError:
 def get_migration_files() -> list[Path]:
     """Return all migration SQL files in sorted order."""
     migrations_dir = Path(__file__).parent / "migrations"
-    migration_files = sorted(migrations_dir.glob("*.sql"))
+    backend_files = sorted(migrations_dir.glob("*.sql"))
+
+    repo_root = Path(__file__).resolve().parent.parent.parent.parent
+    reserve_dir = repo_root / "reserve" / "migrations"
+    reserve_files = sorted(reserve_dir.glob("*.sql")) if reserve_dir.exists() else []
+
+    migration_files = backend_files + reserve_files
     return migration_files
 
 
