@@ -1,0 +1,160 @@
+{
+  "experiment": {
+    "name": "Trust-Weighting Decision Experiment",
+    "date": "2026-06-19",
+    "status": "complete",
+    "seeds_run": 25,
+    "hypothesis_status": "REJECTED",
+    "verdict": "(d) Trust-weighting made outcomes worse"
+  },
+  "primary_metric": {
+    "metric": "Final Cash Balance (36 months)",
+    "unit": "USD",
+    "arm_a_control": {
+      "name": "Control (Equal Weighting)",
+      "mean": -471573.36,
+      "median": -470089.70,
+      "std_dev": 13845.21,
+      "min": -502845.26,
+      "max": -450273.53,
+      "wins_against_b": 25,
+      "win_rate": 1.0
+    },
+    "arm_b_treatment": {
+      "name": "Treatment (Trust Weighting)",
+      "mean": -731394.28,
+      "median": -729719.30,
+      "std_dev": 10047.65,
+      "min": -748819.62,
+      "max": -711112.97,
+      "wins_against_a": 0,
+      "win_rate": 0.0
+    },
+    "difference_b_minus_a": {
+      "mean": -259820.92,
+      "median": -259629.60,
+      "direction": "Arm A better",
+      "amount_per_seed": "~$260,000 worse for trust-weighting"
+    },
+    "statistical_significance": {
+      "test": "binomial",
+      "null_hypothesis": "p=0.5 (arms equal)",
+      "observed": "0/25 wins for Arm B",
+      "p_value": 1.5e-7,
+      "conclusion": "Extremely significant (Arm B lost conclusively)"
+    }
+  },
+  "secondary_metrics": {
+    "months_survived": {
+      "arm_a": 36,
+      "arm_b": 36,
+      "difference": 0,
+      "finding": "No difference (both ran full term)"
+    },
+    "profitable_months": {
+      "arm_a_mean": 0,
+      "arm_b_mean": 0,
+      "finding": "Neither arm profitable (business model broken)"
+    },
+    "final_status": {
+      "arm_a": "failed (all 25 seeds)",
+      "arm_b": "failed (all 25 seeds)",
+      "finding": "No difference in outcome classification"
+    },
+    "capital_burned": {
+      "arm_a_mean": -721573.36,
+      "arm_b_mean": -981394.28,
+      "difference": -259820.92,
+      "finding": "Arm B burned ~$260k more per seed"
+    }
+  },
+  "calibration_analysis": {
+    "expected_calibration_error": {
+      "value": 0.1733,
+      "threshold_high": 0.15,
+      "assessment": "HIGH MISCALIBRATION",
+      "interpretation": "Agents poorly calibrated; trust signal is noisy"
+    },
+    "calibration_by_confidence_bin": [
+      {
+        "stated_confidence": 0.5,
+        "actual_hit_rate": 0.528,
+        "sample_size": 72,
+        "error": 0.028,
+        "assessment": "acceptable"
+      },
+      {
+        "stated_confidence": 0.6,
+        "actual_hit_rate": 0.87,
+        "sample_size": 108,
+        "error": 0.27,
+        "assessment": "severe overstating (27% error)"
+      }
+    ],
+    "hit_rate_by_agent": [
+      {
+        "agent": "Finance Controller",
+        "hit_rate": 1.0,
+        "stated_confidence": 0.6,
+        "calibration_gap": 0.4,
+        "assessment": "overconfident (claimed 60%, achieved 100%)"
+      },
+      {
+        "agent": "Operations Manager",
+        "hit_rate": 0.972,
+        "stated_confidence": 0.64,
+        "calibration_gap": 0.332,
+        "assessment": "strong performer but overstated confidence"
+      },
+      {
+        "agent": "Product Manager",
+        "hit_rate": 1.0,
+        "stated_confidence": 0.58,
+        "calibration_gap": 0.42,
+        "assessment": "perfect outcomes but conservative claims"
+      },
+      {
+        "agent": "Growth Marketer",
+        "hit_rate": 0.639,
+        "stated_confidence": 0.62,
+        "calibration_gap": -0.019,
+        "assessment": "well-calibrated (only one)"
+      },
+      {
+        "agent": "Founder CEO",
+        "hit_rate": 0.056,
+        "stated_confidence": 0.56,
+        "calibration_gap": -0.504,
+        "assessment": "SEVERE MISCALIBRATION (5.6% hit rate vs 56% stated)"
+      }
+    ],
+    "critical_finding": "Founder CEO's trust score directly affected continue/scale/cut decisions. With only 5.6% hit rate, weighting by CEO trust added noise, causing Arm B to lose."
+  },
+  "root_cause_analysis": {
+    "issue_1": "Agents are overconfident — large gap between stated confidence and actual accuracy",
+    "issue_2": "Early-stage insufficient history — months 1-5 have < 5 resolved predictions, so trust scores are just penalty multipliers, not predictive",
+    "issue_3": "Trust-weighting on noisy signal adds noise — ECE=0.1733 means calibration noise dominates any signal; applying it to decisions backfires",
+    "issue_4": "Structural issue — business model is fundamentally broken (unprofitable in all seeds); trust system can't rescue unviable business. Margins too thin for calibration to matter."
+  },
+  "what_this_proves": {
+    "point_1": "Noisy calibration can hurt decisions — equal-weighting beat trust-weighted by $260k/seed avg",
+    "point_2": "Calibration is not automatic — trust system present but agents poorly calibrated (ECE > 0.15)",
+    "point_3": "Signal-to-noise matters — high ECE means applying trust-weighted decisions makes outcomes worse",
+    "point_4": "Founder CEO unreliable — 5.6% hit rate on strategy predictions is nearly random"
+  },
+  "what_this_does_not_prove": {
+    "point_1": "Calibration can never help — only that it doesn't help with poorly-calibrated agents",
+    "point_2": "Trust systems are useless — trust controller well-designed; agents are the problem",
+    "point_3": "Business simulation is realistic — deterministic oracle with synthetic agents, not real market",
+    "point_4": "AgentCo can't work — only that this particular synthetic test shows negative result"
+  },
+  "recommendation": {
+    "status": "Do not deploy trust-weighting",
+    "preconditions_to_retry": [
+      "Improve agent calibration to ECE < 0.08",
+      "Test on fresh, independent dataset",
+      "Improve Founder CEO hit rate from 5.6% to >40%"
+    ],
+    "value_of_negative_result": "Demonstrates that calibration noise can hurt decisions. 'Only reality promotes' — this reality shows calibration-weighted decisions don't improve outcomes when signal quality is poor."
+  }
+}
