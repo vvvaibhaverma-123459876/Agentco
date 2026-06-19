@@ -1,0 +1,142 @@
+"""
+Database migration runner with environment variable substitution.
+
+Applies all migrations in sequential order to the database specified by DATABASE_URL.
+Handles environment variable substitution for sensitive values (e.g., role passwords).
+
+Usage:
+  python run_migrations.py                    # runs all migrations
+  python run_migrations.py --check-only       # validates migrations without applying
+"""
+from __future__ import annotations
+
+import os
+import sys
+from pathlib import Path
+from typing import Optional
+
+try:
+    import psycopg2
+    from psycopg2 import sql
+except ImportError:
+    psycopg2 = None
+
+
+def get_migration_files() -> list[Path]:
+    """Return all migration SQL files in sorted order."""
+    migrations_dir = Path(__file__).parent / "db" / "migrations"
+    migration_files = sorted(migrations_dir.glob("*.sql"))
+    return migration_files
+
+
+def substitute_env_vars(sql_text: str) -> str:
+    """
+    Substitute environment variable placeholders in SQL.
+
+    Placeholders use the format :VAR_NAME
+    E.g. :RESOLUTION_SERVICE_PASSWORD gets substituted with os.environ['RESOLUTION_SERVICE_PASSWORD']
+
+    If an env var is missing, defaults are provided:
+      - RESOLUTION_SERVICE_PASSWORD: random UUID (generated at runtime)
+    """
+    # Handle RESOLUTION_SERVICE_PASSWORD
+    if ":RESOLUTION_SERVICE_PASSWORD" in sql_text:
+        password = os.environ.get("RESOLUTION_SERVICE_PASSWORD")
+        if not password:
+            # Generate a random password if not provided
+            import uuid
+            password = str(uuid.uuid4())
+            print(f"⚠️  RESOLUTION_SERVICE_PASSWORD not set; using generated UUID", file=sys.stderr)
+        # Escape single quotes for SQL
+        password_escaped = password.replace("'", "''")
+        sql_text = sql_text.replace(":RESOLUTION_SERVICE_PASSWORD", f"'{password_escaped}'")
+
+    return sql_text
+
+
+def run_migrations(db_url: Optional[str] = None) -> bool:
+    """
+    Run all migrations in order.
+
+    Args:
+        db_url: PostgreSQL connection string. Defaults to DATABASE_URL env var.
+
+    Returns:
+        True if successful, False otherwise.
+    """
+    if psycopg2 is None:
+        print("ERROR: psycopg2 not installed. Install with: pip install psycopg2-binary", file=sys.stderr)
+        return False
+
+    db_url = db_url or os.environ.get("DATABASE_URL", "postgresql://agentco:password@localhost:5432/agentco")
+
+    try:
+        conn = psycopg2.connect(db_url)
+        conn.autocommit = True  # Each migration is a separate transaction
+        cursor = conn.cursor()
+
+        migration_files = get_migration_files()
+        if not migration_files:
+            print("ERROR: No migration files found", file=sys.stderr)
+            return False
+
+        print(f"📁 Found {len(migration_files)} migrations")
+        print()
+
+        for migration_file in migration_files:
+            migration_name = migration_file.name
+            print(f"▶️  Applying {migration_name}...", end=" ", flush=True)
+
+            try:
+                # Read the SQL file
+                sql_text = migration_file.read_text()
+
+                # Substitute environment variables
+                sql_text = substitute_env_vars(sql_text)
+
+                # Execute the migration
+                cursor.execute(sql_text)
+
+                print("✅ OK")
+            except psycopg2.Error as e:
+                print(f"❌ FAILED")
+                print(f"\nERROR in {migration_name}:")
+                print(f"  {e}", file=sys.stderr)
+                cursor.close()
+                conn.close()
+                return False
+            except Exception as e:
+                print(f"❌ FAILED")
+                print(f"\nUnexpected error in {migration_name}:")
+                print(f"  {e}", file=sys.stderr)
+                cursor.close()
+                conn.close()
+                return False
+
+        cursor.close()
+        conn.close()
+
+        print()
+        print(f"✅ All {len(migration_files)} migrations applied successfully")
+        return True
+
+    except psycopg2.OperationalError as e:
+        print(f"ERROR: Failed to connect to database: {e}", file=sys.stderr)
+        return False
+    except Exception as e:
+        print(f"ERROR: Unexpected error: {e}", file=sys.stderr)
+        return False
+
+
+if __name__ == "__main__":
+    check_only = "--check-only" in sys.argv
+    if check_only:
+        print("🔍 Checking migrations (no changes will be applied)...\n")
+        # Just list the migrations without applying
+        migration_files = get_migration_files()
+        for mf in migration_files:
+            print(f"  ✓ {mf.name}")
+        sys.exit(0)
+
+    success = run_migrations()
+    sys.exit(0 if success else 1)
