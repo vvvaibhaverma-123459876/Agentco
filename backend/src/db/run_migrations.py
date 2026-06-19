@@ -24,7 +24,7 @@ except ImportError:
 
 def get_migration_files() -> list[Path]:
     """Return all migration SQL files in sorted order."""
-    migrations_dir = Path(__file__).parent / "db" / "migrations"
+    migrations_dir = Path(__file__).parent / "migrations"
     migration_files = sorted(migrations_dir.glob("*.sql"))
     return migration_files
 
@@ -33,8 +33,9 @@ def substitute_env_vars(sql_text: str) -> str:
     """
     Substitute environment variable placeholders in SQL.
 
-    Placeholders use the format :VAR_NAME
-    E.g. :RESOLUTION_SERVICE_PASSWORD gets substituted with os.environ['RESOLUTION_SERVICE_PASSWORD']
+    Placeholders use the format :VAR_NAME inside single quotes
+    E.g. ':RESOLUTION_SERVICE_PASSWORD' gets replaced with the password value
+    The placeholder is already inside quotes in the SQL, so we replace just the placeholder.
 
     If an env var is missing, defaults are provided:
       - RESOLUTION_SERVICE_PASSWORD: random UUID (generated at runtime)
@@ -47,9 +48,10 @@ def substitute_env_vars(sql_text: str) -> str:
             import uuid
             password = str(uuid.uuid4())
             print(f"⚠️  RESOLUTION_SERVICE_PASSWORD not set; using generated UUID", file=sys.stderr)
-        # Escape single quotes for SQL
+        # Escape single quotes for SQL (password is placed inside quotes in the SQL)
         password_escaped = password.replace("'", "''")
-        sql_text = sql_text.replace(":RESOLUTION_SERVICE_PASSWORD", f"'{password_escaped}'")
+        # Replace placeholder (which is already surrounded by single quotes in SQL)
+        sql_text = sql_text.replace("':RESOLUTION_SERVICE_PASSWORD'", f"'{password_escaped}'")
 
     return sql_text
 
