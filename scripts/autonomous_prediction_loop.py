@@ -30,7 +30,10 @@ from openai import OpenAI
 
 from calibration import create_calibration_engine
 from calibration.ledger.prediction_ledger import PredictionRegistration
-from agents.core.tools.web_scraper import fetch_page, find_resolvable_claims
+from agents.core.tools.web_scraper import (
+    fetch_page, find_resolvable_claims, discover_sources, current_date_context, register_prediction_safe,
+    is_duplicate_claim, _is_js_shell_page, SourceReliabilityTracker, CURATED_FALLBACK_SOURCES
+)
 
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -86,6 +89,9 @@ def run():
     registered: list[dict] = []
     token_usage = {"prompt": 0, "completion": 0, "total": 0}
 
+    # BUG FIX #5: Initialize source reliability tracker
+    source_tracker = SourceReliabilityTracker(failure_threshold=3)
+
     print(f"\n{'='*64}")
     print("AUTONOMOUS PREDICTION LOOP — registering 5 real predictions")
     print(f"{'='*64}\n")
@@ -125,16 +131,47 @@ def run():
     )
     print(f"  trust_confidence (before) : {trust_before:.4f}\n")
 
-    for source_url in SOURCES:
+    # ── NEW: Discover model-proposed sources before generic search ──────────────
+    print(f"  [SOURCE DISCOVERY] Querying model for domain-specific sources...")
+    try:
+        discovered = discover_sources(
+            topic="technology news and developments",
+            existing_claims=prior_claims,
+            llm_client=client,
+            model=model,
+        )
+        discovered_urls = [s["url"] for s in discovered]
+        if discovered_urls:
+            print(f"    → discovered {len(discovered_urls)} sources:")
+            for s in discovered:
+                print(f"      • {s['source_name']}: {s['reason']}")
+            sources_to_scan = discovered_urls + SOURCES
+        else:
+            print(f"    → no sources discovered, using default list")
+            sources_to_scan = SOURCES
+    except Exception as exc:
+        logger.warning("Source discovery failed (non-blocking): %s", exc)
+        sources_to_scan = SOURCES
+
+    for source_url in sources_to_scan:
         if len(registered) >= TARGET_PREDICTIONS:
             break
+
+        # BUG FIX #5: Skip sources that have failed too many times
+        if source_tracker.is_excluded(source_url):
+            print(f"  Skipping (excluded after repeated failures): {source_url}")
+            continue
 
         print(f"  Scraping: {source_url}")
         page = fetch_page(source_url, timeout=15)
 
         if "error" in page or not page.get("text"):
-            print(f"    → skipped ({page.get('error', 'no text')})")
+            print(f"    → fetch failed ({page.get('error', 'no text')})")
+            source_tracker.record_failure(source_url)
             continue
+
+        # Fetch succeeded; reset failure count
+        source_tracker.record_success(source_url)
 
         print(f"    → fetched {len(page['text'])} chars  (title: {page.get('title','')[:60]})")
 
@@ -142,7 +179,7 @@ def run():
         try:
             today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
             memory_section = f"\n\n{prior_context}\n\nIMPORTANT: Do NOT re-register claims you have already registered in prior runs (listed above under PREVIOUS EXPERIENCE).\n" if prior_context else ""
-            prompt = f"""You are a prediction-calibration assistant. Extract 3–5 specific, verifiable factual claims
+            prompt = f"""{current_date_context()}You are a prediction-calibration assistant. Extract 3–5 specific, verifiable factual claims
 from the news text below.
 {memory_section}
 Rules:
@@ -204,6 +241,17 @@ Return ONLY JSON (no prose, no code fences):
             domain        = claim_obj.get("domain", "technology")
 
             if not claim_text:
+                continue
+
+            # BUG FIX #3: Check for near-duplicates using substance-based detection
+            # (not just word overlap, but numeric signature matching)
+            is_duplicate = False
+            for r in registered:
+                if is_duplicate_claim(claim_text, r["claim"]):
+                    print(f"      ⚠ Skipped near-duplicate: {claim_text[:60]}")
+                    is_duplicate = True
+                    break
+            if is_duplicate:
                 continue
 
             # Validate ground_truth_source (must not be internal)
@@ -289,6 +337,13 @@ Return ONLY JSON (no prose, no code fences):
             print(f"\n  [MEMORY] Episodic memory written: {mid}")
         except Exception as exc:
             logger.warning("Memory write failed (non-blocking): %s", exc)
+
+    # BUG FIX #5: Report excluded sources
+    excluded = source_tracker.get_excluded_sources()
+    if excluded:
+        print(f"\n  Sources excluded (too many failures):")
+        for src in excluded:
+            print(f"    - {src}")
 
     print(f"\n{'='*64}")
     print(f"REGISTERED {len(registered)}/5 PREDICTIONS")
