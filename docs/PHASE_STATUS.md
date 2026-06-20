@@ -42,6 +42,36 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Standalone frontend `npm test` still fails because `jest` is not installed/resolvable; `make test` does not invoke it.
 - Commit hash: `3f454ec`
 
+## Phase 1 - Calibration Independence Engine
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `calibration/ledger/prediction_ledger.py`
+  - `calibration/resolution/resolution_service.py`
+  - `calibration/resolution/source_independence.py`
+  - `calibration/tests/test_resolution_independence_engine.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `calibration/tests/test_resolution_independence_engine.py`
+- Commands run:
+  - `python3 -m pytest calibration/tests/test_resolution_independence_engine.py` - failed once due to a test setup issue, then passed with 11 tests
+  - `python3 -m pytest calibration reserve/tests tests/integration tests/test_trust_monotonicity.py tests/test_weighting_floor_fix.py` - failed once because legacy registrations were interpreted as same-source resolutions, then passed with 103 tests
+  - `make test` - passed:
+    - Python: 238 passed
+    - migrations: 23 applied
+    - backend Jest: 32 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Corrected missing-lineage test setup so it clears both explicit and legacy lineage.
+  - Changed legacy claim lineage to use the pre-registered ledger entry when no explicit claim source URL is provided, preserving existing tests while keeping explicit same-source URL rejection strict.
+- Remaining risks:
+  - New lineage fields are enforced in the Python/domain service layer; DB persistence of the new resolution lineage columns is not implemented in this phase.
+  - Rejection audit events are stored in the resolution service's in-memory audit event list; durable audit integration remains future work.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 1-14 have not started. They must remain blocked until Phase 0 has passed and been committed.
+Phases 2-14 have not started. They must remain blocked until Phase 1 has passed and been committed.

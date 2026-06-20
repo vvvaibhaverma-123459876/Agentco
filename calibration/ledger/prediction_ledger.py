@@ -34,6 +34,13 @@ class PredictionRegistration:
     claim_type: str
     correlation_id: Optional[str] = None
     earliest_knowable_at: Optional[datetime] = None
+    claim_source_url: Optional[str] = None
+    claim_source_canonical_url: Optional[str] = None
+    claim_source_domain: Optional[str] = None
+    claim_source_owner: Optional[str] = None
+    claim_source_fingerprint: Optional[str] = None
+    claim_evidence_hash: Optional[str] = None
+    outcome_available_at: Optional[datetime] = None
 
 
 @dataclass
@@ -61,6 +68,26 @@ class PredictionRecord:
     brier_score: Optional[float] = None
     log_score: Optional[float] = None
     was_surprise: bool = False
+    claim_source_url: Optional[str] = None
+    claim_source_canonical_url: Optional[str] = None
+    claim_source_domain: Optional[str] = None
+    claim_source_owner: Optional[str] = None
+    claim_source_fingerprint: Optional[str] = None
+    claim_evidence_hash: Optional[str] = None
+    resolver_id: Optional[str] = None
+    resolver_type: Optional[str] = None
+    resolver_role: Optional[str] = None
+    resolution_source_url: Optional[str] = None
+    resolution_source_canonical_url: Optional[str] = None
+    resolution_source_domain: Optional[str] = None
+    resolution_source_owner: Optional[str] = None
+    resolution_source_fingerprint: Optional[str] = None
+    evidence_snapshot_hash: Optional[str] = None
+    evidence_fetched_at: Optional[datetime] = None
+    outcome_available_at: Optional[datetime] = None
+    independence_status: str = "unresolved"
+    independence_failure_reason: Optional[str] = None
+    dispute_status: str = "none"
 
 
 class PredictionLedger:
@@ -112,6 +139,27 @@ class PredictionLedger:
             )
 
         prediction_id = str(uuid.uuid4())
+        try:
+            from calibration.resolution.source_independence import build_source_lineage, evidence_hash
+            claim_url = reg.claim_source_url
+            if claim_url is None:
+                claim_url = f"agentco-ledger://prediction/{prediction_id}"
+            lineage = build_source_lineage(claim_url, reg.claim_source_owner or "")
+            claim_hash = reg.claim_evidence_hash or evidence_hash(
+                {
+                    "claim": reg.claim,
+                    "confidence_basis": reg.confidence_basis,
+                    "resolution_criterion": reg.resolution_criterion,
+                    "source": claim_url,
+                }
+            )
+        except Exception:
+            claim_url = reg.claim_source_url
+            if claim_url is None:
+                claim_url = f"agentco-ledger://prediction/{prediction_id}"
+            lineage = None
+            claim_hash = reg.claim_evidence_hash
+
         record = PredictionRecord(
             prediction_id=prediction_id,
             claim=reg.claim,
@@ -128,6 +176,13 @@ class PredictionLedger:
             correlation_id=reg.correlation_id,
             created_at=now,
             post_hoc=post_hoc,
+            claim_source_url=claim_url,
+            claim_source_canonical_url=reg.claim_source_canonical_url or (lineage.canonical_url if lineage else None),
+            claim_source_domain=reg.claim_source_domain or (lineage.domain if lineage else None),
+            claim_source_owner=reg.claim_source_owner or (lineage.owner if lineage else None),
+            claim_source_fingerprint=reg.claim_source_fingerprint or (lineage.fingerprint if lineage else None),
+            claim_evidence_hash=claim_hash,
+            outcome_available_at=reg.outcome_available_at or reg.resolution_date,
         )
 
         self._in_memory[prediction_id] = record

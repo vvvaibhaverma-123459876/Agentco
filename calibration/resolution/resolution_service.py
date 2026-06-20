@@ -42,6 +42,7 @@ class ResolutionService:
         self.scoring = scoring
         self.surprise_register = surprise_register
         self.trust_controller = trust_controller
+        self.audit_events: list[dict] = []
 
     def resolve(
         self,
@@ -49,6 +50,15 @@ class ResolutionService:
         outcome: bool,
         ground_truth_source: str,
         evidence: dict,
+        *,
+        resolver_id: str = "resolution_service_v1",
+        resolver_type: str = "service",
+        resolver_role: str = "resolver_service",
+        resolution_source_url: str | None = None,
+        resolution_source_owner: str | None = None,
+        evidence_fetched_at: datetime | None = None,
+        outcome_available_at: datetime | None = None,
+        dispute_status: str = "none",
     ) -> "PredictionRecord":
         """
         Resolve a prediction. Only callable by this service, not by agents.
@@ -66,7 +76,26 @@ class ResolutionService:
         if record is None:
             raise ValueError(f"Prediction {prediction_id} not found")
 
-        self._validate_resolution(record, ground_truth_source)
+        try:
+            self._validate_resolution(
+                record,
+                ground_truth_source,
+                resolver_id=resolver_id,
+                resolution_source_url=resolution_source_url,
+                resolution_source_owner=resolution_source_owner,
+                evidence=evidence,
+                evidence_fetched_at=evidence_fetched_at,
+                outcome_available_at=outcome_available_at,
+                dispute_status=dispute_status,
+            )
+        except Exception as exc:
+            self._write_audit_event(
+                "resolution_rejected",
+                prediction_id=prediction_id,
+                resolver_id=resolver_id,
+                reason=str(exc),
+            )
+            raise
 
         brier = self.scoring.brier_score(record.probability, outcome)
         log_s = self.scoring.log_score(record.probability, outcome)
@@ -79,9 +108,22 @@ class ResolutionService:
         record.resolved_outcome = outcome
         record.resolved_at = now
         record.resolved_by_service = "resolution_service_v1"
+        record.resolver_id = resolver_id
+        record.resolver_type = resolver_type
+        record.resolver_role = resolver_role
         record.brier_score = brier
         record.log_score = log_s
         record.was_surprise = is_surprise
+        self._record_resolution_lineage(
+            record,
+            ground_truth_source=ground_truth_source,
+            resolution_source_url=resolution_source_url,
+            resolution_source_owner=resolution_source_owner,
+            evidence=evidence,
+            evidence_fetched_at=evidence_fetched_at,
+            outcome_available_at=outcome_available_at,
+            dispute_status=dispute_status,
+        )
 
         logger.info(
             "RESOLVED: id=%s agent=%s outcome=%s probability=%.3f brier=%.4f log=%.4f surprise=%s",
@@ -107,7 +149,19 @@ class ResolutionService:
         # Here we return the list for the caller to drive with real outcomes
         return unresolved
 
-    def _validate_resolution(self, record: "PredictionRecord", ground_truth_source: str) -> None:
+    def _validate_resolution(
+        self,
+        record: "PredictionRecord",
+        ground_truth_source: str,
+        *,
+        resolver_id: str,
+        resolution_source_url: str | None,
+        resolution_source_owner: str | None,
+        evidence: dict,
+        evidence_fetched_at: datetime | None,
+        outcome_available_at: datetime | None,
+        dispute_status: str,
+    ) -> None:
         now = datetime.now(timezone.utc)
         if record.resolved:
             raise ValueError(f"WRITE-ONCE VIOLATION: prediction {record.prediction_id} is already resolved")
@@ -123,8 +177,71 @@ class ResolutionService:
                     f"DISQUALIFIED SOURCE: '{ground_truth_source}' is internal. "
                     "Ground truth must originate outside the reasoning system."
                 )
-        # Predicting agents cannot resolve their own predictions: this is enforced
-        # architecturally (agents have no handle to ResolutionService) and at the
-        # data layer (only the resolution_service DB role may write resolution
-        # columns — see 011_prediction_ledger.sql). resolve() itself takes no
-        # resolver identity, so there is no in-method producer check to perform here.
+        from calibration.resolution.source_independence import build_source_lineage, evaluate_independence
+
+        claim_source_url = (
+            f"agentco-ledger://prediction/{record.prediction_id}"
+            if record.claim_source_url is None
+            else record.claim_source_url
+        )
+        claim_source = build_source_lineage(claim_source_url, record.claim_source_owner or "")
+        resolution_source = build_source_lineage(
+            resolution_source_url or ground_truth_source,
+            resolution_source_owner or "",
+        )
+        result = evaluate_independence(
+            claim_source=claim_source,
+            resolution_source=resolution_source,
+            producer_agent_id=record.producing_agent_id,
+            resolver_id=resolver_id,
+            outcome_available_at=outcome_available_at or record.outcome_available_at or record.resolution_date,
+            resolved_at=now,
+            dispute_status=dispute_status,
+            additional_independent_evidence=bool(
+                isinstance(evidence, dict) and evidence.get("additional_independent_evidence")
+            ),
+        )
+        record.independence_status = result.status
+        record.independence_failure_reason = result.failure_reason or None
+        record.dispute_status = dispute_status
+        if result.status != "accepted":
+            raise ValueError(f"INDEPENDENCE REJECTED: {result.failure_reason}")
+
+    def _record_resolution_lineage(
+        self,
+        record: "PredictionRecord",
+        *,
+        ground_truth_source: str,
+        resolution_source_url: str | None,
+        resolution_source_owner: str | None,
+        evidence: dict,
+        evidence_fetched_at: datetime | None,
+        outcome_available_at: datetime | None,
+        dispute_status: str,
+    ) -> None:
+        from calibration.resolution.source_independence import build_source_lineage, evidence_hash
+
+        resolution_source = build_source_lineage(
+            resolution_source_url or ground_truth_source,
+            resolution_source_owner or "",
+        )
+        record.resolution_source_url = resolution_source.raw_url
+        record.resolution_source_canonical_url = resolution_source.canonical_url
+        record.resolution_source_domain = resolution_source.domain
+        record.resolution_source_owner = resolution_source.owner
+        record.resolution_source_fingerprint = resolution_source.fingerprint
+        record.evidence_snapshot_hash = evidence_hash(evidence)
+        record.evidence_fetched_at = evidence_fetched_at or datetime.now(timezone.utc)
+        record.outcome_available_at = outcome_available_at or record.outcome_available_at or record.resolution_date
+        record.independence_status = "accepted"
+        record.independence_failure_reason = None
+        record.dispute_status = dispute_status
+
+    def _write_audit_event(self, event_type: str, **fields: object) -> None:
+        self.audit_events.append(
+            {
+                "event_type": event_type,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                **fields,
+            }
+        )
