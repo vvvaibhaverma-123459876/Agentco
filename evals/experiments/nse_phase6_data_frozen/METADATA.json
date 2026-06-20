@@ -1,0 +1,64 @@
+{
+  "timestamp": "2026-06-20T12:45:24.171548",
+  "source": "yfinance",
+  "start_date": "2019-01-01",
+  "end_date": "2026-06-20",
+  "field_used": "raw Close",
+  "adjusted_close_used": false,
+  "instruments": {
+    "NIFTY 50": {
+      "ticker": "^NSEI",
+      "rows": 1840,
+      "first_date": "2019-01-02",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/nifty_50_REAL.csv"
+    },
+    "BANK NIFTY": {
+      "ticker": "^NSEBANK",
+      "rows": 1840,
+      "first_date": "2019-01-01",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/bank_nifty_REAL.csv"
+    },
+    "RELIANCE": {
+      "ticker": "RELIANCE.NS",
+      "rows": 1846,
+      "first_date": "2019-01-01",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/reliance_REAL.csv"
+    },
+    "HDFCBANK": {
+      "ticker": "HDFCBANK.NS",
+      "rows": 1846,
+      "first_date": "2019-01-01",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/hdfcbank_REAL.csv"
+    },
+    "TCS": {
+      "ticker": "TCS.NS",
+      "rows": 1846,
+      "first_date": "2019-01-01",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/tcs_REAL.csv"
+    },
+    "INFY": {
+      "ticker": "INFY.NS",
+      "rows": 1846,
+      "first_date": "2019-01-01",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/infy_REAL.csv"
+    },
+    "ICICIBANK": {
+      "ticker": "ICICIBANK.NS",
+      "rows": 1846,
+      "first_date": "2019-01-01",
+      "last_date": "2026-06-19",
+      "file": "evals/experiments/nse_phase6_data_frozen/icicibank_REAL.csv"
+    }
+  },
+  "source_limitations": [
+    "yfinance may differ from official NSE records.",
+    "Raw close is not a total-return series.",
+    "Adjusted close is avoided because it can be retroactively rewritten."
+  ]
+}
