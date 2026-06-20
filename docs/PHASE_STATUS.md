@@ -103,7 +103,7 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Department-level governance remains represented by shared governance/memory primitives, not a dedicated department governance table.
   - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
-- Commit hash: pending
+- Commit hash: `226cce1`
 
 ## Later Phases
 
