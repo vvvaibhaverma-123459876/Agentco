@@ -1,0 +1,227 @@
+[
+  {
+    "seed": 1234,
+    "arm_a_final_cash": -464997.37,
+    "arm_d_final_cash": -722742.76,
+    "cash_difference": -257745.39,
+    "arm_a_profit": -714997.37,
+    "arm_d_profit": -972742.76,
+    "d_wins": 0
+  },
+  {
+    "seed": 1235,
+    "arm_a_final_cash": -459616.38,
+    "arm_d_final_cash": -738038.56,
+    "cash_difference": -278422.18000000005,
+    "arm_a_profit": -709616.38,
+    "arm_d_profit": -988038.56,
+    "d_wins": 0
+  },
+  {
+    "seed": 1236,
+    "arm_a_final_cash": -464079.11,
+    "arm_d_final_cash": -738013.18,
+    "cash_difference": -273934.07000000007,
+    "arm_a_profit": -714079.11,
+    "arm_d_profit": -988013.18,
+    "d_wins": 0
+  },
+  {
+    "seed": 1237,
+    "arm_a_final_cash": -481596.71,
+    "arm_d_final_cash": -727152.69,
+    "cash_difference": -245555.97999999992,
+    "arm_a_profit": -731596.71,
+    "arm_d_profit": -977152.69,
+    "d_wins": 0
+  },
+  {
+    "seed": 1238,
+    "arm_a_final_cash": -450273.53,
+    "arm_d_final_cash": -739956.1,
+    "cash_difference": -289682.56999999995,
+    "arm_a_profit": -700273.53,
+    "arm_d_profit": -989956.1,
+    "d_wins": 0
+  },
+  {
+    "seed": 2001,
+    "arm_a_final_cash": -487450.26,
+    "arm_d_final_cash": -725860.71,
+    "cash_difference": -238410.44999999995,
+    "arm_a_profit": -737450.26,
+    "arm_d_profit": -975860.71,
+    "d_wins": 0
+  },
+  {
+    "seed": 2002,
+    "arm_a_final_cash": -467834.55,
+    "arm_d_final_cash": -734600.2,
+    "cash_difference": -266765.64999999997,
+    "arm_a_profit": -717834.55,
+    "arm_d_profit": -984600.2,
+    "d_wins": 0
+  },
+  {
+    "seed": 2003,
+    "arm_a_final_cash": -465335.49,
+    "arm_d_final_cash": -718612.99,
+    "cash_difference": -253277.5,
+    "arm_a_profit": -715335.49,
+    "arm_d_profit": -968612.99,
+    "d_wins": 0
+  },
+  {
+    "seed": 2004,
+    "arm_a_final_cash": -472245.55,
+    "arm_d_final_cash": -730140.75,
+    "cash_difference": -257895.2,
+    "arm_a_profit": -722245.55,
+    "arm_d_profit": -980140.75,
+    "d_wins": 0
+  },
+  {
+    "seed": 2005,
+    "arm_a_final_cash": -465776.54,
+    "arm_d_final_cash": -730258.6,
+    "cash_difference": -264482.06,
+    "arm_a_profit": -715776.54,
+    "arm_d_profit": -980258.6,
+    "d_wins": 0
+  },
+  {
+    "seed": 3333,
+    "arm_a_final_cash": -471342.09,
+    "arm_d_final_cash": -728003.85,
+    "cash_difference": -256661.75999999995,
+    "arm_a_profit": -721342.09,
+    "arm_d_profit": -978003.85,
+    "d_wins": 0
+  },
+  {
+    "seed": 3334,
+    "arm_a_final_cash": -502845.26,
+    "arm_d_final_cash": -729500.17,
+    "cash_difference": -226654.91000000003,
+    "arm_a_profit": -752845.26,
+    "arm_d_profit": -979500.17,
+    "d_wins": 0
+  },
+  {
+    "seed": 3335,
+    "arm_a_final_cash": -479268.7,
+    "arm_d_final_cash": -722022.65,
+    "cash_difference": -242753.95,
+    "arm_a_profit": -729268.7,
+    "arm_d_profit": -972022.65,
+    "d_wins": 0
+  },
+  {
+    "seed": 3336,
+    "arm_a_final_cash": -461664.57,
+    "arm_d_final_cash": -752008.84,
+    "cash_difference": -290344.26999999996,
+    "arm_a_profit": -711664.57,
+    "arm_d_profit": -1002008.84,
+    "d_wins": 0
+  },
+  {
+    "seed": 3337,
+    "arm_a_final_cash": -474637.3,
+    "arm_d_final_cash": -727197.41,
+    "cash_difference": -252560.11000000004,
+    "arm_a_profit": -724637.3,
+    "arm_d_profit": -977197.41,
+    "d_wins": 0
+  },
+  {
+    "seed": 4999,
+    "arm_a_final_cash": -455338.71,
+    "arm_d_final_cash": -732794.4,
+    "cash_difference": -277455.69,
+    "arm_a_profit": -705338.71,
+    "arm_d_profit": -982794.4,
+    "d_wins": 0
+  },
+  {
+    "seed": 5000,
+    "arm_a_final_cash": -472980.65,
+    "arm_d_final_cash": -713182.81,
+    "cash_difference": -240202.16000000003,
+    "arm_a_profit": -722980.65,
+    "arm_d_profit": -963182.81,
+    "d_wins": 0
+  },
+  {
+    "seed": 5001,
+    "arm_a_final_cash": -473778.3,
+    "arm_d_final_cash": -718353.28,
+    "cash_difference": -244574.98000000004,
+    "arm_a_profit": -723778.3,
+    "arm_d_profit": -968353.28,
+    "d_wins": 0
+  },
+  {
+    "seed": 5002,
+    "arm_a_final_cash": -473416.27,
+    "arm_d_final_cash": -724355.01,
+    "cash_difference": -250938.74,
+    "arm_a_profit": -723416.27,
+    "arm_d_profit": -974355.01,
+    "d_wins": 0
+  },
+  {
+    "seed": 5003,
+    "arm_a_final_cash": -468729.8,
+    "arm_d_final_cash": -730999.97,
+    "cash_difference": -262270.17,
+    "arm_a_profit": -718729.8,
+    "arm_d_profit": -980999.97,
+    "d_wins": 0
+  },
+  {
+    "seed": 6789,
+    "arm_a_final_cash": -497221.92,
+    "arm_d_final_cash": -744221.09,
+    "cash_difference": -246999.16999999998,
+    "arm_a_profit": -747221.92,
+    "arm_d_profit": -994221.09,
+    "d_wins": 0
+  },
+  {
+    "seed": 7000,
+    "arm_a_final_cash": -464637.73,
+    "arm_d_final_cash": -748695.95,
+    "cash_difference": -284058.22,
+    "arm_a_profit": -714637.73,
+    "arm_d_profit": -998695.95,
+    "d_wins": 0
+  },
+  {
+    "seed": 8000,
+    "arm_a_final_cash": -459028.98,
+    "arm_d_final_cash": -739331.9,
+    "cash_difference": -280302.92000000004,
+    "arm_a_profit": -709028.98,
+    "arm_d_profit": -989331.9,
+    "d_wins": 0
+  },
+  {
+    "seed": 9000,
+    "arm_a_final_cash": -457273.48,
+    "arm_d_final_cash": -715544.74,
+    "cash_difference": -258271.26,
+    "arm_a_profit": -707273.48,
+    "arm_d_profit": -965544.74,
+    "d_wins": 0
+  },
+  {
+    "seed": 9999,
+    "arm_a_final_cash": -491176.82,
+    "arm_d_final_cash": -731568.11,
+    "cash_difference": -240391.28999999998,
+    "arm_a_profit": -741176.82,
+    "arm_d_profit": -981568.11,
+    "d_wins": 0
+  }
+]
