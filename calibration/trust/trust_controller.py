@@ -76,8 +76,14 @@ class TrustController:
         score = self._scores.get(key)
 
         if score is None or score.n_resolved < self.MIN_SAMPLES_FOR_TRUST:
-            # Insufficient track record — apply a conservative penalty
-            penalty = 0.8 if score is None else (0.8 + 0.04 * min(score.n_resolved, 5))
+            # Insufficient track record — apply a conservative penalty that does
+            # not get more permissive as additional samples arrive. A fresh
+            # false resolution must never increase trust just because the
+            # sample count changed from 0 to 1.
+            if score is None:
+                penalty = 0.8
+            else:
+                penalty = max(0.8 - 0.04 * min(score.n_resolved, 5), 0.6)
             trusted = stated * penalty
             logger.debug(
                 "TRUST: %s/%s insufficient track record (n=%d) — applying %.0f%% penalty → trusted=%.3f",
@@ -119,6 +125,15 @@ class TrustController:
             domain=record.domain, claim_type=record.claim_type, horizon_class=record.horizon_class,
         ))
 
+        prior_trusted = self.trusted_confidence(
+            stated=record.probability,
+            subject_id=record.producing_agent_id,
+            subject_type="agent",
+            domain=record.domain,
+            claim_type=record.claim_type,
+            horizon_class=record.horizon_class,
+        )
+
         # Update reliability bin
         bin_key = f"{min(int(record.probability * 10) / 10, 0.9):.1f}"
         old_realised = score.stated_to_real.get(bin_key, record.probability)
@@ -134,6 +149,27 @@ class TrustController:
 
         # Recompute trusted_multiplier from ECE trend
         self._recompute_multiplier(score)
+
+        post_trusted = self.trusted_confidence(
+            stated=record.probability,
+            subject_id=record.producing_agent_id,
+            subject_type="agent",
+            domain=record.domain,
+            claim_type=record.claim_type,
+            horizon_class=record.horizon_class,
+        )
+
+        if record.resolved_outcome is False and post_trusted > prior_trusted:
+            current = max(post_trusted, 1e-9)
+            score.trusted_multiplier = max(score.trusted_multiplier * (prior_trusted / current), 0.0)
+            post_trusted = self.trusted_confidence(
+                stated=record.probability,
+                subject_id=record.producing_agent_id,
+                subject_type="agent",
+                domain=record.domain,
+                claim_type=record.claim_type,
+                horizon_class=record.horizon_class,
+            )
 
         # Propagate downgrade if multiplier dropped significantly
         if was - score.trusted_multiplier > 0.05:
