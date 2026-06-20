@@ -1,0 +1,130 @@
+{
+  "mode": "historical_backtest_paper_only",
+  "pre_registration_commit_hash": "5e6491a49e80fb931a5faa9e42392fd37b5cf6c6",
+  "code_commit_hash": "98b9387e32617a87fad4aa8b3dbd07cbd5d1d811",
+  "test_start": "2025-12-12",
+  "test_end": "2026-06-19",
+  "trading_days": 126,
+  "initial_capital": 1000000.0,
+  "arm_a_equal": {
+    "total_pnl": -1907.3036,
+    "total_return_pct": -0.1907,
+    "sharpe_style_ratio": -0.189,
+    "positive_days": 57,
+    "total_days": 126
+  },
+  "arm_b_trust": {
+    "total_pnl": -2217.0471,
+    "total_return_pct": -0.2217,
+    "sharpe_style_ratio": -0.1925,
+    "positive_days": 54,
+    "total_days": 126
+  },
+  "headline": {
+    "b_minus_a_pnl": -309.7435,
+    "b_minus_a_return_pct": -0.031,
+    "b_minus_a_sharpe": -0.0035,
+    "hypothesis_result": "falsified_for_this_window"
+  },
+  "prediction_counts": {
+    "registered": 7065,
+    "resolved_scored": 7065,
+    "post_hoc_false": 7065
+  },
+  "calibration": {
+    "MeanReversionAgent": {
+      "predictions": 2355,
+      "hit_rate": 0.4059,
+      "avg_confidence": 0.6423,
+      "calibration_error": 0.2363,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 491,
+          "hit_rate": 0.4644,
+          "avg_confidence": 0.5261,
+          "calibration_error": 0.0618
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 761,
+          "hit_rate": 0.4284,
+          "avg_confidence": 0.5985,
+          "calibration_error": 0.1701
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 497,
+          "hit_rate": 0.3602,
+          "avg_confidence": 0.6926,
+          "calibration_error": 0.3325
+        },
+        {
+          "bucket": "0.75-1.00",
+          "n": 606,
+          "hit_rate": 0.368,
+          "avg_confidence": 0.75,
+          "calibration_error": 0.382
+        }
+      ]
+    },
+    "RegimeAgent": {
+      "predictions": 2355,
+      "hit_rate": 0.5788,
+      "avg_confidence": 0.6199,
+      "calibration_error": 0.0411,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 65,
+          "hit_rate": 0.4462,
+          "avg_confidence": 0.45,
+          "calibration_error": 0.0038
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 827,
+          "hit_rate": 0.6022,
+          "avg_confidence": 0.58,
+          "calibration_error": -0.0222
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 1463,
+          "hit_rate": 0.5714,
+          "avg_confidence": 0.65,
+          "calibration_error": 0.0786
+        }
+      ]
+    },
+    "TechnicalAgent": {
+      "predictions": 2355,
+      "hit_rate": 0.4854,
+      "avg_confidence": 0.5955,
+      "calibration_error": 0.1102,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 587,
+          "hit_rate": 0.46,
+          "avg_confidence": 0.5,
+          "calibration_error": 0.04
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 1736,
+          "hit_rate": 0.4942,
+          "avg_confidence": 0.625,
+          "calibration_error": 0.1308
+        },
+        {
+          "bucket": "0.75-1.00",
+          "n": 32,
+          "hit_rate": 0.4688,
+          "avg_confidence": 0.75,
+          "calibration_error": 0.2812
+        }
+      ]
+    }
+  }
+}
