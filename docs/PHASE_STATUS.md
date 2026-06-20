@@ -277,6 +277,35 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `0e344a1`
 
+## Phase 9 - Civilization Constitution And Law Registry
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `reserve/migrations/011_civilization_constitution.sql`
+  - `civilization/services/civilization_service.py`
+  - `tests/civilization/test_civilization_constitution.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/civilization/test_civilization_constitution.py`
+- Commands run:
+  - `python3 -m pytest tests/civilization/test_civilization_constitution.py` - passed, 5 tests
+  - `python3 -m pytest tests/civilization calibration reserve/tests tests/e2e/test_institution_operating_loop.py` - passed, 113 tests
+  - `make test` - failed once due to a migration table-name conflict with Institution Kernel memory, then passed:
+    - Python: 267 passed
+    - migrations: 28 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Renamed constitutional memory table to `civilization_constitution_memory_events` to avoid conflicting with the existing Institution Kernel `civilization_memory_events` schema.
+  - Updated focused fixture to apply Institution Kernel migration before Society migration.
+- Remaining risks:
+  - Constitution governance is DB-backed and tested but minimal; quorum semantics are numeric and not yet tied to real voting identities.
+  - Emergency powers block high-risk checks via service helper but are not yet wired into every mutation route.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 9-14 have not started. They must remain blocked until Phase 8 has passed and been committed.
+Phases 10-14 have not started. They must remain blocked until Phase 9 has passed and been committed.
