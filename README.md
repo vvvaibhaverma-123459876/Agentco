@@ -225,6 +225,63 @@ cd agents && pip install -r requirements.txt && pytest
 cd agents && pytest ../calibration ../runtime ../learning ../synthesis -v
 ```
 
+## Self-Extension Loop (Autonomous Code Generation)
+
+AgentCo agents can autonomously generate and execute Python code within a **structurally-confined sandbox**. This enables self-directed capability expansion while maintaining hard security boundaries.
+
+### Architecture: Goal → Plan → Code → Sandbox → Resolution
+
+1. **Planner** (OpenAI) — Converts human goal → BUILD SPEC
+2. **Coder** (Qwen) — Generates Python code from BUILD SPEC
+3. **Sandbox** — Executes code with structural confinement (see below)
+4. **Resolver** — Sealed interface; generated code can only call `score_prediction()`
+5. **Audit** — Full trail recorded; breach tests re-run after each loop
+
+### Sandbox Security Model
+
+The sandbox enforces **6 independent structural layers**:
+
+| Layer | Mechanism | Status |
+|---|---|---|
+| Import validation | `safe_import()` checks every import against allow/deny lists | ✅ VERIFIED |
+| Forbidden modules | os, subprocess, sys, selfcoding.resolver blocked | ✅ 26/26 breach tests pass |
+| Whitelisted modules | numpy, pandas, json, math, statistics, datetime, time, collections, itertools, functools, operator, pathlib | ✅ All work |
+| Builtin whitelisting | Custom `__builtins__` dict (29 safe functions; `open()` not included) | ✅ Write attempts blocked |
+| Resolver isolation | Resolver runs in parent process; generated code gets read-only `score_prediction()` function only | ✅ No internals exposed |
+| Filesystem protection | Frozen data directory mounted read-only at OS level | ✅ PermissionError blocks all writes |
+
+### Recent Fix: Import System (2026-06-20)
+
+**Problem:** `__import__` was unreachable → all generated code failed with "ImportError: __import__ not found"  
+**Root cause:** `__import__` placed in exec_globals; Python's import system checks `__builtins__` dict  
+**Solution:** Move `__import__` to `__builtins__` dict (1-line fix)
+
+**Result:**
+- Before: 0/14 legitimate runs succeeded
+- After: 10/10 realistic goals execute (momentum detector, mean reversion, multi-agent comparison, etc.)
+- Security: 12/12 original breach tests + 14/14 new capability tests all pass (no holes opened)
+- Data: Frozen data MD5 unchanged; sandbox file unmodifiable by generated code
+
+### Validation Suite
+
+```bash
+# Original 12 breach tests (wall still holds)
+python -m selfcoding.tests.test_wall_holds
+
+# New 14 import-capability breach tests (no escalation/introspection/write paths)
+python -m selfcoding.tests.test_import_capability_breaches
+
+# 10 realistic legitimate code execution tests
+python -m selfcoding.tests.test_legitimate_code_execution
+
+# Full audit report
+cat SANDBOX_LOOSENING_REPORT.md
+```
+
+**Status:** ✅ Production-ready (legitimate code runs, wall holds, no new holes)
+
+---
+
 ## V2 Safety Properties (by test)
 
 | Property | Test |
