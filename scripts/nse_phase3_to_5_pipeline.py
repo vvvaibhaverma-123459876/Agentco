@@ -24,7 +24,7 @@ from evals.financial_calibration_toolkit.trust_scoring import original_trust
 from evals.financial_calibration_toolkit.walk_forward_engine import position_from_weighted_signal, summarize_pnl
 
 
-DEFAULT_PREREGISTRATION_COMMIT = "PENDING_LOCK_COMMIT"
+DEFAULT_PREREGISTRATION_COMMIT = "5464d2df1fd3f27f7aec943c959171ef5b9b5cec"
 CAPITAL = 1_000_000.0
 RNG_SEED = 42
 FEATURE_COLUMNS = [
