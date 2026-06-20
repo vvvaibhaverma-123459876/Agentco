@@ -360,6 +360,45 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `68eff0d`
 
+## Phase 12 - Frontend / Dashboard Surface
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `frontend/src/app/page.tsx`
+  - `frontend/src/app/layout.tsx`
+  - `frontend/src/app/dashboard/page.tsx`
+  - `frontend/src/components/Sidebar.tsx`
+  - `frontend/src/components/civilization/CivilizationPageShell.tsx`
+  - `frontend/src/types/civilization.ts`
+  - `frontend/src/lib/civilization-api.ts`
+  - `frontend/src/app/civilization/page.tsx`
+  - `frontend/src/app/civilization/institution/page.tsx`
+  - `frontend/src/app/civilization/reviews/page.tsx`
+  - `frontend/src/app/civilization/governance/page.tsx`
+  - `frontend/src/app/civilization/memory/page.tsx`
+  - `frontend/src/app/civilization/calibration/page.tsx`
+  - `tests/test_frontend_civilization_dashboards.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/test_frontend_civilization_dashboards.py`
+- Commands run:
+  - `python3 -m pytest tests/test_frontend_civilization_dashboards.py` - passed, 3 tests
+  - `npm run build` in `frontend` - failed once on missing typed institution reputation, then passed
+  - `make test` - passed:
+    - Python: 277 passed
+    - migrations: 30 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Added current institution reputation to the typed dashboard model and deterministic mock data so the civilization map and institution dashboard share a valid typed contract.
+- Remaining risks:
+  - Dashboard data is deterministic mock/offline data; live backend binding remains future work.
+  - Frontend package still lacks a standalone Jest setup, so dashboard coverage is provided by Python repository checks and Next production build.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 12-14 have not started. They must remain blocked until Phase 11 has passed and been committed.
+Phases 13-14 have not started. They must remain blocked until Phase 12 has passed and been committed.

@@ -3,8 +3,8 @@ import './globals.css';
 import { Sidebar } from '@/components/Sidebar';
 
 export const metadata: Metadata = {
-  title: 'AgentCo Control Dashboard',
-  description: 'Human governance interface for AgentCo — the autonomous AI company',
+  title: 'Agentco Civilization Dashboard',
+  description: 'Human governance interface for Agentco calibration-first civilization infrastructure',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
