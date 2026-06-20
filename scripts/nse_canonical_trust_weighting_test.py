@@ -25,6 +25,7 @@ TEST_START = pd.Timestamp("2025-12-12")
 TEST_END = pd.Timestamp("2026-06-19")
 INITIAL_CAPITAL = 1_000_000.0
 MAX_GROSS_SLEEVE = 0.05
+PLACEBO_SEED = 42
 INSTRUMENTS = ["NIFTY 50", "BANK NIFTY", "RELIANCE", "HDFCBANK", "TCS", "INFY", "ICICIBANK"]
 STOCKS = {"RELIANCE", "HDFCBANK", "TCS", "INFY", "ICICIBANK"}
 AGENTS = ["TechnicalAgent", "RegimeAgent", "MeanReversionAgent"]
@@ -235,6 +236,7 @@ def run_walk_forward(data: dict[str, pd.DataFrame]) -> dict[str, Any]:
     resolved_history: dict[str, list[dict[str, Any]]] = defaultdict(list)
     daily_pnl = []
     position_ledger = []
+    rng = np.random.RandomState(PLACEBO_SEED)
 
     for prediction_date in trading_dates:
         for row in ledger:
@@ -246,6 +248,7 @@ def run_walk_forward(data: dict[str, pd.DataFrame]) -> dict[str, Any]:
 
         day_a_pnl = 0.0
         day_b_pnl = 0.0
+        day_p_pnl = 0.0
         active_instruments = [name for name, df in data.items() if close_on(df, prediction_date) is not None]
         sleeve_capital = INITIAL_CAPITAL / len(active_instruments)
 
@@ -277,32 +280,42 @@ def run_walk_forward(data: dict[str, pd.DataFrame]) -> dict[str, Any]:
             }
             equal_weights = {agent: 1.0 for agent in signals}
             trust_weights = {agent: trust_score(resolved_history[agent]) for agent in signals}
+            placebo_weights = {agent: float(rng.uniform(0.0, 1.0)) for agent in signals}
             a_signal = weighted_signal(signals, equal_weights)
             b_signal = weighted_signal(signals, trust_weights)
+            p_signal = weighted_signal(signals, placebo_weights)
             a_position = max(-MAX_GROSS_SLEEVE * sleeve_capital, min(MAX_GROSS_SLEEVE * sleeve_capital, a_signal * MAX_GROSS_SLEEVE * sleeve_capital))
             b_position = max(-MAX_GROSS_SLEEVE * sleeve_capital, min(MAX_GROSS_SLEEVE * sleeve_capital, b_signal * MAX_GROSS_SLEEVE * sleeve_capital))
+            p_position = max(-MAX_GROSS_SLEEVE * sleeve_capital, min(MAX_GROSS_SLEEVE * sleeve_capital, p_signal * MAX_GROSS_SLEEVE * sleeve_capital))
             close_return = (next_close - current_close) / current_close
             a_pnl = a_position * close_return
             b_pnl = b_position * close_return
+            p_pnl = p_position * close_return
             day_a_pnl += a_pnl
             day_b_pnl += b_pnl
+            day_p_pnl += p_pnl
             position_ledger.append({
                 "date": str(prediction_date.date()),
                 "instrument": instrument,
                 "next_trading_date": str(next_date.date()),
                 "arm_a_position": round(a_position, 6),
                 "arm_b_position": round(b_position, 6),
+                "arm_p_position": round(p_position, 6),
                 "arm_a_pnl": round(a_pnl, 6),
                 "arm_b_pnl": round(b_pnl, 6),
+                "arm_p_pnl": round(p_pnl, 6),
                 "trust_weights": {agent: round(trust_weights[agent], 6) for agent in trust_weights},
+                "placebo_weights": {agent: round(placebo_weights[agent], 6) for agent in placebo_weights},
             })
 
         daily_pnl.append({
             "date": str(prediction_date.date()),
             "arm_a_pnl": round(day_a_pnl, 6),
             "arm_b_pnl": round(day_b_pnl, 6),
+            "arm_p_pnl": round(day_p_pnl, 6),
             "arm_a_cash": round(INITIAL_CAPITAL + sum(row["arm_a_pnl"] for row in daily_pnl) + day_a_pnl, 6),
             "arm_b_cash": round(INITIAL_CAPITAL + sum(row["arm_b_pnl"] for row in daily_pnl) + day_b_pnl, 6),
+            "arm_p_cash": round(INITIAL_CAPITAL + sum(row["arm_p_pnl"] for row in daily_pnl) + day_p_pnl, 6),
         })
 
     for row in ledger:
@@ -313,21 +326,27 @@ def run_walk_forward(data: dict[str, pd.DataFrame]) -> dict[str, Any]:
     resolved_records = [row for row in ledger if row.get("hit") is not None]
     arm_a = summarize_returns(daily_pnl, "arm_a")
     arm_b = summarize_returns(daily_pnl, "arm_b")
+    arm_p = summarize_returns(daily_pnl, "arm_p")
     return {
         "summary": {
             "mode": "historical_backtest_paper_only",
             "pre_registration_commit_hash": PREREGISTRATION_COMMIT,
             "code_commit_hash": git_commit_hash(),
+            "placebo_seed": PLACEBO_SEED,
             "test_start": str(TEST_START.date()),
             "test_end": str(TEST_END.date()),
             "trading_days": len(trading_dates),
             "initial_capital": INITIAL_CAPITAL,
             "arm_a_equal": arm_a,
             "arm_b_trust": arm_b,
+            "arm_p_random_placebo": arm_p,
             "headline": {
                 "b_minus_a_pnl": round(arm_b["total_pnl"] - arm_a["total_pnl"], 4),
                 "b_minus_a_return_pct": round(arm_b["total_return_pct"] - arm_a["total_return_pct"], 4),
                 "b_minus_a_sharpe": round(arm_b["sharpe_style_ratio"] - arm_a["sharpe_style_ratio"], 4),
+                "b_minus_p_pnl": round(arm_b["total_pnl"] - arm_p["total_pnl"], 4),
+                "b_minus_p_return_pct": round(arm_b["total_return_pct"] - arm_p["total_return_pct"], 4),
+                "b_minus_p_sharpe": round(arm_b["sharpe_style_ratio"] - arm_p["sharpe_style_ratio"], 4),
                 "hypothesis_result": "supported" if arm_b["sharpe_style_ratio"] > arm_a["sharpe_style_ratio"] else "falsified_for_this_window",
             },
             "prediction_counts": {
@@ -509,12 +528,16 @@ def write_report(output_dir: Path, results: dict[str, Any]) -> None:
         "|---|---:|---:|---:|---:|",
         f"| A equal-weighted | {summary['arm_a_equal']['total_return_pct']:.4f}% | {summary['arm_a_equal']['total_pnl']:.2f} | {summary['arm_a_equal']['sharpe_style_ratio']:.4f} | {summary['arm_a_equal']['positive_days']}/{summary['arm_a_equal']['total_days']} |",
         f"| B trust-weighted | {summary['arm_b_trust']['total_return_pct']:.4f}% | {summary['arm_b_trust']['total_pnl']:.2f} | {summary['arm_b_trust']['sharpe_style_ratio']:.4f} | {summary['arm_b_trust']['positive_days']}/{summary['arm_b_trust']['total_days']} |",
+        f"| P random-placebo | {summary['arm_p_random_placebo']['total_return_pct']:.4f}% | {summary['arm_p_random_placebo']['total_pnl']:.2f} | {summary['arm_p_random_placebo']['sharpe_style_ratio']:.4f} | {summary['arm_p_random_placebo']['positive_days']}/{summary['arm_p_random_placebo']['total_days']} |",
         "",
         "## Headline",
         "",
         f"- B minus A return: `{headline['b_minus_a_return_pct']:.4f}%`",
         f"- B minus A P&L: `{headline['b_minus_a_pnl']:.2f}`",
         f"- B minus A Sharpe-style ratio: `{headline['b_minus_a_sharpe']:.4f}`",
+        f"- B minus P return: `{headline['b_minus_p_return_pct']:.4f}%`",
+        f"- B minus P P&L: `{headline['b_minus_p_pnl']:.2f}`",
+        f"- B minus P Sharpe-style ratio: `{headline['b_minus_p_sharpe']:.4f}`",
         f"- Pre-registered result: `{headline['hypothesis_result']}`",
         "",
         "## Prediction Ledger",
