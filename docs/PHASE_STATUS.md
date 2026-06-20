@@ -223,6 +223,33 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `bbe3c0f`
 
+## Phase 7 - Dispute / Judiciary Layer
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `reserve/migrations/009_disputes.sql`
+  - `civilization/services/dispute_service.py`
+  - `tests/civilization/test_dispute_judiciary.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/civilization/test_dispute_judiciary.py`
+- Commands run:
+  - `python3 -m pytest tests/civilization/test_dispute_judiciary.py` - passed, 4 tests
+  - `python3 -m pytest tests/civilization calibration reserve/tests tests/e2e/test_institution_operating_loop.py` - passed, 103 tests
+  - `make test` - passed:
+    - Python: 257 passed
+    - migrations: 26 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed: none after implementation; focused tests and full gate passed on first run.
+- Remaining risks:
+  - Judiciary penalties are recorded but not yet propagated into the Phase 8 economy or broader authority reductions.
+  - Dispute lifecycle is DB-backed and tested but minimal; mediation workflow and richer evidence review remain future hardening.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 7-14 have not started. They must remain blocked until Phase 6 has passed and been committed.
+Phases 8-14 have not started. They must remain blocked until Phase 7 has passed and been committed.
