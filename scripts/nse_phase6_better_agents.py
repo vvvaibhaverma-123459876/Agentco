@@ -228,7 +228,7 @@ def compute_rsi(closes: np.ndarray) -> float:
     avg_gain = float(np.mean(gains)) if len(gains) else 0.0
     avg_loss = float(np.mean(losses)) if len(losses) else 0.0
     if avg_loss == 0:
-        return 100.0
+        return 50.0 if avg_gain == 0 else 100.0
     rs = avg_gain / avg_loss
     return 100.0 - 100.0 / (1.0 + rs)
 
