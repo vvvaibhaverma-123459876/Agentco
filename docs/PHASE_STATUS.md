@@ -331,7 +331,7 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Causal links table exists but causal explanation workflows remain future hardening.
   - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
-- Commit hash: pending
+- Commit hash: `323af59`
 
 ## Later Phases
 
