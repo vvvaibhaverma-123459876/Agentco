@@ -143,9 +143,10 @@ BEGIN CODE:
                     "model": self.MODEL,
                     "prompt": prompt,
                     "stream": False,
-                    "temperature": 0.3,  # Low temperature for code generation
+                    "temperature": 0.3,
+                    "top_p": 0.9,
                 },
-                timeout=120,
+                timeout=300,
             )
 
             if response.status_code != 200:

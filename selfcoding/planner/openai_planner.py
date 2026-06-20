@@ -13,7 +13,10 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from typing import Any
+
+import requests
 
 from selfcoding.coder.build_spec import (
     AgentSpec,
@@ -50,9 +53,155 @@ class OpenAIPlanHandler:
         Raises:
             PlannerError: If planning fails
         """
-        # This would call OpenAI to reason about the goal and produce a spec
-        # For now, return a template that demonstrates the structure
-        raise NotImplementedError("OpenAI integration requires API key setup")
+        prompt = self._build_planning_prompt(human_goal)
+
+        print(f"[Planner] Goal: {human_goal}")
+        print(f"[Planner] Calling OpenAI gpt-4o-mini...")
+
+        start_time = time.time()
+
+        try:
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": (
+                                "You are an expert at converting high-level goals into structured specifications. "
+                                "You produce ONLY valid JSON matching the BUILD SPEC schema. No markdown, no explanations."
+                            ),
+                        },
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0.3,
+                    "max_tokens": 2000,
+                },
+                timeout=30,
+            )
+
+            if response.status_code != 200:
+                raise PlannerError(
+                    f"OpenAI API error: {response.status_code} {response.text[:200]}"
+                )
+
+            result = response.json()
+            if "error" in result:
+                raise PlannerError(f"OpenAI error: {result['error']}")
+
+            # Extract the spec JSON from the response
+            spec_json_str = result["choices"][0]["message"]["content"].strip()
+
+            # Parse the JSON
+            spec_dict = json.loads(spec_json_str)
+
+            elapsed = time.time() - start_time
+            tokens = result.get("usage", {}).get("total_tokens", 0)
+
+            print(f"[Planner] ✓ Spec generated ({tokens} tokens, {elapsed:.2f}s)")
+
+            # Convert dict to BuildSpec and validate
+            build_spec = self._dict_to_build_spec(spec_dict, human_goal)
+
+            valid, err = build_spec.validate()
+            if not valid:
+                raise PlannerError(f"Generated spec failed validation: {err}")
+
+            print(f"[Planner] ✓ Spec validated")
+            return build_spec
+
+        except json.JSONDecodeError as e:
+            raise PlannerError(f"Failed to parse OpenAI response as JSON: {e}") from e
+        except requests.RequestException as e:
+            raise PlannerError(f"Failed to call OpenAI: {e}") from e
+
+    def _build_planning_prompt(self, human_goal: str) -> str:
+        """Build the prompt for the planner."""
+        return f"""Convert this goal into a BUILD SPEC:
+
+Goal: {human_goal}
+
+You MUST produce ONLY valid JSON (no markdown, no explanations). The JSON must match this schema exactly:
+
+{{
+  "goal": "The user's goal",
+  "scenario": {{
+    "name": "Scenario name",
+    "description": "What question does this scenario answer?",
+    "agents": [
+      {{
+        "name": "agent_name",
+        "role": "agent_role",
+        "description": "What does this agent do?",
+        "input_signals": ["signal1", "signal2"],
+        "output_format": "format description",
+        "logic_description": "Plain English description of the agent logic"
+      }}
+    ],
+    "data_sources": [
+      {{
+        "instrument": "NIFTY 50",
+        "date_range": "Full frozen NSE Phase 6 dataset"
+      }}
+    ],
+    "orchestration": "How are agents combined?",
+    "expected_output": "What format is the output?"
+  }}
+}}
+
+CONSTRAINTS:
+- Agents must have 1-3 input signals from: return_1d, return_5d, return_10d, ma20_distance, ma50_distance, rsi, volume_ratio, volatility
+- Data sources can be: NIFTY 50, BANK NIFTY, HDFCBANK, ICICIBANK, INFY, RELIANCE, TCS
+- logic_description CANNOT mention: resolver, sealed_resolver, frozen_data, __import__, write, open(
+- The spec CANNOT contain any forbidden keys
+
+Return ONLY the JSON, no other text."""
+
+    def _dict_to_build_spec(self, spec_dict: dict, human_goal: str) -> BuildSpec:
+        """Convert a dict from OpenAI to a BuildSpec instance."""
+        scenario_dict = spec_dict.get("scenario", {})
+
+        agents = []
+        for agent_dict in scenario_dict.get("agents", []):
+            agents.append(
+                AgentSpec(
+                    name=agent_dict.get("name", ""),
+                    role=agent_dict.get("role", ""),
+                    description=agent_dict.get("description", ""),
+                    input_signals=agent_dict.get("input_signals", []),
+                    output_format=agent_dict.get("output_format", ""),
+                    logic_description=agent_dict.get("logic_description", ""),
+                )
+            )
+
+        data_sources = []
+        for ds_dict in scenario_dict.get("data_sources", []):
+            data_sources.append(
+                DataSourceRef(
+                    instrument=ds_dict.get("instrument", ""),
+                    date_range=ds_dict.get("date_range", ""),
+                )
+            )
+
+        scenario = ScenarioSpec(
+            name=scenario_dict.get("name", ""),
+            description=scenario_dict.get("description", ""),
+            agents=agents,
+            data_sources=data_sources,
+            orchestration=scenario_dict.get("orchestration", ""),
+            expected_output=scenario_dict.get("expected_output", ""),
+        )
+
+        return BuildSpec(
+            goal=human_goal,
+            scenario=scenario,
+            constraints=spec_dict.get("constraints", {}),
+        )
 
 
 # Hardcoded example specs for demonstration

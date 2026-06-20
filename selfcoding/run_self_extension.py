@@ -19,16 +19,17 @@ import json
 from pathlib import Path
 from typing import Any
 
-from selfcoding.planner.openai_planner import get_example_spec
+from selfcoding.planner.openai_planner import OpenAIPlanHandler
+from selfcoding.coder.qwen_coder import generate_from_spec, CoderError
 from selfcoding.sandbox.run_generated import run_generated_code, setup_sandbox
 
 
-def run_self_extension_demo(scenario_type: str = "momentum") -> dict[str, Any]:
+def run_self_extension_demo(human_goal: str) -> dict[str, Any]:
     """
     Run a complete self-extension loop.
 
     Args:
-        scenario_type: "momentum" or "mean_reversion"
+        human_goal: High-level goal for the planner, e.g., "Build a momentum detector"
 
     Returns:
         Audit trail with goal, spec, code, execution results
@@ -36,82 +37,42 @@ def run_self_extension_demo(scenario_type: str = "momentum") -> dict[str, Any]:
     print("=" * 80)
     print("AGENTCO SELF-EXTENSION LOOP")
     print("=" * 80)
-    print(f"\nScenario: {scenario_type.upper()}")
+    print(f"\nGoal: {human_goal}")
     print()
 
-    # STEP 1: Planner produces BUILD SPEC
+    # STEP 1: REAL Planner produces BUILD SPEC
     print("STEP 1: PLANNER (Goal → BUILD SPEC)")
     print("-" * 80)
 
     try:
-        build_spec = get_example_spec(scenario_type)
-        print(f"Goal: {build_spec.goal}")
+        planner = OpenAIPlanHandler()
+        build_spec = planner.plan(human_goal)
         print(f"Scenario: {build_spec.scenario.name}")
         print(f"Agents: {[a.name for a in build_spec.scenario.agents]}")
-
-        valid, err = build_spec.validate()
-        if not valid:
-            print(f"❌ BUILD SPEC validation failed: {err}")
-            return {"status": "failed", "reason": f"BUILD SPEC validation: {err}"}
-        print("✓ BUILD SPEC validated")
 
     except Exception as e:
         print(f"❌ Planner error: {e}")
         return {"status": "failed", "reason": f"Planner error: {e}"}
 
-    # STEP 2: For demo, use a pre-written code snippet instead of Qwen
-    # (Qwen generation is timing out on complex requests)
+    # STEP 2: REAL Coder generates code from spec
     print("\nSTEP 2: CODER (BUILD SPEC → Code)")
     print("-" * 80)
 
-    # Use a safe demo code that exercises the resolver
-    if scenario_type == "momentum":
-        generated_code = """
-result = {
-    "agent": "momentum_agent",
-    "predictions": [],
-    "reasoning": "Momentum detector calls score_prediction on multiple dates"
-}
+    try:
+        generated_code = generate_from_spec(build_spec, verbose=True)
+        print()
+        print("=" * 80)
+        print("GENERATED CODE (from Qwen):")
+        print("=" * 80)
+        print(generated_code)
+        print("=" * 80)
 
-# Test: Call score_prediction with momentum prediction
-try:
-    r = score_prediction("NIFTY 50", "2024-10-21", "down", 0.75)
-    result["predictions"].append({
-        "date": r["prediction_date"],
-        "direction": r["predicted_direction"],
-        "hit": r["hit"],
-        "score": r["score"]
-    })
-    result["success"] = True
-except Exception as e:
-    result["error"] = str(e)
-    result["success"] = False
-"""
-    else:
-        generated_code = """
-result = {
-    "agent": "mean_reversion_agent",
-    "predictions": [],
-    "reasoning": "Mean reversion detector calls score_prediction on multiple dates"
-}
-
-# Test: Call score_prediction with mean reversion prediction
-try:
-    r = score_prediction("NIFTY 50", "2024-10-21", "up", 0.65)
-    result["predictions"].append({
-        "date": r["prediction_date"],
-        "direction": r["predicted_direction"],
-        "hit": r["hit"],
-        "score": r["score"]
-    })
-    result["success"] = True
-except Exception as e:
-    result["error"] = str(e)
-    result["success"] = False
-"""
-
-    print(f"Code snippet ({len(generated_code)} chars)")
-    print("✓ Code generated (demo snippet)")
+    except CoderError as e:
+        print(f"❌ Coder error: {e}")
+        return {"status": "failed", "reason": f"Coder error: {e}"}
+    except Exception as e:
+        print(f"❌ Coder error: {e}")
+        return {"status": "failed", "reason": f"Coder error: {e}"}
 
     # STEP 3: Sandbox execution
     print("\nSTEP 3: SANDBOX (Code → Results)")
@@ -137,8 +98,8 @@ except Exception as e:
     print("-" * 80)
 
     audit_trail = {
-        "scenario": scenario_type,
         "goal": build_spec.goal,
+        "spec_name": build_spec.scenario.name,
         "spec_valid": True,
         "code_executed": True,
         "result": output,
@@ -157,12 +118,16 @@ def main() -> int:
     """Run self-extension demos."""
     print()
 
-    # Demo 1: Momentum detector
-    result_mom = run_self_extension_demo("momentum")
+    # Demo 1: Real momentum detector goal
+    result_mom = run_self_extension_demo(
+        "Build a momentum detector for NIFTY 50 that predicts direction based on recent returns"
+    )
     print()
 
-    # Demo 2: Mean reversion detector
-    result_rev = run_self_extension_demo("mean_reversion")
+    # Demo 2: Real mean reversion goal
+    result_rev = run_self_extension_demo(
+        "Build a mean reversion detector for NIFTY 50 that predicts bounces when price is far from moving average"
+    )
     print()
 
     # Summary
