@@ -29,7 +29,7 @@ except ImportError:  # pragma: no cover - handled at runtime
     yf = None
 
 
-PREREGISTRATION_COMMIT = "PENDING_LOCK_COMMIT"
+PREREGISTRATION_COMMIT = "93c3b6d0f1321dbbf635762e52b82365a8baf087"
 RNG_SEED = 42
 INITIAL_CAPITAL = 1_000_000.0
 MAX_GROSS_SLEEVE = 0.05
