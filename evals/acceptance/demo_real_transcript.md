@@ -1,6 +1,6 @@
 # AgentCo Real Calibration Demo: Data-Driven Predictions
 
-**Date:** 2026-06-20T11:31:01.284247+00:00
+**Date:** 2026-06-20T11:31:22.214562+00:00
 **Mode:** Agents read visible price history and form data-driven directional views
 
 ## Market Context
@@ -20,18 +20,18 @@
 ### Momentum Agent
 - **Reasoning:** DOWN: Recent momentum: -0.0022 (1d: 0.004, 5d: -0.004, 10d: -0.006)
 - **Stated Confidence:** 51%
-- **Trust Before:** 0.686
-- **Weight:** 81.3%
+- **Trust Before:** 0.717
+- **Weight:** 91.2%
 - **Outcome:** ✓ CORRECT
-- **Trust After:** 0.702
+- **Trust After:** 0.731
 
 ### Mean Reversion Agent
 - **Reasoning:** UP: Distance from MA: -0.0152 (MA20: -0.0204, MA50: -0.0100)
 - **Stated Confidence:** 55%
-- **Trust Before:** 0.158
-- **Weight:** 18.7%
+- **Trust Before:** 0.069
+- **Weight:** 8.8%
 - **Outcome:** ✗ WRONG
-- **Trust After:** 0.114
+- **Trust After:** 0.025
 
 ## Market Resolution
 
@@ -49,6 +49,6 @@
 
 ✓ **Trust evolves by skill**: Momentum's correct prediction increased trust. Trust drift reflects actual forecasting skill, not random variation.
 
-✓ **High-trust agent doesn't always win**: Weighting by trust 81%/19%, but actual correctness depends on the specific market condition.
+✓ **High-trust agent doesn't always win**: Weighting by trust 91%/9%, but actual correctness depends on the specific market condition.
 
 This demo proves agents are calibrated to real market data and real outcomes, not scripted bets.
