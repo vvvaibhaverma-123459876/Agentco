@@ -73,9 +73,14 @@ def propagate_institution(institution_id: str, ledger, db) -> dict:
     for dept_id, dept_name, old_dept_score in depts:
         with db.cursor() as cur:
             cur.execute(
-                "SELECT agent_id FROM agent_membership_edges "
-                "WHERE department_id = %s AND active = TRUE",
-                (dept_id,),
+                """
+                SELECT agent_id FROM agent_membership_edges
+                 WHERE department_id = %s
+                   AND active = TRUE
+                   AND evicted_at IS NULL
+                   AND (expires_at IS NULL OR expires_at > %s)
+                """,
+                (dept_id, now),
             )
             members = [r[0] for r in cur.fetchall()]
 

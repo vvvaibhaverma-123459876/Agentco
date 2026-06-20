@@ -44,9 +44,16 @@ CREATE TABLE IF NOT EXISTS agent_membership_edges (
     department_id   TEXT NOT NULL REFERENCES departments(id) ON DELETE RESTRICT,
     role_name       TEXT NOT NULL,
     active          BOOLEAN NOT NULL DEFAULT TRUE,
+    expires_at      TIMESTAMPTZ NULL,
+    evicted_at      TIMESTAMPTZ NULL,
+    eviction_reason TEXT NULL,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (agent_id, department_id)
 );
+
+ALTER TABLE agent_membership_edges ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ NULL;
+ALTER TABLE agent_membership_edges ADD COLUMN IF NOT EXISTS evicted_at TIMESTAMPTZ NULL;
+ALTER TABLE agent_membership_edges ADD COLUMN IF NOT EXISTS eviction_reason TEXT NULL;
 
 -- ── institution_contracts ─────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS institution_contracts (

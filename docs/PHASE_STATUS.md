@@ -72,6 +72,39 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `80196c0`
 
+## Phase 2 - Institution Kernel Hardening
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `civilization/services/institution_service.py`
+  - `civilization/services/review_service.py`
+  - `civilization/services/reputation_service.py`
+  - `reserve/migrations/006_civilization.sql`
+  - `tests/civilization/test_institution_kernel_hardening.py`
+  - `docs/INSTITUTION_KERNEL.md`
+  - `docs/CIVILIZATION_MEMORY_EVENTS.md`
+  - `docs/INSTITUTION_KERNEL_HARDENING_STATUS.md`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/civilization/test_institution_kernel_hardening.py`
+- Commands run:
+  - `python3 -m pytest tests/civilization` - passed, 27 tests
+  - `python3 -m pytest calibration reserve/tests tests/civilization tests/e2e/test_institution_operating_loop.py tests/test_trust_monotonicity.py tests/test_weighting_floor_fix.py` - failed once on role allowlist missing `engineer`, then passed with 95 tests
+  - `make test` - passed:
+    - Python: 244 passed
+    - migrations: 23 applied
+    - backend Jest: 32 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Added `engineer` to the validated membership role allowlist to preserve the existing institution operating loop.
+- Remaining risks:
+  - Automatic reputation-floor probation/suspension remains documented as a remaining risk, not fully implemented.
+  - Department-level governance remains represented by shared governance/memory primitives, not a dedicated department governance table.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 2-14 have not started. They must remain blocked until Phase 1 has passed and been committed.
+Phases 3-14 have not started. They must remain blocked until Phase 2 has passed and been committed.

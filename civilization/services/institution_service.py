@@ -17,6 +17,7 @@ from typing import Optional
 import yaml
 
 CONTRACTS_DIR = Path(__file__).resolve().parents[1] / "contracts"
+CONTROLS_FILE = Path(__file__).resolve().parents[1] / "controls.yaml"
 
 FIVE_DEPARTMENTS = [
     ("Production",    "Produces outputs for the institution"),
@@ -25,6 +26,11 @@ FIVE_DEPARTMENTS = [
     ("Adversarial",   "Adversarially challenges own outputs (mandatory)"),
     ("Improvement",   "Continuous improvement and lesson integration"),
 ]
+
+VALID_MEMBER_ROLES = frozenset({
+    "contributor", "producer", "reviewer", "auditor", "adversary",
+    "improver", "lead", "member", "engineer",
+})
 
 
 # ── Contract loading + validation ────────────────────────────────────────────
@@ -81,6 +87,7 @@ def create_institution(name: str, contract: dict, db) -> dict:
     Writes a 'institution_created' memory event in the same transaction.
     """
     _validate_contract(contract)
+    _enforce_creation_controls(name, contract, db)
 
     inst_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc)
@@ -160,6 +167,8 @@ def get_departments(institution_id: str, db) -> list[dict]:
 
 
 def add_agent_to_department(agent_id: str, department_id: str, role_name: str, db) -> None:
+    if role_name not in VALID_MEMBER_ROLES:
+        raise ValueError(f"Invalid role_name: {role_name}")
     now = datetime.now(timezone.utc)
     with db.cursor() as cur:
         cur.execute(
@@ -170,3 +179,108 @@ def add_agent_to_department(agent_id: str, department_id: str, role_name: str, d
             """,
             (agent_id, department_id, role_name, now),
         )
+
+
+def add_agent_membership(
+    agent_id: str,
+    department_id: str,
+    role_name: str,
+    db,
+    expires_at: Optional[datetime] = None,
+) -> None:
+    if role_name not in VALID_MEMBER_ROLES:
+        raise ValueError(f"Invalid role_name: {role_name}")
+    now = datetime.now(timezone.utc)
+    with db.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO agent_membership_edges
+                (agent_id, department_id, role_name, active, expires_at, evicted_at, eviction_reason, created_at)
+            VALUES (%s, %s, %s, TRUE, %s, NULL, NULL, %s)
+            ON CONFLICT (agent_id, department_id) DO UPDATE
+               SET role_name = EXCLUDED.role_name,
+                   active = TRUE,
+                   expires_at = EXCLUDED.expires_at,
+                   evicted_at = NULL,
+                   eviction_reason = NULL
+            """,
+            (agent_id, department_id, role_name, expires_at, now),
+        )
+
+
+def evict_agent(agent_id: str, department_id: str, reason: str, db) -> None:
+    now = datetime.now(timezone.utc)
+    with db.cursor() as cur:
+        cur.execute(
+            """
+            UPDATE agent_membership_edges
+               SET active = FALSE, evicted_at = %s, eviction_reason = %s
+             WHERE agent_id = %s AND department_id = %s
+            """,
+            (now, reason, agent_id, department_id),
+        )
+        if cur.rowcount == 0:
+            raise ValueError("membership not found")
+
+
+def list_active_members(department_id: str, db) -> list[str]:
+    now = datetime.now(timezone.utc)
+    with db.cursor() as cur:
+        cur.execute(
+            """
+            SELECT agent_id FROM agent_membership_edges
+             WHERE department_id = %s
+               AND active = TRUE
+               AND evicted_at IS NULL
+               AND (expires_at IS NULL OR expires_at > %s)
+            """,
+            (department_id, now),
+        )
+        return [r[0] for r in cur.fetchall()]
+
+
+def get_cross_institution_reputation(db) -> list[dict]:
+    with db.cursor() as cur:
+        cur.execute(
+            """
+            SELECT i.id, i.name, i.status, i.reputation_score, COUNT(d.id) AS department_count
+              FROM institutions i
+              LEFT JOIN departments d ON d.parent_id = i.id
+             GROUP BY i.id, i.name, i.status, i.reputation_score
+             ORDER BY i.name
+            """
+        )
+        rows = cur.fetchall()
+    return [
+        {
+            "institution_id": r[0],
+            "name": r[1],
+            "status": r[2],
+            "reputation_score": r[3],
+            "department_count": r[4],
+        }
+        for r in rows
+    ]
+
+
+def _load_controls() -> dict:
+    if not CONTROLS_FILE.exists():
+        return {}
+    with open(CONTROLS_FILE) as f:
+        return yaml.safe_load(f) or {}
+
+
+def _enforce_creation_controls(name: str, contract: dict, db) -> None:
+    controls = _load_controls()
+    if controls.get("duplicate_institution_detector", True):
+        with db.cursor() as cur:
+            cur.execute("SELECT id FROM institutions WHERE name = %s AND status = 'active'", (name,))
+            if cur.fetchone():
+                raise ValueError(f"DUPLICATE INSTITUTION: active institution with name='{name}' already exists")
+    budget = controls.get("institution_creation_budget")
+    if budget is not None:
+        with db.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM institutions WHERE status = 'active'")
+            count = cur.fetchone()[0]
+        if count >= int(budget):
+            raise ValueError("INSTITUTION CREATION BUDGET EXCEEDED")

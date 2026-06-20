@@ -16,8 +16,13 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Optional
+
+import yaml
+from pathlib import Path
+
+CONTROLS_FILE = Path(__file__).resolve().parents[1] / "controls.yaml"
 
 # Legal state machine transitions
 _TRANSITIONS: dict[str, set[str]] = {
@@ -123,6 +128,14 @@ def transition_review(review_id: str, new_status: str, db, evidence: Optional[di
             db=db,
         )
     elif new_status in ("approved", "rejected"):
+        if current_status == "challenged":
+            _write_memory_event(
+                entity_type="institution", entity_id=reviewer_id,
+                event_type="challenge_resolved",
+                summary=f"Challenge on output '{output_id}' resolved as {new_status}",
+                evidence_refs={"review_id": review_id, "resolution": new_status},
+                db=db,
+            )
         _write_memory_event(
             entity_type="institution", entity_id=producing_id,
             event_type="review_completed" if new_status == "approved" else "failure_recorded",
@@ -130,14 +143,6 @@ def transition_review(review_id: str, new_status: str, db, evidence: Optional[di
             evidence_refs={"review_id": review_id},
             db=db,
         )
-        if new_status == "challenged":
-            _write_memory_event(
-                entity_type="institution", entity_id=reviewer_id,
-                event_type="challenge_resolved",
-                summary=f"Challenge on output '{output_id}' resolved as {new_status}",
-                evidence_refs={"review_id": review_id},
-                db=db,
-            )
 
 
 def get_review(review_id: str, db) -> Optional[dict]:
@@ -156,6 +161,42 @@ def get_review(review_id: str, db) -> Optional[dict]:
         "producing_institution_id": row[2], "reviewer_institution_id": row[3],
         "status": row[4], "review_evidence": row[5], "reputation_delta": row[6],
     }
+
+
+def escalate_review_timeouts(db) -> list[str]:
+    controls = _load_controls()
+    timeout_hours = int(controls.get("review_timeout_hours", 48))
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=timeout_hours)
+    escalated: list[str] = []
+    with db.cursor() as cur:
+        cur.execute(
+            """
+            SELECT id, output_id, producing_institution_id
+              FROM institution_output_reviews
+             WHERE status IN ('proposed', 'under_review')
+               AND created_at < %s
+            """,
+            (cutoff,),
+        )
+        rows = cur.fetchall()
+    for review_id, output_id, producing_id in rows:
+        _write_memory_event(
+            entity_type="institution",
+            entity_id=producing_id,
+            event_type="failure_recorded",
+            summary=f"Review timeout escalated for output '{output_id}'",
+            evidence_refs={"review_id": review_id, "timeout_hours": timeout_hours},
+            db=db,
+        )
+        escalated.append(review_id)
+    return escalated
+
+
+def _load_controls() -> dict:
+    if not CONTROLS_FILE.exists():
+        return {}
+    with open(CONTROLS_FILE) as f:
+        return yaml.safe_load(f) or {}
 
 
 def _write_memory_event(
