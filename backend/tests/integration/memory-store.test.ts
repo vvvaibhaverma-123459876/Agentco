@@ -1,7 +1,7 @@
 /**
  * Memory Store Integration Tests — real Postgres + pgvector, no mocks.
  *
- * Requires: Postgres on localhost:5433, agent_memory + shared_knowledge tables,
+ * Requires: Postgres on localhost:5432, agent_memory + shared_knowledge tables,
  *           pgvector extension enabled (vector(384) on shared_knowledge).
  *
  * Tests:
@@ -19,7 +19,7 @@ import { MemoryStoreService } from '../../src/services/memory-store.service';
 
 const DSN =
   process.env.DATABASE_URL ||
-  'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 const db = new Pool({ connectionString: DSN });
 const svc = new MemoryStoreService();

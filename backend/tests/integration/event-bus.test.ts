@@ -1,7 +1,7 @@
 /**
  * Event Bus Integration Tests — real Kafka + real Postgres, no mocks.
  *
- * Requires: Kafka on localhost:9092, Postgres on localhost:5433, event_history table.
+ * Requires: Kafka on localhost:9092, Postgres on localhost:5432, event_history table.
  *
  * Tests:
  *   1. publish() sends to Kafka and persists to event_history
@@ -18,7 +18,7 @@ import { EventBusService, AgentEvent, SignedEvent } from '../../src/services/eve
 
 const DSN =
   process.env.DATABASE_URL ||
-  'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 const db = new Pool({ connectionString: DSN });
 const svc = new EventBusService();

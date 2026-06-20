@@ -24,6 +24,8 @@ test:
 	$(PYTHON) -m pytest calibration runtime reserve tests evals learning synthesis
 	$(MAKE) migrate
 	cd backend && DATABASE_URL="$(DATABASE_URL)" SUPERUSER_DATABASE_URL="$(DATABASE_URL)" npm test
+	cd backend && npm run build
+	cd frontend && npm test
 	cd frontend && npm run build
 
 smoke:

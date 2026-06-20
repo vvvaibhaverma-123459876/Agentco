@@ -5,7 +5,7 @@
 import { Pool, PoolClient } from 'pg';
 
 const DSN = process.env.DATABASE_URL ??
-  'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 export const db: Pool = new Pool({ connectionString: DSN });
 

@@ -438,6 +438,66 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `8574e65`
 
+## Phase 14 - CI, Release Hygiene, And Final Status
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `.github/workflows/ci.yml`
+  - `Makefile`
+  - `CHANGELOG.md`
+  - `VERSION`
+  - `backend/src/db/client.ts`
+  - `backend/src/db/migrate.ts`
+  - `backend/tests/integration/audit-log.test.ts`
+  - `backend/tests/integration/event-bus.test.ts`
+  - `backend/tests/integration/memory-store.test.ts`
+  - `backend/tests/integration/override-queue.test.ts`
+  - `frontend/package.json`
+  - `frontend/scripts/check-civilization-dashboard.mjs`
+  - `docs/RELEASE_CHECKLIST.md`
+  - `docs/PRODUCTION_READINESS.md`
+  - `docs/LAUNCH_READINESS_STATUS.md`
+  - `docs/TESTING_STRATEGY.md`
+  - `docs/LOCAL_DEVELOPMENT.md`
+  - `docs/LICENSING_STRATEGY.md`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `frontend/scripts/check-civilization-dashboard.mjs`
+- Commands run:
+  - `make doctor` - passed
+  - `make smoke` - passed offline
+  - `make demo` - passed offline and exported audit package
+  - `make migrate` - passed, 30 migrations applied
+  - `docker compose --profile minimal config --services` - passed, returned `postgres`; emitted obsolete `version` warning
+  - `make dev-minimal` - failed once under sandbox Docker socket restrictions, then passed with approval
+  - `docker compose --profile dev up -d zookeeper kafka` - passed with approval
+  - `cd backend && npm test && npm run build` - failed once under sandbox localhost restrictions, then passed with approval:
+    - backend Jest: 42 passed
+    - backend build: passed
+  - `cd frontend && npm test && npm run build` - passed:
+    - frontend dashboard test: passed
+    - frontend build: passed
+  - `make test` - passed:
+    - Python: 280 passed
+    - migrations: 30 applied
+    - backend Jest: 42 passed
+    - backend build: passed
+    - frontend dashboard test: passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Replaced the placeholder frontend Jest script with a deterministic dashboard surface test.
+  - Aligned backend default database DSNs with the repo's Docker Compose and Makefile default on `localhost:5432`.
+  - Updated `make test` to include backend build and frontend tests.
+  - Updated CI to start dev-profile Postgres/Kafka services and run offline gates without paid LLM keys.
+- Remaining risks:
+  - GitHub Actions workflow has not been observed running on the remote CI service in this Codex run.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+  - Docker Compose still emits an obsolete top-level `version` warning.
+  - Society/Civilization are tested as service/domain layers plus dashboard/demo surfaces, but not yet production-grade live orchestration across all API boundaries.
+- Commit hash: pending
+
 ## Later Phases
 
-Phase 14 has not started. It must remain blocked until Phase 13 has passed and been committed.
+All requested phases have implementation, tests, executed commands, status documentation, and phase commits pending only for Phase 14 final commit hash recording.

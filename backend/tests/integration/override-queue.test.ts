@@ -1,7 +1,7 @@
 /**
  * Override Queue Integration Tests — real Postgres, no mocks.
  *
- * Requires: Postgres on localhost:5433, override_queue table (migration 013).
+ * Requires: Postgres on localhost:5432, override_queue table (migration 013).
  *
  * Tests:
  *   1. enqueue() persists and returns a pending override
@@ -19,7 +19,7 @@ import { OverrideQueueService } from '../../src/services/override-queue.service'
 
 const DSN =
   process.env.DATABASE_URL ||
-  'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 const db = new Pool({ connectionString: DSN });
 const svc = new OverrideQueueService();

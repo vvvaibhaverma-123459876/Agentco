@@ -1,7 +1,7 @@
 /**
  * Audit Log Integration Tests — real Postgres, no mocks.
  *
- * Requires: Postgres on port 5433, agentco DB, migrations 004 + 012 applied.
+ * Requires: Postgres on port 5432, agentco DB, migrations 004 + 012 applied.
  *
  * Tests:
  *   1. append() writes N real rows; query() returns them
@@ -17,11 +17,11 @@ import { AuditLogService, AuditEntry } from '../../src/services/audit-log.servic
 
 const DSN =
   process.env.DATABASE_URL ||
-  'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 const SUPER_DSN =
   process.env.SUPERUSER_DATABASE_URL ||
-  'postgresql://postgres:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 // agentco-role pool used by the service under test
 const agentcoDb = new Pool({ connectionString: DSN });

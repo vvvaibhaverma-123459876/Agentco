@@ -14,7 +14,7 @@ import { Pool } from 'pg';
 
 const DSN =
   process.env.DATABASE_URL ??
-  'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
+  'postgresql://agentco:password@localhost:5432/agentco';
 
 // __dirname is dist/db/ when compiled, src/db/ when run via ts-node.
 // Migrations always live next to the source file.
