@@ -99,11 +99,44 @@ Distribution: Some seeds win ($50-300k profit) due to good luck + control
 
 ---
 
+## CRITICAL: Independence Safeguard
+
+**The Risk (Co-Design Bias):**
+If business model and agents are designed together, a "trust-weighting win" could be an artifact of co-optimizing the business to have weaknesses where agents happen to excel. This would be the success-rigged mirror image of PawDent's failure-rigged setup.
+
+**The Safeguard (Frozen Independence):**
+
+1. **FREEZE business model FIRST (before agents):**
+   - Unit economics, oracle response surface, control policy
+   - Commit as `B2B_SAAS_FROZEN_MODEL.md`
+   - Decision: control policy suboptimality chosen WITHOUT seeing agent forecasts
+   - Rationale: Why is control suboptimal? Document it independently
+
+2. **THEN wire in agents:**
+   - Agent forecast accuracy emerges from simulation
+   - NOT hand-set to match business weaknesses
+   - Agents generate their predictions; oracle resolves them naturally
+
+3. **Verification in Final Report:**
+   - Confirm: business model committed before agent code
+   - Confirm: control policy suboptimality is NOT designed around agent strengths
+   - Confirm: agent forecasts were not tuned to business weaknesses
+   - List: commit hashes showing temporal order
+
+**Why This Matters:**
+Without independence, a "weighting win" could mean: "we built agents to succeed where the business is weak" rather than "calibration helps good decisions beat mediocre ones."
+
+---
+
 ## Before the Full Experiment
 
 **Checklist:**
 - [ ] Weighting formulas fixed to [0, full] range (PREREQUISITE 1) ✓ DONE
-- [ ] B2B SaaS model built with viable unit economics
+- [ ] **FREEZE: B2B SaaS model committed independently** (no agent code yet)
+  - [ ] Commit `B2B_SAAS_FROZEN_MODEL.md` with unit economics, oracle, control policy
+  - [ ] Document WHY control policy is suboptimal (independent reasoning)
+  - [ ] NO reference to what agents will predict
+- [ ] Wire in agents (AFTER model is frozen)
 - [ ] Control arm run on 25 seeds
 - [ ] Confirm 30-60% profitable seeds (gate passes) or model adjustments needed (gate fails)
 - [ ] Identify specific suboptimal decisions the control makes

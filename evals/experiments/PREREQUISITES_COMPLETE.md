@@ -40,6 +40,34 @@ Applied to all weighting formulas:
 
 ## PREREQUISITE 2: Ready to Execute
 
+### Independence Safeguard: Frozen Model Artifact
+
+**Critical:** Business model must be frozen BEFORE wiring in agents.
+
+**Why:**
+- Co-designing business and agents risks creating an artificial "weighting win"
+- This would mirror PawDent's failure-rigged setup, but in reverse
+- Control policy suboptimality must be chosen independently of what agents will predict
+- Agent forecast accuracy must emerge naturally from simulation, not be hand-tuned
+
+**Process:**
+1. **Commit frozen business model** (no agent code yet)
+   - Unit economics, oracle response surface, control policy
+   - Document WHY control is suboptimal (independent reasoning)
+   - Commit hash: recorded before any agent implementation
+
+2. **Then wire in agents** (AFTER model locked)
+   - Agent forecasts emerge from simulation
+   - NOT tuned to match business weaknesses
+   - Oracle resolves naturally
+
+3. **Report verification:**
+   - Confirm temporal order: business frozen before agents
+   - Confirm control suboptimality is independent, not co-designed
+   - Show commit hashes proving independence
+
+---
+
 ### Verification Gate Specification
 
 Before running the full four-arm experiment, must validate that B2B SaaS model has profitable decision-space:

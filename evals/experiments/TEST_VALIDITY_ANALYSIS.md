@@ -189,13 +189,27 @@ Only then can we truly answer: Does calibration-weighted decision-making improve
 
 **Do not use PawDent to validate or refute AgentCo's claim.** Instead:
 
-1. **Commit** to B2B SaaS model (or similar with mixed outcomes)
+1. **FREEZE business model FIRST** (before wiring agents)
+   - Commit unit economics, oracle, control policy as artifact
+   - Document why control is suboptimal (independent reasoning)
+   - NO reference to what agents will predict
+   
 2. **Verify** control arm has both profitable and unprofitable seeds
-3. **Pre-register** hypothesis (weighting beats control on cash)
-4. **Run all four arms** on same 25 seeds
-5. **Report honestly** whether weighting correlates with profitable seeds
 
-If this test shows trust-weighting beats control, the claim is **proven on a fair test**.  
+3. **Wire in agents** (AFTER model is frozen)
+   - Agent forecasts emerge naturally from simulation
+   - NOT hand-tuned to match business weaknesses
+
+4. **Pre-register** hypothesis (weighting beats control on cash)
+
+5. **Run all four arms** on same 25 seeds
+
+6. **Report verification** in writeup:
+   - Temporal order: business frozen before agents
+   - Control suboptimality is independent, not co-designed
+   - Commit hashes proving separation
+
+If this test shows trust-weighting beats control, the claim is **proven on a fair test** (with independent design).  
 If it doesn't, that's **valuable information** (calibration alone isn't enough, or other factors dominate).
 
-Either way, you'll have answered the actual question rather than a proxy question on a broken system.
+Either way, you'll have answered the actual question with integrity constraints that prevent co-design bias.
