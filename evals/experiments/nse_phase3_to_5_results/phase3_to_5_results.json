@@ -1,0 +1,1442 @@
+{
+  "timestamp": "2026-06-20T12:05:52.040008",
+  "pre_registration_commit_hash": "5464d2df1fd3f27f7aec943c959171ef5b9b5cec",
+  "code_commit_hash": "ce7f0d4ba61b4594ad7e8eceb2e1beafc0d6f807",
+  "data_dir": "evals/experiments/nse_data_frozen",
+  "rng_seed": 42,
+  "blocked_items": [
+    "Paper-to-live and small-capital trading were not executed; they require brokerage integration and user authorization.",
+    "Alternative data signals were not added because no frozen sentiment/options-flow datasets exist in the repo.",
+    "LSTM was not implemented because the frozen sample is too small for a defensible sequence model evaluation."
+  ],
+  "aggregate": {
+    "instruments": 7,
+    "trust_beats_random_count": 2,
+    "trust_beats_random_share": 0.2857,
+    "median_trust_minus_random_pct": -0.0344,
+    "mean_trust_minus_random_pct": -0.0409,
+    "costed_risk_beats_random_count": 0,
+    "costed_risk_beats_random_share": 0.0,
+    "median_costed_risk_minus_random_pct": -0.7071,
+    "mean_costed_risk_minus_random_pct": -0.7083
+  },
+  "overall_validation_calibration": {
+    "GradientBoosting": {
+      "predictions": 782,
+      "hit_rate": 0.4847,
+      "avg_confidence": 0.5371,
+      "calibration_error": 0.0524,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 537,
+          "hit_rate": 0.4302,
+          "avg_confidence": 0.5065,
+          "calibration_error": 0.0764
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 178,
+          "hit_rate": 0.5843,
+          "avg_confidence": 0.5843,
+          "calibration_error": 0.0
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 67,
+          "hit_rate": 0.6567,
+          "avg_confidence": 0.6567,
+          "calibration_error": 0.0
+        }
+      ]
+    },
+    "LogisticRegression": {
+      "predictions": 782,
+      "hit_rate": 0.5077,
+      "avg_confidence": 0.5286,
+      "calibration_error": 0.021,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 585,
+          "hit_rate": 0.4769,
+          "avg_confidence": 0.5039,
+          "calibration_error": 0.027
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 140,
+          "hit_rate": 0.5643,
+          "avg_confidence": 0.5684,
+          "calibration_error": 0.0041
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 57,
+          "hit_rate": 0.6842,
+          "avg_confidence": 0.6842,
+          "calibration_error": 0.0
+        }
+      ]
+    },
+    "RegimeSpecificGradientBoosting": {
+      "predictions": 782,
+      "hit_rate": 0.4974,
+      "avg_confidence": 0.5309,
+      "calibration_error": 0.0335,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 628,
+          "hit_rate": 0.4697,
+          "avg_confidence": 0.5114,
+          "calibration_error": 0.0417
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 132,
+          "hit_rate": 0.5909,
+          "avg_confidence": 0.5909,
+          "calibration_error": 0.0
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 12,
+          "hit_rate": 0.6667,
+          "avg_confidence": 0.6667,
+          "calibration_error": 0.0
+        },
+        {
+          "bucket": "0.75-1.00",
+          "n": 10,
+          "hit_rate": 0.8,
+          "avg_confidence": 0.8,
+          "calibration_error": 0.0
+        }
+      ]
+    }
+  },
+  "overall_test_calibration": {
+    "GradientBoosting": {
+      "predictions": 789,
+      "hit_rate": 0.5032,
+      "avg_confidence": 0.5355,
+      "calibration_error": 0.0323,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 578,
+          "hit_rate": 0.4983,
+          "avg_confidence": 0.5056,
+          "calibration_error": 0.0073
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 124,
+          "hit_rate": 0.5081,
+          "avg_confidence": 0.5906,
+          "calibration_error": 0.0826
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 87,
+          "hit_rate": 0.5287,
+          "avg_confidence": 0.6557,
+          "calibration_error": 0.127
+        }
+      ]
+    },
+    "LogisticRegression": {
+      "predictions": 789,
+      "hit_rate": 0.4702,
+      "avg_confidence": 0.5238,
+      "calibration_error": 0.0535,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 637,
+          "hit_rate": 0.4568,
+          "avg_confidence": 0.5061,
+          "calibration_error": 0.0493
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 109,
+          "hit_rate": 0.5138,
+          "avg_confidence": 0.5643,
+          "calibration_error": 0.0506
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 43,
+          "hit_rate": 0.5581,
+          "avg_confidence": 0.6826,
+          "calibration_error": 0.1245
+        }
+      ]
+    },
+    "RegimeSpecificGradientBoosting": {
+      "predictions": 789,
+      "hit_rate": 0.4816,
+      "avg_confidence": 0.5348,
+      "calibration_error": 0.0532,
+      "confidence_bins": [
+        {
+          "bucket": "0.45-0.55",
+          "n": 631,
+          "hit_rate": 0.4786,
+          "avg_confidence": 0.5108,
+          "calibration_error": 0.0322
+        },
+        {
+          "bucket": "0.55-0.65",
+          "n": 119,
+          "hit_rate": 0.4958,
+          "avg_confidence": 0.5964,
+          "calibration_error": 0.1006
+        },
+        {
+          "bucket": "0.65-0.75",
+          "n": 19,
+          "hit_rate": 0.4211,
+          "avg_confidence": 0.6667,
+          "calibration_error": 0.2456
+        },
+        {
+          "bucket": "0.75-1.00",
+          "n": 20,
+          "hit_rate": 0.55,
+          "avg_confidence": 0.8,
+          "calibration_error": 0.25
+        }
+      ]
+    }
+  },
+  "instrument_results": {
+    "BANK NIFTY": {
+      "rows": {
+        "train": 222,
+        "validation": 111,
+        "test": 112
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 111,
+          "hit_rate": 0.5676,
+          "avg_confidence": 0.5946,
+          "calibration_error": 0.027,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 36,
+              "hit_rate": 0.4167,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0833
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 28,
+              "hit_rate": 0.6071,
+              "avg_confidence": 0.6071,
+              "calibration_error": 0.0
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 47,
+              "hit_rate": 0.6596,
+              "avg_confidence": 0.6596,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 111,
+          "hit_rate": 0.5405,
+          "avg_confidence": 0.5431,
+          "calibration_error": 0.0026,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 89,
+              "hit_rate": 0.5056,
+              "avg_confidence": 0.5088,
+              "calibration_error": 0.0032
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 22,
+              "hit_rate": 0.6818,
+              "avg_confidence": 0.6818,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 111,
+          "hit_rate": 0.5495,
+          "avg_confidence": 0.5617,
+          "calibration_error": 0.0121,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 74,
+              "hit_rate": 0.4865,
+              "avg_confidence": 0.5047,
+              "calibration_error": 0.0182
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 27,
+              "hit_rate": 0.6296,
+              "avg_confidence": 0.6296,
+              "calibration_error": 0.0
+            },
+            {
+              "bucket": "0.75-1.00",
+              "n": 10,
+              "hit_rate": 0.8,
+              "avg_confidence": 0.8,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5536,
+          "avg_confidence": 0.6011,
+          "calibration_error": 0.0475,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 33,
+              "hit_rate": 0.6061,
+              "avg_confidence": 0.5,
+              "calibration_error": -0.1061
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 24,
+              "hit_rate": 0.5833,
+              "avg_confidence": 0.6071,
+              "calibration_error": 0.0238
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 55,
+              "hit_rate": 0.5091,
+              "avg_confidence": 0.6591,
+              "calibration_error": 0.15
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.5268,
+          "avg_confidence": 0.5687,
+          "calibration_error": 0.0419,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 78,
+              "hit_rate": 0.5,
+              "avg_confidence": 0.5194,
+              "calibration_error": 0.0194
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 34,
+              "hit_rate": 0.5882,
+              "avg_confidence": 0.6818,
+              "calibration_error": 0.0936
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5179,
+          "avg_confidence": 0.6046,
+          "calibration_error": 0.0867,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 51,
+              "hit_rate": 0.5098,
+              "avg_confidence": 0.5078,
+              "calibration_error": -0.002
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 41,
+              "hit_rate": 0.5122,
+              "avg_confidence": 0.6296,
+              "calibration_error": 0.1174
+            },
+            {
+              "bucket": "0.75-1.00",
+              "n": 20,
+              "hit_rate": 0.55,
+              "avg_confidence": 0.8,
+              "calibration_error": 0.25
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 112,
+          "return_pct": 0.2352,
+          "sharpe": 0.0711,
+          "positive_days": 63
+        },
+        "trust_ml": {
+          "days": 112,
+          "return_pct": 0.2345,
+          "sharpe": 0.0707,
+          "positive_days": 63,
+          "vs_random_pct": -0.132
+        },
+        "random_ml": {
+          "days": 112,
+          "return_pct": 0.3665,
+          "sharpe": 0.1067,
+          "positive_days": 68
+        },
+        "risk_managed_trust_ml": {
+          "days": 112,
+          "return_pct": 0.2345,
+          "sharpe": 0.0707,
+          "positive_days": 63
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 112,
+          "return_pct": -0.5046,
+          "sharpe": -0.1518,
+          "positive_days": 43,
+          "vs_random_pct": -0.8711
+        }
+      }
+    },
+    "HDFCBANK": {
+      "rows": {
+        "train": 224,
+        "validation": 112,
+        "test": 113
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.4911,
+          "avg_confidence": 0.5268,
+          "calibration_error": 0.0357,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 84,
+              "hit_rate": 0.4524,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0476
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 28,
+              "hit_rate": 0.6071,
+              "avg_confidence": 0.6071,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.5089,
+          "avg_confidence": 0.5134,
+          "calibration_error": 0.0045,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 94,
+              "hit_rate": 0.5,
+              "avg_confidence": 0.5053,
+              "calibration_error": 0.0053
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 18,
+              "hit_rate": 0.5556,
+              "avg_confidence": 0.5556,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5089,
+          "avg_confidence": 0.5223,
+          "calibration_error": 0.0134,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 96,
+              "hit_rate": 0.5,
+              "avg_confidence": 0.5156,
+              "calibration_error": 0.0156
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 16,
+              "hit_rate": 0.5625,
+              "avg_confidence": 0.5625,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4867,
+          "avg_confidence": 0.5275,
+          "calibration_error": 0.0408,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 84,
+              "hit_rate": 0.5238,
+              "avg_confidence": 0.5,
+              "calibration_error": -0.0238
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 29,
+              "hit_rate": 0.3793,
+              "avg_confidence": 0.6071,
+              "calibration_error": 0.2278
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 113,
+          "hit_rate": 0.4779,
+          "avg_confidence": 0.5183,
+          "calibration_error": 0.0405,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 83,
+              "hit_rate": 0.5181,
+              "avg_confidence": 0.5049,
+              "calibration_error": -0.0132
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 30,
+              "hit_rate": 0.3667,
+              "avg_confidence": 0.5556,
+              "calibration_error": 0.1889
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4956,
+          "avg_confidence": 0.5236,
+          "calibration_error": 0.028,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 96,
+              "hit_rate": 0.5104,
+              "avg_confidence": 0.5167,
+              "calibration_error": 0.0063
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 17,
+              "hit_rate": 0.4118,
+              "avg_confidence": 0.5625,
+              "calibration_error": 0.1507
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 113,
+          "return_pct": 0.0887,
+          "sharpe": 0.0226,
+          "positive_days": 54
+        },
+        "trust_ml": {
+          "days": 113,
+          "return_pct": 0.086,
+          "sharpe": 0.0219,
+          "positive_days": 54,
+          "vs_random_pct": -0.0233
+        },
+        "random_ml": {
+          "days": 113,
+          "return_pct": 0.1093,
+          "sharpe": 0.026,
+          "positive_days": 55
+        },
+        "risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": 0.086,
+          "sharpe": 0.0219,
+          "positive_days": 54
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": -0.692,
+          "sharpe": -0.1771,
+          "positive_days": 36,
+          "vs_random_pct": -0.8013
+        }
+      }
+    },
+    "ICICIBANK": {
+      "rows": {
+        "train": 224,
+        "validation": 112,
+        "test": 113
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.4554,
+          "avg_confidence": 0.5223,
+          "calibration_error": 0.067,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 90,
+              "hit_rate": 0.4222,
+              "avg_confidence": 0.5056,
+              "calibration_error": 0.0833
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 22,
+              "hit_rate": 0.5909,
+              "avg_confidence": 0.5909,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.5804,
+          "avg_confidence": 0.59,
+          "calibration_error": 0.0096,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 13,
+              "hit_rate": 0.4615,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0385
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 64,
+              "hit_rate": 0.5469,
+              "avg_confidence": 0.5559,
+              "calibration_error": 0.0091
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 35,
+              "hit_rate": 0.6857,
+              "avg_confidence": 0.6857,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.4375,
+          "avg_confidence": 0.5312,
+          "calibration_error": 0.0938,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 71,
+              "hit_rate": 0.3521,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.1479
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 41,
+              "hit_rate": 0.5854,
+              "avg_confidence": 0.5854,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4956,
+          "avg_confidence": 0.5129,
+          "calibration_error": 0.0173,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 101,
+              "hit_rate": 0.4851,
+              "avg_confidence": 0.5036,
+              "calibration_error": 0.0185
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 12,
+              "hit_rate": 0.5833,
+              "avg_confidence": 0.5909,
+              "calibration_error": 0.0076
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 113,
+          "hit_rate": 0.5487,
+          "avg_confidence": 0.5537,
+          "calibration_error": 0.005,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 36,
+              "hit_rate": 0.5,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 68,
+              "hit_rate": 0.5882,
+              "avg_confidence": 0.5647,
+              "calibration_error": -0.0236
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 9,
+              "hit_rate": 0.4444,
+              "avg_confidence": 0.6857,
+              "calibration_error": 0.2413
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.5044,
+          "avg_confidence": 0.516,
+          "calibration_error": 0.0116,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 93,
+              "hit_rate": 0.4839,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0161
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 20,
+              "hit_rate": 0.6,
+              "avg_confidence": 0.5905,
+              "calibration_error": -0.0095
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 113,
+          "return_pct": 0.3233,
+          "sharpe": 0.0874,
+          "positive_days": 54
+        },
+        "trust_ml": {
+          "days": 113,
+          "return_pct": 0.3234,
+          "sharpe": 0.0871,
+          "positive_days": 54,
+          "vs_random_pct": -0.0617
+        },
+        "random_ml": {
+          "days": 113,
+          "return_pct": 0.3851,
+          "sharpe": 0.1033,
+          "positive_days": 60
+        },
+        "risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": 0.3234,
+          "sharpe": 0.0871,
+          "positive_days": 54
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": -0.3186,
+          "sharpe": -0.0853,
+          "positive_days": 40,
+          "vs_random_pct": -0.7037
+        }
+      }
+    },
+    "INFY": {
+      "rows": {
+        "train": 224,
+        "validation": 112,
+        "test": 113
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5,
+          "avg_confidence": 0.5268,
+          "calibration_error": 0.0268,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 112,
+              "hit_rate": 0.5,
+              "avg_confidence": 0.5268,
+              "calibration_error": 0.0268
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.4464,
+          "avg_confidence": 0.5089,
+          "calibration_error": 0.0625,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 112,
+              "hit_rate": 0.4464,
+              "avg_confidence": 0.5089,
+              "calibration_error": 0.0625
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5089,
+          "avg_confidence": 0.5268,
+          "calibration_error": 0.0179,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 94,
+              "hit_rate": 0.5,
+              "avg_confidence": 0.5213,
+              "calibration_error": 0.0213
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 18,
+              "hit_rate": 0.5556,
+              "avg_confidence": 0.5556,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4513,
+          "avg_confidence": 0.5253,
+          "calibration_error": 0.074,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 113,
+              "hit_rate": 0.4513,
+              "avg_confidence": 0.5253,
+              "calibration_error": 0.074
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 113,
+          "hit_rate": 0.3628,
+          "avg_confidence": 0.5039,
+          "calibration_error": 0.1411,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 113,
+              "hit_rate": 0.3628,
+              "avg_confidence": 0.5039,
+              "calibration_error": 0.1411
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4779,
+          "avg_confidence": 0.5209,
+          "calibration_error": 0.043,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 95,
+              "hit_rate": 0.4947,
+              "avg_confidence": 0.5143,
+              "calibration_error": 0.0196
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 18,
+              "hit_rate": 0.3889,
+              "avg_confidence": 0.5556,
+              "calibration_error": 0.1667
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 113,
+          "return_pct": -0.6001,
+          "sharpe": -0.1642,
+          "positive_days": 46
+        },
+        "trust_ml": {
+          "days": 113,
+          "return_pct": -0.5329,
+          "sharpe": -0.147,
+          "positive_days": 46,
+          "vs_random_pct": -0.1835
+        },
+        "random_ml": {
+          "days": 113,
+          "return_pct": -0.3494,
+          "sharpe": -0.0847,
+          "positive_days": 48
+        },
+        "risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": -0.5329,
+          "sharpe": -0.147,
+          "positive_days": 46
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": -1.1824,
+          "sharpe": -0.3461,
+          "positive_days": 31,
+          "vs_random_pct": -0.833
+        }
+      }
+    },
+    "NIFTY 50": {
+      "rows": {
+        "train": 223,
+        "validation": 111,
+        "test": 112
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 111,
+          "hit_rate": 0.5225,
+          "avg_confidence": 0.5405,
+          "calibration_error": 0.018,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 76,
+              "hit_rate": 0.4737,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0263
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 15,
+              "hit_rate": 0.6,
+              "avg_confidence": 0.6,
+              "calibration_error": 0.0
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 20,
+              "hit_rate": 0.65,
+              "avg_confidence": 0.65,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 111,
+          "hit_rate": 0.4955,
+          "avg_confidence": 0.5,
+          "calibration_error": 0.0045,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 111,
+              "hit_rate": 0.4955,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0045
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 111,
+          "hit_rate": 0.5045,
+          "avg_confidence": 0.518,
+          "calibration_error": 0.0135,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 99,
+              "hit_rate": 0.4848,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0152
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 12,
+              "hit_rate": 0.6667,
+              "avg_confidence": 0.6667,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5714,
+          "avg_confidence": 0.5589,
+          "calibration_error": -0.0125,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 62,
+              "hit_rate": 0.5484,
+              "avg_confidence": 0.5,
+              "calibration_error": -0.0484
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 18,
+              "hit_rate": 0.6667,
+              "avg_confidence": 0.6,
+              "calibration_error": -0.0667
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 32,
+              "hit_rate": 0.5625,
+              "avg_confidence": 0.65,
+              "calibration_error": 0.0875
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.4732,
+          "avg_confidence": 0.5,
+          "calibration_error": 0.0268,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 112,
+              "hit_rate": 0.4732,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0268
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.4821,
+          "avg_confidence": 0.5283,
+          "calibration_error": 0.0461,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 93,
+              "hit_rate": 0.4946,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0054
+            },
+            {
+              "bucket": "0.65-0.75",
+              "n": 19,
+              "hit_rate": 0.4211,
+              "avg_confidence": 0.6667,
+              "calibration_error": 0.2456
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 112,
+          "return_pct": 0.0009,
+          "sharpe": 0.0003,
+          "positive_days": 55
+        },
+        "trust_ml": {
+          "days": 112,
+          "return_pct": 0.0151,
+          "sharpe": 0.0057,
+          "positive_days": 55,
+          "vs_random_pct": 0.1066
+        },
+        "random_ml": {
+          "days": 112,
+          "return_pct": -0.0915,
+          "sharpe": -0.0332,
+          "positive_days": 53
+        },
+        "risk_managed_trust_ml": {
+          "days": 112,
+          "return_pct": 0.0151,
+          "sharpe": 0.0057,
+          "positive_days": 55
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 112,
+          "return_pct": -0.6418,
+          "sharpe": -0.2385,
+          "positive_days": 39,
+          "vs_random_pct": -0.5503
+        }
+      }
+    },
+    "RELIANCE": {
+      "rows": {
+        "train": 224,
+        "validation": 112,
+        "test": 113
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.3482,
+          "avg_confidence": 0.5,
+          "calibration_error": 0.1518,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 112,
+              "hit_rate": 0.3482,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.1518
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.4554,
+          "avg_confidence": 0.5,
+          "calibration_error": 0.0446,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 112,
+              "hit_rate": 0.4554,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0446
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.4375,
+          "avg_confidence": 0.5089,
+          "calibration_error": 0.0714,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 98,
+              "hit_rate": 0.4184,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.0816
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 14,
+              "hit_rate": 0.5714,
+              "avg_confidence": 0.5714,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.5575,
+          "avg_confidence": 0.5,
+          "calibration_error": -0.0575,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 113,
+              "hit_rate": 0.5575,
+              "avg_confidence": 0.5,
+              "calibration_error": -0.0575
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 113,
+          "hit_rate": 0.469,
+          "avg_confidence": 0.5,
+          "calibration_error": 0.031,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 113,
+              "hit_rate": 0.469,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.031
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4513,
+          "avg_confidence": 0.507,
+          "calibration_error": 0.0556,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 102,
+              "hit_rate": 0.451,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.049
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 11,
+              "hit_rate": 0.4545,
+              "avg_confidence": 0.5714,
+              "calibration_error": 0.1169
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 113,
+          "return_pct": 0.5692,
+          "sharpe": 0.1532,
+          "positive_days": 57
+        },
+        "trust_ml": {
+          "days": 113,
+          "return_pct": 0.549,
+          "sharpe": 0.1478,
+          "positive_days": 57,
+          "vs_random_pct": 0.0422
+        },
+        "random_ml": {
+          "days": 113,
+          "return_pct": 0.5068,
+          "sharpe": 0.1345,
+          "positive_days": 55
+        },
+        "risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": 0.549,
+          "sharpe": 0.1478,
+          "positive_days": 57
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": 0.0151,
+          "sharpe": 0.0041,
+          "positive_days": 42,
+          "vs_random_pct": -0.4917
+        }
+      }
+    },
+    "TCS": {
+      "rows": {
+        "train": 224,
+        "validation": 112,
+        "test": 113
+      },
+      "calibration_validation": {
+        "GradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5089,
+          "avg_confidence": 0.5491,
+          "calibration_error": 0.0402,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 27,
+              "hit_rate": 0.3333,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.1667
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 85,
+              "hit_rate": 0.5647,
+              "avg_confidence": 0.5647,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 112,
+          "hit_rate": 0.5268,
+          "avg_confidence": 0.5449,
+          "calibration_error": 0.0181,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 54,
+              "hit_rate": 0.463,
+              "avg_confidence": 0.5005,
+              "calibration_error": 0.0375
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 58,
+              "hit_rate": 0.5862,
+              "avg_confidence": 0.5862,
+              "calibration_error": 0.0
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 112,
+          "hit_rate": 0.5357,
+          "avg_confidence": 0.5475,
+          "calibration_error": 0.0118,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 96,
+              "hit_rate": 0.5208,
+              "avg_confidence": 0.5346,
+              "calibration_error": 0.0138
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 16,
+              "hit_rate": 0.625,
+              "avg_confidence": 0.625,
+              "calibration_error": 0.0
+            }
+          ]
+        }
+      },
+      "calibration_test": {
+        "GradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4071,
+          "avg_confidence": 0.5236,
+          "calibration_error": 0.1166,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 72,
+              "hit_rate": 0.375,
+              "avg_confidence": 0.5,
+              "calibration_error": 0.125
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 41,
+              "hit_rate": 0.4634,
+              "avg_confidence": 0.5651,
+              "calibration_error": 0.1017
+            }
+          ]
+        },
+        "LogisticRegression": {
+          "predictions": 113,
+          "hit_rate": 0.4336,
+          "avg_confidence": 0.5219,
+          "calibration_error": 0.0883,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 102,
+              "hit_rate": 0.4314,
+              "avg_confidence": 0.515,
+              "calibration_error": 0.0836
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 11,
+              "hit_rate": 0.4545,
+              "avg_confidence": 0.5862,
+              "calibration_error": 0.1317
+            }
+          ]
+        },
+        "RegimeSpecificGradientBoosting": {
+          "predictions": 113,
+          "hit_rate": 0.4425,
+          "avg_confidence": 0.5438,
+          "calibration_error": 0.1013,
+          "confidence_bins": [
+            {
+              "bucket": "0.45-0.55",
+              "n": 101,
+              "hit_rate": 0.4257,
+              "avg_confidence": 0.5342,
+              "calibration_error": 0.1084
+            },
+            {
+              "bucket": "0.55-0.65",
+              "n": 12,
+              "hit_rate": 0.5833,
+              "avg_confidence": 0.625,
+              "calibration_error": 0.0417
+            }
+          ]
+        }
+      },
+      "policy_summaries": {
+        "equal_ml": {
+          "days": 113,
+          "return_pct": -0.4804,
+          "sharpe": -0.1015,
+          "positive_days": 45
+        },
+        "trust_ml": {
+          "days": 113,
+          "return_pct": -0.4753,
+          "sharpe": -0.1006,
+          "positive_days": 45,
+          "vs_random_pct": -0.0344
+        },
+        "random_ml": {
+          "days": 113,
+          "return_pct": -0.4409,
+          "sharpe": -0.0892,
+          "positive_days": 48
+        },
+        "risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": -0.4753,
+          "sharpe": -0.1006,
+          "positive_days": 45
+        },
+        "costed_risk_managed_trust_ml": {
+          "days": 113,
+          "return_pct": -1.148,
+          "sharpe": -0.2709,
+          "positive_days": 36,
+          "vs_random_pct": -0.7071
+        }
+      }
+    }
+  }
+}
