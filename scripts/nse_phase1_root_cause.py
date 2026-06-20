@@ -36,6 +36,8 @@ AGENTS = {
     "MeanReversion": MeanReversionAgent(),
 }
 
+DEFAULT_PREREGISTRATION_COMMIT = "cbfbb85808d195ae6a25031925f83bc02f5fc170"
+
 
 @dataclass(frozen=True)
 class TrustSnapshot:
@@ -402,6 +404,7 @@ def write_report(output_dir: Path, results: dict[str, Any]) -> None:
         "",
         f"**Date:** {datetime.now().date()}",
         f"**Pre-registration commit hash:** `{results['pre_registration_commit_hash']}`",
+        f"**Executable code commit hash:** `{results['code_commit_hash']}`",
         f"**Frozen data:** `{results['data_dir']}`",
         "",
         "## Verdict",
@@ -460,6 +463,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data-dir", type=Path, default=Path("evals/experiments/nse_data_frozen"))
     parser.add_argument("--output-dir", type=Path, default=Path("evals/experiments/nse_phase1_root_cause_results"))
+    parser.add_argument("--pre-registration-commit", default=DEFAULT_PREREGISTRATION_COMMIT)
     args = parser.parse_args(argv)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
@@ -471,7 +475,8 @@ def main(argv: list[str] | None = None) -> int:
     simulation = simulate_policies(records, trading_dates)
     results = {
         "timestamp": datetime.now().isoformat(),
-        "pre_registration_commit_hash": git_commit_hash(),
+        "pre_registration_commit_hash": args.pre_registration_commit,
+        "code_commit_hash": git_commit_hash(),
         "data_dir": str(args.data_dir),
         "trading_days": len(trading_dates),
         "predictions": len(records),
@@ -493,6 +498,7 @@ def main(argv: list[str] | None = None) -> int:
 
     print(f"Wrote Phase 1 results to {args.output_dir}")
     print(f"Pre-registration commit hash: {results['pre_registration_commit_hash']}")
+    print(f"Executable code commit hash: {results['code_commit_hash']}")
     return 0
 
 
