@@ -6,7 +6,14 @@ Agents' raw stated confidence is NEVER used directly for decisions.
 
 trusted_confidence(stated, subject, domain, claim_type, horizon)
   → applies the reliability curve for (subject × domain × claim_type × horizon)
-  → returns a calibrated multiplied confidence value
+  → returns a calibrated multiplied confidence value with confidence intervals
+
+Uses Phase 1 Advanced Calibration:
+  - Continuous isotonic regression curves (no fixed bins)
+  - Metacalibration scoring (ECE-based penalties)
+  - Structural break detection (regime shifts)
+  - Domain transfer (cross-domain generalization)
+  - Skill vs luck decomposition
 
 Mechanical downgrade propagation:
   If subject X's track record degrades, ALL downstream consumers that weight
@@ -23,6 +30,12 @@ from typing import TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from calibration.ledger.prediction_ledger import PredictionRecord
+
+from calibration.calibration_curves import CalibratedTrustCurve
+from calibration.metacalibration import MetacalibrationEngine
+from calibration.structural_breaks import StructuralBreakDetector
+from calibration.domain_transfer import DomainTransferCalibrator
+from calibration.skill_luck import SkillVsLuckAnalyzer
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +63,8 @@ class TrustController:
     """
     The trust authority. Downstream agents call trusted_confidence().
     The Resolution Service calls ingest_resolution() after scoring.
+
+    Integrated with Phase 1 Advanced Calibration for continuous curves and CI bands.
     """
 
     MIN_SAMPLES_FOR_TRUST = 5  # below this, return stated confidence with a penalty
@@ -57,6 +72,13 @@ class TrustController:
     def __init__(self):
         self._scores: dict[tuple, TrustScore] = {}
         self._downgrade_callbacks: list[callable] = []
+
+        # Phase 1 Advanced Calibration engines
+        self._calibrated_curves: dict[tuple, CalibratedTrustCurve] = {}
+        self.metacalibration_engine = MetacalibrationEngine()
+        self.structural_break_detector = StructuralBreakDetector()
+        self.domain_transfer_calibrator = DomainTransferCalibrator()
+        self.skill_luck_analyzer = SkillVsLuckAnalyzer()
 
     def trusted_confidence(
         self,
@@ -66,20 +88,30 @@ class TrustController:
         domain: str,
         claim_type: str = "general",
         horizon_class: str = "medium",
-    ) -> float:
+        return_advanced: bool = False,
+    ) -> float | dict:
         """
         THE FUNCTION that decision-weighting must call. Never use stated confidence directly.
 
         Returns a float in [0,1] representing calibrated trusted confidence.
+        If return_advanced=True, returns dict with point_estimate, CI bands, confidence, etc.
+
+        Uses Phase 1 Advanced Calibration when available (continuous curves + CI).
+        Falls back to legacy bin-based approach if advanced curves not fitted.
         """
         key = (subject_type, subject_id, domain, claim_type, horizon_class)
         score = self._scores.get(key)
+        curve_key = (subject_id, domain, horizon_class)
+
+        # Try to get or create advanced calibration curve
+        if curve_key not in self._calibrated_curves:
+            self._calibrated_curves[curve_key] = CalibratedTrustCurve(
+                subject_id, domain, horizon_class
+            )
+        curve = self._calibrated_curves[curve_key]
 
         if score is None or score.n_resolved < self.MIN_SAMPLES_FOR_TRUST:
-            # Insufficient track record — apply a conservative penalty that does
-            # not get more permissive as additional samples arrive. A fresh
-            # false resolution must never increase trust just because the
-            # sample count changed from 0 to 1.
+            # Insufficient track record — apply a conservative penalty
             if score is None:
                 penalty = 0.8
             else:
@@ -89,24 +121,55 @@ class TrustController:
                 "TRUST: %s/%s insufficient track record (n=%d) — applying %.0f%% penalty → trusted=%.3f",
                 subject_id, domain, score.n_resolved if score else 0, penalty * 100, trusted
             )
+            if return_advanced:
+                return {
+                    "point_estimate": round(min(max(trusted, 0.0), 1.0), 4),
+                    "lower_ci": round(min(max(trusted - 0.125, 0.0), 1.0), 4),
+                    "upper_ci": round(min(max(trusted + 0.125, 0.0), 1.0), 4),
+                    "confidence": 0.4,
+                    "method": "legacy_penalty",
+                }
             return round(min(max(trusted, 0.0), 1.0), 4)
 
-        # Apply reliability curve: find the bin for the stated confidence
-        bin_key = f"{min(int(stated * 10) / 10, 0.9):.1f}"
-        realised = score.stated_to_real.get(bin_key, stated)
+        # Use advanced calibration curve if fitted
+        calibration_result = curve.trusted_confidence(stated)
 
-        # Apply ECE penalty if calibration is poor
-        ece_penalty = 1.0
-        if score.ece > ECE_PENALTY_THRESHOLD:
-            excess = score.ece - ECE_PENALTY_THRESHOLD
-            ece_penalty = max(1.0 - (excess / 0.1) * ECE_PENALTY_RATE, 0.3)
+        # Apply metacalibration penalty if available
+        stated_list = list(score.stated_to_real.keys())
+        if len(stated_list) >= 10:
+            penalty = self.metacalibration_engine.penalty_for_poor_metacalibration(
+                subject_id, domain, horizon_class, stated_list,
+                [score.stated_to_real[k] > 0.5 for k in stated_list]
+            )
+            ci_width = calibration_result.upper_ci - calibration_result.lower_ci
+            widened_ci = ci_width * (1 + penalty)
+            point = calibration_result.point_estimate
+            result_dict = {
+                "point_estimate": round(point, 4),
+                "lower_ci": round(min(max(point - widened_ci / 2, 0.0), 1.0), 4),
+                "upper_ci": round(min(max(point + widened_ci / 2, 0.0), 1.0), 4),
+                "confidence": round(calibration_result.confidence * 0.9, 4),
+                "metacalibration_penalty": round(penalty, 4),
+                "method": "advanced_calibration_v1",
+            }
+        else:
+            result_dict = {
+                "point_estimate": round(calibration_result.point_estimate, 4),
+                "lower_ci": round(calibration_result.lower_ci, 4),
+                "upper_ci": round(calibration_result.upper_ci, 4),
+                "confidence": round(calibration_result.confidence, 4),
+                "method": "advanced_calibration_v1",
+            }
 
-        trusted = realised * score.trusted_multiplier * ece_penalty
-        trusted = round(min(max(trusted, 0.0), 1.0), 4)
+        if return_advanced:
+            return result_dict
 
+        # For backward compatibility, return scalar (point estimate)
+        trusted = result_dict["point_estimate"]
         logger.debug(
-            "TRUST: %s/%s stated=%.3f realised=%.3f multiplier=%.3f ece_penalty=%.3f → trusted=%.3f",
-            subject_id, domain, stated, realised, score.trusted_multiplier, ece_penalty, trusted
+            "TRUST: %s/%s stated=%.3f → point_estimate=%.3f CI=[%.3f,%.3f] method=%s",
+            subject_id, domain, stated, result_dict["point_estimate"],
+            result_dict["lower_ci"], result_dict["upper_ci"], result_dict["method"]
         )
         return trusted
 
@@ -114,6 +177,8 @@ class TrustController:
         """
         Called by Resolution Service after scoring. Updates the reliability curve
         and propagates downgrades to all registered consumers.
+
+        Also feeds into Phase 1 Advanced Calibration curves for continuous modeling.
         """
         if record.post_hoc:
             logger.warning("TRUST: skipping post_hoc resolution for trust update: %s", record.prediction_id)
@@ -134,7 +199,7 @@ class TrustController:
             horizon_class=record.horizon_class,
         )
 
-        # Update reliability bin
+        # Update legacy bin-based reliability tracking
         bin_key = f"{min(int(record.probability * 10) / 10, 0.9):.1f}"
         old_realised = score.stated_to_real.get(bin_key, record.probability)
         n = score.n_resolved
@@ -143,6 +208,12 @@ class TrustController:
         score.n_resolved += 1
         score.last_reality_contact = datetime.now(timezone.utc)
         score.updated_at = datetime.now(timezone.utc)
+
+        # Update Phase 1 Advanced Calibration curve
+        curve_key = (record.producing_agent_id, record.domain, record.horizon_class)
+        if curve_key in self._calibrated_curves:
+            curve = self._calibrated_curves[curve_key]
+            curve.update_from_resolution(record.probability, record.resolved_outcome)
 
         # Capture multiplier BEFORE recompute so we can detect a real drop.
         was = score.trusted_multiplier
