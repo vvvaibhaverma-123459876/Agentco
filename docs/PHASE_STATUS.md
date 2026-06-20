@@ -196,6 +196,33 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `350d78d`
 
+## Phase 6 - Jurisdiction Engine
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `reserve/migrations/008_jurisdiction.sql`
+  - `civilization/services/jurisdiction_service.py`
+  - `tests/civilization/test_jurisdiction.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/civilization/test_jurisdiction.py`
+- Commands run:
+  - `python3 -m pytest tests/civilization/test_jurisdiction.py` - passed, 4 tests
+  - `python3 -m pytest tests/civilization calibration reserve/tests tests/e2e/test_institution_operating_loop.py` - passed, 99 tests
+  - `make test` - passed:
+    - Python: 253 passed
+    - migrations: 25 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed: none after implementation; focused tests and full gate passed on first run.
+- Remaining risks:
+  - Delegated authority checks are scoped to parent action/output matching; deeper constraint evaluation remains future hardening.
+  - External review requirement is recorded and returned as an allowed authority flag, but workflow routing remains later integration work.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 6-14 have not started. They must remain blocked until Phase 5 has passed and been committed.
+Phases 7-14 have not started. They must remain blocked until Phase 6 has passed and been committed.
