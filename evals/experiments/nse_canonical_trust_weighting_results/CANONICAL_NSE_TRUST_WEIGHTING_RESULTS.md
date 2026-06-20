@@ -3,7 +3,7 @@
 **Date:** 2026-06-20
 **Mode:** `historical_backtest_paper_only`
 **Pre-registration commit hash:** `5e6491a49e80fb931a5faa9e42392fd37b5cf6c6`
-**Executable code commit hash:** `98b9387e32617a87fad4aa8b3dbd07cbd5d1d811`
+**Executable code commit hash:** `0da55c45f2c42bdefaac59e8135dc1890b2582b3`
 **Window:** `2025-12-12` to `2026-06-19`
 
 ## Verdict
@@ -18,12 +18,16 @@ This is paper only. There were no live orders, no broker connection, and no real
 |---|---:|---:|---:|---:|
 | A equal-weighted | -0.1907% | -1907.30 | -0.1890 | 57/126 |
 | B trust-weighted | -0.2217% | -2217.05 | -0.1925 | 54/126 |
+| P random-placebo | -0.0834% | -833.81 | -0.0624 | 64/126 |
 
 ## Headline
 
 - B minus A return: `-0.0310%`
 - B minus A P&L: `-309.74`
 - B minus A Sharpe-style ratio: `-0.0035`
+- B minus P return: `-0.1383%`
+- B minus P P&L: `-1383.23`
+- B minus P Sharpe-style ratio: `-0.1301`
 - Pre-registered result: `falsified_for_this_window`
 
 ## Prediction Ledger

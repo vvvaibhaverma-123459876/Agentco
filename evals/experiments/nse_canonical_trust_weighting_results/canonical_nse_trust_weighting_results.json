@@ -1,7 +1,8 @@
 {
   "mode": "historical_backtest_paper_only",
   "pre_registration_commit_hash": "5e6491a49e80fb931a5faa9e42392fd37b5cf6c6",
-  "code_commit_hash": "98b9387e32617a87fad4aa8b3dbd07cbd5d1d811",
+  "code_commit_hash": "0da55c45f2c42bdefaac59e8135dc1890b2582b3",
+  "placebo_seed": 42,
   "test_start": "2025-12-12",
   "test_end": "2026-06-19",
   "trading_days": 126,
@@ -20,10 +21,20 @@
     "positive_days": 54,
     "total_days": 126
   },
+  "arm_p_random_placebo": {
+    "total_pnl": -833.8124,
+    "total_return_pct": -0.0834,
+    "sharpe_style_ratio": -0.0624,
+    "positive_days": 64,
+    "total_days": 126
+  },
   "headline": {
     "b_minus_a_pnl": -309.7435,
     "b_minus_a_return_pct": -0.031,
     "b_minus_a_sharpe": -0.0035,
+    "b_minus_p_pnl": -1383.2347,
+    "b_minus_p_return_pct": -0.1383,
+    "b_minus_p_sharpe": -0.1301,
     "hypothesis_result": "falsified_for_this_window"
   },
   "prediction_counts": {
