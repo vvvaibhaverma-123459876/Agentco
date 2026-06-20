@@ -42,6 +42,7 @@ ALLOWED_IMPORTS = {
     "math",
     "statistics",
     "datetime",
+    "time",  # Needed by datetime module
     "collections",
     "itertools",
     "functools",
@@ -177,7 +178,9 @@ def run_generated_code(code: str, context: dict[str, Any]) -> dict[str, Any]:
             "PermissionError": PermissionError,
             "FileNotFoundError": FileNotFoundError,
             "OSError": OSError,
+            "ImportError": ImportError,
             "type": type,
+            "vars": vars,
         },
     }
 
@@ -193,7 +196,9 @@ def run_generated_code(code: str, context: dict[str, Any]) -> dict[str, Any]:
             raise SandboxError(f"Import not whitelisted: {name}")
         return original_import(name, *args, **kwargs)
 
-    exec_globals["__import__"] = safe_import
+    # Add __import__ to __builtins__ (not just exec_globals)
+    # Python's import system looks in __builtins__ for __import__
+    exec_globals["__builtins__"]["__import__"] = safe_import
 
     # Dynamically allow whitelisted stdlib imports
     for module_name in ALLOWED_IMPORTS:
