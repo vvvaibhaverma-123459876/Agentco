@@ -475,7 +475,10 @@ def main(argv: list[str] | None = None) -> int:
         "data_dir": str(args.data_dir),
         "trading_days": len(trading_dates),
         "predictions": len(records),
-        "split_counts": dict(pd.Series([r["split"] for r in records]).value_counts()),
+        "split_counts": {
+            str(split): int(count)
+            for split, count in pd.Series([r["split"] for r in records]).value_counts().items()
+        },
         "calibration": calibration_summary(records),
         "indicator_diagnostics": indicator_diagnostics(records),
         "policy_summaries": simulation["policy_summaries"],
