@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-06-20T11:30:48.758251",
+  "stop_1_phase": "REAL NSE DATA VALIDATION",
+  "data_source": "yfinance (NSE tickers)",
+  "test_window": "2024-06-01 to 2026-06-20",
+  "close_field_used": "Close (raw, unadjusted)",
+  "close_field_rationale": "yfinance Adj Close is retroactively rewritten on splits/dividends. Using raw Close ensures no future events alter past prices. Same field used for prediction AND resolution guarantees temporal integrity.",
+  "adj_close_handling": "Saved separately for audit; NOT used in test",
+  "instruments_fetched": [
+    "NIFTY 50",
+    "BANK NIFTY",
+    "RELIANCE",
+    "HDFCBANK",
+    "TCS",
+    "INFY",
+    "ICICIBANK"
+  ],
+  "data_rows": {
+    "NIFTY 50": 507,
+    "BANK NIFTY": 506,
+    "RELIANCE": 510,
+    "HDFCBANK": 510,
+    "TCS": 510,
+    "INFY": 510,
+    "ICICIBANK": 510
+  },
+  "lookahead_tests_real_data": {
+    "test_1_strict_cutoff": "PASS",
+    "test_2_future_access": "PASS",
+    "test_3_prediction_sim": "PASS",
+    "test_4_data_quality": "PASS"
+  },
+  "lookahead_verdict": "STRUCTURALLY PREVENTED ON REAL DATA",
+  "ready_for_stop_2": true,
+  "next_step": "PROCEED TO STOP 2 (agents + walk-forward)"
+}

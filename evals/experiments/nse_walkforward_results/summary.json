@@ -1,0 +1,43 @@
+{
+  "timestamp": "2026-06-20T11:43:29.955649",
+  "window": "2024-06-03 to 2026-06-19",
+  "trading_days": 511,
+  "predictions_registered": 1530,
+  "arms": {
+    "A": {
+      "initial_capital": 1000000,
+      "final_cash": 998378.48,
+      "total_return_pct": -0.16,
+      "avg_daily_return": -0.0003,
+      "daily_std_dev": 0.0093,
+      "sharpe_ratio": -0.0323,
+      "positive_days": 253,
+      "total_days": 502
+    },
+    "B": {
+      "initial_capital": 1000000,
+      "final_cash": 998296.83,
+      "total_return_pct": -0.17,
+      "avg_daily_return": -0.0003,
+      "daily_std_dev": 0.0106,
+      "sharpe_ratio": -0.0319,
+      "positive_days": 257,
+      "total_days": 502
+    },
+    "P": {
+      "initial_capital": 1000000,
+      "final_cash": 998537.53,
+      "total_return_pct": -0.15,
+      "avg_daily_return": -0.0003,
+      "daily_std_dev": 0.0137,
+      "sharpe_ratio": -0.0212,
+      "positive_days": 247,
+      "total_days": 502
+    }
+  },
+  "headline_b_vs_p": {
+    "b_minus_p_dollars": -240.7,
+    "b_minus_p_pct": -0.02,
+    "interpretation": "B (trust) loses to P (random)"
+  }
+}

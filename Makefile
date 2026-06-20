@@ -1,7 +1,8 @@
-.PHONY: dev migrate test smoke demo clean
+.PHONY: dev migrate test smoke demo business-demo business-sim clean
 
 PYTHON ?= python3
 DATABASE_URL ?= postgresql://agentco:password@localhost:5432/agentco
+BUSINESS_SIM_ARGS ?=
 
 dev:
 	docker compose up -d
@@ -21,6 +22,12 @@ smoke:
 
 demo: migrate
 	DATABASE_URL="$(DATABASE_URL)" $(PYTHON) scripts/demo_verifiable_calibration.py
+
+business-demo: migrate
+	DATABASE_URL="$(DATABASE_URL)" $(PYTHON) scripts/demo_business_bikeshare_calibration.py
+
+business-sim: migrate
+	DATABASE_URL="$(DATABASE_URL)" $(PYTHON) scripts/run_pawdent_business_simulation.py $(BUSINESS_SIM_ARGS)
 
 clean:
 	@printf "This will run docker compose down -v and delete local volumes. Type 'agentco-clean' to continue: "; \

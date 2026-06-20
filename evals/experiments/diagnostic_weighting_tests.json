@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-06-20T11:13:48.690430",
+  "control_results": {
+    "mean_cash": 700203.24,
+    "seeds_profitable": 20
+  },
+  "test_1_hard_fixed_penalty": {
+    "wins": 14,
+    "pct": 56.0
+  },
+  "test_2_soft_random_placebo": {
+    "wins": 12,
+    "pct": 48.0,
+    "critical_test": true
+  },
+  "test_3_soft_trust": {
+    "wins": 18,
+    "pct": 72.0
+  },
+  "verdict": {
+    "test_2_above_14": false,
+    "test_3_above_14": true,
+    "calibration_works": true,
+    "interpretation": "Calibration works"
+  }
+}

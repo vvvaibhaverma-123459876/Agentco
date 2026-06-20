@@ -1,0 +1,128 @@
+{
+  "average_service_level": 0.9322,
+  "biggest_correct_call": {
+    "actual_cnt": 564,
+    "calibration_delta": 0.0256,
+    "claim": "For target timestamp 2012-03-12 08:00:00, demand will be HIGH.",
+    "claim_source": "uci-bike-sharing-history://hour.csv?before=2012-03-12 08:00:00",
+    "confidence": 0.4518,
+    "finance": {
+      "expected_cost": 355.2,
+      "expected_profit": 1016.3,
+      "expected_revenue": 1371.5,
+      "expected_rides": 422
+    },
+    "learning": {
+      "lesson": "commute-hour capacity buffers need to account for upside demand",
+      "mistake": "capacity was lower than revealed demand",
+      "next_policy_adjustment": "increase next comparable-hour bike buffer"
+    },
+    "metrics": {
+      "actual_demand": 564,
+      "bikes_prepared": 520,
+      "lost_rides": 44,
+      "maintenance_cost": 104.0,
+      "profit": 1334.8,
+      "rebalancing_cost": 83.2,
+      "revenue": 1690.0,
+      "served_rides": 520,
+      "service_level": 0.922,
+      "staff_cost": 168.0,
+      "utilization": 1.0
+    },
+    "operation": {
+      "bikes_to_prepare": 520,
+      "maintenance_buffer": 26,
+      "staff_count": 6
+    },
+    "prediction_id": "a2303bc2-1991-4e81-a80a-535bb6215930",
+    "prediction_true": true,
+    "pricing": {
+      "price_multiplier": 1.0,
+      "pricing_reason": "confidence does not justify a demand surcharge"
+    },
+    "resolution_source": "uci-bike-sharing-heldout://hour.csv?instant=10350",
+    "risk": {
+      "approved_for_resolution": true,
+      "claim_pre_registered": true,
+      "confidence_blindly_trusted": false,
+      "source_non_circular": true
+    },
+    "simulated_timestamp": "2012-03-12 08:00:00",
+    "threshold": 429,
+    "tick": 24,
+    "trust_after": 0.4106,
+    "trust_before": 0.385,
+    "was_high_demand": true
+  },
+  "biggest_wrong_call": {
+    "actual_cnt": 389,
+    "calibration_delta": -0.0057,
+    "claim": "For target timestamp 2012-03-11 18:00:00, demand will be HIGH.",
+    "claim_source": "uci-bike-sharing-history://hour.csv?before=2012-03-11 18:00:00",
+    "confidence": 0.0109,
+    "finance": {
+      "expected_cost": 219.2,
+      "expected_profit": 575.91,
+      "expected_revenue": 795.11,
+      "expected_rides": 233
+    },
+    "learning": {
+      "lesson": "commute-hour capacity buffers need to account for upside demand",
+      "mistake": "capacity was lower than revealed demand",
+      "next_policy_adjustment": "increase next comparable-hour bike buffer"
+    },
+    "metrics": {
+      "actual_demand": 389,
+      "bikes_prepared": 295,
+      "lost_rides": 94,
+      "maintenance_cost": 60.0,
+      "profit": 787.49,
+      "rebalancing_cost": 47.2,
+      "revenue": 1006.69,
+      "served_rides": 295,
+      "service_level": 0.7584,
+      "staff_cost": 112.0,
+      "utilization": 1.0
+    },
+    "operation": {
+      "bikes_to_prepare": 295,
+      "maintenance_buffer": 15,
+      "staff_count": 4
+    },
+    "prediction_id": "de191765-c529-4825-8d84-9570d13fc610",
+    "prediction_true": false,
+    "pricing": {
+      "price_multiplier": 1.05,
+      "pricing_reason": "capacity is below the high-demand threshold, so price is nudged upward"
+    },
+    "resolution_source": "uci-bike-sharing-heldout://hour.csv?instant=10336",
+    "risk": {
+      "approved_for_resolution": true,
+      "claim_pre_registered": true,
+      "confidence_blindly_trusted": false,
+      "source_non_circular": true
+    },
+    "simulated_timestamp": "2012-03-11 18:00:00",
+    "threshold": 457,
+    "tick": 10,
+    "trust_after": 0.0738,
+    "trust_before": 0.0795,
+    "was_high_demand": false
+  },
+  "circular_verification_rejection": "Rejected deliberate circular verification attempt on tick 1: circular resolution rejected: claim source and resolution source are the same URL (uci-bike-sharing-history://hour.csv/?before=2012-03-11+09%3A00%3A00)",
+  "correct_predictions": 11,
+  "dataset": "https://archive.ics.uci.edu/static/public/275/bike+sharing+dataset.zip",
+  "duration_seconds": 300.0,
+  "institution": "Urban Mobility Venture Institution",
+  "next_operating_policy": "Raise prepared-bike buffer by 8% when comparable-prior median is below the high-demand threshold but the target is a commute hour.",
+  "run_id": "urban-mobility-c1ba5e03-9f36-4e9e-84f9-999dec78ab9c",
+  "simulated_hours": 30,
+  "tick_seconds": 10.0,
+  "ticks_completed": 30,
+  "total_lost_rides": 775,
+  "total_profit": 16559.09,
+  "total_revenue": 21332.67,
+  "what_the_institution_learned": "The institution learned that calibration and operating performance diverge: a true high-demand call can still lose rides when capacity rules are too conservative.",
+  "wrong_predictions": 19
+}
