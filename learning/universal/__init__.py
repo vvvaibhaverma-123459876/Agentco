@@ -16,6 +16,20 @@ from .source_registry import (
     SourceRegistry,
 )
 
+from .adapters import (
+    LearningAdapter,
+    IngestionArtifact,
+    TextAdapter,
+    PDFAdapter,
+    WebPageAdapter,
+    VideoAdapter,
+    AudioAdapter,
+    CodeRepositoryAdapter,
+    DatasetAdapter,
+    HumanFeedbackAdapter,
+    AdapterRegistry,
+)
+
 __all__ = [
     "KnowledgeClaim",
     "ClaimType",
@@ -27,4 +41,15 @@ __all__ = [
     "AccessLevel",
     "SourceFingerprint",
     "SourceRegistry",
+    "LearningAdapter",
+    "IngestionArtifact",
+    "TextAdapter",
+    "PDFAdapter",
+    "WebPageAdapter",
+    "VideoAdapter",
+    "AudioAdapter",
+    "CodeRepositoryAdapter",
+    "DatasetAdapter",
+    "HumanFeedbackAdapter",
+    "AdapterRegistry",
 ]
