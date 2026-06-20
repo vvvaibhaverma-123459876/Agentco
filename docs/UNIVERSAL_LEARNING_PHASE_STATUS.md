@@ -128,7 +128,7 @@ Phase 1 assumes and reuses:
 |-------|------|--------|
 | 1 | Core Learning Architecture Documents | ✅ COMPLETED |
 | 2 | Knowledge Claim Model Implementation | ✅ COMPLETED |
-| 3 | Universal Source Registry | ⏳ QUEUED |
+| 3 | Universal Source Registry | ✅ COMPLETED |
 | 4 | Medium Adapter Interfaces | ⏳ QUEUED |
 | 5 | Scientific Evidence Engine | ⏳ QUEUED |
 | 6 | Curiosity Engine | ⏳ QUEUED |
@@ -267,4 +267,167 @@ This model is used by:
 
 ---
 
-**Ready for Phase 3 Implementation**
+---
+
+## Phase 3: Universal Source Registry
+
+**Status:** ✅ COMPLETED  
+**Date:** 2026-06-20
+
+### Summary
+
+Phase 3 implements the central registry for all ingested sources with full provenance tracking, independence verification, and derivation tracking.
+
+### Deliverables
+
+| Component | File | Status |
+|-----------|------|--------|
+| Source dataclass | learning/universal/source_registry.py | ✅ Shipped |
+| SourceMedium enum | learning/universal/source_registry.py | ✅ Shipped |
+| AccessLevel enum | learning/universal/source_registry.py | ✅ Shipped |
+| SourceFingerprint model | learning/universal/source_registry.py | ✅ Shipped |
+| SourceRegistry class | learning/universal/source_registry.py | ✅ Shipped |
+| Registration & lookup | register_source(), get_source(), get_source_by_uri() | ✅ Shipped |
+| URI canonicalization | canonicalize_source_uri() | ✅ Shipped |
+| Fingerprinting | compute_source_fingerprint() | ✅ Shipped |
+| Source equivalence | detect_same_source(), detect_same_canonical_source() | ✅ Shipped |
+| Derivation tracking | link_derived_source(), detect_derived_source() | ✅ Shipped |
+| Independence checks | can_be_used_for_independence() | ✅ Shipped |
+| Provenance export | export_source_provenance() | ✅ Shipped |
+| Tests | tests/test_source_registry.py (28 tests) | ✅ Shipped |
+
+### Tests Passed
+
+All 28 tests pass:
+
+✅ TestSourceRegistryBasics (5 tests)
+- Source registration, duplicate detection, retrieval by ID and URI
+
+✅ TestCanonicalURI (4 tests)
+- Removes trailing slashes, query parameters, fragments
+- Detects same source with tracking parameters
+
+✅ TestSourceFingerprinting (4 tests)
+- Fingerprints deterministic
+- Fingerprints change with content
+- Fingerprint matching logic
+- Different content produces different fingerprints
+
+✅ TestSourceDerivation (3 tests)
+- Link derived source to parent
+- Derived sources cannot be independent resolution
+- Detect derived source relationships
+
+✅ TestSampleDetection (3 tests)
+- Same source by ID
+- Same source via canonical URI
+- Different sources marked as different
+
+✅ TestSameLaunchCanonical (2 tests)
+- Detect canonical same with tracking parameters
+- Detect different canonical sources
+
+✅ TestSerialization (2 tests)
+- Round-trip serialization
+- Preserve enums through serialization
+
+✅ TestProvenance (2 tests)
+- Export source provenance
+- Nonexistent source returns empty
+
+✅ TestIndependenceChecks (2 tests)
+- Direct derivation blocks independence
+- Unrelated sources can be independent
+
+**Result: 28 passed in 0.39s**
+
+### Implementation Details
+
+**Source Fields:**
+- Identity: source_id (UUID)
+- Type & location: source_medium (enum), source_uri, local_path
+- Metadata: title, author, speaker, publisher, institution, publication_date
+- Ingestion: ingestion_date, ingestion_agent
+- Access: access_level, license_info
+- Hashing: content_hash, provenance_hash
+- Derivation: parent_source_ids, derived_from_source_ids, canonical_uri
+- Classification: domain, trust_tier, metadata dict
+- Audit: audit_trace_id, created_at, updated_at
+
+**SourceFingerprint Strategy:**
+- Content hash: SHA256 of source content
+- Metadata hash: SHA256(title + author + publication_date)
+- URI hash: SHA256 of normalized canonical URI
+- Combined: SHA256(content_hash + metadata_hash + uri_hash)
+
+**URI Canonicalization:**
+- Removes trailing slashes (http://example.com/ → http://example.com)
+- Removes query parameters (?tracking=123 removed)
+- Removes URL fragments (#section removed)
+- Handles edge cases (data: URIs preserved)
+
+**Independence Verification:**
+Hard rule: "A source used to derive a claim cannot be reused as an independent resolution source for that same claim"
+
+Implemented via:
+- Direct parent check: can_be_used_for_independence() blocks if in parent_source_ids
+- Self check: blocks same source twice
+- Derivation detection: detect_derived_source() finds relationships
+
+**Registry Features:**
+- In-memory storage with source_id and URI indexing
+- Duplicate detection on registration
+- Fingerprint-based source matching
+- Derivation chain tracking
+- Provenance export for audit trails
+
+### Commands Run
+
+```bash
+# Create source registry module
+touch learning/universal/source_registry.py
+
+# Create comprehensive tests
+touch tests/test_source_registry.py
+
+# Run tests
+python3 -m pytest tests/test_source_registry.py -v
+# Result: 28 passed in 0.39s
+```
+
+### Known Limits
+
+1. **Transitive derivation chains:** Current implementation tracks direct parents. Full transitive closure requires registry lookups (noted in code).
+
+2. **Canonical URI detection:** Uses basic URL normalization. Sophisticated redirects, shortened URLs, or domain redirects require additional mapping.
+
+3. **Content hashing:** Assumes content is provided. For external sources, may need lazy loading or streaming.
+
+4. **Metadata matching:** Uses simple string concatenation. Sophisticated matching requires semantic understanding.
+
+5. **Trust tier assignment:** Currently static. Real system needs dynamic trust scoring based on institutional calibration (Phase 19).
+
+6. **Fingerprint collisions:** SHA256 collisions theoretically possible but computationally infeasible; acceptable for this use case.
+
+### Integration
+
+This module is used by:
+- Phase 2: KnowledgeClaim can reference Source via source_id
+- Phase 4: Adapters register sources before creating claims
+- Phase 5: Evidence Engine considers source trust tier
+- Phase 8: Experiment lab validates source independence for resolution
+- Phase 12: Promotion workflow checks derivation chains
+- Phase 20: Security module uses fingerprints to detect source poisoning
+
+### Next Phase: Phase 4
+
+**Phase 4: Medium Adapter Interfaces**
+
+- Create LearningAdapter base class
+- Text, PDF, web, video, audio, slides, code, dataset adapters
+- All output KnowledgeClaim + register Source
+- Deterministic fixtures for testing
+
+---
+
+**Ready for Phase 4 Implementation**

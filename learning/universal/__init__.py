@@ -8,10 +8,23 @@ from .knowledge_claim import (
     SourceLocation,
 )
 
+from .source_registry import (
+    Source,
+    SourceMedium,
+    AccessLevel,
+    SourceFingerprint,
+    SourceRegistry,
+)
+
 __all__ = [
     "KnowledgeClaim",
     "ClaimType",
     "ClaimStatus",
     "EvidenceType",
     "SourceLocation",
+    "Source",
+    "SourceMedium",
+    "AccessLevel",
+    "SourceFingerprint",
+    "SourceRegistry",
 ]
