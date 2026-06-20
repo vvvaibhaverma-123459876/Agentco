@@ -507,6 +507,7 @@ def per_instrument_summary(test_records: list[dict[str, Any]]) -> dict[str, Any]
 
 def run_experiment(data_dir: Path, output_dir: Path) -> dict[str, Any]:
     data = load_frozen_data(data_dir)
+    lookahead_check = run_lookahead_check(data)
     features = build_feature_rows(data)
     columns = feature_columns(features)
     train, validation, test = split_by_instrument(features)
@@ -516,6 +517,7 @@ def run_experiment(data_dir: Path, output_dir: Path) -> dict[str, Any]:
     validation_records = predict_records(validation, agents, columns, calibrators)
     test_records = predict_records(test, agents, columns, calibrators)
     policy_summaries, daily_rows = simulate(validation_records, test_records)
+    instrument_policy_summaries = per_instrument_policy_summaries(validation_records, test_records)
 
     result = {
         "timestamp": datetime.now().isoformat(),
@@ -524,6 +526,7 @@ def run_experiment(data_dir: Path, output_dir: Path) -> dict[str, Any]:
         "code_commit_hash": git_commit_hash(),
         "data_dir": str(data_dir),
         "rng_seed": RNG_SEED,
+        "lookahead_check": lookahead_check,
         "rows": {"train": len(train), "validation": len(validation), "test": len(test)},
         "date_ranges": {
             "train": date_range(train),
@@ -534,7 +537,8 @@ def run_experiment(data_dir: Path, output_dir: Path) -> dict[str, Any]:
         "validation_calibration": calibration_summary(validation_records),
         "test_calibration": calibration_summary(test_records),
         "instrument_test_calibration": per_instrument_summary(test_records),
-        "success_criteria": evaluate_success(policy_summaries, test_records, validation_records),
+        "instrument_policy_summaries": instrument_policy_summaries,
+        "success_criteria": evaluate_success(policy_summaries, instrument_policy_summaries),
     }
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "phase6_better_agents_results.json").write_text(json.dumps(result, indent=2, default=str))
@@ -551,14 +555,41 @@ def date_range(frame: pd.DataFrame) -> dict[str, str]:
     }
 
 
-def evaluate_success(policy_summaries: dict[str, Any], test_records: list[dict[str, Any]], validation_records: list[dict[str, Any]]) -> dict[str, Any]:
-    by_instrument = {}
+def run_lookahead_check(data: dict[str, pd.DataFrame]) -> dict[str, Any]:
+    checks = {}
+    for instrument, frame in data.items():
+        date = pd.Timestamp(frame.iloc[len(frame) // 2]["Date"])
+        visible = visible_before(frame, date)
+        max_visible = pd.to_datetime(visible["Date"]).max()
+        checks[instrument] = {
+            "prediction_date": str(date.date()),
+            "max_visible_date": str(max_visible.date()),
+            "passed": bool(max_visible < date),
+        }
+    return {
+        "passed": all(row["passed"] for row in checks.values()),
+        "instrument_checks": checks,
+    }
+
+
+def per_instrument_policy_summaries(
+    validation_records: list[dict[str, Any]],
+    test_records: list[dict[str, Any]],
+) -> dict[str, Any]:
+    summaries = {}
     for instrument in sorted({record["instrument"] for record in test_records}):
         instrument_test = [record for record in test_records if record["instrument"] == instrument]
         instrument_validation = [record for record in validation_records if record["instrument"] == instrument]
-        summaries, _ = simulate(instrument_validation, instrument_test)
-        by_instrument[instrument] = summaries["headline"]["B_minus_P_return_pct"] > 0
+        policy_summary, _ = simulate(instrument_validation, instrument_test)
+        summaries[instrument] = policy_summary
+    return summaries
 
+
+def evaluate_success(policy_summaries: dict[str, Any], instrument_policy_summaries: dict[str, Any]) -> dict[str, Any]:
+    by_instrument = {
+        instrument: summary["headline"]["B_minus_P_return_pct"] > 0
+        for instrument, summary in instrument_policy_summaries.items()
+    }
     criteria = {
         "B_beats_P_return": policy_summaries["headline"]["B_minus_P_return_pct"] > 0,
         "B_beats_P_sharpe": policy_summaries["headline"]["B_minus_P_sharpe"] > 0,
@@ -589,6 +620,10 @@ def write_report(output_dir: Path, result: dict[str, Any]) -> None:
         f"**Mode:** `{result['mode']}`",
         f"**Pre-registration commit hash:** `{result['pre_registration_commit_hash']}`",
         f"**Executable code commit hash:** `{result['code_commit_hash']}`",
+        "",
+        "## Lookahead Check",
+        "",
+        f"- Passed: `{result['lookahead_check']['passed']}`",
         "",
         "## Verdict",
         "",
@@ -623,6 +658,20 @@ def write_report(output_dir: Path, result: dict[str, Any]) -> None:
         f"- B-P Sharpe-style: `{headline['B_minus_P_sharpe']:.4f}`",
         f"- Costed B-P return: `{headline['B_costed_minus_P_costed_return_pct']:.4f}%`",
         f"- B beats P instrument share: `{result['success_criteria']['B_beats_P_instrument_share']:.1%}`",
+        "",
+        "## Per-Instrument B vs P",
+        "",
+        "| Instrument | B Return | P Return | B-P | Costed B-P |",
+        "|---|---:|---:|---:|---:|",
+    ])
+    for instrument, summary in result["instrument_policy_summaries"].items():
+        lines.append(
+            f"| {instrument} | {summary['B_trust']['total_return_pct']:.4f}% | "
+            f"{summary['P_random']['total_return_pct']:.4f}% | "
+            f"{summary['headline']['B_minus_P_return_pct']:.4f}% | "
+            f"{summary['headline']['B_costed_minus_P_costed_return_pct']:.4f}% |"
+        )
+    lines.extend([
         "",
         "## Test Calibration",
         "",
