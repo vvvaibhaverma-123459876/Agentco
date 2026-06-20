@@ -369,4 +369,140 @@ Ready to proceed through remaining phases (3-24) to build out:
 
 ---
 
-**Next action:** Phase 3 - Universal Source Registry Implementation
+---
+
+## Session 2 Progress: Phases 3-4 Complete
+
+### ✅ Phase 3: Universal Source Registry
+
+**Commit:** `59712c6`  
+**Files:** source_registry.py (450 lines) + tests (400 lines)  
+**Tests:** 28 passing
+
+Implements central registry for all ingested sources with:
+- Source dataclass with full provenance and derivation tracking
+- SourceMedium enum (8 types)
+- AccessLevel enum (6 types)
+- SourceFingerprint multi-strategy matching
+- URI canonicalization (removes tracking params, fragments)
+- Derivation chain tracking
+- Independence verification (hard rule: derived sources cannot be independent resolution)
+- Source equivalence detection
+- Provenance export for audits
+
+Key methods:
+- `register_source()`, `get_source()`, `get_source_by_uri()`
+- `canonicalize_source_uri()` - normalize URLs
+- `compute_source_fingerprint()` - multi-hash fingerprinting
+- `detect_same_source()`, `detect_same_canonical_source()`
+- `link_derived_source()` - track parent-child relationships
+- `can_be_used_for_independence()` - verify resolution independence
+
+**Tests pass all requirements:**
+- Source registration and retrieval ✅
+- Canonical URI matching ✅
+- Same URL with tracking params detected ✅
+- Derivation chain tracking ✅
+- Independence verification ✅
+- Provenance export ✅
+
+### ✅ Phase 4: Medium Adapter Interfaces
+
+**Commit:** `d0f156b`  
+**Files:** adapters.py (600 lines) + tests (450 lines)  
+**Tests:** 25 passing
+
+Implements adapters for converting any medium to KnowledgeClaim objects:
+
+**8 Concrete Adapters:**
+1. TextAdapter - Plain text files
+2. PDFAdapter - PDF documents (page tracking)
+3. WebPageAdapter - Web pages  
+4. VideoAdapter - Video lectures (transcript fixture)
+5. AudioAdapter - Audio/podcasts (transcript fixture)
+6. CodeRepositoryAdapter - Code repos (README)
+7. DatasetAdapter - Datasets (schema + statistics)
+8. HumanFeedbackAdapter - Annotations and feedback
+
+**Base LearningAdapter ABC provides:**
+- `supports(source)` - Check medium compatibility
+- `ingest(source)` - Extract raw artifact
+- `extract_claims()` - Convert to KnowledgeClaim
+- `extract_concepts()` - Identify concepts (optional)
+- `extract_evidence()` - Mark evidence types (optional)
+- `extract_open_questions()` - Find unknowns (optional)
+
+**AdapterRegistry orchestrates:**
+- Adapter discovery via medium matching
+- End-to-end `ingest_and_extract()` pipeline
+- Automatic source registration
+
+**Features:**
+- Deterministic fixtures (no external APIs)
+- Provenance preservation
+- Source location tracking (page, line, timestamp, code_file)
+- Evidence type classification per adapter
+- All claims include full provenance (source_id, content_hash, provenance_hash)
+
+**Tests pass all requirements:**
+- Adapter support detection ✅
+- Text/PDF/Video/Audio extraction ✅
+- Source location tracking ✅
+- Provenance preservation ✅
+- Adapter registry orchestration ✅
+
+---
+
+## Current Test Summary
+
+| Phase | Component | Tests | Status |
+|-------|-----------|-------|--------|
+| 1 | Documentation | 5 checks | ✅ Pass |
+| 2 | Knowledge Claim | 17 tests | ✅ Pass |
+| 3 | Source Registry | 28 tests | ✅ Pass |
+| 4 | Adapters | 25 tests | ✅ Pass |
+| **Total** | | **75 tests** | **✅ 100% Pass** |
+
+---
+
+## Architecture Now In Place
+
+```
+World Mediums (any source type)
+        ↓
+  AdapterRegistry
+        ↓
+  [8 Concrete Adapters]
+  TextAdapter, PDFAdapter, VideoAdapter, etc.
+        ↓
+  SourceRegistry (registers source)
+        ↓
+  IngestionArtifact (raw content + metadata)
+        ↓
+  LearningAdapter.extract_claims()
+        ↓
+  KnowledgeClaim (with full provenance)
+        ↓
+  10-Rung Promotion Ladder
+  (Observed → Parsed → ... → Constitutionalized)
+```
+
+**Ready for Phase 5:** Scientific Evidence Engine (classify evidence tier, mark verification needs)
+
+---
+
+## Code Metrics This Session
+
+| Metric | Value |
+|--------|-------|
+| Code files created | 4 (knowledge_claim, source_registry, adapters + __init__ updates) |
+| Test files created | 3 (knowledge_claim, source_registry, adapters) |
+| Lines of code | ~2,100 |
+| Lines of tests | ~1,200 |
+| Test cases | 75 |
+| Pass rate | 100% |
+| Documentation | Phase 1 + phase status updates |
+
+---
+
+**Next action:** Phase 5 - Scientific Evidence Engine or continue with Phase 6+ as needed
