@@ -165,6 +165,37 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `e7bbb15`
 
+## Phase 5 - Society Layer
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `reserve/migrations/007_society.sql`
+  - `civilization/services/society_service.py`
+  - `civilization/services/society_governance_service.py`
+  - `civilization/services/society_reputation_service.py`
+  - `civilization/services/society_memory_service.py`
+  - `tests/civilization/test_society_layer.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/civilization/test_society_layer.py`
+- Commands run:
+  - `python3 -m pytest tests/civilization/test_society_layer.py` - failed once due to test transaction setup for reputation guard, then passed with 5 tests
+  - `python3 -m pytest tests/civilization calibration reserve/tests tests/e2e/test_institution_operating_loop.py` - passed, 95 tests
+  - `make test` - passed:
+    - Python: 249 passed
+    - migrations: 24 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Updated society reputation test setup to use a transaction-scoped authorized reputation update instead of weakening the reputation guard.
+- Remaining risks:
+  - Society services are DB-backed but intentionally minimal; inter-institution review routing and resource allocation remain future hardening.
+  - Society dispute handling is represented through society governance decisions, not the full judiciary model planned for Phase 7.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 5-14 have not started. They must remain blocked until Phase 4 has passed and been committed.
+Phases 6-14 have not started. They must remain blocked until Phase 5 has passed and been committed.
