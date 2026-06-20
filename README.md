@@ -1,8 +1,22 @@
-# AgentCo
+# Agentco
 
 ## What is AgentCo?
 
-AgentCo is verifiable calibration: proof that an AI agent's claim was checked against something outside itself, not merely made to look checked.
+Agentco is civilization-grade AI infrastructure beginning with calibration.
+
+The current executable foundation is:
+
+- calibration
+- prediction ledger
+- independent resolution where implemented
+- trust scoring
+- audit trails
+- recomputable credentials
+- Institution Kernel where implemented
+
+The current civilization-side implementation is an Institution -> Department -> Agent substrate. It is not a full Society or Civilization layer yet.
+
+Future work includes the Society layer, Civilization layer, constitution, law registry, economy, dispute judiciary, and civilizational memory.
 
 ## Who is this for?
 
@@ -31,17 +45,17 @@ The demo pre-registers a claim, resolves it against an independent source, updat
 
 Local development uses explicit dev defaults; `AGENTCO_ENV=production` refuses to start with those defaults. Write endpoints use minimal API-key auth; full RBAC is roadmap. Details live in `docs/launch_readiness_audit.md` and `SYSTEM.md`.
 
-## What this is NOT
+## What this is not
 
 This is not yet a full company and not yet a civilization layer. Those ambitions are future work, tracked honestly in `ROADMAP.md`, not claimed as launch-ready product.
 
 ---
 
-# Previous Architecture Notes
+# Historical / Aspirational Architecture Notes
 
-# AgentCo — Autonomous AI Company
+The following notes preserve earlier architecture language for context. They are not current shipped-product claims unless a feature is also listed as shipped in `docs/CAPABILITY_MATRIX.md`.
 
-AgentCo is a fully autonomous, AI-operated company. Every business function is executed by specialised AI agents operating on a shared infrastructure. Humans exist only at the governance layer: they audit, veto, and reconfigure — but do not initiate or perform operational work.
+Earlier drafts described AgentCo as an autonomous AI company with broad department coverage. That remains historical or aspirational unless backed by executable code, tests, documentation, and presence in main.
 
 ## V2 Architecture
 
@@ -243,12 +257,12 @@ The sandbox enforces **6 independent structural layers**:
 
 | Layer | Mechanism | Status |
 |---|---|---|
-| Import validation | `safe_import()` checks every import against allow/deny lists | ✅ VERIFIED |
-| Forbidden modules | os, subprocess, sys, selfcoding.resolver blocked | ✅ 26/26 breach tests pass |
-| Whitelisted modules | numpy, pandas, json, math, statistics, datetime, time, collections, itertools, functools, operator, pathlib | ✅ All work |
-| Builtin whitelisting | Custom `__builtins__` dict (29 safe functions; `open()` not included) | ✅ Write attempts blocked |
-| Resolver isolation | Resolver runs in parent process; generated code gets read-only `score_prediction()` function only | ✅ No internals exposed |
-| Filesystem protection | Frozen data directory mounted read-only at OS level | ✅ PermissionError blocks all writes |
+| Import validation | `safe_import()` checks every import against allow/deny lists | Historical test claim; rerun locally before relying on it |
+| Forbidden modules | os, subprocess, sys, selfcoding.resolver blocked | Historical test claim; rerun locally before relying on it |
+| Whitelisted modules | numpy, pandas, json, math, statistics, datetime, time, collections, itertools, functools, operator, pathlib | Historical test claim; rerun locally before relying on it |
+| Builtin whitelisting | Custom `__builtins__` dict (29 safe functions; `open()` not included) | Historical test claim; rerun locally before relying on it |
+| Resolver isolation | Resolver runs in parent process; generated code gets read-only `score_prediction()` function only | Historical test claim; rerun locally before relying on it |
+| Filesystem protection | Frozen data directory mounted read-only at OS level | Historical test claim; rerun locally before relying on it |
 
 ### Recent Fix: Import System (2026-06-20)
 
@@ -278,7 +292,7 @@ python -m selfcoding.tests.test_legitimate_code_execution
 cat SANDBOX_LOOSENING_REPORT.md
 ```
 
-**Status:** ✅ Production-ready (legitimate code runs, wall holds, no new holes)
+**Status:** Historical claim. Treat as production-ready only after current CI reproduces the referenced checks.
 
 ---
 
@@ -295,9 +309,9 @@ cat SANDBOX_LOOSENING_REPORT.md
 
 ## Real-Infrastructure Integration Status (Phase 1)
 
-Every component below is backed by a test that exercises it against a **real**
-dependency (real Postgres / real Kafka / real pgvector). A component is only
-marked **Proven** when such a test passes; tests against mocks do not count.
+This table is retained as historical implementation context. It is not a current
+launch-readiness claim unless the current local or CI run reproduces the listed
+test against the required dependency.
 
 | # | Component | Status | Real dependency proven | Test |
 |---|---|---|---|---|

@@ -15,6 +15,10 @@ import sys
 from pathlib import Path
 from typing import Optional
 
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 try:
     import psycopg2
     from psycopg2 import sql
@@ -27,8 +31,7 @@ def get_migration_files() -> list[Path]:
     migrations_dir = Path(__file__).parent / "migrations"
     backend_files = sorted(migrations_dir.glob("*.sql"))
 
-    repo_root = Path(__file__).resolve().parent.parent.parent.parent
-    reserve_dir = repo_root / "reserve" / "migrations"
+    reserve_dir = REPO_ROOT / "reserve" / "migrations"
     reserve_files = sorted(reserve_dir.glob("*.sql")) if reserve_dir.exists() else []
 
     migration_files = backend_files + reserve_files

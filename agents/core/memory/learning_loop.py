@@ -147,7 +147,7 @@ Return ONLY JSON:
             # Fallback: simple concatenation of the top 3 facts
             consolidated_fact = " | ".join(facts[:3])
 
-        all_evidence = [m.get("id", "") for m in memories]
+        all_evidence = [str(m.get("id", "")) for m in memories]
         consolidated_id = self._writer.write_semantic(
             agent_id=agent_id,
             fact=f"[CONSOLIDATED] {consolidated_fact}",
