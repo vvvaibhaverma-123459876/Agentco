@@ -250,6 +250,33 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `3f7cae1`
 
+## Phase 8 - Institutional Economy
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `reserve/migrations/010_economy.sql`
+  - `civilization/services/economy_service.py`
+  - `tests/civilization/test_economy.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/civilization/test_economy.py`
+- Commands run:
+  - `python3 -m pytest tests/civilization/test_economy.py` - passed, 5 tests
+  - `python3 -m pytest tests/civilization calibration reserve/tests tests/e2e/test_institution_operating_loop.py` - passed, 108 tests
+  - `make test` - passed:
+    - Python: 262 passed
+    - migrations: 27 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed: none after implementation; focused tests and full gate passed on first run.
+- Remaining risks:
+  - Economy resources are abstract and DB-backed, but not yet wired into every production action path.
+  - High reputation unlocking larger authority scope is represented by separate jurisdiction/reputation layers, not automatic economy-to-jurisdiction expansion.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 8-14 have not started. They must remain blocked until Phase 7 has passed and been committed.
+Phases 9-14 have not started. They must remain blocked until Phase 8 has passed and been committed.
