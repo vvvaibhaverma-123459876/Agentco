@@ -122,12 +122,12 @@ Phase 1 assumes and reuses:
 
 ---
 
-## Phases 2-16 Status (Queued)
+## Phases 2-16 Status
 
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Core Learning Architecture Documents | ✅ COMPLETED |
-| 2 | Knowledge Claim Model Implementation | ⏳ QUEUED |
+| 2 | Knowledge Claim Model Implementation | ✅ COMPLETED |
 | 3 | Universal Source Registry | ⏳ QUEUED |
 | 4 | Medium Adapter Interfaces | ⏳ QUEUED |
 | 5 | Scientific Evidence Engine | ⏳ QUEUED |
@@ -160,4 +160,111 @@ Phase 1 assumes and reuses:
 
 ---
 
-**Ready for Phase 2 Implementation**
+## Phase 2: Knowledge Claim Model Implementation
+
+**Status:** ✅ COMPLETED  
+**Date:** 2026-06-20
+
+### Summary
+
+Phase 2 implements the canonical Knowledge Claim model with full provenance tracking, status validation, and promotion guards.
+
+### Deliverables
+
+| Component | File | Status |
+|-----------|------|--------|
+| KnowledgeClaim dataclass | learning/universal/knowledge_claim.py | ✅ Shipped |
+| ClaimType enum | learning/universal/knowledge_claim.py | ✅ Shipped |
+| ClaimStatus enum | learning/universal/knowledge_claim.py | ✅ Shipped |
+| EvidenceType enum | learning/universal/knowledge_claim.py | ✅ Shipped |
+| Promotion validation | can_promote_to() method | ✅ Shipped |
+| Status update | update_status() method | ✅ Shipped |
+| Prediction linking | link_prediction() method | ✅ Shipped |
+| Serialization | to_dict() / from_dict() | ✅ Shipped |
+| Tests | tests/test_knowledge_claim.py (17 tests) | ✅ Shipped |
+
+### Tests Passed
+
+All 17 tests pass:
+
+✅ Valid claim creation  
+✅ Provenance hash deterministic and changes with content  
+✅ Content hash changes with claim text  
+✅ Cannot skip promotion rungs  
+✅ Lecture claims require TESTED before INSTITUTIONALIZED  
+✅ Analogy claims cannot become facts  
+✅ Paper claims follow promotion path  
+✅ Cannot promote without provenance  
+✅ Provenance includes source info  
+✅ Can link prediction only after HYPOTHESIZED  
+✅ Can link prediction only once  
+✅ High-risk claims marked correctly  
+✅ Serialization round-trip  
+✅ Promotion levels match status  
+✅ Status transitions validated  
+
+### Implementation Details
+
+**KnowledgeClaim Fields:**
+- 9 required fields (source_id, source_medium, source_uri, claim_text, normalized_claim, claim_type, domain, extracted_by, evidence_type)
+- 20+ optional fields for tracking, relationships, audit
+- Automatic hash computation (content_hash, provenance_hash)
+- Status validation in `can_promote_to()` with specific rules for:
+  - Lecture claims: must reach TESTED before INSTITUTIONALIZED
+  - Analogy claims: cannot be promoted to CALIBRATED or INSTITUTIONALIZED
+  - No rung-skipping in the knowledge status ladder
+  - Provenance required for all promotions
+  - Prediction linking only after HYPOTHESIZED
+
+**Promotion Ladder Enforced:**
+```
+OBSERVED → PARSED → UNDERSTOOD → HYPOTHESIZED → SUPPORTED → TESTED → REPLICATED → CALIBRATED → INSTITUTIONALIZED → CONSTITUTIONALIZED
+```
+
+Special statuses (DISPUTED, REJECTED, ARCHIVED) allowed from any state.
+
+### Commands Run
+
+```bash
+# Create knowledge claim module
+touch learning/universal/__init__.py
+touch learning/universal/knowledge_claim.py
+
+# Create tests
+touch tests/test_knowledge_claim.py
+
+# Run tests
+python3 -m pytest tests/test_knowledge_claim.py -v
+# Result: 17 passed
+```
+
+### Known Limits
+
+1. **Semantic judgment of claim type:** Marked by extraction engine; may misclassify novel claims.
+2. **Testability assessment:** Heuristic; some testable claims may be marked untestable and vice versa.
+3. **Risk classification:** Deterministic but heuristic; may misclassify edge cases.
+4. **Provenance stability:** Assumes extraction method stable. Changes to extraction method change hash even for same content.
+5. **No external data validation:** Model assumes extracted metadata (author, publication date) is accurate.
+
+### Integration
+
+This model is used by:
+- Phase 3: Source Registry (references claim objects)
+- Phase 4: Adapters (create claims from ingested content)
+- Phase 5: Evidence Engine (classify and mark verification needs)
+- Phase 12: Promotion Workflow (validate transitions)
+- Phase 17: TMS (track justifications via claims)
+- Phase 20: Security (threat modeling on claims)
+
+### Next Phase: Phase 3
+
+**Phase 3: Universal Source Registry**
+
+- Implement Source Registry with fingerprinting
+- Track source derivation and independence
+- Detect same sources under different URLs
+- Integrate with Phase 2 claims
+
+---
+
+**Ready for Phase 3 Implementation**
