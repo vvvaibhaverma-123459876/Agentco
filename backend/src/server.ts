@@ -5,6 +5,7 @@ import { agentRoutes } from './routes/agents.routes';
 import { overrideRoutes } from './routes/override.routes';
 import { auditRoutes } from './routes/audit.routes';
 import { credentialRoutes } from './routes/credential.routes';
+import { governedRoutes } from './routes/governed.routes';
 import { assertProductionSecrets } from './security';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -21,6 +22,7 @@ export async function build() {
   await app.register(overrideRoutes);
   await app.register(auditRoutes);
   await app.register(credentialRoutes);
+  await app.register(governedRoutes);
 
   app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 

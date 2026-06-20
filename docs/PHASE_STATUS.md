@@ -105,6 +105,36 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `226cce1`
 
+## Phase 3 - Governed API Productization
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `backend/src/server.ts`
+  - `backend/src/routes/governed.routes.ts`
+  - `backend/tests/governed-api.test.ts`
+  - `docs/openapi/agentco-governed-api.yaml`
+  - `sdk/python/agentco_client.py`
+  - `sdk/typescript/agentco-client.ts`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `backend/tests/governed-api.test.ts`
+- Commands run:
+  - `npm test -- governed-api.test.ts` in `backend` - passed, 4 tests
+  - `npm run build` in `backend` - passed
+  - `make test` - passed:
+    - Python: 244 passed
+    - migrations: 23 applied
+    - backend Jest: 36 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed: none after implementation; focused tests and build passed on first run.
+- Remaining risks:
+  - Governed API handlers use an in-memory service boundary in this phase; durable persistence and full OpenAPI schema expansion remain future work.
+  - Python and TypeScript SDKs are stubs for the governed API surface.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 3-14 have not started. They must remain blocked until Phase 2 has passed and been committed.
+Phases 4-14 have not started. They must remain blocked until Phase 3 has passed and been committed.
