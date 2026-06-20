@@ -34,6 +34,7 @@ services:
   # PostgreSQL 16
   # ----------------------------------------------------------
   postgres:
+    profiles: ["minimal", "dev", "full", "demo"]
     image: postgres:16-alpine
     container_name: agentco-postgres
     restart: unless-stopped
@@ -59,6 +60,7 @@ services:
   # Redis 7
   # ----------------------------------------------------------
   redis:
+    profiles: ["dev", "full", "demo"]
     image: redis:7-alpine
     container_name: agentco-redis
     restart: unless-stopped
@@ -78,6 +80,7 @@ services:
 
   # ----------------------------------------------------------
   zookeeper:
+    profiles: ["dev", "full", "demo"]
     image: confluentinc/cp-zookeeper:7.6.1
     container_name: agentco-zookeeper
     restart: unless-stopped
@@ -100,6 +103,7 @@ services:
       start_period: 30s
 
   kafka:
+    profiles: ["dev", "full", "demo"]
     image: confluentinc/cp-kafka:7.6.1
     container_name: agentco-kafka
     restart: unless-stopped
@@ -137,6 +141,7 @@ services:
   # Kafka UI
   # ----------------------------------------------------------
   kafka-ui:
+    profiles: ["full", "demo"]
     image: provectuslabs/kafka-ui:latest
     container_name: agentco-kafka-ui
     restart: unless-stopped
@@ -157,6 +162,7 @@ services:
   # HashiCorp Vault (dev mode — data is in-memory, not for prod)
   # ----------------------------------------------------------
   vault:
+    profiles: ["full"]
     image: hashicorp/vault:1.16
     container_name: agentco-vault
     restart: unless-stopped
@@ -185,6 +191,7 @@ services:
   # OpenTelemetry Collector
   # ----------------------------------------------------------
   otel-collector:
+    profiles: ["full"]
     image: otel/opentelemetry-collector-contrib:0.100.0
     container_name: agentco-otel-collector
     restart: unless-stopped
@@ -204,6 +211,7 @@ services:
   # Prometheus
   # ----------------------------------------------------------
   prometheus:
+    profiles: ["full"]
     image: prom/prometheus:v2.52.0
     container_name: agentco-prometheus
     restart: unless-stopped
@@ -230,6 +238,7 @@ services:
   # Grafana  (port 3005 — frontend occupies 3000)
   # ----------------------------------------------------------
   grafana:
+    profiles: ["full"]
     image: grafana/grafana:10.4.3
     container_name: agentco-grafana
     restart: unless-stopped

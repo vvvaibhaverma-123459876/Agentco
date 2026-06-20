@@ -399,6 +399,45 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `45aad56`
 
+## Phase 13 - Demo, SDK, And Clean Runnability
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `.gitignore`
+  - `Makefile`
+  - `docker-compose.yml`
+  - `scripts/doctor.py`
+  - `scripts/smoke_offline.py`
+  - `examples/civilization_constitution_demo/README.md`
+  - `examples/civilization_constitution_demo/run_demo.py`
+  - `tests/test_civilization_demo_runnability.py`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `tests/test_civilization_demo_runnability.py`
+- Commands run:
+  - `make doctor` - passed
+  - `python3 -m pytest tests/test_civilization_demo_runnability.py` - failed twice while hardening fixture source/timing handling, then passed with 3 tests
+  - `make smoke` - failed twice for the same fixture issues, then passed offline
+  - `make demo` - failed twice for the same fixture issues, then passed offline and exported an audit package
+  - `docker compose --profile minimal config --services` - passed, returned `postgres` only and emitted Docker's existing obsolete `version` warning
+  - `make test` - passed:
+    - Python: 280 passed
+    - migrations: 30 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed:
+  - Replaced fixture source URLs that tripped the ledger's internal-source guard.
+  - Caught the resolution service's wrapped same-source rejection as a `ValueError` while preserving strict failure for unrelated errors.
+  - Changed demo/smoke timing to pre-register before outcome availability and wait briefly before resolution instead of creating post-hoc claims.
+- Remaining risks:
+  - Demo propagation from calibrated trust into department, institution, society, dispute, economy, and memory is deterministic/offline fixture logic, not live cross-service orchestration.
+  - `make dev-minimal` depends on Docker and a free local Postgres port; it was validated through compose config, not started during this phase.
+  - Docker Compose emits an obsolete top-level `version` warning.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 13-14 have not started. They must remain blocked until Phase 12 has passed and been committed.
+Phase 14 has not started. It must remain blocked until Phase 13 has passed and been committed.

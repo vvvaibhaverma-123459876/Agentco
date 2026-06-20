@@ -182,3 +182,6 @@ kubeconfig
 .eslintcache
 .stylelintcache
 *.tsbuildinfo
+
+# Demo run outputs
+examples/civilization_constitution_demo/artifacts/
