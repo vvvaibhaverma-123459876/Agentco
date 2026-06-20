@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-06-20T11:08:18.922935",
+  "penalty_function": "Fixed (75% accurate \u2192 0.7+ trust, not 0.3)",
+  "weighting_range": "0.5-1.5x (soft, not 0-2x hard)",
+  "control_results": {
+    "profitable": 11,
+    "mean_cash": 700203.24,
+    "stdev_cash": 916009.769269424
+  },
+  "soft_results": {
+    "profitable": 15,
+    "mean_cash": 804475.9416,
+    "stdev_cash": 915179.5873607482,
+    "wins_vs_control": 18
+  },
+  "hypothesis_test": {
+    "threshold": 14,
+    "actual": 18,
+    "passes": true
+  }
+}
