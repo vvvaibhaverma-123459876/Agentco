@@ -38,3 +38,69 @@ export async function requireApiKey(req: FastifyRequest, reply: FastifyReply) {
     return reply.status(401).send({ error: 'valid x-agentco-api-key required' });
   }
 }
+
+export type AgentcoRole =
+  | 'agent'
+  | 'resolver_service'
+  | 'reserve_issuer'
+  | 'human_reviewer'
+  | 'auditor'
+  | 'operator'
+  | 'admin'
+  | 'service';
+
+const ROLE_SCOPES: Record<AgentcoRole, string[]> = {
+  agent: ['claims:register', 'trust:read'],
+  resolver_service: ['claims:resolve', 'claims:audit', 'trust:read'],
+  reserve_issuer: ['credentials:issue', 'credentials:verify', 'trust:read'],
+  human_reviewer: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate'],
+  auditor: ['audit:read', 'claims:audit', 'credentials:verify', 'trust:read'],
+  operator: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate', 'audit:read'],
+  admin: ['config:manage', 'audit:read'],
+  service: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate', 'claims:register', 'audit:read'],
+};
+
+export const privilegedSecurityEvents: Array<Record<string, unknown>> = [];
+
+function header(req: FastifyRequest, name: string): string {
+  const value = req.headers[name.toLowerCase()];
+  return String(Array.isArray(value) ? value[0] : value ?? '');
+}
+
+export function roleFromRequest(req: FastifyRequest): AgentcoRole | undefined {
+  const role = header(req, 'x-agentco-role') as AgentcoRole;
+  return Object.prototype.hasOwnProperty.call(ROLE_SCOPES, role) ? role : undefined;
+}
+
+export function auditSecurityDecision(req: FastifyRequest, decision: string, reason: string): void {
+  privilegedSecurityEvents.push({
+    decision,
+    reason,
+    role: header(req, 'x-agentco-role') || 'none',
+    path: req.url,
+    method: req.method,
+    createdAt: new Date().toISOString(),
+  });
+}
+
+export function requireScope(scope: string) {
+  return async function scopedAuth(req: FastifyRequest, reply: FastifyReply) {
+    const keyResult = await requireApiKey(req, reply);
+    if (reply.sent) return keyResult;
+    const role = roleFromRequest(req);
+    if (!role) {
+      auditSecurityDecision(req, 'rejected', 'missing_or_invalid_role');
+      return reply.status(403).send({ error: 'valid x-agentco-role required' });
+    }
+    if (!ROLE_SCOPES[role].includes(scope)) {
+      auditSecurityDecision(req, 'rejected', `missing_scope:${scope}`);
+      return reply.status(403).send({ error: `role ${role} lacks scope ${scope}` });
+    }
+  };
+}
+
+export function assertAgentNotResolvingOwnClaim(agentId: string | undefined, resolverId: string | undefined): void {
+  if (agentId && resolverId && agentId === resolverId) {
+    throw new Error('agent cannot resolve own claim');
+  }
+}

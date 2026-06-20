@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { randomUUID } from 'crypto';
-import { requireApiKey } from '../security';
+import { assertAgentNotResolvingOwnClaim, privilegedSecurityEvents, requireScope } from '../security';
 
 type Entity = Record<string, unknown> & { id: string };
 type MutationResult = { statusCode: number; body: Entity | Record<string, unknown> };
@@ -57,7 +57,7 @@ function notFound(reply: FastifyReply, entity: string) {
 }
 
 export async function governedRoutes(app: FastifyInstance) {
-  app.post('/institutions', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/institutions', { preHandler: requireScope('institutions:mutate') }, async (req, reply) => mutation(req, reply, () => {
     const body = bodyOf(req);
     const id = String(body.id ?? randomUUID());
     const inst = { id, name: String(body.name ?? 'Institution'), status: 'active', createdAt: new Date().toISOString() };
@@ -72,7 +72,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return inst ? inst : notFound(reply, 'institution');
   });
 
-  app.post('/institutions/:id/agents', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/institutions/:id/agents', { preHandler: requireScope('institutions:mutate') }, async (req, reply) => mutation(req, reply, () => {
     const { id } = req.params as { id: string };
     if (!institutions.has(id)) return { statusCode: 404, body: { error: 'institution not found' } };
     const body = bodyOf(req);
@@ -87,7 +87,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return { statusCode: 201, body: agent };
   }));
 
-  app.delete('/institutions/:id/agents/:agent_id', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.delete('/institutions/:id/agents/:agent_id', { preHandler: requireScope('institutions:mutate') }, async (req, reply) => mutation(req, reply, () => {
     const { id, agent_id } = req.params as { id: string; agent_id: string };
     institutionAgents.get(id)?.delete(agent_id);
     audit(req, 'institution_agent_removed', 'agent', agent_id);
@@ -106,7 +106,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return { institution_id: id, events: auditEvents.filter((e) => e.entityId === id || e.entityType === 'institution') };
   });
 
-  app.post('/outputs', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/outputs', { preHandler: requireScope('outputs:mutate') }, async (req, reply) => mutation(req, reply, () => {
     const body = bodyOf(req);
     const id = String(body.id ?? randomUUID());
     const output = { id, status: 'proposed', ...body };
@@ -120,7 +120,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return outputs.get(id) ?? notFound(reply, 'output');
   });
 
-  app.post('/reviews/:id/transition', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/reviews/:id/transition', { preHandler: requireScope('reviews:mutate') }, async (req, reply) => mutation(req, reply, () => {
     const { id } = req.params as { id: string };
     const body = bodyOf(req);
     const review = reviews.get(id) ?? { id, status: 'proposed' };
@@ -135,7 +135,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return reviews.get(id) ?? notFound(reply, 'review');
   });
 
-  app.post('/governance/decisions', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/governance/decisions', { preHandler: requireScope('governance:mutate') }, async (req, reply) => mutation(req, reply, () => {
     const id = randomUUID();
     const decision = { id, status: 'proposed', ...bodyOf(req) };
     governanceDecisions.set(id, decision);
@@ -144,7 +144,7 @@ export async function governedRoutes(app: FastifyInstance) {
   }));
 
   for (const action of ['approve', 'execute', 'rollback'] as const) {
-    app.post(`/governance/decisions/:id/${action}`, { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+    app.post(`/governance/decisions/:id/${action}`, { preHandler: requireScope('governance:mutate') }, async (req, reply) => mutation(req, reply, () => {
       const { id } = req.params as { id: string };
       const decision = governanceDecisions.get(id);
       if (!decision) return { statusCode: 404, body: { error: 'governance decision not found' } };
@@ -159,7 +159,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return governanceDecisions.get(id) ?? notFound(reply, 'governance decision');
   });
 
-  app.post('/claims/register', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/claims/register', { preHandler: requireScope('claims:register') }, async (req, reply) => mutation(req, reply, () => {
     const id = randomUUID();
     const claim = { id, status: 'registered', independence_status: 'unresolved', ...bodyOf(req) };
     claims.set(id, claim);
@@ -167,10 +167,15 @@ export async function governedRoutes(app: FastifyInstance) {
     return { statusCode: 201, body: claim };
   }));
 
-  app.post('/claims/:id/resolve', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/claims/:id/resolve', { preHandler: requireScope('claims:resolve') }, async (req, reply) => mutation(req, reply, () => {
     const { id } = req.params as { id: string };
     const claim = claims.get(id);
     if (!claim) return { statusCode: 404, body: { error: 'claim not found' } };
+    try {
+      assertAgentNotResolvingOwnClaim(String(claim.producing_agent_id ?? claim.agent_id ?? ''), String(bodyOf(req).resolver_id ?? ''));
+    } catch (err) {
+      return { statusCode: 403, body: { error: (err as Error).message } };
+    }
     claim.status = 'resolved';
     claim.independence_status = 'accepted';
     audit(req, 'claim_resolved', 'claim', id);
@@ -187,7 +192,7 @@ export async function governedRoutes(app: FastifyInstance) {
     return { agent_id: id, trust_source: 'resolved_independent_claims', trust_score: null };
   });
 
-  app.post('/credentials/issue', { preHandler: requireApiKey }, async (req, reply) => mutation(req, reply, () => {
+  app.post('/credentials/issue', { preHandler: requireScope('credentials:issue') }, async (req, reply) => mutation(req, reply, () => {
     const id = randomUUID();
     const credential = { id, status: 'issued', recomputable: true, ...bodyOf(req) };
     credentials.set(id, credential);
@@ -202,4 +207,5 @@ export async function governedRoutes(app: FastifyInstance) {
   });
 
   app.get('/audit/mutations', async () => ({ events: auditEvents }));
+  app.get('/audit/security', async () => ({ events: privilegedSecurityEvents }));
 }

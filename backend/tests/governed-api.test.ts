@@ -1,6 +1,6 @@
 import { build } from '../src/server';
 
-const API_KEY = { 'x-agentco-api-key': 'dev-api-key' };
+const API_KEY = { 'x-agentco-api-key': 'dev-api-key', 'x-agentco-role': 'operator' };
 
 describe('governed API boundaries', () => {
   test('route auth required for mutation', async () => {

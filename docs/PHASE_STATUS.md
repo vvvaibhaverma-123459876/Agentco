@@ -135,6 +135,36 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
 - Commit hash: `28b0139`
 
+## Phase 4 - RBAC, Service Identities, And Security Model
+
+- Status: implementation and verification complete; commit pending
+- Files changed:
+  - `backend/src/security.ts`
+  - `backend/src/routes/governed.routes.ts`
+  - `backend/tests/governed-api.test.ts`
+  - `backend/tests/rbac.test.ts`
+  - `docs/SECURITY_MODEL.md`
+  - `docs/THREAT_MODEL.md`
+  - `docs/PHASE_STATUS.md`
+- Tests added:
+  - `backend/tests/rbac.test.ts`
+- Commands run:
+  - `npm test -- rbac.test.ts governed-api.test.ts security.test.ts` in `backend` - passed, 14 tests
+  - `npm run build` in `backend` - passed
+  - `make test` - passed:
+    - Python: 244 passed
+    - migrations: 23 applied
+    - backend Jest: 42 passed
+    - frontend build: passed
+- Pass/fail status: passed
+- Failures fixed: none after implementation; focused tests and build passed on first run.
+- Remaining risks:
+  - RBAC policy is code-defined, not yet backed by durable policy storage.
+  - Key rotation and rate limiting are documented hooks/stubs, not full infrastructure implementations.
+  - Backend Jest still emits existing Kafka partitioner and worker shutdown warnings under `make test`.
+  - Frontend build still emits the existing hook dependency warning in `frontend/src/app/audit/page.tsx`.
+- Commit hash: pending
+
 ## Later Phases
 
-Phases 4-14 have not started. They must remain blocked until Phase 3 has passed and been committed.
+Phases 5-14 have not started. They must remain blocked until Phase 4 has passed and been committed.
