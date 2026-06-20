@@ -60,7 +60,7 @@ def load_frozen_real_data(data_dir: Path) -> dict[str, pd.DataFrame]:
         df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
         df["Close"] = pd.to_numeric(df["Close"], errors="coerce")
         df["Volume"] = pd.to_numeric(df["Volume"], errors="coerce")
-        invalid_rows = int(df["Date"].isna().sum() + df["Close"].isna().sum())
+        invalid_rows = int((df["Date"].isna() | df["Close"].isna()).sum())
         df = df[["Date", "Close", "Volume"]].dropna(subset=["Date", "Close"])
         df = df.sort_values("Date").drop_duplicates(subset=["Date"], keep="last").reset_index(drop=True)
         df.attrs["invalid_rows_dropped"] = invalid_rows
@@ -556,6 +556,7 @@ def serialize_ledger(rows: list[dict[str, Any]]) -> pd.DataFrame:
     for column in ["prediction_date", "resolution_date", "nifty_resolution_date"]:
         if column in df.columns:
             df[column] = df[column].astype(str)
+    df = df.replace({"NaT": "", "nan": ""})
     return df
 
 
