@@ -40,7 +40,7 @@ This file tracks the gated full-build phases. A phase is not complete until impl
   - Backend tests emit an existing Kafka partitioner warning and worker shutdown warning.
   - Frontend build emits an existing `react-hooks/exhaustive-deps` warning in `frontend/src/app/audit/page.tsx`.
   - Standalone frontend `npm test` still fails because `jest` is not installed/resolvable; `make test` does not invoke it.
-- Commit hash: `0c651a6`
+- Commit hash: `3f454ec`
 
 ## Later Phases
 
