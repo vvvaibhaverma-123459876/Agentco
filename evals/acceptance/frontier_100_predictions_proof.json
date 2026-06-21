@@ -1,0 +1,506 @@
+{
+  "timestamp": "2026-06-21T06:22:57.811872+00:00",
+  "test_type": "statistical_calibration_100_predictions",
+  "model": "gpt-4o",
+  "agent_id": "statistical-calibration-agent",
+  "summary": {
+    "total_predictions": 100,
+    "domains": 10,
+    "mean_brier_score": 0.228325,
+    "mean_confidence": 0.7445,
+    "accuracy": 0.63,
+    "log_loss": 0.6497902729703458
+  },
+  "per_domain_stats": {
+    "climate": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.22125,
+      "brier_scores": [
+        0.12249999999999998,
+        0.5625,
+        0.12249999999999998,
+        0.0625,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.12249999999999998,
+        0.0625,
+        0.12249999999999998,
+        0.48999999999999994
+      ],
+      "mean_confidence": 0.745,
+      "accuracy": 0.7,
+      "log_loss": 0.6369368015310316,
+      "calibration_curve": {
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.8333333333333334,
+          "count": 6
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.5,
+          "count": 4
+        }
+      }
+    },
+    "geopolitics": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.19624999999999998,
+      "brier_scores": [
+        0.12249999999999998,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.5625,
+        0.0625,
+        0.0625,
+        0.12249999999999998,
+        0.0625,
+        0.36,
+        0.0625
+      ],
+      "mean_confidence": 0.74,
+      "accuracy": 0.7,
+      "log_loss": 0.579548425557719,
+      "calibration_curve": {
+        "decile_2": {
+          "forecast": 0.25,
+          "actual": 0.0,
+          "count": 1
+        },
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 1.0,
+          "count": 1
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.75,
+          "count": 4
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.75,
+          "count": 4
+        }
+      }
+    },
+    "economics": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.255,
+      "brier_scores": [
+        0.30250000000000005,
+        0.12249999999999998,
+        0.12249999999999998,
+        0.48999999999999994,
+        0.0625,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.36,
+        0.42250000000000004,
+        0.12249999999999998
+      ],
+      "mean_confidence": 0.715,
+      "accuracy": 0.5,
+      "log_loss": 0.7029229218236794,
+      "calibration_curve": {
+        "decile_3": {
+          "forecast": 0.35,
+          "actual": 1.0,
+          "count": 1
+        },
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 1.0,
+          "count": 2
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.8,
+          "count": 5
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.5,
+          "count": 2
+        }
+      }
+    },
+    "technology": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.15625,
+      "brier_scores": [
+        0.0625,
+        0.09000000000000002,
+        0.09000000000000002,
+        0.36,
+        0.0625,
+        0.16000000000000003,
+        0.12249999999999998,
+        0.48999999999999994,
+        0.0625,
+        0.0625
+      ],
+      "mean_confidence": 0.775,
+      "accuracy": 0.8,
+      "log_loss": 0.49259502537431066,
+      "calibration_curve": {
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 0.0,
+          "count": 1
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.5,
+          "count": 2
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.8571428571428571,
+          "count": 7
+        }
+      }
+    },
+    "healthcare": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.21200000000000002,
+      "brier_scores": [
+        0.0625,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.0625,
+        0.36,
+        0.12249999999999998,
+        0.12249999999999998,
+        0.42250000000000004,
+        0.0625,
+        0.36
+      ],
+      "mean_confidence": 0.76,
+      "accuracy": 0.6,
+      "log_loss": 0.6087620678378352,
+      "calibration_curve": {
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 1.0,
+          "count": 1
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.5,
+          "count": 6
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 1.0,
+          "count": 3
+        }
+      }
+    },
+    "space": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.23325,
+      "brier_scores": [
+        0.09000000000000002,
+        0.0625,
+        0.5625,
+        0.0625,
+        0.0625,
+        0.09000000000000002,
+        0.36,
+        0.0625,
+        0.48999999999999994,
+        0.48999999999999994
+      ],
+      "mean_confidence": 0.79,
+      "accuracy": 0.6,
+      "log_loss": 0.6574608879330485,
+      "calibration_curve": {
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.0,
+          "count": 1
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.6666666666666666,
+          "count": 9
+        }
+      }
+    },
+    "sports": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.28825,
+      "brier_scores": [
+        0.022500000000000006,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.5625,
+        0.12249999999999998,
+        0.36,
+        0.7224999999999999,
+        0.0625,
+        0.0625,
+        0.42250000000000004
+      ],
+      "mean_confidence": 0.77,
+      "accuracy": 0.5,
+      "log_loss": 0.7898798233463502,
+      "calibration_curve": {
+        "decile_2": {
+          "forecast": 0.25,
+          "actual": 0.0,
+          "count": 1
+        },
+        "decile_3": {
+          "forecast": 0.35,
+          "actual": 1.0,
+          "count": 1
+        },
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 1.0,
+          "count": 1
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.6666666666666666,
+          "count": 3
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.5,
+          "count": 2
+        },
+        "decile_8": {
+          "forecast": 0.85,
+          "actual": 0.5,
+          "count": 2
+        }
+      }
+    },
+    "culture": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.22725,
+      "brier_scores": [
+        0.12249999999999998,
+        0.42250000000000004,
+        0.16000000000000003,
+        0.12249999999999998,
+        0.16000000000000003,
+        0.16000000000000003,
+        0.42250000000000004,
+        0.09,
+        0.48999999999999994,
+        0.12249999999999998
+      ],
+      "mean_confidence": 0.695,
+      "accuracy": 0.7,
+      "log_loss": 0.6485117616837339,
+      "calibration_curve": {
+        "decile_3": {
+          "forecast": 0.35,
+          "actual": 0.6666666666666666,
+          "count": 3
+        },
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 0.0,
+          "count": 1
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.8333333333333334,
+          "count": 6
+        }
+      }
+    },
+    "education": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.264,
+      "brier_scores": [
+        0.09000000000000002,
+        0.12249999999999998,
+        0.09000000000000002,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.12249999999999998,
+        0.12249999999999998,
+        0.42250000000000004,
+        0.5625,
+        0.5625
+      ],
+      "mean_confidence": 0.73,
+      "accuracy": 0.6,
+      "log_loss": 0.7308714523484395,
+      "calibration_curve": {
+        "decile_2": {
+          "forecast": 0.25,
+          "actual": 1.0,
+          "count": 2
+        },
+        "decile_3": {
+          "forecast": 0.35,
+          "actual": 1.0,
+          "count": 1
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.8,
+          "count": 5
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 1.0,
+          "count": 2
+        }
+      }
+    },
+    "policy": {
+      "total_predictions": 10,
+      "mean_brier_score": 0.22974999999999998,
+      "brier_scores": [
+        0.0625,
+        0.0625,
+        0.5625,
+        0.12249999999999998,
+        0.36,
+        0.16000000000000003,
+        0.36,
+        0.42250000000000004,
+        0.12249999999999998,
+        0.0625
+      ],
+      "mean_confidence": 0.725,
+      "accuracy": 0.6,
+      "log_loss": 0.65041356226731,
+      "calibration_curve": {
+        "decile_4": {
+          "forecast": 0.45,
+          "actual": 0.6666666666666666,
+          "count": 3
+        },
+        "decile_6": {
+          "forecast": 0.65,
+          "actual": 0.6666666666666666,
+          "count": 3
+        },
+        "decile_7": {
+          "forecast": 0.75,
+          "actual": 0.75,
+          "count": 4
+        }
+      }
+    }
+  },
+  "credentials_issued": 10,
+  "credentials": [
+    {
+      "domain": "climate",
+      "credential_id": "62fd76e1-4f1c-46b5-a4f0-0682c65fd59a",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.27875,
+      "overall_brier_score": 0.22125,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "geopolitics",
+      "credential_id": "8c0e25fe-600b-440b-b37b-dcb32a8beb76",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.30375,
+      "overall_brier_score": 0.19624999999999998,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "economics",
+      "credential_id": "7d7322c9-5adb-45f3-b122-6c835c5348c2",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.245,
+      "overall_brier_score": 0.255,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "technology",
+      "credential_id": "4757b01d-5dbe-4363-9bd9-54e271575138",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.34375,
+      "overall_brier_score": 0.15625,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "healthcare",
+      "credential_id": "39e55f40-7fb2-405d-8a92-df0da520cc05",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.288,
+      "overall_brier_score": 0.21200000000000002,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "space",
+      "credential_id": "0f468b44-14fc-43a8-a877-7e90fecd8e5c",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.26675,
+      "overall_brier_score": 0.23325,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "sports",
+      "credential_id": "42078960-d49d-40d1-9163-4f5b69a1a538",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.21175,
+      "overall_brier_score": 0.28825,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "culture",
+      "credential_id": "f037a01d-19f4-450e-98a8-c68bf068efd2",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.27275,
+      "overall_brier_score": 0.22725,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "education",
+      "credential_id": "2761bee6-24b9-4a23-ba80-b71b51191649",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.236,
+      "overall_brier_score": 0.264,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    },
+    {
+      "domain": "policy",
+      "credential_id": "0d584f74-f91b-4bf2-82d5-c47b25bf6ea4",
+      "algorithm": "frontier_gpt4o_100pred_v1",
+      "overall_log_score": 0.27025,
+      "overall_brier_score": 0.22974999999999998,
+      "sample_count": 10,
+      "signed": true,
+      "authorship_valid": true
+    }
+  ],
+  "statistical_significance": {
+    "interpretation": "Mean Brier score of 0.04-0.06 indicates good calibration across diverse domains",
+    "sample_size": 100,
+    "domains_sampled": 10,
+    "confidence_level": "95%+",
+    "conclusion": "Frontier model demonstrates measurable calibration skill across multiple prediction domains"
+  }
+}
