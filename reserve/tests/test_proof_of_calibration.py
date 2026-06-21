@@ -61,8 +61,12 @@ def _apply_migrations(cur):
     ed25519_sql = (
         MIGRATION_ROOT / "reserve" / "migrations" / "004_ed25519_signature.sql"
     ).read_text()
+    evidence_sql = (
+        MIGRATION_ROOT / "backend" / "src" / "db" / "migrations" / "017_resolution_evidence_snapshots.sql"
+    ).read_text()
     cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE")
     cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE")
+    cur.execute("DROP TABLE IF EXISTS resolution_evidence_snapshots CASCADE")
     cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE")
     cur.execute(ledger_sql)
     cur.execute(reserve_sql)
@@ -74,6 +78,7 @@ def _apply_migrations(cur):
     )
     cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
     cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+    cur.execute(evidence_sql)
 
 
 @pytest.fixture(scope="module")

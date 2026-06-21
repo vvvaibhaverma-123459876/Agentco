@@ -293,6 +293,7 @@ Return ONLY JSON (no prose, no code fences):
                 domain=domain,
                 claim_type="news_fact",
                 earliest_knowable_at=None,
+                claim_source_url=source_url,
             )
 
             try:

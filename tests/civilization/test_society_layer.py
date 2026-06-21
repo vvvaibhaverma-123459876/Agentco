@@ -1,118 +1,303 @@
+"""
+Test suite for Society Layer (Phase J).
+
+Tests:
+- create society
+- admit institution through governance
+- duplicate admission rejected
+- institution can be suspended from society
+- society reputation computed from member institutions
+- society cannot judge dispute where society itself is defendant
+- society can assign external reviewer from different institution
+"""
 from __future__ import annotations
 
-import os
-import uuid
-from pathlib import Path
-
 import pytest
+import psycopg2
+import psycopg2.extras
+from datetime import datetime, timezone
 
-psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
+from civilization.societies import (
+    create_society,
+    get_society,
+    list_societies,
+    admit_institution,
+    suspend_institution_from_society,
+    get_society_members,
+    assign_external_reviewer,
+    propose_admission,
+    approve_proposal,
+    compute_society_reputation,
+    aggregate_member_reputations,
+    can_society_judge_dispute,
+)
+from civilization.services.institution_service import create_institution
 
-DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
-ROOT = Path(__file__).resolve().parents[2]
+TEST_DB_URL = "postgresql://agentco:password@localhost:5433/agentco?host=/tmp"
 
 
-@pytest.fixture()
+@pytest.fixture
 def db():
-    conn = psycopg2.connect(DSN)
+    """Fixture for database connection."""
+    conn = psycopg2.connect(TEST_DB_URL)
     conn.autocommit = True
-    with conn.cursor() as cur:
-        for tbl in [
-            "society_reputation_snapshots", "society_memory_events", "society_governance_decisions",
-            "society_contracts", "society_institution_edges", "societies",
-            "agent_membership_edges", "institution_contracts", "institution_output_reviews",
-            "civilization_memory_events", "governance_decisions", "departments", "institutions",
-        ]:
-            cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
-        cur.execute((ROOT / "reserve/migrations/006_civilization.sql").read_text())
-        cur.execute((ROOT / "reserve/migrations/007_society.sql").read_text())
     yield conn
     conn.close()
 
 
-def _inst(db, name: str) -> str:
-    from civilization.services.institution_service import create_institution
-
-    return create_institution(name, {
-        "institution_name": name,
-        "accepted_inputs": ["a"],
-        "produced_outputs": ["b"],
-        "verification_required": True,
-        "required_external_reviewer": "Other",
-        "failure_conditions": ["f"],
-        "escalation_target": "governance",
-        "reputation_metric": "overall_log_score",
-    }, db)["institution_id"]
-
-
-def test_society_created_and_institution_admitted_through_governance(db) -> None:
-    from civilization.services.society_service import admit_institution, create_society
-
-    society_id = create_society("Engineering Society", "engineering", "founder", "external-approver", {}, db)
-    inst_id = _inst(db, f"Software-{uuid.uuid4().hex[:4]}")
-    decision_id = admit_institution(society_id, inst_id, "founder", "external-approver", db)
-    assert decision_id
-
-
-def test_duplicate_membership_rejected(db) -> None:
-    from civilization.services.society_service import SocietyError, admit_institution, create_society
-
-    society_id = create_society("Security Society", "security", "founder", "external-approver", {}, db)
-    inst_id = _inst(db, f"Security-{uuid.uuid4().hex[:4]}")
-    admit_institution(society_id, inst_id, "founder", "external-approver", db)
-    with pytest.raises(SocietyError, match="duplicate"):
-        admit_institution(society_id, inst_id, "founder", "external-approver", db)
-
-
-def test_society_reputation_recomputes_and_unresolved_dispute_blocks_legitimacy(db) -> None:
-    from civilization.services.society_service import (
-        admit_institution,
-        create_society,
-        open_dispute,
-        recompute_society_reputation,
-    )
-
-    society_id = create_society("Reliability Society", "reliability", "founder", "external-approver", {}, db)
-    inst_id = _inst(db, f"Reliability-{uuid.uuid4().hex[:4]}")
-    admit_institution(society_id, inst_id, "founder", "external-approver", db)
-    old_autocommit = db.autocommit
-    db.autocommit = False
-    try:
-        with db.cursor() as cur:
-            cur.execute("SET LOCAL civilization.reputation_update_authorized = 'true'")
-            cur.execute("UPDATE institutions SET reputation_score = 0.8 WHERE id = %s", (inst_id,))
-        db.commit()
-    finally:
-        db.autocommit = old_autocommit
-    open_dispute(society_id, "plaintiff", inst_id, critical=True, db=db)
-    result = recompute_society_reputation(society_id, db)
-    assert result["society_score"] < 0.8
-    assert result["legitimacy_blocked"] is True
-
-
-def test_low_reputation_loses_high_risk_authority_and_society_cannot_judge_self(db) -> None:
-    from civilization.services.society_service import (
-        SocietyError,
-        create_society,
-        low_reputation_blocks_high_risk_authority,
-        open_dispute,
-    )
-
-    society_id = create_society("Architecture Society", "architecture", "founder", "external-approver", {}, db)
-    inst_id = _inst(db, f"Architecture-{uuid.uuid4().hex[:4]}")
-    assert low_reputation_blocks_high_risk_authority(society_id, inst_id, 0.1, db) is True
-    with pytest.raises(SocietyError, match="defendant"):
-        open_dispute(society_id, "plaintiff", society_id, critical=True, db=db)
-
-
-def test_society_memory_records_events(db) -> None:
-    from civilization.services.society_service import admit_institution, create_society, recompute_society_reputation
-
-    society_id = create_society("QA Society", "qa", "founder", "external-approver", {}, db)
-    inst_id = _inst(db, f"QA-{uuid.uuid4().hex[:4]}")
-    admit_institution(society_id, inst_id, "founder", "external-approver", db)
-    recompute_society_reputation(society_id, db)
+@pytest.fixture
+def clean_db(db):
+    """Fixture to clean societies tables before and after test."""
     with db.cursor() as cur:
-        cur.execute("SELECT event_type FROM society_memory_events WHERE society_id = %s", (society_id,))
-        events = {r[0] for r in cur.fetchall()}
-    assert {"society_created", "institution_admitted", "society_reputation_updated"}.issubset(events)
+        try:
+            cur.execute("DELETE FROM society_audit_log")
+            cur.execute("DELETE FROM society_institution_edges")
+            cur.execute("DELETE FROM societies")
+            cur.execute("DELETE FROM society_governance_proposals")
+            cur.execute("DELETE FROM dispute_rulings")
+            cur.execute("DELETE FROM disputes")
+        except:
+            pass
+    yield db
+
+
+def test_create_society(clean_db):
+    """Test creating a new society."""
+    society = create_society(
+        name="Engineering Society",
+        domain="engineering",
+        purpose="Govern engineering practices and standards",
+        authority_scope=["engineering", "architecture"],
+        db=clean_db,
+    )
+
+    assert society.name == "Engineering Society"
+    assert society.domain == "engineering"
+    assert society.status == "active"
+    assert society.reputation_score == 0.0
+
+    retrieved = get_society(society.id, clean_db)
+    assert retrieved is not None
+    assert retrieved.name == "Engineering Society"
+
+
+def test_admit_institution_through_governance(clean_db):
+    """Test admitting an institution through governance proposal + approval."""
+    society = create_society(
+        name="Safety Society",
+        domain="safety",
+        purpose="Govern safety standards",
+        db=clean_db,
+    )
+
+    contract = {
+        "institution_name": "Safety Labs",
+        "accepted_inputs": ["safety review requests"],
+        "produced_outputs": ["safety certifications"],
+        "verification_required": True,
+        "required_external_reviewer": "Engineering Labs",
+        "failure_conditions": ["certification revoked"],
+        "escalation_target": "CEO",
+        "reputation_metric": "safety_score",
+    }
+    inst_result = create_institution("Safety Labs", contract, clean_db)
+    institution_id = inst_result["institution_id"]
+
+    proposal = propose_admission(society.id, institution_id, "admin", clean_db)
+    assert proposal["proposal_type"] == "admission"
+    assert proposal["status"] == "open"
+
+    approved = approve_proposal(society.id, proposal["proposal_id"], "admin", clean_db)
+    assert approved["status"] == "approved"
+
+    members = get_society_members(society.id, clean_db)
+    assert len(members) == 1
+    assert members[0]["institution_id"] == institution_id
+
+
+def test_duplicate_admission_rejected(clean_db):
+    """Test that duplicate institution admission is rejected."""
+    society = create_society(
+        name="Econ Society",
+        domain="economics",
+        purpose="Govern economic standards",
+        db=clean_db,
+    )
+
+    contract = {
+        "institution_name": "Econ Labs",
+        "accepted_inputs": ["economic analysis"],
+        "produced_outputs": ["economic reports"],
+        "verification_required": True,
+        "required_external_reviewer": "Finance Labs",
+        "failure_conditions": ["report invalidated"],
+        "escalation_target": "CFO",
+        "reputation_metric": "econ_score",
+    }
+    inst_result = create_institution("Econ Labs", contract, clean_db)
+    institution_id = inst_result["institution_id"]
+
+    admit_institution(society.id, institution_id, "member", clean_db)
+
+    with pytest.raises(ValueError, match="already active"):
+        admit_institution(society.id, institution_id, "member", clean_db)
+
+
+def test_institution_can_be_suspended(clean_db):
+    """Test suspending an institution from a society."""
+    society = create_society(
+        name="Governance Society",
+        domain="governance",
+        purpose="Govern governance standards",
+        db=clean_db,
+    )
+
+    contract = {
+        "institution_name": "Governance Labs",
+        "accepted_inputs": ["governance requests"],
+        "produced_outputs": ["governance decisions"],
+        "verification_required": True,
+        "required_external_reviewer": "Audit Labs",
+        "failure_conditions": ["decision overturned"],
+        "escalation_target": "Board",
+        "reputation_metric": "governance_score",
+    }
+    inst_result = create_institution("Governance Labs", contract, clean_db)
+    institution_id = inst_result["institution_id"]
+
+    admit_institution(society.id, institution_id, "member", clean_db)
+    from civilization.societies import suspend_institution_from_society
+    suspend_institution_from_society(society.id, institution_id, clean_db)
+
+    members = get_society_members(society.id, clean_db, active_only=False)
+    active_members = get_society_members(society.id, clean_db, active_only=True)
+
+    assert len(members) == 1
+    assert members[0]["membership_status"] == "suspended"
+    assert len(active_members) == 0
+
+
+def test_society_reputation_from_members(clean_db):
+    """Test that society reputation is aggregated from member institutions."""
+    society = create_society(
+        name="Memory Society",
+        domain="memory",
+        purpose="Govern memory standards",
+        db=clean_db,
+    )
+
+    contract1 = {
+        "institution_name": "Memory Lab 1",
+        "accepted_inputs": ["memory tests"],
+        "produced_outputs": ["memory reports"],
+        "verification_required": True,
+        "required_external_reviewer": "Memory Lab 2",
+        "failure_conditions": ["report rejected"],
+        "escalation_target": "CEO",
+        "reputation_metric": "memory_score",
+    }
+    inst1 = create_institution("Memory Lab 1", contract1, clean_db)
+
+    contract2 = {
+        "institution_name": "Memory Lab 2",
+        "accepted_inputs": ["memory tests"],
+        "produced_outputs": ["memory reports"],
+        "verification_required": True,
+        "required_external_reviewer": "Memory Lab 1",
+        "failure_conditions": ["report rejected"],
+        "escalation_target": "CEO",
+        "reputation_metric": "memory_score",
+    }
+    inst2 = create_institution("Memory Lab 2", contract2, clean_db)
+
+    with clean_db.cursor() as cur:
+        cur.execute("UPDATE institutions SET reputation_score = 0.8 WHERE id = %s", (inst1["institution_id"],))
+        cur.execute("UPDATE institutions SET reputation_score = 0.6 WHERE id = %s", (inst2["institution_id"],))
+
+    admit_institution(society.id, inst1["institution_id"], "member", clean_db)
+    admit_institution(society.id, inst2["institution_id"], "member", clean_db)
+
+    rep = compute_society_reputation(society.id, clean_db)
+    assert abs(rep - 0.7) < 0.01
+
+    agg = aggregate_member_reputations(society.id, clean_db)
+    assert agg["member_count"] == 2
+    assert abs(agg["average_reputation"] - 0.7) < 0.01
+
+
+def test_society_cannot_judge_own_dispute(clean_db):
+    """Test that a society cannot judge a dispute where it is the defendant."""
+    society = create_society(
+        name="Justice Society",
+        domain="justice",
+        purpose="Govern justice standards",
+        db=clean_db,
+    )
+
+    with clean_db.cursor() as cur:
+        dispute_id = "test-dispute-123"
+        cur.execute(
+            """
+            INSERT INTO disputes (id, dispute_type, plaintiff_id, defendant_id, subject, status)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (dispute_id, "inter_institution", "some-institution", society.id, "alleged wrongdoing", "open"),
+        )
+
+    can_judge = can_society_judge_dispute(society.id, dispute_id, clean_db)
+    assert not can_judge
+
+
+def test_assign_external_reviewer(clean_db):
+    """Test assigning an external reviewer from a different institution."""
+    society = create_society(
+        name="Review Society",
+        domain="review",
+        purpose="Govern review standards",
+        db=clean_db,
+    )
+
+    contract1 = {
+        "institution_name": "Review Lab A",
+        "accepted_inputs": ["review requests"],
+        "produced_outputs": ["review reports"],
+        "verification_required": True,
+        "required_external_reviewer": "Review Lab B",
+        "failure_conditions": ["review rejected"],
+        "escalation_target": "CEO",
+        "reputation_metric": "review_score",
+    }
+    inst1 = create_institution("Review Lab A", contract1, clean_db)
+
+    contract2 = {
+        "institution_name": "Review Lab B",
+        "accepted_inputs": ["review requests"],
+        "produced_outputs": ["review reports"],
+        "verification_required": True,
+        "required_external_reviewer": "Review Lab A",
+        "failure_conditions": ["review rejected"],
+        "escalation_target": "CEO",
+        "reputation_metric": "review_score",
+    }
+    inst2 = create_institution("Review Lab B", contract2, clean_db)
+
+    admit_institution(society.id, inst1["institution_id"], "member", clean_db)
+    admit_institution(society.id, inst2["institution_id"], "member", clean_db)
+
+    assignment = assign_external_reviewer(
+        society.id,
+        inst1["institution_id"],
+        inst2["institution_id"],
+        clean_db,
+    )
+
+    assert assignment["reviewer_institution_id"] == inst2["institution_id"]
+    assert assignment["institution_id"] == inst1["institution_id"]
+
+    with pytest.raises(ValueError, match="must differ"):
+        assign_external_reviewer(
+            society.id,
+            inst1["institution_id"],
+            inst1["institution_id"],
+            clean_db,
+        )

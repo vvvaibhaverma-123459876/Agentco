@@ -24,6 +24,7 @@ describe('production secret guard', () => {
       JWT_SECRET: 'real-jwt-secret',
       VAULT_TOKEN: 'real-vault-token',
       RESERVE_SIGNING_KEY: 'real-reserve-key',
+      AGENTCO_SERVICE_KEYS_JSON: '{"admin":{"key":"real-service-key","scopes":["admin:*"]}}',
     } as NodeJS.ProcessEnv)).not.toThrow();
   });
 });

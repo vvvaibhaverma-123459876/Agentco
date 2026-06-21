@@ -1,20 +1,80 @@
 # Security Model
 
-Agentco uses fail-closed production secret checks and scoped service identity for governed API mutations.
+## Implemented
 
-## Roles
+- Production startup guard rejects known development defaults.
+- `AGENTCO_SERVICE_KEYS_JSON` defines service principals and scopes.
+- Requests authenticate with `x-agentco-service-key`.
+- Dev mode still supports `x-agentco-api-key` plus `x-agentco-role` compatibility outside production only.
+- Production mode fails closed without service keys.
+- Scope checks support exact scopes and wildcards such as `read:*`, `governance:*`, and `admin:*`.
+- Auth failures are recorded in the in-process security audit event buffer where route middleware runs.
 
-- `agent`: can register claims and read trust.
-- `resolver_service`: can resolve claims and read claim audit/trust.
-- `reserve_issuer`: can issue and verify credentials, but cannot mutate source claims.
-- `human_reviewer`: can mutate institution outputs, reviews, and governance decisions.
-- `auditor`: can read audit, verify credentials, and inspect claim audit/trust without mutating.
-- `operator`: can operate institution/governance workflows.
-- `admin`: manages configuration and can read audit, but does not directly resolve scoring claims.
-- `service`: internal service role for governed service-to-service mutations.
+Example:
 
-Privileged rejections are logged to the security audit surface.
+```json
+{
+  "resolver-service": {
+    "key": "replace-me",
+    "scopes": ["prediction:resolve", "evidence:write"]
+  },
+  "credential-issuer": {
+    "key": "replace-me",
+    "scopes": ["credential:issue", "credential:verify"]
+  },
+  "task-dispatcher": {
+    "key": "replace-me",
+    "scopes": ["task:dispatch", "task:read", "task:cancel"]
+  },
+  "governance-admin": {
+    "key": "replace-me",
+    "scopes": ["governance:*", "admin:audit"]
+  },
+  "auditor": {
+    "key": "replace-me",
+    "scopes": ["read:*", "audit:read"]
+  }
+}
+```
 
-## Production Defaults
+## Applied Scopes
 
-`AGENTCO_ENV=production` refuses dev-default API keys, event signing keys, JWT secret, Vault token, reserve signing key, and default database passwords.
+- Credential issuance: `credential:issue`
+- Credential verification: `credential:verify`
+- Task dispatch: `task:dispatch`
+- Task reads: `task:read`
+- Task cancellation: `task:cancel`
+- Governance/institution mutations: existing governance and institution scopes
+- Override mutation: `governance:mutate`
+
+## Tested
+
+- Missing key rejected.
+- Wrong key rejected.
+- Valid service key accepted.
+- Valid key without scope rejected.
+- Wildcard scope accepted.
+- Production without service keys fails startup guard.
+- Dev fallback does not work in production.
+- Auditor cannot mutate.
+- Resolver cannot issue credentials.
+
+Run:
+
+```bash
+cd backend && npm test -- service-identity.test.ts security.test.ts rbac.test.ts
+```
+
+## Not Implemented
+
+- OAuth/OIDC.
+- Key rotation.
+- Persistent admin audit log for auth decisions.
+- Per-route exhaustive scope audit across every prototype route.
+- Fine-grained RBAC beyond service scopes.
+
+## Future Work
+
+- Add key identifiers and rotation windows.
+- Persist security decisions to append-only audit storage.
+- Replace compatibility role-header dev mode when service-key clients exist for all tools.

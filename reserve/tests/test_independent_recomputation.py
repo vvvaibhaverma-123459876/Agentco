@@ -40,6 +40,7 @@ def db():
     with conn.cursor() as cur:
         cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE")
         cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE")
+        cur.execute("DROP TABLE IF EXISTS resolution_evidence_snapshots CASCADE")
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE")
         cur.execute((ROOT / "backend/src/db/migrations/011_prediction_ledger.sql").read_text())
         cur.execute((ROOT / "reserve/migrations/001_reserve_extension.sql").read_text())
@@ -50,10 +51,12 @@ def db():
         )
         cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+        cur.execute((ROOT / "backend/src/db/migrations/017_resolution_evidence_snapshots.sql").read_text())
     yield conn
     with conn.cursor() as cur:
         cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE")
         cur.execute("DROP TABLE IF EXISTS credential_domains CASCADE")
+        cur.execute("DROP TABLE IF EXISTS resolution_evidence_snapshots CASCADE")
         cur.execute("DROP TABLE IF EXISTS prediction_ledger CASCADE")
     conn.close()
 

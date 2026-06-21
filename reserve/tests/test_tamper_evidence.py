@@ -38,7 +38,7 @@ def db():
     conn.autocommit = True
     with conn.cursor() as cur:
         for tbl in ("prediction_chain_log", "calibration_credentials",
-                    "credential_domains", "prediction_ledger"):
+                    "credential_domains", "resolution_evidence_snapshots", "prediction_ledger"):
             cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
         cur.execute((ROOT / "backend/src/db/migrations/011_prediction_ledger.sql").read_text())
         cur.execute((ROOT / "reserve/migrations/001_reserve_extension.sql").read_text())
@@ -50,10 +50,11 @@ def db():
         )
         cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+        cur.execute((ROOT / "backend/src/db/migrations/017_resolution_evidence_snapshots.sql").read_text())
     yield conn
     with conn.cursor() as cur:
         for tbl in ("prediction_chain_log", "calibration_credentials",
-                    "credential_domains", "prediction_ledger"):
+                    "credential_domains", "resolution_evidence_snapshots", "prediction_ledger"):
             cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
     conn.close()
 

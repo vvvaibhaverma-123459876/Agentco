@@ -1,4 +1,4 @@
-.PHONY: doctor dev dev-minimal dev-full migrate test smoke smoke-real demo business-demo business-sim clean
+.PHONY: doctor dev dev-minimal dev-full migrate test verify verify-core verify-backend verify-frontend verify-calibration verify-resolution verify-reserve verify-dispatch verify-security verify-epistemic verify-jurisdiction verify-civilization verify-demo verify-acceptance smoke smoke-real demo business-demo business-sim clean
 
 PYTHON ?= python3
 DATABASE_URL ?= postgresql://agentco:password@localhost:5432/agentco
@@ -27,6 +27,49 @@ test:
 	cd backend && npm run build
 	cd frontend && npm test
 	cd frontend && npm run build
+
+verify: verify-core verify-backend verify-frontend verify-calibration verify-resolution verify-reserve verify-dispatch verify-security verify-epistemic verify-jurisdiction verify-civilization verify-demo verify-acceptance
+
+verify-core:
+	$(PYTHON) -m pytest tests/test_resolution_independence_engine.py reserve/tests/test_proof_of_calibration.py reserve/tests/test_ed25519_signing.py
+
+verify-backend:
+	cd backend && npm test -- credential-canonical.test.ts credential-routes.test.ts task-dispatch.test.ts
+	cd backend && npm run build
+
+verify-frontend:
+	cd frontend && npm test
+	cd frontend && npm run build
+
+verify-calibration:
+	$(PYTHON) -m pytest calibration reserve/tests tests/test_resolution_independence_engine.py
+
+verify-resolution:
+	$(PYTHON) -m pytest tests/test_resolution_independence_engine.py tests/integration/test_resolution_evidence_snapshots.py
+
+verify-reserve:
+	$(PYTHON) -m pytest reserve/tests/test_canonical_credential_issuer_service.py reserve/tests/test_ed25519_signing.py
+
+verify-dispatch:
+	cd backend && npm test -- task-dispatch.test.ts
+
+verify-security:
+	cd backend && npm test -- service-identity.test.ts security.test.ts rbac.test.ts
+
+verify-epistemic:
+	$(PYTHON) -m pytest tests/test_epistemic_engine_foundation.py tests/test_epistemic_disputes_and_precedent.py
+
+verify-jurisdiction:
+	$(PYTHON) -m pytest tests/test_jurisdiction_authority.py
+
+verify-civilization:
+	$(PYTHON) -m pytest tests/civilization tests/civilization/test_institution_kernel_lifecycle_services.py
+
+verify-demo:
+	$(MAKE) smoke
+
+verify-acceptance:
+	$(PYTHON) -m json.tool evals/acceptance/latest_core_acceptance.json >/dev/null
 
 smoke:
 	$(PYTHON) scripts/smoke_offline.py

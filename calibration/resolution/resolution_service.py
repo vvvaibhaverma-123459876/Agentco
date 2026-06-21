@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -51,9 +52,13 @@ class ResolutionService:
         ground_truth_source: str,
         evidence: dict,
         *,
-        resolver_id: str = "resolution_service_v1",
+        resolver_id: str | None = None,
         resolver_type: str = "service",
         resolver_role: str = "resolver_service",
+        claim_source_url: str | None = None,
+        resolution_url: str | None = None,
+        claim_source_content: str | None = None,
+        resolution_source_content: str | None = None,
         resolution_source_url: str | None = None,
         resolution_source_owner: str | None = None,
         evidence_fetched_at: datetime | None = None,
@@ -81,8 +86,12 @@ class ResolutionService:
                 record,
                 ground_truth_source,
                 resolver_id=resolver_id,
-                resolution_source_url=resolution_source_url,
+                claim_source_url=claim_source_url,
+                resolution_source_url=resolution_source_url or resolution_url,
                 resolution_source_owner=resolution_source_owner,
+                resolver_type=resolver_type,
+                claim_source_content=claim_source_content,
+                resolution_source_content=resolution_source_content,
                 evidence=evidence,
                 evidence_fetched_at=evidence_fetched_at,
                 outcome_available_at=outcome_available_at,
@@ -117,8 +126,13 @@ class ResolutionService:
         self._record_resolution_lineage(
             record,
             ground_truth_source=ground_truth_source,
-            resolution_source_url=resolution_source_url,
+            claim_source_url=claim_source_url,
+            resolution_source_url=resolution_source_url or resolution_url,
             resolution_source_owner=resolution_source_owner,
+            resolver_id=resolver_id,
+            resolver_type=resolver_type,
+            claim_source_content=claim_source_content,
+            resolution_source_content=resolution_source_content,
             evidence=evidence,
             evidence_fetched_at=evidence_fetched_at,
             outcome_available_at=outcome_available_at,
@@ -155,9 +169,13 @@ class ResolutionService:
         ground_truth_source: str,
         *,
         resolver_id: str,
+        resolver_type: str,
+        claim_source_url: str | None,
         resolution_source_url: str | None,
         resolution_source_owner: str | None,
         evidence: dict,
+        claim_source_content: str | None,
+        resolution_source_content: str | None,
         evidence_fetched_at: datetime | None,
         outcome_available_at: datetime | None,
         dispute_status: str,
@@ -170,72 +188,151 @@ class ResolutionService:
                 f"TIME GATE: cannot resolve before resolution_date "
                 f"(now={now.isoformat()}, resolution_date={record.resolution_date.isoformat()})"
             )
-        src_lower = ground_truth_source.lower()
-        for internal in INTERNAL_SOURCES:
-            if internal in src_lower:
-                raise ValueError(
-                    f"DISQUALIFIED SOURCE: '{ground_truth_source}' is internal. "
-                    "Ground truth must originate outside the reasoning system."
-                )
-        from calibration.resolution.source_independence import build_source_lineage, evaluate_independence
+        production = os.environ.get("AGENTCO_ENV") == "production"
+        if production and not resolver_id:
+            raise ValueError("INDEPENDENCE REJECTED: missing_resolver_identity")
+        if not resolver_id:
+            resolver_id = "resolution_service_v1"
 
-        claim_source_url = (
+        from calibration.resolution.independence_engine import (
+            build_source_fingerprint,
+            content_hash,
+            evaluate_resolution_independence,
+            source_fingerprint_hash,
+            verdict_to_dict,
+        )
+
+        actual_claim_source_url = claim_source_url or (
             f"agentco-ledger://prediction/{record.prediction_id}"
             if record.claim_source_url is None
             else record.claim_source_url
         )
-        claim_source = build_source_lineage(claim_source_url, record.claim_source_owner or "")
-        resolution_source = build_source_lineage(
-            resolution_source_url or ground_truth_source,
-            resolution_source_owner or "",
+        metadata = evidence if isinstance(evidence, dict) else {}
+        claim_source = build_source_fingerprint(
+            actual_claim_source_url,
+            content_hash=content_hash(claim_source_content) or record.claim_evidence_hash or metadata.get("claim_content_hash"),
+            fetched_at=metadata.get("claim_fetched_at") if isinstance(metadata.get("claim_fetched_at"), datetime) else None,
+            source_type=metadata.get("claim_source_type"),
+            publisher=metadata.get("claim_publisher"),
+            publisher_owner=record.claim_source_owner or metadata.get("claim_publisher_owner"),
         )
-        result = evaluate_independence(
+        resolution_source = build_source_fingerprint(
+            resolution_source_url or ground_truth_source,
+            content_hash=content_hash(resolution_source_content) or metadata.get("resolution_content_hash"),
+            fetched_at=evidence_fetched_at,
+            source_type=metadata.get("resolution_source_type"),
+            publisher=metadata.get("resolution_publisher"),
+            publisher_owner=resolution_source_owner or metadata.get("resolution_publisher_owner"),
+        )
+        verdict = evaluate_resolution_independence(
             claim_source=claim_source,
             resolution_source=resolution_source,
-            producer_agent_id=record.producing_agent_id,
+            producing_agent_id=record.producing_agent_id,
             resolver_id=resolver_id,
-            outcome_available_at=outcome_available_at or record.outcome_available_at or record.resolution_date,
-            resolved_at=now,
-            dispute_status=dispute_status,
-            additional_independent_evidence=bool(
-                isinstance(evidence, dict) and evidence.get("additional_independent_evidence")
-            ),
+            resolver_type=resolver_type,
+            production=True,
         )
-        record.independence_status = result.status
-        record.independence_failure_reason = result.failure_reason or None
+        if now < (outcome_available_at or record.outcome_available_at or record.resolution_date):
+            verdict_reason = "resolution_before_outcome_available"
+            record.independence_status = "rejected"
+            record.independence_failure_reason = verdict_reason
+            raise ValueError(f"INDEPENDENCE REJECTED: {verdict_reason}")
+        if dispute_status not in {"none", "resolved"}:
+            verdict_reason = f"disputed_claim:{dispute_status}"
+            record.independence_status = "rejected"
+            record.independence_failure_reason = verdict_reason
+            raise ValueError(f"INDEPENDENCE REJECTED: {verdict_reason}")
+        record.claim_source_url = claim_source.raw_url
+        record.claim_source_canonical_url = claim_source.canonical_url
+        record.claim_source_domain = claim_source.domain
+        record.claim_source_fingerprint = source_fingerprint_hash(claim_source)
+        record.independence_status = (
+            "accepted" if verdict.severity == "pass" else ("warn" if verdict.independent else "rejected")
+        )
+        record.independence_failure_reason = None if verdict.independent else verdict.reason
+        record.independence_verdict = verdict_to_dict(verdict)
         record.dispute_status = dispute_status
-        if result.status != "accepted":
-            raise ValueError(f"INDEPENDENCE REJECTED: {result.failure_reason}")
+        if not verdict.independent:
+            if verdict.reason == "internal_resolution_source":
+                raise ValueError(f"DISQUALIFIED SOURCE: {verdict.reason}")
+            raise ValueError(f"INDEPENDENCE REJECTED: {verdict.reason}")
 
     def _record_resolution_lineage(
         self,
         record: "PredictionRecord",
         *,
         ground_truth_source: str,
+        claim_source_url: str | None,
         resolution_source_url: str | None,
         resolution_source_owner: str | None,
+        resolver_id: str | None,
+        resolver_type: str,
+        claim_source_content: str | None,
+        resolution_source_content: str | None,
         evidence: dict,
         evidence_fetched_at: datetime | None,
         outcome_available_at: datetime | None,
         dispute_status: str,
     ) -> None:
-        from calibration.resolution.source_independence import build_source_lineage, evidence_hash
-
-        resolution_source = build_source_lineage(
-            resolution_source_url or ground_truth_source,
-            resolution_source_owner or "",
+        from calibration.resolution.independence_engine import (
+            build_source_fingerprint,
+            content_hash,
+            evidence_snapshot_hash,
+            source_fingerprint_hash,
+            to_jsonable,
+            verdict_to_dict,
         )
+        from dataclasses import asdict
+
+        metadata = evidence if isinstance(evidence, dict) else {}
+        claim_source = build_source_fingerprint(
+            claim_source_url or record.claim_source_url or f"agentco-ledger://prediction/{record.prediction_id}",
+            content_hash=content_hash(claim_source_content) or record.claim_evidence_hash or metadata.get("claim_content_hash"),
+            source_type=metadata.get("claim_source_type"),
+            publisher=metadata.get("claim_publisher"),
+            publisher_owner=record.claim_source_owner or metadata.get("claim_publisher_owner"),
+        )
+        resolution_source = build_source_fingerprint(
+            resolution_source_url or ground_truth_source,
+            content_hash=content_hash(resolution_source_content) or metadata.get("resolution_content_hash"),
+            fetched_at=evidence_fetched_at,
+            source_type=metadata.get("resolution_source_type"),
+            publisher=metadata.get("resolution_publisher"),
+            publisher_owner=resolution_source_owner or metadata.get("resolution_publisher_owner"),
+        )
+        if not getattr(record, "independence_verdict", None):
+            from calibration.resolution.independence_engine import evaluate_resolution_independence
+            verdict = evaluate_resolution_independence(
+                claim_source=claim_source,
+                resolution_source=resolution_source,
+                producing_agent_id=record.producing_agent_id,
+                resolver_id=resolver_id,
+                resolver_type=resolver_type,
+                production=True,
+            )
+            record.independence_verdict = verdict_to_dict(verdict)
         record.resolution_source_url = resolution_source.raw_url
         record.resolution_source_canonical_url = resolution_source.canonical_url
         record.resolution_source_domain = resolution_source.domain
-        record.resolution_source_owner = resolution_source.owner
-        record.resolution_source_fingerprint = resolution_source.fingerprint
-        record.evidence_snapshot_hash = evidence_hash(evidence)
+        record.resolution_source_owner = resolution_source.publisher_owner
+        record.resolution_source_fingerprint = source_fingerprint_hash(resolution_source)
+        record.evidence_snapshot_hash = evidence_snapshot_hash(evidence)
         record.evidence_fetched_at = evidence_fetched_at or datetime.now(timezone.utc)
         record.outcome_available_at = outcome_available_at or record.outcome_available_at or record.resolution_date
-        record.independence_status = "accepted"
-        record.independence_failure_reason = None
+        if record.independence_status == "unresolved":
+            record.independence_status = "accepted"
+            record.independence_failure_reason = None
         record.dispute_status = dispute_status
+        record.resolution_evidence_snapshot = {
+            "prediction_id": record.prediction_id,
+            "resolver_id": resolver_id or "resolution_service_v1",
+            "resolver_type": resolver_type,
+            "claim_source_fingerprint": to_jsonable(asdict(claim_source)),
+            "resolution_source_fingerprint": to_jsonable(asdict(resolution_source)),
+            "independence_verdict": record.independence_verdict,
+            "evidence": evidence,
+            "evidence_hash": record.evidence_snapshot_hash,
+        }
 
     def _write_audit_event(self, event_type: str, **fields: object) -> None:
         self.audit_events.append(

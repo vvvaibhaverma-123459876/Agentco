@@ -209,7 +209,12 @@ def run(agent_filter: str = "research-agent", min_confidence: float = 0.8):
                         "llm_confidence": llm_conf,
                         "evidence_sentence": evidence,
                         "model": model,
+                        "resolution_source_type": "external_web_page",
                     },
+                    resolver_id="resolution-service-checker",
+                    resolver_type="service",
+                    claim_source_url=claim_source_url,
+                    resolution_url=resolution_url,
                 )
                 # Persist to DB with resolution_service role
                 ledger._db = svc_conn

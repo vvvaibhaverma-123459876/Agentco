@@ -88,6 +88,8 @@ class PredictionRecord:
     independence_status: str = "unresolved"
     independence_failure_reason: Optional[str] = None
     dispute_status: str = "none"
+    independence_verdict: Optional[dict[str, Any]] = None
+    resolution_evidence_snapshot: Optional[dict[str, Any]] = None
 
 
 class PredictionLedger:
@@ -220,26 +222,75 @@ class PredictionLedger:
         """
         if self._db is None:
             return
+        old_autocommit = getattr(self._db, "autocommit", None)
+        if old_autocommit is True:
+            self._db.autocommit = False
+        try:
+            if record.resolution_evidence_snapshot:
+                self.persist_resolution_evidence_snapshot(record)
+            else:
+                raise RuntimeError("resolution cannot persist without independence verdict/evidence snapshot")
+            with self._db.cursor() as cur:
+                cur.execute(
+                    """
+                    UPDATE prediction_ledger
+                       SET resolved = %s,
+                           resolved_outcome = %s,
+                           resolved_at = %s,
+                           resolved_by_service = %s,
+                           brier_score = %s,
+                           log_score = %s,
+                           was_surprise = %s
+                     WHERE prediction_id = %s
+                    """,
+                    (
+                        record.resolved, record.resolved_outcome, record.resolved_at,
+                        record.resolved_by_service, record.brier_score,
+                        record.log_score, record.was_surprise, record.prediction_id,
+                    ),
+                )
+            self._commit()
+        except Exception:
+            rollback = getattr(self._db, "rollback", None)
+            if callable(rollback):
+                rollback()
+            raise
+        finally:
+            if old_autocommit is True:
+                self._db.autocommit = True
+
+    def persist_resolution_evidence_snapshot(self, record: PredictionRecord) -> None:
+        """Append durable evidence metadata for a resolved prediction when supported."""
+        if self._db is None or not record.resolution_evidence_snapshot:
+            return
+        import json
+        snapshot = record.resolution_evidence_snapshot
         with self._db.cursor() as cur:
-            cur.execute(
-                """
-                UPDATE prediction_ledger
-                   SET resolved = %s,
-                       resolved_outcome = %s,
-                       resolved_at = %s,
-                       resolved_by_service = %s,
-                       brier_score = %s,
-                       log_score = %s,
-                       was_surprise = %s
-                 WHERE prediction_id = %s
-                """,
-                (
-                    record.resolved, record.resolved_outcome, record.resolved_at,
-                    record.resolved_by_service, record.brier_score,
-                    record.log_score, record.was_surprise, record.prediction_id,
-                ),
-            )
-        self._commit()
+            try:
+                cur.execute(
+                    """
+                    INSERT INTO resolution_evidence_snapshots
+                        (id, prediction_id, resolver_id, resolver_type,
+                         claim_source_fingerprint, resolution_source_fingerprint,
+                         independence_verdict, evidence, evidence_hash)
+                    VALUES (%s, %s, %s, %s, %s::jsonb, %s::jsonb, %s::jsonb, %s::jsonb, %s)
+                    """,
+                    (
+                        str(uuid.uuid4()),
+                        record.prediction_id,
+                        snapshot["resolver_id"],
+                        snapshot["resolver_type"],
+                        json.dumps(snapshot["claim_source_fingerprint"], default=str),
+                        json.dumps(snapshot["resolution_source_fingerprint"], default=str),
+                        json.dumps(snapshot["independence_verdict"], default=str),
+                        json.dumps(snapshot["evidence"], default=str),
+                        snapshot["evidence_hash"],
+                    ),
+                )
+            except Exception as exc:
+                raise RuntimeError(
+                    "resolution evidence snapshot could not be persisted; refusing partial resolution metadata"
+                ) from exc
 
     # ------------------------------------------------------------------ DB I/O
 

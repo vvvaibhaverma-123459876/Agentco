@@ -2,6 +2,17 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 
 const DEV_API_KEY = 'dev-api-key';
 
+export interface Principal {
+  principal_id: string;
+  scopes: string[];
+  auth_method: 'service_key' | 'dev_api_key';
+}
+
+interface ServiceKeyConfig {
+  key: string;
+  scopes: string[];
+}
+
 export function isProductionEnv(env: NodeJS.ProcessEnv = process.env): boolean {
   return env.AGENTCO_ENV === 'production';
 }
@@ -15,6 +26,7 @@ export function assertProductionSecrets(env: NodeJS.ProcessEnv = process.env): v
 
   const failures: string[] = [];
   if (!env.AGENTCO_API_KEY || env.AGENTCO_API_KEY === DEV_API_KEY) failures.push('AGENTCO_API_KEY');
+  if (!env.AGENTCO_SERVICE_KEYS_JSON) failures.push('AGENTCO_SERVICE_KEYS_JSON');
   if (!env.EVENT_BUS_SIGNING_KEY || env.EVENT_BUS_SIGNING_KEY === 'dev-key-replace-in-production') failures.push('EVENT_BUS_SIGNING_KEY');
   if (!env.EVENT_BUS_HMAC_KEY || env.EVENT_BUS_HMAC_KEY === 'dev-insecure-key') failures.push('EVENT_BUS_HMAC_KEY');
   if (!env.JWT_SECRET || env.JWT_SECRET === 'change-me-generate-with-openssl-rand-hex-64') failures.push('JWT_SECRET');
@@ -27,6 +39,22 @@ export function assertProductionSecrets(env: NodeJS.ProcessEnv = process.env): v
     throw new Error(
       `Refusing to start in production with dev-default or missing secrets: ${failures.join(', ')}`
     );
+  }
+}
+
+export function parseServiceKeys(env: NodeJS.ProcessEnv = process.env): Record<string, ServiceKeyConfig> {
+  const raw = env.AGENTCO_SERVICE_KEYS_JSON;
+  if (!raw) return {};
+  try {
+    const parsed = JSON.parse(raw) as Record<string, ServiceKeyConfig>;
+    for (const [principalId, config] of Object.entries(parsed)) {
+      if (!config || typeof config.key !== 'string' || !Array.isArray(config.scopes)) {
+        throw new Error(`invalid service key config for ${principalId}`);
+      }
+    }
+    return parsed;
+  } catch (error) {
+    throw new Error(`Invalid AGENTCO_SERVICE_KEYS_JSON: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -50,14 +78,14 @@ export type AgentcoRole =
   | 'service';
 
 const ROLE_SCOPES: Record<AgentcoRole, string[]> = {
-  agent: ['claims:register', 'trust:read'],
-  resolver_service: ['claims:resolve', 'claims:audit', 'trust:read'],
-  reserve_issuer: ['credentials:issue', 'credentials:verify', 'trust:read'],
+  agent: ['claims:register', 'trust:read', 'task:read', 'read:*'],
+  resolver_service: ['claims:resolve', 'claims:audit', 'prediction:resolve', 'evidence:write', 'trust:read'],
+  reserve_issuer: ['credentials:issue', 'credentials:verify', 'credential:issue', 'credential:verify', 'trust:read'],
   human_reviewer: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate'],
-  auditor: ['audit:read', 'claims:audit', 'credentials:verify', 'trust:read'],
-  operator: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate', 'audit:read'],
-  admin: ['config:manage', 'audit:read'],
-  service: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate', 'claims:register', 'audit:read'],
+  auditor: ['audit:read', 'claims:audit', 'credentials:verify', 'credential:verify', 'trust:read', 'task:read', 'read:*'],
+  operator: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate', 'governance:*', 'audit:read', 'task:dispatch', 'task:read', 'task:cancel'],
+  admin: ['config:manage', 'admin:*', 'audit:read', 'governance:*', 'task:dispatch', 'task:read', 'task:cancel', 'credential:issue', 'credential:verify'],
+  service: ['institutions:mutate', 'outputs:mutate', 'reviews:mutate', 'governance:mutate', 'claims:register', 'audit:read', 'task:dispatch', 'task:read', 'task:cancel'],
 };
 
 export const privilegedSecurityEvents: Array<Record<string, unknown>> = [];
@@ -77,24 +105,59 @@ export function auditSecurityDecision(req: FastifyRequest, decision: string, rea
     decision,
     reason,
     role: header(req, 'x-agentco-role') || 'none',
+    principal_id: (req as FastifyRequest & { principal?: Principal }).principal?.principal_id ?? 'none',
     path: req.url,
     method: req.method,
     createdAt: new Date().toISOString(),
   });
 }
 
+function providedKey(req: FastifyRequest): string {
+  return header(req, 'x-agentco-service-key') || header(req, 'x-agentco-api-key');
+}
+
+export function authenticateRequest(req: FastifyRequest, env: NodeJS.ProcessEnv = process.env): Principal | undefined {
+  const key = providedKey(req);
+  if (!key) return undefined;
+
+  const serviceKeys = parseServiceKeys(env);
+  for (const [principalId, config] of Object.entries(serviceKeys)) {
+    if (key === config.key) {
+      return { principal_id: principalId, scopes: config.scopes, auth_method: 'service_key' };
+    }
+  }
+
+  if (!isProductionEnv(env) && key === (env.AGENTCO_API_KEY || DEV_API_KEY)) {
+    const role = roleFromRequest(req);
+    if (!role) return undefined;
+    return {
+      principal_id: `dev-role:${role}`,
+      scopes: ROLE_SCOPES[role],
+      auth_method: 'dev_api_key',
+    };
+  }
+  return undefined;
+}
+
+export function hasScope(principal: Principal, requiredScope: string): boolean {
+  return principal.scopes.some((scope) => (
+    scope === requiredScope
+    || scope === '*'
+    || (scope.endsWith(':*') && requiredScope.startsWith(scope.slice(0, -1)))
+  ));
+}
+
 export function requireScope(scope: string) {
   return async function scopedAuth(req: FastifyRequest, reply: FastifyReply) {
-    const keyResult = await requireApiKey(req, reply);
-    if (reply.sent) return keyResult;
-    const role = roleFromRequest(req);
-    if (!role) {
-      auditSecurityDecision(req, 'rejected', 'missing_or_invalid_role');
-      return reply.status(403).send({ error: 'valid x-agentco-role required' });
+    const principal = authenticateRequest(req);
+    if (!principal) {
+      auditSecurityDecision(req, 'rejected', 'missing_or_invalid_principal');
+      return reply.status(401).send({ error: 'valid service key required' });
     }
-    if (!ROLE_SCOPES[role].includes(scope)) {
+    (req as FastifyRequest & { principal?: Principal }).principal = principal;
+    if (!hasScope(principal, scope)) {
       auditSecurityDecision(req, 'rejected', `missing_scope:${scope}`);
-      return reply.status(403).send({ error: `role ${role} lacks scope ${scope}` });
+      return reply.status(403).send({ error: `principal ${principal.principal_id} lacks scope ${scope}` });
     }
   };
 }
@@ -103,4 +166,32 @@ export function assertAgentNotResolvingOwnClaim(agentId: string | undefined, res
   if (agentId && resolverId && agentId === resolverId) {
     throw new Error('agent cannot resolve own claim');
   }
+}
+
+export async function checkEmergencyShutdown(): Promise<boolean> {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const yaml = require('js-yaml');
+    const controlsPath = path.resolve(__dirname, '..', '..', 'civilization', 'controls.yaml');
+    const content = fs.readFileSync(controlsPath, 'utf-8');
+    const controls = yaml.load(content) as Record<string, unknown>;
+    return Boolean(controls.emergency_shutdown_flag);
+  } catch {
+    return false;
+  }
+}
+
+export function requireEmergencyShutdownOff(riskLevel: 'low' | 'medium' | 'high' = 'medium') {
+  return async function emergencyCheck(req: FastifyRequest, reply: FastifyReply) {
+    const shutdown = await checkEmergencyShutdown();
+    if (shutdown && riskLevel !== 'low') {
+      auditSecurityDecision(req, 'rejected', `emergency_shutdown_active:${riskLevel}_risk`);
+      return reply.status(503).send({
+        error: 'emergency shutdown active',
+        risk_level: riskLevel,
+        message: `${riskLevel}-risk operations are blocked during emergency shutdown`,
+      });
+    }
+  };
 }

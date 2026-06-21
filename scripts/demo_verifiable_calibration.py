@@ -116,7 +116,12 @@ def main() -> int:
             "source_url": INDEPENDENT_SOURCE,
             "evidence": "Python documentation lists Python 3.12.0 final as released on 2023-10-02.",
             "independence_check": "passed",
+            "resolution_source_type": "external_documentation",
         },
+        resolver_id="resolution-service-demo",
+        resolver_type="service",
+        claim_source_url=CLAIM_SOURCE,
+        resolution_url=INDEPENDENT_SOURCE,
     )
     ledger._db = svc_conn
     ledger.persist_resolution(resolved)
