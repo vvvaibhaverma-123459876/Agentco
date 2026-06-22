@@ -385,8 +385,7 @@ export class AutonomyOrchestratorService {
         `INSERT INTO reward_functions (
           id, name, domain, version, formula_json, owner, risk_level, created_by
         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT (name, version) DO UPDATE SET id = EXCLUDED.id
-         RETURNING id`,
+         ON CONFLICT (name, version) DO NOTHING`,
         [
           rewardFunctionId,
           rewardFunctionName,
