@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS eval_runs (
 
 CREATE TABLE IF NOT EXISTS eval_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    eval_run_id UUID NOT NULL REFERENCES eval_runs(id),
+    eval_run_id UUID NOT NULL,
     test_case_id TEXT NOT NULL,
     test_name TEXT NOT NULL,
     passed BOOLEAN NOT NULL,
