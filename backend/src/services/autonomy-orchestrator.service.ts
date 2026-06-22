@@ -83,6 +83,14 @@ export class AutonomyOrchestratorService {
       console.log(`[${autonomyRun.runId}] STEP 1: Ingesting perception source...`);
       await this.observability.beginTrace({ traceId, runId });
 
+      // Ensure perception source exists
+      const sourceId = 'test-source-001';
+      await db.query(
+        `INSERT INTO perception_sources (id, name, uri, fingerprint_type) VALUES ($1, $2, $3, $4)
+         ON CONFLICT (id) DO NOTHING`,
+        [sourceId, 'Test Source', 'http://test/perception', 'sha256']
+      );
+
       // Create perception event
       const perceptionEventId = uuidv4();
       await db.query(
@@ -91,7 +99,7 @@ export class AutonomyOrchestratorService {
         ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7)`,
         [
           perceptionEventId,
-          'test-source-001',
+          sourceId,
           'test_event',
           'http://test/perception',
           'test-fingerprint-001',
@@ -123,18 +131,19 @@ export class AutonomyOrchestratorService {
       await db.query(
         `INSERT INTO autonomy_goals (
           id, title, description, source, domain, expected_value, risk_level,
-          autonomy_level_allowed, status, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
+          autonomy_level_allowed, status, proposed_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           goalId,
           'LEVEL_3 Autonomy Smoke Test',
           'Execute a controlled autonomy loop with persistence and eval',
-          'autonomy_orchestrator',
+          'system',
           'testing',
           0.8,
           'low',
           3,
           'proposed',
+          'autonomy_orchestrator_smoke_test',
         ]
       );
 
@@ -156,9 +165,17 @@ export class AutonomyOrchestratorService {
       const taskId = uuidv4();
       await db.query(
         `INSERT INTO autonomy_tasks (
-          id, goal_id, status, autonomy_level, risk_level, created_at
-        ) VALUES ($1, $2, $3, $4, $5, NOW())`,
-        [taskId, goalId, 'created', autonomyLevel, riskLevel]
+          id, task_type, title, source, status, autonomy_level, risk_level
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [
+          taskId,
+          'plan_execution',
+          'LEVEL_3 Autonomy Task',
+          'system',
+          'created',
+          autonomyLevel,
+          riskLevel,
+        ]
       );
       autonomyRun.taskId = taskId;
 
@@ -403,8 +420,8 @@ export class AutonomyOrchestratorService {
       } else {
         suiteId = uuidv4();
         await db.query(
-          `INSERT INTO eval_suites (id, suite_name, active) VALUES ($1, $2, $3)`,
-          [suiteId, 'default_eval_suite', true]
+          `INSERT INTO eval_suites (id, name, eval_type, active, total_cases) VALUES ($1, $2, $3, $4, $5)`,
+          [suiteId, 'default_eval_suite', 'safety', true, 0]
         );
       }
 
@@ -437,9 +454,9 @@ export class AutonomyOrchestratorService {
         const canaryPlanId = uuidv4();
         await db.query(
           `INSERT INTO canary_plans (
-            id, artifact_id, deployment_percentage, rollback_threshold, status
-          ) VALUES ($1, $2, $3, $4, $5)`,
-          [canaryPlanId, candidate.artifactId, 5, 0.1, 'created']
+            id, artifact_id, target_service, initial_percentage, max_percentage, status
+          ) VALUES ($1, $2, $3, $4, $5, $6)`,
+          [canaryPlanId, autonomyRun.candidateId, 'autonomy_policy', 5, 10, 'pending']
         );
 
         // Simulate forced regression and rollback
