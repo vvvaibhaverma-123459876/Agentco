@@ -222,29 +222,31 @@ export class AutonomyOrchestratorService {
       const step2Id = uuidv4();
       await db.query(
         `INSERT INTO autonomy_plan_steps (
-          id, plan_id, step_index, step_type, description, expected_outcome_json
-        ) VALUES ($1, $2, $3, $4, $5, $6)`,
+          id, plan_id, step_index, title, description, expected_output_schema, risk_level
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           step1Id,
           planId,
           1,
-          'observation',
+          'Observation',
           'Observe system state and environment',
           JSON.stringify({ type: 'observation', fields: ['time', 'state', 'context'] }),
+          'low',
         ]
       );
 
       await db.query(
         `INSERT INTO autonomy_plan_steps (
-          id, plan_id, step_index, step_type, description, expected_outcome_json
-        ) VALUES ($1, $2, $3, $4, $5, $6)`,
+          id, plan_id, step_index, title, description, expected_output_schema, risk_level
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           step2Id,
           planId,
           2,
-          'action',
+          'Action',
           'Execute test action based on observation',
           JSON.stringify({ type: 'action', fields: ['success', 'outcome', 'metrics'] }),
+          'low',
         ]
       );
 
