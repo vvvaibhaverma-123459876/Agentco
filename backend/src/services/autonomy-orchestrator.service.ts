@@ -346,23 +346,48 @@ export class AutonomyOrchestratorService {
         ]
       );
 
-      await db.query(`UPDATE autonomy_episodes SET outcome_status = 'success' WHERE id = $1`, [
-        episode.id,
-      ]);
-
       // ===== STEP 13: Calculate reward =====
       autonomyRun.currentStep = 13;
       autonomyRun.status = 'reward_calculation';
       console.log(`[${autonomyRun.runId}] STEP 13: Calculating reward...`);
 
+      // Create or get reward function
+      const rewardFunctionId = uuidv4();
+      const rewardFunctionName = 'default_reward_function';
+      await db.query(
+        `INSERT INTO reward_functions (
+          id, name, domain, version, formula_json, owner, risk_level, created_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         ON CONFLICT (name, version) DO UPDATE SET id = EXCLUDED.id
+         RETURNING id`,
+        [
+          rewardFunctionId,
+          rewardFunctionName,
+          'autonomy',
+          '1.0',
+          JSON.stringify({ type: 'linear', weights: { completion: 0.4, safety: 0.6 } }),
+          'system',
+          'low',
+          'autonomy_orchestrator',
+        ]
+      );
+
+      // Get the actual reward_function_id (might be from existing or new)
+      const rfResult = await db.query(
+        `SELECT id FROM reward_functions WHERE name = $1 AND version = $2 LIMIT 1`,
+        [rewardFunctionName, '1.0']
+      );
+      const actualRewardFunctionId = rfResult.rows[0]?.id || rewardFunctionId;
+
       const rewardCalcId = uuidv4();
       await db.query(
         `INSERT INTO reward_calculations (
-          id, outcome_id, reward_score, components_json
-        ) VALUES ($1, $2, $3, $4)`,
+          id, outcome_id, reward_function_id, reward_score, components_json
+        ) VALUES ($1, $2, $3, $4, $5)`,
         [
           rewardCalcId,
           outcomeId,
+          actualRewardFunctionId,
           0.8,
           JSON.stringify({
             completion: 1.0,
@@ -373,10 +398,6 @@ export class AutonomyOrchestratorService {
           }),
         ]
       );
-
-      await db.query(`UPDATE autonomy_episodes SET reward_score = 0.8 WHERE id = $1`, [
-        episode.id,
-      ]);
 
       // ===== STEP 14: Create replay batch =====
       autonomyRun.currentStep = 14;
