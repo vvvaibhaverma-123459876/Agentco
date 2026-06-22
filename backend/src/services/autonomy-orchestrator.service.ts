@@ -86,9 +86,9 @@ export class AutonomyOrchestratorService {
       // Ensure perception source exists
       const sourceId = 'test-source-001';
       await db.query(
-        `INSERT INTO perception_sources (id, name, uri, fingerprint_type) VALUES ($1, $2, $3, $4)
+        `INSERT INTO perception_sources (id, source_type, name) VALUES ($1, $2, $3)
          ON CONFLICT (id) DO NOTHING`,
-        [sourceId, 'Test Source', 'http://test/perception', 'sha256']
+        [sourceId, 'http_readonly', 'Test Source']
       );
 
       // Create perception event
