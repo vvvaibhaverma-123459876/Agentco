@@ -119,9 +119,10 @@ export class LearnerService {
     learnerRunId: string,
     candidateType: LearnerCandidate['candidateType'] = 'prompt_update'
   ): Promise<LearnerCandidate> {
-    // Get learner run
+    // Get learner run (with row-level lock to prevent concurrent modification)
     const runResult = await db.query(
-      `SELECT id, replay_batch_id, baseline_metrics_json FROM learner_runs WHERE id = $1`,
+      `SELECT id, replay_batch_id, baseline_metrics_json FROM learner_runs
+       WHERE id = $1 FOR UPDATE`,
       [learnerRunId]
     );
 
@@ -135,9 +136,9 @@ export class LearnerService {
       ? JSON.parse(run.baseline_metrics_json)
       : run.baseline_metrics_json;
 
-    // Get trajectories from replay batch
+    // Get trajectories from replay batch (with row-level lock)
     const batchResult = await db.query(
-      `SELECT trajectory_ids FROM replay_batches WHERE id = $1`,
+      `SELECT trajectory_ids FROM replay_batches WHERE id = $1 FOR UPDATE`,
       [replayBatchId]
     );
 

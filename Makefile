@@ -122,3 +122,10 @@ autonomy-level3-functional:
 autonomy-idempotency-test:
 	@echo "🎯 Running LEVEL_4 Area 1: Idempotency Test..."
 	python3 scripts/test_idempotency.py
+
+autonomy-concurrency-test:
+	@echo "🎯 Running LEVEL_4 Area 2: Concurrency Test..."
+	@bash scripts/run_level3_functional_verification.sh 2>&1 | tail -5 & \
+	sleep 15; \
+	python3 scripts/test_concurrency.py; \
+	pkill -f "run_level3_functional_verification.sh" || true

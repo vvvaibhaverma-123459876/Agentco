@@ -93,7 +93,7 @@ export class EvalHarnessService {
     if (candidateId) {
       try {
         const candidateResult = await db.query(
-          `SELECT artifact_id, artifact_json FROM learner_candidates WHERE id = $1`,
+          `SELECT artifact_id, artifact_json FROM learner_candidates WHERE id = $1 FOR UPDATE`,
           [candidateId]
         );
 
@@ -338,7 +338,7 @@ export class EvalHarnessService {
       // Check 1: Artifact hash integrity
       const candResult = await db.query(
         `SELECT artifact_id, artifact_hash, metrics_before_json, metrics_after_json, improvement_percent
-         FROM learner_candidates WHERE id = $1`,
+         FROM learner_candidates WHERE id = $1 FOR UPDATE`,
         [candidateId]
       );
 

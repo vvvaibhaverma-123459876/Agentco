@@ -6,6 +6,7 @@ import { LearnerService } from './learner.service';
 import { EvalHarnessService } from './eval-harness.service';
 import { SelfModificationValidator } from './self-modification-validator.service';
 import { ObservabilityService } from './observability.service';
+import { WorkerCoordinatorService } from './worker-coordinator.service';
 
 export interface AutonomyRun {
   id: string;
@@ -56,6 +57,7 @@ export class AutonomyOrchestratorService {
   private evalHarness = new EvalHarnessService();
   private selfModValidator = new SelfModificationValidator();
   private observability = new ObservabilityService();
+  private workerCoordinator = new WorkerCoordinatorService();
 
   /**
    * Execute full LEVEL_3 autonomy smoke test loop
@@ -205,6 +207,19 @@ export class AutonomyOrchestratorService {
         ]
       );
       autonomyRun.taskId = taskId;
+
+      // CONCURRENCY: Acquire lease for this task to prevent parallel execution
+      let leaseId: string;
+      try {
+        leaseId = await this.workerCoordinator.acquireTaskLease(taskId, 120000); // 2-minute lease
+        console.log(`[CONCURRENCY] Acquired lease ${leaseId} for task ${taskId}`);
+      } catch (error: any) {
+        if (error.message.includes('already leased')) {
+          console.log(`[CONCURRENCY] Task ${taskId} is locked by another worker, aborting`);
+          throw new Error(`Task is currently being executed by another worker`);
+        }
+        throw error;
+      }
 
       // ===== STEP 6: Create durable workflow/checkpoint =====
       autonomyRun.currentStep = 6;
