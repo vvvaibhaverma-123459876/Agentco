@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS memory_events (
     trace_id TEXT
 );
 
-CREATE TABLE IF NOT EXISTS eval_runs (
+CREATE TABLE IF NOT EXISTS benchmark_eval_runs (
     eval_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     benchmark TEXT NOT NULL,
     slice TEXT NOT NULL,
