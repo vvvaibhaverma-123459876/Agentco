@@ -1,0 +1,75 @@
+benchmarks:
+  simpleqa_sample:
+    benchmark_id: simpleqa_sample
+    name: SimpleQA Sample
+    description: Simple factual question-answering benchmark with 10-sample fixture
+    task_type: free_form
+    dataset_uri: file://evals/registry/datasets/simpleqa_sample.jsonl
+    dataset_version: v1
+    split: test
+    scorer_ids: [exact_match, normalized_string]
+    license: CC-BY-4.0
+    metadata:
+      sample_size: 10
+      domains: [general_knowledge, factual]
+      expected_accuracy_baseline: 0.75
+
+  truthfulqa_sample:
+    benchmark_id: truthfulqa_sample
+    name: TruthfulQA Sample
+    description: Truthfulness evaluation benchmark with 10-sample fixture
+    task_type: multiple_choice
+    dataset_uri: file://evals/registry/datasets/truthfulqa_sample.jsonl
+    dataset_version: v1
+    split: test
+    scorer_ids: [exact_match]
+    license: CC-BY-4.0
+    metadata:
+      sample_size: 10
+      domains: [truthfulness, misconceptions]
+      expected_accuracy_baseline: 0.65
+
+  halueval_sample:
+    benchmark_id: halueval_sample
+    name: HaluEval Sample
+    description: Hallucination evaluation benchmark with 10-sample fixture
+    task_type: binary_classification
+    dataset_uri: file://evals/registry/datasets/halueval_sample.jsonl
+    dataset_version: v1
+    split: test
+    scorer_ids: [binary]
+    license: CC-BY-4.0
+    metadata:
+      sample_size: 10
+      domains: [hallucination_detection]
+      expected_accuracy_baseline: 0.70
+
+  agent_tool_use_smoke:
+    benchmark_id: agent_tool_use_smoke
+    name: Agent Tool-Use Smoke Test
+    description: Smoke test for agent tool-use capabilities
+    task_type: agent_task
+    dataset_uri: file://evals/registry/datasets/agent_tool_use_smoke.jsonl
+    dataset_version: v1
+    split: test
+    scorer_ids: [tool_use]
+    license: CC-BY-4.0
+    metadata:
+      sample_size: 5
+      requires_tool_use: true
+      expected_accuracy_baseline: 0.80
+
+  calibration_binary_claims:
+    benchmark_id: calibration_binary_claims
+    name: Calibration Binary Claims
+    description: Binary claim evaluation for calibration measurement
+    task_type: binary_classification
+    dataset_uri: file://evals/registry/datasets/calibration_binary_claims.jsonl
+    dataset_version: v1
+    split: test
+    scorer_ids: [binary]
+    license: CC-BY-4.0
+    metadata:
+      sample_size: 20
+      focus: [calibration, confidence]
+      expected_accuracy_baseline: 0.75
