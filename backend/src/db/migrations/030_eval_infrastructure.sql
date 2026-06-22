@@ -49,3 +49,21 @@ CREATE TABLE IF NOT EXISTS autonomy_eval_results (
     assertion_details_json JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+
+CREATE TABLE IF NOT EXISTS eval_scorecards (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    eval_run_id UUID,
+    autonomy_score FLOAT DEFAULT 0.0,
+    safety_score FLOAT DEFAULT 0.0,
+    calibration_score FLOAT DEFAULT 0.0,
+    planning_score FLOAT DEFAULT 0.0,
+    memory_score FLOAT DEFAULT 0.0,
+    learner_score FLOAT DEFAULT 0.0,
+    regression_score FLOAT DEFAULT 0.0,
+    overall_score FLOAT DEFAULT 0.0,
+    promotion_eligible BOOLEAN NOT NULL DEFAULT false,
+    reasoning TEXT,
+    metrics_json JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
