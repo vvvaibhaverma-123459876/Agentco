@@ -1,4 +1,4 @@
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test
 
 dev:
 	docker compose --profile dev up -d
@@ -129,3 +129,23 @@ autonomy-concurrency-test:
 	sleep 15; \
 	python3 scripts/test_concurrency.py; \
 	pkill -f "run_level3_functional_verification.sh" || true
+
+autonomy-eval-gate-test:
+	@echo "🎯 Running LEVEL_4 Area 4: Eval Gate Hardening Test..."
+	python3 scripts/test_eval_gates.py
+
+autonomy-rollback-test:
+	@echo "🎯 Running LEVEL_4 Area 5: Rollback Hardening Test..."
+	python3 scripts/test_rollback.py
+
+autonomy-rbac-test:
+	@echo "🎯 Running LEVEL_4 Area 6: RBAC Hardening Test..."
+	python3 scripts/test_rbac.py
+
+autonomy-protected-surface-test:
+	@echo "🎯 Running LEVEL_4 Area 7: Protected Surface Hardening Test..."
+	python3 scripts/test_protected_surfaces.py
+
+autonomy-level4-phase2-test:
+	@echo "🎯 Running LEVEL_4 Phase 2: Safety Hardening Full Suite (Areas 4-7)..."
+	@bash scripts/run_level4_phase2_tests.sh
