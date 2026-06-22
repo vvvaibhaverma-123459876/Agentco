@@ -90,11 +90,28 @@ class LocalFileAdapter(PerceptionAdapter):
     async def fetch(self, source_uri: str) -> Dict[str, Any]:
         """Fetch from local file"""
         import os
+        import tempfile
 
         # Security: validate path
         path = source_uri.replace('file://', '')
-        if '..' in path or path.startswith('/'):
-            raise ValueError(f"Invalid file path: {path}")
+
+        # Block path traversal
+        if '..' in path:
+            raise ValueError(f"Path traversal not allowed: {path}")
+
+        # Allow: /tmp, /var/folders (macOS temp), project root
+        abs_path = os.path.abspath(path)
+        project_root = '/Users/Zet/Agentco'
+        temp_dir = tempfile.gettempdir()
+
+        allowed = False
+        if abs_path.startswith(temp_dir):
+            allowed = True
+        elif abs_path.startswith(project_root):
+            allowed = True
+
+        if not allowed:
+            raise ValueError(f"Path outside allowed directories: {path}")
 
         if not os.path.exists(path):
             raise FileNotFoundError(f"File not found: {path}")
@@ -207,6 +224,86 @@ class SimulatorAdapter(PerceptionAdapter):
         )
 
 
+class HTTPReadOnlyAdapter(PerceptionAdapter):
+    """Adapter for read-only HTTP sources with allowlist enforcement"""
+
+    def __init__(self, adapter_id: str = 'http_readonly'):
+        super().__init__(adapter_id, 'http_readonly')
+        self.max_content_size = 100 * 1024 * 1024  # 100 MB
+
+    async def fetch(self, source_uri: str, allowlist: list = None, max_size_mb: int = 100,
+                    allowed_mime_types: list = None) -> Dict[str, Any]:
+        """Fetch from HTTP with allowlist enforcement"""
+        import urllib.parse
+        import urllib.request
+
+        # Parse URL
+        parsed = urllib.parse.urlparse(source_uri)
+        domain = parsed.netloc
+
+        # Check allowlist
+        if allowlist and domain not in allowlist:
+            raise ValueError(f"Domain not in allowlist: {domain}")
+
+        # Size limit
+        max_bytes = max_size_mb * 1024 * 1024
+
+        # Fetch (GET only, no POST/PUT/DELETE)
+        try:
+            req = urllib.request.Request(source_uri, method='GET')
+            with urllib.request.urlopen(req, timeout=10) as response:
+                # Check content length
+                content_length = response.headers.get('Content-Length')
+                if content_length and int(content_length) > max_bytes:
+                    raise ValueError(f"Content too large: {content_length} bytes (max {max_bytes})")
+
+                # Get MIME type
+                mime_type = response.headers.get('Content-Type', 'application/octet-stream')
+
+                # Check MIME type
+                if allowed_mime_types and mime_type not in allowed_mime_types:
+                    raise ValueError(f"MIME type not allowed: {mime_type}")
+
+                # Read content
+                content = response.read(max_bytes)
+
+                if len(content) > max_bytes:
+                    raise ValueError(f"Content too large: {len(content)} bytes")
+
+                return {
+                    'url': source_uri,
+                    'domain': domain,
+                    'content': content.decode('utf-8', errors='replace'),
+                    'mime_type': mime_type,
+                    'content_length': len(content),
+                    'status_code': response.status,
+                }
+
+        except urllib.error.URLError as e:
+            raise ValueError(f"HTTP fetch failed: {e}")
+
+    async def normalize(self, raw_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Normalize HTTP response"""
+        return {
+            'type': 'http_content',
+            'url': raw_data.get('url'),
+            'domain': raw_data.get('domain'),
+            'content': raw_data.get('content'),
+            'mime_type': raw_data.get('mime_type'),
+            'size_bytes': raw_data.get('content_length'),
+            'status_code': raw_data.get('status_code'),
+        }
+
+    async def validate(self, data: Dict[str, Any]) -> bool:
+        """Validate HTTP data"""
+        return (
+            data.get('type') == 'http_content'
+            and 'url' in data
+            and 'content' in data
+            and data.get('status_code') == 200
+        )
+
+
 class PerceptionAdapterRegistry:
     """Registry of available adapters"""
 
@@ -217,6 +314,7 @@ class PerceptionAdapterRegistry:
     def _register_defaults(self):
         """Register default adapters"""
         self.register('local_file', LocalFileAdapter())
+        self.register('http_readonly', HTTPReadOnlyAdapter())
         self.register('postgres', PostgresAdapter())
         self.register('simulator', SimulatorAdapter())
 
