@@ -288,7 +288,7 @@ export class AutonomyOrchestratorService {
 
       for (let i = 0; i < 2; i++) {
         await this.trajectoryStore.recordAction(episode.id, i, {
-          actionType: 'autonomy_step',
+          actionType: 'decision',
           toolName: 'autonomy_orchestrator',
           success: true,
         });
