@@ -36,10 +36,6 @@ CREATE TABLE IF NOT EXISTS eval_runs (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_eval_runs_eval_suite_id ON eval_runs(eval_suite_id);
-CREATE INDEX IF NOT EXISTS idx_eval_runs_artifact_id ON eval_runs(artifact_id);
-CREATE INDEX IF NOT EXISTS idx_eval_runs_status ON eval_runs(status);
-
 
 CREATE TABLE IF NOT EXISTS eval_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -52,6 +48,3 @@ CREATE TABLE IF NOT EXISTS eval_results (
     assertion_details_json JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
-CREATE INDEX IF NOT EXISTS idx_eval_results_eval_run_id ON eval_results(eval_run_id);
-CREATE INDEX IF NOT EXISTS idx_eval_results_passed ON eval_results(passed);
