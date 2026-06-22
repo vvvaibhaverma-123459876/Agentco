@@ -7,6 +7,7 @@ import { EvalHarnessService } from './eval-harness.service';
 import { SelfModificationValidator } from './self-modification-validator.service';
 import { ObservabilityService } from './observability.service';
 import { WorkerCoordinatorService } from './worker-coordinator.service';
+import { CrashRecoveryService } from './crash-recovery.service';
 
 export interface AutonomyRun {
   id: string;
@@ -58,6 +59,7 @@ export class AutonomyOrchestratorService {
   private selfModValidator = new SelfModificationValidator();
   private observability = new ObservabilityService();
   private workerCoordinator = new WorkerCoordinatorService();
+  private crashRecovery = new CrashRecoveryService();
 
   /**
    * Execute full LEVEL_3 autonomy smoke test loop
@@ -559,11 +561,30 @@ export class AutonomyOrchestratorService {
       );
 
       return autonomyRun;
-    } catch (error) {
+    } catch (error: any) {
       autonomyRun.status = 'failed';
-      autonomyRun.error = (error as Error).message;
+      autonomyRun.error = error.message || 'Unknown error';
       autonomyRun.completedAt = new Date();
-      console.error(`❌ AUTONOMY RUN FAILED: ${autonomyRun.error}`);
+      console.error(`❌ AUTONOMY RUN FAILED at step ${autonomyRun.currentStep}: ${autonomyRun.error}`);
+
+      // CRASH RECOVERY: Record failure in dead-letter queue
+      if (autonomyRun.taskId) {
+        try {
+          const classification = this.crashRecovery.classifyError(error);
+          await this.crashRecovery.recordFailure(
+            autonomyRun.taskId,
+            classification.type,
+            error,
+            autonomyRun.currentStep,
+            1, // First attempt
+            { step: autonomyRun.currentStep, stepName: autonomyRun.status }
+          );
+          console.log(`[CRASH_RECOVERY] Recorded failure for task ${autonomyRun.taskId}`);
+        } catch (recoveryError) {
+          console.error(`Failed to record crash recovery data: ${recoveryError}`);
+        }
+      }
+
       throw error;
     }
   }
