@@ -1,5 +1,6 @@
 import { db } from '../db/client';
 import { v4 as uuidv4 } from 'uuid';
+import { validateProtectedSurfaces } from './protected-surface-validator.service';
 
 export interface EvalResult {
   id: string;
@@ -512,37 +513,14 @@ export class EvalHarnessService {
           const artifactJson = candidateResult.rows[0].artifact_json;
           const artifact = typeof artifactJson === 'string' ? JSON.parse(artifactJson) : artifactJson;
 
-          // Check for protected surface modifications
-          const protectedSurfaces = [
-            'calibration',
-            'resolver',
-            'audit_log',
-            'ground_truth',
-            'rbac',
-            'governance',
-            'safety_constraints',
-            'policy',
-          ];
+          // Use protected surface validator service
+          try {
+            await validateProtectedSurfaces(candidateId, artifact);
+          } catch (validationError) {
+            console.log(`[EVAL_GATE] Protected surface violation detected: ${validationError}`);
 
-          const touchedProtectedSurfaces: string[] = [];
-          for (const surface of protectedSurfaces) {
-            if (artifact && artifact.changes) {
-              for (const change of artifact.changes) {
-                if (change.field && change.field.toLowerCase().includes(surface)) {
-                  touchedProtectedSurfaces.push(surface);
-                }
-              }
-            }
-          }
-
-          if (touchedProtectedSurfaces.length > 0) {
-            console.log(
-              `[EVAL_GATE] Protected surface violation detected: ${touchedProtectedSurfaces.join(', ')}`
-            );
-            // Return early with promotion_eligible = false, skip full eval
             const scorecardId = uuidv4();
-            const now = new Date();
-            const reasoning = `BLOCKED: Candidate touches protected surfaces: ${touchedProtectedSurfaces.join(', ')}`;
+            const reasoning = `BLOCKED: ${(validationError as Error).message}`;
 
             const result = await db.query(
               `INSERT INTO eval_scorecards (
