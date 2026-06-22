@@ -1,4 +1,4 @@
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full
 
 dev:
 	docker compose --profile dev up -d
@@ -30,6 +30,30 @@ test: smoke db-tests
 
 validation:
 	python3 scripts/run_real_world_validation.py
+
+vendor-risk-smoke:
+	@echo "Running enterprise vendor risk triage benchmark (smoke test)..."
+	python3 -m evals.enterprise_vendor_risk.run_benchmark \
+		--models fake:deterministic \
+		--output results/enterprise_vendor_risk/runs/smoke_$$(date +%s).json
+	@echo "Generating leaderboard..."
+	python3 -m evals.enterprise_vendor_risk.leaderboard \
+		--input $$(ls -t results/enterprise_vendor_risk/runs/smoke_*.json | head -1) \
+		--output-json results/enterprise_vendor_risk/latest.json \
+		--output-md results/enterprise_vendor_risk/latest.md
+	@echo "✓ Vendor risk smoke test complete. Results in results/enterprise_vendor_risk/latest.md"
+
+vendor-risk-full:
+	@echo "Running enterprise vendor risk triage benchmark (full)..."
+	python3 -m evals.enterprise_vendor_risk.run_benchmark \
+		--models fake:deterministic,agentco \
+		--output results/enterprise_vendor_risk/runs/benchmark_$$(date +%s).json
+	@echo "Generating leaderboard..."
+	python3 -m evals.enterprise_vendor_risk.leaderboard \
+		--input $$(ls -t results/enterprise_vendor_risk/runs/benchmark_*.json | head -1) \
+		--output-json results/enterprise_vendor_risk/latest.json \
+		--output-md results/enterprise_vendor_risk/latest.md
+	@echo "✓ Vendor risk benchmark complete. Results in results/enterprise_vendor_risk/latest.md"
 
 master-gate: smoke db-tests validation
 	cd backend && npm run build
