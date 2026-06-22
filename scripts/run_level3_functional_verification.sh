@@ -51,6 +51,23 @@ echo "   Artifacts: $ARTIFACTS_DIR"
 echo "   Timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 echo ""
 
+# ========== CLEANUP PREVIOUS STATE ==========
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "CLEANUP: Removing previous test state..."
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+cd "$REPO_ROOT"
+
+if command -v docker &> /dev/null && docker ps > /dev/null 2>&1; then
+    docker compose down -v 2>&1 | tail -2 || true
+    sleep 2
+    echo "   ✅ Previous state cleaned"
+else
+    echo "   ⓘ Docker not available or already clean"
+fi
+
+echo ""
+
 # ========== STEP 1: START POSTGRES ==========
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "STEP 1: Starting PostgreSQL..."
@@ -218,11 +235,10 @@ echo "CLEANUP: Shutting down backend..."
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 kill $BACKEND_PID 2>/dev/null || true
-sleep 2
+sleep 1
 
-# Optional: Keep docker services running for manual inspection, or stop them
-# Uncomment to stop services:
-# docker compose down
+# Stop docker services
+docker compose down -v 2>&1 | tail -2 || true
 
 echo "   ✅ Backend stopped"
 echo ""

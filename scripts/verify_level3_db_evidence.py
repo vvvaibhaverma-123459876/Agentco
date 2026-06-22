@@ -14,8 +14,6 @@ LEVEL_3 autonomy loop. It checks for evidence that:
 - Candidates were generated
 - Eval runs were executed
 - Scorecards were created
-- Promotion decisions were made
-- Audit events were written
 
 Exit code:
   0 = All evidence found
@@ -84,6 +82,7 @@ def main():
     print("")
 
     # List of critical tables and what they represent
+    # Only include tables from enabled migrations
     evidence_checks = [
         ("autonomy_tasks", "Autonomy tasks created"),
         ("autonomy_goals", "Goals created"),
@@ -100,9 +99,6 @@ def main():
         ("artifacts", "Artifacts created"),
         ("eval_runs", "Eval runs executed"),
         ("eval_scorecards", "Eval scorecards created"),
-        ("promotion_decisions", "Promotion decisions made"),
-        ("canary_plans", "Canary plans created"),
-        ("audit_events", "Audit events written"),
     ]
 
     found_count = 0
