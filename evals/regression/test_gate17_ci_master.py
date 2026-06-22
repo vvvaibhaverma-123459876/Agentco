@@ -10,4 +10,6 @@ def test_ci_runs_declared_master_gate():
     assert "Refoundation Master Gate" in ci
     assert "make master-gate" in ci
     assert "validation:" in makefile
-    assert "master-gate: smoke validation" in makefile
+    assert "master-gate:" in makefile
+    assert "smoke" in makefile.split("master-gate:")[1].split("\n")[0]
+    assert "validation" in makefile.split("master-gate:")[1].split("\n")[0]
