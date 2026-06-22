@@ -6,6 +6,7 @@ import { overrideRoutes } from './routes/override.routes';
 import { auditRoutes } from './routes/audit.routes';
 import { governanceRoutes } from './routes/governance.routes';
 import { disconnectProducer } from './db/kafka';
+import { metricsService } from './services/metrics.service';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -87,6 +88,28 @@ async function build() {
       checks,
       timestamp: new Date().toISOString(),
     });
+  });
+
+  // Metrics endpoint for Prometheus
+  app.get('/metrics', async () => {
+    return metricsService.render();
+  });
+
+  // Record request metrics
+  app.addHook('onResponse', async (request, reply) => {
+    const start = (request as any)._startTime || Date.now();
+    const duration = (Date.now() - start) / 1000;
+    metricsService.recordHttpRequest(
+      request.method,
+      request.url.split('?')[0],
+      reply.statusCode,
+      duration,
+    );
+  });
+
+  // Record errors
+  app.addHook('onError', async (request, reply, error) => {
+    metricsService.recordError(error?.name || 'unknown');
   });
 
   // WebSocket for real-time event stream

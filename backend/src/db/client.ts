@@ -4,6 +4,7 @@
  * Includes retry logic, exponential backoff, and query timeouts.
  */
 import { Pool, PoolClient } from 'pg';
+import { metricsService } from '../services/metrics.service';
 
 const DSN = process.env.DATABASE_URL ??
   'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
@@ -45,6 +46,7 @@ export async function query<T = Record<string, unknown>>(
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     try {
+      const startTime = Date.now();
       const queryPromise = (async () => {
         const result = await db.query(sql, params);
         return result.rows as T[];
@@ -54,9 +56,13 @@ export async function query<T = Record<string, unknown>>(
         setTimeout(() => reject(new Error('Query timeout')), QUERY_TIMEOUT_MS)
       );
 
-      return await Promise.race([queryPromise, timeoutPromise]);
+      const result = await Promise.race([queryPromise, timeoutPromise]);
+      const duration = (Date.now() - startTime) / 1000;
+      metricsService.recordDbQuery(sql, duration, false);
+      return result;
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
+      metricsService.recordDbQuery(sql, 0, true);
 
       if (attempt < MAX_RETRIES && isRetryableError(err)) {
         const delay = INITIAL_RETRY_DELAY_MS * Math.pow(2, attempt);
