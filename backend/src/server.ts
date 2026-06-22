@@ -5,6 +5,8 @@ import { agentRoutes } from './routes/agents.routes';
 import { overrideRoutes } from './routes/override.routes';
 import { auditRoutes } from './routes/audit.routes';
 import { credentialRoutes } from './routes/credential.routes';
+import { learningRoutes } from './services/learning.service';
+import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { assertProductionSecrets } from './security';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -16,6 +18,9 @@ export async function build() {
 
   await app.register(cors, { origin: process.env.FRONTEND_URL ?? 'http://localhost:3000' });
   await app.register(websocket);
+
+  // Register learning middleware (captures all signals across the system)
+  await registerLearningMiddleware(app);
 
   app.addHook('preHandler', async (request, reply) => {
     const method = request.method.toUpperCase();
@@ -50,6 +55,7 @@ export async function build() {
   await app.register(overrideRoutes);
   await app.register(auditRoutes);
   await app.register(credentialRoutes);
+  await app.register(learningRoutes);
 
   // Basic health check
   app.get('/health', async () => ({

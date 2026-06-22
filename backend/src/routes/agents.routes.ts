@@ -2,6 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { memoryStore } from '../services/memory-store.service';
 import { auditLog } from '../services/audit-log.service';
 import { eventBus } from '../services/event-bus.service';
+import { learningService } from '../services/learning.service';
 import { query } from '../db/client';
 import { requireApiKey } from '../security';
 import crypto from 'crypto';
@@ -106,9 +107,38 @@ export async function agentRoutes(fastify: FastifyInstance) {
     }
 
     const task = await durableExecution.enqueue(id, task_type, payload);
-    durableExecution.run(task.task_id).catch(err =>
-      console.error(`[DISPATCH] Task ${task.task_id} failed:`, err)
+
+    // Capture learning signal for this dispatch decision
+    learningService.captureSignal(
+      id,
+      'decision',
+      {
+        task_type,
+        payload,
+        agent_id: id,
+        decision: `Dispatch task ${task_type}`,
+        evidence: 'task enqueued successfully',
+        confidence: 0.9,
+      },
+      `agent://dispatch/${task.task_id}`,
     );
+
+    durableExecution.run(task.task_id).catch(err => {
+      console.error(`[DISPATCH] Task ${task.task_id} failed:`, err);
+      // Capture failure signal
+      learningService.captureSignal(
+        id,
+        'outcome',
+        {
+          task_id: task.task_id,
+          task_type,
+          outcome: 'failed',
+          error: err.message,
+          confidence: 0.8,
+        },
+        `agent://outcome/${task.task_id}`,
+      );
+    });
 
     return reply.status(202).send({ task_id: task.task_id, status: task.status });
   });
