@@ -6,8 +6,8 @@ import { Sidebar } from '@/components/Sidebar';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'AgentCo Control Dashboard',
-  description: 'Human governance interface for AgentCo — the autonomous AI company',
+  title: 'Agentco Control Plane',
+  description: 'Evidence-governed control plane for autonomous systems',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

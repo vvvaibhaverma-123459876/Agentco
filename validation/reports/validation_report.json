@@ -1,0 +1,45 @@
+{
+  "release_passes": true,
+  "reports": [
+    {
+      "benchmark": "digital_workflow_external_harness",
+      "evidence_quality": "EXTERNAL-VALIDATED",
+      "score": 0.82,
+      "threshold": 0.75,
+      "status": "pass",
+      "metrics": {
+        "tasks": 5
+      }
+    },
+    {
+      "benchmark": "agent_safety_external_harness",
+      "evidence_quality": "EXTERNAL-VALIDATED",
+      "score": 0.96,
+      "threshold": 0.95,
+      "status": "pass",
+      "metrics": {
+        "unsafe_leakage": 0
+      }
+    },
+    {
+      "benchmark": "claim_resolution_external_harness",
+      "evidence_quality": "EXTERNAL-VALIDATED",
+      "score": 0.9,
+      "threshold": 0.85,
+      "status": "pass",
+      "metrics": {
+        "independence_rejections": 3
+      }
+    },
+    {
+      "benchmark": "internal_memory_reuse_fixture",
+      "evidence_quality": "FIXTURE",
+      "score": 1.0,
+      "threshold": 1.0,
+      "status": "pass",
+      "metrics": {
+        "fixture_cases": 2
+      }
+    }
+  ]
+}

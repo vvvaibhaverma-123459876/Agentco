@@ -13,22 +13,16 @@
 -- extracts this env var and substitutes it into the SQL before execution.
 -- ============================================================================
 
--- Idempotent role creation: drop if exists, then create
--- This ensures the migration is safe to re-run.
+-- Idempotent role creation/update.
 DO $$
 BEGIN
-    -- Drop the role if it exists (cascade, to remove any active sessions)
-    -- but catch the error if it doesn't exist (role doesn't exist is not an error we care about)
-    IF EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'resolution_service') THEN
-        EXECUTE 'DROP ROLE IF EXISTS resolution_service CASCADE';
+    IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'resolution_service') THEN
+        CREATE ROLE resolution_service WITH LOGIN PASSWORD ':RESOLUTION_SERVICE_PASSWORD';
+    ELSE
+        ALTER ROLE resolution_service WITH LOGIN PASSWORD ':RESOLUTION_SERVICE_PASSWORD';
     END IF;
 END
 $$;
-
--- Create the resolution_service role with LOGIN capability and password
--- The password placeholder will be substituted by the migration runner before execution.
--- If no password is provided (env var not set), default to a random UUID for safety.
-CREATE ROLE resolution_service WITH LOGIN PASSWORD ':RESOLUTION_SERVICE_PASSWORD';
 
 COMMENT ON ROLE resolution_service IS
     'DB role used by the resolution service to write resolution columns in prediction_ledger '
@@ -60,10 +54,4 @@ GRANT SELECT ON beliefs TO resolution_service;
 GRANT UPDATE ON beliefs TO resolution_service;
 
 -- ============================================================================
--- Test confirmation: migration can be re-run without error
--- ============================================================================
--- The DO block ensures idempotency. If this migration is re-run:
--- 1. The IF EXISTS check in the DO block will find the existing role
--- 2. The DROP ROLE CASCADE will remove it cleanly
--- 3. The CREATE ROLE statement will recreate it with the same privileges
--- This is safe because no application data is lost (role is purely a security boundary).
+-- Test confirmation: migration can be re-run without error.

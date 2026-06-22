@@ -24,7 +24,7 @@ except ImportError:
 
 def get_migration_files() -> list[Path]:
     """Return all migration SQL files in sorted order."""
-    migrations_dir = Path(__file__).parent / "db" / "migrations"
+    migrations_dir = Path(__file__).parent / "migrations"
     migration_files = sorted(migrations_dir.glob("*.sql"))
     return migration_files
 

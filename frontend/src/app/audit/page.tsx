@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { AuditEntry, RISK_COLORS } from '@/types';
 
@@ -9,12 +9,12 @@ export default function AuditPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ agent_id: '', risk_level: '', human_approved: '' });
 
-  const load = () => {
+  const load = useCallback(() => {
     const params = Object.fromEntries(Object.entries(filters).filter(([, v]) => v));
     api.audit.list(params).then((r: { entries: AuditEntry[]; count: number }) => setEntries(r.entries)).catch(console.error).finally(() => setLoading(false));
-  };
+  }, [filters]);
 
-  useEffect(() => { load(); }, [filters]);
+  useEffect(() => { load(); }, [load]);
 
   return (
     <div className="p-6">

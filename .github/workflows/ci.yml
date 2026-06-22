@@ -7,6 +7,42 @@ on:
     branches: [main, 'claude/**']
 
 jobs:
+  gate-0:
+    name: Refoundation Master Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install -r agents/requirements.txt
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run master gate
+        env:
+          LLM_BASE_URL: http://localhost:11434/v1
+          LLM_API_KEY: test
+        run: |
+          python3 scripts/gate0_check.py
+          make master-gate
+
   test-agents:
     name: Python Agent Tests
     runs-on: ubuntu-latest

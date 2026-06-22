@@ -1,0 +1,49 @@
+{
+  "current_phase": "complete",
+  "current_gate": "GATES 0-17",
+  "gate_status": "complete_for_implemented_scope",
+  "completed_layers": [
+    "truth_reset_readme",
+    "refoundation_docs_baseline",
+    "frontend_api_client_source_fix",
+    "optional_backend_write_auth",
+    "migration_runner_path_fix",
+    "no_infra_smoke_target",
+    "backend_frontend_dependency_install",
+    "backend_frontend_typecheck",
+    "backend_frontend_build",
+    "unique_migration_numbering",
+    "gate0_ci_smoke",
+    "frontend_audit_hook_warning_fix",
+    "canonical_schema_migration",
+    "canonical_schema_down_contract",
+    "source_independence_engine",
+    "evidence_kernel_promotion_gate",
+    "durable_execution_fabric",
+    "action_attestation_verifier",
+    "uncertainty_stack",
+    "memory_kernel_split",
+    "universal_ingestion",
+    "autonomous_learning_loop",
+    "dynamic_agent_skill_task_kernel",
+    "governance_policy_engine",
+    "institutions_societies",
+    "simulation_world_lab",
+    "self_modification_kernel",
+    "model_foundry",
+    "validation_suite",
+    "operator_governance_console",
+    "ci_master_gate"
+  ],
+  "incomplete_layers": [
+    "npm_vulnerability_triage",
+    "prometheus_compose_mount_fix"
+  ],
+  "blocked_items": [
+    "docker compose full profile has a Prometheus bind-mount error for infrastructure/prometheus/prometheus.yml",
+    "npm audit reports backend/frontend vulnerabilities that need dependency triage"
+  ],
+  "next_task": "Full refoundation gates 0-17 complete for implemented repo scope; next hardening is dependency/security and real external benchmark connectors.",
+  "test_status": "make master-gate passed: 139 Python tests plus validation suite plus backend/frontend builds; DB ledger tests passed 8; durable execution smoke produced attested done task",
+  "last_known_good_commit": null
+}

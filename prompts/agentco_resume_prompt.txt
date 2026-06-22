@@ -1,0 +1,22 @@
+Resume Agentco refoundation.
+
+You are working inside the Agentco repository.
+
+Before doing anything, read:
+- docs/refoundation/SESSION_HANDOFF.md
+- docs/refoundation/NEXT_CODEX_PROMPT.md
+- docs/refoundation/IMPLEMENTATION_MATRIX.md
+- docs/refoundation/BUILD_STATE.json
+- docs/refoundation/FAILED_TESTS.md
+- docs/refoundation/NEXT_ACTIONS.md
+
+Rules:
+1. Do not restart the architecture.
+2. Do not duplicate already completed work.
+3. Do not mark any layer complete unless code, tests, docs, and integration exist.
+4. Preserve existing working systems unless there is a clear reason to modify them.
+5. Prefer vertical slices over fake broad implementation.
+6. If blocked by missing context, inspect the repo and make the safest grounded decision.
+7. Before stopping, update all handoff files again.
+
+Continue from the exact next unfinished step.

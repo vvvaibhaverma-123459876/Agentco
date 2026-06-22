@@ -30,4 +30,15 @@ export function createConsumer(groupId: string): Consumer {
   return kafka.consumer({ groupId, sessionTimeout: 30000 });
 }
 
+export async function disconnectProducer(): Promise<void> {
+  if (_producer) {
+    try {
+      await _producer.disconnect();
+      _producer = null;
+    } catch (err) {
+      console.error('Error disconnecting Kafka producer:', err);
+    }
+  }
+}
+
 export { CompressionTypes };
