@@ -280,6 +280,99 @@ export class LearnerService {
   }
 
   /**
+   * Retrieve memory with stale demotion (rank by freshness first)
+   * AREA 8: Memory Quality Hardening
+   */
+  async retrieveMemory(query: string, limit: number = 10): Promise<any[]> {
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    // Retrieve trajectories ranked by freshness, demoting stale ones
+    const result = await db.query(
+      `SELECT
+        id, episode_id, reward, created_at,
+        CASE
+          WHEN created_at > $2 THEN 'fresh'
+          WHEN created_at > $3 THEN 'recent'
+          ELSE 'stale'
+        END as freshness_category,
+        CASE
+          WHEN created_at > $2 THEN 3
+          WHEN created_at > $3 THEN 2
+          ELSE 1
+        END as freshness_rank
+       FROM trajectory_store
+       ORDER BY freshness_rank DESC, reward DESC
+       LIMIT $1`,
+      [limit, oneWeekAgo, oneMonthAgo]
+    );
+
+    const trajectories = result.rows.map((row: any) => ({
+      id: row.id,
+      episodeId: row.episode_id,
+      reward: parseFloat(row.reward),
+      createdAt: row.created_at,
+      freshnessCategory: row.freshness_category,
+      warning: row.freshness_category === 'stale' ? 'Using stale memory (>30 days old)' : undefined,
+    }));
+
+    // Log warning if using stale memory
+    const staleCount = trajectories.filter((t: any) => t.freshnessCategory === 'stale').length;
+    if (staleCount > 0) {
+      console.warn(`[MEMORY_QUALITY] Retrieved ${staleCount}/${trajectories.length} stale trajectories (>30 days old)`);
+    }
+
+    return trajectories;
+  }
+
+  /**
+   * Create replay batch with simulation label enforcement
+   * AREA 8: Replay Quality Hardening
+   */
+  async createReplayBatch(trajectoryIds: string[]): Promise<string> {
+    if (trajectoryIds.length === 0) {
+      throw new Error('Cannot create replay batch with no trajectories');
+    }
+
+    // Check simulation labels - must be consistent
+    const labelResult = await db.query(
+      `SELECT DISTINCT is_simulation FROM trajectory_store WHERE id = ANY($1)`,
+      [trajectoryIds]
+    );
+
+    const labels = labelResult.rows.map((r: any) => r.is_simulation);
+    if (labels.length > 1) {
+      throw new Error(
+        `Cannot mix simulation and real trajectories in replay batch. Found: ${labels.join(', ')}`
+      );
+    }
+
+    const isSimulation = labels.length > 0 ? labels[0] : false;
+
+    // Create batch hash
+    const batchHash = crypto
+      .createHash('sha256')
+      .update(trajectoryIds.sort().join(','))
+      .digest('hex');
+
+    const batchId = uuidv4();
+    const result = await db.query(
+      `INSERT INTO replay_batches (
+        id, batch_hash, trajectory_ids, batch_size, is_simulation, created_at
+      ) VALUES ($1, $2, $3, $4, $5, NOW())
+       RETURNING id`,
+      [batchId, batchHash, trajectoryIds, trajectoryIds.length, isSimulation]
+    );
+
+    if (isSimulation) {
+      console.warn(`[REPLAY_QUALITY] Created simulation batch ${batchId} (${trajectoryIds.length} trajectories)`);
+    }
+
+    return result.rows[0].id;
+  }
+
+  /**
    * Complete learner run
    */
   async completeLearnerRun(learnerRunId: string): Promise<void> {

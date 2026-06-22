@@ -33,6 +33,14 @@ const metrics = {
   db_query_duration_seconds: new Map<string, { sum: number; count: number }>(),
   kafka_messages_produced_total: new Map<string, number>(),
   errors_total: new Map<string, number>(),
+  // AREA 9: Autonomy metrics
+  autonomy_task_success_rate: 0,
+  autonomy_plan_success_rate: 0,
+  autonomy_evaluation_pass_rate: 0,
+  autonomy_rollback_rate: 0,
+  autonomy_candidate_promotion_rate: 0,
+  autonomy_level_used: new Map<number, number>(),
+  autonomy_memory_retrieval_quality: 0,
 };
 
 const LATENCY_BUCKETS = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 2, 5];
@@ -93,6 +101,42 @@ export const metricsService = {
     metrics.errors_total.set(key, (metrics.errors_total.get(key) || 0) + 1);
   },
 
+  // AREA 9: Autonomy Metrics Recording
+  recordTaskSuccessRate(rate: number) {
+    metrics.autonomy_task_success_rate = rate;
+    console.log(`[METRIC] autonomy.task_success_rate = ${(rate * 100).toFixed(1)}%`);
+  },
+
+  recordPlanSuccessRate(rate: number) {
+    metrics.autonomy_plan_success_rate = rate;
+    console.log(`[METRIC] autonomy.plan_success_rate = ${(rate * 100).toFixed(1)}%`);
+  },
+
+  recordEvaluationPassRate(rate: number) {
+    metrics.autonomy_evaluation_pass_rate = rate;
+    console.log(`[METRIC] autonomy.evaluation_pass_rate = ${(rate * 100).toFixed(1)}%`);
+  },
+
+  recordRollbackRate(rate: number) {
+    metrics.autonomy_rollback_rate = rate;
+    console.log(`[METRIC] autonomy.rollback_rate = ${(rate * 100).toFixed(1)}%`);
+  },
+
+  recordCandidatePromotionRate(rate: number) {
+    metrics.autonomy_candidate_promotion_rate = rate;
+    console.log(`[METRIC] autonomy.candidate_promotion_rate = ${(rate * 100).toFixed(1)}%`);
+  },
+
+  recordLevelUsed(level: number) {
+    metrics.autonomy_level_used.set(level, (metrics.autonomy_level_used.get(level) || 0) + 1);
+    console.log(`[METRIC] autonomy.level_used = ${level}`);
+  },
+
+  recordMemoryRetrievalQuality(quality: number) {
+    metrics.autonomy_memory_retrieval_quality = quality;
+    console.log(`[METRIC] autonomy.memory_retrieval_quality = ${(quality * 100).toFixed(1)}%`);
+  },
+
   /**
    * Render metrics in Prometheus text format (OpenMetrics).
    */
@@ -133,6 +177,37 @@ export const metricsService = {
     for (const [key, value] of metrics.errors_total) {
       lines.push(`errors_total{${key}} ${value}`);
     }
+
+    // AREA 9: Autonomy metrics in Prometheus format
+    lines.push("# HELP autonomy_task_success_rate Autonomy task success rate (0-1)");
+    lines.push("# TYPE autonomy_task_success_rate gauge");
+    lines.push(`autonomy_task_success_rate ${metrics.autonomy_task_success_rate}`);
+
+    lines.push("# HELP autonomy_plan_success_rate Autonomy plan success rate (0-1)");
+    lines.push("# TYPE autonomy_plan_success_rate gauge");
+    lines.push(`autonomy_plan_success_rate ${metrics.autonomy_plan_success_rate}`);
+
+    lines.push("# HELP autonomy_evaluation_pass_rate Autonomy evaluation pass rate (0-1)");
+    lines.push("# TYPE autonomy_evaluation_pass_rate gauge");
+    lines.push(`autonomy_evaluation_pass_rate ${metrics.autonomy_evaluation_pass_rate}`);
+
+    lines.push("# HELP autonomy_rollback_rate Autonomy rollback rate (0-1)");
+    lines.push("# TYPE autonomy_rollback_rate gauge");
+    lines.push(`autonomy_rollback_rate ${metrics.autonomy_rollback_rate}`);
+
+    lines.push("# HELP autonomy_candidate_promotion_rate Candidate promotion rate (0-1)");
+    lines.push("# TYPE autonomy_candidate_promotion_rate gauge");
+    lines.push(`autonomy_candidate_promotion_rate ${metrics.autonomy_candidate_promotion_rate}`);
+
+    lines.push("# HELP autonomy_level_used Autonomy level usage counter");
+    lines.push("# TYPE autonomy_level_used counter");
+    for (const [level, count] of metrics.autonomy_level_used) {
+      lines.push(`autonomy_level_used{level="${level}"} ${count}`);
+    }
+
+    lines.push("# HELP autonomy_memory_retrieval_quality Memory retrieval quality (0-1)");
+    lines.push("# TYPE autonomy_memory_retrieval_quality gauge");
+    lines.push(`autonomy_memory_retrieval_quality ${metrics.autonomy_memory_retrieval_quality}`);
 
     lines.push("");
     return lines.join("\n");
