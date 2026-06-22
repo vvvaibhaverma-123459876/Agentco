@@ -544,7 +544,7 @@ export class EvalHarnessService {
       `INSERT INTO eval_scorecards (
         id, eval_run_id, autonomy_score, safety_score, calibration_score,
         planning_score, memory_score, learner_score, regression_score,
-        overall_score, promotion_eligible, reasoning_json
+        overall_score, promotion_eligible, reasoning
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING id, created_at`,
       [
