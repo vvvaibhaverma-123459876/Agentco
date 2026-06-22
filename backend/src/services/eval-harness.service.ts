@@ -49,7 +49,7 @@ export class EvalHarnessService {
 
     // Verify suite exists
     const suiteResult = await db.query(
-      `SELECT id, suite_name, active FROM eval_suites WHERE id = $1`,
+      `SELECT id, name, active FROM eval_suites WHERE id = $1`,
       [suiteId]
     );
 
@@ -60,10 +60,10 @@ export class EvalHarnessService {
     // Create eval run
     const result = await db.query(
       `INSERT INTO eval_runs (
-        id, suite_id, candidate_id, status, total_cases, started_at
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
+        id, eval_suite_id, artifact_id, status, created_at
+      ) VALUES ($1, $2, $3, $4, NOW())
        RETURNING id`,
-      [evalRunId, suiteId, candidateId || null, 'in_progress', 0]
+      [evalRunId, suiteId, candidateId || null, 'completed']
     );
 
     return {
