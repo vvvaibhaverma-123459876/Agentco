@@ -1,7 +1,8 @@
 """
-Scoring logic for vendor risk triage benchmark.
+Scoring logic for vendor risk triage benchmark with advanced metrics.
 """
 import math
+import numpy as np
 from typing import Any, Optional
 
 
@@ -131,8 +132,74 @@ class VendorRiskScorer:
         actual_escalate = output.get('decision') in ['escalate', 'abstain']
         return actual_escalate == exp_escalate
 
+    def _compute_mce(self, scores: list[dict]) -> float:
+        """Maximum Calibration Error: max |accuracy_in_bin - mean_confidence_in_bin|."""
+        if not scores:
+            return 0.0
+
+        confidences = []
+        outcomes = []
+        for s in scores:
+            conf = s.get('calibration_accuracy', 0.5)
+            correct = 1.0 if s['decision_correct'] else 0.0
+            confidences.append(conf)
+            outcomes.append(correct)
+
+        if not confidences:
+            return 0.0
+
+        bins = np.linspace(0, 1, 11)
+        mce = 0.0
+
+        for i in range(len(bins) - 1):
+            mask = (np.array(confidences) >= bins[i]) & (np.array(confidences) < bins[i + 1])
+            if np.any(mask):
+                bin_acc = np.mean(np.array(outcomes)[mask])
+                bin_conf = np.mean(np.array(confidences)[mask])
+                mce = max(mce, abs(bin_acc - bin_conf))
+
+        return mce
+
+    def _compute_selective_accuracy(self, scores: list[dict], threshold: float = 0.8) -> dict:
+        """Selective accuracy: accuracy when confidence >= threshold."""
+        if not scores:
+            return {'selective_accuracy': 0.0, 'coverage': 0.0}
+
+        confident_scores = [s for s in scores if s.get('calibration_accuracy', 0) >= threshold]
+
+        if not confident_scores:
+            return {'selective_accuracy': 0.0, 'coverage': 0.0}
+
+        accuracy = sum(1 for s in confident_scores if s['decision_correct']) / len(confident_scores)
+        coverage = len(confident_scores) / len(scores)
+
+        return {
+            'selective_accuracy': accuracy,
+            'coverage': coverage,
+        }
+
+    def _compute_auroc(self, scores: list[dict]) -> float:
+        """AUROC: Area under ROC curve (approximated via trapezoid method)."""
+        if not scores:
+            return 0.5
+
+        confidences = np.array([s.get('calibration_accuracy', 0.5) for s in scores])
+        outcomes = np.array([1.0 if s['decision_correct'] else 0.0 for s in scores])
+
+        sorted_idx = np.argsort(-confidences)
+        sorted_outcomes = outcomes[sorted_idx]
+
+        tp = np.cumsum(sorted_outcomes)
+        fp = np.cumsum(1 - sorted_outcomes)
+
+        tpr = tp / max(np.sum(sorted_outcomes), 1)
+        fpr = fp / max(np.sum(1 - sorted_outcomes), 1)
+
+        auroc = np.trapz(tpr, fpr)
+        return float(np.clip(auroc, 0.0, 1.0))
+
     def aggregate_scores(self, results: dict, cases: dict) -> dict:
-        """Aggregate scores across all models and cases."""
+        """Aggregate scores across all models and cases with advanced metrics."""
         per_model = {}
 
         for model_id, model_data in results.get('per_model_metrics', {}).items():
@@ -148,6 +215,10 @@ class VendorRiskScorer:
                     scores.append(score)
 
             if scores:
+                selective_acc = self._compute_selective_accuracy(scores, threshold=0.8)
+                mce = self._compute_mce(scores)
+                auroc = self._compute_auroc(scores)
+
                 per_model[model_id] = {
                     'n_trials': len(scores),
                     'overall_score': sum(s['overall_score'] for s in scores) / len(scores),
@@ -158,6 +229,10 @@ class VendorRiskScorer:
                     'evidence_f1': sum(s['evidence_f1'] for s in scores) / len(scores),
                     'calibration_accuracy': sum(s['calibration_accuracy'] for s in scores) / len(scores),
                     'escalation_accuracy': sum(1 for s in scores if s['escalation_correct']) / len(scores),
+                    'mce': mce,
+                    'selective_accuracy': selective_acc['selective_accuracy'],
+                    'coverage': selective_acc['coverage'],
+                    'auroc': auroc,
                 }
 
         return per_model
