@@ -211,9 +211,9 @@ export class AutonomyOrchestratorService {
       const planId = uuidv4();
       await db.query(
         `INSERT INTO autonomy_plans (
-          id, task_id, status, created_at
-        ) VALUES ($1, $2, $3, NOW())`,
-        [planId, taskId, 'proposed']
+          id, goal_id, task_id, status, horizon, risk_level
+        ) VALUES ($1, $2, $3, $4, $5, $6)`,
+        [planId, goalId, taskId, 'active', 10, 'low']
       );
       autonomyRun.planId = planId;
 
