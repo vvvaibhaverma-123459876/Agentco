@@ -24,7 +24,7 @@ CREATE INDEX IF NOT EXISTS idx_eval_suites_eval_type ON eval_suites(eval_type);
 
 CREATE TABLE IF NOT EXISTS eval_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    eval_suite_id UUID REFERENCES eval_suites(id),
+    eval_suite_id UUID,
     artifact_id UUID,
     run_timestamp TIMESTAMPTZ NOT NULL,
     passed_cases INT NOT NULL DEFAULT 0,
