@@ -17,34 +17,73 @@ function toQuery(params?: Record<string, QueryValue>): string {
   return query ? `?${query}` : '';
 }
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isRetryableStatus(status: number): boolean {
+  return status === 408 || status === 429 || status >= 500;
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
   params?: Record<string, QueryValue>,
 ): Promise<T> {
-  const headers = new Headers(options.headers);
-  headers.set('Accept', 'application/json');
+  const maxRetries = 3;
+  const initialDelayMs = 200;
+  let lastError: Error | null = null;
 
-  if (options.body && !headers.has('Content-Type')) {
-    headers.set('Content-Type', 'application/json');
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const headers = new Headers(options.headers);
+      headers.set('Accept', 'application/json');
+
+      if (options.body && !headers.has('Content-Type')) {
+        headers.set('Content-Type', 'application/json');
+      }
+
+      const method = options.method?.toUpperCase() ?? 'GET';
+      if (API_KEY && !['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+        headers.set('x-api-key', API_KEY);
+      }
+
+      const response = await fetch(`${API_BASE_URL}${path}${toQuery(params)}`, {
+        ...options,
+        headers,
+      });
+
+      if (!response.ok) {
+        const body = await response.text();
+        const error = new Error(`${method} ${path} failed: ${response.status} ${body}`);
+        (error as any).status = response.status;
+
+        if (attempt < maxRetries && isRetryableStatus(response.status)) {
+          const delay = initialDelayMs * Math.pow(2, attempt);
+          console.warn(`Request attempt ${attempt + 1} failed (${response.status}), retrying in ${delay}ms`);
+          lastError = error;
+          await sleep(delay);
+          continue;
+        }
+
+        throw error;
+      }
+
+      return response.json() as Promise<T>;
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+
+      if (attempt < maxRetries && (err instanceof TypeError || (err as any).status >= 500)) {
+        const delay = initialDelayMs * Math.pow(2, attempt);
+        console.warn(`Request attempt ${attempt + 1} failed, retrying in ${delay}ms:`, lastError.message);
+        await sleep(delay);
+      } else {
+        throw lastError;
+      }
+    }
   }
 
-  const method = options.method?.toUpperCase() ?? 'GET';
-  if (API_KEY && !['GET', 'HEAD', 'OPTIONS'].includes(method)) {
-    headers.set('x-api-key', API_KEY);
-  }
-
-  const response = await fetch(`${API_BASE_URL}${path}${toQuery(params)}`, {
-    ...options,
-    headers,
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`${method} ${path} failed: ${response.status} ${body}`);
-  }
-
-  return response.json() as Promise<T>;
+  throw lastError || new Error('Request failed after retries');
 }
 
 export const api = {

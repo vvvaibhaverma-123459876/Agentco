@@ -27,12 +27,67 @@ async function build() {
     }
   });
 
+  // Centralized error handler
+  app.setErrorHandler(async (error: any, request, reply) => {
+    const requestId = request.id || 'unknown';
+    const statusCode = error?.statusCode || 500;
+    const message = error?.message || 'Internal server error';
+
+    console.error(`[${requestId}] Error in ${request.method} ${request.url}:`, error);
+
+    const response = {
+      error: message,
+      status_code: statusCode,
+      request_id: requestId,
+      timestamp: new Date().toISOString(),
+    };
+
+    reply.status(statusCode).send(response);
+  });
+
   await app.register(agentRoutes);
   await app.register(overrideRoutes);
   await app.register(auditRoutes);
   await app.register(governanceRoutes);
 
-  app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
+  // Basic health check
+  app.get('/health', async () => ({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  }));
+
+  // Detailed health check with component status
+  app.get('/health/detailed', async (request, reply) => {
+    const checks: Record<string, boolean> = {};
+
+    try {
+      await import('./db/client').then(async ({ db }) => {
+        const result = await db.query('SELECT 1');
+        checks.database = !!result.rows.length;
+      });
+    } catch (err) {
+      checks.database = false;
+      console.warn('Health check: database check failed:', err);
+    }
+
+    // Kafka check (optional - producer may not be connected yet)
+    try {
+      await import('./db/kafka').then(async ({ kafka }) => {
+        checks.kafka = true;
+      });
+    } catch (err) {
+      checks.kafka = false;
+    }
+
+    const allHealthy = Object.values(checks).every(v => v);
+    const statusCode = allHealthy ? 200 : 503;
+
+    reply.status(statusCode).send({
+      status: allHealthy ? 'healthy' : 'degraded',
+      checks,
+      timestamp: new Date().toISOString(),
+    });
+  });
 
   // WebSocket for real-time event stream
   app.get('/ws/events', { websocket: true }, (socket) => {
