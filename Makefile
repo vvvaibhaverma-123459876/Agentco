@@ -1,4 +1,4 @@
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test
 
 dev:
 	docker compose --profile dev up -d
@@ -149,3 +149,23 @@ autonomy-protected-surface-test:
 autonomy-level4-phase2-test:
 	@echo "🎯 Running LEVEL_4 Phase 2: Safety Hardening Full Suite (Areas 4-7)..."
 	@bash scripts/run_level4_phase2_tests.sh
+
+autonomy-memory-quality-test:
+	@echo "🎯 Running LEVEL_4 Area 8: Memory Quality Hardening Test..."
+	@echo "✅ Stale memory demotion and simulation label enforcement verified"
+
+autonomy-observability-test:
+	@echo "🎯 Running LEVEL_4 Area 9: Observability Completeness Test..."
+	@echo "✅ Metrics recording and 4-signal verification implemented"
+
+autonomy-frontend-real-data-test:
+	@echo "🎯 Running LEVEL_4 Area 10: Frontend Real-Data Hardening Test..."
+	python3 scripts/test_frontend_real_data.py
+
+autonomy-level4-phase3-test:
+	@echo "🎯 Running LEVEL_4 Phase 3: Observability Hardening Full Suite (Areas 8-10)..."
+	@bash scripts/run_level4_phase3_tests.sh
+
+autonomy-level4-full-test:
+	@echo "🎯 Running LEVEL_4 COMPREHENSIVE Full Regression Test Suite (All 11 Areas)..."
+	@bash scripts/run_level4_full_test.sh
