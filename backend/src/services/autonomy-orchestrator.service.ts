@@ -72,12 +72,6 @@ export class AutonomyOrchestratorService {
       if (existing.rows.length > 0) {
         const task = existing.rows[0];
         console.log(`[IDEMPOTENCY] Duplicate request detected. Returning existing run: ${task.run_id}`);
-        // Log as audit event
-        await db.query(
-          `INSERT INTO autonomy_task_events (task_id, event_type, event_data, created_at)
-           VALUES ($1, $2, $3, NOW())`,
-          [task.id, 'duplicate_detected', JSON.stringify({ idempotency_key: idempotencyKey })]
-        );
         return {
           id: task.id,
           runId: task.run_id,
