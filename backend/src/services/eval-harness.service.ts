@@ -162,7 +162,7 @@ export class EvalHarnessService {
     });
 
     const result = await db.query(
-      `INSERT INTO eval_results (
+      `INSERT INTO autonomy_eval_results (
         id, eval_run_id, case_id, test_name, status, details_json
       ) VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, created_at`,
@@ -227,7 +227,7 @@ export class EvalHarnessService {
     });
 
     const result = await db.query(
-      `INSERT INTO eval_results (
+      `INSERT INTO autonomy_eval_results (
         id, eval_run_id, case_id, test_name, status, details_json
       ) VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, created_at`,
@@ -292,7 +292,7 @@ export class EvalHarnessService {
     });
 
     const result = await db.query(
-      `INSERT INTO eval_results (
+      `INSERT INTO autonomy_eval_results (
         id, eval_run_id, case_id, test_name, status, details_json
       ) VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, created_at`,
@@ -396,7 +396,7 @@ export class EvalHarnessService {
     }
 
     const result = await db.query(
-      `INSERT INTO eval_results (
+      `INSERT INTO autonomy_eval_results (
         id, eval_run_id, case_id, test_name, status, details_json
       ) VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, created_at`,
@@ -461,7 +461,7 @@ export class EvalHarnessService {
     });
 
     const result = await db.query(
-      `INSERT INTO eval_results (
+      `INSERT INTO autonomy_eval_results (
         id, eval_run_id, case_id, test_name, status, details_json
       ) VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, created_at`,
@@ -561,7 +561,7 @@ export class EvalHarnessService {
         promotionEligible,
         JSON.stringify({
           reasoning,
-          eval_results: [
+          autonomy_eval_results: [
             { name: 'SafetyEval', status: safetyResult.status },
             { name: 'PlanningEval', status: planningResult.status },
             { name: 'MemoryReplayEval', status: memoryResult.status },
