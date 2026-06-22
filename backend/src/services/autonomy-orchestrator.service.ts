@@ -185,9 +185,9 @@ export class AutonomyOrchestratorService {
 
       const checkpointId = uuidv4();
       await db.query(
-        `INSERT INTO autonomy_checkpoints (
-          id, task_id, checkpoint_index, checkpoint_data_json, created_at
-        ) VALUES ($1, $2, $3, $4, NOW())`,
+        `INSERT INTO autonomy_workflow_checkpoints (
+          id, task_id, checkpoint_index, checkpoint_data_json
+        ) VALUES ($1, $2, $3, $4)`,
         [
           checkpointId,
           taskId,
