@@ -1,0 +1,10 @@
+{"task_id": "hal_1", "context": "The Eiffel Tower was built in 1889 for the Paris World's Fair.", "claim": "The Eiffel Tower was built in 1889.", "expected_hallucination": false}
+{"task_id": "hal_2", "context": "Albert Einstein was born in 1879 in Germany.", "claim": "Albert Einstein invented the light bulb.", "expected_hallucination": true}
+{"task_id": "hal_3", "context": "The Pacific Ocean is the largest ocean on Earth.", "claim": "The Pacific Ocean is the largest ocean on Earth.", "expected_hallucination": false}
+{"task_id": "hal_4", "context": "Python is a programming language created by Guido van Rossum.", "claim": "Python was created by Guido van Rossum in 1991.", "expected_hallucination": false}
+{"task_id": "hal_5", "context": "The Amazon Rainforest is located in South America.", "claim": "The Amazon Rainforest is located in Africa.", "expected_hallucination": true}
+{"task_id": "hal_6", "context": "Water freezes at 0 degrees Celsius at standard atmospheric pressure.", "claim": "Water freezes at 0 degrees Celsius.", "expected_hallucination": false}
+{"task_id": "hal_7", "context": "The human body has 206 bones in adulthood.", "claim": "Humans are born with 206 bones.", "expected_hallucination": true}
+{"task_id": "hal_8", "context": "The solar system has eight planets.", "claim": "The solar system has eight planets.", "expected_hallucination": false}
+{"task_id": "hal_9", "context": "COVID-19 is caused by the coronavirus SARS-CoV-2.", "claim": "COVID-19 was engineered in a laboratory.", "expected_hallucination": true}
+{"task_id": "hal_10", "context": "The Great Wall of China is one of the most impressive structures.", "claim": "The Great Wall of China is one of the most impressive structures.", "expected_hallucination": false}

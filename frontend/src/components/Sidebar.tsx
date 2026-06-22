@@ -7,6 +7,8 @@ const NAV = [
   { href: '/dashboard', label: 'Agent Status', icon: '⚡' },
   { href: '/override', label: 'Override Queue', icon: '🔒' },
   { href: '/audit', label: 'Audit Log', icon: '📋' },
+  { href: '/validation', label: 'Validation', icon: '✓' },
+  { href: '/governance', label: 'Governance', icon: '§' },
   { href: '/events', label: 'Event Stream', icon: '📡' },
   { href: '/performance', label: 'Performance', icon: '📊' },
   { href: '/config', label: 'Config History', icon: '⚙️' },
@@ -20,8 +22,8 @@ export function Sidebar() {
   return (
     <aside className="w-56 bg-gray-900 text-white flex flex-col">
       <div className="p-4 border-b border-gray-700">
-        <div className="font-bold text-lg">AgentCo</div>
-        <div className="text-gray-400 text-xs mt-0.5">Control Dashboard</div>
+        <div className="font-bold text-lg">Agentco</div>
+        <div className="text-gray-400 text-xs mt-0.5">Control Plane</div>
       </div>
       <nav className="flex-1 p-3">
         {NAV.map(({ href, label, icon }) => (
@@ -40,7 +42,7 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="p-4 border-t border-gray-700 text-xs text-gray-500">
-        Human Governor Layer
+        Evidence Governance
       </div>
     </aside>
   );

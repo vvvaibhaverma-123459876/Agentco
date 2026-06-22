@@ -19,6 +19,7 @@ from .firewall.firewall import RealitySimulationFirewall, Belief
 from .surprise.surprise_register import SurpriseRegister, SurpriseEvent
 from .decay.decay_tracker import DecayTracker
 from .self_audit.self_audit import SelfAuditModule, SelfAuditReport
+from .evidence.evidence_kernel import EvidenceKernel, SourceIndependenceEngine
 
 
 def create_calibration_engine(db=None):
@@ -61,5 +62,6 @@ __all__ = [
     "ResolutionService", "ScoringModule", "CalibrationReport",
     "TrustController", "TrustScore", "RealitySimulationFirewall", "Belief",
     "SurpriseRegister", "SurpriseEvent", "DecayTracker",
-    "SelfAuditModule", "SelfAuditReport", "create_calibration_engine",
+    "SelfAuditModule", "SelfAuditReport", "EvidenceKernel",
+    "SourceIndependenceEngine", "create_calibration_engine",
 ]

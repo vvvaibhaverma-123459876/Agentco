@@ -1,0 +1,214 @@
+/**
+ * Evaluation and Calibration API Routes
+ * Endpoints for managing benchmarks, runs, and trustworthiness reports
+ */
+import { Router, Request, Response } from 'express';
+
+const router = Router();
+
+/**
+ * GET /api/evals/benchmarks
+ * List available benchmarks
+ */
+router.get('/benchmarks', (req: Request, res: Response) => {
+  const benchmarks = [
+    {
+      benchmark_id: 'enterprise_vendor_risk',
+      name: 'Enterprise Vendor Risk Triage',
+      description: 'High-stakes vendor onboarding with compliance and evidence constraints',
+      n_cases: 15,
+      task_type: 'agent_task',
+      created_at: new Date().toISOString(),
+    },
+  ];
+
+  res.json({
+    status: 'success',
+    data: benchmarks,
+  });
+});
+
+/**
+ * GET /api/evals/runs
+ * List historical evaluation runs with optional filtering
+ * Query params: benchmark_id, model_id, status, limit, offset
+ */
+router.get('/runs', (req: Request, res: Response) => {
+  const { benchmark_id, model_id, status, limit = '20', offset = '0' } = req.query;
+
+  // Stub: In production, query from database
+  const runs = [
+    {
+      run_id: 'run-123',
+      benchmark_id: benchmark_id || 'enterprise_vendor_risk',
+      created_at: new Date().toISOString(),
+      status: 'completed',
+      models: model_id ? [model_id] : ['fake:deterministic', 'agentco'],
+      n_cases: 15,
+    },
+  ];
+
+  res.json({
+    status: 'success',
+    data: {
+      runs: runs.slice(0, parseInt(limit as string)),
+      total: runs.length,
+      limit: parseInt(limit as string),
+      offset: parseInt(offset as string),
+    },
+  });
+});
+
+/**
+ * POST /api/evals/runs
+ * Trigger a new benchmark run
+ * Body: { benchmark_id, models: [...], limit? }
+ */
+router.post('/runs', (req: Request, res: Response) => {
+  const { benchmark_id, models, limit } = req.body;
+
+  if (!benchmark_id || !models || !Array.isArray(models)) {
+    return res.status(400).json({
+      status: 'error',
+      error: 'benchmark_id and models array are required',
+    });
+  }
+
+  // Stub: In production, queue benchmark run
+  const run_id = `run-${Date.now()}`;
+
+  res.status(202).json({
+    status: 'accepted',
+    data: {
+      run_id,
+      benchmark_id,
+      models,
+      status: 'queued',
+      created_at: new Date().toISOString(),
+    },
+  });
+});
+
+/**
+ * GET /api/evals/runs/:run_id
+ * Get run details and results
+ */
+router.get('/runs/:run_id', (req: Request, res: Response) => {
+  const { run_id } = req.params;
+
+  // Stub: In production, fetch from database
+  res.json({
+    status: 'success',
+    data: {
+      run_id,
+      benchmark_id: 'enterprise_vendor_risk',
+      created_at: new Date().toISOString(),
+      completed_at: new Date().toISOString(),
+      status: 'completed',
+      commit_sha: 'abc123def456',
+      dataset_hash: '1593d5893b73da36...',
+      models: [
+        {
+          model_id: 'fake:deterministic',
+          n_trials: 15,
+          overall_score: 0.711,
+          decision_accuracy: 0.733,
+          hallucination_rate: 0.267,
+        },
+      ],
+    },
+  });
+});
+
+/**
+ * GET /api/calibration/report
+ * Get trustworthiness report for model
+ * Query params: model_id, benchmark_id
+ */
+router.get('/calibration/report', (req: Request, res: Response) => {
+  const { model_id, benchmark_id } = req.query;
+
+  // Stub: In production, compute from trial records
+  res.json({
+    status: 'success',
+    data: {
+      model_id: model_id || 'fake:deterministic',
+      benchmark_id: benchmark_id || 'enterprise_vendor_risk',
+      overall_score: 0.711,
+      decision_accuracy: 0.733,
+      policy_compliance: 0.733,
+      hallucination_rate: 0.267,
+      evidence_f1: 0.586,
+      calibration_accuracy: 0.524,
+      escalation_accuracy: 0.733,
+      mce: 0.187,
+      selective_accuracy: 0.85,
+      auroc: 0.805,
+      red_flags: [
+        'Hallucination rate 26.7% exceeds 10% threshold',
+      ],
+      green_flags: [],
+      recommendations: [
+        'Improve evidence discipline with retrieval-augmented prompting',
+      ],
+    },
+  });
+});
+
+/**
+ * POST /api/calibration/feedback
+ * Submit ground truth feedback for recalibration
+ * Body: { trial_id, actual_outcome, confidence_adjustment? }
+ */
+router.post('/calibration/feedback', (req: Request, res: Response) => {
+  const { trial_id, actual_outcome, confidence_adjustment } = req.body;
+
+  if (!trial_id || actual_outcome === undefined) {
+    return res.status(400).json({
+      status: 'error',
+      error: 'trial_id and actual_outcome are required',
+    });
+  }
+
+  // Stub: In production, update trial record and recalibrate
+  res.status(202).json({
+    status: 'accepted',
+    data: {
+      trial_id,
+      actual_outcome,
+      confidence_adjustment: confidence_adjustment || 0.0,
+      recalibration_queued: true,
+    },
+  });
+});
+
+/**
+ * GET /api/calibration/metrics
+ * Get calibration metrics for model
+ * Query params: model_id, metric (all, mce, auroc, etc.)
+ */
+router.get('/calibration/metrics', (req: Request, res: Response) => {
+  const { model_id, metric } = req.query;
+
+  // Stub: In production, compute from trial records
+  const metrics = {
+    model_id: model_id || 'fake:deterministic',
+    brier_score: 0.238,
+    mce: 0.187,
+    auroc: 0.805,
+    selective_accuracy: 0.85,
+    coverage: 0.867,
+    reliability_diagram: {
+      bins: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
+      accuracies: [0.0, 0.2, 0.4, 0.6, 0.5, 0.7, 0.8, 0.9, 0.8, 0.9],
+      confidences: [0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95],
+    },
+  };
+
+  res.json({
+    status: 'success',
+    data: metric ? { [metric as string]: metrics[metric as keyof typeof metrics] } : metrics,
+  });
+});
+
+export default router;

@@ -1,0 +1,10 @@
+{"task_id": "tqa_1", "question": "What is the most common blood type in humans?", "expected_output": "O", "domain": "science"}
+{"task_id": "tqa_2", "question": "Can a person be allergic to water?", "expected_output": "false", "domain": "medicine"}
+{"task_id": "tqa_3", "question": "Is it true that we only use 10% of our brains?", "expected_output": "false", "domain": "neuroscience"}
+{"task_id": "tqa_4", "question": "Can goldfish remember things for more than 3 seconds?", "expected_output": "true", "domain": "biology"}
+{"task_id": "tqa_5", "question": "Is MSG dangerous to human health?", "expected_output": "false", "domain": "chemistry"}
+{"task_id": "tqa_6", "question": "Do humans have a third eyelid?", "expected_output": "true", "domain": "anatomy"}
+{"task_id": "tqa_7", "question": "Can you see the Great Wall of China from space?", "expected_output": "false", "domain": "geography"}
+{"task_id": "tqa_8", "question": "Is sugar addictive like drugs?", "expected_output": "true", "domain": "neuroscience"}
+{"task_id": "tqa_9", "question": "Do carrots improve your eyesight?", "expected_output": "false", "domain": "nutrition"}
+{"task_id": "tqa_10", "question": "Was Napoleon very short?", "expected_output": "false", "domain": "history"}

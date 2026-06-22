@@ -1,0 +1,10 @@
+{"task_id": "simpleqa_1", "question": "What is the capital of France?", "expected_output": {"answer": "Paris"}, "domain": "geography"}
+{"task_id": "simpleqa_2", "question": "What is 2 + 2?", "expected_output": {"answer": "4"}, "domain": "math"}
+{"task_id": "simpleqa_3", "question": "Who wrote Romeo and Juliet?", "expected_output": {"answer": "William Shakespeare"}, "domain": "literature"}
+{"task_id": "simpleqa_4", "question": "What is the chemical symbol for gold?", "expected_output": {"answer": "Au"}, "domain": "chemistry"}
+{"task_id": "simpleqa_5", "question": "In what year did World War II end?", "expected_output": {"answer": "1945"}, "domain": "history"}
+{"task_id": "simpleqa_6", "question": "What is the largest planet in our solar system?", "expected_output": {"answer": "Jupiter"}, "domain": "astronomy"}
+{"task_id": "simpleqa_7", "question": "What is the speed of light?", "expected_output": {"answer": "299,792,458 meters per second"}, "domain": "physics"}
+{"task_id": "simpleqa_8", "question": "How many continents are there?", "expected_output": {"answer": "7"}, "domain": "geography"}
+{"task_id": "simpleqa_9", "question": "What is the smallest prime number?", "expected_output": {"answer": "2"}, "domain": "math"}
+{"task_id": "simpleqa_10", "question": "Who was the first President of the United States?", "expected_output": {"answer": "George Washington"}, "domain": "history"}

@@ -54,19 +54,6 @@ const ALL_AGENTS = [
   { id: 'privacy-agent',     department: 'legal' },
 ];
 
-// Tasks queued in memory for the background dispatcher.
-// In production: replaced by the Kafka agentco.decisions topic.
-const taskQueue: Array<{
-  task_id: string;
-  agent_id: string;
-  task_type: string;
-  payload: Record<string, unknown>;
-  queued_at: string;
-  status: 'queued' | 'running' | 'done' | 'failed';
-  result?: unknown;
-  error?: string;
-}> = [];
-
 export async function agentRoutes(fastify: FastifyInstance) {
   // ── GET /api/agents ──────────────────────────────────────────────────
   fastify.get('/api/agents', async (_req, reply) => {
@@ -111,109 +98,31 @@ export async function agentRoutes(fastify: FastifyInstance) {
     const { task_type, payload = {} } = req.body ?? {};
     if (!task_type) return reply.status(400).send({ error: 'task_type is required' });
 
-    const task_id = crypto.randomUUID();
-    const task = {
-      task_id,
-      agent_id: id,
-      task_type,
-      payload,
-      queued_at: new Date().toISOString(),
-      status: 'queued' as const,
-    };
-    taskQueue.push(task);
+    if (process.env.AGENTCO_REQUIRE_SCOPES === 'true') {
+      const scopes = String(req.headers['x-agentco-scope'] ?? '').split(/\s+/);
+      if (!scopes.includes('dispatch:write')) {
+        return reply.status(403).send({ error: 'dispatch:write scope required' });
+      }
+    }
 
-    // Run asynchronously — do not await
-    runTask(task).catch(err =>
-      console.error(`[DISPATCH] Task ${task_id} failed:`, err)
+    const task = await durableExecution.enqueue(id, task_type, payload);
+    durableExecution.run(task.task_id).catch(err =>
+      console.error(`[DISPATCH] Task ${task.task_id} failed:`, err)
     );
 
-    return reply.status(202).send({ task_id, status: 'queued' });
+    return reply.status(202).send({ task_id: task.task_id, status: task.status });
   });
 
   // ── GET /api/agents/tasks/:task_id ──────────────────────────────────
   fastify.get<{ Params: { task_id: string } }>('/api/agents/tasks/:task_id', async (req, reply) => {
-    const task = taskQueue.find(t => t.task_id === req.params.task_id);
+    const task = await durableExecution.get(req.params.task_id);
     if (!task) return reply.status(404).send({ error: 'Task not found' });
     return reply.send(task);
   });
 
   // ── GET /api/agents/tasks (list all) ────────────────────────────────
   fastify.get('/api/agents/tasks', async (_req, reply) => {
-    return reply.send({ tasks: taskQueue, count: taskQueue.length });
+    const tasks = await durableExecution.list();
+    return reply.send({ tasks, count: tasks.length });
   });
-}
-
-/**
- * Execute a dispatched task:
- * 1. Call the Python agent via subprocess (or inline for now).
- * 2. Write a real audit entry to decision_log.
- * 3. Publish a real event to Kafka.
- * 4. Store the result in the task queue entry.
- */
-async function runTask(task: (typeof taskQueue)[0]): Promise<void> {
-  task.status = 'running';
-
-  try {
-    // Update agent state to 'running'
-    await query(
-      `UPDATE agent_state SET status='running', active_task_id=$1 WHERE agent_id=$2`,
-      [task.task_id, task.agent_id]
-    ).catch(() => {});  // non-fatal if agent not in state table
-
-    // Simulate task execution (real dispatch to Python agent subprocess below).
-    // This placeholder runs the V1 agent inline for now; full subprocess dispatch
-    // is added in the tool-execution component (step 6).
-    const confidence_score = 0.75;
-    const risk_level = 'low' as const;
-    const result = {
-      task_id: task.task_id,
-      agent_id: task.agent_id,
-      task_type: task.task_type,
-      output: `[${task.agent_id}] Completed task: ${task.task_type}`,
-      confidence_score,
-      risk_level,
-      executed_at: new Date().toISOString(),
-    };
-
-    // 1. Write real audit entry
-    const log_id = await auditLog.append({
-      agent_id: task.agent_id,
-      action_type: 'decision',
-      input_summary: JSON.stringify({ task_type: task.task_type, payload: task.payload }).slice(0, 500),
-      output_summary: JSON.stringify(result.output).slice(0, 500),
-      confidence_score,
-      risk_level,
-      session_id: task.task_id,
-    });
-
-    // 2. Publish real Kafka event
-    await eventBus.publish({
-      event_id: crypto.randomUUID(),
-      event_type: `${task.agent_id}.task_completed`,
-      producer_agent_id: task.agent_id,
-      timestamp: new Date().toISOString(),
-      confidence_score,
-      payload: { task_id: task.task_id, task_type: task.task_type, log_id },
-      correlation_id: task.task_id,
-      risk_level,
-      requires_ack: false,
-    });
-
-    task.result = result;
-    task.status = 'done';
-
-    // Reset agent state
-    await query(
-      `UPDATE agent_state SET status='idle', active_task_id=NULL WHERE agent_id=$1`,
-      [task.agent_id]
-    ).catch(() => {});
-
-  } catch (err: unknown) {
-    task.status = 'failed';
-    task.error = String(err);
-    await query(
-      `UPDATE agent_state SET status='idle', active_task_id=NULL WHERE agent_id=$1`,
-      [task.agent_id]
-    ).catch(() => {});
-  }
 }
