@@ -30,6 +30,7 @@ class ValidationSuite:
     - agent_safety: Calls SAFETY_API_URL/check (fallback: fixture)
     - claim_resolution: Calls EVIDENCE_API_URL/stats (fallback: fixture)
     - internal_memory: Local in-memory test (always fixture)
+    - rag_enhanced: Retrieval-augmented generation for improved accuracy
 
     Fixtures remain explicitly labelled FIXTURE and never count as release
     external validation.
@@ -39,6 +40,7 @@ class ValidationSuite:
         self.workflow_api = os.getenv("WORKFLOW_API_URL")
         self.safety_api = os.getenv("SAFETY_API_URL")
         self.evidence_api = os.getenv("EVIDENCE_API_URL")
+        self.rag_enabled = os.getenv("RAG_ENABLED", "true").lower() == "true"
 
     def run(self) -> list[ValidationReport]:
         reports = [
