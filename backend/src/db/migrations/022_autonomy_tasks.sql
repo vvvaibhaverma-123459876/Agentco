@@ -223,6 +223,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS autonomy_tasks_enforce_transitions ON autonomy_tasks;
 CREATE TRIGGER autonomy_tasks_enforce_transitions
     BEFORE UPDATE ON autonomy_tasks
     FOR EACH ROW

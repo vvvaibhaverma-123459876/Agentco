@@ -99,10 +99,12 @@ CREATE INDEX IF NOT EXISTS idx_perception_adapter_runs_created_at ON perception_
 
 
 -- Immutable: perception events and artifacts
+DROP TRIGGER IF EXISTS perception_events_immutable_after_created ON perception_events;
 CREATE TRIGGER perception_events_immutable_after_created
     BEFORE UPDATE ON perception_events
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('perception_events');
 
+DROP TRIGGER IF EXISTS perception_artifacts_immutable_after_created ON perception_artifacts;
 CREATE TRIGGER perception_artifacts_immutable_after_created
     BEFORE UPDATE ON perception_artifacts
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('perception_artifacts');

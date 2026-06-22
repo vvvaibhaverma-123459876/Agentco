@@ -4,6 +4,7 @@
 -- Goals are proposed by agents but controlled by governance rules.
 
 -- Goal statuses
+DROP TYPE IF EXISTS goal_status CASCADE;
 CREATE TYPE goal_status AS ENUM (
     'proposed',
     'under_review',
@@ -17,12 +18,14 @@ CREATE TYPE goal_status AS ENUM (
 );
 
 -- Autonomy levels
+DROP TYPE IF EXISTS autonomy_level CASCADE;
 CREATE TYPE autonomy_level AS ENUM (
     'L0', 'L1', 'L2', 'L3', 'L4', 'L5', 'L6'
 );
 
--- Risk levels
-CREATE TYPE goal_risk_level AS ENUM (
+-- Risk levels (shared across goals, plans, outcomes)
+DROP TYPE IF EXISTS risk_level CASCADE;
+CREATE TYPE risk_level AS ENUM (
     'critical',
     'high',
     'medium',
@@ -40,7 +43,7 @@ CREATE TABLE IF NOT EXISTS autonomy_goals (
     owning_institution_id UUID,
     domain TEXT NOT NULL,
     expected_value NUMERIC(10, 2),
-    risk_level goal_risk_level NOT NULL DEFAULT 'medium',
+    risk_level risk_level NOT NULL DEFAULT 'medium',
     autonomy_level_allowed autonomy_level NOT NULL DEFAULT 'L2',
     status goal_status NOT NULL DEFAULT 'proposed',
     parent_goal_id UUID REFERENCES autonomy_goals(id),
@@ -58,6 +61,11 @@ CREATE TABLE IF NOT EXISTS autonomy_goals (
 CREATE INDEX IF NOT EXISTS idx_autonomy_goals_status ON autonomy_goals(status);
 CREATE INDEX IF NOT EXISTS idx_autonomy_goals_owning_agent ON autonomy_goals(owning_agent_id);
 CREATE INDEX IF NOT EXISTS idx_autonomy_goals_owning_institution ON autonomy_goals(owning_institution_id);
+
+-- Add columns expected by downstream migrations
+ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS simulation_derived BOOLEAN DEFAULT false;
+ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS paused_at TIMESTAMPTZ;
+ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
 CREATE INDEX IF NOT EXISTS idx_autonomy_goals_domain ON autonomy_goals(domain);
 CREATE INDEX IF NOT EXISTS idx_autonomy_goals_risk_level ON autonomy_goals(risk_level);
 CREATE INDEX IF NOT EXISTS idx_autonomy_goals_parent ON autonomy_goals(parent_goal_id);
@@ -99,7 +107,7 @@ CREATE TABLE IF NOT EXISTS goal_conflicts (
         'institutional_conflict',
         'custom'
     )),
-    severity goal_risk_level NOT NULL DEFAULT 'medium',
+    severity risk_level NOT NULL DEFAULT 'medium',
     resolution_status TEXT CHECK (resolution_status IN ('unresolved', 'sequenced', 'merged', 'one_blocked')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -157,15 +165,18 @@ CREATE INDEX IF NOT EXISTS idx_goal_status_events_created_at ON goal_status_even
 
 
 -- Immutable: goal evidence and audit trail
+DROP TRIGGER IF EXISTS goal_evidence_immutable ON goal_evidence;
 CREATE TRIGGER goal_evidence_immutable
     BEFORE UPDATE ON goal_evidence
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('goal_evidence');
 
+DROP TRIGGER IF EXISTS goal_status_events_immutable ON goal_status_events;
 CREATE TRIGGER goal_status_events_immutable
     BEFORE UPDATE ON goal_status_events
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('goal_status_events');
 
 -- Prevent deletion of completed goals
+DROP TRIGGER IF EXISTS goal_prevent_deletion ON autonomy_goals;
 CREATE TRIGGER goal_prevent_deletion
     BEFORE DELETE ON autonomy_goals
     FOR EACH ROW

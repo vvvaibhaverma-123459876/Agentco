@@ -152,6 +152,7 @@ CREATE INDEX IF NOT EXISTS idx_trace_audit_events_created_at ON trace_audit_even
 
 
 -- Immutable: trace contexts cannot be modified after creation
+DROP TRIGGER IF EXISTS trace_contexts_immutable_after_created ON trace_contexts;
 CREATE TRIGGER trace_contexts_immutable_after_created
     BEFORE UPDATE ON trace_contexts
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('trace_contexts');

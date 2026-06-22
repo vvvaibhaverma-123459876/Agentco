@@ -196,18 +196,22 @@ CREATE INDEX IF NOT EXISTS idx_replay_batches_created_at ON replay_batches(creat
 
 
 -- Immutable: episodes cannot be modified after creation
+DROP TRIGGER IF EXISTS autonomy_episodes_immutable_after_created ON autonomy_episodes;
 CREATE TRIGGER autonomy_episodes_immutable_after_created
     BEFORE UPDATE ON autonomy_episodes
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('autonomy_episodes');
 
+DROP TRIGGER IF EXISTS autonomy_actions_immutable_after_created ON autonomy_actions;
 CREATE TRIGGER autonomy_actions_immutable_after_created
     BEFORE UPDATE ON autonomy_actions
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('autonomy_actions');
 
+DROP TRIGGER IF EXISTS autonomy_outcomes_immutable_after_created ON autonomy_outcomes;
 CREATE TRIGGER autonomy_outcomes_immutable_after_created
     BEFORE UPDATE ON autonomy_outcomes
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('autonomy_outcomes');
 
+DROP TRIGGER IF EXISTS trajectory_store_immutable_after_created ON trajectory_store;
 CREATE TRIGGER trajectory_store_immutable_after_created
     BEFORE UPDATE ON trajectory_store
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('trajectory_store');
