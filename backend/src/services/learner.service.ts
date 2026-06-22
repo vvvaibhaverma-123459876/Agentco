@@ -131,7 +131,9 @@ export class LearnerService {
 
     const run = runResult.rows[0];
     const replayBatchId = run.replay_batch_id;
-    const baselineMetrics = JSON.parse(run.baseline_metrics_json);
+    const baselineMetrics = typeof run.baseline_metrics_json === 'string'
+      ? JSON.parse(run.baseline_metrics_json)
+      : run.baseline_metrics_json;
 
     // Get trajectories from replay batch
     const batchResult = await db.query(
