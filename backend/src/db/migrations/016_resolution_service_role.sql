@@ -54,13 +54,9 @@ GRANT SELECT ON beliefs TO resolution_service;
 GRANT UPDATE ON beliefs TO resolution_service;
 
 -- ============================================================================
-<<<<<<< HEAD
 -- Test confirmation: migration can be re-run without error
 -- ============================================================================
 -- The DO block and ALTER ROLE ensure idempotency. If this migration is re-run:
 -- 1. The role is created only if missing
 -- 2. LOGIN/password settings are refreshed
 -- 3. Grants are revoked and re-applied to the minimal required set
-=======
--- Test confirmation: migration can be re-run without error.
->>>>>>> agentco-refoundation-codex-loop

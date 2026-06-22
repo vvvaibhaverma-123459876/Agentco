@@ -341,7 +341,8 @@ export async function learningRoutes(fastify: FastifyInstance) {
 
   // GET /api/learning/insights - Get recent insights
   fastify.get('/api/learning/insights', async (req, reply) => {
-    const limit = typeof req.query.limit === 'string' ? parseInt(req.query.limit) : 50;
+    const query = req.query as Record<string, unknown>;
+    const limit = typeof query.limit === 'string' ? parseInt(query.limit) : 50;
     // Return recent insights (implementation depends on internal structure)
     return reply.send({ status: 'ok', count: learningService.getStats().total_insights });
   });

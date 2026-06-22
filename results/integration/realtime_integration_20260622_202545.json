@@ -1,0 +1,82 @@
+{
+  "cycles": 5,
+  "duration": 28.495088815689087,
+  "openai_calls": 20,
+  "avg_trust": 0.202,
+  "system_state": {
+    "claims": 5,
+    "proposals": 1,
+    "approved": 1,
+    "memory": 5
+  },
+  "connections": [
+    [
+      "Learning \u2192 Evidence",
+      true
+    ],
+    [
+      "Evidence \u2192 Calibration",
+      true
+    ],
+    [
+      "Calibration \u2192 Trust",
+      true
+    ],
+    [
+      "Trust \u2192 Governance",
+      true
+    ],
+    [
+      "Governance \u2192 Execution",
+      true
+    ]
+  ],
+  "integration_score": 1.0,
+  "cycle_results": [
+    {
+      "cycle": 1,
+      "situation": "Evidence foundation shows declining claim accuracy",
+      "evidence_quality": 0.6,
+      "calibration_confidence": 0.0,
+      "trust_score": 0.0,
+      "governance_decision": false,
+      "openai_calls_this_cycle": 4
+    },
+    {
+      "cycle": 2,
+      "situation": "Calibration reveals overconfidence in predictions",
+      "evidence_quality": 0.7,
+      "calibration_confidence": 0.0,
+      "trust_score": 0.0,
+      "governance_decision": false,
+      "openai_calls_this_cycle": 4
+    },
+    {
+      "cycle": 3,
+      "situation": "Trust metrics declining due to miscalibrated confidence",
+      "evidence_quality": 0.65,
+      "calibration_confidence": 0.0,
+      "trust_score": 1.0,
+      "governance_decision": true,
+      "openai_calls_this_cycle": 4
+    },
+    {
+      "cycle": 4,
+      "situation": "Governance proposals failing to improve system coherence",
+      "evidence_quality": 0.6,
+      "calibration_confidence": 0.0,
+      "trust_score": 0.0,
+      "governance_decision": false,
+      "openai_calls_this_cycle": 4
+    },
+    {
+      "cycle": 5,
+      "situation": "Complete integration test: all systems working together",
+      "evidence_quality": 0.7,
+      "calibration_confidence": 0.0,
+      "trust_score": 0.01,
+      "governance_decision": false,
+      "openai_calls_this_cycle": 4
+    }
+  ]
+}

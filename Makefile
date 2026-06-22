@@ -1,4 +1,4 @@
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test
 
 dev:
 	docker compose --profile dev up -d
@@ -59,3 +59,62 @@ master-gate: smoke db-tests validation
 	cd backend && npm run build
 	cd frontend && npm run build
 	@echo "✓ All gates passed: smoke tests, DB validation, release validation"
+
+# ========== TRUE AUTONOMY IMPLEMENTATION COMMANDS ==========
+
+autonomy-migrate:
+	@echo "⏳ Applying autonomy migrations (021-035)..."
+	cd backend && npm run build && npm run db:migrate
+	@echo "✓ Autonomy migrations complete"
+
+autonomy-smoke:
+	@echo "🔄 Running autonomy smoke test (real end-to-end loop)..."
+	python3 scripts/autonomy_smoke.py
+	@echo "✓ Autonomy smoke test passed"
+
+autonomy-eval:
+	@echo "📊 Running autonomy evaluation suite..."
+	python3 scripts/run_autonomy_eval.py
+	@echo "✓ Autonomy eval suite complete. Check results/ for details."
+
+autonomy-sim:
+	@echo "🎮 Running autonomy simulators..."
+	python3 scripts/run_simulator.py
+	@echo "✓ Simulator runs complete"
+
+autonomy-learner:
+	@echo "🧠 Running autonomy learner (trajectory → candidate)..."
+	python3 scripts/run_learner.py
+	@echo "✓ Learner run complete"
+
+autonomy-dashboard:
+	@echo "📈 Starting autonomy dashboard (frontend)..."
+	cd frontend && npm run dev
+	@echo "Navigate to http://localhost:3000/autonomy"
+
+autonomy-security-test:
+	@echo "🔒 Running security tests (RBAC, protected surfaces, etc)..."
+	python3 -m pytest backend/tests/security/ -v
+	@echo "✓ Security tests passed"
+
+autonomy-full-test:
+	@echo "🔬 Running full autonomy test suite..."
+	make autonomy-smoke
+	make autonomy-eval
+	make autonomy-security-test
+	@echo "✓ All autonomy tests passed"
+
+autonomy-level3-smoke:
+	@echo "🎯 Running LEVEL_3 Autonomy Smoke Test (real end-to-end loop)..."
+	python3 scripts/run_level3_autonomy_smoke.py
+	@echo "✓ LEVEL_3 smoke test complete"
+
+autonomy-level3-test:
+	@echo "🔬 Running LEVEL_3 integration tests..."
+	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set, skipping"; exit 0; fi
+	python3 -m pytest tests/integration/test_level3_autonomy_loop.py -v
+	@echo "✓ LEVEL_3 tests passed"
+
+autonomy-level3-functional:
+	@echo "🎯 Running LEVEL_3 Functional Verification (Real Runtime Test)..."
+	@bash scripts/run_level3_functional_verification.sh

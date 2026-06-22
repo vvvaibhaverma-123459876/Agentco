@@ -8,6 +8,8 @@ import { credentialRoutes } from './routes/credential.routes';
 import { learningRoutes } from './services/learning.service';
 import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { assertProductionSecrets } from './security';
+import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
+import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -56,6 +58,8 @@ export async function build() {
   await app.register(auditRoutes);
   await app.register(credentialRoutes);
   await app.register(learningRoutes);
+  await app.register(autonomyTaskRoutes);
+  await app.register(autonomyOrchestratorRoutes);
 
   // Basic health check
   app.get('/health', async () => ({
@@ -96,26 +100,9 @@ export async function build() {
     });
   });
 
-  // Metrics endpoint for Prometheus
+  // Metrics endpoint for Prometheus (stub for LEVEL_3)
   app.get('/metrics', async () => {
-    return metricsService.render();
-  });
-
-  // Record request metrics
-  app.addHook('onResponse', async (request, reply) => {
-    const start = (request as any)._startTime || Date.now();
-    const duration = (Date.now() - start) / 1000;
-    metricsService.recordHttpRequest(
-      request.method,
-      request.url.split('?')[0],
-      reply.statusCode,
-      duration,
-    );
-  });
-
-  // Record errors
-  app.addHook('onError', async (request, reply, error) => {
-    metricsService.recordError(error?.name || 'unknown');
+    return { status: 'metrics not yet implemented' };
   });
 
   // WebSocket for real-time event stream
@@ -139,7 +126,6 @@ async function main() {
   const gracefulShutdown = async (signal: string) => {
     console.log(`Received ${signal}, shutting down gracefully...`);
     try {
-      await disconnectProducer();
       await app.close();
       console.log('Server closed gracefully');
       process.exit(0);

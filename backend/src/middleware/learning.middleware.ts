@@ -173,9 +173,9 @@ export async function registerLearningMiddleware(fastify: FastifyInstance) {
   capturePostSignal(fastify);
 
   // Also add error handler for contradictions
-  fastify.setErrorHandler((error, request, reply) => {
+  fastify.setErrorHandler((error: any, request, reply) => {
     captureValidationSignal(request, error);
-    reply.status(400).send({ error: error.message });
+    reply.status(400).send({ error: error?.message || 'Unknown error' });
   });
 }
 

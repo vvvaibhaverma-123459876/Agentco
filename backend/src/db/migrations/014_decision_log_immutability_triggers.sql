@@ -2,6 +2,15 @@
 -- REVOKE UPDATE/DELETE FROM PUBLIC cannot block superusers or the table owner,
 -- so we use BEFORE triggers that raise unconditionally. Superusers disable the
 -- trigger temporarily for administrative operations (chain tamper detection in tests).
+
+-- Generic immutability violation function (trigger functions cannot have args, uses TG_ARGV instead)
+CREATE OR REPLACE FUNCTION raise_immutability_violation()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION '% is append-only: % is forbidden', TG_ARGV[0], TG_OP;
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION enforce_decision_log_immutable()
 RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN

@@ -1,0 +1,60 @@
+{
+  "duration": 60.0873920917511,
+  "iterations": 34,
+  "openai_calls": 34,
+  "successful_decisions": 0,
+  "final_utility": 0.5,
+  "initial_utility": 0.5,
+  "utility_improvement": 0.0,
+  "system_state": {
+    "societies": 1,
+    "institutions": 5,
+    "evidence_claims": 0,
+    "evidence_sources": 0,
+    "memory_experiential": 0,
+    "memory_operational": 0,
+    "proposals_made": 0,
+    "proposals_approved": 0,
+    "scenarios_created": 0,
+    "simulation_results": 0,
+    "learning_proposals": 0
+  },
+  "objective_status": {
+    "current_utility": 0.5,
+    "components": {
+      "trustworthiness": {
+        "value": 0.5,
+        "weight": 0.35,
+        "improvement_rate": 0.0,
+        "history_length": 0
+      },
+      "capability": {
+        "value": 0.5,
+        "weight": 0.25,
+        "improvement_rate": 0.0,
+        "history_length": 0
+      },
+      "autonomy": {
+        "value": 0.5,
+        "weight": 0.2,
+        "improvement_rate": 0.0,
+        "history_length": 0
+      },
+      "coherence": {
+        "value": 0.5,
+        "weight": 0.15,
+        "improvement_rate": 0.0,
+        "history_length": 0
+      },
+      "efficiency": {
+        "value": 0.5,
+        "weight": 0.05,
+        "improvement_rate": 0.0,
+        "history_length": 0
+      }
+    },
+    "decisions_made": 0,
+    "utility_history_length": 0,
+    "meta_observations": 0
+  }
+}

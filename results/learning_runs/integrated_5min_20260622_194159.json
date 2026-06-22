@@ -1,0 +1,64 @@
+{
+  "experiment": "Agentco Integrated Learning 5-Min Run",
+  "duration": 300,
+  "iterations": 28295,
+  "throughput": 94.3070542950356,
+  "before": {
+    "timestamp": "2026-06-22T19:36:59.318260",
+    "label": "BEFORE_5MIN_RUN",
+    "duration_seconds": 0,
+    "state": {
+      "societies": 1,
+      "institutions": 4,
+      "agent_memberships": 0,
+      "proposals_made": 0,
+      "proposals_approved": 0,
+      "evidence_claims": 0,
+      "evidence_sources": 0,
+      "evidence_resolutions": 0,
+      "memory_experiences": 0,
+      "memory_operational": 0,
+      "learning_proposals": 0,
+      "learning_proposals_approved": 0,
+      "simulation_scenarios": 0,
+      "simulation_results": 0
+    }
+  },
+  "after": {
+    "timestamp": "2026-06-22T19:41:59.348962",
+    "label": "AFTER_5MIN_RUN",
+    "duration_seconds": 300,
+    "state": {
+      "societies": 1,
+      "institutions": 4,
+      "agent_memberships": 0,
+      "proposals_made": 28295,
+      "proposals_approved": 28295,
+      "evidence_claims": 28295,
+      "evidence_sources": 28295,
+      "evidence_resolutions": 0,
+      "memory_experiences": 28295,
+      "memory_operational": 0,
+      "learning_proposals": 28295,
+      "learning_proposals_approved": 0,
+      "simulation_scenarios": 28295,
+      "simulation_results": 28295
+    }
+  },
+  "changes": {
+    "societies": 0,
+    "institutions": 0,
+    "agent_memberships": 0,
+    "proposals_made": 28295,
+    "proposals_approved": 28295,
+    "evidence_claims": 28295,
+    "evidence_sources": 28295,
+    "evidence_resolutions": 0,
+    "memory_experiences": 28295,
+    "memory_operational": 0,
+    "learning_proposals": 28295,
+    "learning_proposals_approved": 0,
+    "simulation_scenarios": 28295,
+    "simulation_results": 28295
+  }
+}

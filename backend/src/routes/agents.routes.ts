@@ -3,6 +3,7 @@ import { memoryStore } from '../services/memory-store.service';
 import { auditLog } from '../services/audit-log.service';
 import { eventBus } from '../services/event-bus.service';
 import { learningService } from '../services/learning.service';
+import { durableExecution } from '../services/durable-execution.service';
 import { query } from '../db/client';
 import { requireApiKey } from '../security';
 import crypto from 'crypto';

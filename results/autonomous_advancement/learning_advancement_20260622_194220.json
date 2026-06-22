@@ -1,0 +1,61 @@
+{
+  "experiment": "Autonomous 10-Minute Self-Modifying Learning",
+  "description": "Agentco learns, proposes institutional changes, and adapts structure based on evidence.",
+  "timestamp": "2026-06-22T19:42:20.156418",
+  "before": {
+    "timestamp": "2026-06-22T19:32:20.138037",
+    "label": "BEFORE_ADVANCEMENT",
+    "metadata": {
+      "societies": 1,
+      "institutions": 4,
+      "agent_memberships": 0,
+      "proposals": 0,
+      "proposals_approved": 0,
+      "evidence_claims": 0,
+      "evidence_sources": 0,
+      "evidence_resolutions": 0,
+      "memory_experiential": 0,
+      "memory_operational": 0,
+      "simulation_scenarios": 0,
+      "simulation_results": 0,
+      "learning_proposals": 0
+    }
+  },
+  "after": {
+    "timestamp": "2026-06-22T19:42:20.139904",
+    "label": "AFTER_ADVANCEMENT",
+    "metadata": {
+      "societies": 1,
+      "institutions": 4,
+      "agent_memberships": 0,
+      "proposals": 42753,
+      "proposals_approved": 42753,
+      "evidence_claims": 42753,
+      "evidence_sources": 42753,
+      "evidence_resolutions": 0,
+      "memory_experiential": 85506,
+      "memory_operational": 0,
+      "simulation_scenarios": 42753,
+      "simulation_results": 42753,
+      "learning_proposals": 42753
+    }
+  },
+  "duration_seconds": 600.0018289089203,
+  "performance": {
+    "iterations_completed": 42753,
+    "throughput_iterations_per_second": 71.25479109849583,
+    "changes_proposed": 42753,
+    "changes_approved": 42753,
+    "changes_rejected": 0,
+    "approval_rate": 1.0
+  },
+  "advancement": {
+    "societies_created": 0,
+    "institutions_created": 0,
+    "evidence_claims_added": 42753,
+    "memory_events_added": 85506,
+    "proposals_made": 42753,
+    "proposals_approved": 42753,
+    "simulation_scenarios_run": 42753
+  }
+}

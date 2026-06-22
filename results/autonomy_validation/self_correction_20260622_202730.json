@@ -1,0 +1,52 @@
+{
+  "cycles": 4,
+  "issues_detected": 3,
+  "root_causes_identified": 3,
+  "fixes_proposed": 3,
+  "diagnoses": [
+    {
+      "cycle": 1,
+      "health_status": "DEGRADED",
+      "severity": 40,
+      "issues": [
+        "High rejection rate: 100%"
+      ],
+      "root_causes": [
+        "Low trust scores causing governance to reject proposals"
+      ]
+    },
+    {
+      "cycle": 2,
+      "health_status": "HEALTHY",
+      "severity": 0,
+      "issues": [],
+      "root_causes": []
+    },
+    {
+      "cycle": 3,
+      "health_status": "CRITICAL",
+      "severity": 90,
+      "issues": [
+        "Calibration always returning 0.0",
+        "High rejection rate: 67%"
+      ],
+      "root_causes": [
+        "OpenAI response parsing broken - can't extract numbers from 'confidence' field",
+        "Low trust scores causing governance to reject proposals"
+      ]
+    },
+    {
+      "cycle": 4,
+      "health_status": "CRITICAL",
+      "severity": 90,
+      "issues": [
+        "Calibration always returning 0.0",
+        "High rejection rate: 75%"
+      ],
+      "root_causes": [
+        "OpenAI response parsing broken - can't extract numbers from 'confidence' field",
+        "Low trust scores causing governance to reject proposals"
+      ]
+    }
+  ]
+}
