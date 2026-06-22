@@ -1,8 +1,9 @@
--- Migration 030: Evaluation infrastructure
+-- Migration 030: Autonomy evaluation infrastructure
 --
--- Evaluation suites, runs, and results tracking
+-- Autonomy-specific evaluation suites, runs, and results tracking
+-- (Note: eval_runs table already exists in migration 018 with different schema, so we use autonomy_eval_runs)
 
-CREATE TABLE IF NOT EXISTS eval_suites (
+CREATE TABLE IF NOT EXISTS autonomy_eval_suites (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name TEXT NOT NULL UNIQUE,
     eval_type TEXT NOT NULL CHECK (eval_type IN (
@@ -18,11 +19,11 @@ CREATE TABLE IF NOT EXISTS eval_suites (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_eval_suites_name ON eval_suites(name);
-CREATE INDEX IF NOT EXISTS idx_eval_suites_eval_type ON eval_suites(eval_type);
+CREATE INDEX IF NOT EXISTS idx_autonomy_eval_suites_name ON autonomy_eval_suites(name);
+CREATE INDEX IF NOT EXISTS idx_autonomy_eval_suites_eval_type ON autonomy_eval_suites(eval_type);
 
 
-CREATE TABLE IF NOT EXISTS eval_runs (
+CREATE TABLE IF NOT EXISTS autonomy_eval_runs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     eval_suite_id UUID,
     artifact_id UUID,
@@ -37,7 +38,7 @@ CREATE TABLE IF NOT EXISTS eval_runs (
 );
 
 
-CREATE TABLE IF NOT EXISTS eval_results (
+CREATE TABLE IF NOT EXISTS autonomy_eval_results (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     eval_run_id UUID NOT NULL,
     test_case_id TEXT NOT NULL,

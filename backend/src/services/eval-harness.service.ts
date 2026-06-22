@@ -49,7 +49,7 @@ export class EvalHarnessService {
 
     // Verify suite exists
     const suiteResult = await db.query(
-      `SELECT id, name, active FROM eval_suites WHERE id = $1`,
+      `SELECT id, name, active FROM autonomy_eval_suites WHERE id = $1`,
       [suiteId]
     );
 
@@ -59,7 +59,7 @@ export class EvalHarnessService {
 
     // Create eval run
     const result = await db.query(
-      `INSERT INTO eval_runs (
+      `INSERT INTO autonomy_eval_runs (
         id, eval_suite_id, artifact_id, run_timestamp, status, created_at
       ) VALUES ($1, $2, $3, NOW(), $4, NOW())
        RETURNING id`,
@@ -573,7 +573,7 @@ export class EvalHarnessService {
     );
 
     // Update eval run status
-    await db.query(`UPDATE eval_runs SET status = 'completed' WHERE id = $1`, [evalRunId]);
+    await db.query(`UPDATE autonomy_eval_runs SET status = 'completed' WHERE id = $1`, [evalRunId]);
 
     return {
       id: result.rows[0].id,

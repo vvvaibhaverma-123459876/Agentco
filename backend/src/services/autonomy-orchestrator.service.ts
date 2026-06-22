@@ -437,7 +437,7 @@ export class AutonomyOrchestratorService {
 
       // Get or create eval suite
       const suiteResult = await db.query(
-        `SELECT id FROM eval_suites WHERE active = true LIMIT 1`
+        `SELECT id FROM autonomy_eval_suites WHERE active = true LIMIT 1`
       );
       let suiteId: string;
       if (suiteResult.rows.length > 0) {
@@ -445,7 +445,7 @@ export class AutonomyOrchestratorService {
       } else {
         suiteId = uuidv4();
         await db.query(
-          `INSERT INTO eval_suites (id, name, eval_type, active, total_cases) VALUES ($1, $2, $3, $4, $5)`,
+          `INSERT INTO autonomy_eval_suites (id, name, eval_type, active, total_cases) VALUES ($1, $2, $3, $4, $5)`,
           [suiteId, 'default_eval_suite', 'safety', true, 0]
         );
       }
