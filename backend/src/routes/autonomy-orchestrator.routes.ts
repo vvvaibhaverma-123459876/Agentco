@@ -16,8 +16,16 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
     try {
       console.log('[LEVEL_3] Starting controlled autonomy loop...');
 
+      // Extract optional idempotency_key from request body
+      const body = request.body as { idempotency_key?: string } | undefined;
+      const idempotencyKey = body?.idempotency_key;
+
+      if (idempotencyKey) {
+        console.log(`[LEVEL_3] Using idempotency_key: ${idempotencyKey}`);
+      }
+
       // Execute the real orchestrated loop
-      const autonomyRun = await autonomyOrchestrator.executeControlledAutonomyLoop();
+      const autonomyRun = await autonomyOrchestrator.executeControlledAutonomyLoop(idempotencyKey);
 
       console.log('[LEVEL_3] Loop completed successfully');
 

@@ -118,3 +118,7 @@ autonomy-level3-test:
 autonomy-level3-functional:
 	@echo "🎯 Running LEVEL_3 Functional Verification (Real Runtime Test)..."
 	@bash scripts/run_level3_functional_verification.sh
+
+autonomy-idempotency-test:
+	@echo "🎯 Running LEVEL_4 Area 1: Idempotency Test..."
+	python3 scripts/test_idempotency.py

@@ -60,8 +60,38 @@ export class AutonomyOrchestratorService {
   /**
    * Execute full LEVEL_3 autonomy smoke test loop
    * This is a real, end-to-end controlled autonomy loop that demonstrates all 20 steps
+   * @param idempotencyKey Optional key for idempotent execution - same key returns same run
    */
-  async executeControlledAutonomyLoop(): Promise<AutonomyRun> {
+  async executeControlledAutonomyLoop(idempotencyKey?: string): Promise<AutonomyRun> {
+    // IDEMPOTENCY CHECK: If key provided, check if we've already run this
+    if (idempotencyKey) {
+      const existing = await db.query(
+        `SELECT id, run_id, status, trace_id, created_at FROM autonomy_tasks WHERE idempotency_key = $1 LIMIT 1`,
+        [idempotencyKey]
+      );
+      if (existing.rows.length > 0) {
+        const task = existing.rows[0];
+        console.log(`[IDEMPOTENCY] Duplicate request detected. Returning existing run: ${task.run_id}`);
+        // Log as audit event
+        await db.query(
+          `INSERT INTO autonomy_task_events (task_id, event_type, event_data, created_at)
+           VALUES ($1, $2, $3, NOW())`,
+          [task.id, 'duplicate_detected', JSON.stringify({ idempotency_key: idempotencyKey })]
+        );
+        return {
+          id: task.id,
+          runId: task.run_id,
+          status: task.status,
+          traceId: task.trace_id,
+          currentStep: 0,
+          totalSteps: 20,
+          trajectoryIds: [],
+          promotionEligible: false,
+          startedAt: task.created_at,
+        };
+      }
+    }
+
     const runId = `autonomy_run_${Date.now()}`;
     const traceId = uuidv4();
     const autonomyRun: AutonomyRun = {
@@ -165,8 +195,8 @@ export class AutonomyOrchestratorService {
       const taskId = uuidv4();
       await db.query(
         `INSERT INTO autonomy_tasks (
-          id, task_type, title, source, status, autonomy_level, risk_level
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          id, task_type, title, source, status, autonomy_level, risk_level, run_id, idempotency_key, trace_id
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
         [
           taskId,
           'plan_execution',
@@ -175,6 +205,9 @@ export class AutonomyOrchestratorService {
           'created',
           autonomyLevel,
           riskLevel,
+          runId,
+          idempotencyKey || null,
+          traceId,
         ]
       );
       autonomyRun.taskId = taskId;
