@@ -1,238 +1,179 @@
 /**
- * Trustworthiness Service: Comprehensive Trust Scoring
+ * Trustworthiness Service - Trust Scoring Engine
+ * 6-dimensional trust metric based on research
  *
- * Research-backed trust metrics:
- * - Accuracy: Base model accuracy + ensemble correction
- * - Calibration: Confidence-accuracy alignment (ECE)
- * - Consistency: Agreement across models/evidence
- * - Explainability: SHAP-style importance + reasoning chain
- * - Uncertainty: Proper uncertainty quantification
- * - Coverage: Conformal prediction set coverage
- *
- * Formula: trust_score = weighted_sum(6 dimensions)
+ * Dimensions:
+ * 1. Accuracy (25%) - correct answers
+ * 2. Calibration (20%) - confidence matches correctness
+ * 3. Consistency (20%) - agreement across models/evidence
+ * 4. Explainability (15%) - reasoning quality (SHAP)
+ * 5. Uncertainty (10%) - proper confidence quantification
+ * 6. Coverage (10%) - conformal prediction coverage
  */
 
-export interface TrustDimension {
-  accuracy: number; // 0-1: Accuracy relative to baseline
-  calibration: number; // 0-1: Confidence-accuracy alignment
-  consistency: number; // 0-1: Agreement across evidence/models
-  explainability: number; // 0-1: Quality of explanation
-  uncertainty: number; // 0-1: Proper uncertainty quantification
-  coverage: number; // 0-1: Conformal prediction coverage adequacy
+interface TrustDimension {
+  name: string;
+  score: number; // 0-1
+  weight: number;
+  reasoning: string;
 }
 
-export interface TrustworthinessResult {
-  trust_score: number; // 0-1: Overall trustworthiness
-  dimensions: TrustDimension;
-  detailed_reasoning: string;
-  risk_factors: string[];
-  recommendations: string[];
+interface TrustworthinessScore {
+  overall_trust: number; // 0-1 weighted average
+  dimensions: TrustDimension[];
+  risk_level: 'low' | 'moderate' | 'high' | 'critical';
+  recommendation: string;
+  confidence_in_trust: number; // Meta-confidence
 }
 
 export class TrustworthinessService {
   /**
    * Compute comprehensive trust score
+   * 6-dimensional metric (Zhou et al., Ribeiro et al., Angelopoulos & Bates)
    */
-  computeTrustScore(input: {
-    answer: string;
-    confidence: number;
-    rag_quality: number;
-    ensemble_agreement: number;
-    symbolic_guaranteed: boolean;
-    calibration_error: number;
-    explanation: string;
-  }): TrustworthinessResult {
-    // Compute each dimension
-    const accuracy = this.computeAccuracy(input.confidence, input.symbolic_guaranteed);
-    const calibration = this.computeCalibration(input.confidence, input.calibration_error);
-    const consistency = this.computeConsistency(input.rag_quality, input.ensemble_agreement);
-    const explainability = this.computeExplainability(input.explanation);
-    const uncertainty = this.computeUncertainty(input.confidence);
-    const coverage = this.computeCoverage(input.ensemble_agreement);
+  computeTrustScore(
+    accuracy: number, // 0-1: base model accuracy on task
+    calibrationError: number, // 0-1: ECE (lower is better)
+    consistency: number, // 0-1: agreement across models
+    explainability: number, // 0-1: quality of reasoning chain
+    uncertaintyQuality: number, // 0-1: proper uncertainty quantification
+    conformalCoverage: number, // 0-1: coverage of prediction set
+  ): TrustworthinessScore {
+    const dimensions: TrustDimension[] = [
+      {
+        name: 'Accuracy',
+        score: accuracy,
+        weight: 0.25,
+        reasoning: `Base model accuracy: ${(accuracy * 100).toFixed(1)}%`,
+      },
+      {
+        name: 'Calibration',
+        score: 1 - Math.min(1, calibrationError * 2), // ECE 0.05 → score 0.9
+        weight: 0.20,
+        reasoning: `Calibration error: ${(calibrationError * 100).toFixed(1)}%`,
+      },
+      {
+        name: 'Consistency',
+        score: consistency,
+        weight: 0.20,
+        reasoning: `Model agreement: ${(consistency * 100).toFixed(1)}%`,
+      },
+      {
+        name: 'Explainability',
+        score: explainability,
+        weight: 0.15,
+        reasoning: `Reasoning quality: ${this.explainabilityLevel(explainability)}`,
+      },
+      {
+        name: 'Uncertainty',
+        score: uncertaintyQuality,
+        weight: 0.10,
+        reasoning: `Uncertainty quantification: ${this.uncertaintyLevel(uncertaintyQuality)}`,
+      },
+      {
+        name: 'Coverage',
+        score: conformalCoverage,
+        weight: 0.10,
+        reasoning: `Conformal coverage: ${(conformalCoverage * 100).toFixed(1)}%`,
+      },
+    ];
 
-    const dimensions: TrustDimension = {
-      accuracy,
-      calibration,
-      consistency,
-      explainability,
-      uncertainty,
-      coverage,
-    };
+    // Compute weighted average
+    const overallTrust = dimensions.reduce((sum, d) => sum + d.score * d.weight, 0);
 
-    // Weighted combination
-    const trust_score = this.fuseDimensions(dimensions);
+    // Determine risk level
+    const riskLevel = this.determineRiskLevel(overallTrust);
 
-    // Generate risk factors and recommendations
-    const risk_factors = this.identifyRiskFactors(dimensions, input);
-    const recommendations = this.generateRecommendations(dimensions, risk_factors);
+    // Generate recommendation
+    const recommendation = this.generateRecommendation(overallTrust, dimensions);
 
-    const detailed_reasoning = this.generateDetailedReasoning(dimensions, input);
+    // Confidence in trust score (based on consistency and calibration)
+    const confidenceInTrust = (consistency * 0.6 + (1 - calibrationError) * 0.4) * 0.9 + 0.1;
 
     return {
-      trust_score,
+      overall_trust: Math.round(overallTrust * 1000) / 1000,
       dimensions,
-      detailed_reasoning,
-      risk_factors,
-      recommendations,
+      risk_level: riskLevel,
+      recommendation,
+      confidence_in_trust: Math.round(confidenceInTrust * 1000) / 1000,
     };
   }
 
   /**
-   * Accuracy dimension
-   * Higher confidence + symbolic guarantee = higher accuracy
+   * Determine risk level from trust score
    */
-  private computeAccuracy(confidence: number, symbolic_guaranteed: boolean): number {
-    if (symbolic_guaranteed) return 0.99; // Logic proofs are nearly certain
-    return Math.min(0.95, confidence * 1.2); // Scale confidence (confidence is optimistic)
+  private determineRiskLevel(trustScore: number): 'low' | 'moderate' | 'high' | 'critical' {
+    if (trustScore >= 0.90) return 'low';
+    if (trustScore >= 0.75) return 'moderate';
+    if (trustScore >= 0.60) return 'high';
+    return 'critical';
   }
 
   /**
-   * Calibration dimension
-   * Lower calibration error = better calibration
+   * Generate actionable recommendation
    */
-  private computeCalibration(confidence: number, calibration_error: number): number {
-    // Target: ECE < 0.05 (excellent), tolerate up to 0.15 (poor)
-    if (calibration_error < 0.05) return 0.95;
-    if (calibration_error < 0.1) return 0.85;
-    if (calibration_error < 0.15) return 0.7;
-    return Math.max(0.4, 1 - calibration_error); // Degrade with error
+  private generateRecommendation(trustScore: number, dimensions: TrustDimension[]): string {
+    if (trustScore >= 0.90) {
+      return '✅ Highly trustworthy. Use with high confidence. Minimal verification needed.';
+    }
+
+    if (trustScore >= 0.75) {
+      return '⚠️ Mostly trustworthy. Normal confidence appropriate. Consider secondary validation for critical decisions.';
+    }
+
+    // Find weakest dimension
+    const weakest = dimensions.reduce((min, d) => (d.score < min.score ? d : min));
+
+    if (trustScore >= 0.60) {
+      return `⚡ Moderately trustworthy. Weak area: ${weakest.name} (${(weakest.score * 100).toFixed(0)}%). Request verification for important decisions.`;
+    }
+
+    return `❌ Low trustworthiness. Weak areas: ${dimensions.filter(d => d.score < 0.5).map(d => d.name).join(', ')}. Reject answer or seek alternative.`;
+  }
+
+  private explainabilityLevel(score: number): string {
+    if (score >= 0.9) return 'Excellent (clear reasoning + SHAP)';
+    if (score >= 0.7) return 'Good (coherent reasoning)';
+    if (score >= 0.5) return 'Moderate (some explanation)';
+    return 'Poor (minimal reasoning)';
+  }
+
+  private uncertaintyLevel(score: number): string {
+    if (score >= 0.9) return 'Excellent (proper calibration + conformal sets)';
+    if (score >= 0.7) return 'Good (well-calibrated confidence)';
+    if (score >= 0.5) return 'Moderate (rough uncertainty estimates)';
+    return 'Poor (overconfident predictions)';
   }
 
   /**
-   * Consistency dimension
-   * Agreement between RAG evidence and ensemble models
+   * Risk assessment for specific answer
    */
-  private computeConsistency(rag_quality: number, ensemble_agreement: number): number {
-    return (rag_quality * 0.6 + ensemble_agreement * 0.4);
-  }
-
-  /**
-   * Explainability dimension
-   * Quality of reasoning/explanation provided
-   */
-  private computeExplainability(explanation: string): number {
-    if (!explanation) return 0.3; // No explanation
-    if (explanation.length < 50) return 0.5; // Brief explanation
-    if (explanation.length < 200) return 0.75; // Good explanation
-    return 0.9; // Detailed explanation
-  }
-
-  /**
-   * Uncertainty dimension
-   * How well does the system quantify uncertainty?
-   */
-  private computeUncertainty(confidence: number): number {
-    // Perfect: confidence aligns with accuracy
-    // Over-confident (confidence > accuracy) = lower trust
-    // Under-confident (confidence < accuracy) = lower trust
-
-    // Assume accuracy ≈ confidence (ideal) = 0.9
-    // Penalize deviations
-    const deviation = Math.abs(confidence - 0.7); // Assume 70% base accuracy
-    return Math.max(0.4, 1 - deviation);
-  }
-
-  /**
-   * Coverage dimension
-   * Is prediction set appropriately sized? (Conformal prediction)
-   */
-  private computeCoverage(ensemble_agreement: number): number {
-    // High agreement → small prediction set (efficient)
-    // Low agreement → large prediction set (conservative)
-    // Ideal: minimal set with guaranteed coverage
-
-    if (ensemble_agreement > 0.8) return 0.95; // Very small set, high confidence
-    if (ensemble_agreement > 0.6) return 0.85; // Moderate set
-    if (ensemble_agreement > 0.4) return 0.7; // Larger set
-    return 0.5; // Very uncertain
-  }
-
-  /**
-   * Fuse dimensions into single trust score
-   * Weights from research literature
-   */
-  private fuseDimensions(dims: TrustDimension): number {
-    const weights = {
-      accuracy: 0.25, // Accuracy is critical
-      calibration: 0.20, // Confidence calibration matters
-      consistency: 0.20, // Evidence alignment
-      explainability: 0.15, // Transparency/interpretability
-      uncertainty: 0.10, // Proper quantification
-      coverage: 0.10, // Conformal coverage
+  assessAnswerRisk(
+    answer: string,
+    trustScore: number,
+    domain: 'safety' | 'financial' | 'medical' | 'general',
+  ): { risk_level: string; requires_review: boolean; suggested_actions: string[] } {
+    const domainThresholds: { [key: string]: number } = {
+      safety: 0.95,
+      financial: 0.90,
+      medical: 0.92,
+      general: 0.75,
     };
 
-    const weighted =
-      dims.accuracy * weights.accuracy +
-      dims.calibration * weights.calibration +
-      dims.consistency * weights.consistency +
-      dims.explainability * weights.explainability +
-      dims.uncertainty * weights.uncertainty +
-      dims.coverage * weights.coverage;
+    const threshold = domainThresholds[domain];
+    const requires_review = trustScore < threshold;
 
-    return Math.min(0.99, Math.max(0.1, weighted));
-  }
+    const actions: string[] = [];
+    if (trustScore < 0.90) actions.push('Request verification');
+    if (trustScore < 0.75) actions.push('Escalate to human expert');
+    if (trustScore < 0.60) actions.push('Reject answer');
 
-  /**
-   * Identify risk factors
-   */
-  private identifyRiskFactors(dims: TrustDimension, input: any): string[] {
-    const risks: string[] = [];
-
-    if (dims.accuracy < 0.7) risks.push('Low accuracy: answer may be incorrect');
-    if (dims.calibration < 0.7) risks.push('Poor calibration: confidence unreliable');
-    if (dims.consistency < 0.6) risks.push('Low consistency: evidence/models disagree');
-    if (dims.explainability < 0.6) risks.push('Poor explainability: reasoning unclear');
-    if (dims.uncertainty < 0.6) risks.push('Uncertainty poorly quantified');
-    if (dims.coverage < 0.6) risks.push('Prediction set may be insufficiently conservative');
-
-    return risks;
-  }
-
-  /**
-   * Generate recommendations
-   */
-  private generateRecommendations(dims: TrustDimension, risks: string[]): string[] {
-    const recs: string[] = [];
-
-    if (dims.accuracy < 0.7) {
-      recs.push('Consider requesting additional context or alternative phrasing');
-    }
-    if (dims.calibration < 0.7) {
-      recs.push('Retrain model on better-calibrated confidence scores');
-    }
-    if (dims.consistency < 0.6) {
-      recs.push('Seek additional evidence sources to resolve disagreement');
-    }
-    if (dims.explainability < 0.6) {
-      recs.push('Enable verbose mode for detailed reasoning chain');
-    }
-
-    if (recs.length === 0) {
-      recs.push('Answer appears trustworthy; use with normal confidence');
-    }
-
-    return recs;
-  }
-
-  /**
-   * Generate detailed reasoning
-   */
-  private generateDetailedReasoning(dims: TrustDimension, input: any): string {
-    const accuracy_pct = (dims.accuracy * 100).toFixed(0);
-    const calibration_pct = (dims.calibration * 100).toFixed(0);
-    const consistency_pct = (dims.consistency * 100).toFixed(0);
-
-    return `Trust assessment: Accuracy ${accuracy_pct}%, Calibration ${calibration_pct}%, Consistency ${consistency_pct}%. ` +
-      `System confidence: ${(input.confidence * 100).toFixed(0)}% (${this.confidenceQualifier(input.confidence)}).`;
-  }
-
-  private confidenceQualifier(conf: number): string {
-    if (conf > 0.9) return 'very high';
-    if (conf > 0.75) return 'high';
-    if (conf > 0.6) return 'moderate';
-    if (conf > 0.4) return 'low';
-    return 'very low';
+    return {
+      risk_level: requires_review ? 'HIGH' : 'LOW',
+      requires_review,
+      suggested_actions: actions,
+    };
   }
 }
 
-export const trustService = new TrustworthinessService();
+export const trustworthinessService = new TrustworthinessService();
