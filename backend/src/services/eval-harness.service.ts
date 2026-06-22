@@ -60,8 +60,8 @@ export class EvalHarnessService {
     // Create eval run
     const result = await db.query(
       `INSERT INTO eval_runs (
-        id, eval_suite_id, artifact_id, status, created_at
-      ) VALUES ($1, $2, $3, $4, NOW())
+        id, eval_suite_id, artifact_id, run_timestamp, status, created_at
+      ) VALUES ($1, $2, $3, NOW(), $4, NOW())
        RETURNING id`,
       [evalRunId, suiteId, candidateId || null, 'completed']
     );
