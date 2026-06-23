@@ -9,10 +9,12 @@
 -- CIVILIZATION ENTITY TYPES
 -- ============================================================
 
+DROP TYPE IF EXISTS entity_type CASCADE;
 CREATE TYPE entity_type AS ENUM (
     'agent', 'team', 'institution', 'society', 'civilization'
 );
 
+DROP TYPE IF EXISTS knowledge_type CASCADE;
 CREATE TYPE knowledge_type AS ENUM (
     'prompt_template', 'tool_selection_policy', 'escalation_threshold',
     'coordination_pattern', 'procedure', 'standard', 'review_rule',
@@ -20,10 +22,12 @@ CREATE TYPE knowledge_type AS ENUM (
     'safety_doctrine', 'constitutional_constraint'
 );
 
+DROP TYPE IF EXISTS learning_level CASCADE;
 CREATE TYPE learning_level AS ENUM (
     'agent', 'team', 'institution', 'society', 'civilization'
 );
 
+DROP TYPE IF EXISTS dispute_status CASCADE;
 CREATE TYPE dispute_status AS ENUM (
     'raised', 'under_investigation', 'awaiting_evidence',
     'in_consensus_formation', 'resolved', 'escalated_to_civilization'
@@ -32,6 +36,14 @@ CREATE TYPE dispute_status AS ENUM (
 -- ============================================================
 -- CIVILIZATION HIERARCHY TABLES
 -- ============================================================
+
+-- Clean slate: drop all civilization tables that may exist from previous migrations
+DROP TABLE IF EXISTS civilization_governance_reviews CASCADE;
+DROP TABLE IF EXISTS society_disputes CASCADE;
+DROP TABLE IF EXISTS institutional_knowledge_items CASCADE;
+DROP TABLE IF EXISTS civilization_learning_events CASCADE;
+DROP TABLE IF EXISTS civilization_memberships CASCADE;
+DROP TABLE IF EXISTS civilization_entities CASCADE;
 
 CREATE TABLE civilization_entities (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
