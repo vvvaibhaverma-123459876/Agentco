@@ -77,6 +77,9 @@ export class CalibrationChangeGovernanceService {
       ]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error('Failed to create change request');
+    }
     return result.rows[0];
   }
 
@@ -173,6 +176,9 @@ export class CalibrationChangeGovernanceService {
       ]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error('Failed to record compliance check');
+    }
     return result.rows[0];
   }
 
