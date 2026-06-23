@@ -6,7 +6,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
 import { ActionSpec, ActionResult } from '../types/action.types';
@@ -55,6 +55,7 @@ export interface ActivationResult {
 
 export class TeamActivationService {
   private activeSpecialists = new Map<string, SpecialistInstance>();
+  private activeProcesses = new Map<string, ChildProcess>();
 
   /**
    * Activate a specialist agent with bounded resources
@@ -90,6 +91,8 @@ export class TeamActivationService {
     // Create specialist instance
     const specialistId = uuidv4();
     const budget = request.customBudget || roleSpec.defaultBudgets;
+    const portNumber = this.findAvailablePort();
+    const httpEndpoint = `http://127.0.0.1:${portNumber}`;
 
     const specialist: SpecialistInstance = {
       specialistId,
@@ -103,14 +106,34 @@ export class TeamActivationService {
       iterationsBudget: budget.iterations,
       iterationsUsed: 0,
       secondsBudget: budget.seconds,
+      httpEndpoint,
+      portNumber,
     };
+
+    // Spawn Python subprocess
+    const childProcess = this.spawnSpecialistProcess(specialistId, request.role, portNumber, budget);
+    if (!childProcess) {
+      console.error(`[TeamActivation] Failed to spawn subprocess for specialist ${specialistId}`);
+      return null;
+    }
+
+    // Wait for HTTP server to be ready (max 5 seconds)
+    const ready = await this.waitForSpecialistReady(httpEndpoint, 5000);
+    if (!ready) {
+      console.error(`[TeamActivation] Specialist HTTP server not ready at ${httpEndpoint}`);
+      childProcess.kill();
+      return null;
+    }
+
+    specialist.processId = childProcess.pid;
 
     // Store in database
     await db.query(
       `INSERT INTO autonomy_team_activations (
         id, parent_goal_id, specialist_id, specialist_role, objective,
-        budget_tokens, budget_iterations, budget_seconds, status
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        budget_tokens, budget_iterations, budget_seconds, status,
+        http_endpoint, process_pid, port_number
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [
         uuidv4(),
         request.parentGoalId,
@@ -121,13 +144,23 @@ export class TeamActivationService {
         budget.iterations,
         budget.seconds,
         'active',
+        httpEndpoint,
+        childProcess.pid,
+        portNumber,
       ]
     );
 
     // Track in memory
     this.activeSpecialists.set(specialistId, specialist);
+    this.activeProcesses.set(specialistId, childProcess);
 
-    console.log(`[TeamActivation] Spawned specialist ${specialistId} (role: ${request.role})`);
+    // Handle process termination
+    childProcess.on('exit', (code) => {
+      console.log(`[TeamActivation] Specialist process ${specialistId} exited with code ${code}`);
+      this.activeProcesses.delete(specialistId);
+    });
+
+    console.log(`[TeamActivation] Spawned specialist ${specialistId} (role: ${request.role}, pid: ${childProcess.pid}, port: ${portNumber})`);
     return specialist;
   }
 
@@ -213,6 +246,18 @@ export class TeamActivationService {
     const completedAt = new Date();
     const status = results.error ? 'failed' : 'completed';
 
+    // Kill subprocess if still running
+    const childProcess = this.activeProcesses.get(specialistId);
+    if (childProcess && !childProcess.killed) {
+      childProcess.kill('SIGTERM');
+      // Wait up to 2 seconds for graceful shutdown, then force kill
+      setTimeout(() => {
+        if (!childProcess.killed) {
+          childProcess.kill('SIGKILL');
+        }
+      }, 2000);
+    }
+
     await db.query(
       `UPDATE autonomy_team_activations SET
         status = $1, completed_at = $2, results = $3
@@ -226,6 +271,7 @@ export class TeamActivationService {
     );
 
     this.activeSpecialists.delete(specialistId);
+    this.activeProcesses.delete(specialistId);
     console.log(`[TeamActivation] Terminated specialist ${specialistId} (status: ${status})`);
   }
 
@@ -360,6 +406,76 @@ export class TeamActivationService {
     }
 
     console.log(`[TeamActivation] Aggregated ${specialistResults.artifacts.length} artifacts and ${specialistResults.claims.length} claims to parent goal ${parentGoalId}`);
+  }
+
+  /**
+   * Spawn a Python specialist subprocess
+   */
+  private spawnSpecialistProcess(
+    specialistId: string,
+    role: string,
+    port: number,
+    budget: SpecialistBudget
+  ): ChildProcess | null {
+    try {
+      const args = [
+        '-m', `agents.autonomy.${role}`,
+        '--specialist-id', specialistId,
+        '--port', port.toString(),
+        '--role', role,
+        '--budget', JSON.stringify(budget),
+      ];
+
+      const childProcess = spawn('python3', args, {
+        detached: false,
+        stdio: ['ignore', 'pipe', 'pipe'],
+        env: {
+          ...process.env,
+          SPECIALIST_ID: specialistId,
+          SPECIALIST_ROLE: role,
+        },
+      });
+
+      // Log subprocess output for debugging
+      childProcess.stdout?.on('data', (data) => {
+        console.log(`[Specialist ${specialistId}] ${data.toString().trim()}`);
+      });
+
+      childProcess.stderr?.on('data', (data) => {
+        console.error(`[Specialist ${specialistId}] ERROR: ${data.toString().trim()}`);
+      });
+
+      return childProcess;
+    } catch (error: any) {
+      console.error(`[TeamActivation] Failed to spawn specialist subprocess: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * Wait for specialist HTTP server to be ready
+   */
+  private async waitForSpecialistReady(httpEndpoint: string, timeoutMs: number): Promise<boolean> {
+    const startTime = Date.now();
+    const statusUrl = `${httpEndpoint}/status`;
+
+    while (Date.now() - startTime < timeoutMs) {
+      try {
+        const response = await fetch(statusUrl, { method: 'GET' });
+        if (response.ok) {
+          console.log(`[TeamActivation] Specialist server ready at ${httpEndpoint}`);
+          return true;
+        }
+      } catch (error) {
+        // Server not ready yet, retry
+      }
+
+      // Wait 100ms before retrying
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    console.error(`[TeamActivation] Specialist server at ${httpEndpoint} did not become ready within ${timeoutMs}ms`);
+    return false;
   }
 
   /**
