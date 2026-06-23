@@ -16,6 +16,7 @@ import hashlib
 import os
 import hmac
 import time
+from collections import defaultdict
 
 # Database connection pooling (optional - only if env vars present)
 try:
@@ -133,6 +134,9 @@ def verify_request_signature(payload_bytes: bytes, signature: str, timestamp: st
 class SpecialistAgent(BaseAgent):
     """Base specialist agent with HTTP server for orchestrator communication"""
 
+    # Rate limiting: max requests per second (per specialist instance)
+    REQUEST_RATE_LIMIT = 10  # Allow 10 requests/sec
+
     def __init__(self, specialist_id: str, role: str, budget: Dict[str, int]):
         """
         Initialize specialist agent
@@ -151,6 +155,10 @@ class SpecialistAgent(BaseAgent):
         self.iterations_used = 0
         self.start_time = datetime.now()
 
+        # Rate limiting with token bucket algorithm
+        self.request_tokens = self.REQUEST_RATE_LIMIT
+        self.last_token_refill = datetime.now()
+
         # Flask app for HTTP communication
         self.app = Flask(f"specialist_{specialist_id}")
         self.setup_routes()
@@ -162,6 +170,15 @@ class SpecialistAgent(BaseAgent):
         def execute_action():
             """Execute action spec and return result"""
             try:
+                # RATE LIMIT: Check request rate FIRST
+                allowed, rate_info = self.check_rate_limit()
+                if not allowed:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': ['Rate limit exceeded'],
+                        'rate_limit': rate_info
+                    }), 429  # 429 Too Many Requests
+
                 # SECURITY: Verify HMAC signature if headers present
                 signature = request.headers.get('X-Signature')
                 timestamp = request.headers.get('X-Timestamp')
@@ -225,13 +242,16 @@ class SpecialistAgent(BaseAgent):
                 # Now execute the action
                 result = self.handle_action(action_spec)
 
-                return jsonify({
+                response_data = {
                     'status': 'completed',
                     'observations': result.get('observations', {}),
                     'artifacts': result.get('artifacts', []),
                     'tokens_used': self.tokens_used,
-                    'errors': result.get('errors')
-                }), 200
+                    'errors': result.get('errors'),
+                    'rate_limit': rate_info,
+                }
+
+                return jsonify(response_data), 200
 
             except RuntimeError as e:
                 # Budget exceeded or constraint violation
@@ -266,6 +286,39 @@ class SpecialistAgent(BaseAgent):
         def health():
             """Health check endpoint"""
             return jsonify({'status': 'healthy'}), 200
+
+    def check_rate_limit(self) -> tuple[bool, Dict[str, int]]:
+        """
+        Check rate limit using token bucket algorithm.
+        Returns (allowed, rate_limit_info)
+        """
+        now = datetime.now()
+        time_since_refill = (now - self.last_token_refill).total_seconds()
+
+        # Refill tokens based on elapsed time
+        tokens_to_add = time_since_refill * self.REQUEST_RATE_LIMIT
+        if tokens_to_add > 0:
+            self.request_tokens = min(
+                self.REQUEST_RATE_LIMIT,
+                self.request_tokens + tokens_to_add
+            )
+            self.last_token_refill = now
+
+        # Check if we can serve this request
+        if self.request_tokens >= 1:
+            self.request_tokens -= 1
+            return (True, {
+                'limit': self.REQUEST_RATE_LIMIT,
+                'remaining': int(self.request_tokens),
+                'reset_in_seconds': int(1.0 / self.REQUEST_RATE_LIMIT),
+            })
+        else:
+            # Rate limited
+            return (False, {
+                'limit': self.REQUEST_RATE_LIMIT,
+                'remaining': 0,
+                'retry_after_seconds': int(1.0 / self.REQUEST_RATE_LIMIT),
+            })
 
     def get_allowed_actions(self) -> set:
         """
