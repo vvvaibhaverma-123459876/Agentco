@@ -13,6 +13,7 @@ import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
 import { ActionSpec, ActionResult } from '../types/action.types';
 import { metricsService } from './autonomy-metrics.service';
+import { structuredLogger } from './structured-logger.service';
 
 export interface SpecialistBudget {
   tokens: number;
@@ -63,17 +64,17 @@ export class TeamActivationService {
   constructor() {
     // Graceful shutdown handlers to prevent orphaned processes
     process.on('SIGTERM', () => {
-      console.log('[TeamActivation] SIGTERM received, initiating graceful shutdown...');
+      structuredLogger.logProcessEvent('signal', 'SIGTERM received, initiating graceful shutdown');
       this.gracefulShutdown().catch((err) => {
-        console.error('[TeamActivation] Error during shutdown:', err);
+        structuredLogger.logProcessEvent('error', `Error during SIGTERM shutdown: ${err.message}`);
         process.exit(1);
       });
     });
 
     process.on('SIGINT', () => {
-      console.log('[TeamActivation] SIGINT received, initiating graceful shutdown...');
+      structuredLogger.logProcessEvent('signal', 'SIGINT received, initiating graceful shutdown');
       this.gracefulShutdown().catch((err) => {
-        console.error('[TeamActivation] Error during shutdown:', err);
+        structuredLogger.logProcessEvent('error', `Error during SIGINT shutdown: ${err.message}`);
         process.exit(1);
       });
     });
@@ -86,17 +87,23 @@ export class TeamActivationService {
     const timeout = 10000; // 10 seconds total timeout
     const startTime = Date.now();
 
-    console.log(`[TeamActivation] Starting graceful shutdown of ${this.activeProcesses.size} active specialists...`);
+    structuredLogger.logProcessEvent('signal', `Starting graceful shutdown of ${this.activeProcesses.size} active specialists`);
 
     // Step 1: Signal all specialists to terminate gracefully (SIGTERM)
     for (const [specialistId, childProcess] of this.activeProcesses) {
       try {
         if (!childProcess.killed) {
           childProcess.kill('SIGTERM');
-          console.log(`[TeamActivation] Sent SIGTERM to specialist ${specialistId} (PID: ${childProcess.pid})`);
+          structuredLogger.log('info', 'Sent SIGTERM to specialist', {
+            specialistId,
+            pid: childProcess.pid,
+          });
         }
-      } catch (err) {
-        console.warn(`[TeamActivation] Failed to send SIGTERM to ${specialistId}:`, err);
+      } catch (err: any) {
+        structuredLogger.log('warn', 'Failed to send SIGTERM to specialist', {
+          specialistId,
+          error: err.message,
+        });
       }
     }
 
@@ -110,9 +117,15 @@ export class TeamActivationService {
       if (!childProcess.killed) {
         try {
           childProcess.kill('SIGKILL');
-          console.log(`[TeamActivation] Force-killed specialist ${specialistId} (PID: ${childProcess.pid})`);
-        } catch (err) {
-          console.warn(`[TeamActivation] Failed to SIGKILL ${specialistId}:`, err);
+          structuredLogger.log('warn', 'Force-killed specialist', {
+            specialistId,
+            pid: childProcess.pid,
+          });
+        } catch (err: any) {
+          structuredLogger.log('error', 'Failed to SIGKILL specialist', {
+            specialistId,
+            error: err.message,
+          });
         }
       }
     }
@@ -126,12 +139,15 @@ export class TeamActivationService {
           claims: [],
           error: 'Process killed during server shutdown',
         });
-      } catch (err) {
-        console.warn(`[TeamActivation] Error terminating specialist ${specialistId} in shutdown:`, err);
+      } catch (err: any) {
+        structuredLogger.log('error', 'Error terminating specialist in shutdown', {
+          specialistId,
+          error: err.message,
+        });
       }
     }
 
-    console.log('[TeamActivation] Graceful shutdown complete');
+    structuredLogger.logProcessEvent('stopped', 'Graceful shutdown complete');
   }
 
   /**
@@ -235,11 +251,22 @@ export class TeamActivationService {
 
     // Handle process termination
     childProcess.on('exit', (code) => {
-      console.log(`[TeamActivation] Specialist process ${specialistId} exited with code ${code}`);
+      structuredLogger.log('info', 'Specialist process exited', {
+        specialistId,
+        role: request.role,
+        exitCode: code,
+      });
       this.activeProcesses.delete(specialistId);
     });
 
-    console.log(`[TeamActivation] Spawned specialist ${specialistId} (role: ${request.role}, pid: ${childProcess.pid}, port: ${portNumber})`);
+    // Log specialist spawn
+    structuredLogger.logSpecialistSpawn(specialistId, request.role, {
+      goalId: request.parentGoalId,
+      pid: childProcess.pid,
+      port: portNumber,
+      httpEndpoint,
+    });
+
     return specialist;
   }
 
@@ -455,7 +482,11 @@ export class TeamActivationService {
   ): Promise<ActionResult | null> {
     const specialist = this.activeSpecialists.get(specialistId);
     if (!specialist || !specialist.httpEndpoint) {
-      console.error(`Specialist not found or HTTP endpoint not available: ${specialistId}`);
+      structuredLogger.logSpecialistError(
+        specialistId,
+        'not_found',
+        'Specialist not found or HTTP endpoint not available'
+      );
       metricsService.recordSpecialistError(specialist?.role || 'unknown', 'not_found');
       return null;
     }
@@ -463,6 +494,12 @@ export class TeamActivationService {
     const startTime = Date.now();
 
     try {
+      // Log action start
+      structuredLogger.logSpecialistAction(specialistId, actionSpec.actionType, 'started', {
+        goalId: actionSpec.goalId,
+        objective: actionSpec.objective,
+      });
+
       // Create abort controller for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), specialist.secondsBudget * 1000);
@@ -491,12 +528,26 @@ export class TeamActivationService {
 
       if (!response.ok) {
         if (response.status === 401) {
-          console.error(`[Security] Specialist rejected request: authentication failed`);
+          structuredLogger.logAuthenticationEvent('signature_invalid', {
+            specialistId,
+            role: specialist.role,
+          });
           metricsService.recordSpecialistError(specialist.role, 'auth_failed');
         } else if (response.status === 429) {
+          structuredLogger.logBudgetExceeded(
+            specialistId,
+            'tokens',
+            specialist.tokensUsed,
+            specialist.tokensBudget,
+            { role: specialist.role }
+          );
           metricsService.recordSpecialistError(specialist.role, 'budget_exceeded');
         } else {
-          console.error(`Specialist HTTP error: ${response.status}`);
+          structuredLogger.logSpecialistError(
+            specialistId,
+            `http_${response.status}`,
+            `Specialist HTTP error: ${response.status}`
+          );
           metricsService.recordSpecialistError(specialist.role, `http_${response.status}`);
         }
         return null;
@@ -519,6 +570,13 @@ export class TeamActivationService {
         executionTime
       );
 
+      // Log action completion
+      structuredLogger.logSpecialistAction(specialistId, actionSpec.actionType, 'completed', {
+        durationSeconds: executionTime,
+        tokensUsed: result.tokens_used || 0,
+        observations: result.observations,
+      });
+
       return {
         actionId: actionSpec.actionId,
         status: result.status || 'completed',
@@ -532,7 +590,10 @@ export class TeamActivationService {
       const duration = (Date.now() - startTime) / 1000;
 
       if (error.name === 'AbortError') {
-        console.error(`Specialist HTTP execution timeout after ${duration.toFixed(1)}s`);
+        structuredLogger.logSpecialistAction(specialistId, actionSpec.actionType, 'timeout', {
+          durationSeconds: duration,
+          budgetSeconds: specialist.secondsBudget,
+        });
         metricsService.recordSpecialistAction(
           specialist.role,
           actionSpec.actionType,
@@ -540,7 +601,11 @@ export class TeamActivationService {
           duration
         );
       } else {
-        console.error(`Specialist HTTP execution failed: ${error.message}`);
+        structuredLogger.logSpecialistError(
+          specialistId,
+          error.name || 'unknown',
+          `Specialist HTTP execution failed: ${error.message}`
+        );
         metricsService.recordSpecialistError(specialist.role, error.name || 'unknown');
       }
 
