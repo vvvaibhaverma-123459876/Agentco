@@ -825,6 +825,25 @@ export class AutonomyOrchestratorService {
           );
         }
 
+        // If specialist was spawned, aggregate results back to parent goal
+        if (action.actionType === ActionType.SPAWN_SPECIALIST && result.status === ActionStatus.COMPLETED) {
+          try {
+            const specialistId = result.observations?.specialistId;
+            if (specialistId) {
+              // Specialist result aggregation happens in action-executor.persistSpecialistResults
+              // This just logs the aggregation for observability
+              console.log(
+                `   🤖 Specialist "${result.observations?.role}" completed: ` +
+                `${result.observations?.artifactsCreated || 0} artifacts, ` +
+                `${result.observations?.claimsGenerated || 0} claims, ` +
+                `${result.observations?.evidenceCollected || 0} evidence`
+              );
+            }
+          } catch (error: any) {
+            console.warn(`[Specialist] Aggregation logging failed: ${error.message}`);
+          }
+        }
+
         actionsExecuted++;
 
         // Track in action history for loop detection
