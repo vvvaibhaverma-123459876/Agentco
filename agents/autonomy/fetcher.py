@@ -83,3 +83,30 @@ class FetcherAgent(SpecialistAgent):
             },
             'artifacts': []
         }
+
+
+if __name__ == '__main__':
+    import argparse
+    import json
+
+    parser = argparse.ArgumentParser(description='Fetcher Specialist Agent')
+    parser.add_argument('--specialist-id', required=True, help='Unique specialist ID')
+    parser.add_argument('--port', type=int, required=True, help='HTTP server port')
+    parser.add_argument('--role', required=True, help='Specialist role')
+    parser.add_argument('--budget', required=True, help='Budget JSON string')
+
+    args = parser.parse_args()
+    budget = json.loads(args.budget)
+
+    agent = FetcherAgent(args.specialist_id, args.role, budget)
+    print(f"Starting fetcher specialist {args.specialist_id} on port {args.port}")
+    agent.run_server(args.port)
+
+    # Keep process alive
+    import time
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print(f"Fetcher specialist {args.specialist_id} shutting down")
+        pass
