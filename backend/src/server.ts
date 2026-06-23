@@ -10,6 +10,7 @@ import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { assertProductionSecrets } from './security';
 import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
+import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
 import { civilizationGovernanceRoutes } from './routes/civilization-governance.routes';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -61,6 +62,7 @@ export async function build() {
   await app.register(learningRoutes);
   await app.register(autonomyTaskRoutes);
   await app.register(autonomyOrchestratorRoutes);
+  await app.register(autonomyDashboardRoutes);
   await app.register(civilizationGovernanceRoutes);
 
   // Basic health check
