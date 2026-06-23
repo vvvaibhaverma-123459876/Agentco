@@ -12,6 +12,7 @@ import { createHmac } from 'crypto';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
 import { ActionSpec, ActionResult } from '../types/action.types';
+import { metricsService } from './autonomy-metrics.service';
 
 export interface SpecialistBudget {
   tokens: number;
@@ -198,10 +199,12 @@ export class TeamActivationService {
     if (!ready) {
       console.error(`[TeamActivation] Specialist HTTP server not ready at ${httpEndpoint}`);
       childProcess.kill();
+      metricsService.recordSpecialistSpawn(request.role, false);
       return null;
     }
 
     specialist.processId = childProcess.pid;
+    metricsService.recordSpecialistSpawn(request.role, true);
 
     // Store in database
     await db.query(
@@ -444,7 +447,7 @@ export class TeamActivationService {
   }
 
   /**
-   * Execute action via specialist HTTP endpoint with HMAC signature
+   * Execute action via specialist HTTP endpoint with HMAC signature and metrics
    */
   async executeActionViaSpecialist(
     specialistId: string,
@@ -453,8 +456,11 @@ export class TeamActivationService {
     const specialist = this.activeSpecialists.get(specialistId);
     if (!specialist || !specialist.httpEndpoint) {
       console.error(`Specialist not found or HTTP endpoint not available: ${specialistId}`);
+      metricsService.recordSpecialistError(specialist?.role || 'unknown', 'not_found');
       return null;
     }
+
+    const startTime = Date.now();
 
     try {
       // Create abort controller for timeout
@@ -479,11 +485,19 @@ export class TeamActivationService {
 
       clearTimeout(timeoutId);
 
+      // Record response time
+      const responseTime = (Date.now() - startTime) / 1000;
+      metricsService.recordResponseTime(specialist.role, '/execute', responseTime);
+
       if (!response.ok) {
         if (response.status === 401) {
           console.error(`[Security] Specialist rejected request: authentication failed`);
+          metricsService.recordSpecialistError(specialist.role, 'auth_failed');
+        } else if (response.status === 429) {
+          metricsService.recordSpecialistError(specialist.role, 'budget_exceeded');
         } else {
           console.error(`Specialist HTTP error: ${response.status}`);
+          metricsService.recordSpecialistError(specialist.role, `http_${response.status}`);
         }
         return null;
       }
@@ -492,7 +506,18 @@ export class TeamActivationService {
 
       // Record token usage
       await this.recordTokenUsage(specialistId, result.tokens_used || 0);
+      metricsService.updateTokenUsage(specialistId, specialist.role, specialist.tokensUsed);
+
       await this.recordIterationUsage(specialistId);
+
+      // Record action metrics
+      const executionTime = (Date.now() - startTime) / 1000;
+      metricsService.recordSpecialistAction(
+        specialist.role,
+        actionSpec.actionType,
+        'success',
+        executionTime
+      );
 
       return {
         actionId: actionSpec.actionId,
@@ -504,7 +529,21 @@ export class TeamActivationService {
         toolCalls: [],
       };
     } catch (error: any) {
-      console.error(`Specialist HTTP execution failed: ${error.message}`);
+      const duration = (Date.now() - startTime) / 1000;
+
+      if (error.name === 'AbortError') {
+        console.error(`Specialist HTTP execution timeout after ${duration.toFixed(1)}s`);
+        metricsService.recordSpecialistAction(
+          specialist.role,
+          actionSpec.actionType,
+          'timeout',
+          duration
+        );
+      } else {
+        console.error(`Specialist HTTP execution failed: ${error.message}`);
+        metricsService.recordSpecialistError(specialist.role, error.name || 'unknown');
+      }
+
       return null;
     }
   }

@@ -12,6 +12,7 @@ import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
 import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
 import { civilizationGovernanceRoutes } from './routes/civilization-governance.routes';
+import { metricsService } from './services/autonomy-metrics.service';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -104,9 +105,17 @@ export async function build() {
     });
   });
 
-  // Metrics endpoint for Prometheus (stub for LEVEL_3)
-  app.get('/metrics', async () => {
-    return { status: 'metrics not yet implemented' };
+  // Prometheus metrics endpoint
+  app.get('/metrics', async (request, reply) => {
+    try {
+      const metrics = metricsService.getMetrics();
+      const contentType = metricsService.getContentType();
+      reply.type(contentType);
+      return metrics;
+    } catch (error: any) {
+      console.error('Error generating metrics:', error);
+      reply.status(500).send({ error: 'Failed to generate metrics' });
+    }
   });
 
   // WebSocket for real-time event stream
