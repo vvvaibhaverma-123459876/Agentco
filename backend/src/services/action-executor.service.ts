@@ -372,11 +372,121 @@ export class ActionExecutorService {
       return;
     }
 
-    result.observations.specialistId = specialist.specialistId;
-    result.observations.role = specialist.role;
-    result.observations.budget = specialist.budget;
-    result.createdArtifacts.push(specialist.specialistId);
-    result.observations.status = 'specialist_activated';
+    try {
+      // Wait for specialist to complete (with timeout)
+      const specialistResults = await this.waitForSpecialistCompletion(specialist);
+
+      if (specialistResults) {
+        // Persist specialist results to database
+        await this.persistSpecialistResults(parentGoalId, specialistResults);
+
+        result.observations = {
+          ...result.observations,
+          specialistId: specialist.specialistId,
+          role: specialist.role,
+          status: 'specialist_completed',
+          artifactsCreated: specialistResults.artifacts?.length || 0,
+          claimsGenerated: specialistResults.claims?.length || 0,
+          evidenceCollected: specialistResults.evidence?.length || 0,
+        };
+        result.createdArtifacts.push(...(specialistResults.artifacts || []));
+        result.status = ActionStatus.COMPLETED;
+      } else {
+        result.observations.status = 'specialist_timeout';
+        result.observations.specialistId = specialist.specialistId;
+        result.status = ActionStatus.FAILED;
+        if (!result.errors) result.errors = [];
+        result.errors.push('Specialist timed out before completion');
+      }
+    } catch (error: any) {
+      result.status = ActionStatus.FAILED;
+      result.observations.specialistId = specialist.specialistId;
+      if (!result.errors) result.errors = [];
+      result.errors.push(`Specialist execution failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Wait for specialist to complete and return results
+   */
+  private async waitForSpecialistCompletion(
+    specialist: any,
+    timeoutMs: number = 30000
+  ): Promise<{ artifacts: string[]; evidence: string[]; claims: string[] } | null> {
+    const startTime = Date.now();
+    const pollInterval = 500; // Poll every 500ms
+
+    while (Date.now() - startTime < timeoutMs) {
+      try {
+        // Query database for specialist record
+        const query = await db.query(
+          `SELECT status, results FROM autonomy_team_activations WHERE specialist_id = $1`,
+          [specialist.specialistId]
+        );
+
+        if (query.rows.length === 0) {
+          console.warn(`Specialist record not found: ${specialist.specialistId}`);
+          return null;
+        }
+
+        const row = query.rows[0];
+
+        // Check if specialist has completed
+        if (row.status === 'completed' || row.status === 'failed') {
+          if (row.results) {
+            return JSON.parse(row.results);
+          }
+          return null;
+        }
+
+        // Still running, wait before polling again
+        await new Promise((resolve) => setTimeout(resolve, pollInterval));
+      } catch (error: any) {
+        console.error(`Error polling specialist status: ${error.message}`);
+        return null;
+      }
+    }
+
+    // Timeout reached
+    console.warn(`Specialist did not complete within ${timeoutMs}ms`);
+    return null;
+  }
+
+  /**
+   * Persist specialist results back to parent goal
+   */
+  private async persistSpecialistResults(
+    parentGoalId: string,
+    results: { artifacts: string[]; evidence: string[]; claims: string[] }
+  ): Promise<void> {
+    // Link evidence artifacts to parent goal
+    for (const evidenceId of results.evidence || []) {
+      try {
+        await db.query(
+          `UPDATE autonomy_evidence SET goal_id = $1 WHERE id = $2`,
+          [parentGoalId, evidenceId]
+        );
+      } catch (error: any) {
+        console.warn(`Failed to link evidence ${evidenceId} to goal: ${error.message}`);
+      }
+    }
+
+    // Link claims to parent goal
+    for (const claimId of results.claims || []) {
+      try {
+        await db.query(
+          `UPDATE autonomy_claims SET goal_id = $1 WHERE id = $2`,
+          [parentGoalId, claimId]
+        );
+      } catch (error: any) {
+        console.warn(`Failed to link claim ${claimId} to goal: ${error.message}`);
+      }
+    }
+
+    console.log(
+      `[Specialist] Persisted ${results.artifacts?.length || 0} artifacts ` +
+        `${results.evidence?.length || 0} evidence, ${results.claims?.length || 0} claims to goal ${parentGoalId}`
+    );
   }
 
   private async handleTerminate(spec: ActionSpec, result: ActionResult): Promise<void> {
