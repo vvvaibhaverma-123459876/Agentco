@@ -218,6 +218,9 @@ Decide now:
       case 'evaluate':
       case 'evaluate_progress':
         return ActionType.EVALUATE_PROGRESS;
+      case 'spawn':
+      case 'spawn_specialist':
+        return ActionType.SPAWN_SPECIALIST;
       case 'terminate':
         return ActionType.TERMINATE;
       default:
@@ -255,6 +258,12 @@ Decide now:
         return [
           'Progress metrics calculated',
           'Next step hint provided',
+        ];
+      case ActionType.SPAWN_SPECIALIST:
+        return [
+          'Specialist role validated',
+          'Budget allocated',
+          'Specialist instance created',
         ];
       case ActionType.TERMINATE:
         return ['Autonomy loop terminated with reason'];

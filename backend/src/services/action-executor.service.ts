@@ -17,9 +17,11 @@ import {
   Claim,
 } from '../types/action.types';
 import { WebAdapter } from '../adapters/web-adapter';
+import { TeamActivationService } from './team-activation.service';
 
 export class ActionExecutorService {
   private webAdapter: WebAdapter | null = null;
+  private teamActivation = new TeamActivationService();
 
   /**
    * Inject web adapter (can be real or mock)
@@ -59,6 +61,9 @@ export class ActionExecutorService {
           break;
         case ActionType.EVALUATE_PROGRESS:
           await this.handleEvaluateProgress(spec, result);
+          break;
+        case ActionType.SPAWN_SPECIALIST:
+          await this.handleSpawnSpecialist(spec, result);
           break;
         case ActionType.TERMINATE:
           await this.handleTerminate(spec, result);
@@ -339,6 +344,39 @@ export class ActionExecutorService {
       claimCount > 0
         ? 'Good progress. Consider searching for contradictions or evidence gaps.'
         : 'No claims yet. Continue gathering evidence.';
+  }
+
+  private async handleSpawnSpecialist(spec: ActionSpec, result: ActionResult): Promise<void> {
+    const role = spec.args.role;
+    const objective = spec.args.objective;
+    const parentGoalId = spec.goalId;
+    const customBudget = spec.args.budget;
+
+    if (!role || !objective || !parentGoalId) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = 'Spawn specialist requires "role", "objective", and "goalId"';
+      return;
+    }
+
+    // Activate specialist
+    const specialist = await this.teamActivation.activateSpecialist({
+      parentGoalId,
+      role,
+      objective,
+      customBudget,
+    });
+
+    if (!specialist) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = `Failed to activate specialist with role "${role}"`;
+      return;
+    }
+
+    result.observations.specialistId = specialist.specialistId;
+    result.observations.role = specialist.role;
+    result.observations.budget = specialist.budget;
+    result.createdArtifacts.push(specialist.specialistId);
+    result.observations.status = 'specialist_activated';
   }
 
   private async handleTerminate(spec: ActionSpec, result: ActionResult): Promise<void> {

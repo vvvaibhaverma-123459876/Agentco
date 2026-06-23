@@ -15,6 +15,7 @@ import { ActionExecutorService } from './action-executor.service';
 import { LoopDetectorService, ActionHistory } from './loop-detector.service';
 import { AutonomyActionPlannerService } from './autonomy-action-planner.service';
 import { ReflectionService } from './reflection.service';
+import { TeamActivationService } from './team-activation.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType } from '../types/action.types';
 import { MockWebAdapter } from '../adapters/mock-web-adapter';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
@@ -77,6 +78,7 @@ export class AutonomyOrchestratorService {
   private loopDetector = new LoopDetectorService();
   private actionPlanner = new AutonomyActionPlannerService();
   private reflection = new ReflectionService();
+  private teamActivation = new TeamActivationService();
 
   constructor() {
     // Initialize web adapter based on environment
