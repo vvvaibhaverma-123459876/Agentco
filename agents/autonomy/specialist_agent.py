@@ -88,6 +88,86 @@ def return_db_connection(conn):
                 pass
 
 
+def validate_url(url: str) -> tuple[bool, str]:
+    """
+    Validate URL for FETCH_PAGE actions.
+    Prevents SSRF and injection attacks.
+    """
+    if not url or not isinstance(url, str):
+        return (False, "URL must be a non-empty string")
+
+    if len(url) > 2048:
+        return (False, "URL exceeds maximum length of 2048 characters")
+
+    try:
+        from urllib.parse import urlparse
+        parsed = urlparse(url)
+
+        # Only allow HTTP and HTTPS
+        if parsed.scheme not in ('http', 'https'):
+            return (False, "Only HTTP and HTTPS URLs are allowed")
+
+        # Reject localhost/private IPs
+        hostname = parsed.hostname or ''
+        if is_private_address(hostname):
+            return (False, "Access to private/internal networks is not allowed")
+
+        return (True, "")
+    except Exception as e:
+        return (False, f"Invalid URL format: {str(e)}")
+
+
+def validate_search_query(query: str) -> tuple[bool, str]:
+    """
+    Validate search query for WEB_SEARCH actions.
+    Prevents injection and extremely large queries.
+    """
+    if not query or not isinstance(query, str):
+        return (False, "Query must be a non-empty string")
+
+    if len(query) > 500:
+        return (False, "Query exceeds maximum length of 500 characters")
+
+    # Check for suspicious patterns
+    suspicious_patterns = [
+        r'javascript:',
+        r'data:',
+        r'vbscript:',
+    ]
+
+    query_lower = query.lower()
+    for pattern in suspicious_patterns:
+        if pattern in query_lower:
+            return (False, "Query contains suspicious patterns")
+
+    return (True, "")
+
+
+def is_private_address(hostname: str) -> bool:
+    """Check if hostname is a private/internal address."""
+    import re
+
+    private_patterns = [
+        r'^localhost$',
+        r'^127\.',
+        r'^192\.168\.',
+        r'^10\.',
+        r'^172\.(1[6-9]|2\d|3[01])\.',
+        r'^169\.254\.',
+        r'^::1$',
+        r'^fc00:',
+        r'^fd00:',
+        r'^0\.0\.0\.0$',
+        r'^255\.255\.255\.255$',
+    ]
+
+    for pattern in private_patterns:
+        if re.match(pattern, hostname, re.IGNORECASE):
+            return True
+
+    return False
+
+
 def verify_request_signature(payload_bytes: bytes, signature: str, timestamp: str) -> bool:
     """
     Verify HMAC-SHA256 signature of request.
@@ -238,6 +318,24 @@ class SpecialistAgent(BaseAgent):
                         'status': 'failed',
                         'errors': ['Objective field exceeds maximum length of 1000 characters']
                     }), 400
+
+                # INPUT SANITIZATION: Validate action-specific arguments
+                args = action_spec.get('args', {})
+                if action_type == 'FETCH_PAGE' and 'url' in args:
+                    url_valid, url_error = validate_url(args['url'])
+                    if not url_valid:
+                        return jsonify({
+                            'status': 'failed',
+                            'errors': [url_error]
+                        }), 400
+
+                if action_type == 'WEB_SEARCH' and 'query' in args:
+                    query_valid, query_error = validate_search_query(args['query'])
+                    if not query_valid:
+                        return jsonify({
+                            'status': 'failed',
+                            'errors': [query_error]
+                        }), 400
 
                 # Now execute the action
                 result = self.handle_action(action_spec)
