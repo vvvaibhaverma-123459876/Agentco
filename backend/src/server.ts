@@ -14,6 +14,7 @@ import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.route
 import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
 import { civilizationGovernanceRoutes } from './routes/civilization-governance.routes';
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
+import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
 import { metricsService } from './services/autonomy-metrics.service';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -71,6 +72,7 @@ export async function build() {
   await app.register(autonomyDashboardRoutes);
   await app.register(civilizationGovernanceRoutes);
   await app.register(institutionWorkAssignmentRoutes);
+  await app.register(goalHierarchyRoutes);
 
   // Basic health check
   app.get('/health', async () => ({
