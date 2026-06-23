@@ -16,8 +16,17 @@ import {
   Evidence,
   Claim,
 } from '../types/action.types';
+import { WebAdapter } from '../adapters/web-adapter';
 
 export class ActionExecutorService {
+  private webAdapter: WebAdapter | null = null;
+
+  /**
+   * Inject web adapter (can be real or mock)
+   */
+  setWebAdapter(adapter: WebAdapter): void {
+    this.webAdapter = adapter;
+  }
   /**
    * Execute a validated action and return typed result
    */
