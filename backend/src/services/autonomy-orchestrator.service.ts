@@ -14,7 +14,10 @@ import { CalibrationConstitutionService } from './calibration-constitution.servi
 import { ActionExecutorService } from './action-executor.service';
 import { LoopDetectorService, ActionHistory } from './loop-detector.service';
 import { AutonomyActionPlannerService } from './autonomy-action-planner.service';
+import { ReflectionService } from './reflection.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType } from '../types/action.types';
+import { MockWebAdapter } from '../adapters/mock-web-adapter';
+import { RealWebAdapter } from '../adapters/real-web-adapter';
 
 export interface AutonomyRun {
   id: string;
@@ -73,6 +76,13 @@ export class AutonomyOrchestratorService {
   private actionExecutor = new ActionExecutorService();
   private loopDetector = new LoopDetectorService();
   private actionPlanner = new AutonomyActionPlannerService();
+  private reflection = new ReflectionService();
+
+  constructor() {
+    // Initialize web adapter based on environment
+    const adapter = process.env.NODE_ENV === 'test' ? new MockWebAdapter() : new RealWebAdapter();
+    this.actionExecutor.setWebAdapter(adapter);
+  }
 
   /**
    * Execute full LEVEL_3 autonomy smoke test loop
@@ -744,12 +754,25 @@ export class AutonomyOrchestratorService {
         // Check for loops
         const loopDetection = this.loopDetector.detectLoop(actionHistory);
 
+        // Generate reflection if looping
+        let reflectionContext = '';
+        if (loopDetection.isLooping && loopDetection.streak >= 3) {
+          const reflection = this.reflection.generateReflection(goalId, loopDetection, actionHistory);
+          await this.reflection.storeReflection(reflection);
+          reflectionContext = this.reflection.formatForContext([reflection]);
+        } else {
+          // Get recent reflections for ongoing context
+          const recentReflections = await this.reflection.getRecentReflections(goalId, 2);
+          reflectionContext = this.reflection.formatForContext(recentReflections);
+        }
+
         // Plan next action
         const action = await this.actionPlanner.planNextAction(goalId, {
           goalText,
           claimsGenerated: currentClaimsCount,
           evidenceCount,
           loopDetection,
+          reflectionContext,
           previousActions: actionHistory.map(h => ({
             type: h.actionType,
             result: h.resultStatus,

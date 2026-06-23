@@ -35,6 +35,7 @@ export class AutonomyActionPlannerService {
       claimsGenerated: number;
       evidenceCount: number;
       loopDetection: LoopDetectionResult;
+      reflectionContext?: string;
       previousActions: Array<{ type: ActionType; result: string }>;
     }
   ): Promise<ActionSpec> {
@@ -90,9 +91,10 @@ Action types: search, fetch, extract_evidence, generate_claim, evaluate_progress
     claimsGenerated: number;
     evidenceCount: number;
     loopDetection: LoopDetectionResult;
+    reflectionContext?: string;
     previousActions: Array<{ type: ActionType; result: string }>;
   }): string {
-    return `
+    let prompt = `
 Goal: ${state.goalText}
 
 Progress:
@@ -100,17 +102,31 @@ Progress:
 - Evidence collected: ${state.evidenceCount}
 - Previous actions: ${state.previousActions.map(a => `${a.type}(${a.result})`).join(', ') || 'none'}
 
-Loop status: ${state.loopDetection.isLooping ? `DETECTED: ${state.loopDetection.loopType}` : 'clear'}
+Loop status: ${state.loopDetection.isLooping ? `DETECTED: ${state.loopDetection.loopType}` : 'clear'}`;
+
+    if (state.reflectionContext) {
+      prompt += `
+
+${state.reflectionContext}
+
+Given these learnings from previous attempts, what is the NEXT ACTION to take? Choose differently from what you've tried before.`;
+    } else {
+      prompt += `
 
 What is the next action to take?
 Consider:
 1. If no evidence yet, search for relevant information
 2. If evidence exists, fetch specific pages and extract details
 3. When evidence is sufficient, generate claims (MUST be backed by sources)
-4. When stuck or looping, terminate instead of repeating
+4. When stuck or looping, terminate instead of repeating`;
+    }
+
+    prompt += `
 
 Decide now:
     `;
+
+    return prompt;
   }
 
   /**

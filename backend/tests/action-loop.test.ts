@@ -425,8 +425,7 @@ describe('Action Loop Integration', () => {
               ? { claimText: 'test', supportSourceIds: ['test'] }
               : actionType === ActionType.FETCH_PAGE
                 ? { url: 'https://example.com' }
-                ? { query: 'test' }
-                : {},
+                : { query: 'test' },
           successCriteria: [],
           riskLevel: RiskLevel.LOW,
           decidedBy: 'test',

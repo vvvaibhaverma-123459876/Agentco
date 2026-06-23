@@ -92,7 +92,50 @@ export class ActionExecutorService {
       return;
     }
 
-    // Record the search decision
+    // Try to use web adapter if available
+    if (this.webAdapter && (await this.webAdapter.isReady())) {
+      try {
+        const searchResults = await this.webAdapter.search(query);
+
+        if (searchResults.length > 0) {
+          // Store each search result as evidence
+          for (const searchResult of searchResults) {
+            const sourceId = uuidv4();
+            await db.query(
+              `INSERT INTO autonomy_evidence (
+                id, source_id, action_id, url, title, snippet, retrieved_at,
+                content_hash, source_type, is_public_access, created_at
+              ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, NOW())`,
+              [
+                uuidv4(),
+                sourceId,
+                spec.actionId,
+                searchResult.url,
+                searchResult.title,
+                searchResult.snippet,
+                `hash_${searchResult.rank || 0}`,
+                'web_search',
+                true,
+              ]
+            );
+            result.createdArtifacts.push(sourceId);
+          }
+
+          result.observations.searchQuery = query;
+          result.observations.resultsFound = searchResults.length;
+          result.observations.status = 'search_completed';
+        } else {
+          result.observations.searchQuery = query;
+          result.observations.resultsFound = 0;
+          result.observations.status = 'search_completed_no_results';
+        }
+        return;
+      } catch (error: any) {
+        console.warn(`Web search failed: ${error.message}, falling back to stub behavior`);
+      }
+    }
+
+    // Fallback: stub behavior (record search intent only)
     const searchId = uuidv4();
     await db.query(
       `INSERT INTO autonomy_searches (id, action_id, query, status)
@@ -102,10 +145,6 @@ export class ActionExecutorService {
 
     result.observations.searchId = searchId;
     result.observations.query = query;
-    result.createdArtifacts.push(searchId);
-
-    // In production, would call a real search API
-    // For now, record the intent
     result.observations.status = 'search_recorded';
   }
 
@@ -117,10 +156,51 @@ export class ActionExecutorService {
       return;
     }
 
-    const fetchId = uuidv4();
+    // Try to use web adapter if available
+    if (this.webAdapter && (await this.webAdapter.isReady())) {
+      try {
+        const fetchResult = await this.webAdapter.fetch(url);
 
+        if (fetchResult) {
+          // Store evidence in database with real content
+          const sourceId = uuidv4();
+          await db.query(
+            `INSERT INTO autonomy_evidence (
+              id, action_id, source_id, url, title, retrieved_at, content_hash,
+              source_type, is_public_access, created_at
+            ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, NOW())`,
+            [
+              uuidv4(),
+              spec.actionId,
+              sourceId,
+              url,
+              fetchResult.title || 'Fetched Page',
+              fetchResult.contentHash,
+              'web',
+              true,
+            ]
+          );
+
+          result.observations.url = url;
+          result.observations.title = fetchResult.title;
+          result.observations.contentLength = fetchResult.content.length;
+          result.createdArtifacts.push(sourceId);
+          result.observations.status = 'fetch_completed';
+          return;
+        } else {
+          result.observations.url = url;
+          result.observations.status = 'fetch_failed_http_error';
+          result.errors = ['HTTP fetch failed'];
+          return;
+        }
+      } catch (error: any) {
+        console.warn(`Web fetch failed: ${error.message}, falling back to stub behavior`);
+      }
+    }
+
+    // Fallback: stub behavior (record fetch intent only)
+    const fetchId = uuidv4();
     try {
-      // Simulate fetch (real would use requests library with timeout)
       const evidence: Evidence = {
         sourceId: uuidv4(),
         url,
@@ -130,19 +210,20 @@ export class ActionExecutorService {
         isPublicAccess: true,
       };
 
-      // Store evidence in database
       await db.query(
         `INSERT INTO autonomy_evidence (
-          id, action_id, source_id, url, retrieved_at, content_hash, source_type
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          id, action_id, source_id, url, retrieved_at, content_hash, source_type,
+          is_public_access, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())`,
         [
-          evidence.sourceId,
+          uuidv4(),
           spec.actionId,
           evidence.sourceId,
           url,
           evidence.retrievedAt,
           evidence.contentHash,
           evidence.sourceType,
+          evidence.isPublicAccess,
         ]
       );
 
