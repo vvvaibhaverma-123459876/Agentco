@@ -1,4 +1,4 @@
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run
 
 dev:
 	docker compose --profile dev up -d
@@ -275,4 +275,17 @@ production-release-gate:
 	@echo ""
 	@exit 0
 
-.PHONY: production-release-gate
+autonomy-real-web-free-run:
+	@echo "🚀 STARTING REAL-WEB AUTONOMOUS BEHAVIOR OBSERVATION"
+	@echo "=================================================================="
+	@echo "Duration: $${DURATION_SECONDS:-120} seconds"
+	@echo "LLM Model: $${OPENAI_MODEL:-gpt-4o-mini}"
+	@echo "Max Tokens: $${LLM_MAX_TOKENS_TOTAL:-20000}"
+	@echo "Max Web Fetches: $${WEB_MAX_FETCHES:-20}"
+	@echo "=================================================================="
+	@echo ""
+	@python3 scripts/autonomy_real_web_free_run.py
+	@echo ""
+	@echo "✓ Real-web autonomous observation complete"
+
+.PHONY: production-release-gate autonomy-real-web-free-run
