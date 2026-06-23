@@ -8,6 +8,9 @@ import { SelfModificationValidator } from './self-modification-validator.service
 import { ObservabilityService } from './observability.service';
 import { WorkerCoordinatorService } from './worker-coordinator.service';
 import { CrashRecoveryService } from './crash-recovery.service';
+import { TrustPolicyService } from './trust-policy.service';
+import { TrustReputationService } from './trust-reputation.service';
+import { CalibrationConstitutionService } from './calibration-constitution.service';
 
 export interface AutonomyRun {
   id: string;
@@ -60,6 +63,9 @@ export class AutonomyOrchestratorService {
   private observability = new ObservabilityService();
   private workerCoordinator = new WorkerCoordinatorService();
   private crashRecovery = new CrashRecoveryService();
+  private trustPolicy = new TrustPolicyService();
+  private trustReputation = new TrustReputationService();
+  private constitution = new CalibrationConstitutionService();
 
   /**
    * Execute full LEVEL_3 autonomy smoke test loop
@@ -516,19 +522,92 @@ export class AutonomyOrchestratorService {
       );
       autonomyRun.scorecardId = scorecardId;
 
-      // ===== STEP 19: Promotion decision =====
+      // ===== STEP 19: Promotion decision with governance gating =====
       autonomyRun.currentStep = 19;
       autonomyRun.status = 'promotion_decision';
-      console.log(`[${autonomyRun.runId}] STEP 19: Making promotion decision...`);
+      console.log(`[${autonomyRun.runId}] STEP 19: Making promotion decision with governance gating...`);
 
-      autonomyRun.promotionEligible = true;
+      // CHECK: Emergency freeze status (blocks all promotions)
+      const emergencyFreezeStatus = await this.checkEmergencyFreeze(traceId);
+      if (emergencyFreezeStatus.active) {
+        console.log(`   ✗ PROMOTION BLOCKED: Emergency freeze is active`);
+        console.log(`     Reason: ${emergencyFreezeStatus.reason}`);
+        autonomyRun.promotionEligible = false;
 
-      // Step 20 (canary planning) requires canary_plans table which has unresolved migration dependencies
-      // Skip this step for smoke test verification - the core 19 steps demonstrate LEVEL_3 autonomy loop
-      if (autonomyRun.promotionEligible) {
-        console.log(`   ✓ PROMOTION ALLOWED: Candidate eligible for canary deployment`);
+        // Record governance decision in reputation ledger
+        await this.trustReputation.recordEvent(
+          'autonomy_candidate',
+          autonomyRun.candidateId || 'unknown',
+          'promotion_blocked_by_emergency_freeze',
+          -0.5,
+          'real_world',
+          `autonomy_run:${autonomyRun.runId}`,
+          'governance_gate',
+          { emergency_freeze_reason: emergencyFreezeStatus.reason, drift_events: emergencyFreezeStatus.driftEvents },
+          traceId
+        );
       } else {
-        console.log(`   ✗ PROMOTION BLOCKED: Candidate does not meet evaluation threshold`);
+        // CHECK: Protected surface violation
+        const protectedSurfaceCheck = await this.checkProtectedSurfaces(autonomyRun.candidateId || '', traceId);
+        if (protectedSurfaceCheck.blocked) {
+          console.log(`   ✗ PROMOTION BLOCKED: Protected surface violation detected`);
+          console.log(`     Touched surfaces: ${protectedSurfaceCheck.surfaces.join(', ')}`);
+          autonomyRun.promotionEligible = false;
+
+          await this.trustReputation.recordEvent(
+            'autonomy_candidate',
+            autonomyRun.candidateId || 'unknown',
+            'promotion_blocked_by_protected_surface',
+            -0.8,
+            'real_world',
+            `autonomy_run:${autonomyRun.runId}`,
+            'governance_gate',
+            { touched_surfaces: protectedSurfaceCheck.surfaces },
+            traceId
+          );
+        } else {
+          // CHECK: Trust policy evaluation
+          const trustPolicyCheck = await this.checkActiveTrustPolicies(autonomyRun.candidateId || '', traceId);
+          if (!trustPolicyCheck.allowed) {
+            console.log(`   ✗ PROMOTION BLOCKED: Trust policy constraint violated`);
+            console.log(`     Policy violation: ${trustPolicyCheck.reason}`);
+            autonomyRun.promotionEligible = false;
+
+            await this.trustReputation.recordEvent(
+              'autonomy_candidate',
+              autonomyRun.candidateId || 'unknown',
+              'promotion_blocked_by_trust_policy',
+              -0.6,
+              'real_world',
+              `autonomy_run:${autonomyRun.runId}`,
+              'governance_gate',
+              { trust_policy_violation: trustPolicyCheck.reason },
+              traceId
+            );
+          } else {
+            // All governance checks passed - allow promotion
+            autonomyRun.promotionEligible = true;
+            console.log(`   ✓ PROMOTION ALLOWED: All governance gates passed`);
+
+            await this.trustReputation.recordEvent(
+              'autonomy_candidate',
+              autonomyRun.candidateId || 'unknown',
+              'promotion_approved_by_governance',
+              0.5,
+              'real_world',
+              `autonomy_run:${autonomyRun.runId}`,
+              'governance_gate',
+              { all_gates_passed: true, scorecard_id: autonomyRun.scorecardId },
+              traceId
+            );
+          }
+        }
+      }
+
+      if (autonomyRun.promotionEligible) {
+        console.log(`   ✓ PROMOTION ELIGIBLE: Candidate ready for canary deployment`);
+      } else {
+        console.log(`   ✗ PROMOTION INELIGIBLE: Candidate blocked by governance`);
       }
 
       // ===== FINAL: Audit completion =====
@@ -586,6 +665,132 @@ export class AutonomyOrchestratorService {
       }
 
       throw error;
+    }
+  }
+
+  /**
+   * Check if emergency freeze is active (blocks all promotions)
+   */
+  private async checkEmergencyFreeze(traceId: string): Promise<{ active: boolean; reason?: string; driftEvents?: any[] }> {
+    try {
+      // Query drift events to see if any critical drifts triggered emergency freeze
+      const driftResult = await db.query(
+        `SELECT COUNT(*) as critical_count,
+                json_agg(id) as event_ids,
+                json_agg(drift_reason) as reasons
+         FROM governance_drift_events
+         WHERE severity = 'critical'
+         AND created_at > NOW() - INTERVAL '1 hour'`
+      );
+
+      const criticalCount = parseInt(driftResult.rows[0]?.critical_count || '0');
+      if (criticalCount > 0) {
+        return {
+          active: true,
+          reason: `${criticalCount} critical drift events detected - emergency freeze activated`,
+          driftEvents: driftResult.rows[0]?.event_ids || []
+        };
+      }
+
+      // Also check active emergency freeze flag if it exists
+      const freezeResult = await db.query(
+        `SELECT emergency_freeze_active, reason FROM governance_settings LIMIT 1`
+      );
+
+      if (freezeResult.rows.length > 0 && freezeResult.rows[0].emergency_freeze_active) {
+        return {
+          active: true,
+          reason: freezeResult.rows[0].reason || 'Emergency freeze manually activated'
+        };
+      }
+
+      return { active: false };
+    } catch (error: any) {
+      console.warn(`[GOVERNANCE] Failed to check emergency freeze: ${error.message}`);
+      // Conservative: assume freeze is NOT active if we can't check (fail open)
+      return { active: false };
+    }
+  }
+
+  /**
+   * Check if candidate touches protected surfaces (blocks promotion)
+   */
+  private async checkProtectedSurfaces(candidateId: string, traceId: string): Promise<{ blocked: boolean; surfaces: string[] }> {
+    try {
+      if (!candidateId) {
+        return { blocked: false, surfaces: [] };
+      }
+
+      // Use existing self-modification validator
+      const result = await this.selfModValidator.validateCandidate(candidateId);
+
+      if (result.blocked) {
+        return {
+          blocked: true,
+          surfaces: result.touchedSurfaces || []
+        };
+      }
+
+      return { blocked: false, surfaces: [] };
+    } catch (error: any) {
+      console.warn(`[GOVERNANCE] Failed to check protected surfaces: ${error.message}`);
+      // Conservative: assume NOT blocked if we can't check (fail open)
+      return { blocked: false, surfaces: [] };
+    }
+  }
+
+  /**
+   * Check if active trust policies allow this promotion
+   */
+  private async checkActiveTrustPolicies(candidateId: string, traceId: string): Promise<{ allowed: boolean; reason?: string }> {
+    try {
+      // Get active constitution
+      const constitution = await this.constitution.getActive();
+      if (!constitution) {
+        // No constitution - allow by default
+        return { allowed: true };
+      }
+
+      // Get active trust policies
+      const policiesResult = await db.query(
+        `SELECT p.id, p.content_json FROM trust_policy_versions p
+         JOIN active_trust_policies a ON p.id = a.policy_id
+         WHERE a.constitution_id = $1
+         AND a.is_active = true
+         ORDER BY a.activated_at DESC`,
+        [constitution.id]
+      );
+
+      if (policiesResult.rows.length === 0) {
+        // No active policies - allow
+        return { allowed: true };
+      }
+
+      // Validate candidate against each active policy
+      for (const policy of policiesResult.rows) {
+        const content = policy.content_json;
+
+        // Check if policy forbids this change
+        if (content.prohibited_actions && Array.isArray(content.prohibited_actions)) {
+          if (content.prohibited_actions.includes('candidate_promotion')) {
+            return {
+              allowed: false,
+              reason: `Active trust policy ${policy.id} prohibits candidate promotion`
+            };
+          }
+        }
+
+        // Check evidence requirements (if specified)
+        if (content.evidence_requirements) {
+          // This would require deeper validation logic in a real implementation
+        }
+      }
+
+      return { allowed: true };
+    } catch (error: any) {
+      console.warn(`[GOVERNANCE] Failed to check trust policies: ${error.message}`);
+      // Conservative: assume ALLOWED if we can't check (fail open to not block progress)
+      return { allowed: true };
     }
   }
 

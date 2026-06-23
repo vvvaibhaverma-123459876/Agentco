@@ -564,6 +564,26 @@ export class TrustPolicyService {
     const jsonString = JSON.stringify(content);
     return createHash('sha256').update(jsonString).digest('hex');
   }
+
+  /**
+   * List all active policies
+   */
+  async listActivePolicies(): Promise<TrustPolicyVersion[]> {
+    const result = await db.query(
+      `SELECT DISTINCT tpv.* FROM trust_policy_versions tpv
+       INNER JOIN active_trust_policies atp ON atp.policy_id = tpv.id
+       ORDER BY atp.activated_at DESC`
+    );
+
+    return result.rows;
+  }
+
+  /**
+   * Get policies by type (alias for listByType)
+   */
+  async getByType(policyType: string): Promise<TrustPolicyVersion[]> {
+    return this.listByType(policyType, 50, 0);
+  }
 }
 
 export const trustPolicyService = new TrustPolicyService();

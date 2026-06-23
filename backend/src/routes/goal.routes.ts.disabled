@@ -7,6 +7,23 @@ import { goalManager } from '../services/goal-manager.service';
  * All routes enforce real logic - no static responses.
  */
 
+interface PostGoalBody {
+  title: string;
+  description?: string;
+  source?: string;
+  proposedBy: string;
+  owningAgentId?: string;
+  owningInstitutionId?: string;
+  domain: string;
+  expectedValue?: string;
+  riskLevel: string;
+  autonomyLevelAllowed: string;
+  successCriteria: string[];
+  stopConditions: string[];
+  traceId?: string;
+  runId?: string;
+}
+
 export async function goalRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/goals - List goals with filters
@@ -15,11 +32,12 @@ export async function goalRoutes(fastify: FastifyInstance) {
     Querystring: {status?: string; domain?: string; riskLevel?: string; agentId?: string};
   }>('/api/goals', async (request, reply) => {
     try {
+      const qs = request.query as {status?: string; domain?: string; riskLevel?: string; agentId?: string};
       const goals = await goalManager.listGoals({
-        status: request.query.status,
-        domain: request.query.domain,
-        riskLevel: request.query.riskLevel,
-        agentId: request.query.agentId,
+        status: qs.status,
+        domain: qs.domain,
+        riskLevel: qs.riskLevel,
+        agentId: qs.agentId,
       });
 
       reply.code(200).send({
@@ -38,9 +56,10 @@ export async function goalRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/goals - Propose new goal
    */
-  fastify.post<{Body: any}>('/api/goals', async (request, reply) => {
+  fastify.post<{Body: PostGoalBody}>('/api/goals', async (request, reply) => {
     try {
-      const {title, description, source, proposedBy, owningAgentId, owningInstitutionId, domain, expectedValue, riskLevel, autonomyLevelAllowed, successCriteria, stopConditions, traceId, runId} = request.body;
+      const body = request.body as PostGoalBody;
+      const {title, description, source, proposedBy, owningAgentId, owningInstitutionId, domain, expectedValue, riskLevel, autonomyLevelAllowed, successCriteria, stopConditions, traceId, runId} = body;
 
       // Validation
       if (!title || !domain || !proposedBy || !riskLevel || !autonomyLevelAllowed || !successCriteria || !stopConditions) {
@@ -112,9 +131,10 @@ export async function goalRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/goals/:goalId/evidence - Attach evidence
    */
-  fastify.post<{Params: {goalId: string}; Body: any}>('/api/goals/:goalId/evidence', async (request, reply) => {
+  fastify.post<{Params: {goalId: string}; Body: Record<string, any>}>('/api/goals/:goalId/evidence', async (request, reply) => {
     try {
-      const {evidenceType, evidenceRef, relevanceScore, provenanceJson} = request.body;
+      const body = request.body as Record<string, any>;
+      const {evidenceType, evidenceRef, relevanceScore, provenanceJson} = body;
 
       if (!evidenceType || !evidenceRef) {
         reply.code(400).send({
@@ -147,9 +167,10 @@ export async function goalRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/goals/:goalId/budget - Set budget
    */
-  fastify.post<{Params: {goalId: string}; Body: any}>('/api/goals/:goalId/budget', async (request, reply) => {
+  fastify.post<{Params: {goalId: string}; Body: Record<string, any>}>('/api/goals/:goalId/budget', async (request, reply) => {
     try {
-      const {computeBudget, tokenBudget, timeBudgetSeconds, toolBudget, spendLimit} = request.body;
+      const body = request.body as Record<string, any>;
+      const {computeBudget, tokenBudget, timeBudgetSeconds, toolBudget, spendLimit} = body;
 
       const budgetId = await goalManager.setBudget(request.params.goalId, {
         computeBudget,
@@ -174,9 +195,10 @@ export async function goalRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/goals/:goalId/review - Review goal
    */
-  fastify.post<{Params: {goalId: string}; Body: any}>('/api/goals/:goalId/review', async (request, reply) => {
+  fastify.post<{Params: {goalId: string}; Body: Record<string, any>}>('/api/goals/:goalId/review', async (request, reply) => {
     try {
-      const {reviewerId, reviewerRole, decision, reason} = request.body;
+      const body = request.body as Record<string, any>;
+      const {reviewerId, reviewerRole, decision, reason} = body;
 
       if (!reviewerId || !reviewerRole || !decision) {
         reply.code(400).send({
@@ -254,7 +276,8 @@ export async function goalRoutes(fastify: FastifyInstance) {
    */
   fastify.post<{Params: {goalId: string}; Body: {outcomeRef: string}}>('/api/goals/:goalId/complete', async (request, reply) => {
     try {
-      const {outcomeRef} = request.body;
+      const body = request.body as Record<string, any>;
+      const {outcomeRef} = body;
 
       if (!outcomeRef) {
         reply.code(400).send({

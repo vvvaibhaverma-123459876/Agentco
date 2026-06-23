@@ -1,0 +1,105 @@
+src/middleware/governance-rbac.middleware.ts(1,49): error TS2307: Cannot find module 'express' or its corresponding type declarations.
+src/middleware/governance-rbac.middleware.ts(148,26): error TS7006: Parameter 'data' implicitly has an 'any' type.
+src/middleware/rbac.middleware.ts(60,27): error TS2339: Property 'user' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+src/middleware/rbac.middleware.ts(61,29): error TS2339: Property 'user' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+src/routes/evals.routes.ts(5,43): error TS2307: Cannot find module 'express' or its corresponding type declarations.
+src/routes/goal.routes.ts(43,14): error TS2339: Property 'title' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,21): error TS2339: Property 'description' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,34): error TS2339: Property 'source' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,42): error TS2339: Property 'proposedBy' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,54): error TS2339: Property 'owningAgentId' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,69): error TS2339: Property 'owningInstitutionId' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,90): error TS2339: Property 'domain' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,98): error TS2339: Property 'expectedValue' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,113): error TS2339: Property 'riskLevel' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,124): error TS2339: Property 'autonomyLevelAllowed' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,146): error TS2339: Property 'successCriteria' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,163): error TS2339: Property 'stopConditions' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,179): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(43,188): error TS2339: Property 'runId' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(117,14): error TS2339: Property 'evidenceType' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(117,28): error TS2339: Property 'evidenceRef' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(117,41): error TS2339: Property 'relevanceScore' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(117,57): error TS2339: Property 'provenanceJson' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(152,14): error TS2339: Property 'computeBudget' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(152,29): error TS2339: Property 'tokenBudget' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(152,42): error TS2339: Property 'timeBudgetSeconds' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(152,61): error TS2339: Property 'toolBudget' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(152,73): error TS2339: Property 'spendLimit' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(179,14): error TS2339: Property 'reviewerId' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(179,26): error TS2339: Property 'reviewerRole' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(179,40): error TS2339: Property 'decision' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(179,50): error TS2339: Property 'reason' does not exist on type 'unknown'.
+src/routes/goal.routes.ts(236,58): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/routes/goal.routes.ts(288,59): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+src/routes/phases-6-8.routes.ts(20,15): error TS2339: Property 'goalId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(20,23): error TS2339: Property 'plannerAgentId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(20,39): error TS2339: Property 'horizon' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(20,48): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(20,57): error TS2339: Property 'runId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(48,15): error TS2339: Property 'goalId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(109,15): error TS2339: Property 'reviewerId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(152,17): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(153,17): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(154,20): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(176,15): error TS2339: Property 'goalId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(176,23): error TS2339: Property 'planId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(176,31): error TS2339: Property 'outcomeType' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(176,44): error TS2339: Property 'objectiveResult' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(176,61): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(204,15): error TS2339: Property 'name' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(204,21): error TS2339: Property 'domain' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(204,29): error TS2339: Property 'version' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(204,38): error TS2339: Property 'formula' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(204,47): error TS2339: Property 'owner' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(204,54): error TS2339: Property 'riskLevel' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(236,15): error TS2339: Property 'rewardFunctionId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(236,33): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(263,17): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(264,17): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(286,15): error TS2339: Property 'suiteId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(286,24): error TS2339: Property 'targetType' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(286,36): error TS2339: Property 'targetId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(286,46): error TS2339: Property 'baselineRef' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(286,59): error TS2339: Property 'candidateRef' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(286,73): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(316,18): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(317,17): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(318,28): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-6-8.routes.ts(359,15): error TS2339: Property 'targetId' does not exist on type 'unknown'.
+src/routes/phases-6-8.routes.ts(359,25): error TS2339: Property 'promotionReason' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(26,15): error TS2339: Property 'trajectoryIds' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(26,30): error TS2339: Property 'sourceFilter' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(26,44): error TS2339: Property 'batchLabel' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(26,56): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(26,65): error TS2339: Property 'createdBy' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(67,15): error TS2339: Property 'learnerType' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(67,28): error TS2339: Property 'replayBatchId' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(67,43): error TS2339: Property 'baselinePolicyVersion' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(67,66): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(67,75): error TS2339: Property 'createdBy' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(116,17): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-9-13.routes.ts(117,23): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-9-13.routes.ts(118,28): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-9-13.routes.ts(144,9): error TS1117: An object literal cannot have multiple properties with the same name.
+src/routes/phases-9-13.routes.ts(162,17): error TS2339: Property 'configJson' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(162,29): error TS2339: Property 'seed' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(162,35): error TS2339: Property 'traceId' does not exist on type 'unknown'.
+src/routes/phases-9-13.routes.ts(215,24): error TS18046: 'request.query' is of type 'unknown'.
+src/routes/phases-9-13.routes.ts(216,17): error TS18046: 'request.query' is of type 'unknown'.
+src/services/autonomy-orchestrator.service.ts(468,45): error TS2551: Property 'startLearnerRun' does not exist on type 'LearnerService'. Did you mean 'getLearnerRun'?
+src/services/autonomy-orchestrator.service.ts(472,44): error TS2554: Expected 3 arguments, but got 2.
+src/services/autonomy-orchestrator.service.ts(473,43): error TS2339: Property 'id' does not exist on type '{ candidateId: string; }'.
+src/services/autonomy-orchestrator.service.ts(475,26): error TS2551: Property 'completeLearnerRun' does not exist on type 'LearnerService'. Did you mean 'getLearnerRun'?
+src/services/institutions.service.ts(418,37): error TS2345: Argument of type '{ learned_topics: number; expertise_gained: number; }' is not assignable to parameter of type '{ topics: number; expertise: number; }'.
+src/services/institutions.service.ts(427,32): error TS2345: Argument of type '{ learned_topics: number; expertise_gained: number; }' is not assignable to parameter of type '{ topics: number; expertise: number; }'.
+src/services/integration.service.ts(102,7): error TS2322: Type 'string | undefined' is not assignable to type 'string'.
+src/services/integration.service.ts(107,7): error TS2322: Type '(string | undefined)[]' is not assignable to type 'string[]'.
+src/services/integration.service.ts(110,7): error TS2552: Cannot find name 'reasoning_path'. Did you mean 'reasoningPath'?
+src/services/integration.service.ts(146,29): error TS2339: Property 'models_used' does not exist on type 'EnsembleResult'.
+src/services/knowledge-persistence.service.ts(131,7): error TS2783: 'verification_tests_passed' is specified more than once, so this usage will be overwritten.
+src/services/knowledge-persistence.service.ts(132,7): error TS2783: 'verification_tests_total' is specified more than once, so this usage will be overwritten.
+src/services/knowledge-persistence.service.ts(133,7): error TS2783: 'times_used' is specified more than once, so this usage will be overwritten.
+src/services/trust-reputation.service.ts(175,9): error TS2393: Duplicate function implementation.
+src/services/trust-reputation.service.ts(315,37): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+src/services/trust-reputation.service.ts(336,9): error TS2393: Duplicate function implementation.

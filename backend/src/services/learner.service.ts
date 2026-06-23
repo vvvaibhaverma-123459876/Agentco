@@ -37,10 +37,10 @@ export interface LearnerConfig {
   createdBy?: string;
 }
 
-class LearnerService {
+export class LearnerService {
   /**
    * Create a replay batch from trajectory IDs
-   * 
+   *
    * Rule: Batch must use real trajectory_store rows
    * Rule: Batch hash must be deterministic
    * Rule: Empty replay batch must fail
@@ -171,18 +171,16 @@ class LearnerService {
 
       const { trajectory_ids, simulation_derived } = batchResult.rows[0];
 
-      // Start learner run
+      // Start learner run (matches schema: replay_batch_id, policy_version_before)
       await client.query(
         `INSERT INTO learner_runs
-         (id, learner_type, input_replay_batch_id, baseline_policy_version, status, trace_id)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         (id, replay_batch_id, policy_version_before, status, created_at)
+         VALUES ($1, $2, $3, $4, NOW())`,
         [
           learnerRunId,
-          config.learnerType,
           config.replayBatchId,
           config.baselinePolicyVersion || 'v1',
-          'running',
-          config.traceId || null,
+          'in_progress'
         ]
       );
 
@@ -206,11 +204,11 @@ class LearnerService {
         simulationTrained: simulation_derived,
       });
 
-      // Mark learner run complete
+      // Store baseline metrics for completion step
       await client.query(
-        `UPDATE learner_runs SET status = $1, completed_at = NOW(), metrics_json = $2
-         WHERE id = $3`,
-        ['completed', JSON.stringify(metrics), learnerRunId]
+        `UPDATE learner_runs SET baseline_metrics_json = $1
+         WHERE id = $2`,
+        [JSON.stringify(metrics), learnerRunId]
       );
 
       return { learnerRunId };
@@ -277,8 +275,8 @@ class LearnerService {
   async generateCandidate(
     learnerRunId: string,
     candidateType: string,
-    context: any
-  ): Promise<{ candidateId: string }> {
+    context?: any
+  ): Promise<{ candidateId: string; id: string }> {
     const client = await pool.connect();
     try {
       const candidateId = uuidv4();
@@ -316,7 +314,7 @@ class LearnerService {
         ]
       );
 
-      return { candidateId };
+      return { candidateId, id: candidateId };
     } finally {
       client.release();
     }
@@ -393,6 +391,34 @@ class LearnerService {
       await client.query(
         `UPDATE learner_candidates SET status = $1 WHERE id = $2`,
         ['ready_for_eval', candidateId]
+      );
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Start learner run (alias for runLearner compatibility)
+   */
+  async startLearnerRun(replayBatchId: string, baselineVersion: string): Promise<{ id: string }> {
+    const config: LearnerConfig = {
+      learnerType: 'prompt_update',
+      replayBatchId,
+      baselinePolicyVersion: baselineVersion,
+    };
+    const result = await this.runLearner(config);
+    return { id: result.learnerRunId };
+  }
+
+  /**
+   * Complete learner run (marks run as finished)
+   */
+  async completeLearnerRun(learnerRunId: string): Promise<void> {
+    const client = await pool.connect();
+    try {
+      await client.query(
+        `UPDATE learner_runs SET status = $1, completed_at = NOW() WHERE id = $2`,
+        ['completed', learnerRunId]
       );
     } finally {
       client.release();

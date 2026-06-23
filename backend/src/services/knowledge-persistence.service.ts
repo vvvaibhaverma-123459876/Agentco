@@ -126,12 +126,12 @@ export class KnowledgePersistenceService {
   addKnowledgeNode(node: Omit<KnowledgeNode, 'id' | 'created_at'>): KnowledgeNode {
     const id = `node_${Date.now()}_${Math.random()}`;
     const knowledge_node: KnowledgeNode = {
+      ...node,
       id,
       created_at: Date.now(),
-      verification_tests_passed: 0,
-      verification_tests_total: 0,
-      times_used: 0,
-      ...node,
+      verification_tests_passed: node.verification_tests_passed ?? 0,
+      verification_tests_total: node.verification_tests_total ?? 0,
+      times_used: node.times_used ?? 0,
     };
 
     this.knowledgeStore.set(id, knowledge_node);

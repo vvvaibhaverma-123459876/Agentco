@@ -311,8 +311,12 @@ export class TrustReputationService {
       ['correction_event', 0.05, 'both', 'Correction events are slightly positive']
     ];
 
-    for (const [eventType, weight, context, description] of weights) {
-      await this.setEventTypeWeight(eventType, weight as number, context as any, description as string);
+    for (const item of weights) {
+      const eventType = item[0] as string;
+      const weight = item[1] as number;
+      const context = item[2] as any;
+      const description = item[3] as string;
+      await this.setEventTypeWeight(eventType, weight, context, description);
     }
   }
 
@@ -328,6 +332,22 @@ export class TrustReputationService {
 
     // Trust weight: 0.5 (low trust) to 1.5 (high trust)
     return 0.5 + reputation;
+  }
+
+  // Duplicate listEvents removed - use the more complete version at line 175 instead
+
+  /**
+   * List reputation snapshots for an entity
+   */
+  async listSnapshots(entityType: string, entityId: string): Promise<ReputationSnapshot[]> {
+    const result = await db.query(
+      `SELECT * FROM reputation_snapshots
+       WHERE entity_type = $1 AND entity_id = $2
+       ORDER BY snapshot_timestamp DESC`,
+      [entityType, entityId]
+    );
+
+    return result.rows;
   }
 }
 

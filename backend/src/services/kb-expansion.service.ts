@@ -123,7 +123,7 @@ export class KBExpansionService {
    * Add AI/ML advances (2020-2026)
    */
   public addAIAdvances(): ExpandedFact[] {
-    const aiF acts: ExpandedFact[] = [
+    const aiFacts: ExpandedFact[] = [
       {
         fact_id: 'AI_TRANSFORMER_001',
         content: 'Transformer architecture (2017) forms basis of modern LLMs: BERT, GPT series, Claude, with attention mechanisms enabling 100B+ parameter models',
@@ -181,14 +181,14 @@ export class KBExpansionService {
       },
     ];
 
-    for (const fact of aiF acts) {
+    for (const fact of aiFacts) {
       this.newFacts.set(fact.fact_id, fact);
     }
 
-    this.expansionProgress.new_facts_added += aiF acts.length;
-    console.log(`✅ Added ${aiF acts.length} AI/ML advances`);
+    this.expansionProgress.new_facts_added += aiFacts.length;
+    console.log(`✅ Added ${aiFacts.length} AI/ML advances`);
 
-    return aiF acts;
+    return aiFacts;
   }
 
   /**

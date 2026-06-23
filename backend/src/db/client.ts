@@ -86,3 +86,5 @@ export async function withClient<T>(fn: (client: PoolClient) => Promise<T>): Pro
     client.release();
   }
 }
+
+export const pool = db;

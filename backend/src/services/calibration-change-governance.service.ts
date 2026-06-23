@@ -323,6 +323,16 @@ export class CalibrationChangeGovernanceService {
     reason?: string,
     traceId?: string
   ): Promise<ChangeApproval> {
+    // ENFORCE: No self-certification (Rule #2)
+    const changeRequest = await this.getById(changeRequestId);
+    if (!changeRequest) {
+      throw new Error(`Change request ${changeRequestId} not found`);
+    }
+
+    if (changeRequest.requester_entity_id === approverEntityId) {
+      throw new Error(`Requester cannot approve their own change request (self-certification prohibited)`);
+    }
+
     const approvalResult = await db.query(
       `INSERT INTO change_approvals (
         change_request_id, approver_entity_id, decision, approval_scope, reason
@@ -503,6 +513,13 @@ export class CalibrationChangeGovernanceService {
       ) VALUES ($1, $2, $3, $4, $5)`,
       [changeRequestId, eventType, previousStatus, newStatus, traceId || null]
     );
+  }
+
+  /**
+   * List pending changes (under review or awaiting approval)
+   */
+  async listPending(): Promise<ChangeRequest[]> {
+    return this.listByStatus('under_review', 50, 0);
   }
 }
 

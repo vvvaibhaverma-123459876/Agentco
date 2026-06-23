@@ -99,15 +99,15 @@ export class IntegrationService {
 
     // PHASE 8: Final Answer Construction
     const finalAnswer: IntegratedAnswer = {
-      answer: verified.is_correct ? consensus.answer : verified.correction,
+      answer: verified.is_correct ? consensus.answer : (verified.correction || consensus.answer),
       confidence: verified.is_correct ? consensus.confidence : Math.min(consensus.confidence, 0.65),
       uncertainty_interval: trust.uncertainty_interval,
       sources: consensus.sources,
       verified_by: consensus.verified_by,
-      corrections_applied: verified.is_correct ? [] : [verified.correction],
+      corrections_applied: verified.is_correct ? [] : (verified.correction ? [verified.correction] : []),
       governance_notes: governance.notes,
       learning_impact: learning.impact_score,
-      reasoning_path,
+      reasoning_path: reasoningPath,
     };
 
     console.log('\n╔════════════════════════════════════════════════════════════════╗');
@@ -143,7 +143,6 @@ export class IntegrationService {
         service: 'Ensemble Voting',
         answer: result.final_answer,
         confidence: result.confidence,
-        models_used: result.models_used || [],
       };
     } catch (e) {
       return { service: 'Ensemble Voting', answer: 'Error', confidence: 0 };

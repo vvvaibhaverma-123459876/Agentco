@@ -415,7 +415,10 @@ export class InstitutionsService {
         this.isRelevant(institution, paper)
       ) {
         const result = institution.ingestPaper(paper);
-        results.set(institution.id, result);
+        results.set(institution.id, {
+          topics: result.learned_topics,
+          expertise: result.expertise_gained,
+        });
         matched = true;
       }
     }
@@ -424,7 +427,10 @@ export class InstitutionsService {
     if (!matched && !Array.from(this.institutions.values()).some((i) => i.primary_domain === paper.domain)) {
       const new_inst = this.createInstitution(paper.domain);
       const result = new_inst.ingestPaper(paper);
-      results.set(new_inst.id, result);
+      results.set(new_inst.id, {
+        topics: result.learned_topics,
+        expertise: result.expertise_gained,
+      });
     }
 
     return results;

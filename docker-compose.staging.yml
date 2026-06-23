@@ -1,0 +1,191 @@
+version: '3.8'
+
+services:
+  # =========================================================================
+  # STAGING POSTGRES DATABASE
+  # =========================================================================
+  postgres-staging:
+    image: postgres:14-alpine
+    container_name: agentco-postgres-staging
+    environment:
+      POSTGRES_USER: agentco_staging
+      POSTGRES_PASSWORD: staging_password_change_me
+      POSTGRES_DB: agentco_staging
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentco_staging -d agentco_staging"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentco-staging
+
+  # =========================================================================
+  # STAGING REDIS CACHE
+  # =========================================================================
+  redis-staging:
+    image: redis:7-alpine
+    container_name: agentco-redis-staging
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_staging_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentco-staging
+
+  # =========================================================================
+  # STAGING ZOOKEEPER (For Kafka)
+  # =========================================================================
+  zookeeper-staging:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: agentco-zookeeper-staging
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    volumes:
+      - zookeeper_staging_data:/var/lib/zookeeper/data
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentco-staging
+
+  # =========================================================================
+  # STAGING KAFKA BROKER
+  # =========================================================================
+  kafka-staging:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: agentco-kafka-staging
+    depends_on:
+      zookeeper-staging:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper-staging:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-staging:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_LOG_RETENTION_BYTES: 1073741824
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions.sh", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentco-staging
+
+  # =========================================================================
+  # STAGING OTEL COLLECTOR
+  # =========================================================================
+  otel-collector-staging:
+    image: otel/opentelemetry-collector:0.68.0
+    container_name: agentco-otel-staging
+    command: ["--config=/etc/otel-collector-config.yml"]
+    ports:
+      - "4318:4318"   # HTTP receiver
+      - "4317:4317"   # gRPC receiver
+      - "8888:8888"   # Prometheus metrics
+    depends_on:
+      - prometheus-staging
+    networks:
+      - agentco-staging
+
+  # =========================================================================
+  # STAGING PROMETHEUS METRICS
+  # =========================================================================
+  prometheus-staging:
+    image: prom/prometheus:v2.40.0
+    container_name: agentco-prometheus-staging
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    volumes:
+      - prometheus_staging_data:/prometheus
+    ports:
+      - "9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentco-staging
+
+  # =========================================================================
+  # STAGING GRAFANA DASHBOARDS
+  # =========================================================================
+  grafana-staging:
+    image: grafana/grafana:9.2.0
+    container_name: agentco-grafana-staging
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+    volumes:
+      - grafana_staging_data:/var/lib/grafana
+    ports:
+      - "3050:3000"
+    depends_on:
+      - prometheus-staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - agentco-staging
+
+volumes:
+  postgres_staging_data:
+  redis_staging_data:
+  zookeeper_staging_data:
+  prometheus_staging_data:
+  grafana_staging_data:
+
+networks:
+  agentco-staging:
+    driver: bridge
+
+# ============================================================================
+# USAGE:
+# ============================================================================
+#
+# Start staging environment:
+#   docker-compose -f docker-compose.staging.yml up -d
+#
+# Check services are healthy:
+#   docker-compose -f docker-compose.staging.yml ps
+#
+# Access services:
+#   - PostgreSQL: localhost:5433 (user: agentco_staging, pass: staging_password_change_me)
+#   - Redis: localhost:6380
+#   - Kafka: localhost:9092
+#   - Prometheus: http://localhost:9090
+#   - Grafana: http://localhost:3050 (admin/admin)
+#   - OpenTelemetry: http://localhost:4318
+#
+# View logs:
+#   docker-compose -f docker-compose.staging.yml logs -f [service-name]
+#
+# Stop services:
+#   docker-compose -f docker-compose.staging.yml down
+#
+# Clean up volumes (WARNING: destroys data):
+#   docker-compose -f docker-compose.staging.yml down -v

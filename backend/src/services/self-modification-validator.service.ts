@@ -15,6 +15,7 @@ export interface SelfModValidation {
   id: string;
   candidateId: string;
   status: 'passed' | 'blocked';
+  blocked: boolean;
   blockedReasons: string[];
   touchedSurfaces: string[];
   auditEventId?: string;
@@ -349,6 +350,7 @@ export class SelfModificationValidator {
       id: result.rows[0].id,
       candidateId,
       status,
+      blocked: !passed,
       blockedReasons,
       touchedSurfaces,
       auditEventId,
@@ -400,6 +402,7 @@ export class SelfModificationValidator {
       id: row.id,
       candidateId: row.candidate_id,
       status: row.status,
+      blocked: row.status === 'blocked',
       blockedReasons: JSON.parse(row.blocked_reasons_json || '[]'),
       touchedSurfaces: JSON.parse(row.touched_surfaces_json || '[]'),
       createdAt: row.created_at,

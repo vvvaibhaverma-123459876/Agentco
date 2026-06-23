@@ -22,7 +22,7 @@ router.get('/benchmarks', (req: Request, res: Response) => {
     },
   ];
 
-  res.json({
+  res.send({
     status: 'success',
     data: benchmarks,
   });
@@ -48,7 +48,7 @@ router.get('/runs', (req: Request, res: Response) => {
     },
   ];
 
-  res.json({
+  res.send({
     status: 'success',
     data: {
       runs: runs.slice(0, parseInt(limit as string)),
@@ -68,7 +68,7 @@ router.post('/runs', (req: Request, res: Response) => {
   const { benchmark_id, models, limit } = req.body;
 
   if (!benchmark_id || !models || !Array.isArray(models)) {
-    return res.status(400).json({
+    return res.status(400).send({
       status: 'error',
       error: 'benchmark_id and models array are required',
     });
@@ -77,7 +77,7 @@ router.post('/runs', (req: Request, res: Response) => {
   // Stub: In production, queue benchmark run
   const run_id = `run-${Date.now()}`;
 
-  res.status(202).json({
+  res.status(202).send({
     status: 'accepted',
     data: {
       run_id,
@@ -97,7 +97,7 @@ router.get('/runs/:run_id', (req: Request, res: Response) => {
   const { run_id } = req.params;
 
   // Stub: In production, fetch from database
-  res.json({
+  res.send({
     status: 'success',
     data: {
       run_id,
@@ -129,7 +129,7 @@ router.get('/calibration/report', (req: Request, res: Response) => {
   const { model_id, benchmark_id } = req.query;
 
   // Stub: In production, compute from trial records
-  res.json({
+  res.send({
     status: 'success',
     data: {
       model_id: model_id || 'fake:deterministic',
@@ -164,14 +164,14 @@ router.post('/calibration/feedback', (req: Request, res: Response) => {
   const { trial_id, actual_outcome, confidence_adjustment } = req.body;
 
   if (!trial_id || actual_outcome === undefined) {
-    return res.status(400).json({
+    return res.status(400).send({
       status: 'error',
       error: 'trial_id and actual_outcome are required',
     });
   }
 
   // Stub: In production, update trial record and recalibrate
-  res.status(202).json({
+  res.status(202).send({
     status: 'accepted',
     data: {
       trial_id,
@@ -205,7 +205,7 @@ router.get('/calibration/metrics', (req: Request, res: Response) => {
     },
   };
 
-  res.json({
+  res.send({
     status: 'success',
     data: metric ? { [metric as string]: metrics[metric as keyof typeof metrics] } : metrics,
   });

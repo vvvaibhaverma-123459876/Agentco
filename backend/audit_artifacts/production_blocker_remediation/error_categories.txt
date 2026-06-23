@@ -1,0 +1,73 @@
+  13  'request.query' is of type 'unknown'.
+   8  Property 'traceId' does not exist on type 'unknown'.
+   3  Property 'goalId' does not exist on type 'unknown'.
+   2  Property 'user' does not exist on type 'FastifyRequest<RouteGenericInterface, RawServerDefault, IncomingMessage, FastifySchema, FastifyTypeProviderDefault, unknown, FastifyBaseLogger, ResolveFastifyRequestType<...>>'.
+   2  Property 'targetId' does not exist on type 'unknown'.
+   2  Property 'runId' does not exist on type 'unknown'.
+   2  Property 'riskLevel' does not exist on type 'unknown'.
+   2  Property 'reviewerId' does not exist on type 'unknown'.
+   2  Property 'domain' does not exist on type 'unknown'.
+   2  Property 'createdBy' does not exist on type 'unknown'.
+   2  Duplicate function implementation.
+   2  Cannot find module 'express' or its corresponding type declarations.
+   2  Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+   2  Argument of type '{ learned_topics: number; expertise_gained: number; }' is not assignable to parameter of type '{ topics: number; expertise: number; }'.
+   1  Type 'string | undefined' is not assignable to type 'string'.
+   1  Type '(string | undefined)[]' is not assignable to type 'string[]'.
+   1  Property 'version' does not exist on type 'unknown'.
+   1  Property 'trajectoryIds' does not exist on type 'unknown'.
+   1  Property 'toolBudget' does not exist on type 'unknown'.
+   1  Property 'tokenBudget' does not exist on type 'unknown'.
+   1  Property 'title' does not exist on type 'unknown'.
+   1  Property 'timeBudgetSeconds' does not exist on type 'unknown'.
+   1  Property 'targetType' does not exist on type 'unknown'.
+   1  Property 'suiteId' does not exist on type 'unknown'.
+   1  Property 'successCriteria' does not exist on type 'unknown'.
+   1  Property 'stopConditions' does not exist on type 'unknown'.
+   1  Property 'startLearnerRun' does not exist on type 'LearnerService'. Did you mean 'getLearnerRun'?
+   1  Property 'spendLimit' does not exist on type 'unknown'.
+   1  Property 'sourceFilter' does not exist on type 'unknown'.
+   1  Property 'source' does not exist on type 'unknown'.
+   1  Property 'seed' does not exist on type 'unknown'.
+   1  Property 'rewardFunctionId' does not exist on type 'unknown'.
+   1  Property 'reviewerRole' does not exist on type 'unknown'.
+   1  Property 'replayBatchId' does not exist on type 'unknown'.
+   1  Property 'relevanceScore' does not exist on type 'unknown'.
+   1  Property 'reason' does not exist on type 'unknown'.
+   1  Property 'provenanceJson' does not exist on type 'unknown'.
+   1  Property 'proposedBy' does not exist on type 'unknown'.
+   1  Property 'promotionReason' does not exist on type 'unknown'.
+   1  Property 'plannerAgentId' does not exist on type 'unknown'.
+   1  Property 'planId' does not exist on type 'unknown'.
+   1  Property 'owningInstitutionId' does not exist on type 'unknown'.
+   1  Property 'owningAgentId' does not exist on type 'unknown'.
+   1  Property 'owner' does not exist on type 'unknown'.
+   1  Property 'outcomeType' does not exist on type 'unknown'.
+   1  Property 'objectiveResult' does not exist on type 'unknown'.
+   1  Property 'name' does not exist on type 'unknown'.
+   1  Property 'models_used' does not exist on type 'EnsembleResult'.
+   1  Property 'learnerType' does not exist on type 'unknown'.
+   1  Property 'id' does not exist on type '{ candidateId: string; }'.
+   1  Property 'horizon' does not exist on type 'unknown'.
+   1  Property 'formula' does not exist on type 'unknown'.
+   1  Property 'expectedValue' does not exist on type 'unknown'.
+   1  Property 'evidenceType' does not exist on type 'unknown'.
+   1  Property 'evidenceRef' does not exist on type 'unknown'.
+   1  Property 'description' does not exist on type 'unknown'.
+   1  Property 'decision' does not exist on type 'unknown'.
+   1  Property 'configJson' does not exist on type 'unknown'.
+   1  Property 'computeBudget' does not exist on type 'unknown'.
+   1  Property 'completeLearnerRun' does not exist on type 'LearnerService'. Did you mean 'getLearnerRun'?
+   1  Property 'candidateRef' does not exist on type 'unknown'.
+   1  Property 'batchLabel' does not exist on type 'unknown'.
+   1  Property 'baselineRef' does not exist on type 'unknown'.
+   1  Property 'baselinePolicyVersion' does not exist on type 'unknown'.
+   1  Property 'autonomyLevelAllowed' does not exist on type 'unknown'.
+   1  Parameter 'data' implicitly has an 'any' type.
+   1  Expected 3 arguments, but got 2.
+   1  Cannot find name 'reasoning_path'. Did you mean 'reasoningPath'?
+   1  Argument of type 'string | number' is not assignable to parameter of type 'string'.
+   1  An object literal cannot have multiple properties with the same name.
+   1  'verification_tests_total' is specified more than once, so this usage will be overwritten.
+   1  'verification_tests_passed' is specified more than once, so this usage will be overwritten.
+   1  'times_used' is specified more than once, so this usage will be overwritten.

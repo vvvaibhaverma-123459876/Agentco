@@ -1,0 +1,32 @@
+================================================================================
+BACKEND SECURITY TEST RESULTS
+================================================================================
+
+Test Command: npm test -- tests/security.test.ts
+Location: /Users/Zet/Agentco/backend
+Date: 2026-06-23
+
+RESULT: ❌ COMPILATION FAILED
+
+Exit Code: 0 (masked by --passWithNoTests flag)
+Test Suites: 1 failed
+Tests: 0 total
+
+COMPILATION ERRORS:
+1. src/services/autonomy-orchestrator.service.ts:5:10
+   Error TS2459: Module 'learner.service' declares 'LearnerService' locally, 
+   but it is not exported.
+
+2. src/services/autonomy-orchestrator.service.ts:6:10
+   Error TS2459: Module 'eval-harness.service' declares 'EvalHarnessService' 
+   locally, but it is not exported.
+
+3. src/services/autonomy-orchestrator.service.ts:727:18
+   Error TS2339: Property 'blocked' does not exist on type 'SelfModValidation'.
+
+BLOCKER: Backend code does not compile. Security tests cannot run.
+
+Production Impact: CRITICAL
+The backend cannot be built for production with these unresolved TypeScript errors.
+
+================================================================================

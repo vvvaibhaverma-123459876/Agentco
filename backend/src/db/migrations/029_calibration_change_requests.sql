@@ -165,6 +165,36 @@ CREATE TRIGGER change_events_immutable
     FOR EACH ROW EXECUTE FUNCTION raise_immutability_violation('change_request_events');
 
 -- ============================================================
+-- SELF-CERTIFICATION PREVENTION (Rule #2)
+-- ============================================================
+
+DROP FUNCTION IF EXISTS check_no_self_approval();
+CREATE FUNCTION check_no_self_approval()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_requester_id TEXT;
+BEGIN
+    -- Get the requester of this change request
+    SELECT requester_entity_id INTO v_requester_id
+    FROM calibration_change_requests
+    WHERE id = NEW.change_request_id;
+
+    -- Prevent self-approval
+    IF v_requester_id = NEW.approver_entity_id THEN
+        RAISE EXCEPTION 'Self-certification prohibited: requester cannot approve own change request (Rule #2)';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS prevent_self_approval ON change_approvals;
+CREATE TRIGGER prevent_self_approval
+    BEFORE INSERT ON change_approvals
+    FOR EACH ROW
+    EXECUTE FUNCTION check_no_self_approval();
+
+-- ============================================================
 -- HELPER FUNCTIONS
 -- ============================================================
 

@@ -1,0 +1,167 @@
+import { Request, Response, NextFunction } from 'express';
+import { governanceRBACService } from '../services/governance-rbac.service';
+
+/**
+ * RBAC Middleware for governance operations
+ * Checks if request actor has required permission before proceeding
+ */
+
+declare global {
+  namespace Express {
+    interface Request {
+      actorId?: string;
+      traceId?: string;
+    }
+  }
+}
+
+/**
+ * Require specific permission for endpoint
+ * Usage: app.post('/api/governance/policies/approve', requireGovernancePermission('governance.approve_policies'), handler)
+ */
+export function requireGovernancePermission(requiredPermission: string) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Get actor ID from headers or request context
+      const actorId = req.headers['x-actor-id'] as string || req.headers['x-service-identity'] as string || 'unknown';
+      const traceId = req.headers['x-trace-id'] as string || req.headers['trace-id'] as string;
+
+      // Attach to request for downstream use
+      req.actorId = actorId;
+      req.traceId = traceId;
+
+      // Check permission
+      const hasPermission = await governanceRBACService.hasPermission(actorId, requiredPermission);
+
+      if (!hasPermission) {
+        // Audit the failed attempt
+        await governanceRBACService.auditRBACCheck(
+          actorId,
+          req.method,
+          req.path,
+          false,
+          requiredPermission,
+          `Missing required permission: ${requiredPermission}`,
+          traceId
+        );
+
+        console.warn(`[RBAC] DENIED: ${actorId} attempted ${req.method} ${req.path} (requires ${requiredPermission})`);
+
+        return res.status(403).json({
+          error: 'PERMISSION_DENIED',
+          message: `Required permission: ${requiredPermission}`,
+          resource: req.path,
+        });
+      }
+
+      // Audit the successful check
+      await governanceRBACService.auditRBACCheck(
+        actorId,
+        req.method,
+        req.path,
+        true,
+        requiredPermission,
+        undefined,
+        traceId
+      );
+
+      console.log(`[RBAC] ALLOWED: ${actorId} ${req.method} ${req.path}`);
+
+      next();
+    } catch (error: any) {
+      console.error(`[RBAC] Error checking permission: ${error.message}`);
+      res.status(500).json({
+        error: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to check permissions',
+      });
+    }
+  };
+}
+
+/**
+ * Require minimum permission level (1-5)
+ * 1=viewer, 2=operator, 3=reviewer, 4=approver, 5=admin
+ */
+export function requireGovernanceLevel(minimumLevel: number) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const actorId = req.headers['x-actor-id'] as string || req.headers['x-service-identity'] as string || 'unknown';
+      const traceId = req.headers['x-trace-id'] as string || req.headers['trace-id'] as string;
+
+      req.actorId = actorId;
+      req.traceId = traceId;
+
+      const hasLevel = await governanceRBACService.checkPermissionLevel(actorId, minimumLevel);
+
+      if (!hasLevel) {
+        await governanceRBACService.auditRBACCheck(
+          actorId,
+          req.method,
+          req.path,
+          false,
+          `LEVEL_${minimumLevel}`,
+          `Insufficient permission level (requires level ${minimumLevel})`,
+          traceId
+        );
+
+        console.warn(`[RBAC] DENIED: ${actorId} needs level ${minimumLevel} for ${req.path}`);
+
+        return res.status(403).json({
+          error: 'INSUFFICIENT_LEVEL',
+          message: `This operation requires permission level ${minimumLevel}`,
+        });
+      }
+
+      await governanceRBACService.auditRBACCheck(
+        actorId,
+        req.method,
+        req.path,
+        true,
+        `LEVEL_${minimumLevel}`,
+        undefined,
+        traceId
+      );
+
+      console.log(`[RBAC] LEVEL CHECK: ${actorId} has level >= ${minimumLevel}`);
+
+      next();
+    } catch (error: any) {
+      console.error(`[RBAC] Error checking level: ${error.message}`);
+      res.status(500).json({
+        error: 'INTERNAL_SERVER_ERROR',
+        message: 'Failed to check permission level',
+      });
+    }
+  };
+}
+
+/**
+ * Log all requests to governance endpoints
+ */
+export function auditGovernanceRequest() {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const actorId = req.headers['x-actor-id'] as string || req.headers['x-service-identity'] as string || 'unknown';
+    const traceId = req.headers['x-trace-id'] as string || req.headers['trace-id'] as string;
+
+    // Log after response sent
+    const originalSend = res.send;
+    res.send = function (data) {
+      const statusCode = res.statusCode;
+      const permissionGranted = statusCode >= 200 && statusCode < 400;
+
+      governanceRBACService.auditRBACCheck(
+        actorId,
+        req.method,
+        req.path,
+        permissionGranted,
+        undefined,
+        statusCode >= 400 ? `HTTP ${statusCode}` : undefined,
+        traceId
+      ).catch(err => console.error(`Audit error: ${err}`));
+
+      return originalSend.call(this, data);
+    };
+
+    next();
+  };
+}
