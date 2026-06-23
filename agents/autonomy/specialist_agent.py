@@ -15,27 +15,74 @@ import uuid
 import hashlib
 import os
 
-# Database connection (optional - only if env vars present)
+# Database connection pooling (optional - only if env vars present)
 try:
     import psycopg2
+    import psycopg2.pool
     from psycopg2.extras import RealDictCursor
     HAS_DB = True
 except ImportError:
     HAS_DB = False
 
+_connection_pool = None
+
+def init_db_pool():
+    """Initialize database connection pool once at startup"""
+    global _connection_pool
+    if _connection_pool is not None:
+        return  # Already initialized
+
+    db_url = os.environ.get('DATABASE_URL')
+    if not db_url:
+        return
+
+    try:
+        _connection_pool = psycopg2.pool.SimpleConnectionPool(
+            1,  # min connections
+            5,  # max connections
+            db_url,
+            connect_timeout=5,
+            options="-c statement_timeout=10000"  # 10s query timeout
+        )
+        print(f"[DB] Connection pool initialized: min=1, max=5")
+    except Exception as e:
+        print(f"[DB] Pool initialization failed: {e}")
+        _connection_pool = None
+
 def get_db_connection():
-    """Get PostgreSQL connection if available"""
+    """Get connection from pool if available"""
+    global _connection_pool
     if not HAS_DB:
         return None
-    try:
-        db_url = os.environ.get('DATABASE_URL')
-        if not db_url:
-            return None
-        conn = psycopg2.connect(db_url)
-        return conn
-    except Exception as e:
-        print(f"[DB] Connection failed: {e}")
+
+    # Initialize pool on first use
+    if _connection_pool is None:
+        init_db_pool()
+
+    if _connection_pool is None:
         return None
+
+    try:
+        return _connection_pool.getconn()
+    except psycopg2.pool.PoolError:
+        print("[DB] Connection pool exhausted (all connections in use)")
+        return None
+    except Exception as e:
+        print(f"[DB] Failed to get connection from pool: {e}")
+        return None
+
+def return_db_connection(conn):
+    """Return connection to pool"""
+    global _connection_pool
+    if conn and _connection_pool:
+        try:
+            _connection_pool.putconn(conn)
+        except Exception as e:
+            print(f"[DB] Failed to return connection to pool: {e}")
+            try:
+                conn.close()
+            except:
+                pass
 
 
 class SpecialistAgent(BaseAgent):
@@ -70,6 +117,7 @@ class SpecialistAgent(BaseAgent):
         def execute_action():
             """Execute action spec and return result"""
             try:
+                # VALIDATION: Check request body
                 action_spec = request.json
                 if not action_spec:
                     return jsonify({
@@ -77,10 +125,46 @@ class SpecialistAgent(BaseAgent):
                         'errors': ['No action spec provided']
                     }), 400
 
-                # Check budget before executing
-                self.check_budget()
+                # VALIDATION: Check budget FIRST (before any execution)
+                try:
+                    self.check_budget()
+                except RuntimeError as e:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': [f'Budget exceeded: {str(e)}']
+                    }), 429  # 429 Too Many Requests
 
-                # Execute action (subclass implements)
+                # VALIDATION: Check action type is allowed for this specialist
+                action_type = action_spec.get('actionType', '').upper()
+                if not action_type:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': ['Missing actionType field']
+                    }), 400
+
+                allowed_actions = self.get_allowed_actions()
+                if action_type not in allowed_actions:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': [f'Action {action_type} not allowed for specialist role {self.role}. Allowed: {", ".join(sorted(allowed_actions))}']
+                    }), 403  # 403 Forbidden
+
+                # VALIDATION: Check required arguments
+                if action_type in ['WEB_SEARCH', 'FETCH_PAGE'] and 'args' not in action_spec:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': [f'Missing required args field for action {action_type}']
+                    }), 400
+
+                # VALIDATION: Bounds check on string fields
+                objective = action_spec.get('objective', '')
+                if len(objective) > 1000:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': ['Objective field exceeds maximum length of 1000 characters']
+                    }), 400
+
+                # Now execute the action
                 result = self.handle_action(action_spec)
 
                 return jsonify({
@@ -92,16 +176,18 @@ class SpecialistAgent(BaseAgent):
                 }), 200
 
             except RuntimeError as e:
-                # Budget exceeded or other constraint violation
+                # Budget exceeded or constraint violation
                 return jsonify({
                     'status': 'failed',
                     'errors': [str(e)]
-                }), 429  # 429 Too Many Requests (budget exceeded)
+                }), 429
 
             except Exception as e:
+                # Unexpected error
+                print(f"[{self.role}] Unexpected error in /execute: {e}")
                 return jsonify({
                     'status': 'failed',
-                    'errors': [str(e)]
+                    'errors': [f'Unexpected error: {str(e)}']
                 }), 500
 
         @self.app.route('/status', methods=['GET'])
@@ -122,6 +208,25 @@ class SpecialistAgent(BaseAgent):
         def health():
             """Health check endpoint"""
             return jsonify({'status': 'healthy'}), 200
+
+    def get_allowed_actions(self) -> set:
+        """
+        Return set of allowed action types for this specialist role.
+        Subclasses can override to restrict actions.
+
+        Default: All action types are allowed.
+        Overrides in subclasses define role-specific restrictions.
+        """
+        return {
+            'WEB_SEARCH',
+            'FETCH_PAGE',
+            'EXTRACT_EVIDENCE',
+            'GENERATE_CLAIM',
+            'UPDATE_MEMORY',
+            'EVALUATE_PROGRESS',
+            'SYNTHESIZE_FINDINGS',
+            'VALIDATE_CLAIM'
+        }
 
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -206,42 +311,85 @@ class SpecialistAgent(BaseAgent):
         title: str = '',
         snippet: str = ''
     ) -> str:
-        """Persist evidence to database and return evidence ID"""
+        """Persist evidence to database with retry logic"""
+        import time
+
         evidence_id = str(uuid.uuid4())
         content_hash = hashlib.md5(content.encode()).hexdigest() if content else ''
 
-        conn = get_db_connection()
-        if not conn:
-            print(f"[Evidence] DB unavailable, returning stub ID: {evidence_id}")
-            return evidence_id
+        # Retry logic with exponential backoff
+        for attempt in range(3):
+            conn = None
+            try:
+                conn = get_db_connection()
+                if not conn:
+                    if attempt < 2:
+                        wait_time = 2 ** attempt
+                        print(f"[Evidence] No connection available, retrying in {wait_time}s (attempt {attempt + 1}/3)")
+                        time.sleep(wait_time)
+                        continue
+                    print(f"[Evidence] DB unavailable after 3 attempts, returning stub ID: {evidence_id}")
+                    return evidence_id
 
-        try:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO autonomy_evidence
-                (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
-            """, (
-                evidence_id,
-                str(uuid.uuid4()),  # source_id
-                url,
-                title,
-                snippet,
-                content_hash,
-                source_type,
-                True  # is_public_access
-            ))
-            conn.commit()
-            print(f"[Evidence] Persisted: {evidence_id}")
-            return evidence_id
-        except Exception as e:
-            print(f"[Evidence] Insert failed: {e}")
-            if conn:
-                conn.rollback()
-            return evidence_id
-        finally:
-            if conn:
-                conn.close()
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO autonomy_evidence
+                    (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                """, (
+                    evidence_id,
+                    str(uuid.uuid4()),  # source_id
+                    url,
+                    title,
+                    snippet,
+                    content_hash,
+                    source_type,
+                    True  # is_public_access
+                ))
+                conn.commit()
+                print(f"[Evidence] Persisted: {evidence_id}")
+                return evidence_id
+
+            except Exception as e:
+                if conn:
+                    conn.rollback()
+
+                # Handle specific psycopg2 errors if available
+                if HAS_DB:
+                    if isinstance(e, psycopg2.errors.UniqueViolation):
+                        # UUID collision (extremely rare), generate new ID
+                        evidence_id = str(uuid.uuid4())
+                        if attempt < 2:
+                            print(f"[Evidence] UUID collision, retrying with new ID")
+                            continue
+                        raise RuntimeError(f"Evidence ID collision after 3 attempts: {e}")
+
+                    elif isinstance(e, psycopg2.errors.OperationalError):
+                        # Connection error, retry with backoff
+                        if attempt < 2:
+                            wait_time = 2 ** attempt
+                            print(f"[Evidence] DB operational error, retrying in {wait_time}s: {e}")
+                            time.sleep(wait_time)
+                            continue
+                        raise RuntimeError(f"Database unavailable after 3 attempts: {e}")
+
+                    elif isinstance(e, psycopg2.errors.InsufficientPrivilege):
+                        # Permissions issue, don't retry
+                        raise RuntimeError(f"Database permission denied: {e}")
+
+                # Generic error handling
+                if attempt < 2:
+                    print(f"[Evidence] Unexpected error, retrying: {e}")
+                    time.sleep(2 ** attempt)
+                    continue
+                raise RuntimeError(f"Failed to persist evidence after 3 attempts: {e}")
+
+            finally:
+                if conn:
+                    return_db_connection(conn)
+
+        # Should never reach here
+        raise RuntimeError(f"Evidence persistence failed unexpectedly")
 
     def persist_claim(
         self,
@@ -250,40 +398,82 @@ class SpecialistAgent(BaseAgent):
         confidence: float = 0.7,
         status: str = 'supported'
     ) -> str:
-        """Persist claim to database and return claim ID"""
+        """Persist claim to database with retry logic"""
+        import time
+
         claim_id = str(uuid.uuid4())
 
         if not support_source_ids:
             print(f"[Claim] No sources provided, returning stub ID: {claim_id}")
             return claim_id
 
-        conn = get_db_connection()
-        if not conn:
-            print(f"[Claim] DB unavailable, returning stub ID: {claim_id}")
-            return claim_id
+        # Retry logic with exponential backoff
+        for attempt in range(3):
+            conn = None
+            try:
+                conn = get_db_connection()
+                if not conn:
+                    if attempt < 2:
+                        wait_time = 2 ** attempt
+                        print(f"[Claim] No connection available, retrying in {wait_time}s (attempt {attempt + 1}/3)")
+                        time.sleep(wait_time)
+                        continue
+                    print(f"[Claim] DB unavailable after 3 attempts, returning stub ID: {claim_id}")
+                    return claim_id
 
-        try:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO autonomy_claims
-                (id, claim_id, text, status, confidence, support_source_ids, generated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, NOW())
-            """, (
-                claim_id,
-                claim_id,
-                claim_text,
-                status,
-                confidence,
-                json.dumps(support_source_ids)  # JSONB array
-            ))
-            conn.commit()
-            print(f"[Claim] Persisted: {claim_id}")
-            return claim_id
-        except Exception as e:
-            print(f"[Claim] Insert failed: {e}")
-            if conn:
-                conn.rollback()
-            return claim_id
-        finally:
-            if conn:
-                conn.close()
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO autonomy_claims
+                    (id, claim_id, text, status, confidence, support_source_ids, generated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                """, (
+                    claim_id,
+                    claim_id,
+                    claim_text,
+                    status,
+                    confidence,
+                    json.dumps(support_source_ids)  # JSONB array
+                ))
+                conn.commit()
+                print(f"[Claim] Persisted: {claim_id}")
+                return claim_id
+
+            except Exception as e:
+                if conn:
+                    conn.rollback()
+
+                # Handle specific psycopg2 errors if available
+                if HAS_DB:
+                    if isinstance(e, psycopg2.errors.UniqueViolation):
+                        # UUID collision, generate new ID
+                        claim_id = str(uuid.uuid4())
+                        if attempt < 2:
+                            continue
+                        raise RuntimeError(f"Claim ID collision after 3 attempts: {e}")
+
+                    elif isinstance(e, psycopg2.errors.OperationalError):
+                        # Connection error, retry with backoff
+                        if attempt < 2:
+                            wait_time = 2 ** attempt
+                            print(f"[Claim] DB operational error, retrying in {wait_time}s: {e}")
+                            time.sleep(wait_time)
+                            continue
+                        raise RuntimeError(f"Database unavailable after 3 attempts: {e}")
+
+                    elif isinstance(e, psycopg2.errors.InsufficientPrivilege):
+                        # Permissions issue
+                        raise RuntimeError(f"Database permission denied: {e}")
+
+                # Generic error handling
+                if attempt < 2:
+                    print(f"[Claim] Unexpected error, retrying: {e}")
+                    time.sleep(2 ** attempt)
+                    continue
+                raise RuntimeError(f"Failed to persist claim after 3 attempts: {e}")
+
+            finally:
+                if conn:
+                    return_db_connection(conn)
+
+        # Should never reach here
+        raise RuntimeError(f"Claim persistence failed unexpectedly")

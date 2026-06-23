@@ -7,6 +7,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { spawn, ChildProcess } from 'child_process';
+import { createWriteStream } from 'fs';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
 import { ActionSpec, ActionResult } from '../types/action.types';
@@ -56,6 +57,80 @@ export interface ActivationResult {
 export class TeamActivationService {
   private activeSpecialists = new Map<string, SpecialistInstance>();
   private activeProcesses = new Map<string, ChildProcess>();
+
+  constructor() {
+    // Graceful shutdown handlers to prevent orphaned processes
+    process.on('SIGTERM', () => {
+      console.log('[TeamActivation] SIGTERM received, initiating graceful shutdown...');
+      this.gracefulShutdown().catch((err) => {
+        console.error('[TeamActivation] Error during shutdown:', err);
+        process.exit(1);
+      });
+    });
+
+    process.on('SIGINT', () => {
+      console.log('[TeamActivation] SIGINT received, initiating graceful shutdown...');
+      this.gracefulShutdown().catch((err) => {
+        console.error('[TeamActivation] Error during shutdown:', err);
+        process.exit(1);
+      });
+    });
+  }
+
+  /**
+   * Graceful shutdown: terminate all specialists and their processes
+   */
+  private async gracefulShutdown(): Promise<void> {
+    const timeout = 10000; // 10 seconds total timeout
+    const startTime = Date.now();
+
+    console.log(`[TeamActivation] Starting graceful shutdown of ${this.activeProcesses.size} active specialists...`);
+
+    // Step 1: Signal all specialists to terminate gracefully (SIGTERM)
+    for (const [specialistId, childProcess] of this.activeProcesses) {
+      try {
+        if (!childProcess.killed) {
+          childProcess.kill('SIGTERM');
+          console.log(`[TeamActivation] Sent SIGTERM to specialist ${specialistId} (PID: ${childProcess.pid})`);
+        }
+      } catch (err) {
+        console.warn(`[TeamActivation] Failed to send SIGTERM to ${specialistId}:`, err);
+      }
+    }
+
+    // Step 2: Wait for graceful termination
+    while (this.activeProcesses.size > 0 && Date.now() - startTime < timeout) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    // Step 3: Force kill any remaining processes (SIGKILL)
+    for (const [specialistId, childProcess] of this.activeProcesses) {
+      if (!childProcess.killed) {
+        try {
+          childProcess.kill('SIGKILL');
+          console.log(`[TeamActivation] Force-killed specialist ${specialistId} (PID: ${childProcess.pid})`);
+        } catch (err) {
+          console.warn(`[TeamActivation] Failed to SIGKILL ${specialistId}:`, err);
+        }
+      }
+    }
+
+    // Step 4: Update database records for any remaining specialists
+    for (const [specialistId] of this.activeSpecialists) {
+      try {
+        await this.terminateSpecialist(specialistId, {
+          artifacts: [],
+          evidence: [],
+          claims: [],
+          error: 'Process killed during server shutdown',
+        });
+      } catch (err) {
+        console.warn(`[TeamActivation] Error terminating specialist ${specialistId} in shutdown:`, err);
+      }
+    }
+
+    console.log('[TeamActivation] Graceful shutdown complete');
+  }
 
   /**
    * Activate a specialist agent with bounded resources
@@ -249,27 +324,48 @@ export class TeamActivationService {
     // Kill subprocess if still running
     const childProcess = this.activeProcesses.get(specialistId);
     if (childProcess && !childProcess.killed) {
-      childProcess.kill('SIGTERM');
-      // Wait up to 2 seconds for graceful shutdown, then force kill
-      setTimeout(() => {
-        if (!childProcess.killed) {
-          childProcess.kill('SIGKILL');
-        }
-      }, 2000);
+      try {
+        childProcess.kill('SIGTERM');
+        console.log(`[TeamActivation] Sent SIGTERM to specialist ${specialistId} (PID: ${childProcess.pid})`);
+
+        // Wait up to 2 seconds for graceful shutdown
+        await new Promise((resolve) => {
+          setTimeout(() => {
+            // If still running, force kill with SIGKILL
+            if (!childProcess.killed) {
+              try {
+                childProcess.kill('SIGKILL');
+                console.warn(`[TeamActivation] Force-killed specialist ${specialistId} (PID: ${childProcess.pid})`);
+              } catch (err) {
+                console.warn(`[TeamActivation] Error force-killing specialist ${specialistId}:`, err);
+              }
+            }
+            resolve(undefined);
+          }, 2000);
+        });
+      } catch (err) {
+        console.error(`[TeamActivation] Error killing process for specialist ${specialistId}:`, err);
+      }
     }
 
-    await db.query(
-      `UPDATE autonomy_team_activations SET
-        status = $1, completed_at = $2, results = $3
-       WHERE specialist_id = $4`,
-      [
-        status,
-        completedAt,
-        JSON.stringify(results),
-        specialistId,
-      ]
-    );
+    // Update database
+    try {
+      await db.query(
+        `UPDATE autonomy_team_activations SET
+          status = $1, completed_at = $2, results = $3
+         WHERE specialist_id = $4`,
+        [
+          status,
+          completedAt,
+          JSON.stringify(results),
+          specialistId,
+        ]
+      );
+    } catch (err) {
+      console.error(`[TeamActivation] Error updating database for specialist ${specialistId}:`, err);
+    }
 
+    // Cleanup in-memory tracking
     this.activeSpecialists.delete(specialistId);
     this.activeProcesses.delete(specialistId);
     console.log(`[TeamActivation] Terminated specialist ${specialistId} (status: ${status})`);
@@ -409,7 +505,7 @@ export class TeamActivationService {
   }
 
   /**
-   * Spawn a Python specialist subprocess
+   * Spawn a Python specialist subprocess with file logging
    */
   private spawnSpecialistProcess(
     specialistId: string,
@@ -436,13 +532,54 @@ export class TeamActivationService {
         },
       });
 
-      // Log subprocess output for debugging
+      // Create log file stream for this specialist
+      const logFilePath = `/tmp/specialist_${specialistId}.log`;
+      const logStream = createWriteStream(logFilePath, { flags: 'a' });
+
+      const getTimestamp = () => new Date().toISOString();
+
+      // Capture and log stdout
       childProcess.stdout?.on('data', (data) => {
-        console.log(`[Specialist ${specialistId}] ${data.toString().trim()}`);
+        const message = data.toString().trim();
+        const logLine = `[${getTimestamp()}] [INFO] ${message}\n`;
+        logStream.write(logLine);
+        console.log(`[Specialist ${specialistId}] ${message}`);
       });
 
+      // Capture and log stderr with alert detection
       childProcess.stderr?.on('data', (data) => {
-        console.error(`[Specialist ${specialistId}] ERROR: ${data.toString().trim()}`);
+        const message = data.toString().trim();
+        const logLine = `[${getTimestamp()}] [ERROR] ${message}\n`;
+        logStream.write(logLine);
+        console.error(`[Specialist ${specialistId}] ERROR: ${message}`);
+
+        // Alert on critical errors
+        if (message.toLowerCase().includes('exception') ||
+            message.toLowerCase().includes('failed') ||
+            message.toLowerCase().includes('error')) {
+          console.error(`[ALERT] Specialist error detected in ${specialistId}: ${message}`);
+          logStream.write(`[${getTimestamp()}] [ALERT] Critical error: ${message}\n`);
+        }
+      });
+
+      // Log process exit
+      childProcess.on('exit', (code, signal) => {
+        const exitLine = `[${getTimestamp()}] [INFO] Process exited with code ${code}${signal ? ` (signal: ${signal})` : ''}\n`;
+        logStream.write(exitLine);
+        logStream.end();
+
+        if (code !== 0 && code !== null) {
+          console.error(`[ALERT] Specialist ${specialistId} exited with error code ${code}`);
+        }
+      });
+
+      // Store log file path in database metadata
+      db.query(
+        `UPDATE autonomy_team_activations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{log_file}', to_jsonb($1))
+         WHERE specialist_id = $2`,
+        [logFilePath, specialistId]
+      ).catch((err) => {
+        console.warn(`[TeamActivation] Failed to store log path for ${specialistId}: ${err.message}`);
       });
 
       return childProcess;
