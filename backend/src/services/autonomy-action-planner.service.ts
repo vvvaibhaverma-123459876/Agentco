@@ -26,6 +26,68 @@ export class AutonomyActionPlannerService {
   }
 
   /**
+   * Evaluate if a specialist could help with the current goal
+   */
+  private evaluateSpecialistFit(
+    goalText: string,
+    evidenceCount: number,
+    claimsGenerated: number
+  ): {
+    shouldConsider: boolean;
+    recommendedRoles: string[];
+  } {
+    const goal = goalText.toLowerCase();
+    const recommended: string[] = [];
+
+    // Don't recommend if no evidence yet
+    if (evidenceCount === 0) {
+      return { shouldConsider: false, recommendedRoles: [] };
+    }
+
+    // Pattern matching for specialist recommendation
+    if (goal.includes('code') || goal.includes('bug') || goal.includes('review')) {
+      recommended.push('code_reviewer');
+    }
+    if (goal.includes('pdf') || goal.includes('document') || goal.includes('spec')) {
+      recommended.push('doc_analyzer');
+    }
+    if (goal.includes('opinion') || goal.includes('sentiment') || goal.includes('bias')) {
+      recommended.push('sentiment_analyzer');
+    }
+    if (goal.includes('compare') || goal.includes('vs') || goal.includes('difference')) {
+      recommended.push('comparative_analyst');
+    }
+    if (goal.includes('time') || goal.includes('timeline') || goal.includes('history')) {
+      recommended.push('temporal_analyst');
+    }
+    if (goal.includes('quality') || goal.includes('standard') || goal.includes('compliance')) {
+      recommended.push('quality_auditor');
+    }
+    if (goal.includes('data') || goal.includes('statistic') || goal.includes('metric')) {
+      recommended.push('data_analyst');
+    }
+    if (goal.includes('credibility') || goal.includes('source') || goal.includes('valid')) {
+      recommended.push('source_validator');
+    }
+    if (goal.includes('contradiction') || goal.includes('conflict')) {
+      recommended.push('contradiction_hunter');
+    }
+    if (goal.includes('synthesis') || goal.includes('summary') || goal.includes('conclusion')) {
+      recommended.push('synthesizer');
+    }
+
+    // Default recommendation if goal is generic
+    if (recommended.length === 0) {
+      recommended.push('background_researcher');
+    }
+
+    return {
+      shouldConsider: recommended.length > 0,
+      recommendedRoles: recommended.slice(0, 3), // Top 3 recommendations
+    };
+  }
+
+  /**
    * Decide the next action given goal context and loop status
    */
   async planNextAction(
@@ -53,21 +115,20 @@ export class AutonomyActionPlannerService {
 
     // Use LLM to decide next action
     const prompt = this.buildDecisionPrompt(currentState);
+    const systemPrompt = this.buildSystemPrompt();
     const decision = await this.openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
-          content: `You are an autonomous research agent. Based on goal progress, decide the NEXT action.
-Return JSON with: action_type, objective, args, reasoning.
-Action types: search, fetch, extract_evidence, generate_claim, evaluate_progress, terminate.`,
+          content: systemPrompt,
         },
         {
           role: 'user',
           content: prompt,
         },
       ],
-      max_tokens: 300,
+      max_tokens: 400,
       temperature: 0.7,
     });
 
@@ -81,6 +142,44 @@ Action types: search, fetch, extract_evidence, generate_claim, evaluate_progress
 
     // Convert to ActionSpec
     return this.createActionSpecFromDecision(goalId, actionData);
+  }
+
+  /**
+   * Build system prompt with specialist context
+   */
+  private buildSystemPrompt(): string {
+    return `You are an autonomous research agent with access to specialized teams. Based on goal progress, decide the NEXT action.
+
+Available action types:
+- search, fetch, extract_evidence, generate_claim, update_memory, evaluate_progress, terminate
+- spawn_specialist: Delegate work to a specialized agent
+
+SPECIALIST ROLES (delegate when you need specialized analysis):
+- researcher: General research (search, fetch, extract)
+- data_analyst: Statistical analysis and pattern detection
+- source_validator: Verify source credibility and bias
+- evidence_linker: Cross-reference evidence patterns
+- contradiction_hunter: Find contradictions in claims
+- synthesizer: Combine claims into conclusions
+- background_researcher: Deep historical/contextual research
+- code_reviewer: Code analysis and bug detection
+- doc_analyzer: Extract from PDFs and specifications
+- sentiment_analyzer: Analyze opinion and bias
+- comparative_analyst: Compare entities across dimensions
+- temporal_analyst: Timeline and causality analysis
+- quality_auditor: Compliance and standards auditing
+- fetcher: Read-only page fetching
+- claim_validator: Validate claims with evidence backing
+- evidence_summarizer: Summarize evidence
+- reviewer: Progress evaluation
+
+WHEN TO SPAWN A SPECIALIST:
+1. You have evidence already (don't spawn empty)
+2. Specialist role matches your current need
+3. You want deeper analysis than inline execution
+
+Return JSON with: action_type, objective, args, reasoning.
+For spawn_specialist: include role, objective, and optional budget.`;
   }
 
   /**
@@ -117,8 +216,22 @@ What is the next action to take?
 Consider:
 1. If no evidence yet, search for relevant information
 2. If evidence exists, fetch specific pages and extract details
-3. When evidence is sufficient, generate claims (MUST be backed by sources)
-4. When stuck or looping, terminate instead of repeating`;
+3. If you have evidence but need specialized analysis, consider spawning a specialist
+4. When evidence is sufficient, generate claims (MUST be backed by sources)
+5. When stuck or looping, terminate instead of repeating`;
+    }
+
+    // Add specialist recommendation if evidence exists
+    if (state.evidenceCount > 0) {
+      const specialistFit = this.evaluateSpecialistFit(state.goalText, state.evidenceCount, state.claimsGenerated);
+      if (specialistFit.shouldConsider) {
+        prompt += `
+
+SPECIALIST OPPORTUNITY: Based on your goal, consider delegating to:
+- ${specialistFit.recommendedRoles.join('\n- ')}
+
+Use spawn_specialist action with role and objective if you want to delegate.`;
+      }
     }
 
     prompt += `
