@@ -13,6 +13,13 @@ import uuid
 class FetcherAgent(SpecialistAgent):
     """Fetcher specialist with limited, safe tool access"""
 
+    def get_allowed_actions(self) -> set:
+        """Fetcher can only fetch pages and evaluate progress"""
+        return {
+            'FETCH_PAGE',
+            'EVALUATE_PROGRESS'
+        }
+
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle fetcher action: FETCH_PAGE or EVALUATE_PROGRESS only

@@ -13,6 +13,16 @@ import uuid
 class ClaimValidatorAgent(SpecialistAgent):
     """Claim validator specialist for evidence-backed claims"""
 
+    def get_allowed_actions(self) -> set:
+        """Claim validator can generate and validate claims"""
+        return {
+            'GENERATE_CLAIM',
+            'VALIDATE_CLAIM',
+            'EXTRACT_EVIDENCE',
+            'UPDATE_MEMORY',
+            'EVALUATE_PROGRESS'
+        }
+
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle claim validator action: GENERATE_CLAIM, EXTRACT_EVIDENCE, EVALUATE_PROGRESS

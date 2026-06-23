@@ -12,7 +12,16 @@ import uuid
 class CodeReviewerAgent(SpecialistAgent):
     """Code analysis and review specialist"""
 
-    def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
+    def get_allowed_actions(self) -> set:
+        """Return allowed action types for this specialist"""
+        return {
+            'EXTRACT_EVIDENCE',
+            'GENERATE_CLAIM',
+            'UPDATE_MEMORY',
+            'EVALUATE_PROGRESS',
+        }
+
+        def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         self.record_iteration()
         action_type = action_spec.get('actionType', '').lower()
 

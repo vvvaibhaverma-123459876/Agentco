@@ -12,6 +12,15 @@ import uuid
 class DataAnalystAgent(SpecialistAgent):
     """Data analyst specialist for statistical analysis and pattern detection"""
 
+    def get_allowed_actions(self) -> set:
+        """Data analyst can extract evidence and generate claims"""
+        return {
+            'EXTRACT_EVIDENCE',
+            'GENERATE_CLAIM',
+            'UPDATE_MEMORY',
+            'EVALUATE_PROGRESS'
+        }
+
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """Handle data analysis actions"""
         self.record_iteration()

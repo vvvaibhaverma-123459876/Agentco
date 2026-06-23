@@ -12,6 +12,12 @@ from typing import Dict, Any
 class ReviewerAgent(SpecialistAgent):
     """Reviewer specialist for progress evaluation and sanity checks"""
 
+    def get_allowed_actions(self) -> set:
+        """Reviewer can only evaluate progress"""
+        return {
+            'EVALUATE_PROGRESS'
+        }
+
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle reviewer action: EVALUATE_PROGRESS only

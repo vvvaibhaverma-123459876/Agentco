@@ -13,6 +13,14 @@ import uuid
 class EvidenceSummarizerAgent(SpecialistAgent):
     """Evidence summarizer specialist with passive analysis capabilities"""
 
+    def get_allowed_actions(self) -> set:
+        """Evidence summarizer can extract and analyze evidence only"""
+        return {
+            'EXTRACT_EVIDENCE',
+            'UPDATE_MEMORY',
+            'EVALUATE_PROGRESS'
+        }
+
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle evidence summarizer action: EXTRACT_EVIDENCE, UPDATE_MEMORY, EVALUATE_PROGRESS

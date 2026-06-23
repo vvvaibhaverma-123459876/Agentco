@@ -13,6 +13,17 @@ import uuid
 class ResearcherAgent(SpecialistAgent):
     """Researcher specialist with full autonomy capabilities"""
 
+    def get_allowed_actions(self) -> set:
+        """Researcher can perform all research actions"""
+        return {
+            'WEB_SEARCH',
+            'FETCH_PAGE',
+            'EXTRACT_EVIDENCE',
+            'GENERATE_CLAIM',
+            'UPDATE_MEMORY',
+            'EVALUATE_PROGRESS'
+        }
+
     def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """
         Handle research action: search, fetch, extract, or claim generation
