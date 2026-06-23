@@ -1,0 +1,106 @@
+{
+  "run_id": "b4f4e467",
+  "duration": 300,
+  "elapsed": 301.06245708465576,
+  "calibration": {
+    "total_claims": 106,
+    "by_source_type": {
+      "web_research": {
+        "mean_confidence": 0.8018867924528302,
+        "min_confidence": 0.7,
+        "max_confidence": 0.8999999999999999,
+        "count": 106
+      }
+    },
+    "calibration_quality": "good"
+  },
+  "integration": {
+    "unique_services": 2,
+    "total_calls": 161,
+    "success_rate": 1.0,
+    "avg_duration_ms": 1730.8757763975154,
+    "dependencies": {
+      "researcher": [
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service"
+      ]
+    },
+    "message_count": 31
+  },
+  "civilization": {
+    "societies_activated": 1,
+    "institutions_activated": 1,
+    "teams_activated": 1,
+    "agents_activated": 1,
+    "governance_decisions": 0,
+    "reputation_updates": 0,
+    "structure": {
+      "societies": [
+        {
+          "id": "79076d6c",
+          "purpose": "Research: Investigate the potential impact of integrating ar",
+          "activated_at": "2026-06-23T15:36:09.809884"
+        }
+      ],
+      "institutions": [
+        {
+          "id": "d3d38057",
+          "society_id": "soc1",
+          "role": "research",
+          "activated_at": "2026-06-23T15:36:09.809902"
+        }
+      ],
+      "teams": [
+        {
+          "id": "64ce56cc",
+          "institution_id": "inst1",
+          "mission": "autonomous investigation",
+          "activated_at": "2026-06-23T15:36:09.809919"
+        }
+      ],
+      "agents": [
+        {
+          "id": "7ed6c399",
+          "team_id": "team1",
+          "role": "researcher",
+          "activated_at": "2026-06-23T15:36:09.809931"
+        }
+      ]
+    }
+  },
+  "resources": {
+    "web_fetches": 106,
+    "llm_calls": 55,
+    "tokens_used": 6180,
+    "cost_usd": 0.033125999999999996
+  }
+}

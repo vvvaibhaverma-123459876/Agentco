@@ -1,0 +1,103 @@
+{
+  "run_id": "e618c07b",
+  "duration": 300,
+  "elapsed": 295.19859409332275,
+  "calibration": {
+    "total_claims": 98,
+    "by_source_type": {
+      "web_research": {
+        "mean_confidence": 0.7999999999999999,
+        "min_confidence": 0.7,
+        "max_confidence": 0.8999999999999999,
+        "count": 98
+      }
+    },
+    "calibration_quality": "good"
+  },
+  "integration": {
+    "unique_services": 2,
+    "total_calls": 148,
+    "success_rate": 1.0,
+    "avg_duration_ms": 1856.1351351351352,
+    "dependencies": {
+      "researcher": [
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "learning_service",
+        "calibration_service",
+        "calibration_service",
+        "learning_service"
+      ]
+    },
+    "message_count": 28
+  },
+  "civilization": {
+    "societies_activated": 1,
+    "institutions_activated": 1,
+    "teams_activated": 1,
+    "agents_activated": 1,
+    "governance_decisions": 0,
+    "reputation_updates": 0,
+    "structure": {
+      "societies": [
+        {
+          "id": "952227f3",
+          "purpose": "Research: Investigate how the rapid advancements in artifici",
+          "activated_at": "2026-06-23T15:31:00.204931"
+        }
+      ],
+      "institutions": [
+        {
+          "id": "75760442",
+          "society_id": "soc1",
+          "role": "research",
+          "activated_at": "2026-06-23T15:31:00.204953"
+        }
+      ],
+      "teams": [
+        {
+          "id": "23b87307",
+          "institution_id": "inst1",
+          "mission": "autonomous investigation",
+          "activated_at": "2026-06-23T15:31:00.204965"
+        }
+      ],
+      "agents": [
+        {
+          "id": "89d4434c",
+          "team_id": "team1",
+          "role": "researcher",
+          "activated_at": "2026-06-23T15:31:00.204976"
+        }
+      ]
+    }
+  },
+  "resources": {
+    "web_fetches": 98,
+    "llm_calls": 50,
+    "tokens_used": 6173,
+    "cost_usd": 0.033444
+  }
+}

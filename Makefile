@@ -288,4 +288,17 @@ autonomy-real-web-free-run:
 	@echo ""
 	@echo "✓ Real-web autonomous observation complete"
 
-.PHONY: production-release-gate autonomy-real-web-free-run
+autonomy-open-world-5min:
+	@echo "🌍 STARTING AGENTCO OPEN-WORLD 5-MINUTE TEST (NO SANDBOX)"
+	@echo "=================================================================="
+	@echo "Duration: $${DURATION_SECONDS:-300} seconds (5 minutes)"
+	@echo "Mode: NO SANDBOX - Full autonomy"
+	@echo "Monitors: Calibration | Integration | Civilization"
+	@echo "LLM Model: $${OPENAI_MODEL:-gpt-4-turbo}"
+	@echo "=================================================================="
+	@echo ""
+	@python3 scripts/autonomy_open_world_5min.py
+	@echo ""
+	@echo "✓ Open-world 5-minute test complete"
+
+.PHONY: production-release-gate autonomy-real-web-free-run autonomy-open-world-5min
