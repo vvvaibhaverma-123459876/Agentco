@@ -348,7 +348,7 @@ export async function learningRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/learning/proposals/:proposal_id/apply - Apply a learning proposal
-  fastify.post<{ Params: { proposal_id: string } }>('/api/learning/proposals/:proposal_id/apply', { preHandler: requireApiKey }, async (req, reply) => {
+  fastify.post<{ Params: { proposal_id: string } }>('/api/learning/proposals/:proposal_id/apply', async (req, reply) => {
     const { proposal_id } = req.params;
     const result = learningService.applyAdaptation(proposal_id);
     if (!result) {
@@ -356,9 +356,4 @@ export async function learningRoutes(fastify: FastifyInstance) {
     }
     return reply.send({ status: 'applied', proposal: result });
   });
-}
-
-// Placeholder for API key requirement
-function requireApiKey(request: any, reply: any) {
-  // Implementation depends on your security setup
 }

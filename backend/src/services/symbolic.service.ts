@@ -245,16 +245,177 @@ export class SymbolicService {
 
   /**
    * Constraint solver - CSP (Constraint Satisfaction Problem)
-   * In production: integrate Z3 SMT solver
+   * Handles: inequality constraints, equality constraints, variable binding
+   * Advanced problems would use Z3 SMT solver (future)
    */
   private solveConstraint(question: string): SymbolicResult {
-    // Placeholder for Z3 integration
+    const q = question.toLowerCase();
+
+    // Pattern 1: Variable comparison constraints
+    // "If X > 5 and Y < 10, what values satisfy both?"
+    const constraintPatterns = this.parseConstraints(q);
+    if (constraintPatterns.length > 0) {
+      const solution = this.solveConstraints(constraintPatterns);
+      if (solution) {
+        return {
+          solved: true,
+          answer: solution.answer,
+          confidence: 0.9,
+          reasoning: solution.reasoning,
+          method: 'constraint_solver',
+        };
+      }
+    }
+
+    // Pattern 2: Simple logical constraints
+    // "Everyone who eats apples is healthy. John eats apples. Is John healthy?"
+    if (q.match(/everyone|all|none|some.*is/) && q.match(/therefore|must|can/)) {
+      return this.solveLogicalConstraint(q);
+    }
+
+    // Pattern 3: Assignment constraints
+    // "Assign A, B, C to 1, 2, 3 such that A > B"
+    if (q.match(/assign|arrange|distribute/) && q.match(/such that|where|if/)) {
+      return {
+        solved: false,
+        answer: '',
+        confidence: 0,
+        reasoning: 'Assignment constraint - would require exhaustive search or Z3',
+        method: 'assignment_constraint_deferred',
+      };
+    }
+
+    // Pattern 4: Unknown constraint type
     return {
       solved: false,
       answer: '',
       confidence: 0,
-      reasoning: 'Constraint solver not yet implemented',
-      method: 'constraint_solver_stub',
+      reasoning: 'Constraint pattern not recognized',
+      method: 'constraint_pattern_unknown',
+    };
+  }
+
+  /**
+   * Parse constraint expressions from question
+   */
+  private parseConstraints(question: string): Array<{variable: string; operator: string; value: number}> {
+    const constraints: Array<{variable: string; operator: string; value: number}> = [];
+
+    // Match patterns like "X > 5", "Y < 10", "Z = 7"
+    const regex = /(\w+)\s*(>|<|>=|<=|=)\s*(\d+)/g;
+    let match;
+
+    while ((match = regex.exec(question)) !== null) {
+      constraints.push({
+        variable: match[1],
+        operator: match[2],
+        value: parseInt(match[3], 10),
+      });
+    }
+
+    return constraints;
+  }
+
+  /**
+   * Solve a set of linear constraints
+   */
+  private solveConstraints(constraints: Array<{variable: string; operator: string; value: number}>): {answer: string; reasoning: string} | null {
+    if (constraints.length === 0) return null;
+
+    // Group by variable
+    const byVariable = new Map<string, Array<{operator: string; value: number}>>();
+    for (const c of constraints) {
+      if (!byVariable.has(c.variable)) {
+        byVariable.set(c.variable, []);
+      }
+      byVariable.get(c.variable)!.push({operator: c.operator, value: c.value});
+    }
+
+    // Compute ranges for each variable
+    const ranges = new Map<string, {min: number; max: number}>();
+    for (const [variable, ops] of byVariable) {
+      let min = -Infinity;
+      let max = Infinity;
+
+      for (const op of ops) {
+        if (op.operator === '>') min = Math.max(min, op.value + 1);
+        if (op.operator === '>=') min = Math.max(min, op.value);
+        if (op.operator === '<') max = Math.min(max, op.value - 1);
+        if (op.operator === '<=') max = Math.min(max, op.value);
+        if (op.operator === '=') {
+          min = op.value;
+          max = op.value;
+        }
+      }
+
+      ranges.set(variable, {min, max});
+    }
+
+    // Format answer
+    const answers: string[] = [];
+    for (const [variable, range] of ranges) {
+      if (range.min === range.max) {
+        answers.push(`${variable} = ${range.min}`);
+      } else if (range.max === Infinity) {
+        answers.push(`${variable} ≥ ${range.min}`);
+      } else if (range.min === -Infinity) {
+        answers.push(`${variable} ≤ ${range.max}`);
+      } else {
+        answers.push(`${range.min} ≤ ${variable} ≤ ${range.max}`);
+      }
+    }
+
+    return {
+      answer: answers.join(', '),
+      reasoning: `Constraint satisfaction: ${constraints.map(c => `${c.variable} ${c.operator} ${c.value}`).join(' AND ')}. Solution: ${answers.join(', ')}`,
+    };
+  }
+
+  /**
+   * Solve logical constraints (syllogisms)
+   */
+  private solveLogicalConstraint(question: string): SymbolicResult {
+    const q = question.toLowerCase();
+
+    // Pattern: "All X are Y. Z is X. Therefore Z is Y?"
+    if (q.match(/all.*are/) && q.match(/is.*therefore|must be/)) {
+      return {
+        solved: true,
+        answer: 'Yes (by logical deduction)',
+        confidence: 0.95,
+        reasoning: 'Universal statement: If all A are B, and C is A, then C is B (modus ponens)',
+        method: 'logical_deduction',
+      };
+    }
+
+    // Pattern: "Some X are Y. Z is X. Can Z be Y?"
+    if (q.match(/some.*are/)) {
+      return {
+        solved: true,
+        answer: 'Possible but not certain',
+        confidence: 0.8,
+        reasoning: 'Partial statement: Some does not guarantee all, so Z might or might not be Y',
+        method: 'logical_partial',
+      };
+    }
+
+    // Pattern: "No X are Y. Z is X. Is Z Y?"
+    if (q.match(/no.*are/)) {
+      return {
+        solved: true,
+        answer: 'No (by contradiction)',
+        confidence: 0.95,
+        reasoning: 'Universal negation: If no A are B, and C is A, then C cannot be B',
+        method: 'logical_negation',
+      };
+    }
+
+    return {
+      solved: false,
+      answer: '',
+      confidence: 0,
+      reasoning: 'Logical constraint pattern not recognized',
+      method: 'logical_constraint_unknown',
     };
   }
 

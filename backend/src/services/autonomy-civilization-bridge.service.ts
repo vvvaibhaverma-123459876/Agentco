@@ -7,6 +7,7 @@
  */
 
 import { institutionWorkAssignmentService } from './institution-work-assignment.service';
+import { autonomyOrchestrator } from './autonomy-orchestrator.service';
 
 interface WorkCompletionResult {
   work_request_id: string;
@@ -130,18 +131,36 @@ class AutonomyCivilizationBridgeService {
     objective: string,
     specialists: string[]
   ): Promise<string> {
-    // In production, would create autonomy goal via orchestrator API
-    // For now, return a placeholder goal ID
-    const autonomyGoalId = `autonomy_goal_${workRequestId}`;
+    try {
+      // Create real autonomy goal via orchestrator
+      const autonomyRun = await autonomyOrchestrator.executeControlledAutonomyLoop(
+        `work_request_${workRequestId}`
+      );
 
-    // Update work request with autonomy goal
-    await institutionWorkAssignmentService.updateWorkRequestStatus(
-      workRequestId,
-      'in_progress',
-      { autonomy_goal_id: autonomyGoalId }
-    );
+      const autonomyGoalId = autonomyRun.runId;
 
-    return autonomyGoalId;
+      // Update work request with real autonomy goal ID
+      await institutionWorkAssignmentService.updateWorkRequestStatus(
+        workRequestId,
+        'in_progress',
+        { autonomy_goal_id: autonomyGoalId }
+      );
+
+      console.log(
+        `✅ Work request routed to autonomy: ${workRequestId} → ${autonomyGoalId}`
+      );
+
+      return autonomyGoalId;
+    } catch (error: any) {
+      console.error(`Failed to route work to autonomy: ${error.message}`);
+      // Mark work request as failed
+      await institutionWorkAssignmentService.updateWorkRequestStatus(
+        workRequestId,
+        'failed',
+        { result_summary: { error: `Autonomy routing failed: ${error.message}` } }
+      );
+      throw error;
+    }
   }
 }
 
