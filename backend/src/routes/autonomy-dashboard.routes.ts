@@ -594,14 +594,4 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
     }
   );
 
-  /**
-   * GET /health
-   * Health check endpoint
-   */
-  fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
-    reply.code(200).send({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-    });
-  });
 }
