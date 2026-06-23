@@ -1,0 +1,4 @@
+{"purpose": "What topic should I research?", "tokens_in": 11, "tokens_out": 12, "cost": 8.85e-06, "timestamp": "2026-06-23T15:25:20.738810"}
+{"purpose": "Goal: Determine the impact of social media usage o", "tokens_in": 7, "tokens_out": 92, "cost": 5.624999999999999e-05, "timestamp": "2026-06-23T15:25:25.624143"}
+{"purpose": "Goal: Determine the impact of social media usage o", "tokens_in": 13, "tokens_out": 28, "cost": 1.875e-05, "timestamp": "2026-06-23T15:25:40.049523"}
+{"purpose": "From research on 'Determine the impact of social m", "tokens_in": 5, "tokens_out": 163, "cost": 9.855e-05, "timestamp": "2026-06-23T15:25:51.062352"}
