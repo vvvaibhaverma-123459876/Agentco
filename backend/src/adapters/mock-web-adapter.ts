@@ -44,9 +44,10 @@ export class MockWebAdapter implements WebAdapter {
 
   async fetch(url: string): Promise<FetchResult | null> {
     // Check if this exact URL is in mock data
-    if (MOCK_DATA.fetches[url]) {
+    const mockFetches = MOCK_DATA.fetches as Record<string, { title: string; content: string }>;
+    if (mockFetches[url]) {
       console.log(`[MockWebAdapter] Fetch "${url}" → exact match in mock data`);
-      const data = MOCK_DATA.fetches[url];
+      const data = mockFetches[url];
       return {
         url,
         status: 200,
@@ -61,7 +62,7 @@ export class MockWebAdapter implements WebAdapter {
     const urlObj = new URL(url);
     const domain = urlObj.hostname;
 
-    for (const [mockUrl, mockData] of Object.entries(MOCK_DATA.fetches)) {
+    for (const [mockUrl, mockData] of Object.entries(mockFetches)) {
       const mockDomain = new URL(mockUrl).hostname;
       if (domain === mockDomain) {
         console.log(`[MockWebAdapter] Fetch "${url}" → matched domain "${domain}"`);
