@@ -11,6 +11,31 @@ import threading
 import json
 from datetime import datetime
 from typing import Dict, Any, Optional
+import uuid
+import hashlib
+import os
+
+# Database connection (optional - only if env vars present)
+try:
+    import psycopg2
+    from psycopg2.extras import RealDictCursor
+    HAS_DB = True
+except ImportError:
+    HAS_DB = False
+
+def get_db_connection():
+    """Get PostgreSQL connection if available"""
+    if not HAS_DB:
+        return None
+    try:
+        db_url = os.environ.get('DATABASE_URL')
+        if not db_url:
+            return None
+        conn = psycopg2.connect(db_url)
+        return conn
+    except Exception as e:
+        print(f"[DB] Connection failed: {e}")
+        return None
 
 
 class SpecialistAgent(BaseAgent):
@@ -172,3 +197,93 @@ class SpecialistAgent(BaseAgent):
             'elapsed_seconds': elapsed,
             'budget': self.budget
         }
+
+    def persist_evidence(
+        self,
+        url: str,
+        content: str = '',
+        source_type: str = 'specialist_output',
+        title: str = '',
+        snippet: str = ''
+    ) -> str:
+        """Persist evidence to database and return evidence ID"""
+        evidence_id = str(uuid.uuid4())
+        content_hash = hashlib.md5(content.encode()).hexdigest() if content else ''
+
+        conn = get_db_connection()
+        if not conn:
+            print(f"[Evidence] DB unavailable, returning stub ID: {evidence_id}")
+            return evidence_id
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO autonomy_evidence
+                (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (
+                evidence_id,
+                str(uuid.uuid4()),  # source_id
+                url,
+                title,
+                snippet,
+                content_hash,
+                source_type,
+                True  # is_public_access
+            ))
+            conn.commit()
+            print(f"[Evidence] Persisted: {evidence_id}")
+            return evidence_id
+        except Exception as e:
+            print(f"[Evidence] Insert failed: {e}")
+            if conn:
+                conn.rollback()
+            return evidence_id
+        finally:
+            if conn:
+                conn.close()
+
+    def persist_claim(
+        self,
+        claim_text: str,
+        support_source_ids: list,
+        confidence: float = 0.7,
+        status: str = 'supported'
+    ) -> str:
+        """Persist claim to database and return claim ID"""
+        claim_id = str(uuid.uuid4())
+
+        if not support_source_ids:
+            print(f"[Claim] No sources provided, returning stub ID: {claim_id}")
+            return claim_id
+
+        conn = get_db_connection()
+        if not conn:
+            print(f"[Claim] DB unavailable, returning stub ID: {claim_id}")
+            return claim_id
+
+        try:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO autonomy_claims
+                (id, claim_id, text, status, confidence, support_source_ids, generated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, NOW())
+            """, (
+                claim_id,
+                claim_id,
+                claim_text,
+                status,
+                confidence,
+                json.dumps(support_source_ids)  # JSONB array
+            ))
+            conn.commit()
+            print(f"[Claim] Persisted: {claim_id}")
+            return claim_id
+        except Exception as e:
+            print(f"[Claim] Insert failed: {e}")
+            if conn:
+                conn.rollback()
+            return claim_id
+        finally:
+            if conn:
+                conn.close()

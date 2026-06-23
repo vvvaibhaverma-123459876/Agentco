@@ -103,15 +103,22 @@ class ResearcherAgent(SpecialistAgent):
         estimated_tokens = len(content) // 4
         self.record_token_usage(estimated_tokens)
 
-        # Create evidence ID
-        artifact_id = str(uuid.uuid4())
+        # Persist evidence to database with real ID
+        artifact_id = self.persist_evidence(
+            url=url,
+            content=content,
+            title=title,
+            snippet=content[:200],
+            source_type='web_page'
+        )
 
         return {
             'observations': {
                 'url': url,
                 'title': title,
                 'contentLength': len(content),
-                'status': 'fetch_completed'
+                'status': 'fetch_completed',
+                'artifactId': artifact_id
             },
             'artifacts': [artifact_id]
         }
