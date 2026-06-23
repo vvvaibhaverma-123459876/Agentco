@@ -1,0 +1,4 @@
+{"purpose": "What topic should I research?", "tokens_in": 11, "tokens_out": 18, "cost": 1.2449999999999998e-05, "timestamp": "2026-06-23T12:43:08.634202"}
+{"purpose": "Goal: You should research the impact of remote wor", "tokens_in": 7, "tokens_out": 20, "cost": 1.3049999999999999e-05, "timestamp": "2026-06-23T12:43:10.012636"}
+{"purpose": "Goal: You should research the impact of remote wor", "tokens_in": 13, "tokens_out": 51, "cost": 3.255e-05, "timestamp": "2026-06-23T12:43:24.229377"}
+{"purpose": "From research on 'You should research the impact o", "tokens_in": 5, "tokens_out": 127, "cost": 7.695e-05, "timestamp": "2026-06-23T12:43:29.187545"}

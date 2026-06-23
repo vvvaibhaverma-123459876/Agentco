@@ -1,0 +1,1 @@
+{"llm_call_id": "da803880-c3f0-46bc-ba3e-97530b26e40f", "provider": "openai", "model": "gpt-4o-mini", "tokens_in": 80, "tokens_out": 15, "estimated_cost": 2.0999999999999995e-05, "purpose": "autonomous_goal_selection", "timestamp": "2026-06-23T12:35:23.275911"}
