@@ -14,6 +14,8 @@ from typing import Dict, Any, Optional
 import uuid
 import hashlib
 import os
+import hmac
+import time
 
 # Database connection pooling (optional - only if env vars present)
 try:
@@ -85,6 +87,49 @@ def return_db_connection(conn):
                 pass
 
 
+def verify_request_signature(payload_bytes: bytes, signature: str, timestamp: str) -> bool:
+    """
+    Verify HMAC-SHA256 signature of request.
+
+    Args:
+        payload_bytes: Raw request body bytes
+        signature: X-Signature header value
+        timestamp: X-Timestamp header value
+
+    Returns:
+        True if signature is valid and timestamp is recent
+    """
+    # Get shared secret from environment
+    secret = os.environ.get('SPECIALIST_SHARED_SECRET', 'default-insecure-secret')
+
+    # Check timestamp is recent (within 30 seconds to prevent replay attacks)
+    try:
+        request_time = int(timestamp)
+        current_time = int(time.time())
+        if abs(current_time - request_time) > 30:
+            print(f"[Auth] Signature timestamp too old: {abs(current_time - request_time)}s")
+            return False
+    except (ValueError, TypeError):
+        print(f"[Auth] Invalid timestamp format: {timestamp}")
+        return False
+
+    # Compute expected signature
+    message = payload_bytes + b':' + timestamp.encode()
+    expected_signature = hmac.new(
+        secret.encode(),
+        message,
+        hashlib.sha256
+    ).hexdigest()
+
+    # Use constant-time comparison to prevent timing attacks
+    is_valid = hmac.compare_digest(signature, expected_signature)
+
+    if not is_valid:
+        print(f"[Auth] Signature verification failed")
+
+    return is_valid
+
+
 class SpecialistAgent(BaseAgent):
     """Base specialist agent with HTTP server for orchestrator communication"""
 
@@ -117,6 +162,19 @@ class SpecialistAgent(BaseAgent):
         def execute_action():
             """Execute action spec and return result"""
             try:
+                # SECURITY: Verify HMAC signature if headers present
+                signature = request.headers.get('X-Signature')
+                timestamp = request.headers.get('X-Timestamp')
+
+                if signature and timestamp:
+                    # Signature provided, verify it
+                    payload = request.get_data()
+                    if not verify_request_signature(payload, signature, timestamp):
+                        return jsonify({
+                            'status': 'failed',
+                            'errors': ['Invalid request signature']
+                        }), 401  # 401 Unauthorized
+
                 # VALIDATION: Check request body
                 action_spec = request.json
                 if not action_spec:

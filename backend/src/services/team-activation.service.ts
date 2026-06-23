@@ -8,6 +8,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { spawn, ChildProcess } from 'child_process';
 import { createWriteStream } from 'fs';
+import { createHmac } from 'crypto';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
 import { ActionSpec, ActionResult } from '../types/action.types';
@@ -424,7 +425,26 @@ export class TeamActivationService {
   }
 
   /**
-   * Execute action via specialist HTTP endpoint
+   * Sign request with HMAC-SHA256
+   */
+  private signRequest(payload: object): {
+    signature: string;
+    timestamp: string;
+  } {
+    const secret = process.env.SPECIALIST_SHARED_SECRET || 'default-insecure-secret';
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const payloadStr = JSON.stringify(payload);
+    const message = payloadStr + ':' + timestamp;
+
+    const signature = createHmac('sha256', secret)
+      .update(message)
+      .digest('hex');
+
+    return { signature, timestamp };
+  }
+
+  /**
+   * Execute action via specialist HTTP endpoint with HMAC signature
    */
   async executeActionViaSpecialist(
     specialistId: string,
@@ -441,18 +461,30 @@ export class TeamActivationService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), specialist.secondsBudget * 1000);
 
-      // Call specialist HTTP endpoint
+      // Sign the request
+      const { signature, timestamp } = this.signRequest(actionSpec);
+      const payload = JSON.stringify(actionSpec);
+
+      // Call specialist HTTP endpoint with HMAC signature
       const response = await fetch(`${specialist.httpEndpoint}/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(actionSpec),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Signature': signature,
+          'X-Timestamp': timestamp,
+        },
+        body: payload,
         signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        console.error(`Specialist HTTP error: ${response.status}`);
+        if (response.status === 401) {
+          console.error(`[Security] Specialist rejected request: authentication failed`);
+        } else {
+          console.error(`Specialist HTTP error: ${response.status}`);
+        }
         return null;
       }
 
