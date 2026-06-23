@@ -1,0 +1,22 @@
+{
+  "test_type": "Full AgentCo with OpenAI API (1 minute)",
+  "test_date": "2026-06-23T15:59:09.547017",
+  "duration_seconds": 60.051231,
+  "openai": {
+    "api_calls": 13,
+    "tokens_used": 766,
+    "model": "gpt-4o-mini",
+    "status": "\u2705 WORKING"
+  },
+  "backend": {
+    "calls": 19,
+    "errors": 0,
+    "status": "\u2705 HEALTHY"
+  },
+  "autonomy": {
+    "tasks": 0,
+    "successful": 12,
+    "failed": 0
+  },
+  "overall_status": "\u2705 SUCCESS"
+}
