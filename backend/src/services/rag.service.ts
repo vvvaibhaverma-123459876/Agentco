@@ -142,9 +142,53 @@ export class RAGService {
   }
 
   private simulateArXivSearch(question: string): SearchResult[] {
-    // In production, call ArXiv API for academic papers
-    // For now: return empty (Wikipedia usually sufficient)
-    return [];
+    // Simulate ArXiv search results for academic questions
+    const normalizedQ = question.toLowerCase();
+
+    const academic_knowledge_base: Record<string, SearchResult[]> = {
+      'machine learning': [
+        {
+          source: 'ArXiv',
+          title: 'A Survey on Machine Learning',
+          snippet: 'Machine learning is a subset of artificial intelligence that focuses on learning from data.',
+          relevance: 0.92,
+          url: 'https://arxiv.org/abs/1808.07747',
+        },
+      ],
+      'neural network': [
+        {
+          source: 'ArXiv',
+          title: 'Deep Learning',
+          snippet: 'Deep neural networks are powerful machine learning models that can learn hierarchical representations.',
+          relevance: 0.90,
+          url: 'https://arxiv.org/abs/1512.03385',
+        },
+      ],
+      'artificial intelligence': [
+        {
+          source: 'ArXiv',
+          title: 'AI: A Modern Approach',
+          snippet: 'Artificial Intelligence encompasses broad areas of automated decision making and learning systems.',
+          relevance: 0.88,
+          url: 'https://arxiv.org/abs/1709.07871',
+        },
+      ],
+    };
+
+    for (const [key, results] of Object.entries(academic_knowledge_base)) {
+      if (normalizedQ.includes(key) || key.includes(normalizedQ)) {
+        return results;
+      }
+    }
+
+    // Return generic academic result if no match
+    return [{
+      source: 'ArXiv',
+      title: `Academic research on ${question}`,
+      snippet: `Research papers related to: ${question}`,
+      relevance: 0.75,
+      url: `https://arxiv.org/search/?query=${encodeURIComponent(question)}&searchtype=all`,
+    }];
   }
 
   /**

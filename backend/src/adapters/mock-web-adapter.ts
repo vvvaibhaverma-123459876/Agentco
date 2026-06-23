@@ -59,11 +59,23 @@ export class MockWebAdapter implements WebAdapter {
     }
 
     // Try to match by domain
-    const urlObj = new URL(url);
-    const domain = urlObj.hostname;
+    let domain: string | null = null;
+    try {
+      const urlObj = new URL(url);
+      domain = urlObj.hostname;
+    } catch (e) {
+      console.warn(`[MockWebAdapter] Invalid URL: ${url}`);
+      return null;
+    }
 
     for (const [mockUrl, mockData] of Object.entries(mockFetches)) {
-      const mockDomain = new URL(mockUrl).hostname;
+      let mockDomain: string | null = null;
+      try {
+        mockDomain = new URL(mockUrl).hostname;
+      } catch (e) {
+        console.warn(`[MockWebAdapter] Invalid mock URL: ${mockUrl}`);
+        continue;
+      }
       if (domain === mockDomain) {
         console.log(`[MockWebAdapter] Fetch "${url}" → matched domain "${domain}"`);
         return {

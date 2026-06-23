@@ -434,7 +434,12 @@ export class ActionExecutorService {
         // Check if specialist has completed
         if (row.status === 'completed' || row.status === 'failed') {
           if (row.results) {
-            return JSON.parse(row.results);
+            try {
+              return JSON.parse(row.results);
+            } catch (e) {
+              console.error(`Failed to parse specialist results: ${e}`);
+              throw new Error('Invalid JSON in specialist results');
+            }
           }
           return null;
         }

@@ -65,6 +65,9 @@ export class CalibrationConstitutionService {
       [JSON.stringify(contentJson), contentHash, signature, signerEntityId]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error('Failed to create constitution version');
+    }
     return result.rows[0];
   }
 
@@ -194,6 +197,9 @@ export class CalibrationConstitutionService {
       ]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error('Failed to add protected surface');
+    }
     return result.rows[0];
   }
 
@@ -242,6 +248,9 @@ export class CalibrationConstitutionService {
       ]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error('Failed to add allowed change type');
+    }
     return result.rows[0];
   }
 
@@ -265,6 +274,9 @@ export class CalibrationConstitutionService {
       [activeConstitution.id, changeTypeName, reason]
     );
 
+    if (result.rows.length === 0) {
+      throw new Error('Failed to add prohibited change type');
+    }
     return result.rows[0];
   }
 

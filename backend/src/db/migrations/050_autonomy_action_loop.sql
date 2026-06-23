@@ -2,36 +2,14 @@
 -- Purpose: Add tables for typed action execution, evidence handling, and claim generation
 -- Includes: actions, evidence, claims, searches, loop detection
 
--- Actions table: Tracks every decided and executed action
-CREATE TABLE IF NOT EXISTS autonomy_actions (
-  id VARCHAR(36) PRIMARY KEY,
-  action_id VARCHAR(36) NOT NULL UNIQUE,
-  action_type VARCHAR(50) NOT NULL,
-  goal_id VARCHAR(36),
-  plan_step_id VARCHAR(36),
-  objective TEXT NOT NULL,
-  args JSONB DEFAULT '{}',
-  expected_artifacts TEXT[],
-  success_criteria TEXT[],
-  risk_level VARCHAR(20),
-  decided_by VARCHAR(50),
-  decided_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  reasoning TEXT,
-  status VARCHAR(50),
-  started_at TIMESTAMP,
-  completed_at TIMESTAMP,
-  observations JSONB DEFAULT '{}',
-  created_artifacts TEXT[],
-  errors TEXT[],
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  CONSTRAINT fk_goal FOREIGN KEY (goal_id) REFERENCES autonomy_goals(id)
-);
+-- Actions table: Already created in migration 023, so we skip it here
+-- Migration 050 adds evidence and claims tracking for the existing autonomy_actions table
 
 -- Evidence table: Tracks all evidence sources for claims
 CREATE TABLE IF NOT EXISTS autonomy_evidence (
-  id VARCHAR(36) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   source_id VARCHAR(36) NOT NULL UNIQUE,
-  action_id VARCHAR(36),
+  action_id UUID,
   url TEXT NOT NULL,
   title TEXT,
   snippet TEXT,
@@ -45,9 +23,9 @@ CREATE TABLE IF NOT EXISTS autonomy_evidence (
 
 -- Claims table: Tracks all generated claims with evidence backing
 CREATE TABLE IF NOT EXISTS autonomy_claims (
-  id VARCHAR(36) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   claim_id VARCHAR(36) NOT NULL UNIQUE,
-  action_id VARCHAR(36),
+  action_id UUID,
   text TEXT NOT NULL,
   status VARCHAR(50), -- 'draft', 'unsupported', 'weakly_supported', 'supported', 'contradicted'
   confidence FLOAT DEFAULT 0.7,
@@ -65,8 +43,8 @@ CREATE TABLE IF NOT EXISTS autonomy_claims (
 
 -- Searches table: Tracks search decisions (precursor to web_search action execution)
 CREATE TABLE IF NOT EXISTS autonomy_searches (
-  id VARCHAR(36) PRIMARY KEY,
-  action_id VARCHAR(36),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action_id UUID,
   query TEXT NOT NULL,
   status VARCHAR(50), -- 'initiated', 'completed', 'failed'
   results_count INT DEFAULT 0,
@@ -76,8 +54,8 @@ CREATE TABLE IF NOT EXISTS autonomy_searches (
 
 -- Memory table: Tracks memory updates and learning
 CREATE TABLE IF NOT EXISTS autonomy_memory (
-  id VARCHAR(36) PRIMARY KEY,
-  action_id VARCHAR(36),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action_id UUID,
   content JSONB NOT NULL,
   timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -86,8 +64,8 @@ CREATE TABLE IF NOT EXISTS autonomy_memory (
 
 -- Loop detection table: Tracks potential loops for analysis
 CREATE TABLE IF NOT EXISTS autonomy_loop_detection (
-  id VARCHAR(36) PRIMARY KEY,
-  goal_id VARCHAR(36),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  goal_id UUID,
   is_looping BOOLEAN,
   loop_type VARCHAR(50),
   streak INT,
@@ -98,9 +76,6 @@ CREATE TABLE IF NOT EXISTS autonomy_loop_detection (
 );
 
 -- Indexes for query performance
-CREATE INDEX IF NOT EXISTS idx_actions_goal_id ON autonomy_actions(goal_id);
-CREATE INDEX IF NOT EXISTS idx_actions_status ON autonomy_actions(status);
-CREATE INDEX IF NOT EXISTS idx_actions_decided_at ON autonomy_actions(decided_at);
 CREATE INDEX IF NOT EXISTS idx_evidence_action_id ON autonomy_evidence(action_id);
 CREATE INDEX IF NOT EXISTS idx_evidence_source_id ON autonomy_evidence(source_id);
 CREATE INDEX IF NOT EXISTS idx_claims_action_id ON autonomy_claims(action_id);
@@ -109,4 +84,4 @@ CREATE INDEX IF NOT EXISTS idx_claims_generated_at ON autonomy_claims(generated_
 CREATE INDEX IF NOT EXISTS idx_searches_action_id ON autonomy_searches(action_id);
 CREATE INDEX IF NOT EXISTS idx_loop_detection_goal_id ON autonomy_loop_detection(goal_id);
 CREATE INDEX IF NOT EXISTS idx_claims_support_sources ON autonomy_claims USING GIN (support_source_ids);
-CREATE INDEX IF NOT EXISTS idx_actions_derived_from ON autonomy_claims USING GIN (derived_from_action_ids);
+CREATE INDEX IF NOT EXISTS idx_claims_derived_from ON autonomy_claims USING GIN (derived_from_action_ids);

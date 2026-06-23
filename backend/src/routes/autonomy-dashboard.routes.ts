@@ -77,7 +77,8 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { limit = '10' } = request.query as { limit?: string };
-        const limitNum = Math.min(parseInt(limit) || 10, 100);
+        const parsed = parseInt(limit, 10);
+        const limitNum = Math.min(isNaN(parsed) ? 10 : parsed, 100);
 
         const result = await db.query(
           `SELECT id, run_id, status, trace_id, task_id, episode_id,
@@ -180,7 +181,8 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { limit = '20' } = request.query as { limit?: string };
-        const limitNum = Math.min(parseInt(limit) || 20, 100);
+        const parsed = parseInt(limit, 10);
+        const limitNum = Math.min(isNaN(parsed) ? 20 : parsed, 100);
 
         const result = await db.query(
           `SELECT id, task_id, goal_id, status, autonomy_level, risk_level,
@@ -280,7 +282,8 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { limit = '20' } = request.query as { limit?: string };
-        const limitNum = Math.min(parseInt(limit) || 20, 100);
+        const parsed = parseInt(limit, 10);
+        const limitNum = Math.min(isNaN(parsed) ? 20 : parsed, 100);
 
         const result = await db.query(
           `SELECT id, learner_run_id, candidate_type, artifact_id, artifact_hash,
@@ -385,7 +388,8 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const { limit = '20' } = request.query as { limit?: string };
-        const limitNum = Math.min(parseInt(limit) || 20, 100);
+        const parsed = parseInt(limit, 10);
+        const limitNum = Math.min(isNaN(parsed) ? 20 : parsed, 100);
 
         const result = await db.query(
           `SELECT id, eval_run_id, autonomy_score, safety_score, calibration_score,

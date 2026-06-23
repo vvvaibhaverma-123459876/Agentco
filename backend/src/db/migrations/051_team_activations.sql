@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS autonomy_team_activations (
   CONSTRAINT fk_parent_goal FOREIGN KEY (parent_goal_id) REFERENCES autonomy_goals(id) ON DELETE CASCADE
 );
 
-CREATE INDEX idx_team_activations_parent ON autonomy_team_activations(parent_goal_id);
-CREATE INDEX idx_team_activations_status ON autonomy_team_activations(status);
-CREATE INDEX idx_team_activations_specialist ON autonomy_team_activations(specialist_id);
-CREATE INDEX idx_team_activations_role ON autonomy_team_activations(specialist_role);
+CREATE INDEX IF NOT EXISTS idx_team_activations_parent ON autonomy_team_activations(parent_goal_id);
+CREATE INDEX IF NOT EXISTS idx_team_activations_status ON autonomy_team_activations(status);
+CREATE INDEX IF NOT EXISTS idx_team_activations_specialist ON autonomy_team_activations(specialist_id);
+CREATE INDEX IF NOT EXISTS idx_team_activations_role ON autonomy_team_activations(specialist_role);

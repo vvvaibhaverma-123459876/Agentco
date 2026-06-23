@@ -34,14 +34,37 @@ export async function build() {
   // Register civilization request validator (body size, rate limiting)
   await civilizationRequestValidator(app);
 
+  // Rate limiting map: track requests per API key
+  const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+  const RATE_LIMIT_WINDOW = 60000; // 1 minute
+  const RATE_LIMIT_MAX_REQUESTS = 100;
+
   app.addHook('preHandler', async (request, reply) => {
     const method = request.method.toUpperCase();
     const apiKey = process.env.AGENTCO_API_KEY;
+
     if (!apiKey || ['GET', 'HEAD', 'OPTIONS'].includes(method)) return;
 
     const provided = request.headers['x-api-key'];
     if (provided !== apiKey) {
       return reply.status(401).send({ error: 'write API key required' });
+    }
+
+    // Rate limiting
+    const now = Date.now();
+    const identifier = provided || 'anonymous';
+    const rateLimit = rateLimitMap.get(identifier);
+
+    if (rateLimit && rateLimit.resetAt > now) {
+      if (rateLimit.count >= RATE_LIMIT_MAX_REQUESTS) {
+        return reply.status(429).send({
+          error: 'Rate limit exceeded',
+          retryAfter: Math.ceil((rateLimit.resetAt - now) / 1000)
+        });
+      }
+      rateLimit.count++;
+    } else {
+      rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
     }
   });
 

@@ -98,6 +98,28 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
           });
         }
 
+        // Input validation
+        if (typeof goal !== 'string' || goal.length === 0) {
+          return reply.code(400).send({
+            status: 'error',
+            message: 'Goal must be a non-empty string',
+          });
+        }
+
+        if (goal.length > 10000) {
+          return reply.code(400).send({
+            status: 'error',
+            message: 'Goal exceeds maximum length of 10000 characters',
+          });
+        }
+
+        if (typeof maxIterations !== 'number' || maxIterations <= 0 || maxIterations > 1000) {
+          return reply.code(400).send({
+            status: 'error',
+            message: 'maxIterations must be between 1 and 1000',
+          });
+        }
+
         console.log('[ACTION_LOOP] Starting action loop with goal:', goal);
 
         const result = await autonomyOrchestrator.executeAutonomyActionLoop(
