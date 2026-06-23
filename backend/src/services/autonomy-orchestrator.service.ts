@@ -11,6 +11,10 @@ import { CrashRecoveryService } from './crash-recovery.service';
 import { TrustPolicyService } from './trust-policy.service';
 import { TrustReputationService } from './trust-reputation.service';
 import { CalibrationConstitutionService } from './calibration-constitution.service';
+import { ActionExecutorService } from './action-executor.service';
+import { LoopDetectorService, ActionHistory } from './loop-detector.service';
+import { AutonomyActionPlannerService } from './autonomy-action-planner.service';
+import { ActionSpec, ActionResult, ActionStatus, ActionType } from '../types/action.types';
 
 export interface AutonomyRun {
   id: string;
@@ -66,6 +70,9 @@ export class AutonomyOrchestratorService {
   private trustPolicy = new TrustPolicyService();
   private trustReputation = new TrustReputationService();
   private constitution = new CalibrationConstitutionService();
+  private actionExecutor = new ActionExecutorService();
+  private loopDetector = new LoopDetectorService();
+  private actionPlanner = new AutonomyActionPlannerService();
 
   /**
    * Execute full LEVEL_3 autonomy smoke test loop
@@ -664,6 +671,205 @@ export class AutonomyOrchestratorService {
         }
       }
 
+      throw error;
+    }
+  }
+
+  /**
+   * Execute a true end-to-end autonomy action loop
+   * Implements: goal creation → [plan → validate → execute → loop-detect] → claim generation → termination
+   * Uses typed ActionSpecs with validation before execution
+   * Enforces evidence requirements and loop detection
+   */
+  async executeAutonomyActionLoop(
+    goalText: string,
+    maxIterations: number = 10,
+    idempotencyKey?: string
+  ): Promise<{ goalId: string; claimsGenerated: number; actionsExecuted: number; status: string; reason?: string }> {
+    const runId = `action_loop_${Date.now()}`;
+    const traceId = uuidv4();
+
+    console.log(`\n🔄 Starting Autonomy Action Loop`);
+    console.log(`   Goal: ${goalText}`);
+    console.log(`   Max iterations: ${maxIterations}`);
+
+    try {
+      // Create goal
+      const goalId = uuidv4();
+      await db.query(
+        `INSERT INTO autonomy_goals (
+          id, title, description, source, domain, expected_value, risk_level,
+          autonomy_level_allowed, status, proposed_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          goalId,
+          goalText.substring(0, 100),
+          goalText,
+          'autonomy_orchestrator',
+          'research',
+          0.7,
+          'low',
+          3,
+          'approved',
+          'autonomy_action_planner',
+        ]
+      );
+
+      let claimsGenerated = 0;
+      let actionsExecuted = 0;
+      let terminated = false;
+      let terminationReason = '';
+      const actionHistory: ActionHistory[] = [];
+
+      // Main action loop
+      for (let iteration = 0; iteration < maxIterations && !terminated; iteration++) {
+        console.log(`\n[Iteration ${iteration + 1}/${maxIterations}] Planning next action...`);
+
+        // Get current state for planning
+        const claimsResult = await db.query(
+          `SELECT COUNT(*) as count FROM autonomy_claims
+           WHERE action_id IN (SELECT id FROM autonomy_actions WHERE goal_id = $1)`,
+          [goalId]
+        );
+        const currentClaimsCount = parseInt(claimsResult.rows[0]?.count || '0');
+
+        const evidenceResult = await db.query(
+          `SELECT COUNT(*) as count FROM autonomy_evidence WHERE action_id IN (
+            SELECT id FROM autonomy_actions WHERE goal_id = $1
+          )`,
+          [goalId]
+        );
+        const evidenceCount = parseInt(evidenceResult.rows[0]?.count || '0');
+
+        // Check for loops
+        const loopDetection = this.loopDetector.detectLoop(actionHistory);
+
+        // Plan next action
+        const action = await this.actionPlanner.planNextAction(goalId, {
+          goalText,
+          claimsGenerated: currentClaimsCount,
+          evidenceCount,
+          loopDetection,
+          previousActions: actionHistory.map(h => ({
+            type: h.actionType,
+            result: h.resultStatus,
+          })),
+        });
+
+        // Store action in database
+        await db.query(
+          `INSERT INTO autonomy_actions (
+            id, action_id, action_type, goal_id, objective, args, success_criteria,
+            risk_level, decided_by, decided_at, reasoning, status
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+          [
+            uuidv4(),
+            action.actionId,
+            action.actionType,
+            goalId,
+            action.objective,
+            JSON.stringify(action.args),
+            JSON.stringify(action.successCriteria),
+            action.riskLevel,
+            action.decidedBy,
+            action.decidedAt,
+            action.reasoning,
+            'planned',
+          ]
+        );
+
+        // Execute action
+        console.log(`   Action: ${action.actionType} - ${action.objective}`);
+        const result = await this.actionExecutor.executeAction(action);
+
+        // Update action with result
+        if (result.completedAt) {
+          await db.query(
+            `UPDATE autonomy_actions SET status = $1, started_at = $2, completed_at = $3,
+             observations = $4, created_artifacts = $5, errors = $6
+             WHERE action_id = $7`,
+            [
+              result.status,
+              result.startedAt,
+              result.completedAt,
+              JSON.stringify(result.observations),
+              JSON.stringify(result.createdArtifacts),
+              JSON.stringify(result.errors || []),
+              action.actionId,
+            ]
+          );
+        }
+
+        actionsExecuted++;
+
+        // Track in action history for loop detection
+        actionHistory.push({
+          actionType: action.actionType,
+          timestamp: new Date(),
+          args: action.args,
+          resultStatus: result.status,
+          newArtifacts: result.createdArtifacts.length,
+        });
+
+        // Handle result
+        if (result.status === ActionStatus.BLOCKED) {
+          console.log(`   ⚠️  Action blocked: ${result.blockedReason}`);
+        } else if (result.status === ActionStatus.FAILED) {
+          console.log(`   ❌ Action failed: ${result.errors?.join(', ')}`);
+        } else if (result.status === ActionStatus.COMPLETED) {
+          console.log(`   ✅ Action completed`);
+
+          // Count new claims if generated
+          if (result.createdArtifacts.length > 0) {
+            const newClaimsResult = await db.query(
+              `SELECT COUNT(*) as count FROM autonomy_claims WHERE claim_id = ANY($1::text[])`,
+              [result.createdArtifacts]
+            );
+            const newClaims = parseInt(newClaimsResult.rows[0]?.count || '0');
+            claimsGenerated += newClaims;
+          }
+        }
+
+        // Check for termination
+        if (action.actionType === ActionType.TERMINATE) {
+          terminated = true;
+          terminationReason = action.args.reason || 'Autonomy loop terminated by planner';
+          console.log(`\n🛑 Loop terminated: ${terminationReason}`);
+        }
+
+        // Check for loop and decide next step
+        if (actionHistory.length >= 3) {
+          const newLoopDetection = this.loopDetector.detectLoop(actionHistory);
+          if (newLoopDetection.isLooping) {
+            console.log(`\n⚠️  ${newLoopDetection.loopType} detected (${newLoopDetection.streak} streak)`);
+            if (newLoopDetection.recommendation === 'terminate') {
+              terminated = true;
+              terminationReason = `Loop detected: ${newLoopDetection.loopType}. Forcing termination.`;
+              console.log(`🛑 Forced termination: ${terminationReason}`);
+            }
+          }
+        }
+      }
+
+      if (!terminated && actionHistory.length >= maxIterations) {
+        terminationReason = `Max iterations (${maxIterations}) reached`;
+        console.log(`\n🛑 Max iterations reached: ${terminationReason}`);
+      }
+
+      console.log(`\n✅ Action loop completed`);
+      console.log(`   Claims generated: ${claimsGenerated}`);
+      console.log(`   Actions executed: ${actionsExecuted}`);
+      console.log(`   Reason: ${terminationReason}`);
+
+      return {
+        goalId,
+        claimsGenerated,
+        actionsExecuted,
+        status: 'completed',
+        reason: terminationReason,
+      };
+    } catch (error: any) {
+      console.error(`❌ Action loop failed: ${error.message}`);
       throw error;
     }
   }
