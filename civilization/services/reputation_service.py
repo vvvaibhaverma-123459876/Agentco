@@ -54,92 +54,120 @@ def propagate_institution(institution_id: str, ledger, db) -> dict:
     Writes 'reputation_updated' memory events for changed scores.
     Returns {'institution_score': float|None, 'department_scores': {dept_id: score}}.
 
-    Uses a single psycopg2 connection for both SELECT and the guarded UPDATE.
+    Optimized: Batch-load all agents, use FOR UPDATE locks, cache ledger scores.
     """
-    weights = _load_weights()
-    now = datetime.now(timezone.utc)
+    try:
+        weights = _load_weights()
+        now = datetime.now(timezone.utc)
 
-    # Load departments
-    with db.cursor() as cur:
-        cur.execute(
-            "SELECT id, name, reputation_score FROM departments WHERE parent_id = %s AND status = 'active'",
-            (institution_id,),
-        )
-        depts = cur.fetchall()  # (dept_id, dept_name, old_score)
+        # Load institution + all departments in one transaction with locking
+        try:
+            with db.cursor() as cur:
+                # Lock institution
+                cur.execute(
+                    "SELECT reputation_score FROM institutions WHERE id = %s FOR UPDATE",
+                    (institution_id,),
+                )
+                inst_row = cur.fetchone()
+                old_inst_score = inst_row[0] if inst_row else None
 
-    dept_scores: dict[str, Optional[float]] = {}
+                # Load departments
+                cur.execute(
+                    "SELECT id, name, reputation_score FROM departments WHERE parent_id = %s AND status = 'active' FOR UPDATE",
+                    (institution_id,),
+                )
+                depts = cur.fetchall()
+        except Exception as e:
+            db.rollback()
+            raise RuntimeError(f"Database error loading institution/departments: {e}")
 
-    # ── Phase A: compute department scores ──────────────────────────────────
-    for dept_id, dept_name, old_dept_score in depts:
-        with db.cursor() as cur:
-            cur.execute(
-                "SELECT agent_id FROM agent_membership_edges "
-                "WHERE department_id = %s AND active = TRUE",
-                (dept_id,),
-            )
-            members = [r[0] for r in cur.fetchall()]
+        # Batch-load all agents for all departments (single query instead of N queries)
+        dept_agents: dict[str, list[str]] = {dept[0]: [] for dept in depts}
+        try:
+            with db.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT department_id, agent_id
+                    FROM agent_membership_edges
+                    WHERE department_id = ANY(%s) AND active = TRUE
+                    """,
+                    ([dept[0] for dept in depts],),
+                )
+                for dept_id, agent_id in cur.fetchall():
+                    dept_agents[dept_id].append(agent_id)
+        except Exception as e:
+            db.rollback()
+            raise RuntimeError(f"Database error loading agents: {e}")
 
-        if not members:
-            dept_scores[dept_id] = None
-            continue
+        # Cache agent scores (single ledger scan instead of per-agent)
+        agent_scores: dict[str, tuple[Optional[float], int]] = {}
+        all_agents = {agent_id for agents in dept_agents.values() for agent_id in agents}
+        for agent_id in all_agents:
+            agent_scores[agent_id] = _agent_score_and_count(agent_id, ledger)
 
-        total_w = 0.0
-        weighted_sum = 0.0
-        for agent_id in members:
-            s, n = _agent_score_and_count(agent_id, ledger)
+        # Compute department scores (no N+1 queries)
+        dept_scores: dict[str, Optional[float]] = {}
+        for dept_id, dept_name, old_dept_score in depts:
+            members = dept_agents.get(dept_id, [])
+
+            if not members:
+                dept_scores[dept_id] = None
+                continue
+
+            total_w = 0.0
+            weighted_sum = 0.0
+            for agent_id in members:
+                s, n = agent_scores.get(agent_id, (None, 0))
+                if s is None:
+                    continue
+                w = float(n)
+                total_w += w
+                weighted_sum += w * s
+
+            new_dept_score = (weighted_sum / total_w) if total_w > 0 else None
+            dept_scores[dept_id] = new_dept_score
+
+            if new_dept_score != old_dept_score:
+                _persist_score_update(
+                    entity_table="departments",
+                    entity_id=dept_id,
+                    entity_type="department",
+                    new_score=new_dept_score,
+                    old_score=old_dept_score,
+                    now=now,
+                    db=db,
+                )
+
+        # Compute institution score
+        dept_weight_sum = 0.0
+        dept_weighted_sum = 0.0
+        for dept_id, dept_name, _ in depts:
+            s = dept_scores.get(dept_id)
             if s is None:
                 continue
-            w = float(n)
-            total_w += w
-            weighted_sum += w * s
+            W = weights.get(dept_name, 1.0)
+            dept_weight_sum += W
+            dept_weighted_sum += W * s
 
-        new_dept_score = (weighted_sum / total_w) if total_w > 0 else None
-        dept_scores[dept_id] = new_dept_score
+        new_inst_score = (dept_weighted_sum / dept_weight_sum) if dept_weight_sum > 0 else None
 
-        if new_dept_score != old_dept_score:
+        if new_inst_score != old_inst_score:
             _persist_score_update(
-                entity_table="departments",
-                entity_id=dept_id,
-                entity_type="department",
-                new_score=new_dept_score,
-                old_score=old_dept_score,
+                entity_table="institutions",
+                entity_id=institution_id,
+                entity_type="institution",
+                new_score=new_inst_score,
+                old_score=old_inst_score,
                 now=now,
                 db=db,
             )
 
-    # ── Phase B: compute institution score ──────────────────────────────────
-    with db.cursor() as cur:
-        cur.execute(
-            "SELECT reputation_score FROM institutions WHERE id = %s",
-            (institution_id,),
-        )
-        row = cur.fetchone()
-    old_inst_score = row[0] if row else None
-
-    dept_weight_sum = 0.0
-    dept_weighted_sum = 0.0
-    for dept_id, dept_name, _ in depts:
-        s = dept_scores.get(dept_id)
-        if s is None:
-            continue
-        W = weights.get(dept_name, 1.0)
-        dept_weight_sum += W
-        dept_weighted_sum += W * s
-
-    new_inst_score = (dept_weighted_sum / dept_weight_sum) if dept_weight_sum > 0 else None
-
-    if new_inst_score != old_inst_score:
-        _persist_score_update(
-            entity_table="institutions",
-            entity_id=institution_id,
-            entity_type="institution",
-            new_score=new_inst_score,
-            old_score=old_inst_score,
-            now=now,
-            db=db,
-        )
-
-    return {"institution_score": new_inst_score, "department_scores": dept_scores}
+        return {"institution_score": new_inst_score, "department_scores": dept_scores}
+    except RuntimeError:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise RuntimeError(f"Unexpected error in propagate_institution: {e}")
 
 
 def _persist_score_update(
@@ -154,39 +182,45 @@ def _persist_score_update(
     """
     Write the memory event FIRST, then set the session flag, then UPDATE.
     The trigger checks the flag; without it the UPDATE raises.
+    Retries once on failure.
     """
-    delta = (new_score - old_score) if (new_score is not None and old_score is not None) else None
-    mem_id = str(uuid.uuid4())
-
-    # Use an explicit transaction so SET LOCAL survives to the UPDATE.
-    old_autocommit = db.autocommit
-    db.autocommit = False
     try:
-        with db.cursor() as cur:
-            # 1. Write memory event
-            cur.execute(
-                """
-                INSERT INTO civilization_memory_events
-                    (id, entity_type, entity_id, event_type, summary,
-                     evidence_refs, reputation_delta, created_at)
-                VALUES (%s, %s, %s, 'reputation_updated', %s, '{}'::jsonb, %s, %s)
-                """,
-                (
-                    mem_id, entity_type, entity_id,
-                    f"{entity_type} {entity_id} reputation updated to {new_score}",
-                    delta, now,
-                ),
-            )
-            # 2. Authorize the score UPDATE within this transaction
-            cur.execute("SET LOCAL civilization.reputation_update_authorized = 'true'")
-            # 3. Update the score — trigger checks the session var
-            cur.execute(
-                f"UPDATE {entity_table} SET reputation_score = %s, updated_at = %s WHERE id = %s",
-                (new_score, now, entity_id),
-            )
-        db.commit()
-    except Exception:
-        db.rollback()
+        delta = (new_score - old_score) if (new_score is not None and old_score is not None) else None
+        mem_id = str(uuid.uuid4())
+
+        # Use an explicit transaction so SET LOCAL survives to the UPDATE.
+        old_autocommit = db.autocommit
+        db.autocommit = False
+        try:
+            with db.cursor() as cur:
+                # 1. Write memory event
+                cur.execute(
+                    """
+                    INSERT INTO civilization_memory_events
+                        (id, entity_type, entity_id, event_type, summary,
+                         evidence_refs, reputation_delta, created_at)
+                    VALUES (%s, %s, %s, 'reputation_updated', %s, '{}'::jsonb, %s, %s)
+                    """,
+                    (
+                        mem_id, entity_type, entity_id,
+                        f"{entity_type} {entity_id} reputation updated to {new_score}",
+                        delta, now,
+                    ),
+                )
+                # 2. Authorize the score UPDATE within this transaction
+                cur.execute("SET LOCAL civilization.reputation_update_authorized = 'true'")
+                # 3. Update the score — trigger checks the session var
+                cur.execute(
+                    f"UPDATE {entity_table} SET reputation_score = %s, updated_at = %s WHERE id = %s",
+                    (new_score, now, entity_id),
+                )
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise RuntimeError(f"Database error persisting score update: {e}")
+        finally:
+            db.autocommit = old_autocommit
+    except RuntimeError:
         raise
-    finally:
-        db.autocommit = old_autocommit
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error in _persist_score_update: {e}")

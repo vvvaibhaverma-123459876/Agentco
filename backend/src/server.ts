@@ -7,6 +7,7 @@ import { auditRoutes } from './routes/audit.routes';
 import { credentialRoutes } from './routes/credential.routes';
 import { learningRoutes } from './services/learning.service';
 import { registerLearningMiddleware } from './middleware/learning.middleware';
+import { civilizationRequestValidator } from './middleware/civilization-request-validator';
 import { assertProductionSecrets } from './security';
 import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
@@ -26,6 +27,9 @@ export async function build() {
 
   // Register learning middleware (captures all signals across the system)
   await registerLearningMiddleware(app);
+
+  // Register civilization request validator (body size, rate limiting)
+  await civilizationRequestValidator(app);
 
   app.addHook('preHandler', async (request, reply) => {
     const method = request.method.toUpperCase();

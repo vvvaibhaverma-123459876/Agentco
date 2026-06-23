@@ -80,93 +80,145 @@ def create_institution(name: str, contract: dict, db) -> dict:
 
     Writes a 'institution_created' memory event in the same transaction.
     """
-    _validate_contract(contract)
+    try:
+        _validate_contract(contract)
 
-    inst_id = str(uuid.uuid4())
-    now = datetime.now(timezone.utc)
+        inst_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc)
 
-    with db.cursor() as cur:
-        # Institution row
-        purpose = contract.get("purpose", name)
-        cur.execute(
-            """
-            INSERT INTO institutions
-                (id, name, entity_type, parent_id, status, purpose,
-                 authority_scope, metadata, created_at, updated_at)
-            VALUES (%s, %s, 'institution', NULL, 'active', %s, %s::jsonb, '{}'::jsonb, %s, %s)
-            """,
-            (
-                inst_id, name, purpose,
-                json.dumps(contract.get("accepted_inputs", [])),
-                now, now,
-            ),
-        )
+        try:
+            with db.cursor() as cur:
+                # Check for existing institution with same name (prevent race conditions)
+                cur.execute(
+                    "SELECT id FROM institutions WHERE name = %s AND status = 'active' FOR UPDATE SKIP LOCKED",
+                    (name,),
+                )
+                if cur.fetchone():
+                    raise ContractValidationError(f"Institution '{name}' already exists")
 
-        # Contract row
-        cur.execute(
-            "INSERT INTO institution_contracts (institution_id, contract, created_at) "
-            "VALUES (%s, %s::jsonb, %s)",
-            (inst_id, json.dumps(contract), now),
-        )
+                # Institution row
+                purpose = contract.get("purpose", name)
+                cur.execute(
+                    """
+                    INSERT INTO institutions
+                        (id, name, entity_type, parent_id, status, purpose,
+                         authority_scope, metadata, created_at, updated_at)
+                    VALUES (%s, %s, 'institution', NULL, 'active', %s, %s::jsonb, '{}'::jsonb, %s, %s)
+                    """,
+                    (
+                        inst_id, name, purpose,
+                        json.dumps(contract.get("accepted_inputs", [])),
+                        now, now,
+                    ),
+                )
 
-        # Five mandatory departments
-        dept_ids = {}
-        for dept_name, dept_purpose in FIVE_DEPARTMENTS:
-            dept_id = str(uuid.uuid4())
-            cur.execute(
-                """
-                INSERT INTO departments
-                    (id, name, entity_type, parent_id, status, purpose,
-                     authority_scope, metadata, created_at, updated_at)
-                VALUES (%s, %s, 'department', %s, 'active', %s, '[]'::jsonb, '{}'::jsonb, %s, %s)
-                """,
-                (dept_id, dept_name, inst_id, dept_purpose, now, now),
-            )
-            dept_ids[dept_name] = dept_id
+                # Contract row
+                cur.execute(
+                    "INSERT INTO institution_contracts (institution_id, contract, created_at) "
+                    "VALUES (%s, %s::jsonb, %s)",
+                    (inst_id, json.dumps(contract), now),
+                )
 
-        # Memory event — institution_created (no reputation change)
-        cur.execute(
-            """
-            INSERT INTO civilization_memory_events
-                (id, entity_type, entity_id, event_type, summary, evidence_refs, created_at)
-            VALUES (%s, 'institution', %s, 'institution_created', %s, '{}'::jsonb, %s)
-            """,
-            (str(uuid.uuid4()), inst_id, f"Institution '{name}' created with 5 departments", now),
-        )
+                # Five mandatory departments
+                dept_ids = {}
+                for dept_name, dept_purpose in FIVE_DEPARTMENTS:
+                    dept_id = str(uuid.uuid4())
+                    cur.execute(
+                        """
+                        INSERT INTO departments
+                            (id, name, entity_type, parent_id, status, purpose,
+                             authority_scope, metadata, created_at, updated_at)
+                        VALUES (%s, %s, 'department', %s, 'active', %s, '[]'::jsonb, '{}'::jsonb, %s, %s)
+                        """,
+                        (dept_id, dept_name, inst_id, dept_purpose, now, now),
+                    )
+                    dept_ids[dept_name] = dept_id
 
-    return {"institution_id": inst_id, "department_ids": dept_ids}
+                # Memory event — institution_created (no reputation change)
+                cur.execute(
+                    """
+                    INSERT INTO civilization_memory_events
+                        (id, entity_type, entity_id, event_type, summary, evidence_refs, created_at)
+                    VALUES (%s, 'institution', %s, 'institution_created', %s, '{}'::jsonb, %s)
+                    """,
+                    (str(uuid.uuid4()), inst_id, f"Institution '{name}' created with 5 departments", now),
+                )
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise ContractValidationError(f"Database error creating institution: {e}")
+
+        return {"institution_id": inst_id, "department_ids": dept_ids}
+    except ContractValidationError:
+        raise
+    except Exception as e:
+        raise ContractValidationError(f"Unexpected error in create_institution: {e}")
 
 
 def get_institution(institution_id: str, db) -> Optional[dict]:
-    with db.cursor() as cur:
-        cur.execute(
-            "SELECT id, name, status, reputation_score FROM institutions WHERE id = %s",
-            (institution_id,),
-        )
-        row = cur.fetchone()
-    if row is None:
-        return None
-    return {"id": row[0], "name": row[1], "status": row[2], "reputation_score": row[3]}
+    try:
+        with db.cursor() as cur:
+            cur.execute(
+                "SELECT id, name, status, reputation_score FROM institutions WHERE id = %s",
+                (institution_id,),
+            )
+            row = cur.fetchone()
+        if row is None:
+            return None
+        return {"id": row[0], "name": row[1], "status": row[2], "reputation_score": row[3]}
+    except Exception as e:
+        raise ContractValidationError(f"Database error fetching institution: {e}")
 
 
 def get_departments(institution_id: str, db) -> list[dict]:
-    with db.cursor() as cur:
-        cur.execute(
-            "SELECT id, name, status, reputation_score FROM departments WHERE parent_id = %s",
-            (institution_id,),
-        )
-        rows = cur.fetchall()
-    return [{"id": r[0], "name": r[1], "status": r[2], "reputation_score": r[3]} for r in rows]
+    try:
+        with db.cursor() as cur:
+            cur.execute(
+                "SELECT id, name, status, reputation_score FROM departments WHERE parent_id = %s",
+                (institution_id,),
+            )
+            rows = cur.fetchall()
+        return [{"id": r[0], "name": r[1], "status": r[2], "reputation_score": r[3]} for r in rows]
+    except Exception as e:
+        raise ContractValidationError(f"Database error fetching departments: {e}")
 
 
-def add_agent_to_department(agent_id: str, department_id: str, role_name: str, db) -> None:
-    now = datetime.now(timezone.utc)
-    with db.cursor() as cur:
-        cur.execute(
-            """
-            INSERT INTO agent_membership_edges (agent_id, department_id, role_name, active, created_at)
-            VALUES (%s, %s, %s, TRUE, %s)
-            ON CONFLICT (agent_id, department_id) DO UPDATE SET active = TRUE
-            """,
-            (agent_id, department_id, role_name, now),
-        )
+def add_agent_to_department(agent_id: str, department_id: str, role_name: str, db) -> dict:
+    try:
+        now = datetime.now(timezone.utc)
+        try:
+            with db.cursor() as cur:
+                # Check if agent already in department
+                cur.execute(
+                    "SELECT id, active FROM agent_membership_edges WHERE agent_id = %s AND department_id = %s FOR UPDATE",
+                    (agent_id, department_id),
+                )
+                existing = cur.fetchone()
+
+                if existing:
+                    # Agent already in department
+                    cur.execute(
+                        "UPDATE agent_membership_edges SET active = TRUE, updated_at = %s WHERE agent_id = %s AND department_id = %s",
+                        (now, agent_id, department_id),
+                    )
+                    status = "updated"
+                else:
+                    # Add new membership
+                    cur.execute(
+                        """
+                        INSERT INTO agent_membership_edges (agent_id, department_id, role_name, active, created_at)
+                        VALUES (%s, %s, %s, TRUE, %s)
+                        """,
+                        (agent_id, department_id, role_name, now),
+                    )
+                    status = "inserted"
+            db.commit()
+        except Exception as e:
+            db.rollback()
+            raise ContractValidationError(f"Database error adding agent to department: {e}")
+
+        return {"status": status, "agent_id": agent_id, "department_id": department_id}
+    except ContractValidationError:
+        raise
+    except Exception as e:
+        raise ContractValidationError(f"Unexpected error in add_agent_to_department: {e}")
