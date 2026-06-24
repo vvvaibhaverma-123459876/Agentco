@@ -18,6 +18,7 @@ import {
 } from '../types/action.types';
 import { WebAdapter } from '../adapters/web-adapter';
 import { TeamActivationService } from './team-activation.service';
+import { validateGrounding, GroundingSource } from './claim-grounding';
 
 export class ActionExecutorService {
   private webAdapter: WebAdapter | null = null;
@@ -278,9 +279,10 @@ export class ActionExecutorService {
     }
 
     // CRITICAL: Validate claim is grounded in source content, not hallucinated
+    const supportSnippets: string[] = spec.args.supportSnippets || [];
     console.log(`[Claim Validation] Text: "${claimText.substring(0, 60)}..."`);
     console.log(`[Claim Validation] Source IDs: ${JSON.stringify(supportSourceIds)}`);
-    const groundingValidation = await this.validateClaimGrounding(claimText, supportSourceIds);
+    const groundingValidation = await this.validateClaimGrounding(claimText, supportSourceIds, supportSnippets);
     if (!groundingValidation.valid) {
       result.status = ActionStatus.BLOCKED;
       result.blockedReason = `Claim not grounded in sources: ${groundingValidation.reason}`;
@@ -327,24 +329,22 @@ export class ActionExecutorService {
   }
 
   /**
-   * Validate that a claim is actually grounded in source material
-   * Reject hallucinated claims that fabricate concepts not in the sources
-   *
-   * Checks:
-   * 1. Named-concept verification: theorems, authors, specific discoveries mentioned must exist in sources
-   * 2. Term-overlap: 30%+ of claim terms must appear in abstracts (catches generic hallucinations)
-   * 3. Snippet requirement: for claims with specific names/theorems, verify exact text in abstract
+   * Validate that a claim is actually grounded in source material.
+   * Fetches the cited source content from the evidence table, then delegates ALL
+   * grounding logic to the pure `validateGrounding` function (the single source of
+   * truth, unit-tested directly). This method only does the I/O.
    */
   private async validateClaimGrounding(
     claimText: string,
-    sourceIds: string[]
+    sourceIds: string[],
+    supportSnippets: string[] = []
   ): Promise<{ valid: boolean; reason?: string }> {
     if (sourceIds.length === 0) {
       return { valid: false, reason: 'No source IDs provided' };
     }
 
-    // Fetch source content (abstracts) from evidence table
-    // NOTE: Query by source_id, not id (they are different columns)
+    // Fetch source content (abstracts) from evidence table.
+    // NOTE: Query by source_id, not id (they are different columns).
     const result = await db.query(
       `SELECT source_id, url, snippet FROM autonomy_evidence
        WHERE source_id = ANY($1)`,
@@ -357,84 +357,13 @@ export class ActionExecutorService {
       return { valid: false, reason: `Sources not found (tried ${sourceIds.length} IDs)` };
     }
 
-    const sourceContents = result.rows.map(r => r.snippet || r.url).join(' ');
-    const sourceLower = sourceContents.toLowerCase();
+    const sources: GroundingSource[] = result.rows.map(r => ({
+      sourceId: String(r.source_id),
+      content: String(r.snippet || r.url || ''),
+    }));
 
-    // ===== CHECK 1: Named-Concept Verification =====
-    // Extract named entities: theorem names, author names, specific concepts
-    // Pattern: "[Name] [Noun]" where Name is capitalized and Noun = Theorem|Conjecture|Lemma|Algorithm|Method|etc.
-    // Be strict: capture only 1-2 word names to avoid over-matching
-    const namedConceptPattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(theorem|conjecture|lemma|hypothesis|method|algorithm|principle|law|axiom|corollary)\b/gi;
-
-    const foundConcepts = new Set<string>();
-    let match;
-    while ((match = namedConceptPattern.exec(claimText)) !== null) {
-      // Just capture the concept name + keyword, not the surrounding text
-      foundConcepts.add(`${match[1].toLowerCase()} ${match[2].toLowerCase()}`);
-    }
-
-    // Verify each named concept exists in the source
-    const missingConcepts: string[] = [];
-    for (const concept of foundConcepts) {
-      if (!sourceLower.includes(concept)) {
-        missingConcepts.push(concept);
-      }
-    }
-
-    if (missingConcepts.length > 0) {
-      return {
-        valid: false,
-        reason: `Named concept(s) not found in sources: ${missingConcepts.join(', ')}`
-      };
-    }
-
-    // ===== CHECK 2: Term-Overlap Analysis =====
-    // Extract key terms from claim (4+ chars, non-stopwords)
-    const stopwords = new Set(['the', 'and', 'that', 'this', 'with', 'from', 'have', 'been', 'about', 'also', 'which']);
-    const claimTerms = (claimText.match(/\b[a-z]{4,}\b/gi) || [])
-      .filter(t => !stopwords.has(t.toLowerCase()));
-
-    let matchCount = 0;
-    for (const term of claimTerms) {
-      if (sourceLower.includes(term.toLowerCase())) {
-        matchCount++;
-      }
-    }
-
-    // If less than 30% of claim terms appear in sources, likely hallucinated
-    const matchRatio = claimTerms.length > 0 ? matchCount / claimTerms.length : 0;
-    if (matchRatio < 0.3 && claimTerms.length > 5) {
-      return {
-        valid: false,
-        reason: `Only ${(matchRatio * 100).toFixed(0)}% of claim terms found in sources (need ≥30%)`
-      };
-    }
-
-    // ===== CHECK 3: Red-Flag Pattern Detection =====
-    // Patterns that strongly indicate fabrication: "Xm Theorem", "newly discovered X", etc.
-    const redFlags = [
-      /(\d+[a-z]m?\s+theorem)/i,  // "6m Theorem", "3x Theorem" - likely fabricated
-      /\b(newly|recently)\s+discovered\s+[a-z\s]+theorem/i,
-      /\b(hypothetical|proposed)\s+[a-z\s]+theorem/i,
-    ];
-
-    for (const pattern of redFlags) {
-      if (pattern.test(claimText)) {
-        // Extract the potentially fabricated concept
-        const conceptMatch = claimText.match(/([a-zA-Z\s]+(?:theorem|conjecture|lemma|method))/i);
-        if (conceptMatch) {
-          const concept = conceptMatch[1].trim().toLowerCase();
-          if (!sourceLower.includes(concept)) {
-            return {
-              valid: false,
-              reason: `Red-flag concept "${concept}" not found in sources`
-            };
-          }
-        }
-      }
-    }
-
-    return { valid: true };
+    const grounding = validateGrounding(claimText, sources, supportSnippets);
+    return { valid: grounding.valid, reason: grounding.reason };
   }
 
   private async handleUpdateMemory(spec: ActionSpec, result: ActionResult): Promise<void> {
