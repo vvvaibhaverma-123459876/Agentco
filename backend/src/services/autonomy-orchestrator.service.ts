@@ -97,17 +97,27 @@ export class AutonomyOrchestratorService {
    * Bypasses the planner - directly fetches from discovered URLs
    * Used on first iteration to populate real evidence without relying on planner URL generation
    */
-  private async injectDiscoveredSourceActions(
+  /**
+   * Inject discovered sources with goal-aware arxiv category routing
+   * Routes goal keywords to appropriate arxiv category (math.NT, cs.AI, etc.)
+   */
+  private async injectDiscoveredSourceActionsWithGoalAwareness(
     goalId: string,
-    sourcePack: string = 'technical',
+    goalText: string,
     maxUrls: number = 3
   ): Promise<{ discoveredCount: number; fetchedCount: number; evidenceCreated: number }> {
     let fetchedCount = 0;
     let evidenceCreated = 0;
 
     try {
-      console.log(`\n[D1] Discovering sources from '${sourcePack}' pack...`);
-      const discovered = await this.sourceDiscovery.discoverSourcesFromPack(sourcePack, maxUrls);
+      console.log(`\n[D1] Discovering sources with goal-aware routing...`);
+      console.log(`[D1] Goal: "${goalText}"`);
+
+      // Use scientific pack for academic research with goal-aware arxiv category selection
+      const discovered = await this.sourceDiscovery.discoverSourcesWithGoalAwareness(goalText, 'scientific', maxUrls);
+
+      console.log(`[D1] Goal-aware routing selected arxiv category based on goal keywords`);
+      console.log(`[D1] Fetching discovered sources...`);
 
       console.log(`[D1] Discovered ${discovered.length} sources, fetching them...`);
 
@@ -892,12 +902,12 @@ export class AutonomyOrchestratorService {
         }));
         const evidenceCount = evidenceSources.length;
 
-        // On first iteration with no evidence, inject discovered sources from seed registry
-        // This bypasses the planner and provides real evidence without needing search API
+        // On first iteration with no evidence, inject discovered sources with goal-aware routing
+        // Routes goal text to appropriate arxiv category (math.NT for math, cs.AI for AI, etc.)
         let didBootstrap = false;
         if (iteration === 0 && evidenceCount === 0) {
-          console.log(`\n[Iteration 1] Bootstrapping with discovered sources...`);
-          const d1Result = await this.injectDiscoveredSourceActions(goalId, 'technical', 3);
+          console.log(`\n[Iteration 1] Bootstrapping with goal-aware source discovery...`);
+          const d1Result = await this.injectDiscoveredSourceActionsWithGoalAwareness(goalId, goalText, 3);
           console.log(`[Iteration 1] D1 bootstrap: discovered=${d1Result.discoveredCount}, fetched=${d1Result.fetchedCount}, evidence=${d1Result.evidenceCreated}`);
           actionsExecuted += d1Result.fetchedCount;
           didBootstrap = d1Result.evidenceCreated > 0;
