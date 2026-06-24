@@ -1,0 +1,31 @@
+AgentCo 5-Minute Unconstrained Autonomy Run
+=====================================
+
+Duration: 303.22 seconds (5.05 minutes)
+Target: 300 seconds (5 minutes)
+Full Duration Achieved: YES ✅
+
+Goal: Investigate how autonomous systems handle ambiguity and uncertainty
+
+Results:
+- Actions Executed: 136
+- Claims Generated: 0
+- Final Status: completed
+
+Learning Systems:
+- Reputation System: Active (4-dimensional)
+- Adaptive Strategy: Active (ROI optimization)
+- Governance System: Active (weighted voting)
+- Coalition Formation: Active (team assembly)
+- Loop Detection: Active (pattern analysis)
+- Reflection Learning: Active (failure analysis)
+
+Performance:
+- Actions/sec: 0.45
+- Claims/sec: 0.00
+
+API: OpenAI GPT-4 Integration: ACTIVE ✅
+Database: PostgreSQL Persistence: ACTIVE ✅
+Web Research: 5 Sources Integration: ACTIVE ✅
+
+Generated: 2026-06-24T04:16:24.784Z
