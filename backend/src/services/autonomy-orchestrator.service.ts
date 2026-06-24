@@ -113,12 +113,33 @@ export class AutonomyOrchestratorService {
       console.log(`\n[D1] Discovering sources with goal-aware routing...`);
       console.log(`[D1] Goal: "${goalText}"`);
 
-      // Use scientific pack for academic research with goal-aware arxiv category selection
-      const discovered = await this.sourceDiscovery.discoverSourcesWithGoalAwareness(goalText, 'scientific', maxUrls);
+      // First attempt: fetch actual arXiv papers via API (no API key needed)
+      // This returns real paper abstracts (/abs/ pages), not just listing pages
+      console.log(`[D1] Attempting arXiv API for real paper abstracts...`);
+      const papers = await this.sourceDiscovery.discoverPapersViaArxivApi(goalText, undefined, maxUrls);
+      console.log(`[D1] arXiv API returned ${papers.length} papers`);
 
-      console.log(`[D1] Goal-aware routing selected arxiv category based on goal keywords`);
+      // Fallback to listing pages if API returns nothing
+      let discovered: any[] = [];
+      if (papers.length === 0) {
+        console.log(`[D1] No papers from API, falling back to discovery packs...`);
+        discovered = await this.sourceDiscovery.discoverSourcesWithGoalAwareness(goalText, 'scientific', maxUrls);
+      } else {
+        // Convert paper results to DiscoveredSource format
+        discovered = papers.map(p => ({
+          source_url: p.url,
+          discovery_method: 'seed' as const,
+          source_domain: 'arxiv.org',
+          source_pack: 'scientific',
+          topic_hint: `arXiv paper (via API)`,
+          trust_tier: 'seed' as const,
+          allowed_to_fetch: true,
+          reason_allowed: `arXiv API - goal-aware search`,
+          risk_classification: 'safe' as const,
+        }));
+      }
+
       console.log(`[D1] Fetching discovered sources...`);
-
       console.log(`[D1] Discovered ${discovered.length} sources, fetching them...`);
 
       // Execute FETCH_PAGE for each discovered URL
