@@ -320,8 +320,38 @@ export class BoundedCivilizationLearningRun {
           continue;
         }
 
+        const sourceId = uuidv4();
+
+        // IMPORTANT: Persist evidence to autonomy_evidence so claims can link to real sources
+        try {
+          await db.query(
+            `INSERT INTO autonomy_evidence (
+              id, source_id, url, title, snippet, retrieved_at, content_hash,
+              source_type, is_public_access, created_at
+            ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, NOW())`,
+            [
+              uuidv4(),
+              sourceId,
+              source.source_url,
+              result.title || 'Untitled',
+              result.content.substring(0, 2000), // First 2000 chars as snippet
+              result.contentHash,
+              'web',
+              true,
+            ]
+          );
+        } catch (dbError: any) {
+          this.logAuditEvent('evidence_persistence_failed', {
+            url: source.source_url,
+            sourceId,
+            error: dbError.message,
+          });
+          this.warnings.push(`Failed to persist evidence for ${source.source_url}: ${dbError.message}`);
+          continue; // Skip this document if evidence can't be persisted
+        }
+
         documents.push({
-          sourceId: uuidv4(),
+          sourceId,
           url: source.source_url,
           title: result.title || 'Untitled',
           content: result.content,
@@ -331,6 +361,7 @@ export class BoundedCivilizationLearningRun {
 
         this.logAuditEvent('fetch_succeeded', {
           url: source.source_url,
+          sourceId,
           contentLength: result.content.length,
           contentHash: result.contentHash,
         });
@@ -410,10 +441,18 @@ export class BoundedCivilizationLearningRun {
   private async extractClaimsWithOpenAI(document: any): Promise<any[]> {
     const openaiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY;
     if (!openaiKey) {
+      console.warn('  ⚠️ No OpenAI API key available');
+      return [];
+    }
+
+    // Skip if no extracted text
+    if (!document.extractedText || document.extractedText.trim().length === 0) {
+      console.warn(`  ⚠️ No content to extract from: ${document.url}`);
       return [];
     }
 
     try {
+      console.log(`  Calling OpenAI for ${document.url}...`);
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -426,13 +465,14 @@ export class BoundedCivilizationLearningRun {
             {
               role: 'system',
               content: `You are a claim extractor. Extract 1-3 factual claims from the provided content.
-              Return a JSON array with objects having: text (string), confidence (0-1).
-              Claims must be supported by evidence in the content.
-              Do not invent claims not present in the text.`,
+Return ONLY a valid JSON array with objects having: text (string), confidence (0-1 number).
+Example: [{"text": "claim 1", "confidence": 0.9}]
+Claims must be supported by evidence in the content.
+Do not invent claims not present in the text.`,
             },
             {
               role: 'user',
-              content: `Extract claims from this content:\n\nTitle: ${document.title}\n\nContent:\n${document.extractedText}`,
+              content: `Extract claims from:\n\nTitle: ${document.title}\n\nContent:\n${document.extractedText.substring(0, 3000)}`,
             },
           ],
           temperature: 0.3,
@@ -448,29 +488,46 @@ export class BoundedCivilizationLearningRun {
       const content = data.choices?.[0]?.message?.content;
 
       if (!content) {
+        console.warn('  ⚠️ OpenAI returned empty response');
         return [];
       }
 
-      // Parse JSON response
+      // Parse JSON response - handle markdown code blocks and plain JSON
       try {
-        const jsonMatch = content.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (Array.isArray(parsed)) {
+        // Try to extract from markdown code block first
+        let jsonText = content;
+        const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (codeBlockMatch) {
+          jsonText = codeBlockMatch[1].trim();
+        } else {
+          // Try to find JSON array
+          const arrayMatch = content.match(/\[[\s\S]*\]/);
+          if (arrayMatch) {
+            jsonText = arrayMatch[0];
+          }
+        }
+
+        const parsed = JSON.parse(jsonText);
+        if (Array.isArray(parsed)) {
+          if (parsed.length > 0) {
+            console.log(`  ✅ Extracted ${parsed.length} claims from OpenAI`);
             return parsed.map((claim: any) => ({
               id: uuidv4(),
               text: claim.text || '',
-              confidence: claim.confidence || 0.7,
+              confidence: typeof claim.confidence === 'number' ? claim.confidence : 0.7,
             }));
+          } else {
+            console.log(`  ℹ️ OpenAI returned empty array (no claims found in content)`);
+            return [];
           }
         }
-      } catch {
-        // If JSON parsing fails, extract plain text claims
-        return [];
+      } catch (parseError: any) {
+        console.warn(`  ⚠️ Failed to parse OpenAI JSON: ${parseError.message}\n     Response: ${content.substring(0, 150)}`);
       }
 
       return [];
     } catch (error: any) {
+      console.warn(`  ⚠️ OpenAI extraction error: ${error.message}`);
       throw new Error(`OpenAI extraction failed: ${error.message}`);
     }
   }

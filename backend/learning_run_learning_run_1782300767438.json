@@ -1,0 +1,21 @@
+{
+  "runId": "learning_run_1782300767438",
+  "status": "success",
+  "goalText": "Learn about AI autonomy from real sources",
+  "sourcePack": "ai_tech",
+  "sourcesDiscovered": 1,
+  "sourcesAllowed": 1,
+  "sourcesFetched": 0,
+  "documentsFetched": 0,
+  "claimsExtracted": 0,
+  "claimsPersisted": 0,
+  "claimsRouted": 0,
+  "auditEventsLogged": 10,
+  "errors": [],
+  "warnings": [
+    "Failed to fetch: https://openai.com/blog"
+  ],
+  "startedAt": "2026-06-24T11:32:47.438Z",
+  "completedAt": "2026-06-24T11:32:47.801Z",
+  "durationMs": 363
+}
