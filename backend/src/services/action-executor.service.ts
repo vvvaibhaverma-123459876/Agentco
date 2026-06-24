@@ -175,15 +175,16 @@ export class ActionExecutorService {
           const sourceId = uuidv4();
           await db.query(
             `INSERT INTO autonomy_evidence (
-              id, action_id, source_id, url, title, retrieved_at, content_hash,
+              id, action_id, source_id, url, title, snippet, retrieved_at, content_hash,
               source_type, is_public_access, created_at
-            ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, NOW())`,
+            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, NOW())`,
             [
               uuidv4(),
               spec.actionId,
               sourceId,
               url,
               fetchResult.title || 'Fetched Page',
+              fetchResult.content.substring(0, 2000),  // First 2000 chars for extraction
               fetchResult.contentHash,
               'web',
               true,
