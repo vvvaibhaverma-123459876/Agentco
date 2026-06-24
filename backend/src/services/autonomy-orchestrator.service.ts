@@ -757,6 +757,7 @@ export class AutonomyOrchestratorService {
       let terminated = false;
       let terminationReason = '';
       const actionHistory: ActionHistory[] = [];
+      const allCreatedArtifacts: string[] = [];  // Collect artifacts for HTTP response
 
       // Main action loop
       for (let iteration = 0; iteration < maxIterations && !terminated; iteration++) {
@@ -912,6 +913,9 @@ export class AutonomyOrchestratorService {
 
         actionsExecuted++;
 
+        // Collect artifacts for HTTP response
+        allCreatedArtifacts.push(...result.createdArtifacts);
+
         // Track in action history for loop detection
         actionHistory.push({
           actionType: action.actionType,
@@ -977,6 +981,7 @@ export class AutonomyOrchestratorService {
         actionsExecuted,
         status: 'completed',
         reason: terminationReason,
+        artifacts: allCreatedArtifacts,  // Return all artifacts created during loop
       };
     } catch (error: any) {
       console.error(`❌ Action loop failed: ${error.message}`);
