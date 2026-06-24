@@ -17,14 +17,20 @@ import { LoopDetectionResult } from './loop-detector.service';
 import { AutonomyModelSelectionService, ModelDecision } from './autonomy-model-selection.service';
 
 export class AutonomyActionPlannerService {
-  private apiKey: string;
   private modelSelector = new AutonomyModelSelectionService();
 
-  constructor() {
-    this.apiKey = process.env.LLM_API_KEY || '';
-    if (!this.apiKey) {
+  /**
+   * Read the LLM API key at call time. Deferred from the constructor so that merely
+   * importing/constructing this service (e.g. when the orchestrator singleton loads as
+   * part of the HTTP app) does not crash the process when the key is unset. The check
+   * fires only when an actual LLM call is attempted.
+   */
+  private get apiKey(): string {
+    const key = process.env.LLM_API_KEY || '';
+    if (!key) {
       throw new Error('LLM_API_KEY environment variable not set');
     }
+    return key;
   }
 
   /**
