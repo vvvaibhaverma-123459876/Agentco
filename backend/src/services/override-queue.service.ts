@@ -156,21 +156,25 @@ export class OverrideQueueService {
 
     // Fire HTTP POST to webhook (Slack / PagerDuty compatible)
     await new Promise<void>((resolve, reject) => {
-      const url = new URL(webhookUrl);
-      const opts = {
-        hostname: url.hostname,
-        path: url.pathname + url.search,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-      };
-      const mod = url.protocol === 'https:' ? require('https') : require('http');
-      const req = mod.request(opts, (res: any) => {
-        res.on('data', () => {});
-        res.on('end', () => resolve());
-      });
-      req.on('error', reject);
-      req.write(body);
-      req.end();
+      try {
+        const url = new URL(webhookUrl);
+        const opts = {
+          hostname: url.hostname,
+          path: url.pathname + url.search,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+        };
+        const mod = url.protocol === 'https:' ? require('https') : require('http');
+        const req = mod.request(opts, (res: any) => {
+          res.on('data', () => {});
+          res.on('end', () => resolve());
+        });
+        req.on('error', reject);
+        req.write(body);
+        req.end();
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 }

@@ -3,14 +3,7 @@
     [
       "Growth Marketer",
       {
-        "last_trust": 0.6944,
-        "resolved_claims": 36
-      }
-    ],
-    [
-      "Product Manager",
-      {
-        "last_trust": 0.09,
+        "last_trust": 0.6667,
         "resolved_claims": 36
       }
     ],
@@ -18,6 +11,13 @@
       "Finance Controller",
       {
         "last_trust": 0.09,
+        "resolved_claims": 36
+      }
+    ],
+    [
+      "Product Manager",
+      {
+        "last_trust": 0.0875,
         "resolved_claims": 36
       }
     ],
@@ -38,43 +38,43 @@
   ],
   "biggest_correct_call": {
     "agent": "Growth Marketer",
-    "calibration_delta": 0.1702,
-    "claim": "Month 14 CAC will be <= 43.28.",
-    "claim_source": "market_oracle_pre_decision_signal:seed=7319:month=14",
+    "calibration_delta": 0.1015,
+    "claim": "Month 24 CAC will be <= 46.91.",
+    "claim_source": "market_oracle_pre_decision_signal:seed=9999:month=24",
     "confidence": 0.62,
-    "explanation": "CAC actual 41.38 <= 43.28",
-    "month": 14,
+    "explanation": "CAC actual 37.11 <= 46.91",
+    "month": 24,
     "outcome": true,
-    "prediction_id": "662e6806-c0be-4859-9ac4-fb151c3322fd",
-    "resolution_source": "market_oracle_monthly_actual:seed=7319:month=14",
-    "run_id": "pawdent-0476b188-783f-4265-8a7a-65bfa05a0684",
-    "seed": 7319,
-    "simulated_date": "2028-02-01",
+    "prediction_id": "fa36dde9-02f7-4540-814f-cf148f99d1d6",
+    "resolution_source": "market_oracle_monthly_actual:seed=9999:month=24",
+    "run_id": "pawdent-d013b9f2-b8f6-4251-9bac-5869f66d447e",
+    "seed": 9999,
+    "simulated_date": "2028-12-01",
     "trust_after": 0.5,
-    "trust_before": 0.3298
+    "trust_before": 0.3985
   },
   "biggest_wrong_call": {
     "agent": "Growth Marketer",
     "calibration_delta": -0.3968,
-    "claim": "Month 5 CAC will be <= 39.72.",
-    "claim_source": "market_oracle_pre_decision_signal:seed=7319:month=5",
+    "claim": "Month 5 CAC will be <= 35.23.",
+    "claim_source": "market_oracle_pre_decision_signal:seed=9999:month=5",
     "confidence": 0.62,
-    "explanation": "CAC actual 40.72 > 39.72",
+    "explanation": "CAC actual 41.92 > 35.23",
     "month": 5,
     "outcome": false,
-    "prediction_id": "09e1891e-9469-4db0-a016-a88ddc4b573a",
-    "resolution_source": "market_oracle_monthly_actual:seed=7319:month=5",
-    "run_id": "pawdent-0476b188-783f-4265-8a7a-65bfa05a0684",
-    "seed": 7319,
+    "prediction_id": "b739fc1e-49cc-4fd9-a799-6da82c71ecfd",
+    "resolution_source": "market_oracle_monthly_actual:seed=9999:month=5",
+    "run_id": "pawdent-d013b9f2-b8f6-4251-9bac-5869f66d447e",
+    "seed": 9999,
     "simulated_date": "2027-05-01",
     "trust_after": 0.0,
     "trust_before": 0.3968
   },
-  "circular_verification_rejection": "circular verification rejected in month 1: circular resolution rejected: claim source and resolution source are the same URL (https:market_oracle_pre_decision_signal:seed=7319:month=1)",
-  "duration_seconds": 30.0,
-  "final_active_subscribers": 5520,
+  "circular_verification_rejection": "circular verification rejected in month 1: circular resolution rejected: claim source and resolution source are the same URL (https:market_oracle_pre_decision_signal:seed=9999:month=1)",
+  "duration_seconds": 120.0,
+  "final_active_subscribers": 6003,
   "final_business_status": "failed",
-  "final_cash_balance": -461171.82,
+  "final_cash_balance": -731568.11,
   "institution": "Pet Care Venture Institution",
   "months": 36,
   "next_12_month_plan": [
@@ -85,9 +85,9 @@
   ],
   "product": "PawDent",
   "profitable_months": 0,
-  "run_id": "pawdent-0476b188-783f-4265-8a7a-65bfa05a0684",
-  "seed": 7319,
-  "total_profit": -711171.82,
-  "total_revenue": 2733975.0,
+  "run_id": "pawdent-d013b9f2-b8f6-4251-9bac-5869f66d447e",
+  "seed": 9999,
+  "total_profit": -981568.11,
+  "total_revenue": 2174987.41,
   "what_the_institution_learned": "PawDent worked when acquisition was paced by resolved CAC and retention, but stockouts and quality gaps could erase demand gains."
 }
