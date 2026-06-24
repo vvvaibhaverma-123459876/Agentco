@@ -33,7 +33,7 @@ CREATE INDEX IF NOT EXISTS idx_goal_actions_type ON autonomy_goal_actions(action
 CREATE TABLE IF NOT EXISTS autonomy_evidence (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   source_id VARCHAR(36) NOT NULL UNIQUE,
-  action_id UUID,
+  action_id VARCHAR(36),
   url TEXT NOT NULL,
   title TEXT,
   snippet TEXT,
@@ -42,14 +42,14 @@ CREATE TABLE IF NOT EXISTS autonomy_evidence (
   source_type VARCHAR(50), -- 'web', 'document', 'analysis', 'agent_output'
   is_public_access BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_actions(id)
+  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE
 );
 
 -- Claims table: Tracks all generated claims with evidence backing
 CREATE TABLE IF NOT EXISTS autonomy_claims (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   claim_id VARCHAR(36) NOT NULL UNIQUE,
-  action_id UUID,
+  action_id VARCHAR(36),
   text TEXT NOT NULL,
   status VARCHAR(50), -- 'draft', 'unsupported', 'weakly_supported', 'supported', 'contradicted'
   confidence FLOAT DEFAULT 0.7,
@@ -61,29 +61,29 @@ CREATE TABLE IF NOT EXISTS autonomy_claims (
   contradicts JSONB DEFAULT '[]',
   contradicted_by JSONB DEFAULT '[]',
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_actions(id),
+  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE,
   CONSTRAINT claim_must_have_evidence CHECK (jsonb_array_length(support_source_ids) > 0)
 );
 
 -- Searches table: Tracks search decisions (precursor to web_search action execution)
 CREATE TABLE IF NOT EXISTS autonomy_searches (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  action_id UUID,
+  action_id VARCHAR(36),
   query TEXT NOT NULL,
   status VARCHAR(50), -- 'initiated', 'completed', 'failed'
   results_count INT DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_actions(id)
+  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE
 );
 
 -- Memory table: Tracks memory updates and learning
 CREATE TABLE IF NOT EXISTS autonomy_memory (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  action_id UUID,
+  action_id VARCHAR(36),
   content JSONB NOT NULL,
   timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_actions(id)
+  CONSTRAINT fk_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE
 );
 
 -- Loop detection table: Tracks potential loops for analysis

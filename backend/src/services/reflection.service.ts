@@ -71,27 +71,30 @@ export class ReflectionService {
 
     const recent = history.slice(-3);
     const action = recent[0];
+    const actionArgs = JSON.stringify(action.args);
 
-    reflection.failurePattern = `Repeated ${action.actionType} with args ${JSON.stringify(action.args)} ${detection.streak} times`;
+    reflection.failurePattern = `${action.actionType} was repeated ${detection.streak} times with args: ${actionArgs}`;
 
-    reflection.summary = `LOOP: Identical action repeat
-Action: ${action.actionType}(${JSON.stringify(action.args).substring(0, 50)})
-Repeated: ${detection.streak} times
-Result: No new artifacts each time`;
+    reflection.summary = `LOOP: Identical action repeat (${detection.streak}x)
+Action type: ${action.actionType}
+Arguments: ${actionArgs}
+Outcome: Blocked every time, zero artifacts created`;
 
-    // Suggest different strategy based on action type
-    if (action.actionType === 'web_search') {
-      reflection.suggestedStrategy =
-        'Try different search query terms, or use FETCH_PAGE directly if you have a URL';
+    // Suggest different strategy based on action type - VERY SPECIFIC
+    if (action.actionType === 'web_search' && actionArgs.includes('query') === false) {
+      reflection.suggestedStrategy = 'ERROR: web_search needs args.query parameter. TRY: {"action_type": "evaluate_progress", "args": {}} OR {"action_type": "fetch_page", "args": {"url": "..."}}';
+    } else if (action.actionType === 'web_search') {
+      reflection.suggestedStrategy = 'web_search with that query failed. TRY: {"action_type": "evaluate_progress", "objective": "check progress", "args": {}}';
+    } else if (action.actionType === 'fetch_page' && actionArgs.includes('url') === false) {
+      reflection.suggestedStrategy = 'ERROR: fetch_page needs args.url parameter. TRY: {"action_type": "web_search", "objective": "search for content", "args": {"query": "your search terms"}}';
     } else if (action.actionType === 'fetch_page') {
-      reflection.suggestedStrategy =
-        'Fetched page may not have useful content. Try WEB_SEARCH with different query terms';
-    } else if (action.actionType === 'extract_evidence' || action.actionType === 'evaluate_progress') {
-      reflection.suggestedStrategy =
-        'Evidence extraction produced nothing new. Gather more evidence with WEB_SEARCH or FETCH_PAGE';
+      reflection.suggestedStrategy = 'fetch_page with that URL returned no useful content. TRY: {"action_type": "web_search", "objective": "find better sources", "args": {"query": "topic name"}}';
+    } else if (action.actionType === 'evaluate_progress') {
+      reflection.suggestedStrategy = 'evaluate_progress with no data changed nothing. TRY: {"action_type": "web_search", "objective": "gather initial evidence", "args": {"query": "search term"}}';
+    } else if (action.actionType === 'spawn_specialist') {
+      reflection.suggestedStrategy = 'spawn_specialist failed due to missing parameters. TRY: {"action_type": "evaluate_progress", "objective": "check current state", "args": {}}';
     } else {
-      reflection.suggestedStrategy =
-        'Try a different action type. Current approach is not producing results';
+      reflection.suggestedStrategy = `CHANGE ACTION TYPE: Do not use ${action.actionType} again. TRY: "evaluate_progress" or "web_search" with proper arguments`;
     }
   }
 
@@ -199,12 +202,34 @@ Action variety: ${uniqueTypes === 1 ? 'single type repeated' : 'multiple types, 
       return '';
     }
 
-    const lines = ['## Recent Learnings from This Goal:'];
-    reflections.forEach((r, i) => {
-      lines.push(`\n### Learning ${i + 1} (confidence: ${(r.confidence * 100).toFixed(0)}%)`);
-      lines.push(`Pattern: ${r.failurePattern}`);
-      lines.push(`Suggestion: ${r.suggestedStrategy}`);
+    const lines = [
+      'CRITICAL LEARNINGS FROM PREVIOUS ATTEMPTS:',
+      '(Use these to make DIFFERENT decisions this iteration)',
+      ''
+    ];
+
+    reflections.slice(0, 3).forEach((r, i) => {
+      lines.push(`Learning ${i + 1} (confidence: ${(r.confidence * 100).toFixed(0)}%):`);
+      lines.push(`  ❌ What FAILED: ${r.failurePattern}`);
+      lines.push(`  💡 Try INSTEAD: ${r.suggestedStrategy}`);
+
+      // Add specific guidance based on loop type
+      if (r.loopType === 'identical_action_repeat') {
+        lines.push(`  ⚠️  The same action was repeated ${r.streak || 3}+ times.`);
+        lines.push(`  ✅ MUST choose a DIFFERENT action type this iteration.`);
+      } else if (r.loopType === 'no_progress_streak') {
+        lines.push(`  ⚠️  No goal progress for ${r.streak || 5} consecutive actions.`);
+        lines.push(`  ✅ Must take action that generates NEW evidence or claims.`);
+      }
+      lines.push('');
     });
+
+    lines.push('CONSTRAINTS TO RESPECT:');
+    lines.push('- If previous attempt used web_search, try fetch_page or evaluate_progress instead');
+    lines.push('- If previous attempt used evaluate_progress, try web_search or fetch_page');
+    lines.push('- Ensure ALL required parameters are provided in your action');
+    lines.push('- DIFFERENT action = choose different action_type than before');
+    lines.push('');
 
     return lines.join('\n');
   }

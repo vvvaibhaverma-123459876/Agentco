@@ -100,23 +100,33 @@ async function runUnconstrainedAutonomy(): Promise<boolean> {
     console.log('\n' + '-'.repeat(80) + '\n');
 
     // Run autonomy loop for exactly 5 minutes, even if loops are detected
+    // IMPORTANT: Reuse goalId across all loops to enable reflection persistence
     let result: any = null;
     let totalActionsExecuted = 0;
     let totalClaimsGenerated = 0;
+    let persistentGoalId = '';
 
     while ((Date.now() - startTime) < timeoutMs) {
       const remainingMs = timeoutMs - (Date.now() - startTime);
       if (remainingMs < 1000) break; // Less than 1 second left, stop
 
+      // Pass reuseGoalId to reuse same goal across loops (enables reflection persistence)
       const loopResult = await orchestrator.executeAutonomyActionLoop(
         goal,
         2000, // Max iterations per call
-        `unconstrained_5min_loop_${startTime}_${totalActionsExecuted}`
+        `unconstrained_5min_loop_${startTime}_${totalActionsExecuted}`,
+        persistentGoalId || undefined // Reuse goalId after first iteration
       );
 
       result = loopResult;
       totalActionsExecuted += loopResult.actionsExecuted || 0;
       totalClaimsGenerated += loopResult.claimsGenerated || 0;
+
+      // Store goalId from first loop to reuse in subsequent loops
+      if (!persistentGoalId && loopResult.goalId) {
+        persistentGoalId = loopResult.goalId;
+        console.log(`📌 Persistent Goal ID: ${persistentGoalId}`);
+      }
 
       // If orchestrator returned, it means goal completed or loop detected
       // Continue running until 5 minutes is up

@@ -26,10 +26,55 @@ export class AutonomyActionPlannerService {
   }
 
   /**
-   * Call OpenAI API using native fetch
+   * Validate required parameters for each action type
    */
-  private async callOpenAI(messages: Array<{ role: string; content: string }>): Promise<string> {
+  private validateActionParameters(actionType: string, args: any): { valid: boolean; error?: string } {
+    const requiredParams: Record<string, string[]> = {
+      web_search: ['query'],
+      fetch_page: ['url'],
+      extract_evidence: ['content', 'source'],
+      generate_claim: ['text', 'evidence_sources'],
+      update_memory: ['content'],
+      evaluate_progress: [],
+      spawn_specialist: ['role', 'objective', 'goalId'],
+      replan: [],
+      terminate: [],
+    };
+
+    const required = requiredParams[actionType] || [];
+    for (const param of required) {
+      if (!args || !(param in args) || !args[param]) {
+        return {
+          valid: false,
+          error: `Missing required parameter: "${param}" for action type "${actionType}"`,
+        };
+      }
+    }
+
+    return { valid: true };
+  }
+
+  /**
+   * Call OpenAI API using native fetch with parameter validation
+   */
+  private async callOpenAI(
+    messages: Array<{ role: string; content: string }>,
+    attemptNumber: number = 0,
+    previousError?: string
+  ): Promise<string> {
     const apiUrl = 'https://api.openai.com/v1/chat/completions';
+
+    // Add error feedback to messages on retry
+    let messagesWithFeedback = [...messages];
+    if (attemptNumber > 0 && previousError) {
+      messagesWithFeedback = [
+        ...messages.slice(0, -1),
+        {
+          role: 'user',
+          content: `${messages[messages.length - 1].content}\n\nIMPORTANT: Your previous response had an issue: ${previousError}\nPlease provide a corrected response with all required parameters.`,
+        },
+      ];
+    }
 
     let lastError;
     for (let attempt = 0; attempt < 3; attempt++) {
@@ -45,8 +90,8 @@ export class AutonomyActionPlannerService {
           },
           body: JSON.stringify({
             model: 'gpt-4o-mini',
-            messages,
-            max_tokens: 400,
+            messages: messagesWithFeedback,
+            max_tokens: 500,
             temperature: 0.7,
           }),
           signal: controller.signal,
@@ -141,6 +186,7 @@ export class AutonomyActionPlannerService {
 
   /**
    * Decide the next action given goal context and loop status
+   * Includes parameter validation and fallback strategy
    */
   async planNextAction(
     goalId: string,
@@ -165,37 +211,97 @@ export class AutonomyActionPlannerService {
       }
     }
 
-    // Use LLM to decide next action
+    // Use LLM to decide next action with parameter validation and retry
     const prompt = this.buildDecisionPrompt(currentState);
     const systemPrompt = this.buildSystemPrompt();
 
-    const content = await this.callOpenAI([
-      {
-        role: 'system',
-        content: systemPrompt,
-      },
-      {
-        role: 'user',
-        content: prompt,
-      },
-    ]);
+    let actionData: any = null;
+    let lastValidationError: string | undefined;
+    let attemptCount = 0;
 
-    // Parse LLM decision
-    const actionData = this.parseLLMDecision(content);
+    // Try up to 2 times with feedback
+    while (attemptCount < 2 && !actionData) {
+      try {
+        const content = await this.callOpenAI(
+          [
+            {
+              role: 'system',
+              content: systemPrompt,
+            },
+            {
+              role: 'user',
+              content: prompt,
+            },
+          ],
+          attemptCount,
+          lastValidationError
+        );
+
+        // Parse LLM decision
+        actionData = this.parseLLMDecision(content);
+
+        // Validate parameters
+        if (actionData && actionData.action_type) {
+          const validation = this.validateActionParameters(actionData.action_type, actionData.args);
+          if (!validation.valid) {
+            lastValidationError = validation.error;
+            actionData = null;
+            attemptCount++;
+            console.log(`Parameter validation failed (attempt ${attemptCount}): ${validation.error}`);
+          }
+        }
+      } catch (error) {
+        console.error(`LLM call error: ${error}`);
+        throw error;
+      }
+    }
+
+    // If LLM failed to provide valid parameters after retries, use fallback
+    if (!actionData) {
+      console.log(`Fallback: LLM failed to generate valid parameters after ${attemptCount} attempts. Using safe default.`);
+      return this.createFallbackAction(goalId, lastValidationError);
+    }
 
     // Convert to ActionSpec
     return this.createActionSpecFromDecision(goalId, actionData);
   }
 
   /**
-   * Build system prompt with specialist context
+   * Build system prompt with specialist context and detailed examples
    */
   private buildSystemPrompt(): string {
     return `You are an autonomous research agent with access to specialized teams. Based on goal progress, decide the NEXT action.
 
-Available action types:
-- search, fetch, extract_evidence, generate_claim, update_memory, evaluate_progress, terminate
-- spawn_specialist: Delegate work to a specialized agent
+CRITICAL: Return valid JSON with ALL required parameters. Missing parameters will cause action to be BLOCKED.
+
+Available action types with REQUIRED parameters:
+
+1. web_search [REQUIRED: query]
+   Example: {"action_type": "web_search", "objective": "Find articles on topic", "args": {"query": "AI safety trends 2026"}}
+
+2. fetch_page [REQUIRED: url]
+   Example: {"action_type": "fetch_page", "objective": "Read the article", "args": {"url": "https://example.com/article"}}
+
+3. extract_evidence [REQUIRED: content, source]
+   Example: {"action_type": "extract_evidence", "objective": "Extract key points", "args": {"content": "text...", "source": "url"}}
+
+4. generate_claim [REQUIRED: text, evidence_sources]
+   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"text": "claim text", "evidence_sources": ["source1", "source2"]}}
+
+5. update_memory [REQUIRED: content]
+   Example: {"action_type": "update_memory", "objective": "Store learning", "args": {"content": {"type": "learning", "text": "..."}}}
+
+6. evaluate_progress [No required parameters]
+   Example: {"action_type": "evaluate_progress", "objective": "Check progress", "args": {}}
+
+7. spawn_specialist [REQUIRED: role, objective, goalId]
+   Example: {"action_type": "spawn_specialist", "objective": "delegate work", "args": {"role": "researcher", "objective": "find more sources", "goalId": "goal-uuid"}}
+
+8. replan [No required parameters]
+   Example: {"action_type": "replan", "objective": "Change strategy", "args": {}}
+
+9. terminate [No required parameters]
+   Example: {"action_type": "terminate", "objective": "End autonomy", "args": {}}
 
 SPECIALIST ROLES (delegate when you need specialized analysis):
 - researcher: General research (search, fetch, extract)
@@ -216,13 +322,14 @@ SPECIALIST ROLES (delegate when you need specialized analysis):
 - evidence_summarizer: Summarize evidence
 - reviewer: Progress evaluation
 
-WHEN TO SPAWN A SPECIALIST:
-1. You have evidence already (don't spawn empty)
-2. Specialist role matches your current need
-3. You want deeper analysis than inline execution
+CRITICAL RULES:
+1. web_search MUST include args.query (NOT just objective)
+2. fetch_page MUST include args.url (NOT just objective)
+3. spawn_specialist MUST include role, objective, AND goalId
+4. Return ONLY valid JSON, no other text
+5. Every required parameter MUST be present and non-empty
 
-Return JSON with: action_type, objective, args, reasoning.
-For spawn_specialist: include role, objective, and optional budget.`;
+Return JSON with: action_type, objective, args, reasoning.`;
   }
 
   /**
@@ -464,6 +571,24 @@ Decide now:
       decidedBy: 'loop_detector',
       decidedAt: new Date(),
       reasoning: `Loop detected: ${loopDetection.loopType} (${loopDetection.streak} iterations)`,
+    };
+  }
+
+  /**
+   * Create fallback action when LLM fails to provide valid parameters
+   */
+  private createFallbackAction(goalId: string, reason?: string): ActionSpec {
+    return {
+      actionId: uuidv4(),
+      actionType: ActionType.EVALUATE_PROGRESS,
+      goalId,
+      objective: 'Safe fallback: Evaluate current progress',
+      args: {},
+      successCriteria: ['Progress metrics calculated', 'Status updated'],
+      riskLevel: RiskLevel.LOW,
+      decidedBy: 'autonomy_planner_fallback',
+      decidedAt: new Date(),
+      reasoning: `LLM parameter validation failed: ${reason || 'Unknown error'}. Using safe default action.`,
     };
   }
 }

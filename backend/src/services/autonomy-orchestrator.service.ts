@@ -700,7 +700,8 @@ export class AutonomyOrchestratorService {
   async executeAutonomyActionLoop(
     goalText: string,
     maxIterations: number = 10,
-    idempotencyKey?: string
+    idempotencyKey?: string,
+    reuseGoalId?: string
   ): Promise<{ goalId: string; claimsGenerated: number; actionsExecuted: number; status: string; reason?: string }> {
     const runId = `action_loop_${Date.now()}`;
     const traceId = uuidv4();
@@ -710,26 +711,30 @@ export class AutonomyOrchestratorService {
     console.log(`   Max iterations: ${maxIterations}`);
 
     try {
-      // Create goal
-      const goalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (
-          id, title, description, source, domain, expected_value, risk_level,
-          autonomy_level_allowed, status, proposed_by
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-        [
-          goalId,
-          goalText.substring(0, 100),
-          goalText,
-          'agent_proposed',
-          'research',
-          0.7,
-          'low',
-          'L3',
-          'approved',
-          'autonomy_action_planner',
-        ]
-      );
+      // Reuse goal if provided, otherwise create new one
+      let goalId = reuseGoalId || uuidv4();
+
+      if (!reuseGoalId) {
+        // Create new goal only if not reusing existing one
+        await db.query(
+          `INSERT INTO autonomy_goals (
+            id, title, description, source, domain, expected_value, risk_level,
+            autonomy_level_allowed, status, proposed_by
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+          [
+            goalId,
+            goalText.substring(0, 100),
+            goalText,
+            'agent_proposed',
+            'research',
+            0.7,
+            'low',
+            'L3',
+            'approved',
+            'autonomy_action_planner',
+          ]
+        );
+      }
 
       // Initialize reputation for goal (society-level entity)
       try {
