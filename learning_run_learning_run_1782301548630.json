@@ -1,0 +1,21 @@
+{
+  "runId": "learning_run_1782301548630",
+  "status": "success",
+  "goalText": "Learn about: software engineering best practices",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 2,
+  "sourcesAllowed": 2,
+  "sourcesFetched": 1,
+  "documentsFetched": 1,
+  "claimsExtracted": 0,
+  "claimsPersisted": 0,
+  "claimsRouted": 0,
+  "auditEventsLogged": 11,
+  "errors": [],
+  "warnings": [
+    "Failed to fetch: https://github.com/trending"
+  ],
+  "startedAt": "2026-06-24T11:45:48.630Z",
+  "completedAt": "2026-06-24T11:45:51.919Z",
+  "durationMs": 3289
+}

@@ -1,0 +1,22 @@
+{
+  "runId": "learning_run_1782301493122",
+  "status": "success",
+  "goalText": "Learn about AI autonomy and self-modification safety",
+  "sourcePack": "ai_tech",
+  "sourcesDiscovered": 3,
+  "sourcesAllowed": 3,
+  "sourcesFetched": 1,
+  "documentsFetched": 1,
+  "claimsExtracted": 0,
+  "claimsPersisted": 0,
+  "claimsRouted": 0,
+  "auditEventsLogged": 14,
+  "errors": [],
+  "warnings": [
+    "Failed to fetch: https://openai.com/blog",
+    "Failed to fetch: https://www.anthropic.com/news"
+  ],
+  "startedAt": "2026-06-24T11:44:53.122Z",
+  "completedAt": "2026-06-24T11:45:01.090Z",
+  "durationMs": 7968
+}

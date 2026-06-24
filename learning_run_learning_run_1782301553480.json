@@ -1,0 +1,21 @@
+{
+  "runId": "learning_run_1782301553480",
+  "status": "success",
+  "goalText": "Learn about: machine learning evaluation metrics",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 2,
+  "sourcesAllowed": 2,
+  "sourcesFetched": 1,
+  "documentsFetched": 1,
+  "claimsExtracted": 0,
+  "claimsPersisted": 0,
+  "claimsRouted": 0,
+  "auditEventsLogged": 11,
+  "errors": [],
+  "warnings": [
+    "Failed to fetch: https://github.com/trending"
+  ],
+  "startedAt": "2026-06-24T11:45:53.480Z",
+  "completedAt": "2026-06-24T11:45:56.047Z",
+  "durationMs": 2567
+}
