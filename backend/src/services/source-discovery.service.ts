@@ -55,6 +55,7 @@ interface ArxivCategory {
 
 export class SourceDiscoveryEngine {
   private seedRegistry: Map<string, SourcePack> = new Map();
+  private arxivCache: Map<string, { url: string; title: string }[]> = new Map();
   private arxivCategories: ArxivCategory[] = [
     { code: 'cs.AI', title: 'Artificial Intelligence', keywords: ['ai', 'autonomy', 'agent', 'intelligence', 'learning', 'llm', 'language model'] },
     { code: 'cs.DS', title: 'Data Structures and Algorithms', keywords: ['algorithm', 'data structure', 'distributed', 'system', 'consensus'] },
@@ -505,52 +506,93 @@ export class SourceDiscoveryEngine {
       return [];
     }
 
-    try {
-      // Build arxiv API query with spaces as separators
-      let query = `all:${keywords}`;
-      if (categoryCode) {
-        query += ` AND cat:${categoryCode}`;
-      }
+    // Build cache key
+    const cacheKey = `${keywords}|${categoryCode || ''}|${maxResults}`;
 
-      const apiUrl = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&max_results=${maxResults}`;
-
-      // Fetch from arxiv API
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        console.warn(`ArXiv API error: ${response.status}`);
-        return [];
-      }
-
-      const xmlContent = await response.text();
-
-      // Parse Atom XML: extract <id> (URL) and <title> (title) from each <entry>
-      const papers: { url: string; title: string }[] = [];
-      const entryPattern = /<entry>[\s\S]*?<id>([^<]+)<\/id>[\s\S]*?<title>([^<]+)<\/title>/gi;
-
-      let match;
-      while ((match = entryPattern.exec(xmlContent)) && papers.length < maxResults) {
-        let url = match[1].trim();
-        const title = match[2]
-          .replace(/&amp;/g, '&')
-          .replace(/&lt;/g, '<')
-          .replace(/&gt;/g, '>')
-          .trim();
-
-        // Normalize URL to https
-        if (url.startsWith('http://arxiv.org')) {
-          url = url.replace('http://', 'https://');
-        }
-
-        if (title.length > 5) {
-          papers.push({ url, title });
-        }
-      }
-
-      return papers;
-    } catch (error: any) {
-      console.warn(`ArXiv API fetch failed: ${error.message}`);
-      return [];
+    // Check cache first
+    if (this.arxivCache.has(cacheKey)) {
+      console.log(`[ArXiv] Cache hit for: ${keywords}`);
+      return this.arxivCache.get(cacheKey)!;
     }
+
+    // Retry with exponential backoff
+    const maxAttempts = 3;
+    const retryDelays = [2000, 4000, 8000]; // 2s, 4s, 8s
+
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        // Build arxiv API query with spaces as separators
+        let query = `all:${keywords}`;
+        if (categoryCode) {
+          query += ` AND cat:${categoryCode}`;
+        }
+
+        const apiUrl = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&max_results=${maxResults}`;
+        console.log(`[ArXiv] Attempt ${attempt + 1}/${maxAttempts}: Fetching ${categoryCode || 'all'} (${keywords})`);
+
+        // Fetch from arxiv API with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+        const response = await fetch(apiUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          console.warn(`[ArXiv] Attempt ${attempt + 1} failed: HTTP ${response.status}`);
+          if (attempt < maxAttempts - 1) {
+            const delay = retryDelays[attempt];
+            console.log(`[ArXiv] Retrying in ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+          continue;
+        }
+
+        const xmlContent = await response.text();
+
+        // Parse Atom XML: extract <id> (URL) and <title> (title) from each <entry>
+        const papers: { url: string; title: string }[] = [];
+        const entryPattern = /<entry>[\s\S]*?<id>([^<]+)<\/id>[\s\S]*?<title>([^<]+)<\/title>/gi;
+
+        let match;
+        while ((match = entryPattern.exec(xmlContent)) && papers.length < maxResults) {
+          let url = match[1].trim();
+          const title = match[2]
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .trim();
+
+          // Normalize URL to https /abs/ (not /list/)
+          if (url.startsWith('http://arxiv.org')) {
+            url = url.replace('http://', 'https://');
+          }
+          if (url.includes('/pdf/')) {
+            url = url.replace('/pdf/', '/abs/');
+          }
+
+          if (title.length > 5) {
+            papers.push({ url, title });
+          }
+        }
+
+        console.log(`[ArXiv] Attempt ${attempt + 1} SUCCESS: fetched ${papers.length} papers (${papers.length > 0 ? 'using /abs/' : 'fallback'})`);
+
+        // Cache result
+        this.arxivCache.set(cacheKey, papers);
+        return papers;
+
+      } catch (error: any) {
+        console.warn(`[ArXiv] Attempt ${attempt + 1} error: ${error.message}`);
+        if (attempt < maxAttempts - 1) {
+          const delay = retryDelays[attempt];
+          console.log(`[ArXiv] Retrying in ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    console.error(`[ArXiv] All ${maxAttempts} attempts failed, falling back to empty result`);
+    return [];
   }
 }
 
