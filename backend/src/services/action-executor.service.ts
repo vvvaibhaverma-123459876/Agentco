@@ -83,6 +83,10 @@ export class ActionExecutorService {
 
     if (result.status === ActionStatus.EXECUTING) {
       result.status = ActionStatus.COMPLETED;
+    }
+
+    // Ensure completedAt is always set for completed/terminal actions
+    if (!result.completedAt) {
       result.completedAt = new Date();
     }
 
