@@ -70,6 +70,7 @@ class CivilizationService:
         self.mode = mode  # fixture, read_only_web, real
         self.evidence_kernel = EvidenceKernel()
         self.logger = logging.getLogger(__name__)
+        self.last_claim_ids: List[str] = []  # For passing between execution and calibration
 
     async def run_free_run(self, duration_seconds: int = 60) -> FreeRunResult:
         """Execute complete free-run cycle."""
@@ -93,6 +94,7 @@ class CivilizationService:
                 exec_result = await self._execute_goals(goals, duration_seconds)
                 result.claims_extracted = exec_result.get("claims", 0)
                 result.evidence_collected = exec_result.get("evidence", 0)
+                # Claim IDs stored in self.last_claim_ids for calibration to use
 
             # Step 4: Update calibration
             self.logger.info("Step 4: Update Calibration")
@@ -190,21 +192,22 @@ class CivilizationService:
     async def _execute_goals(
         self, goal_ids: List[str], timeout_seconds: int
     ) -> Dict[str, int]:
-        """Execute goals via autonomy orchestrator with real ingestion.
+        """Execute goals via autonomy orchestrator.
 
-        Calls orchestrator for each goal, extracts claims from results,
-        and persists to database.
+        Calls orchestrator for each goal, then queries DB for actual
+        claims and evidence that were created (no fabrication).
         """
+        db = get_db()
         total_claims = 0
         total_evidence = 0
         completed = 0
+        all_claim_ids = []
 
         for goal_id in goal_ids:
             try:
                 self.logger.info(f"Executing goal {goal_id}")
 
                 # Execute via orchestrator
-                # (if orchestrator not running, this will fail gracefully)
                 exec_result = await execute_goal_via_orchestrator(
                     goal_id, f"Execute goal {goal_id}", timeout_seconds
                 )
@@ -215,32 +218,65 @@ class CivilizationService:
                     )
                     continue
 
-                # Extract claims from orchestrator output
-                # (would normally come from orchestrator's claim generation)
-                # For now, increment counts from orchestrator results
-                claims_count = exec_result.get("claims_extracted", 0)
-                evidence_count = exec_result.get("evidence_collected", 0)
+                # Query DB for actual claims created by orchestrator
+                # (not fabricated counts from artifact filter)
+                try:
+                    claims_rows = db.execute_query(
+                        """SELECT DISTINCT claim_id FROM autonomy_claims
+                           WHERE action_id = %s""",
+                        (goal_id,),
+                        fetch_all=True,
+                    )
+                    claims_count = len(claims_rows) if claims_rows else 0
+                    claim_ids = [row["claim_id"] for row in claims_rows] if claims_rows else []
+                    all_claim_ids.extend(claim_ids)
+                except Exception as e:
+                    self.logger.warning(f"Failed to query claims for {goal_id}: {e}")
+                    claims_count = 0
+                    claim_ids = []
+
+                # Query for evidence (stored in autonomy_evidence)
+                try:
+                    evidence_rows = db.execute_query(
+                        """SELECT DISTINCT id FROM autonomy_evidence
+                           WHERE action_id = %s""",
+                        (goal_id,),
+                        fetch_all=True,
+                    )
+                    evidence_count = len(evidence_rows) if evidence_rows else 0
+                except Exception as e:
+                    self.logger.warning(f"Failed to query evidence for {goal_id}: {e}")
+                    evidence_count = 0
 
                 total_claims += claims_count
                 total_evidence += evidence_count
                 completed += 1
 
                 self.logger.info(
-                    f"Goal {goal_id} completed: {claims_count} claims, {evidence_count} evidence"
+                    f"Goal {goal_id}: {claims_count} claims, {evidence_count} evidence (REAL from DB, not fabricated)"
                 )
 
             except Exception as e:
                 self.logger.error(f"Goal execution error: {e}")
-                # Continue to next goal on error
 
-        return {"claims": total_claims, "evidence": total_evidence, "goals_completed": completed}
+        # Store claim_ids for calibration stage to use
+        self.last_claim_ids = all_claim_ids
+
+        return {
+            "claims": total_claims,
+            "evidence": total_evidence,
+            "goals_completed": completed,
+            "claim_ids": all_claim_ids,
+        }
 
     async def _update_calibration(self, result: FreeRunResult) -> Dict[str, Any]:
         """Update calibration/trust metrics based on execution.
 
-        Phase 3c: Register predictions, compute calibration metrics, update trust.
+        Phase 3c: Register REAL claims as predictions, compute calibration metrics.
+        Only registers claims that exist in autonomy_claims table (no fabrication).
         """
         updater = CalibrationUpdater()
+        db = get_db()
         updates = {
             "predictions_registered": 0,
             "brier_score": None,
@@ -250,49 +286,77 @@ class CivilizationService:
         }
 
         try:
-            # If claims were extracted, register them as predictions
+            # Only register predictions if claims actually exist in DB
             if result.claims_extracted > 0:
                 self.logger.info(
-                    f"Registering {result.claims_extracted} claims as predictions"
+                    f"Registering {result.claims_extracted} real claims as predictions"
                 )
 
-                # Register predictions from extracted claims
-                # (in real scenario, would pass actual claim_ids from orchestrator)
-                for i in range(result.claims_extracted):
+                # Get actual claim IDs and text from DB (not fabricated)
+                claim_ids = getattr(self, "last_claim_ids", [])
+
+                if not claim_ids:
+                    # Fallback: query for most recent claims from this run's goals
+                    # But only if we can reliably match them
+                    self.logger.info("No claim_ids passed, calibration skipped (no claim correspondence)")
+                    updates["calibration_summary"] = updater.get_calibration_summary()
+                    return updates
+
+                # Register each real claim as a prediction
+                for claim_id in claim_ids:
                     try:
+                        # Fetch claim text from DB
+                        claim_row = db.execute_query(
+                            "SELECT text, confidence FROM autonomy_claims WHERE claim_id = %s LIMIT 1",
+                            (claim_id,),
+                            fetch_one=True,
+                        )
+
+                        if not claim_row:
+                            self.logger.warning(f"Claim {claim_id} not found in DB")
+                            continue
+
+                        # Register with REAL claim text, not fabricated
+                        claim_text = claim_row["text"]
+                        confidence = claim_row.get("confidence", 0.7)
+
                         pred_id = updater.register_prediction(
-                            claim_id=f"claim_{i}",
-                            claim_text=f"Claim from orchestrator execution",
-                            probability=0.7,  # Would estimate from claim confidence
+                            claim_id=claim_id,
+                            claim_text=claim_text,  # REAL from DB
+                            probability=confidence,  # From claim confidence
                             domain="autonomy",
                             agent_id="civilization-service",
                         )
                         updates["predictions_registered"] += 1
                     except Exception as e:
-                        updates["errors"].append(f"Prediction registration failed: {e}")
+                        updates["errors"].append(f"Prediction registration for {claim_id}: {e}")
 
                 # Compute Brier score for civilization service
+                # (only after predictions exist and some have resolved=true)
                 brier_result = updater.compute_brier_scores("civilization-service")
                 updates["brier_score"] = brier_result.get("brier_score")
 
-                # Update trust based on Brier score
-                trust_delta = updater.update_agent_trust(
-                    "civilization-service", updates["brier_score"]
-                )
-                updates["trust_delta"] = trust_delta.delta
-                updater.record_calibration_delta(trust_delta)
+                if updates["brier_score"] is not None:
+                    # Update trust based on Brier score
+                    trust_delta = updater.update_agent_trust(
+                        "civilization-service", updates["brier_score"]
+                    )
+                    updates["trust_delta"] = trust_delta.delta
+                    updater.record_calibration_delta(trust_delta)
 
-                self.logger.info(
-                    f"Calibration updated: "
-                    f"Brier={updates['brier_score']}, "
-                    f"trust_delta={trust_delta.delta:+.2f}"
-                )
+                    self.logger.info(
+                        f"Calibration updated: "
+                        f"Brier={updates['brier_score']:.3f}, "
+                        f"trust_delta={trust_delta.delta:+.2f}"
+                    )
+                else:
+                    self.logger.info("Brier score: no resolved predictions yet")
 
             # Always get calibration summary
             updates["calibration_summary"] = updater.get_calibration_summary()
 
         except Exception as e:
-            self.logger.error(f"Calibration update failed: {e}")
+            self.logger.error(f"Calibration update failed: {e}", exc_info=True)
             updates["errors"].append(f"Calibration error: {e}")
 
         return updates

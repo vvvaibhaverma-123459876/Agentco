@@ -95,36 +95,30 @@ class OrchestratorClient:
     ) -> Dict[str, Any]:
         """Process orchestrator response and extract artifacts.
 
+        IMPORTANT: Artifacts returned are bare UUIDs (no prefix).
+        We return them all; claiming layer will query DB to categorize.
+
         Args:
             goal_id: The goal that was executed
             response: Response from orchestrator
 
         Returns:
-            Processed results with counts and IDs
+            Processed results with action count and artifact IDs
         """
         result = {
             "status": "success",
             "goal_id": goal_id,
-            "claims_extracted": 0,
-            "evidence_collected": 0,
             "actions_executed": response.get("actionsExecuted", 0),
             "loop_reason": response.get("reason", ""),
-            "claim_ids": [],
-            "evidence_ids": [],
+            "artifact_ids": [],  # Raw artifact IDs from orchestrator
+            "claims_extracted": 0,  # Will be filled by claiming layer
+            "evidence_collected": 0,  # Will be filled by claiming layer
         }
 
-        # Extract artifacts from response
+        # Collect raw artifacts (bare UUIDs from createdArtifacts)
+        # The claiming layer will query DB to determine which are claims vs evidence
         if "artifacts" in response:
-            artifacts = response["artifacts"]
-
-            # Count evidence and claims
-            evidence_ids = [a for a in artifacts if a.startswith("evidence_")]
-            claim_ids = [a for a in artifacts if a.startswith("claim_")]
-
-            result["evidence_collected"] = len(evidence_ids)
-            result["claims_extracted"] = len(claim_ids)
-            result["evidence_ids"] = evidence_ids
-            result["claim_ids"] = claim_ids
+            result["artifact_ids"] = response["artifacts"]
 
         return result
 
