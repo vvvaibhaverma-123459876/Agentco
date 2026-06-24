@@ -277,6 +277,16 @@ export class ActionExecutorService {
       return;
     }
 
+    // CRITICAL: Validate claim is grounded in source content, not hallucinated
+    const groundingValidation = await this.validateClaimGrounding(claimText, supportSourceIds);
+    if (!groundingValidation.valid) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = `Claim not grounded in sources: ${groundingValidation.reason}`;
+      console.warn(`❌ REJECTED ungrounded claim: "${claimText.substring(0, 80)}..."`);
+      console.warn(`   Reason: ${groundingValidation.reason}`);
+      return;
+    }
+
     const claimId = uuidv4();
     const claim: Claim = {
       claimId,
@@ -311,6 +321,79 @@ export class ActionExecutorService {
     result.createdArtifacts.push(claimId);
     result.observations.claimText = claimText;
     result.observations.supportedBySources = supportSourceIds.length;
+    console.log(`✅ ACCEPTED grounded claim: "${claimText.substring(0, 80)}..."`);
+  }
+
+  /**
+   * Validate that a claim is actually grounded in source material
+   * Reject hallucinated claims that fabricate concepts not in the sources
+   */
+  private async validateClaimGrounding(
+    claimText: string,
+    sourceIds: string[]
+  ): Promise<{ valid: boolean; reason?: string }> {
+    // Fetch source content (abstracts) from evidence table
+    const result = await db.query(
+      `SELECT id, url, snippet FROM autonomy_evidence
+       WHERE id = ANY($1)`,
+      [sourceIds]
+    );
+
+    if (result.rows.length === 0) {
+      return { valid: false, reason: 'No sources found in database' };
+    }
+
+    const sourceContents = result.rows.map(r => r.snippet || r.url).join(' ');
+
+    // Check: claim must reference terms/concepts actually present in sources
+    // Look for proper names, theorems, key concepts that should be grounded
+    const claimLower = claimText.toLowerCase();
+
+    // Red flag patterns: unverifiable theorems or invented proper nouns
+    const redFlags = [
+      /(\d+[a-z]m?\s+theorem)/i,  // "6m Theorem", "3x Theorem" - likely fabricated
+      /theorem for\s+[a-z\s]+that\s+doesn't exist/i,
+      /newly discovered [a-z\s]+theorem/i,
+    ];
+
+    for (const pattern of redFlags) {
+      if (pattern.test(claimText)) {
+        // Check if this specific theorem is mentioned in the sources
+        const theoremMatch = claimText.match(/(\w+\s+theorem)/i);
+        if (theoremMatch) {
+          const theorem = theoremMatch[1];
+          if (!sourceContents.toLowerCase().includes(theorem.toLowerCase())) {
+            return {
+              valid: false,
+              reason: `Theorem "${theorem}" not found in sources`
+            };
+          }
+        }
+      }
+    }
+
+    // Basic check: claim should have some overlap with source terms
+    // Extract key terms from claim
+    const claimTerms = claimText.match(/\b[a-z]{4,}\b/gi) || [];
+    const sourceTerms = sourceContents.toLowerCase();
+
+    let matchCount = 0;
+    for (const term of claimTerms) {
+      if (sourceTerms.includes(term.toLowerCase())) {
+        matchCount++;
+      }
+    }
+
+    // If less than 30% of claim terms appear in sources, likely hallucinated
+    const matchRatio = claimTerms.length > 0 ? matchCount / claimTerms.length : 0;
+    if (matchRatio < 0.3 && claimTerms.length > 5) {
+      return {
+        valid: false,
+        reason: `Only ${(matchRatio * 100).toFixed(0)}% of claim terms found in sources`
+      };
+    }
+
+    return { valid: true };
   }
 
   private async handleUpdateMemory(spec: ActionSpec, result: ActionResult): Promise<void> {
