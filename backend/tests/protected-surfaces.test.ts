@@ -1,5 +1,5 @@
-import { ProtectedSurfaceEnforcerService } from './src/services/protected-surface-enforcer.service';
-import { db } from './src/db/client';
+import { ProtectedSurfaceEnforcerService } from '../src/services/protected-surface-enforcer.service';
+import { db } from '../src/db/client';
 
 async function testProtectedSurfaces() {
   console.log('\n' + '='.repeat(70));

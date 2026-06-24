@@ -37,11 +37,15 @@ export interface ProtectedSurfaceState {
  * Auto-derives surfaces from policy.py and verifies they remain unmodified.
  */
 export class ProtectedSurfaceEnforcerService {
-  // Policy file location: /Users/Zet/agentco/governance/policy.py (absolute path)
-  private POLICY_FILE = '/Users/Zet/agentco/governance/policy.py';
+  // Policy file location: derived from repo root + governance/policy.py
+  private POLICY_FILE: string;
   private protectedSurfaces: Set<string> = new Set();
 
   constructor() {
+    // Derive repo root from backend location: process.cwd() = repo/backend
+    // Go up 1 level: repo/backend -> repo
+    const repoRoot = path.join(process.cwd(), '..');
+    this.POLICY_FILE = path.join(repoRoot, 'governance', 'policy.py');
     this.loadProtectedSurfaces();
   }
 
@@ -84,13 +88,13 @@ export class ProtectedSurfaceEnforcerService {
   async verifyProtectedSurfacesExist(): Promise<ProtectedSurfaceState> {
     const surfaces: ProtectedSurface[] = [];
 
+    // Resolve paths relative to repo root (same as policy.py)
+    const repoRoot = path.join(process.cwd(), '..');
+
     for (const surfacePath of this.protectedSurfaces) {
-      // Resolve relative paths from policy.py's root (/Users/Zet/agentco)
       let fullPath = surfacePath;
       if (!fullPath.startsWith('/')) {
-        // Policy file is at /Users/Zet/agentco/governance/policy.py
-        // So base is /Users/Zet/agentco
-        fullPath = path.join('/Users/Zet/agentco', surfacePath);
+        fullPath = path.join(repoRoot, surfacePath);
       }
 
       const exists = fs.existsSync(fullPath);
