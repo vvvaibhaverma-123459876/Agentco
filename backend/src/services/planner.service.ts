@@ -161,7 +161,7 @@ class PlannerService {
         [planId]
       );
 
-      const steps = result.rows;
+      const steps: Array<{ id: string; step_index: number; depends_on_step_ids?: string[] }> = result.rows;
       const issues: string[] = [];
       const stepIds = new Set(steps.map((s) => s.id));
 
@@ -181,7 +181,7 @@ class PlannerService {
       }
 
       // Check topological order (each step's deps have lower index)
-      const stepIdToIndex = new Map(steps.map((s) => [s.id, s.step_index]));
+      const stepIdToIndex = new Map(steps.map((s: { id: string; step_index: number }) => [s.id, s.step_index]));
       for (const step of steps) {
         const deps = step.depends_on_step_ids || [];
         for (const depId of deps) {

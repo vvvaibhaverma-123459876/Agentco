@@ -128,3 +128,19 @@ export async function issueCredential(agentId: string) {
     },
   };
 }
+
+// Phase 5: Canonical credential routes (stubs for type checking; real implementation in reserve layer)
+export async function getCanonicalCredential(agentId: string): Promise<unknown> {
+  // Stub: Phase 5 feature - get canonical credential from reserve
+  return null;
+}
+
+export async function issueCanonicalCredential(agentId: string): Promise<unknown> {
+  // Stub: Phase 5 feature - issue canonical credential through reserve path
+  throw new Error('Canonical credential issuance not yet implemented. Use reserve/tools/recompute_credential.py');
+}
+
+export async function verifyCanonicalCredential(credential: unknown): Promise<boolean> {
+  // Stub: Phase 5 feature - verify canonical credential signature
+  return false;
+}

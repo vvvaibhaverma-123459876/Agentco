@@ -8,6 +8,7 @@ const DSN = process.env.DATABASE_URL ??
   'postgresql://agentco:password@localhost:5432/agentco';
 
 export const db: Pool = new Pool({ connectionString: DSN });
+export const pool: Pool = db; // Alias for backward compatibility
 
 /** Convenience: run a single parameterised query */
 export async function query<T = Record<string, unknown>>(

@@ -80,7 +80,7 @@ export class LearnerService {
         [input.trajectoryIds]
       );
 
-      const simulations = simCheck.rows.map((r) => r.is_simulation);
+      const simulations = simCheck.rows.map((r: { is_simulation: boolean }) => r.is_simulation);
       const isMixed = simulations.length > 1 || (simulations.includes(true) && simulations.includes(false));
 
       if (isMixed) {
