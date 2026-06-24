@@ -59,6 +59,12 @@ export class AutonomyActionPlannerService {
   /**
    * Call LLM API using native fetch with parameter validation.
    * Uses model selected by ModelSelectionService and logs decision.
+   *
+   * TODO: Anthropic fallback path is incomplete. Currently assumes OpenAI-compatible /chat/completions,
+   * but Anthropic uses /v1/messages with different request/response format. This code path won't
+   * execute until selectModelForAction() chooses an Anthropic model (currently always gpt-4o-mini).
+   * When fallback is enabled, either: (a) detect provider and format differently, or (b) use
+   * claude-js SDK instead of raw fetch.
    */
   private async callOpenAI(
     messages: Array<{ role: string; content: string }>,
@@ -73,7 +79,7 @@ export class AutonomyActionPlannerService {
         ? 'https://api.anthropic.com/v1'
         : 'https://api.openai.com/v1';
     }
-    const apiUrl = `${baseUrl}/chat/completions`;
+    const apiUrl = `${baseUrl}/chat/completions`;  // TODO: Anthropic endpoint is different (/messages not /chat/completions)
 
     // Add error feedback to messages on retry
     let messagesWithFeedback = [...messages];
