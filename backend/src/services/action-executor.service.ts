@@ -329,6 +329,11 @@ export class ActionExecutorService {
   /**
    * Validate that a claim is actually grounded in source material
    * Reject hallucinated claims that fabricate concepts not in the sources
+   *
+   * Checks:
+   * 1. Named-concept verification: theorems, authors, specific discoveries mentioned must exist in sources
+   * 2. Term-overlap: 30%+ of claim terms must appear in abstracts (catches generic hallucinations)
+   * 3. Snippet requirement: for claims with specific names/theorems, verify exact text in abstract
    */
   private async validateClaimGrounding(
     claimText: string,
@@ -353,42 +358,45 @@ export class ActionExecutorService {
     }
 
     const sourceContents = result.rows.map(r => r.snippet || r.url).join(' ');
+    const sourceLower = sourceContents.toLowerCase();
 
-    // Check: claim must reference terms/concepts actually present in sources
-    // Look for proper names, theorems, key concepts that should be grounded
-    const claimLower = claimText.toLowerCase();
+    // ===== CHECK 1: Named-Concept Verification =====
+    // Extract named entities: theorem names, author names, specific concepts
+    // Pattern: "[Name] [Noun]" where Name is capitalized and Noun = Theorem|Conjecture|Lemma|Algorithm|Method|etc.
+    // Be strict: capture only 1-2 word names to avoid over-matching
+    const namedConceptPattern = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(theorem|conjecture|lemma|hypothesis|method|algorithm|principle|law|axiom|corollary)\b/gi;
 
-    // Red flag patterns: unverifiable theorems or invented proper nouns
-    const redFlags = [
-      /(\d+[a-z]m?\s+theorem)/i,  // "6m Theorem", "3x Theorem" - likely fabricated
-      /theorem for\s+[a-z\s]+that\s+doesn't exist/i,
-      /newly discovered [a-z\s]+theorem/i,
-    ];
+    const foundConcepts = new Set<string>();
+    let match;
+    while ((match = namedConceptPattern.exec(claimText)) !== null) {
+      // Just capture the concept name + keyword, not the surrounding text
+      foundConcepts.add(`${match[1].toLowerCase()} ${match[2].toLowerCase()}`);
+    }
 
-    for (const pattern of redFlags) {
-      if (pattern.test(claimText)) {
-        // Check if this specific theorem is mentioned in the sources
-        const theoremMatch = claimText.match(/(\w+\s+theorem)/i);
-        if (theoremMatch) {
-          const theorem = theoremMatch[1];
-          if (!sourceContents.toLowerCase().includes(theorem.toLowerCase())) {
-            return {
-              valid: false,
-              reason: `Theorem "${theorem}" not found in sources`
-            };
-          }
-        }
+    // Verify each named concept exists in the source
+    const missingConcepts: string[] = [];
+    for (const concept of foundConcepts) {
+      if (!sourceLower.includes(concept)) {
+        missingConcepts.push(concept);
       }
     }
 
-    // Basic check: claim should have some overlap with source terms
-    // Extract key terms from claim
-    const claimTerms = claimText.match(/\b[a-z]{4,}\b/gi) || [];
-    const sourceTerms = sourceContents.toLowerCase();
+    if (missingConcepts.length > 0) {
+      return {
+        valid: false,
+        reason: `Named concept(s) not found in sources: ${missingConcepts.join(', ')}`
+      };
+    }
+
+    // ===== CHECK 2: Term-Overlap Analysis =====
+    // Extract key terms from claim (4+ chars, non-stopwords)
+    const stopwords = new Set(['the', 'and', 'that', 'this', 'with', 'from', 'have', 'been', 'about', 'also', 'which']);
+    const claimTerms = (claimText.match(/\b[a-z]{4,}\b/gi) || [])
+      .filter(t => !stopwords.has(t.toLowerCase()));
 
     let matchCount = 0;
     for (const term of claimTerms) {
-      if (sourceTerms.includes(term.toLowerCase())) {
+      if (sourceLower.includes(term.toLowerCase())) {
         matchCount++;
       }
     }
@@ -398,8 +406,32 @@ export class ActionExecutorService {
     if (matchRatio < 0.3 && claimTerms.length > 5) {
       return {
         valid: false,
-        reason: `Only ${(matchRatio * 100).toFixed(0)}% of claim terms found in sources`
+        reason: `Only ${(matchRatio * 100).toFixed(0)}% of claim terms found in sources (need ≥30%)`
       };
+    }
+
+    // ===== CHECK 3: Red-Flag Pattern Detection =====
+    // Patterns that strongly indicate fabrication: "Xm Theorem", "newly discovered X", etc.
+    const redFlags = [
+      /(\d+[a-z]m?\s+theorem)/i,  // "6m Theorem", "3x Theorem" - likely fabricated
+      /\b(newly|recently)\s+discovered\s+[a-z\s]+theorem/i,
+      /\b(hypothetical|proposed)\s+[a-z\s]+theorem/i,
+    ];
+
+    for (const pattern of redFlags) {
+      if (pattern.test(claimText)) {
+        // Extract the potentially fabricated concept
+        const conceptMatch = claimText.match(/([a-zA-Z\s]+(?:theorem|conjecture|lemma|method))/i);
+        if (conceptMatch) {
+          const concept = conceptMatch[1].trim().toLowerCase();
+          if (!sourceLower.includes(concept)) {
+            return {
+              valid: false,
+              reason: `Red-flag concept "${concept}" not found in sources`
+            };
+          }
+        }
+      }
     }
 
     return { valid: true };
