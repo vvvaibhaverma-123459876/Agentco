@@ -702,7 +702,7 @@ export class AutonomyOrchestratorService {
     maxIterations: number = 10,
     idempotencyKey?: string,
     reuseGoalId?: string
-  ): Promise<{ goalId: string; claimsGenerated: number; actionsExecuted: number; status: string; reason?: string }> {
+  ): Promise<{ goalId: string; claimsGenerated: number; actionsExecuted: number; status: string; reason?: string; artifacts: string[] }> {
     const runId = `action_loop_${Date.now()}`;
     const traceId = uuidv4();
 
