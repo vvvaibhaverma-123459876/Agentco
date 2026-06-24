@@ -478,6 +478,76 @@ export class SourceDiscoveryEngine {
     const best = scores.sort((a, b) => b.score - a.score)[0];
     return best && best.score > 0 ? best.category : null;
   }
+
+  /**
+   * Fetch papers from arxiv API using goal-based keyword search
+   * Returns (url, title) pairs with high relevance to goal
+   */
+  async discoverPapersViaArxivApi(
+    goal: string,
+    categoryCode?: string,
+    maxResults: number = 10
+  ): Promise<{ url: string; title: string }[]> {
+    // Extract meaningful keywords from goal
+    const keywords = goal
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 4)
+      .map(w => w.replace(/[^a-z0-9]/g, ''))
+      .slice(0, 5)
+      .join('+');
+
+    if (!keywords) {
+      return [];
+    }
+
+    try {
+      // Build arxiv API query
+      let query = `all:${keywords}`;
+      if (categoryCode) {
+        query += `+AND+cat:${categoryCode}`;
+      }
+
+      const apiUrl = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&max_results=${maxResults}`;
+
+      // Fetch from arxiv API
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        console.warn(`ArXiv API error: ${response.status}`);
+        return [];
+      }
+
+      const xmlContent = await response.text();
+
+      // Parse Atom XML: extract <id> (URL) and <title> (title) from each <entry>
+      const papers: { url: string; title: string }[] = [];
+      const entryPattern = /<entry>[\s\S]*?<id>([^<]+)<\/id>[\s\S]*?<title>([^<]+)<\/title>/gi;
+
+      let match;
+      while ((match = entryPattern.exec(xmlContent)) && papers.length < maxResults) {
+        let url = match[1].trim();
+        const title = match[2]
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .trim();
+
+        // Normalize URL to https
+        if (url.startsWith('http://arxiv.org')) {
+          url = url.replace('http://', 'https://');
+        }
+
+        if (title.length > 5) {
+          papers.push({ url, title });
+        }
+      }
+
+      return papers;
+    } catch (error: any) {
+      console.warn(`ArXiv API fetch failed: ${error.message}`);
+      return [];
+    }
+  }
 }
 
 // Singleton instance

@@ -1,0 +1,31 @@
+claim_id,claim_text,llm_confidence,provider,created_at
+fca029bb-efce-4d9c-9bba-d8fadc0a0cec,Andreas & Günther have introduced seven definitions of actual causation.,0.9,openai,2026-06-24 19:06:19.446594
+1d87bd4a-bbb1-43bb-96dd-f19cbd3b9dd3,"The definitions of actual causation are classified into three different types: factual difference-making, counterfactual difference-making, and regularity-based.",0.9,openai,2026-06-24 19:06:19.456161
+8fc8b1b5-4882-4ec4-ae3d-93e1302d9374,"The paper discusses the most recent definition of actual causation, which is factual difference-making.",0.85,openai,2026-06-24 19:06:19.461405
+e7d02231-9472-45f4-841a-5655996179a9,The paper derives empirical scaling laws for domain-specific LLM compression.,0.9,openai,2026-06-24 19:06:19.464329
+c77288da-5c92-4122-ad04-a05e0af0b45f,Large Language Models (LLMs) achieve strong performance across a growing range of domains.,0.9,openai,2026-06-24 19:06:19.470592
+2034423d-437e-4556-bc30-b5354ec34e58,The scale of LLMs poses deployment challenges in applications where latency and cost constraints are critical.,0.9,openai,2026-06-24 19:06:19.472369
+44d06f2a-2743-453f-90d7-a0abc809d190,Andreas & Günther have introduced seven definitions of actual causation.,0.9,openai,2026-06-24 19:06:46.282953
+8d1788cb-f325-4bba-9cfe-65b564e24d4c,"These definitions are classified into three different types of accounts: factual difference-making, counterfactual difference-making, and regularity-based.",0.9,openai,2026-06-24 19:06:46.285253
+d2cc0e16-9c0d-4751-b1d6-619d0d3d8312,"The paper discusses the most recent definition of actual causation, which is factual difference-making.",0.85,openai,2026-06-24 19:06:46.285738
+b21df0c8-fd33-49db-a144-0f2686c0f8af,The paper derives empirical scaling laws for domain-specific LLM compression.,0.9,openai,2026-06-24 19:06:46.286188
+0e70345f-5eb3-4eb6-bc31-e34e53d33fd7,Large Language Models (LLMs) achieve strong performance across a growing range of domains.,0.85,openai,2026-06-24 19:06:46.286637
+7d7b0c3e-ae71-4a20-9e36-338c905cb893,The scale of LLMs poses deployment challenges in applications where latency and cost constraints are critical.,0.9,openai,2026-06-24 19:06:46.287187
+1e16f129-9c99-4428-ac4a-e143ebf3e21f,Andreas & Günther have introduced seven definitions of actual causation.,0.9,openai,2026-06-24 19:06:54.696393
+1fb589e9-ab36-4b39-bfb3-c8498f63b8a1,"These definitions are classified into three different types of accounts: factual difference-making, counterfactual difference-making, and regularity-based.",0.9,openai,2026-06-24 19:06:54.701016
+9bf948e2-9d3d-44a3-9a4b-1cbcf1c0835d,"The paper discusses the most recent definition of actual causation, which is factual difference-making.",0.85,openai,2026-06-24 19:06:54.701653
+c4cd1816-84d2-42f5-b8e6-5169d861ce4d,The paper derives empirical scaling laws for domain-specific LLM compression.,0.9,openai,2026-06-24 19:06:54.702224
+6738be43-dd9f-4202-ac61-c3a9f3edd03e,Large Language Models (LLMs) achieve strong performance across a growing range of domains.,0.85,openai,2026-06-24 19:06:54.703049
+bb9e9d14-c7e7-4f6d-8492-80442ba1f1ba,The scale of LLMs poses deployment challenges in applications where latency and cost constraints are critical.,0.9,openai,2026-06-24 19:06:54.70466
+c46b3253-50cf-4ed2-bb66-0b381636ea19,Andreas & Günther have introduced seven definitions of actual causation.,0.9,openai,2026-06-24 19:07:04.275398
+92cbce18-45f8-4d00-9bdb-831eadd9539f,"These definitions are classified into three different types of accounts: factual difference-making, counterfactual difference-making, and regularity-based.",0.9,openai,2026-06-24 19:07:04.280212
+00f23e5c-5b2d-4ad7-ba5c-07e4193f2d5b,"The paper discusses the most recent definition of actual causation, which is factual difference-making.",0.85,openai,2026-06-24 19:07:04.281538
+54de9ccf-2cc7-4920-ad4d-5257b236e6fd,The paper derives empirical scaling laws for domain-specific LLM compression.,0.9,openai,2026-06-24 19:07:04.282253
+03f1658e-77bd-41c2-ab37-035d6b6ae5dd,LLMs achieve strong performance across a growing range of domains.,0.85,openai,2026-06-24 19:07:04.282903
+689ac0d3-d1b9-4d10-b9f6-8b674d62a8a3,The scale of LLMs poses deployment challenges in applications where latency and cost constraints are critical.,0.9,openai,2026-06-24 19:07:04.283652
+50de8251-b21f-4cdb-a446-68c7aa5aec8a,Andreas & Günther have introduced seven definitions of actual causation.,0.9,openai,2026-06-24 19:07:13.285989
+c3bf0afb-8d17-4af1-a1c7-8f3fea59d738,"These definitions are classified into three different types of accounts: factual difference-making, counterfactual difference-making, and regularity-based.",0.9,openai,2026-06-24 19:07:13.291375
+cdae19ad-5f58-4d81-beb7-32f60dcd40b5,"The paper discusses the most recent definition of actual causation, which is factual difference-making.",0.85,openai,2026-06-24 19:07:13.292473
+13adb183-f592-4176-9fb0-7028c902414e,The paper derives empirical scaling laws for domain-specific LLM compression.,0.9,openai,2026-06-24 19:07:13.295645
+504789d7-1939-4637-a333-9ad113e8de43,The study quantifies how in-domain and general knowledge performance scales with model size.,0.85,openai,2026-06-24 19:07:13.296554
+d266a894-2969-470c-be76-33b8e81283e8,Large Language Models (LLMs) achieve strong performance across a growing range of domains.,0.8,openai,2026-06-24 19:07:13.297688

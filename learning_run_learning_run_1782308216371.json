@@ -1,0 +1,19 @@
+{
+  "runId": "learning_run_1782308216371",
+  "status": "success",
+  "goalText": "Learning cycle 4 on technical topics",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 1,
+  "sourcesAllowed": 1,
+  "sourcesFetched": 3,
+  "documentsFetched": 3,
+  "claimsExtracted": 6,
+  "claimsPersisted": 6,
+  "claimsRouted": 6,
+  "auditEventsLogged": 25,
+  "errors": [],
+  "warnings": [],
+  "startedAt": "2026-06-24T13:36:56.371Z",
+  "completedAt": "2026-06-24T13:37:04.312Z",
+  "durationMs": 7941
+}

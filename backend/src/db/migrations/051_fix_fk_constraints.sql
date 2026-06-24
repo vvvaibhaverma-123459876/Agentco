@@ -35,15 +35,26 @@ ALTER COLUMN action_id TYPE VARCHAR(36) USING (CASE WHEN action_id IS NOT NULL T
 ALTER TABLE IF EXISTS autonomy_memory
 ALTER COLUMN action_id TYPE VARCHAR(36) USING (CASE WHEN action_id IS NOT NULL THEN action_id::text ELSE NULL END);
 
--- Step 2: Create NEW FK constraints with unique names to avoid naming conflicts
-ALTER TABLE autonomy_evidence
-ADD CONSTRAINT fk_evidence_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+-- Step 2: Create NEW FK constraints with unique names to avoid naming conflicts (idempotent)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_evidence_action' AND table_name = 'autonomy_evidence') THEN
+    ALTER TABLE autonomy_evidence
+    ADD CONSTRAINT fk_evidence_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  END IF;
 
-ALTER TABLE autonomy_claims
-ADD CONSTRAINT fk_claims_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_claims_action' AND table_name = 'autonomy_claims') THEN
+    ALTER TABLE autonomy_claims
+    ADD CONSTRAINT fk_claims_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  END IF;
 
-ALTER TABLE autonomy_searches
-ADD CONSTRAINT fk_searches_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_searches_action' AND table_name = 'autonomy_searches') THEN
+    ALTER TABLE autonomy_searches
+    ADD CONSTRAINT fk_searches_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  END IF;
 
-ALTER TABLE autonomy_memory
-ADD CONSTRAINT fk_memory_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'fk_memory_action' AND table_name = 'autonomy_memory') THEN
+    ALTER TABLE autonomy_memory
+    ADD CONSTRAINT fk_memory_action FOREIGN KEY (action_id) REFERENCES autonomy_goal_actions(action_id) ON DELETE CASCADE;
+  END IF;
+END $$;

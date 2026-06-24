@@ -1,0 +1,21 @@
+claim_id,text,source_url,llm_confidence,outcome,confidence,notes
+660e8400-e29b-41d4-a716-446655440001,"LLaMA 2 is released as open-source with 70B parameters, licensed for commercial use","https://arxiv.org/abs/2307.09288",0.92,,0.5,
+660e8400-e29b-41d4-a716-446655440002,"LLaMA 2 Chat models trained with RLHF achieve safety improvements and reduced harmful outputs","https://arxiv.org/abs/2307.09288",0.88,,0.5,
+660e8400-e29b-41d4-a716-446655440003,"Vision Transformers (ViT) transform images into patch sequences and apply self-attention directly to patches","https://arxiv.org/abs/2010.11929",0.90,,0.5,Correct paper ID (ViT original)
+660e8400-e29b-41d4-a716-446655440004,"ViT models require large-scale pretraining (e.g., JFT-300M) to match or exceed CNN performance on ImageNet","https://arxiv.org/abs/2010.11929",0.85,,0.5,Corrected claim to match paper findings
+660e8400-e29b-41d4-a716-446655440005,"QLoRA enables fine-tuning of 65B parameter models on a single 48GB GPU using 4-bit quantization","https://arxiv.org/abs/2305.14314",0.91,,0.5,Correct paper ID (QLoRA original)
+660e8400-e29b-41d4-a716-446655440006,"QLoRA reduces memory requirements from 780GB to 48GB while maintaining full model performance","https://arxiv.org/abs/2305.14314",0.87,,0.5,Specific memory reduction from QLoRA paper
+660e8400-e29b-41d4-a716-446655440007,"Direct Preference Optimization (DPO) is an alternative to RLHF that directly optimizes the language model","https://arxiv.org/abs/2305.18290",0.89,,0.5,DPO paper (not scaling laws)
+660e8400-e29b-41d4-a716-446655440008,"DPO achieves superior performance to RLHF-trained models while being simpler and more stable","https://arxiv.org/abs/2305.18290",0.86,,0.5,DPO core contribution
+660e8400-e29b-41d4-a716-446655440009,"Mixtral of Experts uses sparse routing to activate only 2 out of 8 expert modules per token","https://arxiv.org/abs/2401.04088",0.88,,0.5,Correct paper ID (Mixtral original)
+660e8400-e29b-41d4-a716-446655440010,"Mixtral 8x7B achieves superior performance to Llama 2 70B while using significantly fewer active parameters","https://arxiv.org/abs/2401.04088",0.85,,0.5,Mixtral vs Llama 2 70B comparison
+660e8400-e29b-41d4-a716-446655440011,"Vision Mixture of Experts (V-MoE) scales vision transformers to billions of parameters using sparse routing","https://arxiv.org/abs/2106.05974",0.79,,0.5,Correct paper ID (V-MoE original)
+660e8400-e29b-41d4-a716-446655440012,"V-MoE achieves strong performance on image classification with conditional computation","https://arxiv.org/abs/2106.05974",0.80,,0.5,V-MoE classification results
+660e8400-e29b-41d4-a716-446655440013,"GPT-4 exhibits improved reasoning, accuracy, and safety compared to GPT-3.5","https://arxiv.org/abs/2303.08774",0.91,,0.5,GPT-4 core findings
+660e8400-e29b-41d4-a716-446655440014,"GPT-4 shows improved performance across academic and professional exams including law, medicine, and coding","https://arxiv.org/abs/2303.08774",0.90,,0.5,GPT-4 benchmark results
+660e8400-e29b-41d4-a716-446655440015,"LLaMA foundation models achieve strong performance on academic benchmarks through next-token prediction training only","https://arxiv.org/abs/2302.13971",0.87,,0.5,Correct paper ID (LLaMA foundation original)
+660e8400-e29b-41d4-a716-446655440016,"LLaMA 13B outperforms GPT-3 (175B) on many NLU and NLG tasks despite having 13x fewer parameters","https://arxiv.org/abs/2302.13971",0.84,,0.5,LLaMA vs GPT-3 comparison
+660e8400-e29b-41d4-a716-446655440017,"Mistral 7B language model matches or exceeds Llama 2 13B performance on multiple benchmarks","https://arxiv.org/abs/2310.06825",0.86,,0.5,Correct paper ID (Mistral 7B original)
+660e8400-e29b-41d4-a716-446655440018,"Mistral uses grouped query attention and sliding-window attention to reduce memory and increase inference speed","https://arxiv.org/abs/2310.06825",0.89,,0.5,Mistral architectural innovations
+660e8400-e29b-41d4-a716-446655440019,"Mistral 7B is released under the Apache 2.0 license allowing commercial and research use","https://arxiv.org/abs/2310.06825",0.92,,0.5,Mistral licensing
+660e8400-e29b-41d4-a716-446655440020,"Emergent abilities appear in large language models above a certain scale threshold, unexpectedly suddenly","https://arxiv.org/abs/2206.07682",0.89,,0.5,Correct paper on emergent abilities

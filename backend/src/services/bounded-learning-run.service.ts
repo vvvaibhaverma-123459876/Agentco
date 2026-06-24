@@ -385,25 +385,28 @@ export class BoundedCivilizationLearningRun {
                           source.source_url.includes('/recent');
 
         if (isListPage) {
-          console.log(`  Fetching list page: ${source.source_url}`);
-          const listResult = await this.webAdapter.fetch(source.source_url);
-          if (listResult) {
-            // Extract article URLs with titles for goal-based ranking
-            const articles = this.extractArticlesFromListPage(source.source_url, listResult.content);
-            console.log(`  📄 Found ${articles.length} articles to evaluate`);
+          // For arXiv, prefer API-based discovery for goal-relevant papers
+          if (source.source_url.includes('arxiv.org')) {
+            const categoryMatch = source.source_url.match(/\/list\/([^/]+)/);
+            const category = categoryMatch ? categoryMatch[1] : undefined;
 
-            // Rank articles by goal relevance and select top-3
-            const rankedArticles = this.rankArticlesByGoalRelevance(articles, config.goal);
-            const selectedArticles = rankedArticles.slice(0, 3);
+            console.log(`  📡 Fetching from arXiv API (goal-aware)`);
+            const papers = await this.sourceDiscovery.discoverPapersViaArxivApi(config.goal, category, 10);
 
-            // Fetch selected articles for content extraction
-            for (let j = 0; j < selectedArticles.length; j++) {
-              const article = selectedArticles[j];
-              const articleUrl = article.url;
-              console.log(`    Fetching (score: ${article.relevanceScore?.toFixed(2)}): ${article.title}`);
+            if (papers.length > 0) {
+              console.log(`  📄 Found ${papers.length} papers via arXiv API`);
 
-              try {
-                console.log(`    Fetching article: ${articleUrl}`);
+              // Rank by goal relevance and select top-3
+              const rankedArticles = this.rankArticlesByGoalRelevance(papers, config.goal);
+              const selectedArticles = rankedArticles.slice(0, 3);
+
+              // Fetch selected articles for content extraction
+              for (let j = 0; j < selectedArticles.length; j++) {
+                const article = selectedArticles[j];
+                const articleUrl = article.url;
+                console.log(`    Fetching (score: ${article.relevanceScore?.toFixed(2)}, title: ${article.title})`);
+
+                try {
                 const articleResult = await this.webAdapter.fetch(articleUrl);
                 if (articleResult && articleResult.content.length > 500) {
                   const sourceId = uuidv4();
@@ -445,9 +448,65 @@ export class BoundedCivilizationLearningRun {
               } catch (articleError: any) {
                 this.logAuditEvent('fetch_failed', { url: articleUrl, error: articleError.message });
               }
+              }
             }
-            continue;
+          } else {
+            // Non-arxiv list pages: use HTML scraping fallback
+            const listResult = await this.webAdapter.fetch(source.source_url);
+            if (listResult) {
+              const articles = this.extractArticlesFromListPage(source.source_url, listResult.content);
+              console.log(`  📄 Found ${articles.length} articles to evaluate`);
+
+              const rankedArticles = this.rankArticlesByGoalRelevance(articles, config.goal);
+              const selectedArticles = rankedArticles.slice(0, 3);
+
+              for (let j = 0; j < selectedArticles.length; j++) {
+                const article = selectedArticles[j];
+                const articleUrl = article.url;
+                try {
+                  const articleResult = await this.webAdapter.fetch(articleUrl);
+                  if (articleResult && articleResult.content.length > 500) {
+                    const sourceId = uuidv4();
+                    await db.query(
+                      `INSERT INTO autonomy_evidence (
+                        id, source_id, url, title, snippet, retrieved_at, content_hash,
+                        source_type, is_public_access, created_at
+                      ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, NOW())`,
+                      [
+                        uuidv4(),
+                        sourceId,
+                        articleUrl,
+                        articleResult.title || 'Untitled Article',
+                        articleResult.content.substring(0, 2000),
+                        articleResult.contentHash,
+                        'web',
+                        true,
+                      ]
+                    );
+
+                    documents.push({
+                      sourceId,
+                      url: articleUrl,
+                      title: articleResult.title || 'Untitled Article',
+                      content: articleResult.content,
+                      contentHash: articleResult.contentHash,
+                      fetchedAt: new Date(),
+                    });
+
+                    this.logAuditEvent('fetch_succeeded', {
+                      url: articleUrl,
+                      sourceId,
+                      contentLength: articleResult.content.length,
+                      contentHash: articleResult.contentHash,
+                    });
+                  }
+                } catch (articleError: any) {
+                  this.logAuditEvent('fetch_failed', { url: articleUrl, error: articleError.message });
+                }
+              }
+            }
           }
+          continue;
         }
 
         console.log(`  Fetching: ${source.source_url}`);
@@ -887,48 +946,39 @@ Example: [{"text": "The study found 87% accuracy", "confidence": 0.95}]`,
   private extractArticlesFromListPage(listUrl: string, content: string): ArticleMetadata[] {
     const articles: ArticleMetadata[] = [];
 
-    // ArXiv patterns - extract (URL, Title) pairs
-    if (listUrl.includes('arxiv.org')) {
-      // Extract pairs of: paper ID + title
-      // ArXiv structure: /abs/NNNN.NNNNN followed by title in class="list-title"
-      const abstracts = content.match(/\/abs\/\d{4}\.\d{4,5}/g) || [];
-      const titles = content.match(/<div class="list-title[^"]*">.*?<span class="descriptor">Title:<\/span>\s*([^<]+)/gi) || [];
+    // ArXiv export API format (Atom XML)
+    if (listUrl.includes('arxiv.org') || content.includes('<?xml') || content.includes('<entry>')) {
+      // Parse Atom XML entries: <entry> → <id> (URL) + <title> (title)
+      const entryPattern = /<entry>[\s\S]*?<id>([^<]+)<\/id>[\s\S]*?<title>([^<]+)<\/title>/gi;
 
-      // Pair them up
-      for (let i = 0; i < Math.min(abstracts.length, titles.length); i++) {
-        const paperId = abstracts[i].split('/').pop();
-        const titleMatch = titles[i].match(/<span class="descriptor">Title:<\/span>\s*([^<]+)/i);
-        if (titleMatch && paperId) {
-          const title = titleMatch[1]
-            .replace(/<[^>]*>/g, '')
-            .replace(/&lt;/g, '<')
-            .replace(/&gt;/g, '>')
-            .replace(/&amp;/g, '&')
-            .replace(/\s+/g, ' ')
-            .trim();
+      let match;
+      while ((match = entryPattern.exec(content)) && articles.length < 20) {
+        let arxivUrl = match[1].trim();
+        const title = match[2]
+          .replace(/&amp;/g, '&')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&quot;/g, '"')
+          .replace(/\s+/g, ' ')
+          .trim();
 
-          if (title.length > 10) {
-            articles.push({
-              url: `https://arxiv.org/abs/${paperId}`,
-              title: title.substring(0, 200),
-            });
-          }
+        // Convert arxiv ID to https URL if needed
+        if (arxivUrl.startsWith('http://arxiv.org')) {
+          arxivUrl = arxivUrl.replace('http://', 'https://');
+        } else if (!arxivUrl.startsWith('https://')) {
+          arxivUrl = `https://arxiv.org${arxivUrl}`;
         }
-      }
 
-      // Final fallback: extract all /abs/ URLs with generic titles
-      if (articles.length === 0) {
-        for (const absMatch of abstracts.slice(0, 20)) {
-          const paperId = absMatch.split('/').pop();
+        if (title.length > 5) {
           articles.push({
-            url: `https://arxiv.org${absMatch}`,
-            title: `ArXiv ${paperId}`,
+            url: arxivUrl,
+            title: title.substring(0, 200),
           });
         }
       }
     }
 
-    // Generic article link patterns for non-arxiv sites
+    // Fallback for HTML list pages (non-arxiv)
     if (articles.length === 0) {
       const allLinks = content.match(/<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>/gi) || [];
       for (const link of allLinks.slice(0, 15)) {

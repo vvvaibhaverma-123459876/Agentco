@@ -1,0 +1,19 @@
+{
+  "runId": "learning_run_1782309898360",
+  "status": "success",
+  "goalText": "Final calibration cycle 3",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 1,
+  "sourcesAllowed": 1,
+  "sourcesFetched": 3,
+  "documentsFetched": 3,
+  "claimsExtracted": 6,
+  "claimsPersisted": 6,
+  "claimsRouted": 6,
+  "auditEventsLogged": 25,
+  "errors": [],
+  "warnings": [],
+  "startedAt": "2026-06-24T14:04:58.360Z",
+  "completedAt": "2026-06-24T14:05:05.985Z",
+  "durationMs": 7625
+}
