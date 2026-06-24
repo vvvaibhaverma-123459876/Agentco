@@ -56,11 +56,17 @@ async function testProtectedSurfaces() {
   }
 
   console.log('\n' + '='.repeat(70));
-  if (state.all_exist) {
+  const success = state.all_exist && state.surfaces.length === 4;
+  if (success) {
     console.log('✅ SUCCESS: All 4 protected surfaces exist and verified');
   } else {
-    const missing = state.surfaces.filter(s => !s.exists).map(s => s.path);
-    console.log(`❌ FAILURE: Missing surfaces: ${missing.join(', ')}`);
+    if (state.surfaces.length !== 4) {
+      console.log(`❌ FAILURE: Expected 4 surfaces, got ${state.surfaces.length}`);
+    }
+    if (!state.all_exist) {
+      const missing = state.surfaces.filter((s: any) => !s.exists).map((s: any) => s.path);
+      console.log(`❌ FAILURE: Missing surfaces: ${missing.join(', ')}`);
+    }
   }
   console.log('='.repeat(70) + '\n');
 

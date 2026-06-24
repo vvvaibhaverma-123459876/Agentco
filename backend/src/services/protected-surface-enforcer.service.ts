@@ -37,30 +37,59 @@ export interface ProtectedSurfaceState {
  * Auto-derives surfaces from policy.py and verifies they remain unmodified.
  */
 export class ProtectedSurfaceEnforcerService {
-  // Policy file location: derived from repo root + governance/policy.py
-  private POLICY_FILE: string;
+  // Policy file location: discovered by walking up from __dirname
+  private POLICY_FILE: string | null;
   private protectedSurfaces: Set<string> = new Set();
+  private loadFailed: boolean = false;
 
   constructor() {
-    // Derive repo root from backend location: process.cwd() = repo/backend
-    // Go up 1 level: repo/backend -> repo
-    const repoRoot = path.join(process.cwd(), '..');
-    this.POLICY_FILE = path.join(repoRoot, 'governance', 'policy.py');
+    // Find governance/policy.py by walking up from this file's location (__dirname)
+    // This works regardless of launch directory or build output location
+    this.POLICY_FILE = this.findPolicyFile(__dirname);
+    if (!this.POLICY_FILE) {
+      this.loadFailed = true;
+      console.error('Failed to locate governance/policy.py in repo');
+      return;
+    }
     this.loadProtectedSurfaces();
+  }
+
+  /**
+   * Walk upward from a starting directory to find governance/policy.py
+   */
+  private findPolicyFile(startDir: string): string | null {
+    let current = startDir;
+    for (let i = 0; i < 10; i++) {
+      const candidate = path.join(current, 'governance', 'policy.py');
+      if (fs.existsSync(candidate)) {
+        return candidate;
+      }
+      const parent = path.dirname(current);
+      if (parent === current) break; // reached filesystem root
+      current = parent;
+    }
+    return null;
   }
 
   /**
    * Auto-derive protected surfaces from policy.py
    * Extracts the PROTECTED_SURFACES set definition
+   * FAIL-CLOSED: Errors prevent service initialization; empty set is treated as failure
    */
   private loadProtectedSurfaces(): void {
+    if (!this.POLICY_FILE) {
+      this.loadFailed = true;
+      return;
+    }
+
     try {
       const policyContent = fs.readFileSync(this.POLICY_FILE, 'utf-8');
 
       // Extract PROTECTED_SURFACES = { ... }
       const match = policyContent.match(/PROTECTED_SURFACES\s*=\s*\{([^}]+)\}/s);
       if (!match) {
-        console.warn('Could not find PROTECTED_SURFACES in policy.py');
+        this.loadFailed = true;
+        console.error('Could not find PROTECTED_SURFACES in policy.py');
         return;
       }
 
@@ -75,21 +104,48 @@ export class ProtectedSurfaceEnforcerService {
         })
         .filter(line => line.length > 0);
 
+      if (surfaceLines.length === 0) {
+        this.loadFailed = true;
+        console.error('PROTECTED_SURFACES set is empty');
+        return;
+      }
+
       this.protectedSurfaces = new Set(surfaceLines);
       console.log(`✅ Auto-derived ${this.protectedSurfaces.size} protected surfaces from policy.py`);
     } catch (error) {
+      this.loadFailed = true;
       console.error('Failed to load protected surfaces:', error);
     }
   }
 
   /**
    * Verify all protected surfaces exist
+   * FAIL-CLOSED: If load failed or no surfaces, report all_exist=false
    */
   async verifyProtectedSurfacesExist(): Promise<ProtectedSurfaceState> {
     const surfaces: ProtectedSurface[] = [];
 
-    // Resolve paths relative to repo root (same as policy.py)
-    const repoRoot = path.join(process.cwd(), '..');
+    // If policy.py load failed, return failed state immediately
+    if (this.loadFailed || this.protectedSurfaces.size === 0) {
+      console.error('❌ Cannot verify surfaces: policy.py load failed or surfaces set is empty');
+      return {
+        surfaces: [],
+        all_exist: false,
+        verified_at: new Date(),
+      };
+    }
+
+    // Find repo root from policy.py directory
+    if (!this.POLICY_FILE) {
+      console.error('❌ Cannot verify surfaces: policy.py path not set');
+      return {
+        surfaces: [],
+        all_exist: false,
+        verified_at: new Date(),
+      };
+    }
+    const policyDir = path.dirname(this.POLICY_FILE);
+    const repoRoot = path.dirname(policyDir); // governance -> repo
 
     for (const surfacePath of this.protectedSurfaces) {
       let fullPath = surfacePath;
@@ -115,7 +171,8 @@ export class ProtectedSurfaceEnforcerService {
       });
     }
 
-    const allExist = surfaces.every(s => s.exists);
+    // all_exist is true only if all surfaces exist AND we have exactly the expected count
+    const allExist = surfaces.length > 0 && surfaces.every(s => s.exists);
 
     if (!allExist) {
       const missing = surfaces.filter(s => !s.exists).map(s => s.path);
@@ -132,6 +189,7 @@ export class ProtectedSurfaceEnforcerService {
   /**
    * Check if a proposed change violates protected surface constraints
    * Used by self-improvement loop (Phase 3) to gate modifications
+   * FAIL-CLOSED: If enforcer failed to initialize, all changes require approval
    */
   async evaluateModificationAttempt(
     filePath: string,
@@ -140,6 +198,16 @@ export class ProtectedSurfaceEnforcerService {
   ): Promise<SurfaceModificationAttempt> {
     // Normalize path for comparison
     const normalizedPath = path.normalize(filePath);
+
+    // If enforcer failed to load, fail closed: require human approval for all changes
+    if (this.loadFailed || this.protectedSurfaces.size === 0) {
+      return {
+        surface_path: filePath,
+        proposed_change: proposedChange.substring(0, 200),
+        risk_level: riskLevel,
+        requires_human_approval: true, // FAIL CLOSED
+      };
+    }
 
     // Check if this file is a protected surface
     const isProtected = Array.from(this.protectedSurfaces).some(surface => {
