@@ -19,9 +19,9 @@
  * - trust_tier ('seed', 'verified', 'discovered')
  * - allowed_to_fetch (boolean)
  * - risk_classification ('safe', 'caution', 'blocked')
+ *
+ * Uses native fetch (Node 18+) instead of node-fetch to avoid "Premature close" errors.
  */
-
-import fetch from 'node-fetch';
 
 interface DiscoveredSource {
   source_url: string;
@@ -254,7 +254,12 @@ export class SourceDiscoveryEngine {
     const discovered: DiscoveredSource[] = [];
 
     try {
-      const response = await fetch(feedUrl, { timeout: 8000 });
+      const response = await Promise.race([
+        fetch(feedUrl),
+        new Promise<Response>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 8000)
+        ),
+      ]);
       if (!response.ok) {
         console.warn(`RSS feed not reachable: ${feedUrl}`);
         return [];
@@ -316,7 +321,12 @@ export class SourceDiscoveryEngine {
     const discovered: DiscoveredSource[] = [];
 
     try {
-      const response = await fetch(sitemapUrl, { timeout: 8000 });
+      const response = await Promise.race([
+        fetch(sitemapUrl),
+        new Promise<Response>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 8000)
+        ),
+      ]);
       if (!response.ok) {
         console.warn(`Sitemap not reachable: ${sitemapUrl}`);
         return [];
@@ -372,7 +382,6 @@ export class SourceDiscoveryEngine {
       const response = await Promise.race([
         fetch(url, {
           method: 'HEAD',
-          timeout: 3000,
         }),
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('timeout')), 3000)

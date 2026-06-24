@@ -10,9 +10,10 @@
  * 3. Bing Search API (if BING_SEARCH_API_KEY set)
  * 4. DuckDuckGo with retry logic
  * 5. If all fail: BLOCKED (not synthetic results)
+ *
+ * Uses native fetch (Node 18+) instead of node-fetch to avoid "Premature close" errors.
  */
 
-import fetch from 'node-fetch';
 import { WebAdapter, SearchResult, FetchResult } from './web-adapter';
 
 const USER_AGENT = 'AgentCo-Research/1.0 (autonomous research agent)';
@@ -80,13 +81,18 @@ export class RealWebAdapter implements WebAdapter {
     try {
       const encodedQuery = encodeURIComponent(query);
       const url = `https://customsearch.googleapis.com/cse/v1?q=${encodedQuery}&key=${apiKey}`;
-      const response = await fetch(url, { timeout: FETCH_TIMEOUT_MS });
+      const response = await Promise.race([
+        fetch(url),
+        new Promise<Response>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), FETCH_TIMEOUT_MS)
+        ),
+      ]);
 
       if (!response.ok) {
         throw new Error(`Google Custom Search returned ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       if (!data.items || data.items.length === 0) {
         throw new Error('No results from Google Custom Search');
       }
@@ -111,19 +117,23 @@ export class RealWebAdapter implements WebAdapter {
       const url = `https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}`;
 
       // Try without API key first (Brave allows limited free requests)
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': USER_AGENT,
-          'Accept': 'application/json',
-        },
-        timeout: FETCH_TIMEOUT_MS,
-      });
+      const response = await Promise.race([
+        fetch(url, {
+          headers: {
+            'User-Agent': USER_AGENT,
+            'Accept': 'application/json',
+          },
+        }),
+        new Promise<Response>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), FETCH_TIMEOUT_MS)
+        ),
+      ]);
 
       if (!response.ok) {
         throw new Error(`Brave Search returned ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       if (!data.web || data.web.length === 0) {
         throw new Error('No results from Brave Search');
       }
@@ -151,18 +161,22 @@ export class RealWebAdapter implements WebAdapter {
       const encodedQuery = encodeURIComponent(query);
       const url = `https://api.bing.microsoft.com/v7.0/search?q=${encodedQuery}`;
 
-      const response = await fetch(url, {
-        headers: {
-          'Ocp-Apim-Subscription-Key': apiKey,
-        },
-        timeout: FETCH_TIMEOUT_MS,
-      });
+      const response = await Promise.race([
+        fetch(url, {
+          headers: {
+            'Ocp-Apim-Subscription-Key': apiKey,
+          },
+        }),
+        new Promise<Response>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), FETCH_TIMEOUT_MS)
+        ),
+      ]);
 
       if (!response.ok) {
         throw new Error(`Bing Search returned ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       if (!data.webPages || data.webPages.value.length === 0) {
         throw new Error('No results from Bing Search');
       }
@@ -185,13 +199,17 @@ export class RealWebAdapter implements WebAdapter {
         const encodedQuery = encodeURIComponent(query);
         const url = `https://duckduckgo.com/html/?q=${encodedQuery}`;
 
-        const response = await fetch(url, {
-          headers: {
-            'User-Agent': USER_AGENT,
-            'Accept': 'text/html',
-          },
-          timeout: FETCH_TIMEOUT_MS,
-        });
+        const response = await Promise.race([
+          fetch(url, {
+            headers: {
+              'User-Agent': USER_AGENT,
+              'Accept': 'text/html',
+            },
+          }),
+          new Promise<Response>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), FETCH_TIMEOUT_MS)
+          ),
+        ]);
 
         if (!response.ok) {
           throw new Error(`DuckDuckGo returned ${response.status}`);
@@ -265,7 +283,6 @@ export class RealWebAdapter implements WebAdapter {
       const response = await Promise.race([
         fetch(url, {
           headers: { 'User-Agent': USER_AGENT },
-          timeout: FETCH_TIMEOUT_MS,
           redirect: 'follow',
         }),
         new Promise<Response | null>((_, reject) =>
