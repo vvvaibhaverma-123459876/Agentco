@@ -278,6 +278,8 @@ export class ActionExecutorService {
     }
 
     // CRITICAL: Validate claim is grounded in source content, not hallucinated
+    console.log(`[Claim Validation] Text: "${claimText.substring(0, 60)}..."`);
+    console.log(`[Claim Validation] Source IDs: ${JSON.stringify(supportSourceIds)}`);
     const groundingValidation = await this.validateClaimGrounding(claimText, supportSourceIds);
     if (!groundingValidation.valid) {
       result.status = ActionStatus.BLOCKED;
@@ -332,15 +334,22 @@ export class ActionExecutorService {
     claimText: string,
     sourceIds: string[]
   ): Promise<{ valid: boolean; reason?: string }> {
+    if (sourceIds.length === 0) {
+      return { valid: false, reason: 'No source IDs provided' };
+    }
+
     // Fetch source content (abstracts) from evidence table
+    // NOTE: Query by source_id, not id (they are different columns)
     const result = await db.query(
-      `SELECT id, url, snippet FROM autonomy_evidence
-       WHERE id = ANY($1)`,
+      `SELECT source_id, url, snippet FROM autonomy_evidence
+       WHERE source_id = ANY($1)`,
       [sourceIds]
     );
 
+    console.log(`[Validation] Found ${result.rows.length} sources for IDs: ${JSON.stringify(sourceIds)}`);
+
     if (result.rows.length === 0) {
-      return { valid: false, reason: 'No sources found in database' };
+      return { valid: false, reason: `Sources not found (tried ${sourceIds.length} IDs)` };
     }
 
     const sourceContents = result.rows.map(r => r.snippet || r.url).join(' ');
