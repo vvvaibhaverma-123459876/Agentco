@@ -7,6 +7,7 @@ import { auditRoutes } from './routes/audit.routes';
 import { credentialRoutes } from './routes/credential.routes';
 import { governedRoutes } from './routes/governed.routes';
 import { civilizationRoutes } from './routes/civilization.routes';
+import { institutionsRoutes } from './routes/institutions.routes';
 import { assertProductionSecrets } from './security';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -25,6 +26,7 @@ export async function build() {
   await app.register(credentialRoutes);
   await app.register(governedRoutes);
   await app.register(civilizationRoutes);
+  await app.register(institutionsRoutes);
 
   app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 
