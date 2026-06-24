@@ -11,7 +11,7 @@
  */
 
 import { db } from '../db/client';
-import { AutonomyActionPlannerService } from './autonomy-action-planner.service';
+import { AutonomyModelSelectionService } from './autonomy-model-selection.service';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface ExternalEventDescription {
@@ -36,7 +36,7 @@ export interface GeneratedForecast {
  * Produces confidences through the same LLM infrastructure as the planner
  */
 export class AutonomyForecastingService {
-  private planner = new AutonomyActionPlannerService();
+  private modelSelector = new AutonomyModelSelectionService();
 
   /**
    * Generate a system confidence for an external event
@@ -47,7 +47,7 @@ export class AutonomyForecastingService {
     const prompt = this.buildForecastPrompt(event);
 
     // Get model decision (selects model, logs to ledger)
-    const modelDecision = await this.callModelForForecast(prompt);
+    const modelDecision = await this.callModelForForecast(prompt, event);
 
     // Parse response to extract confidence and reasoning
     const { confidence, reasoning, rawResponse } = this.parseForecastResponse(
@@ -80,33 +80,29 @@ export class AutonomyForecastingService {
   }
 
   /**
-   * Call the model through the same stack as the planner
-   * This ensures the confidence is system-generated, not assistant-authored
+   * Call the model through selectModelForAction + same API as the planner
+   * This ensures the confidence is system-generated and routed through Brick 2 infrastructure
    */
   private async callModelForForecast(
-    prompt: string
+    prompt: string,
+    event: ExternalEventDescription
   ): Promise<{ response: string; decision_id: string; modelCode: string }> {
-    // Use the same API path as the action planner to ensure consistency
+    // Use the model selector to route through Brick 2 infrastructure
+    const modelDecision = await this.modelSelector.selectModelForAction('FORECAST_' + event.category.toUpperCase());
+
     const apiKey = process.env.LLM_API_KEY || '';
     if (!apiKey) {
       throw new Error('LLM_API_KEY not set');
     }
 
-    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+    // Determine API URL based on provider
+    let baseUrl = process.env.LLM_BASE_URL;
+    if (!baseUrl) {
+      baseUrl = modelDecision.provider === 'anthropic'
+        ? 'https://api.anthropic.com/v1'
+        : 'https://api.openai.com/v1';
+    }
     const apiUrl = `${baseUrl}/chat/completions`;
-
-    // Default to gpt-4o-mini (same as planner)
-    const modelCode = 'gpt-4o-mini';
-    const provider = 'openai';
-
-    // Log decision to model_decision_ledger
-    const decision_id = uuidv4();
-    await db.query(
-      `INSERT INTO model_decision_ledger
-       (id, decision_id, model_code, provider, selection_reasoning)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [uuidv4(), decision_id, modelCode, provider, 'forecasting_request']
-    );
 
     try {
       const response = await fetch(apiUrl, {
@@ -116,7 +112,7 @@ export class AutonomyForecastingService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: modelCode,
+          model: modelDecision.modelCode,
           messages: [
             {
               role: 'system',
@@ -153,29 +149,30 @@ REASONING: <text>`,
         throw new Error('Empty response from model');
       }
 
-      // Update decision ledger with token usage
+      // Update decision ledger with token usage (uses decision_id from selectModelForAction)
       const requestTokens = data.usage?.prompt_tokens;
       const responseTokens = data.usage?.completion_tokens;
 
-      await db.query(
-        `UPDATE model_decision_ledger
-         SET request_tokens = $1, response_tokens = $2, success = true, resolved_at = NOW()
-         WHERE decision_id = $3`,
-        [requestTokens, responseTokens, decision_id]
+      await this.modelSelector.updateDecisionOutcome(
+        modelDecision.decision_id,
+        requestTokens || 0,
+        responseTokens || 0,
+        true
       );
 
       return {
         response: content,
-        decision_id,
-        modelCode,
+        decision_id: modelDecision.decision_id,
+        modelCode: modelDecision.modelCode,
       };
     } catch (error) {
-      // Log failure
-      await db.query(
-        `UPDATE model_decision_ledger
-         SET success = false, error_message = $1, resolved_at = NOW()
-         WHERE decision_id = $2`,
-        [String(error), decision_id]
+      // Log failure via model selector
+      await this.modelSelector.updateDecisionOutcome(
+        modelDecision.decision_id,
+        0,
+        0,
+        false,
+        String(error)
       );
 
       throw error;
