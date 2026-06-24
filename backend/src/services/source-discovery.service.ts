@@ -495,17 +495,17 @@ export class SourceDiscoveryEngine {
       .filter(w => w.length > 4)
       .map(w => w.replace(/[^a-z0-9]/g, ''))
       .slice(0, 5)
-      .join('+');
+      .join(' ');  // Use space, not +, to avoid double-encoding
 
     if (!keywords) {
       return [];
     }
 
     try {
-      // Build arxiv API query
+      // Build arxiv API query with spaces as separators
       let query = `all:${keywords}`;
       if (categoryCode) {
-        query += `+AND+cat:${categoryCode}`;
+        query += ` AND cat:${categoryCode}`;
       }
 
       const apiUrl = `https://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&max_results=${maxResults}`;
