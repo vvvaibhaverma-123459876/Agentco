@@ -102,7 +102,8 @@ export class ActionExecutorService {
     }
 
     // Try to use web adapter if available
-    if (this.webAdapter && (await this.webAdapter.isReady())) {
+    // Skip isReady() - it checks Google which may be unreachable
+    if (this.webAdapter) {
       try {
         const searchResults = await this.webAdapter.search(query);
 
@@ -164,7 +165,8 @@ export class ActionExecutorService {
     }
 
     // Try to use web adapter if available
-    if (this.webAdapter && (await this.webAdapter.isReady())) {
+    // Skip isReady() - it checks Google which may be unreachable
+    if (this.webAdapter) {
       try {
         const fetchResult = await this.webAdapter.fetch(url);
 
