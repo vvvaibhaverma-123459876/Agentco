@@ -5,7 +5,7 @@ Foundation for all specialist agents.
 Handles HTTP server, budget tracking, and action execution.
 """
 
-from agents.base_agent import BaseAgent
+from agents.core.base_agent import BaseAgent
 from flask import Flask, request, jsonify
 import threading
 import json
@@ -226,7 +226,11 @@ class SpecialistAgent(BaseAgent):
             role: Specialist role (researcher, fetcher, etc.)
             budget: {"tokens": int, "iterations": int, "seconds": int}
         """
-        super().__init__(name=f"{role}_specialist_{specialist_id}")
+        # Set AGENT_ID as required by BaseAgent
+        self.AGENT_ID = f"{role}_specialist_{specialist_id}"
+        self.MODEL = "mistral:7b"  # Default local model
+
+        super().__init__()
         self.specialist_id = specialist_id
         self.role = role
         self.budget = budget  # {tokens, iterations, seconds}

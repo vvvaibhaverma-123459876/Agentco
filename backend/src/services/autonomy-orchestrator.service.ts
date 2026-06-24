@@ -18,9 +18,10 @@ import { ReflectionService } from './reflection.service';
 import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
-import { ActionSpec, ActionResult, ActionStatus, ActionType } from '../types/action.types';
+import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '../types/action.types';
 import { MockWebAdapter } from '../adapters/mock-web-adapter';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
+import { SourceDiscoveryEngine } from './source-discovery.service';
 
 export interface AutonomyRun {
   id: string;
@@ -83,11 +84,118 @@ export class AutonomyOrchestratorService {
   private teamActivation = new TeamActivationService();
   private reputation = new ReputationLearningService();
   private adaptiveStrategy = new AdaptiveStrategyService();
+  private sourceDiscovery = new SourceDiscoveryEngine();
 
   constructor() {
     // Initialize web adapter based on environment
     const adapter = process.env.NODE_ENV === 'test' ? new MockWebAdapter() : new RealWebAdapter();
     this.actionExecutor.setWebAdapter(adapter);
+  }
+
+  /**
+   * Discover sources from a source pack and execute FETCH_PAGE actions for them
+   * Bypasses the planner - directly fetches from discovered URLs
+   * Used on first iteration to populate real evidence without relying on planner URL generation
+   */
+  private async injectDiscoveredSourceActions(
+    goalId: string,
+    sourcePack: string = 'technical',
+    maxUrls: number = 3
+  ): Promise<{ discoveredCount: number; fetchedCount: number; evidenceCreated: number }> {
+    let fetchedCount = 0;
+    let evidenceCreated = 0;
+
+    try {
+      console.log(`\n[D1] Discovering sources from '${sourcePack}' pack...`);
+      const discovered = await this.sourceDiscovery.discoverSourcesFromPack(sourcePack, maxUrls);
+
+      console.log(`[D1] Discovered ${discovered.length} sources, fetching them...`);
+
+      // Execute FETCH_PAGE for each discovered URL
+      for (const source of discovered) {
+        try {
+          // Create action spec for FETCH_PAGE
+          const actionId = uuidv4();
+          const action: ActionSpec = {
+            actionId,
+            actionType: ActionType.FETCH_PAGE,
+            objective: `Fetch page from discovered source: ${source.source_domain}`,
+            args: {
+              url: source.source_url,
+              sourcePackOrigin: source.source_pack,
+              discoveryMethod: source.discovery_method,
+            },
+            successCriteria: ['content_extracted', 'url_resolved'],
+            riskLevel: RiskLevel.LOW,
+            decidedBy: 'source_discovery_engine',
+            decidedAt: new Date(),
+          };
+
+          // Store action in database
+          await db.query(
+            `INSERT INTO autonomy_goal_actions (
+              id, action_id, goal_id, action_type, objective, args, success_criteria,
+              risk_level, decided_by, decided_at, status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+            [
+              uuidv4(),
+              action.actionId,
+              goalId,
+              action.actionType,
+              action.objective,
+              JSON.stringify(action.args),
+              JSON.stringify(action.successCriteria),
+              action.riskLevel,
+              action.decidedBy,
+              action.decidedAt,
+              'planned',
+            ]
+          );
+
+          // Execute action immediately
+          const result = await this.actionExecutor.executeAction(action);
+
+          if (result.status === ActionStatus.COMPLETED) {
+            fetchedCount++;
+            evidenceCreated += result.createdArtifacts.length;
+
+            console.log(
+              `[D1] ✅ Fetched: ${source.source_domain} - ` +
+                `${result.observations.contentLength || 0} bytes, ` +
+                `${result.createdArtifacts.length} evidence created`
+            );
+          } else {
+            console.log(`[D1] ⚠️  Fetch failed for: ${source.source_domain} - ${result.blockedReason || result.errors?.[0]}`);
+          }
+
+          // Update action with result
+          if (result.completedAt) {
+            await db.query(
+              `UPDATE autonomy_goal_actions SET status = $1, executed_at = $2, result = $3
+               WHERE action_id = $4`,
+              [
+                result.status,
+                result.completedAt,
+                JSON.stringify({
+                  observations: result.observations,
+                  createdArtifacts: result.createdArtifacts,
+                  errors: result.errors || []
+                }),
+                action.actionId,
+              ]
+            );
+          }
+        } catch (error: any) {
+          console.warn(`[D1] Error fetching ${source.source_url}: ${error.message}`);
+        }
+      }
+
+      console.log(`[D1] Completed: fetched ${fetchedCount}/${discovered.length}, created ${evidenceCreated} evidence`);
+      return { discoveredCount: discovered.length, fetchedCount, evidenceCreated };
+    } catch (error: any) {
+      console.warn(`[D1] Source discovery failed: ${error.message}`);
+      return { discoveredCount: 0, fetchedCount: 0, evidenceCreated: 0 };
+    }
   }
 
   /**
@@ -783,6 +891,33 @@ export class AutonomyOrchestratorService {
           snippet: r.snippet,
         }));
         const evidenceCount = evidenceSources.length;
+
+        // On first iteration with no evidence, inject discovered sources from seed registry
+        // This bypasses the planner and provides real evidence without needing search API
+        let didBootstrap = false;
+        if (iteration === 0 && evidenceCount === 0) {
+          console.log(`\n[Iteration 1] Bootstrapping with discovered sources...`);
+          const d1Result = await this.injectDiscoveredSourceActions(goalId, 'technical', 3);
+          console.log(`[Iteration 1] D1 bootstrap: discovered=${d1Result.discoveredCount}, fetched=${d1Result.fetchedCount}, evidence=${d1Result.evidenceCreated}`);
+          actionsExecuted += d1Result.fetchedCount;
+          didBootstrap = d1Result.evidenceCreated > 0;
+
+          if (didBootstrap) {
+            // Re-fetch evidence for use in subsequent planner calls
+            const updatedEvidenceResult = await db.query(
+              `SELECT source_id, url, snippet FROM autonomy_evidence WHERE action_id IN (
+                SELECT action_id FROM autonomy_goal_actions WHERE goal_id = $1
+              ) ORDER BY created_at DESC LIMIT 10`,
+              [goalId]
+            );
+            evidenceSources.length = 0;
+            evidenceSources.push(...updatedEvidenceResult.rows.map(r => ({
+              sourceId: r.source_id,
+              url: r.url,
+              snippet: r.snippet,
+            })));
+          }
+        }
 
         // Check for loops
         const loopDetection = this.loopDetector.detectLoop(actionHistory);
