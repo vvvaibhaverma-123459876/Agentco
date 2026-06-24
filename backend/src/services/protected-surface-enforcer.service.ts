@@ -85,10 +85,12 @@ export class ProtectedSurfaceEnforcerService {
     const surfaces: ProtectedSurface[] = [];
 
     for (const surfacePath of this.protectedSurfaces) {
-      // Handle both absolute and relative paths
+      // Resolve relative paths from policy.py's root (/Users/Zet/agentco)
       let fullPath = surfacePath;
       if (!fullPath.startsWith('/')) {
-        fullPath = path.join(process.cwd(), '..', surfacePath);
+        // Policy file is at /Users/Zet/agentco/governance/policy.py
+        // So base is /Users/Zet/agentco
+        fullPath = path.join('/Users/Zet/agentco', surfacePath);
       }
 
       const exists = fs.existsSync(fullPath);
