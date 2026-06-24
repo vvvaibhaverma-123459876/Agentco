@@ -72,6 +72,7 @@ interface FetchedDocument {
   content: string;
   contentHash: string;
   fetchedAt: Date;
+  relevanceScore?: number;
 }
 
 interface ArticleMetadata {
@@ -436,6 +437,7 @@ export class BoundedCivilizationLearningRun {
                     content: articleResult.content,
                     contentHash: articleResult.contentHash,
                     fetchedAt: new Date(),
+                    relevanceScore: article.relevanceScore,
                   });
 
                   this.logAuditEvent('fetch_succeeded', {
@@ -491,6 +493,7 @@ export class BoundedCivilizationLearningRun {
                       content: articleResult.content,
                       contentHash: articleResult.contentHash,
                       fetchedAt: new Date(),
+                      relevanceScore: article.relevanceScore,
                     });
 
                     this.logAuditEvent('fetch_succeeded', {
@@ -761,12 +764,19 @@ Example: [{"text": "The study found 87% accuracy", "confidence": 0.95}]`,
   }
 
   private classifyEvidence(claims: any[], documents: FetchedDocument[]): any[] {
-    return claims.map(claim => ({
-      ...claim,
-      evidenceType: 'WEBSITE_ARTICLE',
-      classification: 'OBSERVED',
-      supportSourceIds: [claim.sourceId],
-    }));
+    // Map sourceId → document for relevance lookup
+    const docsBySourceId = new Map(documents.map(d => [d.sourceId, d]));
+
+    return claims.map(claim => {
+      const sourceDoc = docsBySourceId.get(claim.sourceId);
+      return {
+        ...claim,
+        evidenceType: 'WEBSITE_ARTICLE',
+        classification: 'OBSERVED',
+        supportSourceIds: [claim.sourceId],
+        relevanceScore: sourceDoc?.relevanceScore,  // Inherit source paper's relevance
+      };
+    });
   }
 
   private async persistClaims(classified: any[], config: BoundedLearningRunConfig): Promise<any[]> {
@@ -787,8 +797,8 @@ Example: [{"text": "The study found 87% accuracy", "confidence": 0.95}]`,
         await db.query(
           `INSERT INTO autonomy_claims (
             id, claim_id, text, status, confidence, support_source_ids,
-            generated_by, generated_at, created_at
-          ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())`,
+            generated_by, generated_at, relevance_score, created_at
+          ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, NOW())`,
           [
             uuidv4(),
             claimId,
@@ -797,6 +807,7 @@ Example: [{"text": "The study found 87% accuracy", "confidence": 0.95}]`,
             claim.confidence,
             JSON.stringify(claim.supportSourceIds),
             claim.provider || 'local_llm',
+            claim.relevanceScore ?? null,
           ]
         );
 
