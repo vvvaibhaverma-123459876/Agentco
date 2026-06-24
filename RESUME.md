@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25
+**Last updated:** 2026-06-25 (rev 2 — adds grounded-claim fix, live-boot defect fixes, e2e smoke suite)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -8,14 +8,40 @@
 
 ## 1. Where we are (ground truth)
 
-The civilization layer has been integrated component-by-component into the deployable app.
+The civilization layer has been integrated component-by-component into the deployable app,
+proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
 
 - **Reachability from `backend/src/server.ts`: 65 / 78 services** (was 5).
 - **Orphans: 13** — all infra/leaf utilities (see §4), intentionally not REST-exposed.
-- **Tests: 129 pass, 2 fail** — both *infrastructure-only* (need Postgres + Kafka, see §2).
+- **Tests:**
+  - Default `jest` (no infra): **132 pass, 0 fail**, 12 gated-skip.
+  - Full Postgres e2e (`RUN_LIVE_SMOKE=1` + real PG + OpenAI): **142 pass, 0 fail**, 2 skip
+    (Kafka publish — needs Kafka, runs under `RUN_KAFKA_SMOKE=1`).
 - **`tsc --noEmit`: 0 errors.**
 - Each integration step has a real test (pure logic tested against the REAL function, never a
-  copy) plus route-level wiring tests via `build()`. Commits are tagged B.1–B.7d.
+  copy) + route-level wiring via `build()`. Commits tagged B.1–B.7d, then the fixes below.
+
+### What was proven end-to-end (real LLM + real DB)
+- **Grounded claim generation works** (commit `6fcc39f`): the autonomy loop now produces claims
+  each carrying a `supportSnippet` that is a verbatim substring of its cited source. Re-ran the
+  number-theory e2e 3× with real OpenAI → 7/7/4 grounded claims, 0 rejected (was 0 claims).
+  The planner was rewritten to quote source text; grounding also catches numeric-prefixed
+  fabrications ("6m theorem"). See memory `e2e_openai_run_2026_06_25`.
+- **Civilization endpoints work live** (commit `9d52290`): booting the real app vs real Postgres
+  surfaced + fixed 3 defects that mocked tests hid — `civilization.solve` was a SIMULATION (now
+  dispatches to real symbolic/ensemble/rag); `POST /api/goals` NOT-NULL violation (now defaults
+  autonomy level to safest `L0`); reputation column drift (now derives from specialist scores).
+  Guarded by `tests/integration/civilization-smoke.test.ts`. See memory `civilization_live_boot_findings`.
+
+### Known remaining gaps (honest)
+- **Evidence quality:** the fetcher stores RAW HTML (128/154 evidence rows contain `<head>/<title>`),
+  so claims can ground against page titles/boilerplate. NEXT highest-leverage fix: strip HTML and
+  store clean abstract text before persisting evidence. (This is why e2e claims fixated on the
+  "6m theorem" arXiv *title*.)
+- **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims.
+- **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
+  or replace the backend.
+- **Learning loop not proven closed end-to-end** (see §5).
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).
@@ -27,39 +53,45 @@ The civilization layer has been integrated component-by-component into the deplo
 
 ---
 
-## 2. Resolving the 2 infrastructure test failures
+## 2. Test tiers & infrastructure (RESOLVED — the 2 old failures are gone)
 
-The failures are **not logic bugs** — the services are real, they just need their backing infra.
+The previous "2 failures" were **not infra failures**:
+- `protected-surfaces.test.ts` was a `console.log` **script with no `it()` blocks** → jest "must
+  contain at least one test". **Converted to real assertions** (commit `9d52290`).
+- `event-bus.test.ts` mixed pure signature/envelope tests with Kafka-dependent `publish()`. **Split**:
+  pure tests always run; Kafka tests gated behind `RUN_KAFKA_SMOKE=1`.
 
-| Failing test | Needs | Why |
-|---|---|---|
-| `tests/integration/event-bus.test.ts` | **Kafka** at `localhost:9092` | `EventBusService.publish` produces to Kafka (`backend/src/db/kafka.ts`, `KAFKA_BROKERS`). |
-| `tests/protected-surfaces.test.ts` | **Postgres** at `localhost:5432` | enforcer writes/reads verification rows in `autonomy_memory`. |
+### Three test tiers
+| Tier | Command | Needs | Result |
+|---|---|---|---|
+| Unit/wiring (default) | `cd backend && npx jest` | nothing | **132 pass, 0 fail**, 12 gated-skip |
+| Postgres e2e | `RUN_LIVE_SMOKE=1 DATABASE_URL=… npx jest` | Postgres + (LLM key for solve) | **142 pass, 0 fail**, 2 Kafka-skip |
+| Kafka e2e | `RUN_KAFKA_SMOKE=1 DATABASE_URL=… npx jest event-bus` | Kafka + Postgres | runs `publish()` |
 
-### Steps to make them pass (everything already exists in `docker-compose.yml`)
+### Bring up infra (all defined in `docker-compose.yml`)
 ```bash
-# 1. Bring up infra (Postgres, Redis, Kafka, Zookeeper, ...). Profiles: minimal|dev|full|demo
-docker compose --profile dev up -d
-
-# 2. Wait for healthchecks, then run DB migrations
-#    DSN default already matches compose: postgresql://agentco:password@localhost:5432/agentco
+docker compose --profile dev up -d            # Postgres, Redis, Kafka, Zookeeper, ...
 cd backend && python3 src/db/run_migrations.py
-
-# 3. (Kafka) topics auto-create on first publish; if disabled, create agentco.events* topics.
-
-# 4. Run the full suite WITHOUT --forceExit (handles should close once infra is real)
-cd backend && npx jest
-# Expect: event-bus + protected-surfaces now green.
+# Postgres e2e (also needs the OpenAI key for /civilization/solve):
+set -a; source .codex.env; set +a; export DATABASE_URL="$AGENTCO_TEST_DATABASE_URL"
+RUN_LIVE_SMOKE=1 npx jest --forceExit
+# Kafka e2e (only when Kafka is up):
+RUN_KAFKA_SMOKE=1 npx jest integration/event-bus --forceExit
 ```
-Env vars consumed (defaults work with compose): `DATABASE_URL`, `KAFKA_BROKERS`,
-`EVENT_BUS_SIGNING_KEY`, `LLM_API_KEY` (only needed when the planner actually calls an LLM).
+Env: `DATABASE_URL`, `KAFKA_BROKERS`, `EVENT_BUS_SIGNING_KEY`, `LLM_API_KEY`/`LLM_BASE_URL`/
+`LLM_MODEL_DEFAULT` (in `.codex.env`). Live boot only enforces production secrets when
+`NODE_ENV=production`; dev boot uses `dev-api-key`.
 
-### Known minor issue to fix while here
-The Jest suite currently needs `--forceExit`: a constructed calibration service
-(`dynamic-calibration` / `phase0b` / `autonomy-forecasting`) holds a **timer handle open**.
-Fix: find the `setInterval` in those constructors and call `.unref()` on the returned timer
-(or guard construction behind a lazy getter, as was done for the planner's `LLM_API_KEY` check
-in `autonomy-action-planner.service.ts`). This also matters for graceful production shutdown.
+### NOTE: this machine has no Docker
+Postgres is running natively (5432) so the Postgres e2e tier passes here. **Kafka is unavailable
+(Docker absent)** so the 2 `publish()` tests skip — they are wired/gated correctly and will run
+wherever Kafka is up. That is the only unproven-here surface.
+
+### Known minor issue: `--forceExit`
+The Jest suite needs `--forceExit`: a constructed calibration service (`dynamic-calibration` /
+`phase0b` / `autonomy-forecasting`) holds a **timer handle open** (a `setInterval`, e.g. the
+"Auto-calibration started (every 60 minutes)" log on boot). Fix: `.unref()` the returned timer,
+or lazy-init it. Also matters for graceful production shutdown.
 
 ---
 
@@ -174,21 +206,36 @@ print("server.ts reaches:", len(server&allsv), "/", len(allsv))
 
 ---
 
-## 7. Suggested resume order
+## 7. Suggested resume order (updated)
 
-1. **Infra green** (§2): `docker compose --profile dev up -d`, migrate, run suite → 131/131.
-2. **Fix the timer `.unref()`** so `--forceExit` is no longer needed (§2).
-3. **Single `agentco` entrypoint** (§3) with the constitution boot-gate + `boot.test.ts`.
-4. **Close the learning loop** with the end-to-end test (§5) — the real unproven gap.
-5. **Wire the infra/leaf services** where they belong in the bootstrap (§4); delete `orchestrator`
-   if confirmed dead.
-6. Keep the discipline: real test (real function, not a copy) + reachability + green suite per commit.
+1. **Clean-abstract extraction** (HIGHEST leverage, §1 gaps): strip HTML in the fetch/extract path
+   so evidence stores real abstract prose, not `<head>/<title>` boilerplate. This directly raises
+   claim quality and stops claims grounding against page titles (the "6m theorem" artifact).
+   Re-run the number-theory e2e as the acceptance check.
+2. **Close the learning loop** end-to-end (§5) — run the autonomy loop twice, assert the second
+   run's decision changes given stored reflections/reputation. The real unproven capability.
+3. **Single `agentco` entrypoint** (§3) with the constitution boot-gate + `boot.test.ts`, and an
+   env-gated Phase -1 that brings up infra (`AGENTCO_MANAGE_INFRA=1`) for dev convenience.
+4. **Fix the timer `.unref()`** so `--forceExit` is no longer needed (§2).
+5. **Repair web search** (DuckDuckGo dead) or add a search API key; **claim dedup/diversity**.
+6. **Wire the infra/leaf services** where they belong in the bootstrap (§4); delete `orchestrator`
+   if confirmed dead. Run the Kafka e2e tier where Kafka is available.
+7. Keep the discipline: real test (real function, not a copy) + reachability + green suite, and
+   **boot against real infra** before claiming a DB/LLM-backed service works (mocks hide schema
+   drift + simulation stubs — that's how the §1 defects were caught).
 
 ---
 
 ## 8. Commit / branch state
 
-All work is on `main`, committed in order: `fface77` (de-stub correction), `56b4287` (audit),
-`6b7eef4` (B.1), `ab112e9` (credential model B), `945b6c9` (B.2), `8ef9fe8` (B.3), `661f544` (B.4),
-`ae7c7c6` (B.5), `5014590` (B.6), `4f6f931`/`2d01a81`/`e6dcc63`/`d9efc1a` (B.7a–d).
-Memory index: `~/.claude/projects/-Users-Zet-Agentco/memory/civilization_audit_phase_a.md`.
+All work on `main`, in order:
+- `fface77` de-stub correction · `56b4287` audit (`CIVILIZATION_AUDIT.md`)
+- `6b7eef4` B.1 grounding · `ab112e9` credential model B
+- `945b6c9` B.2 bridge · `8ef9fe8` B.3 constitution · `661f544` B.4 institutions
+- `ae7c7c6` B.5 trust · `5014590` B.6 calibration
+- `4f6f931`/`2d01a81`/`e6dcc63`/`d9efc1a` B.7a–d remaining capability services
+- `7f24fb2` RESUME.md · `6fcc39f` snippet-quoting grounded claims (e2e proven)
+- `9d52290` de-simulate civilization.solve + 2 schema fixes + live e2e smoke suite
+
+Memory (`~/.claude/projects/-Users-Zet-Agentco/memory/`):
+`civilization_audit_phase_a.md`, `e2e_openai_run_2026_06_25.md`, `civilization_live_boot_findings.md`.
