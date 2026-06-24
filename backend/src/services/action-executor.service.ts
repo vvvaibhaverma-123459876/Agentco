@@ -140,74 +140,16 @@ export class ActionExecutorService {
       }
     }
 
-    // Fallback: Try DuckDuckGo or synthetic search results
-    try {
-      const fallbackResults = await this.getFallbackSearchResults(query);
-      if (fallbackResults && fallbackResults.length > 0) {
-        // Store fallback results as evidence
-        for (const result_ of fallbackResults) {
-          const sourceId = uuidv4();
-          await db.query(
-            `INSERT INTO autonomy_evidence (
-              id, source_id, action_id, url, title, snippet, retrieved_at,
-              content_hash, source_type, is_public_access, created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, NOW())`,
-            [
-              uuidv4(),
-              sourceId,
-              spec.actionId,
-              result_.url,
-              result_.title,
-              result_.snippet,
-              `hash_fallback_${result_.rank || 0}`,
-              'fallback_search',
-              true,
-            ]
-          );
-          result.createdArtifacts.push(sourceId);
-        }
-
-        result.observations.searchQuery = query;
-        result.observations.resultsFound = fallbackResults.length;
-        result.observations.status = 'search_completed_fallback';
-        return;
-      }
-    } catch (fallbackError: any) {
-      console.warn(`Fallback search also failed: ${fallbackError.message}`);
-    }
-
-    // Last resort: record search intent without results
-    const searchId = uuidv4();
-    await db.query(
-      `INSERT INTO autonomy_searches (id, action_id, query, status)
-       VALUES ($1, $2, $3, $4)`,
-      [searchId, spec.actionId, query, 'attempted_no_results']
-    );
-
-    result.observations.searchId = searchId;
-    result.observations.query = query;
-    result.observations.status = 'search_attempted_failed';
-    result.errors = ['Web search unavailable - no results'];
+    // Search failed - BLOCKED (no synthetic fallback)
+    // Return BLOCKED status instead of fake results
+    result.status = ActionStatus.BLOCKED;
+    result.blockedReason = `Web search failed for query: "${query}". No real search results available. Configure SEARCH_ENGINE_API_KEY or BING_SEARCH_API_KEY for real search capability.`;
+    result.observations.searchQuery = query;
+    result.observations.resultsFound = 0;
+    result.observations.status = 'search_blocked_no_real_results';
+    result.errors = [result.blockedReason];
   }
 
-  private async getFallbackSearchResults(query: string): Promise<any[] | null> {
-    // Return generic search results based on query keywords
-    const keywords = query.toLowerCase().split(/\s+/).slice(0, 3);
-    return [
-      {
-        url: `https://search.example.com?q=${encodeURIComponent(query)}`,
-        title: `Search results for "${query}"`,
-        snippet: `Information related to: ${keywords.join(', ')}`,
-        rank: 1,
-      },
-      {
-        url: `https://research.example.com?topic=${keywords[0] || 'research'}`,
-        title: `Research on ${keywords[0] || 'topic'}`,
-        snippet: `Research materials and references for ${query}`,
-        rank: 2,
-      },
-    ];
-  }
 
   private async handleFetchPage(spec: ActionSpec, result: ActionResult): Promise<void> {
     const url = spec.args.url;

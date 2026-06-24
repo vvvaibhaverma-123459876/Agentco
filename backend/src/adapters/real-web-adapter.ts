@@ -2,15 +2,23 @@
  * Real Web Adapter
  * ================
  * Uses actual HTTP requests to search and fetch public web content.
- * For testing or production when real internet access is needed.
+ * Implements real search using multiple strategies - NO synthetic fallback.
+ *
+ * Priority:
+ * 1. Google Custom Search API (if SEARCH_ENGINE_API_KEY set)
+ * 2. Brave Search API (free, no key needed for limited requests)
+ * 3. Bing Search API (if BING_SEARCH_API_KEY set)
+ * 4. DuckDuckGo with retry logic
+ * 5. If all fail: BLOCKED (not synthetic results)
  */
 
 import fetch from 'node-fetch';
 import { WebAdapter, SearchResult, FetchResult } from './web-adapter';
 
 const USER_AGENT = 'AgentCo-Research/1.0 (autonomous research agent)';
-const FETCH_TIMEOUT_MS = 5000;
+const FETCH_TIMEOUT_MS = 8000;
 const MAX_CONTENT_SIZE = 500000; // 500KB
+const MAX_RETRIES = 3;
 
 export class RealWebAdapter implements WebAdapter {
   getName(): string {
@@ -33,90 +41,217 @@ export class RealWebAdapter implements WebAdapter {
   }
 
   async search(query: string): Promise<SearchResult[]> {
-    const apiKey = process.env.SEARCH_ENGINE_API_KEY;
+    console.log(`[RealWebAdapter] Searching for: "${query}"`);
 
-    if (apiKey) {
-      // Real Google Custom Search API
+    // Try each search method in priority order
+    const methods = [
+      () => this.tryGoogleCustomSearch(query),
+      () => this.tryBraveSearch(query),
+      () => this.tryBingSearch(query),
+      () => this.tryDuckDuckGoWithRetry(query),
+    ];
+
+    for (const method of methods) {
       try {
-        const encodedQuery = encodeURIComponent(query);
-        const url = `https://customsearch.googleapis.com/cse/v1?q=${encodedQuery}&key=${apiKey}`;
-        const response = await fetch(url, { timeout: FETCH_TIMEOUT_MS });
-
-        if (!response.ok) {
-          console.warn(`Search failed: ${response.status}`);
-          return this.getSearchFallback(query);
+        const results = await method();
+        if (results && results.length > 0) {
+          console.log(`[RealWebAdapter] ✅ Found ${results.length} results`);
+          return results;
         }
-
-        const data = await response.json();
-        return (data.items || []).map((item: any) => ({
-          url: item.link,
-          title: item.title,
-          snippet: item.snippet,
-          rank: item.position,
-        }));
       } catch (error) {
-        console.error(`Search error: ${error}`);
-        return this.getSearchFallback(query);
+        console.log(`[RealWebAdapter] Method failed: ${error}`);
+        // Continue to next method
       }
-    } else {
-      // Fallback: Use DuckDuckGo HTML scraping (no API key needed)
-      return this.searchDuckDuckGo(query);
+    }
+
+    // ALL methods failed - BLOCKED, not synthetic
+    const errorMsg = `[RealWebAdapter] ❌ ALL search methods failed for: "${query}". No fallback to synthetic.`;
+    console.error(errorMsg);
+    throw new Error(errorMsg);
+  }
+
+  private async tryGoogleCustomSearch(query: string): Promise<SearchResult[]> {
+    const apiKey = process.env.SEARCH_ENGINE_API_KEY;
+    if (!apiKey) {
+      console.log('[RealWebAdapter] No SEARCH_ENGINE_API_KEY, skipping Google Custom Search');
+      return [];
+    }
+
+    try {
+      const encodedQuery = encodeURIComponent(query);
+      const url = `https://customsearch.googleapis.com/cse/v1?q=${encodedQuery}&key=${apiKey}`;
+      const response = await fetch(url, { timeout: FETCH_TIMEOUT_MS });
+
+      if (!response.ok) {
+        throw new Error(`Google Custom Search returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.items || data.items.length === 0) {
+        throw new Error('No results from Google Custom Search');
+      }
+
+      return data.items.map((item: any) => ({
+        url: item.link,
+        title: item.title,
+        snippet: item.snippet,
+        rank: item.position,
+      }));
+    } catch (error) {
+      console.warn(`Google Custom Search failed: ${error}`);
+      return [];
     }
   }
 
-  private async searchDuckDuckGo(query: string): Promise<SearchResult[]> {
+  private async tryBraveSearch(query: string): Promise<SearchResult[]> {
+    // Brave Search has a free tier
     try {
       const encodedQuery = encodeURIComponent(query);
-      const url = `https://duckduckgo.com/html/?q=${encodedQuery}`;
+      // Using Brave's public search (no API key for basic search)
+      const url = `https://api.search.brave.com/res/v1/web/search?q=${encodedQuery}`;
+
+      // Try without API key first (Brave allows limited free requests)
       const response = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT },
+        headers: {
+          'User-Agent': USER_AGENT,
+          'Accept': 'application/json',
+        },
         timeout: FETCH_TIMEOUT_MS,
       });
 
-      if (!response.ok) return this.getSearchFallback(query);
-
-      const content = await response.text();
-      const results: SearchResult[] = [];
-
-      // Extract results from DuckDuckGo HTML
-      const resultRegex = /<a\s+rel="noopener"\s+href="([^"]+)"\s+class="result__url">([^<]+)<\/a>[\s\S]*?<a[^>]*>([^<]+)<\/a>/g;
-      let match;
-      let rank = 1;
-
-      while ((match = resultRegex.exec(content)) && results.length < 10) {
-        results.push({
-          url: match[1],
-          title: match[3] || 'Search Result',
-          snippet: `Result for: ${query}`,
-          rank: rank++,
-        });
+      if (!response.ok) {
+        throw new Error(`Brave Search returned ${response.status}`);
       }
 
-      return results.length > 0 ? results : this.getSearchFallback(query);
+      const data = await response.json();
+      if (!data.web || data.web.length === 0) {
+        throw new Error('No results from Brave Search');
+      }
+
+      return data.web.slice(0, 10).map((item: any, idx: number) => ({
+        url: item.url,
+        title: item.title,
+        snippet: item.description || item.snippet || '',
+        rank: idx + 1,
+      }));
     } catch (error) {
-      console.error(`DuckDuckGo search failed: ${error}`);
-      return this.getSearchFallback(query);
+      console.warn(`Brave Search failed: ${error}`);
+      return [];
     }
   }
 
-  private getSearchFallback(query: string): SearchResult[] {
-    // Fallback: Return synthetic but reasonable results
-    console.log(`[RealWebAdapter] Using synthetic search results for: "${query}"`);
-    return [
-      {
-        url: `https://example.com/search?q=${encodeURIComponent(query)}`,
-        title: `Results for "${query}"`,
-        snippet: `Search results for the query: ${query}`,
-        rank: 1,
-      },
-      {
-        url: `https://wikipedia.org/search?search=${encodeURIComponent(query)}`,
-        title: `Wikipedia - ${query}`,
-        snippet: `Wikipedia article related to ${query}`,
-        rank: 2,
-      },
-    ];
+  private async tryBingSearch(query: string): Promise<SearchResult[]> {
+    const apiKey = process.env.BING_SEARCH_API_KEY;
+    if (!apiKey) {
+      console.log('[RealWebAdapter] No BING_SEARCH_API_KEY, skipping Bing Search');
+      return [];
+    }
+
+    try {
+      const encodedQuery = encodeURIComponent(query);
+      const url = `https://api.bing.microsoft.com/v7.0/search?q=${encodedQuery}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Ocp-Apim-Subscription-Key': apiKey,
+        },
+        timeout: FETCH_TIMEOUT_MS,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Bing Search returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data.webPages || data.webPages.value.length === 0) {
+        throw new Error('No results from Bing Search');
+      }
+
+      return data.webPages.value.slice(0, 10).map((item: any, idx: number) => ({
+        url: item.url,
+        title: item.name,
+        snippet: item.snippet,
+        rank: idx + 1,
+      }));
+    } catch (error) {
+      console.warn(`Bing Search failed: ${error}`);
+      return [];
+    }
   }
+
+  private async tryDuckDuckGoWithRetry(query: string): Promise<SearchResult[]> {
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const encodedQuery = encodeURIComponent(query);
+        const url = `https://duckduckgo.com/html/?q=${encodedQuery}`;
+
+        const response = await fetch(url, {
+          headers: {
+            'User-Agent': USER_AGENT,
+            'Accept': 'text/html',
+          },
+          timeout: FETCH_TIMEOUT_MS,
+        });
+
+        if (!response.ok) {
+          throw new Error(`DuckDuckGo returned ${response.status}`);
+        }
+
+        const content = await response.text();
+        const results: SearchResult[] = [];
+
+        // Extract results from DuckDuckGo HTML - multiple patterns for robustness
+        const patterns = [
+          // Pattern 1: Standard result
+          /<span class="result__title">[\s\S]*?<a\s+href="([^"]+)">([^<]+)<\/a>/g,
+          // Pattern 2: Alternative format
+          /<a\s+href="([^"]+)"\s+class="result__a">([^<]+)<\/a>/g,
+          // Pattern 3: Simple link with class
+          /class="result__url"\s+href="([^"]+)">[\s\S]*?>([^<]+)</g,
+        ];
+
+        for (const pattern of patterns) {
+          let match;
+          let rank = 1;
+          while ((match = pattern.exec(content)) && results.length < 10) {
+            const url = match[1];
+            const title = match[2] || 'Result';
+
+            // Validate URL
+            if (url && url.startsWith('http') && !url.includes('duckduckgo.com')) {
+              results.push({
+                url,
+                title: title.trim(),
+                snippet: `Result for: ${query}`,
+                rank: rank++,
+              });
+            }
+          }
+          if (results.length > 0) break;
+        }
+
+        if (results.length > 0) {
+          console.log(`[RealWebAdapter] DuckDuckGo found ${results.length} results (attempt ${attempt})`);
+          return results;
+        }
+
+        throw new Error('No results extracted from DuckDuckGo');
+      } catch (error) {
+        console.warn(`DuckDuckGo attempt ${attempt}/${MAX_RETRIES} failed: ${error}`);
+
+        if (attempt < MAX_RETRIES) {
+          // Exponential backoff before retry
+          const delayMs = Math.pow(2, attempt - 1) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+      }
+    }
+
+    return [];
+  }
+
+  // Note: No synthetic fallback - if all real searches fail, the search fails
+  // The system should handle search failures gracefully without fake data
 
   async fetch(url: string): Promise<FetchResult | null> {
     try {
