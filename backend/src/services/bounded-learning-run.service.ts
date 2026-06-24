@@ -325,9 +325,13 @@ export class BoundedCivilizationLearningRun {
             const articleUrls = this.extractArticleUrlsFromListPage(source.source_url, listResult.content);
             console.log(`  📄 Found ${articleUrls.length} article URLs to fetch`);
 
-            // Fetch first 2-3 specific articles for content extraction
-            for (let j = 0; j < Math.min(articleUrls.length, 2); j++) {
-              const articleUrl = articleUrls[j];
+            // Diversify selection: fetch articles spread across the list (not just first N)
+            // This avoids duplicate papers and gets diverse content
+            const diverseUrls = this.selectDiverseUrls(articleUrls, 3);
+
+            // Fetch selected articles for content extraction
+            for (let j = 0; j < diverseUrls.length; j++) {
+              const articleUrl = diverseUrls[j];
               try {
                 console.log(`    Fetching article: ${articleUrl}`);
                 const articleResult = await this.webAdapter.fetch(articleUrl);
@@ -442,6 +446,7 @@ export class BoundedCivilizationLearningRun {
 
   private async extractClaims(documents: any[], config: BoundedLearningRunConfig): Promise<any[]> {
     const claims: any[] = [];
+    const seenClaimTexts = new Set<string>(); // Track extracted claims to avoid duplicates
 
     // If provider is test-only, use deterministic extraction
     if (config.provider === 'deterministic_test_only') {
@@ -470,18 +475,40 @@ export class BoundedCivilizationLearningRun {
         try {
           const extracted = await this.extractClaimsWithOpenAI(doc);
           if (extracted && extracted.length > 0) {
-            claims.push(
-              ...extracted.map((claim: any) => ({
-                ...claim,
-                sourceId: doc.sourceId,
-                provider: 'openai',
-                isTestFixture: false,
-              }))
-            );
-            this.logAuditEvent('claim_extracted_openai', {
-              sourceId: doc.sourceId,
-              claimsCount: extracted.length,
+            // Filter out duplicate claims (same text)
+            const uniqueClaims = extracted.filter((claim: any) => {
+              const claimText = claim.text.toLowerCase().trim();
+              if (seenClaimTexts.has(claimText)) {
+                this.logAuditEvent('claim_deduplicated', {
+                  text: claim.text.substring(0, 50),
+                  sourceId: doc.sourceId,
+                });
+                return false; // Skip duplicate
+              }
+              seenClaimTexts.add(claimText);
+              return true;
             });
+
+            if (uniqueClaims.length > 0) {
+              claims.push(
+                ...uniqueClaims.map((claim: any) => ({
+                  ...claim,
+                  sourceId: doc.sourceId,
+                  provider: 'openai',
+                  isTestFixture: false,
+                }))
+              );
+              this.logAuditEvent('claim_extracted_openai', {
+                sourceId: doc.sourceId,
+                claimsCount: uniqueClaims.length,
+                duplicatesFiltered: extracted.length - uniqueClaims.length,
+              });
+            } else {
+              this.logAuditEvent('claim_extraction_all_duplicates', {
+                sourceId: doc.sourceId,
+                totalExtracted: extracted.length,
+              });
+            }
           }
         } catch (error: any) {
           this.logAuditEvent('claim_extraction_failed', {
@@ -529,15 +556,22 @@ export class BoundedCivilizationLearningRun {
           messages: [
             {
               role: 'system',
-              content: `You are a claim extractor. Extract 1-3 factual claims from the provided content.
-Return ONLY a valid JSON array with objects having: text (string), confidence (0-1 number).
-Example: [{"text": "claim 1", "confidence": 0.9}]
-Claims must be supported by evidence in the content.
-Do not invent claims not present in the text.`,
+              content: `You are a claim extractor. Extract 2-4 SPECIFIC, NOVEL factual claims from the provided content.
+
+REQUIREMENTS:
+- Claims must be specific (not generic statements)
+- Claims must be directly supported by text evidence
+- Each claim must assert something factual that can be verified
+- Avoid generic statements like "X is important" or "Y is used in field Z"
+- Focus on concrete findings, results, or discoveries
+- Do not invent or extrapolate beyond what the text states
+
+Return ONLY a valid JSON array with objects: {text (string), confidence (0-1)}
+Example: [{"text": "The study found 87% accuracy on the benchmark", "confidence": 0.95}]`,
             },
             {
               role: 'user',
-              content: `Extract claims from:\n\nTitle: ${document.title}\n\nContent:\n${document.extractedText.substring(0, 3000)}`,
+              content: `Extract SPECIFIC FACTUAL CLAIMS from:\n\nTitle: ${document.title}\n\nAbstract/Content:\n${document.extractedText.substring(0, 2500)}`,
             },
           ],
           temperature: 0.3,
@@ -746,6 +780,23 @@ Do not invent claims not present in the text.`,
     } catch (error: any) {
       console.warn(`Warning: Failed to write audit trace: ${error.message}`);
     }
+  }
+
+  private selectDiverseUrls(urls: string[], count: number): string[] {
+    if (urls.length <= count) return urls;
+
+    // Select diverse URLs spread across the list (not just first N)
+    const selected: string[] = [];
+    const step = Math.max(1, Math.floor(urls.length / count));
+
+    for (let i = 0; i < count && selected.length < count; i++) {
+      const index = i * step;
+      if (index < urls.length) {
+        selected.push(urls[index]);
+      }
+    }
+
+    return selected.length > 0 ? selected : urls.slice(0, count);
   }
 
   private extractArticleUrlsFromListPage(listUrl: string, content: string): string[] {
