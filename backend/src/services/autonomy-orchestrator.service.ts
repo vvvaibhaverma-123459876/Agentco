@@ -16,6 +16,8 @@ import { LoopDetectorService, ActionHistory } from './loop-detector.service';
 import { AutonomyActionPlannerService } from './autonomy-action-planner.service';
 import { ReflectionService } from './reflection.service';
 import { TeamActivationService } from './team-activation.service';
+import { ReputationLearningService } from './reputation-learning.service';
+import { AdaptiveStrategyService } from './adaptive-strategy.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType } from '../types/action.types';
 import { MockWebAdapter } from '../adapters/mock-web-adapter';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
@@ -79,6 +81,8 @@ export class AutonomyOrchestratorService {
   private actionPlanner = new AutonomyActionPlannerService();
   private reflection = new ReflectionService();
   private teamActivation = new TeamActivationService();
+  private reputation = new ReputationLearningService();
+  private adaptiveStrategy = new AdaptiveStrategyService();
 
   constructor() {
     // Initialize web adapter based on environment
@@ -727,6 +731,22 @@ export class AutonomyOrchestratorService {
         ]
       );
 
+      // Initialize reputation for goal (society-level entity)
+      try {
+        await this.reputation.initializeEntity(goalId, 'society', ['research', 'autonomy', goalText.split(' ')[0]]);
+      } catch (e) {
+        console.warn(`[Reputation] Failed to initialize entity: ${(e as any).message}`);
+      }
+
+      // Initialize adaptive strategy for goal
+      let strategyId = '';
+      try {
+        const strategy = await this.adaptiveStrategy.initializeStrategy(goalId, 'multi_angle_research');
+        strategyId = strategy.strategy_id;
+      } catch (e) {
+        console.warn(`[AdaptiveStrategy] Failed to initialize strategy: ${(e as any).message}`);
+      }
+
       let claimsGenerated = 0;
       let actionsExecuted = 0;
       let terminated = false;
@@ -823,6 +843,41 @@ export class AutonomyOrchestratorService {
               action.actionId,
             ]
           );
+        }
+
+        // Record reputation event for orchestrator (goal entity)
+        try {
+          const magnitude =
+            result.status === ActionStatus.COMPLETED
+              ? 1.0
+              : result.status === ActionStatus.BLOCKED
+              ? -0.3
+              : -0.5;
+
+          const eventType =
+            action.actionType === ActionType.WEB_SEARCH
+              ? 'research_completed'
+              : action.actionType === ActionType.FETCH_PAGE
+              ? 'research_completed'
+              : action.actionType === ActionType.GENERATE_CLAIM
+              ? 'claim_verified'
+              : action.actionType === ActionType.VALIDATE_CLAIM
+              ? 'claim_verified'
+              : 'research_completed';
+
+          await this.reputation.recordEvent(
+            goalId,
+            eventType as any,
+            magnitude,
+            [goalId],
+            {
+              actionType: action.actionType,
+              newArtifacts: result.createdArtifacts.length,
+              resultStatus: result.status,
+            }
+          );
+        } catch (e) {
+          console.warn(`[Reputation] Failed to record event: ${(e as any).message}`);
         }
 
         // If specialist was spawned, aggregate results back to parent goal
