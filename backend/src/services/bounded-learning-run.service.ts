@@ -74,6 +74,12 @@ interface FetchedDocument {
   fetchedAt: Date;
 }
 
+interface ArticleMetadata {
+  url: string;
+  title: string;
+  relevanceScore?: number;
+}
+
 export class BoundedCivilizationLearningRun {
   private sourceDiscovery = new SourceDiscoveryEngine();
   private webAdapter = new RealWebAdapter();
@@ -382,17 +388,20 @@ export class BoundedCivilizationLearningRun {
           console.log(`  Fetching list page: ${source.source_url}`);
           const listResult = await this.webAdapter.fetch(source.source_url);
           if (listResult) {
-            // Extract specific article URLs from list page
-            const articleUrls = this.extractArticleUrlsFromListPage(source.source_url, listResult.content);
-            console.log(`  📄 Found ${articleUrls.length} article URLs to fetch`);
+            // Extract article URLs with titles for goal-based ranking
+            const articles = this.extractArticlesFromListPage(source.source_url, listResult.content);
+            console.log(`  📄 Found ${articles.length} articles to evaluate`);
 
-            // Diversify selection: fetch articles spread across the list (not just first N)
-            // This avoids duplicate papers and gets diverse content
-            const diverseUrls = this.selectDiverseUrls(articleUrls, 3);
+            // Rank articles by goal relevance and select top-3
+            const rankedArticles = this.rankArticlesByGoalRelevance(articles, config.goal);
+            const selectedArticles = rankedArticles.slice(0, 3);
 
             // Fetch selected articles for content extraction
-            for (let j = 0; j < diverseUrls.length; j++) {
-              const articleUrl = diverseUrls[j];
+            for (let j = 0; j < selectedArticles.length; j++) {
+              const article = selectedArticles[j];
+              const articleUrl = article.url;
+              console.log(`    Fetching (score: ${article.relevanceScore?.toFixed(2)}): ${article.title}`);
+
               try {
                 console.log(`    Fetching article: ${articleUrl}`);
                 const articleResult = await this.webAdapter.fetch(articleUrl);
@@ -843,21 +852,98 @@ Example: [{"text": "The study found 87% accuracy", "confidence": 0.95}]`,
     }
   }
 
-  private selectDiverseUrls(urls: string[], count: number): string[] {
-    if (urls.length <= count) return urls;
+  private rankArticlesByGoalRelevance(articles: ArticleMetadata[], goal: string): ArticleMetadata[] {
+    // Extract meaningful keywords from goal
+    const goalKeywords = goal
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(word => word.length > 4)
+      .map(word => word.replace(/[^a-z0-9]/g, ''));
 
-    // Select diverse URLs spread across the list (not just first N)
-    const selected: string[] = [];
-    const step = Math.max(1, Math.floor(urls.length / count));
+    // Score each article
+    const scored = articles.map(article => {
+      const titleLower = article.title.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+      let score = 0;
 
-    for (let i = 0; i < count && selected.length < count; i++) {
-      const index = i * step;
-      if (index < urls.length) {
-        selected.push(urls[index]);
+      // Count keyword matches in title
+      for (const keyword of goalKeywords) {
+        if (titleLower.includes(keyword)) {
+          score += 1;
+        }
+      }
+
+      return {
+        ...article,
+        relevanceScore: score / Math.max(1, goalKeywords.length),
+      };
+    });
+
+    // Sort by relevance score descending
+    scored.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+
+    return scored;
+  }
+
+  private extractArticlesFromListPage(listUrl: string, content: string): ArticleMetadata[] {
+    const articles: ArticleMetadata[] = [];
+
+    // ArXiv patterns - extract (URL, Title) pairs
+    if (listUrl.includes('arxiv.org')) {
+      // Extract pairs of: paper ID + title
+      // ArXiv structure: /abs/NNNN.NNNNN followed by title in class="list-title"
+      const abstracts = content.match(/\/abs\/\d{4}\.\d{4,5}/g) || [];
+      const titles = content.match(/<div class="list-title[^"]*">.*?<span class="descriptor">Title:<\/span>\s*([^<]+)/gi) || [];
+
+      // Pair them up
+      for (let i = 0; i < Math.min(abstracts.length, titles.length); i++) {
+        const paperId = abstracts[i].split('/').pop();
+        const titleMatch = titles[i].match(/<span class="descriptor">Title:<\/span>\s*([^<]+)/i);
+        if (titleMatch && paperId) {
+          const title = titleMatch[1]
+            .replace(/<[^>]*>/g, '')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&amp;/g, '&')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          if (title.length > 10) {
+            articles.push({
+              url: `https://arxiv.org/abs/${paperId}`,
+              title: title.substring(0, 200),
+            });
+          }
+        }
+      }
+
+      // Final fallback: extract all /abs/ URLs with generic titles
+      if (articles.length === 0) {
+        for (const absMatch of abstracts.slice(0, 20)) {
+          const paperId = absMatch.split('/').pop();
+          articles.push({
+            url: `https://arxiv.org${absMatch}`,
+            title: `ArXiv ${paperId}`,
+          });
+        }
       }
     }
 
-    return selected.length > 0 ? selected : urls.slice(0, count);
+    // Generic article link patterns for non-arxiv sites
+    if (articles.length === 0) {
+      const allLinks = content.match(/<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>/gi) || [];
+      for (const link of allLinks.slice(0, 15)) {
+        const match = link.match(/<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>/i);
+        if (match) {
+          const href = match[1];
+          const text = match[2].trim();
+          if (href.startsWith('http') && text.length > 5 && text.length < 200) {
+            articles.push({ url: href, title: text });
+          }
+        }
+      }
+    }
+
+    return articles;
   }
 
   private extractArticleUrlsFromListPage(listUrl: string, content: string): string[] {
