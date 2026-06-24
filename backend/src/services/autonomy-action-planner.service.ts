@@ -62,7 +62,9 @@ export class AutonomyActionPlannerService {
     attemptNumber: number = 0,
     previousError?: string
   ): Promise<string> {
-    const apiUrl = 'https://api.openai.com/v1/chat/completions';
+    // Use configured LLM provider, default to OpenAI
+    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+    const apiUrl = `${baseUrl}/chat/completions`;
 
     // Add error feedback to messages on retry
     let messagesWithFeedback = [...messages];
@@ -89,7 +91,7 @@ export class AutonomyActionPlannerService {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini',
             messages: messagesWithFeedback,
             max_tokens: 500,
             temperature: 0.7,
