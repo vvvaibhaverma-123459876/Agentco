@@ -311,6 +311,71 @@ export class BoundedCivilizationLearningRun {
           continue;
         }
 
+        // Check if this is a list page that needs URL extraction
+        const isListPage = source.source_url.includes('/list') ||
+                          source.source_url.includes('/trending') ||
+                          source.source_url.includes('/blog/') ||
+                          source.source_url.includes('/recent');
+
+        if (isListPage) {
+          console.log(`  Fetching list page: ${source.source_url}`);
+          const listResult = await this.webAdapter.fetch(source.source_url);
+          if (listResult) {
+            // Extract specific article URLs from list page
+            const articleUrls = this.extractArticleUrlsFromListPage(source.source_url, listResult.content);
+            console.log(`  📄 Found ${articleUrls.length} article URLs to fetch`);
+
+            // Fetch first 2-3 specific articles for content extraction
+            for (let j = 0; j < Math.min(articleUrls.length, 2); j++) {
+              const articleUrl = articleUrls[j];
+              try {
+                console.log(`    Fetching article: ${articleUrl}`);
+                const articleResult = await this.webAdapter.fetch(articleUrl);
+                if (articleResult && articleResult.content.length > 500) {
+                  const sourceId = uuidv4();
+
+                  // Persist the actual article content
+                  await db.query(
+                    `INSERT INTO autonomy_evidence (
+                      id, source_id, url, title, snippet, retrieved_at, content_hash,
+                      source_type, is_public_access, created_at
+                    ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, NOW())`,
+                    [
+                      uuidv4(),
+                      sourceId,
+                      articleUrl,
+                      articleResult.title || 'Untitled Article',
+                      articleResult.content.substring(0, 2000),
+                      articleResult.contentHash,
+                      'web',
+                      true,
+                    ]
+                  );
+
+                  documents.push({
+                    sourceId,
+                    url: articleUrl,
+                    title: articleResult.title || 'Untitled Article',
+                    content: articleResult.content,
+                    contentHash: articleResult.contentHash,
+                    fetchedAt: new Date(),
+                  });
+
+                  this.logAuditEvent('fetch_succeeded', {
+                    url: articleUrl,
+                    sourceId,
+                    contentLength: articleResult.content.length,
+                    contentHash: articleResult.contentHash,
+                  });
+                }
+              } catch (articleError: any) {
+                this.logAuditEvent('fetch_failed', { url: articleUrl, error: articleError.message });
+              }
+            }
+            continue;
+          }
+        }
+
         console.log(`  Fetching: ${source.source_url}`);
         const result = await this.webAdapter.fetch(source.source_url);
 
@@ -681,6 +746,75 @@ Do not invent claims not present in the text.`,
     } catch (error: any) {
       console.warn(`Warning: Failed to write audit trace: ${error.message}`);
     }
+  }
+
+  private extractArticleUrlsFromListPage(listUrl: string, content: string): string[] {
+    const urls = new Set<string>();
+
+    // ArXiv patterns - target actual paper links
+    if (listUrl.includes('arxiv.org')) {
+      // Pattern: /abs/YYYY.NNNNN (paper abstract pages)
+      const arxivMatches = content.match(/\/abs\/\d{4}\.\d{4,5}/g);
+      if (arxivMatches) {
+        for (const path of arxivMatches) {
+          urls.add(`https://arxiv.org${path}`);
+        }
+      }
+    }
+
+    // GitHub patterns
+    if (listUrl.includes('github.com')) {
+      // Pattern: /[user]/[repo]
+      const ghMatches = content.match(/href="(\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_.-]+)"/g);
+      if (ghMatches) {
+        for (const match of ghMatches) {
+          const path = match.replace(/href="([^"]+)"/, '$1');
+          if (!path.includes('/issues') && !path.includes('/settings') && !path.includes('/search')) {
+            urls.add(`https://github.com${path}`);
+          }
+        }
+      }
+    }
+
+    // Medium.com patterns
+    if (listUrl.includes('medium.com')) {
+      // Look for article links
+      const mediumMatches = content.match(/href="https:\/\/medium\.com\/[^"]+"/g);
+      if (mediumMatches) {
+        for (const match of mediumMatches) {
+          const url = match.replace('href="', '').replace('"', '');
+          if (url && !url.includes('?') && url.length < 500) {
+            urls.add(url);
+          }
+        }
+      }
+    }
+
+    // Generic article link patterns (but be selective)
+    const allHrefs = content.match(/href="([^"]+)"/g);
+    if (allHrefs) {
+      for (const match of allHrefs) {
+        const href = match.replace('href="', '').replace('"', '');
+        try {
+          // Only accept http(s) absolute URLs, not anchors or page jumps
+          if (href.startsWith('http') && !href.includes('?') && href.length < 500) {
+            // Skip common non-article patterns
+            if (!href.match(/\.(pdf|jpg|png|gif|css|js)$/i) &&
+                !href.includes('/search') &&
+                !href.includes('/tag/') &&
+                !href.includes('/author/') &&
+                !href.includes('/ads/') &&
+                !href.includes('/static/')) {
+              urls.add(href);
+            }
+          }
+        } catch {
+          // Skip invalid URLs
+        }
+      }
+    }
+
+    return Array.from(urls).slice(0, 15); // Return top 15 URLs
   }
 }
 

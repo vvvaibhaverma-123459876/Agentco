@@ -1,0 +1,19 @@
+{
+  "runId": "learning_run_1782302942165",
+  "status": "success",
+  "goalText": "reinforcement learning agents",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 1,
+  "sourcesAllowed": 1,
+  "sourcesFetched": 2,
+  "documentsFetched": 2,
+  "claimsExtracted": 6,
+  "claimsPersisted": 6,
+  "claimsRouted": 6,
+  "auditEventsLogged": 24,
+  "errors": [],
+  "warnings": [],
+  "startedAt": "2026-06-24T12:09:02.165Z",
+  "completedAt": "2026-06-24T12:09:07.499Z",
+  "durationMs": 5334
+}
