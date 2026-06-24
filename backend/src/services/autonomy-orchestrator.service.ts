@@ -86,10 +86,7 @@ export class AutonomyOrchestratorService {
 
   constructor() {
     // Initialize web adapter based on environment
-    // Use MockWebAdapter in development for deterministic testing
-    const adapter = process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development'
-      ? new MockWebAdapter()
-      : new RealWebAdapter();
+    const adapter = process.env.NODE_ENV === 'test' ? new MockWebAdapter() : new RealWebAdapter();
     this.actionExecutor.setWebAdapter(adapter);
   }
 
