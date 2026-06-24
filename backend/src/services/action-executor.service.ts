@@ -344,9 +344,10 @@ export class ActionExecutorService {
     // Store claim in database
     await db.query(
       `INSERT INTO autonomy_claims (
-        id, action_id, text, status, confidence, support_source_ids, derived_from_action_ids
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        id, claim_id, action_id, text, status, confidence, support_source_ids, derived_from_action_ids
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       [
+        uuidv4(),
         claimId,
         spec.actionId,
         claim.text,

@@ -771,12 +771,17 @@ export class AutonomyOrchestratorService {
         const currentClaimsCount = parseInt(claimsResult.rows[0]?.count || '0');
 
         const evidenceResult = await db.query(
-          `SELECT COUNT(*) as count FROM autonomy_evidence WHERE action_id IN (
+          `SELECT source_id, url, snippet FROM autonomy_evidence WHERE action_id IN (
             SELECT action_id FROM autonomy_goal_actions WHERE goal_id = $1
-          )`,
+          ) ORDER BY created_at DESC LIMIT 10`,
           [goalId]
         );
-        const evidenceCount = parseInt(evidenceResult.rows[0]?.count || '0');
+        const evidenceSources = evidenceResult.rows.map(r => ({
+          sourceId: r.source_id,
+          url: r.url,
+          snippet: r.snippet,
+        }));
+        const evidenceCount = evidenceSources.length;
 
         // Check for loops
         const loopDetection = this.loopDetector.detectLoop(actionHistory);
@@ -798,6 +803,7 @@ export class AutonomyOrchestratorService {
           goalText,
           claimsGenerated: currentClaimsCount,
           evidenceCount,
+          evidenceSources,
           loopDetection,
           reflectionContext,
           previousActions: actionHistory.map(h => ({

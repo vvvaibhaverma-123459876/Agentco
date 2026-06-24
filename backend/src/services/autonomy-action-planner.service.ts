@@ -33,7 +33,7 @@ export class AutonomyActionPlannerService {
       web_search: ['query'],
       fetch_page: ['url'],
       extract_evidence: ['content', 'source'],
-      generate_claim: ['text', 'evidence_sources'],
+      generate_claim: ['claimText', 'supportSourceIds'],
       update_memory: ['content'],
       evaluate_progress: [],
       spawn_specialist: ['role', 'objective', 'goalId'],
@@ -194,6 +194,7 @@ export class AutonomyActionPlannerService {
       goalText: string;
       claimsGenerated: number;
       evidenceCount: number;
+      evidenceSources?: Array<{ sourceId: string; url: string; snippet: string }>;
       loopDetection: LoopDetectionResult;
       reflectionContext?: string;
       previousActions: Array<{ type: ActionType; result: string }>;
@@ -285,8 +286,8 @@ Available action types with REQUIRED parameters:
 3. extract_evidence [REQUIRED: content, source]
    Example: {"action_type": "extract_evidence", "objective": "Extract key points", "args": {"content": "text...", "source": "url"}}
 
-4. generate_claim [REQUIRED: text, evidence_sources]
-   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"text": "claim text", "evidence_sources": ["source1", "source2"]}}
+4. generate_claim [REQUIRED: claimText, supportSourceIds]
+   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"claimText": "claim text", "supportSourceIds": ["source1", "source2"]}}
 
 5. update_memory [REQUIRED: content]
    Example: {"action_type": "update_memory", "objective": "Store learning", "args": {"content": {"type": "learning", "text": "..."}}}
@@ -339,6 +340,7 @@ Return JSON with: action_type, objective, args, reasoning.`;
     goalText: string;
     claimsGenerated: number;
     evidenceCount: number;
+    evidenceSources?: Array<{ sourceId: string; url: string; snippet: string }>;
     loopDetection: LoopDetectionResult;
     reflectionContext?: string;
     previousActions: Array<{ type: ActionType; result: string }>;
@@ -352,6 +354,17 @@ Progress:
 - Previous actions: ${state.previousActions.map(a => `${a.type}(${a.result})`).join(', ') || 'none'}
 
 Loop status: ${state.loopDetection.isLooping ? `DETECTED: ${state.loopDetection.loopType}` : 'clear'}`;
+
+    // Include evidence details if available
+    if (state.evidenceSources && state.evidenceSources.length > 0) {
+      prompt += `
+
+Available Evidence Sources (USE THESE IDs FOR CLAIMS):`;
+      state.evidenceSources.forEach((src, i) => {
+        prompt += `\n${i + 1}. [${src.sourceId}] ${src.url}\n   Snippet: ${src.snippet?.substring(0, 100) || 'N/A'}`;
+      });
+      prompt += `\n\nYou can now generate claims using these source IDs in supportSourceIds parameter.`;
+    }
 
     if (state.reflectionContext) {
       prompt += `
