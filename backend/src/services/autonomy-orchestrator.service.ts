@@ -765,14 +765,14 @@ export class AutonomyOrchestratorService {
         // Get current state for planning
         const claimsResult = await db.query(
           `SELECT COUNT(*) as count FROM autonomy_claims
-           WHERE action_id IN (SELECT id FROM autonomy_goal_actions WHERE goal_id = $1)`,
+           WHERE action_id IN (SELECT action_id FROM autonomy_goal_actions WHERE goal_id = $1)`,
           [goalId]
         );
         const currentClaimsCount = parseInt(claimsResult.rows[0]?.count || '0');
 
         const evidenceResult = await db.query(
           `SELECT COUNT(*) as count FROM autonomy_evidence WHERE action_id IN (
-            SELECT id FROM autonomy_goal_actions WHERE goal_id = $1
+            SELECT action_id FROM autonomy_goal_actions WHERE goal_id = $1
           )`,
           [goalId]
         );
@@ -836,7 +836,7 @@ export class AutonomyOrchestratorService {
         if (result.completedAt) {
           await db.query(
             `UPDATE autonomy_goal_actions SET status = $1, executed_at = $2, result = $3
-             WHERE id = $4`,
+             WHERE action_id = $4`,
             [
               result.status,
               result.completedAt,
