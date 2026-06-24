@@ -1,146 +1,230 @@
+import { execFile } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 import crypto from 'crypto';
 import { query } from '../db/client';
 
-const ALGORITHM = 'log_score+brier/hardness_weighted/v1';
-const EPSILON = 1e-9;
-
-interface LedgerRow {
-  prediction_id: string;
-  probability: string | number;
-  resolved_outcome: boolean;
-  domain: string;
-  horizon_class: string;
-  consequence: boolean;
-  resolved_at: string;
+interface StoredCredentialRow {
+  credential_id: string;
+  agent_id: string;
+  issued_at: string;
+  expires_at: string;
+  domain_cells: unknown;
+  overall_score: string | number;
+  sample_count: number;
+  algorithm: string;
+  hmac_sha256: string | null;
+  ed25519_signature: string | null;
+  is_valid: boolean;
 }
 
-function hardness(p: number): number {
-  return 2.0 * p * (1.0 - p);
+export interface BackendCredentialResponse {
+  credential: Record<string, unknown>;
+  verification: {
+    correctness: string;
+    authorship: string;
+    command: string;
+    expired: boolean;
+    canonical_source: string;
+  };
 }
 
-function weight(p: number, consequence: boolean): number {
-  return hardness(p) * (consequence ? 2.0 : 1.0);
+function repoRoot(): string {
+  return path.resolve(__dirname, '..', '..', '..');
 }
 
-function logScore(pRaw: number, outcome: boolean): number {
-  const p = Math.max(Math.min(pRaw, 1.0 - EPSILON), EPSILON);
-  return outcome ? Math.log(p) : Math.log(1.0 - p);
-}
-
-function brierScore(p: number, outcome: boolean): number {
-  const o = outcome ? 1.0 : 0.0;
-  return (p - o) ** 2;
-}
-
-function sortForJson(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(sortForJson);
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>)
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, item]) => [key, sortForJson(item)]),
-    );
+function loadReservePublicKey(): Buffer | null {
+  try {
+    const keyPath = path.resolve(repoRoot(), 'reserve', 'keys', 'agentco_reserve_public.pem');
+    const base64Content = fs.readFileSync(keyPath, 'utf-8').trim();
+    return Buffer.from(base64Content, 'base64');
+  } catch {
+    return null;
   }
-  return value;
 }
 
-function canonicalPayload(payload: Record<string, unknown>): string {
-  return JSON.stringify(sortForJson(payload));
+// DER SPKI prefix for an Ed25519 public key (RFC 8410).
+// A raw 32-byte Ed25519 public key becomes a valid SPKI key by prepending
+// this fixed 12-byte header: SEQUENCE { SEQUENCE { OID 1.3.101.112 }, BIT STRING }.
+const ED25519_SPKI_PREFIX = Buffer.from('302a300506032b6570032100', 'hex');
+
+function rawEd25519ToKeyObject(publicKeyBytes: Buffer): crypto.KeyObject {
+  // If the bytes are already a full DER SPKI key, use them directly.
+  if (publicKeyBytes.length > 32) {
+    return crypto.createPublicKey({ key: publicKeyBytes, format: 'der', type: 'spki' });
+  }
+  // Otherwise wrap the raw 32-byte key in the SPKI envelope.
+  const spki = Buffer.concat([ED25519_SPKI_PREFIX, publicKeyBytes]);
+  return crypto.createPublicKey({ key: spki, format: 'der', type: 'spki' });
 }
 
-export async function issueCredential(agentId: string) {
-  const rows = await query<LedgerRow>(
-    `SELECT prediction_id, probability, resolved_outcome, domain, horizon_class,
-            COALESCE(consequence, FALSE) AS consequence, resolved_at
-       FROM prediction_ledger
-      WHERE producing_agent_id = $1
-        AND resolved = TRUE
-        AND resolved_outcome IS NOT NULL
-        AND (post_hoc IS NULL OR post_hoc = FALSE)
-      ORDER BY resolved_at`,
+function verifyEd25519Signature(
+  signatureHex: string,
+  payloadJson: string,
+  publicKeyBytes: Buffer,
+): boolean {
+  try {
+    const signatureBuffer = Buffer.from(signatureHex, 'hex');
+    const keyObject = rawEd25519ToKeyObject(publicKeyBytes);
+    return crypto.verify(
+      null,
+      Buffer.from(payloadJson, 'utf-8'),
+      keyObject,
+      signatureBuffer,
+    );
+  } catch {
+    return false;
+  }
+}
+
+function runPythonJson(script: string, args: string[]): Promise<Record<string, unknown>> {
+  return new Promise((resolve, reject) => {
+    const root = repoRoot();
+    execFile('python3', [script, ...args], { cwd: root, env: process.env }, (error, stdout, stderr) => {
+      if (error) {
+        const message = stderr?.trim() || error.message;
+        reject(new Error(message));
+        return;
+      }
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (parseError) {
+        reject(new Error(`canonical credential command returned non-JSON output: ${String(parseError)}`));
+      }
+    });
+  });
+}
+
+export async function getCanonicalCredential(agentId: string): Promise<BackendCredentialResponse | null> {
+  const rows = await query<StoredCredentialRow>(
+    `SELECT credential_id, agent_id, issued_at, expires_at, domain_cells,
+            overall_score, sample_count, algorithm, hmac_sha256,
+            ed25519_signature, is_valid
+       FROM calibration_credentials
+      WHERE agent_id = $1
+        AND is_valid = TRUE
+      ORDER BY issued_at DESC
+      LIMIT 1`,
     [agentId],
   );
 
   if (rows.length === 0) return null;
 
-  const grouped = new Map<string, LedgerRow[]>();
-  for (const row of rows) {
-    const key = `${row.domain}\u0000${row.horizon_class}`;
-    grouped.set(key, [...(grouped.get(key) ?? []), row]);
-  }
-
-  const cells = Array.from(grouped.entries()).sort(([a], [b]) => a.localeCompare(b)).map(([key, cellRows]) => {
-    const [domain, horizon_class] = key.split('\u0000');
-    let totalWeight = 0;
-    let weightedLog = 0;
-    let weightedBrier = 0;
-    let sharpness = 0;
-    let lastRealityContact = '';
-
-    for (const row of cellRows) {
-      const p = Number(row.probability);
-      const w = weight(p, row.consequence);
-      totalWeight += w;
-      weightedLog += w * logScore(p, row.resolved_outcome);
-      weightedBrier += w * brierScore(p, row.resolved_outcome);
-      sharpness += p * (1.0 - p);
-      if (!lastRealityContact || String(row.resolved_at) > lastRealityContact) {
-        lastRealityContact = String(row.resolved_at);
-      }
-    }
-
-    return {
-      domain,
-      horizon_class,
-      weighted_log_score: totalWeight > 0 ? weightedLog / totalWeight : 0,
-      weighted_brier_score: totalWeight > 0 ? weightedBrier / totalWeight : 0,
-      sharpness: sharpness / cellRows.length,
-      sample_count: cellRows.length,
-      total_weight: totalWeight,
-      last_reality_contact: lastRealityContact,
-    };
-  });
-
-  const overallLog = cells.reduce((sum, cell) => sum + cell.weighted_log_score, 0) / cells.length;
-  const overallBrier = cells.reduce((sum, cell) => sum + cell.weighted_brier_score, 0) / cells.length;
-  const issuedAt = new Date();
-  const expiresAt = new Date(issuedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const credential = {
-    credential_id: crypto.randomUUID(),
-    agent_id: agentId,
-    issued_at: issuedAt.toISOString(),
-    expires_at: expiresAt.toISOString(),
-    cells,
-    overall_log_score: overallLog,
-    overall_brier_score: overallBrier,
-    sample_count: rows.length,
-    algorithm: ALGORITHM,
-  };
-  const signingKey = process.env.RESERVE_SIGNING_KEY || 'dev-insecure-key';
-  const hmac_sha256 = crypto.createHmac('sha256', signingKey).update(canonicalPayload(credential)).digest('hex');
-
+  const row = rows[0];
+  const expired = new Date(String(row.expires_at)).getTime() <= Date.now();
   return {
-    ...credential,
-    hmac_sha256,
-    recompute: {
+    credential: {
+      credential_id: row.credential_id,
+      agent_id: row.agent_id,
+      issued_at: row.issued_at,
+      expires_at: row.expires_at,
+      cells: row.domain_cells,
+      overall_log_score: Number(row.overall_score),
+      sample_count: Number(row.sample_count),
+      algorithm: row.algorithm,
+      ed25519_signature: row.ed25519_signature ?? '',
+      legacy_hmac_sha256: row.hmac_sha256 ?? '',
+      expired,
+    },
+    verification: {
+      correctness: 'recompute from resolved, non-post-hoc prediction_ledger rows',
+      authorship: 'verify Ed25519 signature with reserve/keys/agentco_reserve_public.pem when ed25519_signature is present',
       command: `python3 reserve/tools/recompute_credential.py ${agentId}`,
-      description: 'Recomputes this score from public prediction_ledger rows without any signing secret.',
+      expired,
+      canonical_source: 'reserve/credentials/proof_of_calibration.py',
     },
   };
 }
 
-// Phase 5: Canonical credential routes (stubs for type checking; real implementation in reserve layer)
-export async function getCanonicalCredential(agentId: string): Promise<unknown> {
-  // Stub: Phase 5 feature - get canonical credential from reserve
-  return null;
+export async function issueCanonicalCredential(agentId: string): Promise<Record<string, unknown>> {
+  return runPythonJson('scripts/issue_canonical_credential.py', [agentId]);
 }
 
-export async function issueCanonicalCredential(agentId: string): Promise<unknown> {
-  // Stub: Phase 5 feature - issue canonical credential through reserve path
-  throw new Error('Canonical credential issuance not yet implemented. Use reserve/tools/recompute_credential.py');
-}
+export async function verifyCanonicalCredential(agentId: string): Promise<Record<string, unknown>> {
+  const stored = await getCanonicalCredential(agentId);
+  if (!stored) {
+    return {
+      valid: false,
+      correctness: 'no stored canonical credential',
+      authorship: 'not_checked',
+      recompute_command: `python3 reserve/tools/recompute_credential.py ${agentId}`,
+    };
+  }
+  try {
+    const recomputed = await runPythonJson('reserve/tools/recompute_credential.py', [agentId]);
+    const score = (recomputed.score ?? {}) as Record<string, unknown>;
+    const credential = stored.credential;
+    const storedLog = Number(credential.overall_log_score);
+    const recomputedLog = Number(score.overall_log_score);
+    const storedCount = Number(credential.sample_count);
+    const recomputedCount = Number(score.total_sample_count);
+    const correctnessValid = Math.abs(storedLog - recomputedLog) < 1e-9 && storedCount === recomputedCount;
 
-export async function verifyCanonicalCredential(credential: unknown): Promise<boolean> {
-  // Stub: Phase 5 feature - verify canonical credential signature
-  return false;
+    let authorshipValid = false;
+    let authorshipStatus = 'not_checked';
+    if (credential.ed25519_signature) {
+      const pubKeyBytes = loadReservePublicKey();
+      if (pubKeyBytes) {
+        const canonicalPayload = JSON.stringify(
+          {
+            credential_id: credential.credential_id,
+            agent_id: credential.agent_id,
+            issued_at: credential.issued_at,
+            expires_at: credential.expires_at,
+            cells: Array.isArray(credential.cells) ? credential.cells : [],
+            overall_log_score: storedLog,
+            overall_brier_score: credential.overall_brier_score ?? 0,
+            sample_count: storedCount,
+            algorithm: credential.algorithm,
+          },
+          (key: string, value: unknown) => {
+            if (typeof value === 'number') {
+              return parseFloat(value.toString()).toFixed(10).replace(/\.?0+$/, '');
+            }
+            return value;
+          },
+        );
+        authorshipValid = verifyEd25519Signature(
+          String(credential.ed25519_signature),
+          canonicalPayload,
+          pubKeyBytes,
+        );
+        authorshipStatus = authorshipValid ? 'verified' : 'verification_failed';
+      } else {
+        authorshipStatus = 'public_key_unavailable';
+      }
+    } else {
+      authorshipStatus = 'no_ed25519_signature_present';
+    }
+
+    return {
+      valid: correctnessValid && authorshipValid,
+      correctness: correctnessValid ? 'passed' : 'failed',
+      authorship: authorshipStatus,
+      recompute_command: `python3 reserve/tools/recompute_credential.py ${agentId}`,
+      stored: {
+        overall_log_score: storedLog,
+        sample_count: storedCount,
+        expired: credential.expired,
+      },
+      recomputed: {
+        overall_log_score: recomputedLog,
+        sample_count: recomputedCount,
+      },
+    };
+  } catch (error) {
+    const credential = stored.credential;
+    let authorshipStatus = 'not_checked';
+    if (credential.ed25519_signature) {
+      const pubKeyBytes = loadReservePublicKey();
+      authorshipStatus = pubKeyBytes ? 'verification_skipped_due_to_recompute_error' : 'public_key_unavailable';
+    }
+    return {
+      valid: false,
+      correctness: 'recompute_failed',
+      authorship: authorshipStatus,
+      error: String(error instanceof Error ? error.message : error),
+      recompute_command: `python3 reserve/tools/recompute_credential.py ${agentId}`,
+    };
+  }
 }
