@@ -226,7 +226,8 @@ class CivilizationService:
                     continue
 
                 # Match artifact_ids against autonomy_claims and autonomy_evidence
-                # (artifacts are bare UUIDs from createdArtifacts)
+                # IMPORTANT: claim_id is VARCHAR, source_id is VARCHAR
+                # Both are returned as string UUIDs in artifact_ids
                 try:
                     if artifact_ids:
                         # Query claims table for these artifact IDs
@@ -240,10 +241,11 @@ class CivilizationService:
                         claims_count = len(claim_ids)
                         all_claim_ids.extend(claim_ids)
 
-                        # Query evidence table for remaining artifact IDs
+                        # Query evidence table by source_id (not id, which is UUID)
+                        # Evidence.source_id is the artifact returned from orchestrator
                         evidence_rows = db.execute_query(
                             """SELECT id FROM autonomy_evidence
-                               WHERE id = ANY(%s)""",
+                               WHERE source_id::text = ANY(%s)""",
                             (artifact_ids,),
                             fetch_all=True,
                         )
