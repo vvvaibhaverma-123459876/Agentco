@@ -10,6 +10,7 @@ import { civilizationRoutes } from './routes/civilization.routes';
 import { institutionsRoutes } from './routes/institutions.routes';
 import { trustRoutes } from './routes/trust.routes';
 import { calibrationRoutes } from './routes/calibration.routes';
+import { governanceExtRoutes } from './routes/governance-ext.routes';
 import { assertProductionSecrets } from './security';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -31,6 +32,7 @@ export async function build() {
   await app.register(institutionsRoutes);
   await app.register(trustRoutes);
   await app.register(calibrationRoutes);
+  await app.register(governanceExtRoutes);
 
   app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
 
