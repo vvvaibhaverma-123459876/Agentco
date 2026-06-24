@@ -3,8 +3,8 @@
 
 -- Coalition formations for tasks
 CREATE TABLE IF NOT EXISTS coalition_formations (
-  coalition_id VARCHAR(36) PRIMARY KEY,
-  task_id VARCHAR(36) NOT NULL,
+  coalition_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  task_id UUID NOT NULL,
   objective TEXT NOT NULL,
   required_specializations JSONB NOT NULL DEFAULT '[]',  -- array of specialization strings
   team_lead VARCHAR(36) NOT NULL,
@@ -25,8 +25,8 @@ CREATE INDEX IF NOT EXISTS idx_coalition_created ON coalition_formations(created
 
 -- Coalition performance history
 CREATE TABLE IF NOT EXISTS coalition_performance (
-  performance_id VARCHAR(36) PRIMARY KEY,
-  coalition_id VARCHAR(36) NOT NULL,
+  performance_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  coalition_id UUID NOT NULL,
   metric_type VARCHAR(50) NOT NULL,  -- efficiency, quality, cohesion, specialization_coverage
   metric_value NUMERIC(5, 3) NOT NULL,  -- 0-100 scale
   evaluated_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -41,8 +41,8 @@ CREATE INDEX IF NOT EXISTS idx_perf_evaluated ON coalition_performance(evaluated
 
 -- Coalition member assignments
 CREATE TABLE IF NOT EXISTS coalition_member_assignments (
-  assignment_id VARCHAR(36) PRIMARY KEY,
-  coalition_id VARCHAR(36) NOT NULL,
+  assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  coalition_id UUID NOT NULL,
   agent_id VARCHAR(36) NOT NULL,
   role VARCHAR(50) NOT NULL,  -- team_lead, core_member, supporting_member
   specializations JSONB NOT NULL DEFAULT '[]',
@@ -60,8 +60,8 @@ CREATE INDEX IF NOT EXISTS idx_member_assigned ON coalition_member_assignments(a
 
 -- Coalition collaboration events
 CREATE TABLE IF NOT EXISTS coalition_collaboration_events (
-  event_id VARCHAR(36) PRIMARY KEY,
-  coalition_id VARCHAR(36) NOT NULL,
+  event_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  coalition_id UUID NOT NULL,
   event_type VARCHAR(50) NOT NULL,  -- coordination_success, coordination_failure, member_joined, member_left
   magnitude NUMERIC(3, 2),  -- -1.0 to 1.0, impact of event
   involved_agents JSONB NOT NULL DEFAULT '[]',  -- array of agent IDs
@@ -77,7 +77,7 @@ CREATE INDEX IF NOT EXISTS idx_collab_timestamp ON coalition_collaboration_event
 
 -- Coalition composition recommendations
 CREATE TABLE IF NOT EXISTS coalition_composition_recommendations (
-  recommendation_id VARCHAR(36) PRIMARY KEY,
+  recommendation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   task_objective TEXT NOT NULL,
   required_specializations JSONB NOT NULL,
   recommended_lead_id VARCHAR(36),

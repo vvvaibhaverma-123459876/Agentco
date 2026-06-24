@@ -721,11 +721,11 @@ export class AutonomyOrchestratorService {
           goalId,
           goalText.substring(0, 100),
           goalText,
-          'autonomy_orchestrator',
+          'agent_proposed',
           'research',
           0.7,
           'low',
-          3,
+          'L3',
           'approved',
           'autonomy_action_planner',
         ]
@@ -760,14 +760,14 @@ export class AutonomyOrchestratorService {
         // Get current state for planning
         const claimsResult = await db.query(
           `SELECT COUNT(*) as count FROM autonomy_claims
-           WHERE action_id IN (SELECT id FROM autonomy_actions WHERE goal_id = $1)`,
+           WHERE action_id IN (SELECT id FROM autonomy_goal_actions WHERE goal_id = $1)`,
           [goalId]
         );
         const currentClaimsCount = parseInt(claimsResult.rows[0]?.count || '0');
 
         const evidenceResult = await db.query(
           `SELECT COUNT(*) as count FROM autonomy_evidence WHERE action_id IN (
-            SELECT id FROM autonomy_actions WHERE goal_id = $1
+            SELECT id FROM autonomy_goal_actions WHERE goal_id = $1
           )`,
           [goalId]
         );
@@ -803,15 +803,15 @@ export class AutonomyOrchestratorService {
 
         // Store action in database
         await db.query(
-          `INSERT INTO autonomy_actions (
-            id, action_id, action_type, goal_id, objective, args, success_criteria,
+          `INSERT INTO autonomy_goal_actions (
+            id, action_id, goal_id, action_type, objective, args, success_criteria,
             risk_level, decided_by, decided_at, reasoning, status
           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
           [
             uuidv4(),
             action.actionId,
-            action.actionType,
             goalId,
+            action.actionType,
             action.objective,
             JSON.stringify(action.args),
             JSON.stringify(action.successCriteria),

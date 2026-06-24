@@ -44,8 +44,10 @@ CREATE INDEX IF NOT EXISTS idx_specialists_role ON specialists(role);
 CREATE INDEX IF NOT EXISTS idx_specialists_current_reputation ON specialists(current_reputation);
 CREATE INDEX IF NOT EXISTS idx_specialists_status ON specialists(status);
 
--- Reputation scores table
-CREATE TABLE IF NOT EXISTS reputation_scores (
+-- Entity reputation baseline table (for assignment decisions)
+-- Note: The main reputation learning system uses reputation_scores (created in migration 057)
+-- This table tracks baseline reputation for specialists/institutions for assignment purposes
+CREATE TABLE IF NOT EXISTS entity_reputation_baseline (
   id VARCHAR(36) PRIMARY KEY,
   entity_id VARCHAR(36) NOT NULL, -- specialist or institution id
   entity_type VARCHAR(50) NOT NULL, -- 'specialist', 'department', 'institution'
@@ -56,12 +58,13 @@ CREATE TABLE IF NOT EXISTS reputation_scores (
   CONSTRAINT check_score CHECK (score >= 0 AND score <= 100)
 );
 
-CREATE INDEX IF NOT EXISTS idx_reputation_entity_id ON reputation_scores(entity_id);
-CREATE INDEX IF NOT EXISTS idx_reputation_entity_type ON reputation_scores(entity_type);
-CREATE INDEX IF NOT EXISTS idx_reputation_score ON reputation_scores(score);
+CREATE INDEX IF NOT EXISTS idx_entity_reputation_entity_id ON entity_reputation_baseline(entity_id);
+CREATE INDEX IF NOT EXISTS idx_entity_reputation_entity_type ON entity_reputation_baseline(entity_type);
+CREATE INDEX IF NOT EXISTS idx_entity_reputation_score ON entity_reputation_baseline(score);
 
--- Audit log for reputation changes
-CREATE TABLE IF NOT EXISTS reputation_audit_log (
+-- Audit log for entity reputation changes (baseline system)
+-- Note: The main reputation learning system uses reputation_audit_log (created in migration 057)
+CREATE TABLE IF NOT EXISTS entity_reputation_audit_log (
   id VARCHAR(36) PRIMARY KEY,
   entity_id VARCHAR(36) NOT NULL,
   previous_reputation NUMERIC(5, 2),
@@ -70,11 +73,12 @@ CREATE TABLE IF NOT EXISTS reputation_audit_log (
   recorded_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_reputation_audit_entity_id ON reputation_audit_log(entity_id);
-CREATE INDEX IF NOT EXISTS idx_reputation_audit_recorded_at ON reputation_audit_log(recorded_at);
+CREATE INDEX IF NOT EXISTS idx_entity_reputation_audit_entity_id ON entity_reputation_audit_log(entity_id);
+CREATE INDEX IF NOT EXISTS idx_entity_reputation_audit_recorded_at ON entity_reputation_audit_log(recorded_at);
 
--- Consistency checks table
-CREATE TABLE IF NOT EXISTS consistency_checks (
+-- Institution consistency checks (baseline audit)
+-- Note: The main consistency checking system uses consistency_checks (created in migration 055)
+CREATE TABLE IF NOT EXISTS institution_consistency_audit (
   id VARCHAR(36) PRIMARY KEY,
   institution_id VARCHAR(36),
   check_type VARCHAR(100),
@@ -84,8 +88,8 @@ CREATE TABLE IF NOT EXISTS consistency_checks (
   CONSTRAINT fk_institution FOREIGN KEY (institution_id) REFERENCES institutions(id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_consistency_checks_institution_id ON consistency_checks(institution_id);
-CREATE INDEX IF NOT EXISTS idx_consistency_checks_checked_at ON consistency_checks(checked_at);
+CREATE INDEX IF NOT EXISTS idx_institution_consistency_audit_institution_id ON institution_consistency_audit(institution_id);
+CREATE INDEX IF NOT EXISTS idx_institution_consistency_audit_checked_at ON institution_consistency_audit(checked_at);
 
 -- Departments table
 CREATE TABLE IF NOT EXISTS departments (

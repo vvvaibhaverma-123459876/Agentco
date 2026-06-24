@@ -3,7 +3,8 @@
 -- Date: 2026-06-23
 
 -- Enhanced autonomy_goals with hierarchy support
-ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS parent_goal_id VARCHAR(36);
+-- Note: parent_goal_id already exists in autonomy_goals (defined as UUID in migration 025)
+-- Just add additional columns for hierarchy tracking
 ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS goal_depth INT DEFAULT 0;
 ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS goal_path TEXT;
 ALTER TABLE autonomy_goals ADD COLUMN IF NOT EXISTS rollup_status VARCHAR(100);
@@ -15,9 +16,9 @@ CREATE INDEX IF NOT EXISTS idx_goals_path ON autonomy_goals(goal_path);
 
 -- Track evidence deduplication across institutions
 CREATE TABLE IF NOT EXISTS evidence_deduplication_map (
-  id VARCHAR(36) PRIMARY KEY,
-  evidence_source_id VARCHAR(36) NOT NULL,
-  canonical_evidence_id VARCHAR(36) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  evidence_source_id UUID NOT NULL,
+  canonical_evidence_id UUID NOT NULL,
   institution_ids JSONB DEFAULT '[]',
   work_request_ids JSONB DEFAULT '[]',
   confidence_score NUMERIC(3, 2),
@@ -34,8 +35,8 @@ CREATE INDEX IF NOT EXISTS idx_dedup_active ON evidence_deduplication_map(is_act
 
 -- Track cross-institutional evidence sharing
 CREATE TABLE IF NOT EXISTS cross_institutional_evidence_access (
-  id VARCHAR(36) PRIMARY KEY,
-  evidence_id VARCHAR(36) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  evidence_id UUID NOT NULL,
   source_institution_id VARCHAR(36) NOT NULL,
   requesting_institution_id VARCHAR(36) NOT NULL,
   access_status VARCHAR(50) DEFAULT 'pending',
@@ -56,7 +57,7 @@ CREATE INDEX IF NOT EXISTS idx_access_status ON cross_institutional_evidence_acc
 
 -- Track specialist allocation decisions for adaptation
 CREATE TABLE IF NOT EXISTS specialist_allocation_history (
-  id VARCHAR(36) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   work_request_id VARCHAR(36) NOT NULL,
   department_id VARCHAR(36) NOT NULL,
   specialist_role VARCHAR(100) NOT NULL,
@@ -74,8 +75,8 @@ CREATE INDEX IF NOT EXISTS idx_alloc_specialist ON specialist_allocation_history
 
 -- Goal rollup: track aggregated results from child goals
 CREATE TABLE IF NOT EXISTS goal_rollup_results (
-  id VARCHAR(36) PRIMARY KEY,
-  parent_goal_id VARCHAR(36) NOT NULL,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  parent_goal_id UUID NOT NULL,
   child_goal_ids JSONB DEFAULT '[]',
   total_evidence_count INT DEFAULT 0,
   total_claim_count INT DEFAULT 0,
@@ -91,7 +92,7 @@ CREATE INDEX IF NOT EXISTS idx_rollup_completeness ON goal_rollup_results(rollup
 
 -- Track specialist team compositions for pattern learning
 CREATE TABLE IF NOT EXISTS specialist_team_patterns (
-  id VARCHAR(36) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   team_composition JSONB NOT NULL,
   success_count INT DEFAULT 0,
   total_deployments INT DEFAULT 0,

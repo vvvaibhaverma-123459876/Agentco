@@ -5,6 +5,30 @@
 -- Actions table: Already created in migration 023, so we skip it here
 -- Migration 050 adds evidence and claims tracking for the existing autonomy_actions table
 
+-- Goal-based actions table: Tracks orchestrated actions tied to goals
+CREATE TABLE IF NOT EXISTS autonomy_goal_actions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  action_id VARCHAR(36) NOT NULL UNIQUE,
+  goal_id UUID NOT NULL,
+  action_type VARCHAR(100) NOT NULL,
+  objective TEXT NOT NULL,
+  args JSONB DEFAULT '{}',
+  success_criteria JSONB DEFAULT '[]',
+  risk_level VARCHAR(50),
+  decided_by VARCHAR(100),
+  decided_at TIMESTAMP,
+  reasoning TEXT,
+  status VARCHAR(50) DEFAULT 'planned',
+  executed_at TIMESTAMP,
+  result JSONB,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  CONSTRAINT fk_goal FOREIGN KEY (goal_id) REFERENCES autonomy_goals(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_goal_actions_goal ON autonomy_goal_actions(goal_id);
+CREATE INDEX IF NOT EXISTS idx_goal_actions_status ON autonomy_goal_actions(status);
+CREATE INDEX IF NOT EXISTS idx_goal_actions_type ON autonomy_goal_actions(action_type);
+
 -- Evidence table: Tracks all evidence sources for claims
 CREATE TABLE IF NOT EXISTS autonomy_evidence (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

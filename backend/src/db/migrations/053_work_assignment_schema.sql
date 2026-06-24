@@ -28,10 +28,10 @@ CREATE TABLE IF NOT EXISTS institution_work_requests (
   CONSTRAINT status_check CHECK (status IN ('queued', 'in_progress', 'completed', 'failed', 'cancelled'))
 );
 
-CREATE INDEX idx_work_requests_institution ON institution_work_requests(institution_id);
-CREATE INDEX idx_work_requests_department ON institution_work_requests(department_id);
-CREATE INDEX idx_work_requests_status ON institution_work_requests(status);
-CREATE INDEX idx_work_requests_goal ON institution_work_requests(autonomy_goal_id);
+CREATE INDEX IF NOT EXISTS idx_work_requests_institution ON institution_work_requests(institution_id);
+CREATE INDEX IF NOT EXISTS idx_work_requests_department ON institution_work_requests(department_id);
+CREATE INDEX IF NOT EXISTS idx_work_requests_status ON institution_work_requests(status);
+CREATE INDEX IF NOT EXISTS idx_work_requests_goal ON institution_work_requests(autonomy_goal_id);
 
 -- Track specialist assignments to departments
 CREATE TABLE IF NOT EXISTS institution_specialist_assignments (
@@ -48,9 +48,9 @@ CREATE TABLE IF NOT EXISTS institution_specialist_assignments (
   UNIQUE(department_id, specialist_role)
 );
 
-CREATE INDEX idx_assignments_institution ON institution_specialist_assignments(institution_id);
-CREATE INDEX idx_assignments_department ON institution_specialist_assignments(department_id);
-CREATE INDEX idx_assignments_role ON institution_specialist_assignments(specialist_role);
+CREATE INDEX IF NOT EXISTS idx_assignments_institution ON institution_specialist_assignments(institution_id);
+CREATE INDEX IF NOT EXISTS idx_assignments_department ON institution_specialist_assignments(department_id);
+CREATE INDEX IF NOT EXISTS idx_assignments_role ON institution_specialist_assignments(specialist_role);
 
 -- Track specialist performance for work requests
 CREATE TABLE IF NOT EXISTS specialist_performance_history (
@@ -68,9 +68,9 @@ CREATE TABLE IF NOT EXISTS specialist_performance_history (
   CONSTRAINT fk_work_request FOREIGN KEY (work_request_id) REFERENCES institution_work_requests(id)
 );
 
-CREATE INDEX idx_perf_work_request ON specialist_performance_history(work_request_id);
-CREATE INDEX idx_perf_specialist ON specialist_performance_history(specialist_role);
-CREATE INDEX idx_perf_overall_score ON specialist_performance_history(overall_score);
+CREATE INDEX IF NOT EXISTS idx_perf_work_request ON specialist_performance_history(work_request_id);
+CREATE INDEX IF NOT EXISTS idx_perf_specialist ON specialist_performance_history(specialist_role);
+CREATE INDEX IF NOT EXISTS idx_perf_overall_score ON specialist_performance_history(overall_score);
 
 -- Track work cycle completion for audit trail
 CREATE TABLE IF NOT EXISTS work_cycle_events (
@@ -83,8 +83,8 @@ CREATE TABLE IF NOT EXISTS work_cycle_events (
   CONSTRAINT fk_work_request FOREIGN KEY (work_request_id) REFERENCES institution_work_requests(id)
 );
 
-CREATE INDEX idx_cycle_work_request ON work_cycle_events(work_request_id);
-CREATE INDEX idx_cycle_timestamp ON work_cycle_events(timestamp);
+CREATE INDEX IF NOT EXISTS idx_cycle_work_request ON work_cycle_events(work_request_id);
+CREATE INDEX IF NOT EXISTS idx_cycle_timestamp ON work_cycle_events(timestamp);
 
 -- Trigger to update work_requests updated_at timestamp
 CREATE OR REPLACE FUNCTION update_work_requests_timestamp()
