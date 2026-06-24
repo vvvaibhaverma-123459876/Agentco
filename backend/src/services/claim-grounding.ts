@@ -78,6 +78,14 @@ export function validateGrounding(
   while ((match = namedConceptPattern.exec(claimText)) !== null) {
     foundConcepts.add(`${match[1].toLowerCase()} ${match[2].toLowerCase()}`);
   }
+  // Also catch numeric-prefixed fabrications the capitalised pattern misses,
+  // e.g. "6m theorem", "3x conjecture". Require the exact phrase to appear in the sources.
+  const numericConceptPattern =
+    /\b(\d+[a-z]*)\s+(theorem|conjecture|lemma|hypothesis|axiom|corollary)\b/gi;
+  while ((match = numericConceptPattern.exec(claimText)) !== null) {
+    foundConcepts.add(`${match[1].toLowerCase()} ${match[2].toLowerCase()}`);
+  }
+
   const missingConcepts: string[] = [];
   for (const concept of foundConcepts) {
     if (!sourceNorm.includes(concept)) missingConcepts.push(concept);

@@ -23,6 +23,13 @@ describe('validateGrounding — Named-Concept Verification', () => {
     expect(r.reason).toMatch(/verma conjecture/i);
   });
 
+  it('REJECTS a numeric-prefixed fabrication ("6m theorem") absent from sources', () => {
+    const claim = 'The 6m theorem establishes new bounds on prime gaps in cryptography.';
+    const r = validateGrounding(claim, src(PRIME_ABSTRACT), [], { requireSnippet: false });
+    expect(r.valid).toBe(false);
+    expect(r.reason).toMatch(/6m theorem|not found/i);
+  });
+
   it('REJECTS a fabricated "Fibonacci Theorem" when Fibonacci is absent', () => {
     const claim = 'The Fibonacci Theorem describes a fundamental property of prime number sequences.';
     const r = validateGrounding(claim, src(PRIME_ABSTRACT), [], { requireSnippet: false });

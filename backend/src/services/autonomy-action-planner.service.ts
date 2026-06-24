@@ -41,7 +41,7 @@ export class AutonomyActionPlannerService {
       web_search: ['query'],
       fetch_page: ['url'],
       extract_evidence: ['content', 'source'],
-      generate_claim: ['claimText', 'supportSourceIds'],
+      generate_claim: ['claimText', 'supportSourceIds', 'supportSnippets'],
       update_memory: ['content'],
       evaluate_progress: [],
       spawn_specialist: ['role', 'objective', 'goalId'],
@@ -341,8 +341,15 @@ Available action types with REQUIRED parameters:
 3. extract_evidence [REQUIRED: content, source]
    Example: {"action_type": "extract_evidence", "objective": "Extract key points", "args": {"content": "text...", "source": "url"}}
 
-4. generate_claim [REQUIRED: claimText, supportSourceIds]
-   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"claimText": "claim text", "supportSourceIds": ["source1", "source2"]}}
+4. generate_claim [REQUIRED: claimText, supportSourceIds, supportSnippets]
+   GROUNDING RULES (claims are REJECTED unless these hold):
+   - supportSnippets MUST be an array of VERBATIM quotes copied EXACTLY (word-for-word) from the
+     "Snippet:" text of the evidence sources shown below. Do not paraphrase a snippet.
+   - claimText MUST be written using the specific terminology found in those snippets (paper names,
+     theorem names, concepts) — NOT vague preambles like "Recent discoveries have significant implications".
+   - Do NOT invent named theorems/conjectures (e.g. "the 6m theorem"); only state what the snippets say.
+   - Each supportSourceId must be a source whose snippet you actually quoted.
+   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"claimText": "Goldston, Pintz and Yildirim proved bounded gaps between primes infinitely often.", "supportSourceIds": ["src-uuid-1"], "supportSnippets": ["bounded gaps between primes occur infinitely often"]}}
 
 5. update_memory [REQUIRED: content]
    Example: {"action_type": "update_memory", "objective": "Store learning", "args": {"content": {"type": "learning", "text": "..."}}}
@@ -414,11 +421,12 @@ Loop status: ${state.loopDetection.isLooping ? `DETECTED: ${state.loopDetection.
     if (state.evidenceSources && state.evidenceSources.length > 0) {
       prompt += `
 
-Available Evidence Sources (USE THESE IDs FOR CLAIMS):`;
+Available Evidence Sources (USE THESE IDs FOR CLAIMS — quote the Snippet text VERBATIM):`;
       state.evidenceSources.forEach((src, i) => {
-        prompt += `\n${i + 1}. [${src.sourceId}] ${src.url}\n   Snippet: ${src.snippet?.substring(0, 100) || 'N/A'}`;
+        // Provide a long-enough excerpt that the model has real sentences to quote verbatim.
+        prompt += `\n${i + 1}. [${src.sourceId}] ${src.url}\n   Snippet: ${src.snippet?.substring(0, 600) || 'N/A'}`;
       });
-      prompt += `\n\nYou can now generate claims using these source IDs in supportSourceIds parameter.`;
+      prompt += `\n\nTo generate a claim: pick ONE source above, copy a VERBATIM sentence/phrase from its Snippet into supportSnippets (exact words), put that source's id in supportSourceIds, and write claimText restating that quoted fact using the same specific terms. Vague claims not traceable to a quoted snippet WILL be rejected.`;
     }
 
     if (state.reflectionContext) {
