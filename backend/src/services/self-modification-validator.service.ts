@@ -1,5 +1,6 @@
 import { db } from '../db/client';
 import { v4 as uuidv4 } from 'uuid';
+import { ProtectedSurfaceEnforcerService } from './protected-surface-enforcer.service';
 
 export interface ProtectedSurface {
   id: string;
@@ -23,6 +24,13 @@ export interface SelfModValidation {
 }
 
 export class SelfModificationValidator {
+  /**
+   * Authoritative enforcer: derives protected surfaces from governance/policy.py and
+   * fails closed. Consulted per change so enforcement is unified on the policy-derived
+   * surfaces rather than only the in-class manifest below.
+   */
+  private enforcer = new ProtectedSurfaceEnforcerService();
+
   /**
    * Get protected surfaces manifest
    */
@@ -296,6 +304,27 @@ export class SelfModificationValidator {
 
         if (action === 'override' || action === 'bypass') {
           blockedReasons.push(`BLOCKED: Attempt to override/bypass ${field}`);
+        }
+
+        // Authoritative check: consult the policy.py-derived enforcer (fail-closed).
+        // This is the source of truth for protected surfaces; the in-class manifest above
+        // is a fast pre-filter. A destructive action raises the risk to 'critical'.
+        const enforcerRisk: 'low' | 'high' | 'critical' =
+          action === 'delete' || action === 'remove' || action === 'override' || action === 'bypass'
+            ? 'critical'
+            : 'high';
+        const verdict = await this.enforcer.evaluateModificationAttempt(
+          field,
+          change.value !== undefined ? JSON.stringify(change.value) : '',
+          enforcerRisk,
+        );
+        if (verdict.requires_human_approval) {
+          if (!touchedSurfaces.includes(verdict.surface_path)) {
+            touchedSurfaces.push(verdict.surface_path);
+          }
+          blockedReasons.push(
+            `BLOCKED by protected-surface enforcer: ${field} requires human approval (risk: ${enforcerRisk})`,
+          );
         }
       }
     }
