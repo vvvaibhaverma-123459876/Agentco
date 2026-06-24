@@ -123,56 +123,6 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
   );
 
   /**
-   * GET /api/autonomy/tasks/:taskId
-   * Get a specific task
-   */
-  fastify.get<{ Params: { taskId: string } }>(
-    '/api/autonomy/tasks/:taskId',
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      try {
-        const { taskId } = request.params as { taskId: string };
-
-        const result = await db.query(
-          `SELECT id, task_id, goal_id, status, autonomy_level, risk_level,
-                  task_type, created_at, updated_at
-           FROM autonomy_tasks WHERE id = $1 OR task_id = $1`,
-          [taskId]
-        );
-
-        if (result.rows.length === 0) {
-          return reply.code(404).send({
-            status: 'error',
-            message: 'Task not found',
-          });
-        }
-
-        const row = result.rows[0];
-        const task = {
-          id: row.id,
-          taskId: row.task_id,
-          goalId: row.goal_id,
-          status: row.status,
-          autonomyLevel: row.autonomy_level,
-          riskLevel: row.risk_level,
-          taskType: row.task_type,
-          createdAt: row.created_at,
-          updatedAt: row.updated_at,
-        };
-
-        reply.code(200).send({
-          status: 'success',
-          task,
-        });
-      } catch (error: any) {
-        reply.code(500).send({
-          status: 'error',
-          message: error.message,
-        });
-      }
-    }
-  );
-
-  /**
    * GET /api/autonomy/tasks?limit=20
    * List tasks
    */
