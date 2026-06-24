@@ -33,6 +33,7 @@ interface BoundedLearningRunConfig {
   provider?: 'openai' | 'local_llm' | 'deterministic_test_only';
   dryRun?: boolean;
   realWebEnabled?: boolean;
+  useGoalBasedSearch?: boolean;  // NEW: Enable goal-aware search for sources
 }
 
 interface BoundedLearningRunResult {
@@ -230,17 +231,76 @@ export class BoundedCivilizationLearningRun {
 
   private async discoverSources(config: BoundedLearningRunConfig): Promise<DiscoveredSource[]> {
     try {
+      // First try: seed registry (static, curated sources)
       const discovered = await this.sourceDiscovery.discoverSourcesFromPack(
         config.sourcePack,
         config.maxPages ?? 5
       );
 
-      console.log(`✅ Discovered ${discovered.length} sources`);
+      console.log(`✅ Discovered ${discovered.length} sources from seed registry`);
+
+      // Second try: if enabled, augment with goal-based search results
+      if (config.useGoalBasedSearch && discovered.length > 0) {
+        try {
+          const searchResults = await this.discoverSourcesViaGoalSearch(config.goal, 3);
+          if (searchResults.length > 0) {
+            console.log(`✅ Discovered ${searchResults.length} additional sources via goal-based search`);
+            discovered.push(...(searchResults as any));
+            this.logAuditEvent('sources_discovered_via_goal_search', {
+              goal: config.goal,
+              searchSourcesCount: searchResults.length,
+            });
+          }
+        } catch (searchError: any) {
+          console.warn(`⚠️ Goal-based search failed (non-blocking): ${searchError.message}`);
+          // Don't fail the whole run; goal-based search is augmentation, not required
+        }
+      }
+
       return discovered as any;
     } catch (error: any) {
       console.warn(`⚠️ Source discovery failed: ${error.message}`);
       this.warnings.push(`Source discovery failed: ${error.message}`);
       return [];
+    }
+  }
+
+  private async discoverSourcesViaGoalSearch(goal: string, maxResults: number = 3): Promise<DiscoveredSource[]> {
+    // Extract search query from goal (remove common words, keep meaningful terms)
+    const searchQuery = goal
+      .replace(/\b(find|discover|research|recent|developments|advances|learn|about|in|the|a|and|or)\b/gi, '')
+      .split(/\s+/)
+      .filter(word => word.length > 3)
+      .slice(0, 5)
+      .join(' ')
+      .trim();
+
+    if (!searchQuery) {
+      console.warn('⚠️ Could not extract search query from goal');
+      return [];
+    }
+
+    try {
+      console.log(`  🔍 Searching for goal-relevant sources: "${searchQuery}"`);
+      const results = await this.webAdapter.search(searchQuery);
+
+      if (!results || results.length === 0) {
+        console.warn(`⚠️ Search returned no results for: "${searchQuery}"`);
+        return [];
+      }
+
+      const discovered: any[] = results.slice(0, maxResults).map((result: any) => ({
+        source_url: result.url,
+        source_domain: new URL(result.url).hostname || 'unknown',
+        source_pack: 'search_results',
+        trust_tier: 'discovered',
+        allowed_to_fetch: true,
+        reason_allowed: `Discovered via goal-based search: "${goal}"`,
+      }));
+
+      return discovered as DiscoveredSource[];
+    } catch (error: any) {
+      throw new Error(`Goal-based search failed: ${error.message}`);
     }
   }
 
@@ -556,18 +616,18 @@ export class BoundedCivilizationLearningRun {
           messages: [
             {
               role: 'system',
-              content: `You are a claim extractor. Extract 2-4 SPECIFIC, NOVEL factual claims from the provided content.
+              content: `You are a claim extractor. Extract 2-4 factual claims from the provided content.
 
 REQUIREMENTS:
-- Claims must be specific (not generic statements)
-- Claims must be directly supported by text evidence
-- Each claim must assert something factual that can be verified
-- Avoid generic statements like "X is important" or "Y is used in field Z"
-- Focus on concrete findings, results, or discoveries
-- Do not invent or extrapolate beyond what the text states
+- Claims must be specific and verifiable (not generic)
+- Claims must be directly supported by the text
+- Each claim should assert something about the research work or findings
+- Avoid ONLY starting claims with "This paper", "The authors", "The work introduces"
+- Focus on concrete findings, results, and claims from the work
+- Do not invent or extrapolate beyond what is stated
 
-Return ONLY a valid JSON array with objects: {text (string), confidence (0-1)}
-Example: [{"text": "The study found 87% accuracy on the benchmark", "confidence": 0.95}]`,
+Return ONLY a valid JSON array: [{"text": "...", "confidence": 0.0-1.0}]
+Example: [{"text": "The study found 87% accuracy", "confidence": 0.95}]`,
             },
             {
               role: 'user',
