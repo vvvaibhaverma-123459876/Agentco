@@ -62,6 +62,10 @@ export class SourceDiscoveryEngine {
     { code: 'quant-ph', title: 'Quantum Physics', keywords: ['quantum', 'qubit', 'error correction', 'quantum computing'] },
     { code: 'cs.PL', title: 'Programming Languages', keywords: ['language', 'compiler', 'parsing', 'type system'] },
     { code: 'cs.NE', title: 'Neural and Evolutionary', keywords: ['neural', 'evolution', 'genetic', 'network', 'deep learning'] },
+    { code: 'math.NT', title: 'Number Theory', keywords: ['number', 'prime', 'integer', 'modular', 'diophantine', 'cryptography'] },
+    { code: 'math.CT', title: 'Category Theory', keywords: ['category', 'functor', 'morphism', 'topology', 'abstract'] },
+    { code: 'math.PR', title: 'Probability', keywords: ['probability', 'random', 'distribution', 'stochastic', 'measure'] },
+    { code: 'math.AP', title: 'Analysis & PDE', keywords: ['analysis', 'differential', 'equation', 'pde', 'calculus'] },
   ];
 
   constructor() {
