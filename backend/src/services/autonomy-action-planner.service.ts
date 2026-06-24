@@ -14,9 +14,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/client';
 import { ActionSpec, ActionType, RiskLevel } from '../types/action.types';
 import { LoopDetectionResult } from './loop-detector.service';
+import { AutonomyModelSelectionService, ModelDecision } from './autonomy-model-selection.service';
 
 export class AutonomyActionPlannerService {
   private apiKey: string;
+  private modelSelector = new AutonomyModelSelectionService();
 
   constructor() {
     this.apiKey = process.env.LLM_API_KEY || '';
@@ -55,15 +57,22 @@ export class AutonomyActionPlannerService {
   }
 
   /**
-   * Call OpenAI API using native fetch with parameter validation
+   * Call LLM API using native fetch with parameter validation.
+   * Uses model selected by ModelSelectionService and logs decision.
    */
   private async callOpenAI(
     messages: Array<{ role: string; content: string }>,
+    modelDecision: ModelDecision,
     attemptNumber: number = 0,
     previousError?: string
-  ): Promise<string> {
-    // Use configured LLM provider, default to OpenAI
-    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+  ): Promise<{ content: string; requestTokens?: number; responseTokens?: number }> {
+    // Determine base URL based on provider
+    let baseUrl = process.env.LLM_BASE_URL;
+    if (!baseUrl) {
+      baseUrl = modelDecision.provider === 'anthropic'
+        ? 'https://api.anthropic.com/v1'
+        : 'https://api.openai.com/v1';
+    }
     const apiUrl = `${baseUrl}/chat/completions`;
 
     // Add error feedback to messages on retry
@@ -91,7 +100,7 @@ export class AutonomyActionPlannerService {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini',
+            model: modelDecision.modelCode,
             messages: messagesWithFeedback,
             max_tokens: 500,
             temperature: 0.7,
@@ -111,7 +120,11 @@ export class AutonomyActionPlannerService {
           throw new Error('Empty response from API');
         }
 
-        return content;
+        // Extract token usage if available
+        const requestTokens = data.usage?.prompt_tokens;
+        const responseTokens = data.usage?.completion_tokens;
+
+        return { content, requestTokens, responseTokens };
       } catch (error) {
         lastError = error;
         if (attempt < 2) {
@@ -189,6 +202,7 @@ export class AutonomyActionPlannerService {
   /**
    * Decide the next action given goal context and loop status
    * Includes parameter validation and fallback strategy
+   * Uses ModelSelectionService to select and log model decision
    */
   async planNextAction(
     goalId: string,
@@ -214,6 +228,10 @@ export class AutonomyActionPlannerService {
       }
     }
 
+    // Select model for this decision (logs to model_decision_ledger)
+    const modelDecision = await this.modelSelector.selectModelForAction('PLAN_ACTION');
+    console.log(`Selected model: ${modelDecision.modelCode} (reason: ${modelDecision.reasoning})`);
+
     // Use LLM to decide next action with parameter validation and retry
     const prompt = this.buildDecisionPrompt(currentState);
     const systemPrompt = this.buildSystemPrompt();
@@ -221,11 +239,12 @@ export class AutonomyActionPlannerService {
     let actionData: any = null;
     let lastValidationError: string | undefined;
     let attemptCount = 0;
+    let lastTokenUsage: { requestTokens?: number; responseTokens?: number } = {};
 
     // Try up to 2 times with feedback
     while (attemptCount < 2 && !actionData) {
       try {
-        const content = await this.callOpenAI(
+        const llmResponse = await this.callOpenAI(
           [
             {
               role: 'system',
@@ -236,12 +255,18 @@ export class AutonomyActionPlannerService {
               content: prompt,
             },
           ],
+          modelDecision,
           attemptCount,
           lastValidationError
         );
 
+        lastTokenUsage = {
+          requestTokens: llmResponse.requestTokens,
+          responseTokens: llmResponse.responseTokens,
+        };
+
         // Parse LLM decision
-        actionData = this.parseLLMDecision(content);
+        actionData = this.parseLLMDecision(llmResponse.content);
 
         // Validate parameters
         if (actionData && actionData.action_type) {
@@ -255,9 +280,25 @@ export class AutonomyActionPlannerService {
         }
       } catch (error) {
         console.error(`LLM call error: ${error}`);
+        // Update ledger with error
+        await this.modelSelector.updateDecisionOutcome(
+          modelDecision.decision_id,
+          lastTokenUsage.requestTokens || 0,
+          lastTokenUsage.responseTokens || 0,
+          false,
+          String(error)
+        );
         throw error;
       }
     }
+
+    // Update ledger with success status and token usage
+    await this.modelSelector.updateDecisionOutcome(
+      modelDecision.decision_id,
+      lastTokenUsage.requestTokens || 0,
+      lastTokenUsage.responseTokens || 0,
+      !!actionData
+    );
 
     // If LLM failed to provide valid parameters after retries, use fallback
     if (!actionData) {
