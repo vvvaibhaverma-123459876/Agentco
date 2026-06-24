@@ -231,13 +231,14 @@ export class BoundedCivilizationLearningRun {
 
   private async discoverSources(config: BoundedLearningRunConfig): Promise<DiscoveredSource[]> {
     try {
-      // First try: seed registry (static, curated sources)
-      const discovered = await this.sourceDiscovery.discoverSourcesFromPack(
+      // First try: seed registry with goal-aware arxiv selection
+      const discovered = await this.sourceDiscovery.discoverSourcesWithGoalAwareness(
+        config.goal,
         config.sourcePack,
         config.maxPages ?? 5
       );
 
-      console.log(`✅ Discovered ${discovered.length} sources from seed registry`);
+      console.log(`✅ Discovered ${discovered.length} sources (with goal-aware arxiv selection)`);
 
       // Second try: if enabled, augment with goal-based search results
       if (config.useGoalBasedSearch && discovered.length > 0) {

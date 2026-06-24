@@ -47,8 +47,22 @@ interface SourcePack {
   }[];
 }
 
+interface ArxivCategory {
+  code: string;
+  title: string;
+  keywords: string[];
+}
+
 export class SourceDiscoveryEngine {
   private seedRegistry: Map<string, SourcePack> = new Map();
+  private arxivCategories: ArxivCategory[] = [
+    { code: 'cs.AI', title: 'Artificial Intelligence', keywords: ['ai', 'autonomy', 'agent', 'intelligence', 'learning', 'llm', 'language model'] },
+    { code: 'cs.DS', title: 'Data Structures and Algorithms', keywords: ['algorithm', 'data structure', 'distributed', 'system', 'consensus'] },
+    { code: 'cs.CR', title: 'Cryptography and Security', keywords: ['security', 'privacy', 'cryptograph', 'attack', 'defense'] },
+    { code: 'quant-ph', title: 'Quantum Physics', keywords: ['quantum', 'qubit', 'error correction', 'quantum computing'] },
+    { code: 'cs.PL', title: 'Programming Languages', keywords: ['language', 'compiler', 'parsing', 'type system'] },
+    { code: 'cs.NE', title: 'Neural and Evolutionary', keywords: ['neural', 'evolution', 'genetic', 'network', 'deep learning'] },
+  ];
 
   constructor() {
     this.initializeSeedRegistry();
@@ -408,6 +422,61 @@ export class SourceDiscoveryEngine {
   getSourcePackDescription(packName: string): string | null {
     const pack = this.seedRegistry.get(packName);
     return pack ? pack.description : null;
+  }
+
+  /**
+   * Discover sources with goal-based arxiv category selection
+   * Routes goal to appropriate arxiv category (e.g., "AI safety" → cs.AI, "systems" → cs.DS)
+   */
+  async discoverSourcesWithGoalAwareness(
+    goal: string,
+    packName: string,
+    maxSources: number = 5
+  ): Promise<DiscoveredSource[]> {
+    // First, get seed sources from the pack
+    const seedSources = await this.discoverSourcesFromPack(packName, maxSources);
+
+    // Then, enhance with goal-aware arxiv category selection
+    const selectedCategory = this.selectArxivCategoryByGoal(goal);
+    if (selectedCategory) {
+      // Create an arxiv source for the selected category
+      const arxivSource: any = {
+        source_url: `https://arxiv.org/list/${selectedCategory.code}/recent`,
+        discovery_method: 'seed',
+        discovery_timestamp: new Date(),
+        source_domain: 'arxiv.org',
+        source_pack: packName,
+        topic_hint: `${selectedCategory.title} (goal-selected)`,
+        trust_tier: 'seed',
+        allowed_to_fetch: true,
+        reason_allowed: `Goal-aware arxiv selection: "${goal}" → ${selectedCategory.code}`,
+        risk_classification: 'safe',
+      };
+
+      // Add goal-selected arxiv before general seed sources (higher priority)
+      const merged = [arxivSource, ...seedSources.filter(s => !s.source_url.includes('arxiv.org'))];
+      return merged.slice(0, maxSources);
+    }
+
+    return seedSources;
+  }
+
+  /**
+   * Select arxiv category based on goal keywords
+   * Returns the best-matching category or null if no match
+   */
+  private selectArxivCategoryByGoal(goal: string): ArxivCategory | null {
+    const goalLower = goal.toLowerCase();
+
+    // Count keyword matches per category
+    const scores = this.arxivCategories.map(cat => ({
+      category: cat,
+      score: cat.keywords.filter(kw => goalLower.includes(kw)).length,
+    }));
+
+    // Return highest-scoring category if it has at least one match
+    const best = scores.sort((a, b) => b.score - a.score)[0];
+    return best && best.score > 0 ? best.category : null;
   }
 }
 
