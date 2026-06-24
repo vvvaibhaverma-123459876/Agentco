@@ -1,0 +1,31 @@
+{
+  "type": "unconstrained_5_minute_run",
+  "timestamp": "2026-06-24T03:55:11.835Z",
+  "startTime": "2026-06-24T03:50:10.438Z",
+  "endTime": "2026-06-24T03:55:11.835Z",
+  "goal": "Research emerging trends in AI safety and alignment",
+  "duration_seconds": 301.395,
+  "duration_minutes": 5.02325,
+  "target_duration_seconds": 300,
+  "target_duration_minutes": 5,
+  "fullDurationAchieved": true,
+  "metrics": {
+    "actionsExecuted": 191,
+    "claimsGenerated": 0,
+    "finalStatus": "completed",
+    "terminationReason": "Loop detected: no_progress_streak. Forcing termination."
+  },
+  "api_key_used": true,
+  "learning_systems": {
+    "reputation": "active",
+    "adaptive_strategy": "active",
+    "governance": "active",
+    "coalition_formation": "active",
+    "loop_detection": "active",
+    "reflection": "active"
+  },
+  "performance": {
+    "actions_per_second": "0.63",
+    "claims_per_second": "0.00"
+  }
+}

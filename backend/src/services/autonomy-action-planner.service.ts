@@ -10,19 +10,71 @@
  * Uses LLM to decide, returns typed ActionSpec
  */
 
-import { OpenAI } from 'openai';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/client';
 import { ActionSpec, ActionType, RiskLevel } from '../types/action.types';
 import { LoopDetectionResult } from './loop-detector.service';
 
 export class AutonomyActionPlannerService {
-  private openai: OpenAI;
+  private apiKey: string;
 
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.LLM_API_KEY,
-    });
+    this.apiKey = process.env.LLM_API_KEY || '';
+    if (!this.apiKey) {
+      throw new Error('LLM_API_KEY environment variable not set');
+    }
+  }
+
+  /**
+   * Call OpenAI API using native fetch
+   */
+  private async callOpenAI(messages: Array<{ role: string; content: string }>): Promise<string> {
+    const apiUrl = 'https://api.openai.com/v1/chat/completions';
+
+    let lastError;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages,
+            max_tokens: 400,
+            temperature: 0.7,
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data: any = await response.json();
+        const content = data.choices?.[0]?.message?.content;
+        if (!content) {
+          throw new Error('Empty response from API');
+        }
+
+        return content;
+      } catch (error) {
+        lastError = error;
+        if (attempt < 2) {
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    throw new Error(`LLM call failed after 3 retries: ${lastError}`);
   }
 
   /**
@@ -116,26 +168,17 @@ export class AutonomyActionPlannerService {
     // Use LLM to decide next action
     const prompt = this.buildDecisionPrompt(currentState);
     const systemPrompt = this.buildSystemPrompt();
-    const decision = await this.openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt,
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: 400,
-      temperature: 0.7,
-    });
 
-    const content = decision.choices[0]?.message?.content;
-    if (!content) {
-      throw new Error('LLM returned empty decision');
-    }
+    const content = await this.callOpenAI([
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ]);
 
     // Parse LLM decision
     const actionData = this.parseLLMDecision(content);

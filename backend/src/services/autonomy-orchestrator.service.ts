@@ -830,16 +830,16 @@ export class AutonomyOrchestratorService {
         // Update action with result
         if (result.completedAt) {
           await db.query(
-            `UPDATE autonomy_actions SET status = $1, started_at = $2, completed_at = $3,
-             observations = $4, created_artifacts = $5, errors = $6
-             WHERE action_id = $7`,
+            `UPDATE autonomy_goal_actions SET status = $1, executed_at = $2, result = $3
+             WHERE id = $4`,
             [
               result.status,
-              result.startedAt,
               result.completedAt,
-              JSON.stringify(result.observations),
-              JSON.stringify(result.createdArtifacts),
-              JSON.stringify(result.errors || []),
+              JSON.stringify({
+                observations: result.observations,
+                createdArtifacts: result.createdArtifacts,
+                errors: result.errors || []
+              }),
               action.actionId,
             ]
           );
