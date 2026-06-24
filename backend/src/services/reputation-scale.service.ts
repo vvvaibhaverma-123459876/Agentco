@@ -116,9 +116,12 @@ class ReputationScaleService {
         stddev_reputation: Math.round((row.stddev_reputation || 0) * 100) / 100,
       }));
 
-      // Get institution-level reputation
+      // Institution-level reputation is derived from its specialists' scores
+      // (the institutions table has no reputation_score column).
       const instResult = await db.query(
-        `SELECT reputation_score FROM institutions WHERE id = $1`,
+        `SELECT AVG(reputation_score) AS avg_reputation
+           FROM institution_specialist_assignments
+          WHERE institution_id = $1 AND active = TRUE`,
         [institutionId]
       );
 
@@ -127,7 +130,9 @@ class ReputationScaleService {
         0
       );
       const avgReputation =
-        instResult.rows[0]?.reputation_score || 0.5;
+        instResult.rows[0]?.avg_reputation != null
+          ? Number(instResult.rows[0].avg_reputation)
+          : 0.5;
 
       return {
         institution_id: institutionId,

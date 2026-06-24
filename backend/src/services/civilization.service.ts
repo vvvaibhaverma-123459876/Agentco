@@ -56,6 +56,10 @@ interface ServiceBusMessage {
   timestamp: number;
 }
 
+import { symbolicService } from './symbolic.service';
+import { ensembleService } from './ensemble.service';
+import { ragService } from './rag.service';
+
 export class CivilizationService {
   private knowledgeBase: Map<string, KnowledgeEntry> = new Map();
   private feedbackBuffer: ServiceFeedback[] = [];
@@ -249,17 +253,57 @@ export class CivilizationService {
    * STEP 3: Execute primary solver
    */
   private async executePrimarySolver(question: string, optimalService: any): Promise<any> {
-    // In real implementation, call actual services
-    // For now: simulate
+    // Dispatch to the REAL reasoning service chosen by selectOptimalService.
     console.log(`[${optimalService.service}] Solving: ${question}`);
 
-    return {
-      service: optimalService.service,
-      answer: 'Simulated answer',
-      confidence: 0.85,
-      reasoning: 'Simulated reasoning',
-      method: 'simulated',
-    };
+    try {
+      switch (optimalService.service) {
+        case 'symbolic': {
+          const r = await symbolicService.solve(question);
+          return {
+            service: 'symbolic',
+            answer: r.answer,
+            confidence: r.confidence,
+            reasoning: r.reasoning,
+            method: r.method,
+          };
+        }
+        case 'ensemble': {
+          const r = await ensembleService.ensembleVote(question);
+          return {
+            service: 'ensemble',
+            answer: r.final_answer,
+            confidence: r.confidence,
+            reasoning: r.reasoning,
+            method: r.abstention ? 'ensemble_abstained' : 'ensemble_vote',
+          };
+        }
+        case 'rag':
+        default: {
+          // RAG augments a baseline; derive the baseline from the ensemble first.
+          const base = await ensembleService.ensembleVote(question);
+          const r = await ragService.augmentAnswer(question, base.final_answer, base.confidence);
+          return {
+            service: 'rag',
+            answer: r.final_answer,
+            confidence: r.final_confidence,
+            reasoning: r.reasoning,
+            method: 'rag_augmented',
+          };
+        }
+      }
+    } catch (error) {
+      // Fail-soft: surface the failure honestly rather than fabricating an answer.
+      const message = error instanceof Error ? error.message : String(error);
+      return {
+        service: optimalService.service,
+        answer: null,
+        confidence: 0,
+        reasoning: `Primary solver (${optimalService.service}) failed: ${message}`,
+        method: 'error',
+        error: message,
+      };
+    }
   }
 
   /**

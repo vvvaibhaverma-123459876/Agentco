@@ -1,79 +1,50 @@
+/**
+ * Protected-surface enforcer — DB-backed verification + audit trail.
+ * File-derivation/existence checks run always (no I/O beyond the filesystem).
+ * The audit-trail record/retrieve (autonomy_memory) needs Postgres, so it is gated behind
+ * RUN_LIVE_SMOKE=1 (same convention as the civilization smoke suite).
+ *
+ * NOTE: this file was previously a console.log script with no it() blocks, so it always
+ * failed jest with "must contain at least one test". Converted to real assertions.
+ */
+import { describe, it, expect } from '@jest/globals';
 import { ProtectedSurfaceEnforcerService } from '../src/services/protected-surface-enforcer.service';
-import { db } from '../src/db/client';
 
-async function testProtectedSurfaces() {
-  console.log('\n' + '='.repeat(70));
-  console.log('TESTING: Protected Surface Enforcer Service');
-  console.log('='.repeat(70));
-
+describe('protected surface enforcer (filesystem-derived)', () => {
   const enforcer = new ProtectedSurfaceEnforcerService();
 
-  // Check what was auto-derived
-  const surfaces = enforcer.getProtectedSurfaces();
-  console.log(`\nAuto-derived ${surfaces.length} protected surfaces from policy.py:`);
-  for (const surface of surfaces) {
-    console.log(`  - ${surface}`);
-  }
-
-  // Verify existence
-  console.log('\nVerifying protected surfaces exist:');
-  const state = await enforcer.verifyProtectedSurfacesExist();
-
-  console.log(`\nResults:`);
-  console.log(`Total surfaces: ${state.surfaces.length}`);
-  console.log(`All exist: ${state.all_exist}`);
-
-  for (const surface of state.surfaces) {
-    const status = surface.exists ? '✅' : '❌';
-    const hash = surface.content_hash ? `hash=${surface.content_hash.substring(0, 8)}...` : 'N/A';
-    console.log(`${status} ${surface.path}`);
-    if (surface.exists) {
-      console.log(`   ${hash}`);
+  it('auto-derives the 4 protected surfaces from policy.py and all exist', async () => {
+    const surfaces = enforcer.getProtectedSurfaces();
+    expect(surfaces.length).toBe(4);
+    const state = await enforcer.verifyProtectedSurfacesExist();
+    expect(state.surfaces.length).toBe(4);
+    expect(state.all_exist).toBe(true);
+    for (const s of state.surfaces) {
+      expect(s.exists).toBe(true);
+      expect(s.content_hash).toBeTruthy();
     }
-  }
+  });
 
-  // Test modification evaluation
-  console.log('\n\nTesting modification attempt evaluation:');
-  const protectedPath = '/Users/Zet/agentco/calibration/evidence/evidence_kernel.py';
-  const result = await enforcer.evaluateModificationAttempt(
-    protectedPath,
-    'attempt to modify protected surface',
-    'critical'
-  );
+  it('requires human approval for a critical modification of a protected surface', async () => {
+    const result = await enforcer.evaluateModificationAttempt(
+      'calibration/evidence/evidence_kernel.py',
+      'attempt to modify protected surface',
+      'critical',
+    );
+    expect(result.requires_human_approval).toBe(true);
+  });
+});
 
-  console.log(`\nAttempt to modify: ${result.surface_path}`);
-  console.log(`Requires human approval: ${result.requires_human_approval}`);
+const RUN_DB = process.env.RUN_LIVE_SMOKE === '1';
+(RUN_DB ? describe : describe.skip)('protected surface audit trail (real Postgres)', () => {
+  const enforcer = new ProtectedSurfaceEnforcerService();
 
-  // Test audit trail recording
-  console.log('\n\nRecording surface verification to audit trail...');
-  await enforcer.recordSurfaceVerification(state);
-  console.log('✅ Recorded to autonomy_memory');
-
-  // Retrieve from DB
-  const latest = await enforcer.getLatestSurfaceState();
-  if (latest) {
-    console.log(`✅ Retrieved from DB: ${latest.surfaces.length} surfaces, all_exist=${latest.all_exist}`);
-  }
-
-  console.log('\n' + '='.repeat(70));
-  const success = state.all_exist && state.surfaces.length === 4;
-  if (success) {
-    console.log('✅ SUCCESS: All 4 protected surfaces exist and verified');
-  } else {
-    if (state.surfaces.length !== 4) {
-      console.log(`❌ FAILURE: Expected 4 surfaces, got ${state.surfaces.length}`);
-    }
-    if (!state.all_exist) {
-      const missing = state.surfaces.filter((s: any) => !s.exists).map((s: any) => s.path);
-      console.log(`❌ FAILURE: Missing surfaces: ${missing.join(', ')}`);
-    }
-  }
-  console.log('='.repeat(70) + '\n');
-
-  await db.end();
-}
-
-testProtectedSurfaces().catch(error => {
-  console.error('\n❌ Test failed:', error);
-  process.exit(1);
+  it('records a verification and reads it back from autonomy_memory', async () => {
+    const state = await enforcer.verifyProtectedSurfacesExist();
+    await enforcer.recordSurfaceVerification(state);
+    const latest = await enforcer.getLatestSurfaceState();
+    expect(latest).not.toBeNull();
+    expect(latest!.surfaces.length).toBe(4);
+    expect(latest!.all_exist).toBe(true);
+  });
 });

@@ -80,7 +80,9 @@ export class GoalManager {
         input.domain,
         input.expectedValue || null,
         input.riskLevel,
-        input.autonomyLevelAllowed,
+        // Default to the SAFEST level (L0 = no autonomy) when unspecified; governance
+        // raises it later via assignAutonomyLevel(). Never default permissive.
+        input.autonomyLevelAllowed || 'L0',
         'proposed',
         JSON.stringify(input.successCriteria),
         JSON.stringify(input.stopConditions),
