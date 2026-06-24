@@ -80,20 +80,40 @@ class CalibrationUpdater:
         prediction_id = str(uuid.uuid4())
 
         try:
+            import json
+            from datetime import timedelta
+
+            # Register with all required NOT NULL fields
+            now = datetime.now(timezone.utc)
+            resolution_date = now + timedelta(days=7)  # 7-day resolution window
+
             self.db.execute_update(
                 """INSERT INTO prediction_ledger
                    (prediction_id, claim, probability, confidence_basis,
-                    producing_agent_id, domain, resolved, created_at)
-                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                    producing_agent_id, producing_prompt_version,
+                    resolution_criterion, resolution_date, ground_truth_source,
+                    horizon_class, domain, claim_type,
+                    post_hoc, resolved, was_surprise, hardness,
+                    created_at)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
                 (
                     prediction_id,
                     claim_text,
                     probability,
-                    confidence_basis,
+                    json.dumps({"basis": confidence_basis}),  # confidence_basis is jsonb
                     agent_id,
+                    "civilization-service-v1",  # producing_prompt_version
+                    "external",  # resolution_criterion
+                    resolution_date,  # resolution_date
+                    "pending",  # ground_truth_source
+                    "medium",  # horizon_class (must be 'short', 'medium', or 'long')
                     domain,
-                    False,  # unresolved
-                    datetime.now(timezone.utc),
+                    "factual",  # claim_type
+                    False,  # post_hoc
+                    False,  # resolved (unresolved initially)
+                    False,  # was_surprise
+                    0.5,  # hardness (0-1 scale)
+                    now,  # created_at
                 ),
             )
             logger.info(
