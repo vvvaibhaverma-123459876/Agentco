@@ -194,8 +194,8 @@ class CivilizationService:
     ) -> Dict[str, int]:
         """Execute goals via autonomy orchestrator.
 
-        Calls orchestrator for each goal, then queries DB for actual
-        claims and evidence that were created (no fabrication).
+        Calls orchestrator for each goal, then matches returned artifact_ids
+        against autonomy_claims table (no goal_id/action_id confusion).
         """
         db = get_db()
         total_claims = 0
@@ -218,43 +218,49 @@ class CivilizationService:
                     )
                     continue
 
-                # Query DB for actual claims created by orchestrator
-                # (not fabricated counts from artifact filter)
-                try:
-                    claims_rows = db.execute_query(
-                        """SELECT DISTINCT claim_id FROM autonomy_claims
-                           WHERE action_id = %s""",
-                        (goal_id,),
-                        fetch_all=True,
-                    )
-                    claims_count = len(claims_rows) if claims_rows else 0
-                    claim_ids = [row["claim_id"] for row in claims_rows] if claims_rows else []
-                    all_claim_ids.extend(claim_ids)
-                except Exception as e:
-                    self.logger.warning(f"Failed to query claims for {goal_id}: {e}")
-                    claims_count = 0
-                    claim_ids = []
+                # Get artifact IDs returned by orchestrator
+                artifact_ids = exec_result.get("artifact_ids", [])
 
-                # Query for evidence (stored in autonomy_evidence)
-                try:
-                    evidence_rows = db.execute_query(
-                        """SELECT DISTINCT id FROM autonomy_evidence
-                           WHERE action_id = %s""",
-                        (goal_id,),
-                        fetch_all=True,
-                    )
-                    evidence_count = len(evidence_rows) if evidence_rows else 0
-                except Exception as e:
-                    self.logger.warning(f"Failed to query evidence for {goal_id}: {e}")
-                    evidence_count = 0
+                if not artifact_ids:
+                    self.logger.info(f"Goal {goal_id}: no artifacts returned")
+                    continue
 
-                total_claims += claims_count
-                total_evidence += evidence_count
+                # Match artifact_ids against autonomy_claims and autonomy_evidence
+                # (artifacts are bare UUIDs from createdArtifacts)
+                try:
+                    if artifact_ids:
+                        # Query claims table for these artifact IDs
+                        claims_rows = db.execute_query(
+                            """SELECT claim_id FROM autonomy_claims
+                               WHERE claim_id = ANY(%s)""",
+                            (artifact_ids,),
+                            fetch_all=True,
+                        )
+                        claim_ids = [row["claim_id"] for row in claims_rows] if claims_rows else []
+                        claims_count = len(claim_ids)
+                        all_claim_ids.extend(claim_ids)
+
+                        # Query evidence table for remaining artifact IDs
+                        evidence_rows = db.execute_query(
+                            """SELECT id FROM autonomy_evidence
+                               WHERE id = ANY(%s)""",
+                            (artifact_ids,),
+                            fetch_all=True,
+                        )
+                        evidence_count = len(evidence_rows) if evidence_rows else 0
+
+                        total_claims += claims_count
+                        total_evidence += evidence_count
+
+                        self.logger.info(
+                            f"Goal {goal_id}: {claims_count} claims, {evidence_count} evidence "
+                            f"(matched from {len(artifact_ids)} artifacts)"
+                        )
+                except Exception as e:
+                    self.logger.warning(f"Failed to match artifacts for {goal_id}: {e}")
+                    continue
+
                 completed += 1
-
-                self.logger.info(
-                    f"Goal {goal_id}: {claims_count} claims, {evidence_count} evidence (REAL from DB, not fabricated)"
-                )
 
             except Exception as e:
                 self.logger.error(f"Goal execution error: {e}")
