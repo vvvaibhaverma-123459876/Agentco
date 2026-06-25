@@ -34,11 +34,18 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   Guarded by `tests/integration/civilization-smoke.test.ts`. See memory `civilization_live_boot_findings`.
 
 ### Known remaining gaps (honest)
-- **Evidence quality:** the fetcher stores RAW HTML (128/154 evidence rows contain `<head>/<title>`),
-  so claims can ground against page titles/boilerplate. NEXT highest-leverage fix: strip HTML and
-  store clean abstract text before persisting evidence. (This is why e2e claims fixated on the
-  "6m theorem" arXiv *title*.)
-- **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims.
+- ✅ **Evidence quality — FIXED** (commit `1b55e43`): `src/services/html-extract.ts` now extracts
+  the arXiv abstract (`<blockquote class="abstract">`) / clean body text; the executor stores that
+  instead of raw HTML[:2000]. Proven by a live integration test (`evidence-extraction.test.ts`,
+  gated `RUN_LIVE_SMOKE`) that fetches a real `/abs/` page and asserts a clean abstract is stored.
+  NOTE: full autonomy-loop re-validation is currently blocked by **arXiv search-API rate-limiting**
+  (transient — falls back to listing pages, producing clean-but-useless nav text → 0 claims). Re-run
+  the number-theory e2e once the API recovers to see grounded abstract-based claims flow.
+- **Source-quality scoring (NEXT, highest-leverage):** grounding ≠ credibility. The loop will cite a
+  junk/vanity preprint (e.g. arXiv 1810.02188 "6m theorem") as long as the words match. Add a
+  source-quality / credibility signal (citation count, venue, author reputation, peer-review status)
+  so evidence-governance means *trustworthy* evidence, not just *traceable* evidence.
+- **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
@@ -208,10 +215,11 @@ print("server.ts reaches:", len(server&allsv), "/", len(allsv))
 
 ## 7. Suggested resume order (updated)
 
-1. **Clean-abstract extraction** (HIGHEST leverage, §1 gaps): strip HTML in the fetch/extract path
-   so evidence stores real abstract prose, not `<head>/<title>` boilerplate. This directly raises
-   claim quality and stops claims grounding against page titles (the "6m theorem" artifact).
-   Re-run the number-theory e2e as the acceptance check.
+0. ✅ **Clean-abstract extraction — DONE** (commit `1b55e43`). Re-run the number-theory e2e once
+   arXiv's search API stops rate-limiting to watch grounded abstract-based claims flow.
+1. **Source-quality scoring** (HIGHEST leverage now, §1 gaps): grounding ≠ credibility. Add a
+   credibility signal so the loop won't cite vanity/junk preprints just because the words match.
+   This is what makes "evidence-governed" mean trustworthy, not merely traceable.
 2. **Close the learning loop** end-to-end (§5) — run the autonomy loop twice, assert the second
    run's decision changes given stored reflections/reputation. The real unproven capability.
 3. **Single `agentco` entrypoint** (§3) with the constitution boot-gate + `boot.test.ts`, and an
