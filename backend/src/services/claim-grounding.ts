@@ -46,6 +46,28 @@ function normalise(text: string): string {
   return text.replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
+/** Lowercased alphanumeric tokens — ignores whitespace/punctuation/LaTeX operator spacing. */
+function tokenize(text: string): string[] {
+  return (text.toLowerCase().match(/[a-z0-9]+/g) || []);
+}
+
+/**
+ * True if `needle`'s token sequence appears as a contiguous run inside `haystack`'s tokens.
+ * Robust to formatting differences (whitespace, punctuation, "$P= 6^{m+1}$" vs "$P=6^{m+1}$")
+ * while still requiring the SAME words IN ORDER — so paraphrases and fabrications don't match.
+ */
+function isTokenSubsequence(needle: string[], haystack: string[]): boolean {
+  if (needle.length === 0) return false;
+  for (let i = 0; i + needle.length <= haystack.length; i++) {
+    let ok = true;
+    for (let j = 0; j < needle.length; j++) {
+      if (haystack[i + j] !== needle[j]) { ok = false; break; }
+    }
+    if (ok) return true;
+  }
+  return false;
+}
+
 export function validateGrounding(
   claimText: string,
   sources: GroundingSource[],
@@ -127,16 +149,24 @@ export function validateGrounding(
     }
   }
 
-  // ===== CHECK 4: Snippet-Substring Grounding =====
-  // Every provided snippet must be a verbatim substring of the sources (catches fabricated quotes).
+  // ===== CHECK 4: Snippet Grounding (token-subsequence) =====
+  // Every provided snippet must appear in a source as a contiguous run of the SAME words in order.
+  // Token-based (alphanumeric) so it tolerates whitespace/punctuation/LaTeX-operator-spacing
+  // differences in LLM-quoted text, while still rejecting paraphrases and fabricated quotes.
+  // A short minimum length prevents trivial 1–2 word "quotes" from passing.
+  const MIN_SNIPPET_TOKENS = 4;
+  const sourceTokens = tokenize(sourceContents);
   const groundedSnippets: string[] = [];
   for (const snippet of supportSnippets) {
-    const snippetNorm = normalise(snippet);
-    if (!snippetNorm) continue;
-    if (sourceNorm.includes(snippetNorm)) {
+    const snippetTokens = tokenize(snippet);
+    if (snippetTokens.length === 0) continue;
+    if (snippetTokens.length < MIN_SNIPPET_TOKENS) {
+      return { valid: false, reason: `Support snippet too short to ground (need ≥${MIN_SNIPPET_TOKENS} words): "${snippet.slice(0, 60)}"` };
+    }
+    if (isTokenSubsequence(snippetTokens, sourceTokens)) {
       groundedSnippets.push(snippet);
     } else {
-      return { valid: false, reason: `Support snippet not found verbatim in sources: "${snippet.slice(0, 60)}"` };
+      return { valid: false, reason: `Support snippet not found in sources (not a verbatim quote): "${snippet.slice(0, 60)}"` };
     }
   }
 

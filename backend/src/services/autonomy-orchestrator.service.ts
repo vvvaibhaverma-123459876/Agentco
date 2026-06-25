@@ -113,11 +113,22 @@ export class AutonomyOrchestratorService {
       console.log(`\n[D1] Discovering sources with goal-aware routing...`);
       console.log(`[D1] Goal: "${goalText}"`);
 
-      // First attempt: fetch actual arXiv papers via API (no API key needed)
-      // This returns real paper abstracts (/abs/ pages), not just listing pages
-      console.log(`[D1] Attempting arXiv API for real paper abstracts...`);
-      const papers = await this.sourceDiscovery.discoverPapersViaArxivApi(goalText, undefined, maxUrls);
-      console.log(`[D1] arXiv API returned ${papers.length} papers`);
+      // Seed override: a comma-separated list of known /abs/ URLs in AGENTCO_SEED_ARXIV_URLS
+      // bypasses the (flaky/rate-limited) arXiv search API and fetches real abstract pages directly.
+      // Off by default; used for deterministic runs and as a better-than-listing-page fallback.
+      const seedEnv = (process.env.AGENTCO_SEED_ARXIV_URLS || '').trim();
+      let papers: { url: string; title: string }[] = [];
+      if (seedEnv) {
+        papers = seedEnv.split(',').map(s => s.trim()).filter(Boolean).slice(0, maxUrls)
+          .map(url => ({ url, title: 'seeded arXiv paper' }));
+        console.log(`[D1] Using ${papers.length} SEEDED arXiv URLs (bypassing search API)`);
+      } else {
+        // First attempt: fetch actual arXiv papers via API (no API key needed)
+        // This returns real paper abstracts (/abs/ pages), not just listing pages
+        console.log(`[D1] Attempting arXiv API for real paper abstracts...`);
+        papers = await this.sourceDiscovery.discoverPapersViaArxivApi(goalText, undefined, maxUrls);
+        console.log(`[D1] arXiv API returned ${papers.length} papers`);
+      }
 
       // Fallback to listing pages if API returns nothing
       let discovered: any[] = [];

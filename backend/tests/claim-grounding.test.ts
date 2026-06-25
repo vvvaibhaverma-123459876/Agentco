@@ -55,12 +55,34 @@ describe('validateGrounding — Term-Overlap', () => {
 });
 
 describe('validateGrounding — Snippet-Substring (the hard grounding guarantee)', () => {
-  it('REJECTS a claim whose support snippet is NOT verbatim in the source (fabricated quote)', () => {
+  it('REJECTS a claim whose support snippet is NOT in the source (fabricated quote)', () => {
     const claim = 'The paper proves new bounds on prime gaps.';
     const fabricated = ['primes are always twin primes beyond 10^9']; // not in source
     const r = validateGrounding(claim, src(PRIME_ABSTRACT), fabricated);
     expect(r.valid).toBe(false);
-    expect(r.reason).toMatch(/snippet not found verbatim/i);
+    expect(r.reason).toMatch(/not a verbatim quote|not found in sources/i);
+  });
+
+  it('REJECTS a PARAPHRASED snippet (same topic, different word order)', () => {
+    // Source says "proving new bounds on prime gaps"; paraphrase reorders/changes words.
+    const claim = 'The paper bounds prime gaps.';
+    const paraphrase = ['new prime gap bounds are proven here']; // not a contiguous quote
+    const r = validateGrounding(claim, src(PRIME_ABSTRACT), paraphrase);
+    expect(r.valid).toBe(false);
+  });
+
+  it('TOLERATES formatting differences (whitespace/punctuation/LaTeX spacing)', () => {
+    const mathSrc = [{ sourceId: 's1', content: 'We show that for any $P= 6^{m+1}.N -1 $ is a prime number for any N.' }];
+    const claim = 'For P=6^{m+1}.N-1 the value is prime.';
+    // Same words, different LaTeX operator spacing — must still ground via token-subsequence.
+    const r = validateGrounding(claim, mathSrc, ['$P=6^{m+1}.N-1$ is a prime number']);
+    expect(r.valid).toBe(true);
+  });
+
+  it('REJECTS a too-short snippet (<4 words)', () => {
+    const r = validateGrounding('Primes exist.', src(PRIME_ABSTRACT), ['prime gaps']);
+    expect(r.valid).toBe(false);
+    expect(r.reason).toMatch(/too short/i);
   });
 
   it('ACCEPTS a claim with a snippet that IS a verbatim substring of the source', () => {
