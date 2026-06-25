@@ -18,11 +18,14 @@ The runtime executes:
 3. society agenda persistence in `autonomy_memory`
 4. agenda-driven bounded task execution
 5. grounded claim creation
-6. promotion gate
-7. prediction registration
-8. report artifacts under `audit_artifacts/civilization_free_run/<run_id>/`
+6. active contradiction detection
+7. promotion gate
+8. prediction registration
+9. report artifacts under `audit_artifacts/civilization_free_run/<run_id>/`
 
 The society agenda is not just a note: it carries `societyId`, `institutionId`, `taskType`, and `executionDomain`, and fixture bounded execution consumes that route. Calibration agendas produce evidence-promotion work; research agendas produce research-ingestion work.
+
+Contradiction detection is now an active free-run stage. New claims are compared against recent stored claims for direct polarity conflicts over the same normalized proposition. When a conflict is found, the new claim is marked `contradicted`, `contradicted_by` / `contradicts` links are persisted on the real `autonomy_claims` rows, and promotion blocks the contradicted claim.
 
 ## How It Is Tested
 
@@ -37,10 +40,11 @@ The integration test uses real Postgres and asserts that:
 - the internal goal is persisted as perception-derived
 - the society agenda is persisted
 - the agenda route drives the bounded task objective and claim content
+- direct contradictions are detected and persisted before promotion
 - grounded claims can be promoted
 - ungrounded claims are blocked
 - prediction registration is attempted
-- report, event, and claim artifacts are written
+- report, event, claim, and contradiction artifacts are written
 
 ## Still Partial
 
@@ -48,8 +52,8 @@ This is not the full civilization objective yet.
 
 - self-assessment still uses shallow claim/evidence backlog signals
 - society agendas are persisted records, not a complete society scheduler
-- contradiction detection is only respected by the promotion gate; it is not yet an active discovery stage
+- contradiction detection is conservative and direct-pattern based; it does not yet do semantic contradiction discovery with retrieval or LLM adjudication
 - agent spawn proposals and self-improvement proposals are not yet part of the free-run pass
 - `read_only_web` depends on the external arXiv/LLM path and remains environment-limited
 
-Next integrated increments should deepen self-assessment, then add contradiction detection and structured proposal stages into the same free-run runtime.
+Next integrated increments should deepen self-assessment, then add structured agent-spawn and self-improvement proposal stages into the same free-run runtime.

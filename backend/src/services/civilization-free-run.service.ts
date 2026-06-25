@@ -51,9 +51,17 @@ export interface FreeRunReport {
   claimsProcessed: number;
   claimsPromoted: number;
   claimsBlocked: number;
+  contradictionChecks: number;
+  contradictionsDetected: number;
   predictionsRegistered: number;
   errors: string[];
   reportDir: string;
+}
+
+export interface ContradictionFinding {
+  claimId: string;
+  contradictingClaimId: string;
+  reason: string;
 }
 
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
@@ -209,7 +217,120 @@ export class CivilizationFreeRunService {
   }
 
   /**
-   * STEP 7-8: promotion gate ("believe slowly"). A supported claim is PROMOTED only if it is
+   * STEP 7: actively detect contradictions before the promotion gate. This is deterministic and
+   * conservative: it only links direct polarity conflicts over the same normalized proposition.
+   */
+  async detectContradictions(claimIds: string[]): Promise<ContradictionFinding[]> {
+    if (claimIds.length === 0) return [];
+
+    const incoming = await db.query(
+      `SELECT claim_id, text, contradicted_by, contradicts
+         FROM autonomy_claims
+        WHERE claim_id = ANY($1)`,
+      [claimIds],
+    );
+    const existing = await db.query(
+      `SELECT claim_id, text, contradicted_by, contradicts
+         FROM autonomy_claims
+        WHERE claim_id <> ALL($1)
+        ORDER BY generated_at DESC
+        LIMIT 500`,
+      [claimIds],
+    );
+
+    const findings: ContradictionFinding[] = [];
+    for (const claim of incoming.rows) {
+      for (const candidate of existing.rows) {
+        const reason = this.directContradictionReason(String(claim.text), String(candidate.text));
+        if (!reason) continue;
+        findings.push({
+          claimId: String(claim.claim_id),
+          contradictingClaimId: String(candidate.claim_id),
+          reason,
+        });
+        await this.linkContradiction(String(claim.claim_id), String(candidate.claim_id));
+        break;
+      }
+    }
+
+    return findings;
+  }
+
+  private directContradictionReason(a: string, b: string): string | null {
+    const pa = this.polarizedProposition(a);
+    const pb = this.polarizedProposition(b);
+    if (!pa || !pb) return null;
+    if (pa.proposition === pb.proposition && pa.polarity !== pb.polarity) {
+      return `opposite polarity for proposition "${pa.proposition}"`;
+    }
+    return null;
+  }
+
+  private polarizedProposition(text: string): { proposition: string; polarity: 'positive' | 'negative' } | null {
+    let s = text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!s) return null;
+
+    let polarity: 'positive' | 'negative' = 'positive';
+    const negativePatterns: Array<[RegExp, string]> = [
+      [/\bdoes not\b/, ''],
+      [/\bdo not\b/, ''],
+      [/\bdid not\b/, ''],
+      [/\bis not\b/, 'is'],
+      [/\bare not\b/, 'are'],
+      [/\bwas not\b/, 'was'],
+      [/\bwere not\b/, 'were'],
+      [/\bcannot\b/, 'can'],
+      [/\bcan not\b/, 'can'],
+    ];
+
+    for (const [pattern, replacement] of negativePatterns) {
+      if (pattern.test(s)) {
+        polarity = 'negative';
+        s = s.replace(pattern, replacement);
+      }
+    }
+
+    const proposition = s.replace(/\s+/g, ' ').trim();
+    return proposition ? { proposition, polarity } : null;
+  }
+
+  private async linkContradiction(claimId: string, contradictingClaimId: string): Promise<void> {
+    const rows = await db.query(
+      `SELECT claim_id, contradicted_by, contradicts
+         FROM autonomy_claims
+        WHERE claim_id = ANY($1)`,
+      [[claimId, contradictingClaimId]],
+    );
+
+    const byId = new Map(rows.rows.map((r: { claim_id: string; contradicted_by: unknown; contradicts: unknown }) => [r.claim_id, r]));
+    const current = byId.get(claimId);
+    const other = byId.get(contradictingClaimId);
+    if (!current || !other) return;
+
+    await db.query(
+      `UPDATE autonomy_claims
+          SET contradicted_by = $2,
+              status = CASE WHEN status = 'promoted' THEN status ELSE 'contradicted' END
+        WHERE claim_id = $1`,
+      [claimId, JSON.stringify(this.addJsonArrayValue(current.contradicted_by, contradictingClaimId))],
+    );
+    await db.query(
+      `UPDATE autonomy_claims
+          SET contradicts = $2
+        WHERE claim_id = $1`,
+      [contradictingClaimId, JSON.stringify(this.addJsonArrayValue(other.contradicts, claimId))],
+    );
+  }
+
+  private addJsonArrayValue(raw: unknown, value: string): string[] {
+    const arr = Array.isArray(raw)
+      ? raw.map(String)
+      : (raw ? JSON.parse(String(raw)).map(String) : []);
+    return Array.from(new Set([...arr, value]));
+  }
+
+  /**
+   * STEP 8-9: promotion gate ("believe slowly"). A supported claim is PROMOTED only if it is
    * grounded (snippet traces to a cited source), source credibility isn't 'low', and it is not
    * contradicted. Otherwise it stays blocked. Returns {promoted, blocked} claim ids.
    */
@@ -251,7 +372,7 @@ export class CivilizationFreeRunService {
     return { promoted, blocked };
   }
 
-  /** STEP 9: register predictions for promoted (now-trusted) claims that are testable. */
+  /** STEP 10: register predictions for promoted (now-trusted) claims that are testable. */
   async registerPredictions(promotedClaimIds: string[]): Promise<number> {
     let n = 0;
     for (const claimId of promotedClaimIds) {
@@ -271,8 +392,8 @@ export class CivilizationFreeRunService {
     return n;
   }
 
-  /** STEP 10-12: write the real report artifacts and return the report. */
-  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; predictions: number }): Promise<void> {
+  /** STEP 11-13: write the real report artifacts and return the report. */
+  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; predictions: number }): Promise<void> {
     const dir = report.reportDir;
     fs.mkdirSync(dir, { recursive: true });
     const md = [
@@ -290,15 +411,19 @@ export class CivilizationFreeRunService {
       `- claims processed: ${report.claimsProcessed}`,
       `- claims promoted: ${report.claimsPromoted}`,
       `- claims blocked: ${report.claimsBlocked}`,
+      `- contradiction checks: ${report.contradictionChecks}`,
+      `- contradictions detected: ${report.contradictionsDetected}`,
       `- predictions registered: ${report.predictionsRegistered}`,
       report.errors.length ? `\n## Errors\n${report.errors.map(e => `- ${e}`).join('\n')}` : '',
     ].join('\n');
     fs.writeFileSync(path.join(dir, 'civilization_report.md'), md);
     fs.writeFileSync(path.join(dir, 'goals.jsonl'), extras.goals.map(g => JSON.stringify(g)).join('\n'));
     fs.writeFileSync(path.join(dir, 'claims.jsonl'), extras.claims.map(c => JSON.stringify(c)).join('\n'));
+    fs.writeFileSync(path.join(dir, 'contradictions.jsonl'), extras.contradictions.map(c => JSON.stringify(c)).join('\n'));
     fs.writeFileSync(path.join(dir, 'events.jsonl'), [
       { type: 'self_assessment', weaknesses: report.weaknesses },
       { type: 'society_agenda', agendaItemId: report.agendaItemId, societyId: report.societyId, institutionId: report.institutionId, taskType: report.taskType },
+      { type: 'contradiction_detection', contradictionChecks: report.contradictionChecks, contradictionsDetected: report.contradictionsDetected },
       { type: 'promotion_gate', claimsPromoted: report.claimsPromoted, claimsBlocked: report.claimsBlocked },
       { type: 'prediction_registration', predictionsRegistered: report.predictionsRegistered },
     ].map(e => JSON.stringify(e)).join('\n'));
@@ -316,9 +441,10 @@ export class CivilizationFreeRunService {
     const report: FreeRunReport = {
       runId, mode, startedAt: new Date().toISOString(), durationMs: 0,
       weaknesses: [], internalGoalId: null, agendaItemId: null, societyId: '', institutionId: '', taskType: '',
-      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, predictionsRegistered: 0,
+      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, predictionsRegistered: 0,
       errors: [], reportDir: path.join(ARTIFACT_ROOT, runId),
     };
+    let contradictions: ContradictionFinding[] = [];
     try {
       report.weaknesses = await this.selfAssess();
       const top = report.weaknesses[0];
@@ -333,6 +459,10 @@ export class CivilizationFreeRunService {
         ? await this.executeBoundedTaskFixture(report.internalGoalId, agenda)
         : (boundedTask ? await boundedTask(report.internalGoalId) : []);
       report.claimsProcessed = claimIds.length;
+
+      contradictions = await this.detectContradictions(claimIds);
+      report.contradictionChecks = claimIds.length;
+      report.contradictionsDetected = contradictions.length;
 
       const gate = await this.promotionGate(claimIds);
       report.claimsPromoted = gate.promoted.length;
@@ -352,7 +482,7 @@ export class CivilizationFreeRunService {
           ORDER BY c.generated_at ASC`,
         [report.internalGoalId])
       : { rows: [] };
-    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, predictions: report.predictionsRegistered });
+    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, predictions: report.predictionsRegistered });
     return report;
   }
 }

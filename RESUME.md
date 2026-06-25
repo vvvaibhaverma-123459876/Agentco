@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 3 — adds free-run agenda-driven execution + report artifacts)
+**Last updated:** 2026-06-25 (rev 4 — adds active free-run contradiction detection)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -51,6 +51,11 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   produces calibration-promotion work for calibration agendas and research-ingestion work for
   scientific agendas. Reports now write real `claims.jsonl` and `events.jsonl` artifacts. Covered by
   `tests/integration/civilization-free-run.test.ts` with real Postgres assertions.
+- ✅ **Free-run contradiction detection — DONE** (post-`f0d523e`): the free-run pass now actively
+  checks newly produced claims against recent stored claims for direct polarity conflicts before
+  promotion. Detected conflicts persist `contradicted_by` / `contradicts` links on real
+  `autonomy_claims` rows, mark the new claim `contradicted`, block promotion, and write
+  `contradictions.jsonl` plus a `contradiction_detection` event. Covered by a real Postgres test.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.

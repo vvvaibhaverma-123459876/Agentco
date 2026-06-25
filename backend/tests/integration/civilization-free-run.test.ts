@@ -45,6 +45,8 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(report.claimsProcessed).toBe(1);
     expect(report.claimsPromoted).toBe(1);
     expect(report.claimsBlocked).toBe(0);
+    expect(report.contradictionChecks).toBe(1);
+    expect(report.contradictionsDetected).toBe(0);
     const action = await db.query(
       `SELECT objective FROM autonomy_goal_actions WHERE goal_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [report.internalGoalId]
@@ -65,6 +67,9 @@ d('civilization free-run (fixture, real Postgres)', () => {
     const eventsJsonl = path.join(report.reportDir, 'events.jsonl');
     expect(fs.existsSync(eventsJsonl)).toBe(true);
     expect(fs.readFileSync(eventsJsonl, 'utf8')).toMatch(/society_agenda/);
+    expect(fs.readFileSync(eventsJsonl, 'utf8')).toMatch(/contradiction_detection/);
+    const contradictionsJsonl = path.join(report.reportDir, 'contradictions.jsonl');
+    expect(fs.existsSync(contradictionsJsonl)).toBe(true);
   }, 30000);
 
   it('uses the society agenda to drive the fixture bounded task route', async () => {
@@ -141,5 +146,67 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(row.rows[0].status).toBe('supported'); // NOT promoted
 
     await db.query(`DELETE FROM autonomy_goal_actions WHERE action_id = $1`, [actionId]);
+  }, 20000);
+
+  it('actively detects direct contradictions before promotion and blocks the new claim', async () => {
+    const priorSourceId = uuid(), priorActionId = uuid(), priorClaimId = uuid();
+    const newSourceId = uuid(), newActionId = uuid(), newClaimId = uuid();
+    const proposition = 'Module two widgets converge under calibration';
+
+    await db.query(
+      `INSERT INTO autonomy_goal_actions (id, action_id, goal_id, action_type, objective)
+       VALUES ($1,$2,$3,'generate_claim','free-run contradiction prior')`,
+      [uuid(), priorActionId, uuid()]
+    );
+    await db.query(
+      `INSERT INTO autonomy_evidence (id, source_id, action_id, url, title, snippet, retrieved_at, content_hash, source_type, is_public_access, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,NOW(),$7,'web',true,NOW())`,
+      [uuid(), priorSourceId, priorActionId, 'https://example.org/prior-contradiction', 'Prior', proposition, `h-${priorClaimId}`]
+    );
+    await db.query(
+      `INSERT INTO autonomy_claims (id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids)
+       VALUES ($1,$2,$3,$4,'supported',0.7,$5,$6,$7)`,
+      [uuid(), priorClaimId, priorActionId, proposition,
+       JSON.stringify([priorSourceId]), JSON.stringify([proposition]), JSON.stringify([priorActionId])]
+    );
+
+    await db.query(
+      `INSERT INTO autonomy_goal_actions (id, action_id, goal_id, action_type, objective)
+       VALUES ($1,$2,$3,'generate_claim','free-run contradiction incoming')`,
+      [uuid(), newActionId, uuid()]
+    );
+    await db.query(
+      `INSERT INTO autonomy_evidence (id, source_id, action_id, url, title, snippet, retrieved_at, content_hash, source_type, is_public_access, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6,NOW(),$7,'web',true,NOW())`,
+      [uuid(), newSourceId, newActionId, 'https://example.org/new-contradiction', 'New', `${proposition} is disputed.`, `h-${newClaimId}`]
+    );
+    await db.query(
+      `INSERT INTO autonomy_claims (id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids)
+       VALUES ($1,$2,$3,$4,'supported',0.7,$5,$6,$7)`,
+      [uuid(), newClaimId, newActionId, 'Module two widgets do not converge under calibration.',
+       JSON.stringify([newSourceId]), JSON.stringify(['Module two widgets do not converge under calibration']), JSON.stringify([newActionId])]
+    );
+
+    const findings = await svc.detectContradictions([newClaimId]);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].claimId).toBe(newClaimId);
+    expect(findings[0].contradictingClaimId).toBe(priorClaimId);
+
+    const linked = await db.query(
+      `SELECT claim_id, status, contradicted_by, contradicts
+         FROM autonomy_claims
+        WHERE claim_id = ANY($1)`,
+      [[newClaimId, priorClaimId]]
+    );
+    const byClaim = new Map(linked.rows.map((r: { claim_id: string; status: string; contradicted_by: string[]; contradicts: string[] }) => [r.claim_id, r]));
+    expect(byClaim.get(newClaimId)!.status).toBe('contradicted');
+    expect(byClaim.get(newClaimId)!.contradicted_by).toContain(priorClaimId);
+    expect(byClaim.get(priorClaimId)!.contradicts).toContain(newClaimId);
+
+    const gate = await svc.promotionGate([newClaimId]);
+    expect(gate.blocked).toContain(newClaimId);
+    expect(gate.promoted).not.toContain(newClaimId);
+
+    await db.query(`DELETE FROM autonomy_goal_actions WHERE action_id = ANY($1)`, [[priorActionId, newActionId]]);
   }, 20000);
 });
