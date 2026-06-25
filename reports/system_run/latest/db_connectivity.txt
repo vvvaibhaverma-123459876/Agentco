@@ -1,0 +1,7 @@
+Thu Jun 25 14:26:07 IST 2026
+localhost:5432 - accepting connections
+ current_database | current_user |               now                
+------------------+--------------+----------------------------------
+ agentco          | agentco      | 2026-06-25 14:26:08.352094+05:30
+(1 row)
+

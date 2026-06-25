@@ -1,0 +1,6 @@
+Thu Jun 25 14:26:07 IST 2026
+zsh:1: command not found: redis-cli
+kafka_port_closed
+vault_port_closed
+prometheus_port_closed
+grafana_port_closed

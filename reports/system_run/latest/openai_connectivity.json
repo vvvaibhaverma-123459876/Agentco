@@ -1,0 +1,29 @@
+{
+  "api_key_present": true,
+  "base_url_present": true,
+  "error": null,
+  "latency_ms": 2494.48,
+  "model": "gpt-4o-mini",
+  "provider_path": "openai_compatible_chat_completions",
+  "response": {
+    "claim": "This is an AgentCo OpenAI connectivity test.",
+    "confidence": 0.5,
+    "status": "unknown"
+  },
+  "success": true,
+  "usage": {
+    "completion_tokens": 33,
+    "completion_tokens_details": {
+      "accepted_prediction_tokens": 0,
+      "audio_tokens": 0,
+      "reasoning_tokens": 0,
+      "rejected_prediction_tokens": 0
+    },
+    "prompt_tokens": 40,
+    "prompt_tokens_details": {
+      "audio_tokens": 0,
+      "cached_tokens": 0
+    },
+    "total_tokens": 73
+  }
+}

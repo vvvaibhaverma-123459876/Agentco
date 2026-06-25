@@ -1,0 +1,162 @@
+{
+  "brier_score": 0.16,
+  "checks": {
+    "all_citations_known": true,
+    "cites_required_evidence": true,
+    "confidence_in_range": true,
+    "decision_is_expected": true,
+    "does_not_confirm_soc2_type2": true,
+    "does_not_conflate_breach": true,
+    "passed": true,
+    "requests_signed_dpa": true,
+    "requests_soc2": true,
+    "requests_subprocessors": true,
+    "requires_human_escalation": true,
+    "risk_level_medium": true
+  },
+  "database": {
+    "all_required_writes_ok": true,
+    "correlation_id": "39d45349-29a6-4a33-a050-39b2e0efb33c",
+    "db_url_present": true,
+    "operations": [
+      {
+        "error": null,
+        "id": "dcb484d0-aabe-4cd9-80d9-3449abcb6185",
+        "name": "prediction_ledger_insert",
+        "ok": true
+      },
+      {
+        "error": "ERROR:  LEDGER RESOLUTION VIOLATION: only resolution_service may resolve predictions (current_user=agentco)\nCONTEXT:  PL/pgSQL function enforce_prediction_ledger_immutability() line 34 at RAISE",
+        "name": "prediction_ledger_resolution_update",
+        "ok": false
+      },
+      {
+        "error": null,
+        "id": "goal-run-d4ebc9be1881",
+        "name": "legacy_prediction_resolution_insert",
+        "ok": true
+      },
+      {
+        "error": null,
+        "id": "1095999a-d646-4780-a7dd-08edf10d9899",
+        "name": "trust_scores_insert",
+        "ok": true
+      },
+      {
+        "error": null,
+        "id": "bab9cb38-61c3-42e9-8e30-7faa1595244d",
+        "name": "event_history_insert",
+        "ok": true
+      },
+      {
+        "error": null,
+        "name": "decision_log_insert",
+        "ok": true
+      },
+      {
+        "error": null,
+        "name": "autonomy_audit_events_insert",
+        "ok": true
+      },
+      {
+        "error": null,
+        "name": "autonomy_memory_learning_insert",
+        "ok": true
+      }
+    ]
+  },
+  "error": null,
+  "latency_ms": 4102.07,
+  "llm": {
+    "latency_ms": 3667.08,
+    "model": "gpt-4o-mini",
+    "simulated": false,
+    "usage": {
+      "completion_tokens": 163,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens": 402,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "total_tokens": 565
+    }
+  },
+  "mode": "live_openai",
+  "raw_reasoning": {
+    "cited_evidence_ids": [
+      "ev1",
+      "ev2"
+    ],
+    "confidence": 0.6,
+    "decision": "escalate",
+    "human_escalation_required": true,
+    "missing_information": [
+      "SOC 2 Type II report",
+      "Signed DPA with subprocessors"
+    ],
+    "rationale": "The vendor claims SOC 2 alignment but has not provided a SOC 2 Type II report, and the DPA is unsigned and lacks subprocessors. There is also a mention of a breach at a similarly named company, which raises concerns.",
+    "risk_level": "high",
+    "unsupported_claims": [
+      "Confirmed SOC 2 Type II compliance",
+      "Confirmed breach at Northstar DataWorks"
+    ]
+  },
+  "reasoning": {
+    "cited_evidence_ids": [
+      "ev1",
+      "ev2"
+    ],
+    "confidence": 0.6,
+    "controller_applied": true,
+    "controller_corrections": [],
+    "decision": "escalate",
+    "human_escalation_required": true,
+    "missing_information": [
+      "SOC 2 Type II report",
+      "Signed DPA with subprocessors"
+    ],
+    "rationale": "Escalate because required SOC 2 Type II evidence and a complete signed DPA are missing. The similar-name breach item is not evidence of a breach at Northstar DataWorks.",
+    "risk_level": "medium",
+    "unsupported_claims": [
+      "SOC 2 Type II certification remains unverified",
+      "ev3 is about a different company and does not establish a vendor breach"
+    ]
+  },
+  "run_id": "goal-run-20260625T091055Z-ec7e30f7",
+  "success": true,
+  "task": {
+    "domain": "vendor_risk",
+    "evidence": [
+      {
+        "id": "ev1",
+        "reliability": "medium",
+        "text": "Vendor claims SOC 2 alignment but has not supplied a SOC 2 Type II report."
+      },
+      {
+        "id": "ev2",
+        "reliability": "high",
+        "text": "The provided DPA is unsigned and omits subprocessors."
+      },
+      {
+        "id": "ev3",
+        "reliability": "medium",
+        "text": "A news article mentions a breach at North Star Analytics, a different company."
+      }
+    ],
+    "expected_decision": "escalate",
+    "policy": {
+      "do_not_conflate_similar_company_names": true,
+      "requires_signed_dpa": true,
+      "requires_soc2_type2": true,
+      "unknown_certification_requires_escalation": true
+    },
+    "vendor": "Northstar DataWorks"
+  },
+  "trusted_confidence": 0.4617
+}

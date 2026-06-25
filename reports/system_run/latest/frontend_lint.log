@@ -1,0 +1,12 @@
+Thu Jun 25 14:28:53 IST 2026
+
+> @agentco/frontend@1.0.0 lint
+> next lint
+
+
+./src/app/audit/page.tsx
+17:32  Warning: React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+npm run lint  1.13s user 0.32s system 54% cpu 2.685 total
+exit_code=0

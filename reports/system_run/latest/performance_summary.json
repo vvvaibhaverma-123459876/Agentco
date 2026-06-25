@@ -1,0 +1,48 @@
+{
+  "commit": "e53f018140a19318d0df2b42131b0f4b81c6e2f4",
+  "timestamp_local": "2026-06-25T14:40:55+05:30",
+  "environment": {
+    "python3": "3.14.4",
+    "python3_13": "3.13.9",
+    "node": "v24.17.0",
+    "npm": "11.13.0",
+    "docker_cli": "29.5.3",
+    "docker_daemon": "unavailable",
+    "postgres": "localhost:5432 reachable as agentco"
+  },
+  "durations_seconds": {
+    "backend_tsc_noemit": 2.42,
+    "backend_test_default": 5.5,
+    "backend_build": 2.5,
+    "backend_start_to_probe": 12.68,
+    "frontend_test": 0.52,
+    "frontend_lint": 2.69,
+    "frontend_build": 10.41,
+    "migration_command_failed": 0.35,
+    "civilization_free_run_fixture": 3.37,
+    "openai_connectivity": 2.49,
+    "goal_run_live_total": 4.1,
+    "goal_run_openai_call": 3.67,
+    "goal_run_tests_py313": 0.75
+  },
+  "openai_usage": {
+    "connectivity_total_tokens": 73,
+    "goal_run_total_tokens": 565,
+    "estimated_total_tokens": 638,
+    "estimated_cost_usd": "not computed; pricing not encoded in repo"
+  },
+  "goal_run_outputs": {
+    "predictions_registered": 2,
+    "prediction_ledger_rows_inserted": 1,
+    "legacy_prediction_rows_inserted": 1,
+    "legacy_resolution_rows_inserted": 1,
+    "trust_score_rows_inserted": 1,
+    "event_rows_inserted": 1,
+    "decision_log_rows_inserted": 1,
+    "autonomy_audit_rows_inserted": 1,
+    "autonomy_memory_rows_inserted": 1,
+    "ledger_resolution_update": "blocked by resolution_service role guard"
+  },
+  "failures_or_blockers": 5,
+  "container_health_summary": "Docker daemon unavailable; compose services not started. Native Postgres is healthy. Redis/Kafka/Vault/Prometheus/Grafana ports were not reachable."
+}

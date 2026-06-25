@@ -1,0 +1,10 @@
+Thu Jun 25 14:40:47 IST 2026
+AGENTCO_VERIFY_OFFLINE=1 python3 scripts/verify_agentco_goal_run.py --offline
+{
+  "run_id": "goal-run-20260625T091047Z-af2b8079",
+  "mode": "simulated_offline",
+  "success": true,
+  "latency_ms": 333.96,
+  "error": null
+}
+exit_code=0

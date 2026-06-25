@@ -1,0 +1,62 @@
+[
+  {
+    "endpoint": "/health",
+    "auth": false,
+    "status": 200,
+    "body_prefix": "{\"status\":\"ok\",\"timestamp\":\"2026-06-25T08:56:59.868Z\"}"
+  },
+  {
+    "endpoint": "/health",
+    "auth": true,
+    "status": 200,
+    "body_prefix": "{\"status\":\"ok\",\"timestamp\":\"2026-06-25T08:56:59.872Z\"}"
+  },
+  {
+    "endpoint": "/api/overrides",
+    "auth": false,
+    "status": 200,
+    "body_prefix": "{\"items\":[{\"request_id\":\"3f3ce95c-023c-486b-90ac-5e5415472770\",\"agent_id\":\"civilization_free_run\",\"action\":\"agent_upgrade\",\"risk_score\":\"0.750\",\"risk_level\":\"high\",\"context\":{\"role\":\"researcher\",\"budget\":{\"tokens\":10000,\"seconds\":300,\"iterations\":30},\"goal_id\":\"1b6e5460-f7ea-47ce-aaf7-6b8b3f13838b\","
+  },
+  {
+    "endpoint": "/api/overrides",
+    "auth": true,
+    "status": 200,
+    "body_prefix": "{\"items\":[{\"request_id\":\"3f3ce95c-023c-486b-90ac-5e5415472770\",\"agent_id\":\"civilization_free_run\",\"action\":\"agent_upgrade\",\"risk_score\":\"0.750\",\"risk_level\":\"high\",\"context\":{\"role\":\"researcher\",\"budget\":{\"tokens\":10000,\"seconds\":300,\"iterations\":30},\"goal_id\":\"1b6e5460-f7ea-47ce-aaf7-6b8b3f13838b\","
+  },
+  {
+    "endpoint": "/api/protected-surfaces/check?field=foo",
+    "auth": false,
+    "status": 401,
+    "error": "{\"error\":\"valid service key required\"}"
+  },
+  {
+    "endpoint": "/api/protected-surfaces/check?field=foo",
+    "auth": true,
+    "status": 200,
+    "body_prefix": "{\"field\":\"foo\",\"protected\":false,\"definitions\":{\"calibration\":{\"name\":\"Calibration System\",\"description\":\"Metrics and logic that measure prediction accuracy\",\"criticalityLevel\":\"critical\",\"examples\":[\"calibration_scores\",\"calibration_models\",\"calibration_thresholds\",\"ece_values\"]},\"resolution\":{\"nam"
+  },
+  {
+    "endpoint": "/api/ensemble/experts",
+    "auth": false,
+    "status": 401,
+    "error": "{\"error\":\"valid service key required\"}"
+  },
+  {
+    "endpoint": "/api/ensemble/experts",
+    "auth": true,
+    "status": 403,
+    "error": "{\"error\":\"principal dev-role:operator lacks scope trust:read\"}"
+  },
+  {
+    "endpoint": "/api/civilization/solve",
+    "auth": false,
+    "status": 400,
+    "error": "{\"error\":\"question (non-empty string) is required\"}"
+  },
+  {
+    "endpoint": "/api/civilization/solve",
+    "auth": true,
+    "status": 400,
+    "error": "{\"error\":\"question (non-empty string) is required\"}"
+  }
+]

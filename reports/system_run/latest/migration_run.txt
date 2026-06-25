@@ -1,0 +1,8 @@
+Thu Jun 25 14:26:20 IST 2026
+
+> @agentco/backend@1.0.0 db:migrate
+> python3 src/db/run_migrations.py
+
+ERROR: psycopg2 not installed. Install with: pip install psycopg2-binary
+npm run db:migrate  0.10s user 0.05s system 49% cpu 0.300 total
+exit_code=1

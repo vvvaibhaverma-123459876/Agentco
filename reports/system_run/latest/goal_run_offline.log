@@ -1,0 +1,9 @@
+Thu Jun 25 14:35:37 IST 2026
+{
+  "run_id": "goal-run-20260625T090537Z-89b339ea",
+  "mode": "simulated_offline",
+  "success": true,
+  "latency_ms": 0.05,
+  "error": null
+}
+exit_code=0

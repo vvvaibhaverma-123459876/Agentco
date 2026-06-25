@@ -1,0 +1,20 @@
+{
+  "timestamp": 1782377738.604816,
+  "cwd": "/Users/Zet/Desktop/Agentco",
+  "env_files": {
+    "codex.env": false,
+    ".codex.env": true,
+    ".env": true
+  },
+  "env_keys_present": [
+    "LLM_PROVIDER",
+    "LLM_BASE_URL",
+    "LLM_MODEL_DEFAULT",
+    "LLM_MODEL_FRONTIER",
+    "LLM_MODEL_STANDARD",
+    "LLM_MODEL_MONITOR",
+    "LLM_MODEL_CODER",
+    "AGENTCO_TEST_DATABASE_URL",
+    "LLM_API_KEY"
+  ]
+}

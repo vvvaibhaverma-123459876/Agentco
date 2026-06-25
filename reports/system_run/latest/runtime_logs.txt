@@ -1,0 +1,39 @@
+Thu Jun 25 14:29:24 IST 2026
+/opt/homebrew/opt/python@3.14/bin/python3.14: No module named pytest
+python3 -m pytest calibration runtime agents tests evals -q  0.03s user 0.02s system 52% cpu 0.092 total
+exit_code=1
+
+===== civilization free run fixture =====
+Thu Jun 25 14:38:27 IST 2026
+✅ Auto-derived 4 protected surfaces from policy.py
+✅ Auto-derived 4 protected surfaces from policy.py
+✅ Auto-derived 4 protected surfaces from policy.py
+
+🌐 Civilization Free-Run starting (mode=fixture, no user goal)
+
+[GOAL] Goal proposed: 14f0a07c-77cc-4cc6-8fc9-5f5640857ae3 (Strengthen unknown evidence quality)
+
+===== FREE-RUN REPORT =====
+run:         freerun_1782378509834
+weaknesses:  weak_domain, unpromoted_knowledge
+internalGoal:14f0a07c-77cc-4cc6-8fc9-5f5640857ae3
+agenda:      590841f4-57ee-4f3b-a03b-848f97400242 (scientific_society)
+claims:      processed=1 promoted=1 blocked=0
+queue:       governance_requests=2
+predictions: 1
+report:      /Users/Zet/Desktop/Agentco/audit_artifacts/civilization_free_run/freerun_1782378509834/civilization_report.md
+===========================
+
+npx ts-node scripts/civilization-free-run.ts --mode fixture  2.65s user 0.38s system 90% cpu 3.367 total
+exit_code=0
+
+===== goal run live =====
+Thu Jun 25 14:37:44 IST 2026
+{
+  "run_id": "goal-run-20260625T090744Z-b4050b69",
+  "mode": "live_openai",
+  "success": true,
+  "latency_ms": 3291.12,
+  "error": null
+}
+exit_code=0

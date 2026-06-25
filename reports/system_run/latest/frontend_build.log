@@ -1,0 +1,51 @@
+Thu Jun 25 14:28:53 IST 2026
+
+> @agentco/frontend@1.0.0 build
+> next build
+
+  ▲ Next.js 14.2.5
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+./src/app/audit/page.tsx
+17:32  Warning: React Hook useEffect has a missing dependency: 'load'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/18) ...
+   Generating static pages (4/18) 
+   Generating static pages (8/18) 
+   Generating static pages (13/18) 
+ ✓ Generating static pages (18/18)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    158 B          87.3 kB
+├ ○ /_not-found                          871 B            88 kB
+├ ○ /audit                               2.79 kB        89.9 kB
+├ ○ /civilization                        158 B          87.3 kB
+├ ○ /civilization/calibration            158 B          87.3 kB
+├ ○ /civilization/governance             158 B          87.3 kB
+├ ○ /civilization/institution            158 B          87.3 kB
+├ ○ /civilization/memory                 158 B          87.3 kB
+├ ○ /civilization/reviews                158 B          87.3 kB
+├ ○ /config                              584 B          87.7 kB
+├ ○ /dashboard                           2.66 kB        89.8 kB
+├ ○ /events                              2.22 kB        89.3 kB
+├ ○ /finance                             561 B          87.7 kB
+├ ○ /incidents                           554 B          87.7 kB
+├ ○ /override                            2.64 kB        89.8 kB
+└ ○ /performance                         711 B          87.8 kB
++ First Load JS shared by all            87.1 kB
+  ├ chunks/23-5d6f0e407b4f0755.js        31.5 kB
+  ├ chunks/fd9d1056-211f0c774853bd6b.js  53.6 kB
+  └ other shared chunks (total)          1.95 kB
+
+
+○  (Static)  prerendered as static content
+
+npm run build  14.32s user 3.85s system 174% cpu 10.405 total
+exit_code=0

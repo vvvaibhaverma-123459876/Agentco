@@ -1,0 +1,47 @@
+Thu Jun 25 14:29:15 IST 2026
+pip 26.0.1 from /opt/homebrew/lib/python3.14/site-packages/pip (python 3.14)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/__main__.py", line 24, in <module>
+    sys.exit(_main())
+             ~~~~~^^
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/cli/main.py", line 83, in main
+    command = create_command(cmd_name, isolated=("--isolated" in cmd_args))
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/commands/__init__.py", line 121, in create_command
+    module = importlib.import_module(module_path)
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4/Frameworks/Python.framework/Versions/3.14/lib/python3.14/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1406, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1371, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1342, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 938, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 759, in exec_module
+  File "<frozen importlib._bootstrap>", line 491, in _call_with_frames_removed
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/commands/install.py", line 22, in <module>
+    import pip._internal.self_outdated_check  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/self_outdated_check.py", line 21, in <module>
+    from pip._internal.index.package_finder import PackageFinder
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/index/package_finder.py", line 42, in <module>
+    from pip._internal.req import InstallRequirement
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/req/__init__.py", line 12, in <module>
+    from .req_install import InstallRequirement
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/req/req_install.py", line 37, in <module>
+    from pip._internal.operations.install.wheel import install_wheel
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_internal/operations/install/wheel.py", line 33, in <module>
+    from pip._vendor.distlib.scripts import ScriptMaker
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_vendor/distlib/scripts.py", line 16, in <module>
+    from .compat import sysconfig, detect_encoding, ZipFile
+  File "/opt/homebrew/lib/python3.14/site-packages/pip/_vendor/distlib/compat.py", line 81, in <module>
+    import xmlrpc.client as xmlrpclib
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4/Frameworks/Python.framework/Versions/3.14/lib/python3.14/xmlrpc/client.py", line 138, in <module>
+    from xml.parsers import expat
+  File "/opt/homebrew/Cellar/python@3.14/3.14.4/Frameworks/Python.framework/Versions/3.14/lib/python3.14/xml/parsers/expat.py", line 4, in <module>
+    from pyexpat import *
+ImportError: dlopen(/opt/homebrew/Cellar/python@3.14/3.14.4/Frameworks/Python.framework/Versions/3.14/lib/python3.14/lib-dynload/pyexpat.cpython-314-darwin.so, 0x0002): Symbol not found: _XML_SetAllocTrackerActivationThreshold
+  Referenced from: <1AAB1AFF-0B6A-3B67-86F5-A72CB69F8B1B> /opt/homebrew/Cellar/python@3.14/3.14.4/Frameworks/Python.framework/Versions/3.14/lib/python3.14/lib-dynload/pyexpat.cpython-314-darwin.so
+  Expected in:     <4D62FA9D-D86A-3DD0-98F2-C6D0718849E8> /usr/lib/libexpat.1.dylib
+python3 -m pip install -r agents/requirements.txt  0.15s user 0.06s system 60% cpu 0.352 total
+exit_code=1

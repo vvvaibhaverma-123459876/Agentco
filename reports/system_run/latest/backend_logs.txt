@@ -1,0 +1,48 @@
+✅ Auto-derived 4 protected surfaces from policy.py
+✅ Auto-derived 4 protected surfaces from policy.py
+✅ Trust Scoring Service initialized for 9 domains
+✅ Confidence Service initialized with 9 domains
+✅ Safety Service initialized with 12 registered facts
+📚 KB EXPANSION SERVICE INITIALIZED
+   Current size: 25,119 facts
+   Target size: 50,000 facts
+   Gap: 24,881 facts needed
+   Quality threshold: 95%+ confidence
+✅ Dynamic Calibration initialized with 45 parameter combinations
+   System will self-adjust calibration based on real performance feedback
+⏱️ Auto-calibration started (every 60 minutes)
+✅ Multi-Agent Ensemble initialized with 7 experts
+{"level":30,"time":1782377807189,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","msg":"Server listening at http://0.0.0.0:3101"}
+AgentCo API running on 0.0.0.0:3101
+{"level":30,"time":1782377819867,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/health","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63460},"msg":"incoming request"}
+{"level":30,"time":1782377819871,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":3.4842499792575836,"msg":"request completed"}
+{"level":30,"time":1782377819872,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"GET","url":"/health","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63462},"msg":"incoming request"}
+{"level":30,"time":1782377819872,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":200},"responseTime":0.12187501788139343,"msg":"request completed"}
+{"level":30,"time":1782377819873,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-3","req":{"method":"GET","url":"/api/overrides","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63464},"msg":"incoming request"}
+{"level":30,"time":1782377819894,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-3","res":{"statusCode":200},"responseTime":20.575874984264374,"msg":"request completed"}
+{"level":30,"time":1782377819895,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-4","req":{"method":"GET","url":"/api/overrides","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63467},"msg":"incoming request"}
+{"level":30,"time":1782377819897,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-4","res":{"statusCode":200},"responseTime":1.8774999976158142,"msg":"request completed"}
+{"level":30,"time":1782377819898,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-5","req":{"method":"GET","url":"/api/protected-surfaces/check?field=foo","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63469},"msg":"incoming request"}
+{"level":30,"time":1782377819898,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-5","res":{"statusCode":401},"responseTime":0.26708298921585083,"msg":"request completed"}
+{"level":30,"time":1782377819900,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-6","req":{"method":"GET","url":"/api/protected-surfaces/check?field=foo","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63471},"msg":"incoming request"}
+{"level":30,"time":1782377819900,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-6","res":{"statusCode":200},"responseTime":0.27391698956489563,"msg":"request completed"}
+{"level":30,"time":1782377819901,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-7","req":{"method":"GET","url":"/api/ensemble/experts","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63473},"msg":"incoming request"}
+{"level":30,"time":1782377819901,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-7","res":{"statusCode":401},"responseTime":0.09633299708366394,"msg":"request completed"}
+{"level":30,"time":1782377819902,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-8","req":{"method":"GET","url":"/api/ensemble/experts","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63475},"msg":"incoming request"}
+{"level":30,"time":1782377819902,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-8","res":{"statusCode":403},"responseTime":0.1037919819355011,"msg":"request completed"}
+{"level":30,"time":1782377819903,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-9","req":{"method":"POST","url":"/api/civilization/solve","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63477},"msg":"incoming request"}
+{"level":30,"time":1782377819904,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-9","res":{"statusCode":400},"responseTime":0.9792920053005219,"msg":"request completed"}
+{"level":30,"time":1782377819905,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-a","req":{"method":"POST","url":"/api/civilization/solve","hostname":"localhost:3101","remoteAddress":"127.0.0.1","remotePort":63479},"msg":"incoming request"}
+{"level":30,"time":1782377819905,"pid":26345,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-a","res":{"statusCode":400},"responseTime":0.4258330166339874,"msg":"request completed"}
+14:28:20 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"SIGINT received, initiating graceful shutdown"}
+14:28:20 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"Starting graceful shutdown of 0 active specialists"}
+14:28:20 [32minfo[39m: Process stopped {"service":"autonomy-orchestrator","event":"process_stopped","details":"Graceful shutdown complete"}
+14:28:20 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"SIGINT received, initiating graceful shutdown"}
+14:28:20 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"Starting graceful shutdown of 0 active specialists"}
+14:28:20 [32minfo[39m: Process stopped {"service":"autonomy-orchestrator","event":"process_stopped","details":"Graceful shutdown complete"}
+14:28:32 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"SIGTERM received, initiating graceful shutdown"}
+14:28:32 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"Starting graceful shutdown of 0 active specialists"}
+14:28:32 [32minfo[39m: Process stopped {"service":"autonomy-orchestrator","event":"process_stopped","details":"Graceful shutdown complete"}
+14:28:32 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"SIGTERM received, initiating graceful shutdown"}
+14:28:32 [32minfo[39m: Process signal {"service":"autonomy-orchestrator","event":"process_signal","details":"Starting graceful shutdown of 0 active specialists"}
+14:28:32 [32minfo[39m: Process stopped {"service":"autonomy-orchestrator","event":"process_stopped","details":"Graceful shutdown complete"}

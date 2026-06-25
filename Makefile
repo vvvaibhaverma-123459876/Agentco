@@ -77,6 +77,14 @@ smoke:
 smoke-real:
 	DATABASE_URL="$(DATABASE_URL)" LLM_PROVIDER="$${LLM_PROVIDER:-ollama}" LLM_API_KEY="$${LLM_API_KEY:-ollama}" LLM_BASE_URL="$${LLM_BASE_URL:-http://localhost:11434/v1}" $(PYTHON) scripts/smoke_one_task.py
 
+.PHONY: verify-system verify-system-offline
+verify-system:
+	$(PYTHON) scripts/verify_openai_connectivity.py
+	$(PYTHON) scripts/verify_agentco_goal_run.py
+
+verify-system-offline:
+	AGENTCO_VERIFY_OFFLINE=1 $(PYTHON) scripts/verify_agentco_goal_run.py --offline
+
 demo:
 	$(PYTHON) examples/civilization_constitution_demo/run_demo.py
 

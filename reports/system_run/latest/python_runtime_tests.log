@@ -1,0 +1,4 @@
+Thu Jun 25 14:29:24 IST 2026
+/opt/homebrew/opt/python@3.14/bin/python3.14: No module named pytest
+python3 -m pytest calibration runtime agents tests evals -q  0.03s user 0.02s system 52% cpu 0.092 total
+exit_code=1
