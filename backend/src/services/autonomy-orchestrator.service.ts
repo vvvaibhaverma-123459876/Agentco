@@ -14,7 +14,7 @@ import { CalibrationConstitutionService } from './calibration-constitution.servi
 import { ActionExecutorService } from './action-executor.service';
 import { LoopDetectorService, ActionHistory } from './loop-detector.service';
 import { AutonomyActionPlannerService } from './autonomy-action-planner.service';
-import { ReflectionService } from './reflection.service';
+import { ReflectionService, Reflection, avoidedActionTypesFromReflections } from './reflection.service';
 import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
@@ -101,6 +101,22 @@ export class AutonomyOrchestratorService {
    * Inject discovered sources with goal-aware arxiv category routing
    * Routes goal keywords to appropriate arxiv category (math.NT, cs.AI, etc.)
    */
+  /** Build a forced override ActionSpec (used by the deterministic learning enforcement). */
+  private makeOverrideAction(goalId: string, actionType: ActionType, reason: string): ActionSpec {
+    return {
+      actionId: uuidv4(),
+      actionType,
+      goalId,
+      objective: reason,
+      args: {},
+      successCriteria: [],
+      riskLevel: RiskLevel.LOW,
+      decidedBy: 'learning_enforcement',
+      decidedAt: new Date(),
+      reasoning: reason,
+    };
+  }
+
   private async injectDiscoveredSourceActionsWithGoalAwareness(
     goalId: string,
     goalText: string,
@@ -905,6 +921,7 @@ export class AutonomyOrchestratorService {
       let claimsGenerated = 0;
       let actionsExecuted = 0;
       let terminated = false;
+      let deterministicAvoidCount = 0; // times we overrode the planner for repeating a flagged-failed action
       let terminationReason = '';
       const actionHistory: ActionHistory[] = [];
       const allCreatedArtifacts: string[] = [];  // Collect artifacts for HTTP response
@@ -964,20 +981,25 @@ export class AutonomyOrchestratorService {
         // Check for loops
         const loopDetection = this.loopDetector.detectLoop(actionHistory);
 
-        // Generate reflection if looping
+        // Generate reflection if looping; keep the reflection OBJECTS (not just the formatted
+        // string) so we can enforce their lessons deterministically below.
         let reflectionContext = '';
+        let reflectionObjs: Reflection[] = [];
         if (loopDetection.isLooping && loopDetection.streak >= 3) {
           const reflection = this.reflection.generateReflection(goalId, loopDetection, actionHistory);
           await this.reflection.storeReflection(reflection);
-          reflectionContext = this.reflection.formatForContext([reflection]);
+          reflectionObjs = [reflection];
         } else {
-          // Get recent reflections for ongoing context
-          const recentReflections = await this.reflection.getRecentReflections(goalId, 2);
-          reflectionContext = this.reflection.formatForContext(recentReflections);
+          // Get recent reflections (incl. from PRIOR runs of this goal) for ongoing context.
+          reflectionObjs = await this.reflection.getRecentReflections(goalId, 2);
         }
+        reflectionContext = this.reflection.formatForContext(reflectionObjs);
+
+        // Action types that prior reflections flagged as repeatedly-failed — to be FORBIDDEN this turn.
+        const avoidActionTypes = avoidedActionTypesFromReflections(reflectionObjs);
 
         // Plan next action
-        const action = await this.actionPlanner.planNextAction(goalId, {
+        let action = await this.actionPlanner.planNextAction(goalId, {
           goalText,
           claimsGenerated: currentClaimsCount,
           evidenceCount,
@@ -989,6 +1011,23 @@ export class AutonomyOrchestratorService {
             result: h.resultStatus,
           })),
         });
+
+        // DETERMINISTIC LEARNING ENFORCEMENT: the LLM frequently ignores reflectionContext and
+        // repeats the exact action a prior reflection flagged as failing. Prompting is not enough —
+        // override it. This is what actually CLOSES the learning loop: a lesson changes behaviour.
+        if (avoidActionTypes.has(action.actionType)) {
+          deterministicAvoidCount++;
+          const avoided = action.actionType;
+          if (deterministicAvoidCount <= 2) {
+            console.log(`🧠 [Learning] Planner chose '${avoided}' which a prior reflection flagged as repeatedly-failed → overriding to evaluate_progress (override #${deterministicAvoidCount})`);
+            action = this.makeOverrideAction(goalId, ActionType.EVALUATE_PROGRESS,
+              `Avoided '${avoided}': prior learning flagged it as repeatedly-failed for this goal.`);
+          } else {
+            console.log(`🧠 [Learning] Planner kept choosing flagged action '${avoided}' despite learning → terminating to stop the wasteful loop`);
+            action = this.makeOverrideAction(goalId, ActionType.TERMINATE,
+              `Terminated: planner repeatedly chose '${avoided}' which prior learning flagged as failing.`);
+          }
+        }
 
         // Store action in database
         await db.query(

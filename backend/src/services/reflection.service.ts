@@ -22,6 +22,23 @@ export interface Reflection {
   createdAt: Date;
 }
 
+/**
+ * Pure: derive the set of action types that prior reflections flagged as repeatedly-failed.
+ * For an identical_action_repeat reflection the failurePattern begins with the action type
+ * (e.g. "spawn_specialist was repeated 3 times ..."). The orchestrator FORBIDS these on the next
+ * decision (deterministic learning enforcement) — this is what makes a stored lesson change behaviour.
+ */
+export function avoidedActionTypesFromReflections(reflections: Reflection[]): Set<string> {
+  const avoided = new Set<string>();
+  for (const r of reflections) {
+    if (r.loopType === 'identical_action_repeat' && r.failurePattern) {
+      const m = r.failurePattern.match(/^([a-z_]+)\s+was repeated/i);
+      if (m) avoided.add(m[1]);
+    }
+  }
+  return avoided;
+}
+
 export class ReflectionService {
   /**
    * Generate a reflection when a loop is detected
