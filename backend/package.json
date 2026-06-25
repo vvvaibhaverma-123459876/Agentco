@@ -8,7 +8,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "test": "jest --passWithNoTests",
-    "db:migrate": "python3 src/db/run_migrations.py",
+    "db:migrate": "ts-node src/db/migrate.ts",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {

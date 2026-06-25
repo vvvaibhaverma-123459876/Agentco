@@ -1,4 +1,49 @@
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run
+PYTHON313 ?= python3.13
+
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke verify-system-offline verify-system-native
+
+python-check:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) --version
+	@$(PYTHON313) -m pytest runtime/tests -q
+
+verify-migrations-native:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) scripts/verify_migrations_native.py
+
+verify-resolution-service:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) scripts/verify_resolution_service.py
+
+doctor:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) -m runtime.orchestration.doctor --mode local_native
+
+doctor-offline:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) -m runtime.orchestration.doctor --mode offline_fixture
+
+doctor-production:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) -m runtime.orchestration.doctor --mode production
+
+run-best-effort:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) -m runtime.orchestration.run_best_effort
+
+run-offline-fixture:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) -m runtime.orchestration.run_best_effort --mode offline_fixture
+
+north-star-smoke:
+	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
+	@$(PYTHON313) -m evals.north_star_cross_domain.run_smoke
+
+verify-system-offline: doctor-offline run-offline-fixture north-star-smoke
+	@$(PYTHON313) -m pytest runtime/orchestration/tests tests/test_verify_agentco_goal_run.py evals/north_star_cross_domain/tests -q
+
+verify-system-native:
+	@$(PYTHON313) -m runtime.orchestration.run_best_effort --mode local_native
 
 dev:
 	docker compose --profile dev up -d

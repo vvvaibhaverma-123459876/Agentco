@@ -169,7 +169,7 @@ export default function AutonomyDashboard() {
           <li>✅ End-to-end loop: perception → plan → execution → memory → eval → promotion</li>
           <li>✅ Safety gates: eval harness blocks promotion if thresholds not met</li>
           <li>✅ Rollback testing: canary deployment with rollback on regression</li>
-          <li>📊 To run smoke test: <code className="bg-blue-100 px-2 py-1 rounded">DATABASE_URL='postgresql://...' make autonomy-level3-smoke</code></li>
+          <li>📊 To run smoke test: <code className="bg-blue-100 px-2 py-1 rounded">DATABASE_URL=&apos;postgresql://...&apos; make autonomy-level3-smoke</code></li>
         </ul>
       </div>
     </div>

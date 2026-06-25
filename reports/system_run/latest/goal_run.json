@@ -1,0 +1,140 @@
+{
+  "audit": {
+    "event_records": [
+      "policy_controller_correction",
+      "task_intake",
+      "evidence_parsed",
+      "prediction_preregistered",
+      "llm_reasoning_completed",
+      "structured_output_validated",
+      "trust_adjusted_confidence",
+      "policy_checked",
+      "human_escalation_selected",
+      "synthetic_resolution_scored",
+      "learning_record_written"
+    ],
+    "persistence": "file_report_with_live_llm",
+    "records_generated": 11
+  },
+  "latency_ms": 2416,
+  "llm": {
+    "latency_ms": 2416,
+    "model": "gpt-4o-mini",
+    "simulated": false,
+    "usage": {
+      "completion_tokens": 128,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens": 222,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "total_tokens": 350
+    }
+  },
+  "mode": "live_openai",
+  "prediction": {
+    "brier_score": 0.0,
+    "confidence": 0.65,
+    "id": "goal-run-1782396209",
+    "resolution": "escalate",
+    "statement": "Northstar DataWorks onboarding should be escalated.",
+    "trusted_confidence": 0.585
+  },
+  "result": {
+    "audit_events": [
+      "policy_controller_correction",
+      "task_intake",
+      "evidence_parsed",
+      "prediction_preregistered",
+      "llm_reasoning_completed",
+      "structured_output_validated",
+      "trust_adjusted_confidence",
+      "policy_checked",
+      "human_escalation_selected",
+      "synthetic_resolution_scored",
+      "learning_record_written"
+    ],
+    "cited_evidence_ids": [
+      "ev1",
+      "ev2",
+      "ev3"
+    ],
+    "claims": [
+      {
+        "status": "unsupported",
+        "support_source_ids": [],
+        "text": "Vendor claims SOC 2 alignment"
+      }
+    ],
+    "confidence": 0.65,
+    "decision": "escalate",
+    "missing_information": [
+      "SOC 2 Type II report",
+      "signed DPA",
+      "subprocessor list"
+    ],
+    "policy_checks": {
+      "do_not_conflate_similar_company_names": true,
+      "requires_signed_dpa": true,
+      "requires_soc2_type2": true,
+      "unknown_certification_requires_escalation": true
+    },
+    "policy_controller_corrections": [
+      "added_missing_subprocessor_list_from_ev2"
+    ],
+    "risk_level": "high",
+    "trusted_confidence": 0.585
+  },
+  "simulated": false,
+  "success": true,
+  "task": {
+    "domain": "vendor_risk",
+    "evidence": [
+      {
+        "id": "ev1",
+        "reliability": "medium",
+        "text": "Vendor claims SOC 2 alignment but has not supplied a SOC 2 Type II report."
+      },
+      {
+        "id": "ev2",
+        "reliability": "high",
+        "text": "The provided DPA is unsigned and omits subprocessors."
+      },
+      {
+        "id": "ev3",
+        "reliability": "medium",
+        "text": "A news article mentions a breach at North Star Analytics, a different company."
+      }
+    ],
+    "expected_decision": "escalate",
+    "policy": {
+      "do_not_conflate_similar_company_names": true,
+      "requires_signed_dpa": true,
+      "requires_soc2_type2": true,
+      "unknown_certification_requires_escalation": true
+    },
+    "vendor": "Northstar DataWorks"
+  },
+  "validation": {
+    "checks": {
+      "cites_ev1": true,
+      "cites_ev2": true,
+      "confidence_in_range": true,
+      "does_not_confirm_soc2_type2": true,
+      "does_not_conflate_breach": true,
+      "expected_decision": true,
+      "requests_signed_dpa": true,
+      "requests_soc2_type2": true,
+      "requests_subprocessors": true,
+      "supported_claims_have_sources": true
+    },
+    "passed": true,
+    "score": 1.0
+  }
+}

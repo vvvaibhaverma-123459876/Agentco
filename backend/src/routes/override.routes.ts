@@ -4,14 +4,14 @@ import { requireApiKey } from '../security';
 
 export async function overrideRoutes(fastify: FastifyInstance) {
   // List all pending override requests
-  fastify.get('/api/overrides', async (req, reply) => {
+  fastify.get('/api/overrides', { preHandler: requireApiKey }, async (req, reply) => {
     const { agent_id, risk_level } = req.query as Record<string, string>;
     const items = await overrideQueue.listPending({ agent_id, risk_level });
     return reply.send({ items, count: items.length });
   });
 
   // Get overdue SLA items
-  fastify.get('/api/overrides/overdue', async (_req, reply) => {
+  fastify.get('/api/overrides/overdue', { preHandler: requireApiKey }, async (_req, reply) => {
     const items = await overrideQueue.getOverdueSla();
     return reply.send({ items, count: items.length });
   });

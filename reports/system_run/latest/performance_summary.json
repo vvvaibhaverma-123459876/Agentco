@@ -1,0 +1,8 @@
+{
+  "audit_event_records": 11,
+  "failures": 0,
+  "goal_run_total_latency_ms": 2416,
+  "openai_call_latency_ms": 2416,
+  "predictions_registered": 1,
+  "tokens_used": 350
+}

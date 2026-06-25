@@ -1,0 +1,18 @@
+{
+  "core_schema_status": "real",
+  "core_tables_found": [
+    "decision_log",
+    "override_queue",
+    "prediction_ledger"
+  ],
+  "detail": "existing schema accepted if required tables are present",
+  "migration_dependency_status": "real",
+  "migration_runner": "ts-node src/db/migrate.ts",
+  "postgres_connectivity": "real",
+  "required_tables": [
+    "decision_log",
+    "override_queue",
+    "prediction_ledger"
+  ],
+  "success": true
+}
