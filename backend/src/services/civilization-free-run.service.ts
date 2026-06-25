@@ -20,6 +20,7 @@ import { goalManager } from './goal-manager.service';
 import { Phase0bCalibrationService } from './phase0b-calibration.service';
 import { validateGrounding, GroundingSource } from './claim-grounding';
 import { SourceQualityService } from './source-quality.service';
+import { getSpecialistRole } from '../types/specialist-roles';
 
 export type FreeRunMode = 'fixture' | 'read_only_web';
 
@@ -53,6 +54,7 @@ export interface FreeRunReport {
   claimsBlocked: number;
   contradictionChecks: number;
   contradictionsDetected: number;
+  agentSpawnProposals: number;
   predictionsRegistered: number;
   errors: string[];
   reportDir: string;
@@ -62,6 +64,22 @@ export interface ContradictionFinding {
   claimId: string;
   contradictingClaimId: string;
   reason: string;
+}
+
+export interface AgentSpawnProposal {
+  proposalId: string;
+  goalId: string;
+  agendaItemId: string;
+  role: string;
+  objective: string;
+  reason: string;
+  governanceStatus: 'review_required';
+  budget: { tokens: number; iterations: number; seconds: number };
+  constraints: {
+    maxDepth: number;
+    maxParallelWorkers: number;
+    activationRequiresGovernance: boolean;
+  };
 }
 
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
@@ -330,7 +348,83 @@ export class CivilizationFreeRunService {
   }
 
   /**
-   * STEP 8-9: promotion gate ("believe slowly"). A supported claim is PROMOTED only if it is
+   * STEP 8: propose specialist spawns when the free-run detects a missing capability. This does
+   * NOT spawn a process; it records a bounded, governance-review proposal that can later be approved.
+   */
+  async proposeAgentSpawns(
+    goalId: string,
+    agenda: SocietyAgendaItem,
+    contradictions: ContradictionFinding[],
+  ): Promise<AgentSpawnProposal[]> {
+    const needs = new Map<string, string>();
+    if (agenda.taskType === 'promote_supported_claims') {
+      needs.set('claim_validator', `No active claim_validator assignment for ${agenda.institutionId}`);
+    }
+    if (agenda.taskType === 'ingest_research_evidence') {
+      needs.set('researcher', `No active researcher assignment for ${agenda.institutionId}`);
+    }
+    if (contradictions.length > 0) {
+      needs.set('contradiction_hunter', `${contradictions.length} contradiction(s) require specialist review`);
+    }
+
+    const proposals: AgentSpawnProposal[] = [];
+    for (const [role, reason] of needs) {
+      const roleSpec = getSpecialistRole(role);
+      if (!roleSpec) continue;
+      const active = await db.query(
+        `SELECT id
+           FROM institution_specialist_assignments
+          WHERE institution_id = $1
+            AND specialist_role = $2
+            AND active = TRUE
+          LIMIT 1`,
+        [agenda.institutionId, role],
+      );
+      if (active.rows.length > 0) continue;
+
+      const proposal: AgentSpawnProposal = {
+        proposalId: uuid(),
+        goalId,
+        agendaItemId: agenda.agendaItemId,
+        role,
+        objective: this.spawnObjectiveForRole(role, agenda, contradictions),
+        reason,
+        governanceStatus: 'review_required',
+        budget: { ...roleSpec.defaultBudgets },
+        constraints: {
+          maxDepth: 2,
+          maxParallelWorkers: 3,
+          activationRequiresGovernance: true,
+        },
+      };
+      await db.query(
+        `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+         VALUES ($1, NULL, $2, NOW(), NOW())`,
+        [proposal.proposalId, JSON.stringify({ type: 'agent_spawn_proposal', ...proposal })],
+      );
+      proposals.push(proposal);
+    }
+
+    return proposals;
+  }
+
+  private spawnObjectiveForRole(
+    role: string,
+    agenda: SocietyAgendaItem,
+    contradictions: ContradictionFinding[],
+  ): string {
+    if (role === 'contradiction_hunter') {
+      const ids = contradictions.map(c => c.claimId).join(', ');
+      return `Review detected contradiction(s) for claim(s): ${ids}`;
+    }
+    if (role === 'claim_validator') {
+      return `Validate supported claims for ${agenda.societyId}/${agenda.institutionId} before trusted promotion`;
+    }
+    return `Gather and ground evidence for ${agenda.societyId}/${agenda.institutionId}`;
+  }
+
+  /**
+   * STEP 9-10: promotion gate ("believe slowly"). A supported claim is PROMOTED only if it is
    * grounded (snippet traces to a cited source), source credibility isn't 'low', and it is not
    * contradicted. Otherwise it stays blocked. Returns {promoted, blocked} claim ids.
    */
@@ -372,7 +466,7 @@ export class CivilizationFreeRunService {
     return { promoted, blocked };
   }
 
-  /** STEP 10: register predictions for promoted (now-trusted) claims that are testable. */
+  /** STEP 11: register predictions for promoted (now-trusted) claims that are testable. */
   async registerPredictions(promotedClaimIds: string[]): Promise<number> {
     let n = 0;
     for (const claimId of promotedClaimIds) {
@@ -392,8 +486,8 @@ export class CivilizationFreeRunService {
     return n;
   }
 
-  /** STEP 11-13: write the real report artifacts and return the report. */
-  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; predictions: number }): Promise<void> {
+  /** STEP 12-14: write the real report artifacts and return the report. */
+  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; agentSpawnProposals: unknown[]; predictions: number }): Promise<void> {
     const dir = report.reportDir;
     fs.mkdirSync(dir, { recursive: true });
     const md = [
@@ -413,6 +507,7 @@ export class CivilizationFreeRunService {
       `- claims blocked: ${report.claimsBlocked}`,
       `- contradiction checks: ${report.contradictionChecks}`,
       `- contradictions detected: ${report.contradictionsDetected}`,
+      `- agent spawn proposals: ${report.agentSpawnProposals}`,
       `- predictions registered: ${report.predictionsRegistered}`,
       report.errors.length ? `\n## Errors\n${report.errors.map(e => `- ${e}`).join('\n')}` : '',
     ].join('\n');
@@ -420,10 +515,12 @@ export class CivilizationFreeRunService {
     fs.writeFileSync(path.join(dir, 'goals.jsonl'), extras.goals.map(g => JSON.stringify(g)).join('\n'));
     fs.writeFileSync(path.join(dir, 'claims.jsonl'), extras.claims.map(c => JSON.stringify(c)).join('\n'));
     fs.writeFileSync(path.join(dir, 'contradictions.jsonl'), extras.contradictions.map(c => JSON.stringify(c)).join('\n'));
+    fs.writeFileSync(path.join(dir, 'agent_spawn_proposals.jsonl'), extras.agentSpawnProposals.map(p => JSON.stringify(p)).join('\n'));
     fs.writeFileSync(path.join(dir, 'events.jsonl'), [
       { type: 'self_assessment', weaknesses: report.weaknesses },
       { type: 'society_agenda', agendaItemId: report.agendaItemId, societyId: report.societyId, institutionId: report.institutionId, taskType: report.taskType },
       { type: 'contradiction_detection', contradictionChecks: report.contradictionChecks, contradictionsDetected: report.contradictionsDetected },
+      { type: 'agent_spawn_proposals', proposalsCreated: report.agentSpawnProposals },
       { type: 'promotion_gate', claimsPromoted: report.claimsPromoted, claimsBlocked: report.claimsBlocked },
       { type: 'prediction_registration', predictionsRegistered: report.predictionsRegistered },
     ].map(e => JSON.stringify(e)).join('\n'));
@@ -441,10 +538,11 @@ export class CivilizationFreeRunService {
     const report: FreeRunReport = {
       runId, mode, startedAt: new Date().toISOString(), durationMs: 0,
       weaknesses: [], internalGoalId: null, agendaItemId: null, societyId: '', institutionId: '', taskType: '',
-      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, predictionsRegistered: 0,
+      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, agentSpawnProposals: 0, predictionsRegistered: 0,
       errors: [], reportDir: path.join(ARTIFACT_ROOT, runId),
     };
     let contradictions: ContradictionFinding[] = [];
+    let agentSpawnProposals: AgentSpawnProposal[] = [];
     try {
       report.weaknesses = await this.selfAssess();
       const top = report.weaknesses[0];
@@ -464,6 +562,9 @@ export class CivilizationFreeRunService {
       report.contradictionChecks = claimIds.length;
       report.contradictionsDetected = contradictions.length;
 
+      agentSpawnProposals = await this.proposeAgentSpawns(report.internalGoalId, agenda, contradictions);
+      report.agentSpawnProposals = agentSpawnProposals.length;
+
       const gate = await this.promotionGate(claimIds);
       report.claimsPromoted = gate.promoted.length;
       report.claimsBlocked = gate.blocked.length;
@@ -482,7 +583,7 @@ export class CivilizationFreeRunService {
           ORDER BY c.generated_at ASC`,
         [report.internalGoalId])
       : { rows: [] };
-    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, predictions: report.predictionsRegistered });
+    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, agentSpawnProposals, predictions: report.predictionsRegistered });
     return report;
   }
 }

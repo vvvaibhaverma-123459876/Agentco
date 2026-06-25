@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 4 — adds active free-run contradiction detection)
+**Last updated:** 2026-06-25 (rev 5 — adds governance-bound agent spawn proposals)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -56,6 +56,11 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   promotion. Detected conflicts persist `contradicted_by` / `contradicts` links on real
   `autonomy_claims` rows, mark the new claim `contradicted`, block promotion, and write
   `contradictions.jsonl` plus a `contradiction_detection` event. Covered by a real Postgres test.
+- ✅ **Free-run agent-spawn proposals — DONE** (post-`0479ed2`): the free-run pass now maps agenda
+  and contradiction needs to registered specialist roles, copies bounded budgets from
+  `SPECIALIST_ROLES`, persists `agent_spawn_proposal` records in `autonomy_memory`, writes
+  `agent_spawn_proposals.jsonl`, and explicitly does **not** activate subprocess specialists or
+  create `autonomy_team_activations`. Covered by a real Postgres test.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.

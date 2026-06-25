@@ -47,6 +47,7 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(report.claimsBlocked).toBe(0);
     expect(report.contradictionChecks).toBe(1);
     expect(report.contradictionsDetected).toBe(0);
+    expect(report.agentSpawnProposals).toBeGreaterThanOrEqual(1);
     const action = await db.query(
       `SELECT objective FROM autonomy_goal_actions WHERE goal_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [report.internalGoalId]
@@ -70,6 +71,9 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(fs.readFileSync(eventsJsonl, 'utf8')).toMatch(/contradiction_detection/);
     const contradictionsJsonl = path.join(report.reportDir, 'contradictions.jsonl');
     expect(fs.existsSync(contradictionsJsonl)).toBe(true);
+    const proposalsJsonl = path.join(report.reportDir, 'agent_spawn_proposals.jsonl');
+    expect(fs.existsSync(proposalsJsonl)).toBe(true);
+    expect(fs.readFileSync(proposalsJsonl, 'utf8')).toMatch(/agent_spawn_proposal|claim_validator|researcher/);
   }, 30000);
 
   it('uses the society agenda to drive the fixture bounded task route', async () => {
@@ -208,5 +212,55 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(gate.promoted).not.toContain(newClaimId);
 
     await db.query(`DELETE FROM autonomy_goal_actions WHERE action_id = ANY($1)`, [[priorActionId, newActionId]]);
+  }, 20000);
+
+  it('creates governance-bound agent spawn proposals without activating specialists', async () => {
+    const weakness = {
+      kind: 'unpromoted_knowledge',
+      detail: 'supported claims need promotion and contradiction review',
+      recommendedGoal: {
+        title: 'Promote and review supported claims',
+        description: 'Run promotion with specialist proposals.',
+        domain: 'calibration',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const agenda = await svc.createAgendaItem(goalId, weakness);
+    const before = await db.query(
+      `SELECT count(*) AS n FROM autonomy_team_activations WHERE parent_goal_id = $1`,
+      [goalId]
+    );
+
+    const proposals = await svc.proposeAgentSpawns(goalId, agenda, [{
+      claimId: 'claim-a',
+      contradictingClaimId: 'claim-b',
+      reason: 'test contradiction',
+    }]);
+
+    expect(proposals.map(p => p.role).sort()).toEqual(['claim_validator', 'contradiction_hunter']);
+    for (const proposal of proposals) {
+      expect(proposal.governanceStatus).toBe('review_required');
+      expect(proposal.constraints.activationRequiresGovernance).toBe(true);
+      expect(proposal.constraints.maxDepth).toBe(2);
+      expect(proposal.constraints.maxParallelWorkers).toBe(3);
+      expect(proposal.budget.tokens).toBeGreaterThan(0);
+      expect(proposal.budget.iterations).toBeGreaterThan(0);
+      expect(proposal.budget.seconds).toBeGreaterThan(0);
+    }
+
+    const memory = await db.query(
+      `SELECT content FROM autonomy_memory WHERE id = ANY($1) ORDER BY created_at ASC`,
+      [proposals.map(p => p.proposalId)]
+    );
+    expect(memory.rows).toHaveLength(2);
+    expect(memory.rows.every((r: { content: { type: string; governanceStatus: string } }) =>
+      r.content.type === 'agent_spawn_proposal' && r.content.governanceStatus === 'review_required'
+    )).toBe(true);
+
+    const after = await db.query(
+      `SELECT count(*) AS n FROM autonomy_team_activations WHERE parent_goal_id = $1`,
+      [goalId]
+    );
+    expect(Number(after.rows[0].n)).toBe(Number(before.rows[0].n));
   }, 20000);
 });
