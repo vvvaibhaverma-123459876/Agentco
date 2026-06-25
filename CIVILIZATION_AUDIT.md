@@ -6,6 +6,21 @@
 
 ---
 
+## Status Update — 2026-06-25
+
+| Area | Status |
+|---|---|
+| Runnability verdict | **RUNNABLE_WITH_FALLBACKS** |
+| Doctor integration | COMPLETE — offline_fixture + local_native modes both pass |
+| Override auth gates | HARDENED — unauth→401, wrong scope→403, auth→200 verified |
+| Backend tests | PASSING — 156/182 (26 skipped) |
+| Frontend build | PASSING — lint warning only, build clean |
+| Orphaned services | **UNCHANGED — 49/77 still orphaned** — integration is the primary remaining work |
+
+The runnability and auth fixes are complete. The civilization-integration gap (49 orphaned services, unconnected `autonomy-civilization-bridge`, orphaned `protected-surface-enforcer`) remains open and is the dominant blocker for upgrading beyond `RUNNABLE_WITH_FALLBACKS`.
+
+---
+
 ## HEADLINE: Integration is the real gap, not "unbuilt"
 
 The civilization layer is largely **written** but barely **wired**. Reachability from

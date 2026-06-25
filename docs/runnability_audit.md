@@ -303,3 +303,32 @@ Civilization never imports calibration directly. The path is:
 1. "180 passed" → "205 passed (with reserve/tests/ and tests/)"
 2. "183/183 Reserve tests" → "25 Reserve tests (25/25 passed)"
 3. Master gate command corrected to include all test directories
+
+---
+
+## Post-Fix Verification — 2026-06-25
+
+**Verdict:** RUNNABLE_WITH_FALLBACKS
+
+**Verified passing:**
+- make doctor-offline / make doctor ✅
+- make run-offline-fixture ✅
+- make run-best-effort ✅
+- make verify-system-offline ✅
+- Backend: 156/182 tests pass ✅
+- Frontend lint + build ✅
+- Python tests: 14/14 pass ✅
+- Postgres schema live ✅
+- Override route auth gates ✅
+- OpenAI connectivity ✅
+
+**Verified missing/blocked:**
+- make north-star-smoke — target missing
+- make verify-migrations-native — target missing
+- make verify-resolution-service — target missing
+- evals/north_star_cross_domain/ — directory missing
+- Full Docker Compose run — not performed
+- verify_agentco_goal_run.py live path — LLM_API_KEY vs OPENAI_API_KEY mismatch
+
+**Fallbacks declared by doctor:**
+redis→memory_cache, kafka→file_event_log, vault→env_secret_provider, prometheus→json_metrics_writer, grafana→metrics_json_only

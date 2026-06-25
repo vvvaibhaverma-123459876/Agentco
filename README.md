@@ -1,5 +1,28 @@
 # Agentco
 
+## Runtime Status
+
+**`RUNNABLE_WITH_FALLBACKS`** — verified 2026-06-25 (commit `6b4e27d`)
+
+**Passing:**
+- Offline fixture run (`make run-offline-fixture`, `make verify-system-offline`)
+- Local-native run with live OpenAI (`make run-best-effort`)
+- Runtime doctor (offline_fixture + local_native modes, `can_continue=true`)
+- Override route auth: unauthenticated→401, wrong scope→403, authenticated→200
+- Native Postgres schema live: `prediction_ledger`, `decision_log`, `event_history`, `trust_scores`
+- Backend: 156/182 tests pass; frontend: lint warning only, build clean
+- Python tests: 14/14 pass; live OpenAI connectivity: ~1.2s, gpt-4o-mini
+- Explicit fallbacks: redis→memory_cache, kafka→file_event_log, vault→env_secret_provider, prometheus→json_metrics_writer, grafana→metrics_json_only
+
+**Remaining gaps:**
+- North-star cross-domain benchmark not implemented (`evals/north_star_cross_domain/` missing)
+- Full Docker Compose stack not verified
+- 49/77 TypeScript services orphaned from runtime paths (see `CIVILIZATION_AUDIT.md`)
+- `verify_agentco_goal_run.py` live path: env var mismatch (`LLM_API_KEY` vs `OPENAI_API_KEY`)
+- Standalone `make verify-migrations-native` and `make verify-resolution-service` targets missing
+
+---
+
 Agentco is a calibration-first trust substrate for AI agents. It records what agents claimed, when they claimed it, how independent reality resolved it, and whether their confidence was earned.
 
 The long-term ambition is civilization-grade AI infrastructure. The current product wedge is narrower: verifiable calibration, resolution independence metadata, recomputable trust credentials, and institution-kernel experiments.

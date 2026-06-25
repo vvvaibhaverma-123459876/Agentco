@@ -50,3 +50,27 @@ missing, degraded, or replaced by explicit fallbacks.
 - Missing Postgres may use a file-backed smoke ledger only in `offline_fixture` or `ci_smoke`.
 - Docker absence should select `local_native` when native Postgres is healthy.
 - Security-sensitive routes are never downgraded by degraded mode.
+
+## Verified Runtime State — 2026-06-25
+
+**Runnability verdict:** `RUNNABLE_WITH_FALLBACKS`
+
+| Service | Observed status | Fallback active |
+|---|---|---|
+| Postgres | `real` — 4 core tables live | — |
+| Migrations | `real` — doctor confirms up-to-date | — |
+| Redis | `missing` | memory_cache |
+| Kafka | `missing` | file_event_log |
+| Vault | `missing` | env_secret_provider |
+| Prometheus | `missing` | json_metrics_writer |
+| Grafana | `missing` | metrics_json_only |
+| OpenAI/LLM | `real` — gpt-4o-mini, ~1.2s latency | — |
+| Resolution service | `real` — doctor login verified | — |
+| Auth middleware | `real` — 401/403 gates verified | — |
+| Docker daemon | not required for local_native mode | — |
+
+**Doctor output:** `can_continue=true`, `required_fixes=[]`, `disabled_capabilities=[]`
+
+**Modes verified:** `offline_fixture` (make run-offline-fixture ✅), `local_native` (make run-best-effort ✅)
+
+**Not yet verified:** `production` mode (requires Redis/Kafka/Vault/Prometheus all live + Docker Compose up)
