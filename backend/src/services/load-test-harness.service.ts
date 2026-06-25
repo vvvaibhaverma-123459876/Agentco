@@ -83,7 +83,7 @@ class LoadTestHarnessService {
 
       // Calculate metrics
       const elapsed = Date.now() - startTime;
-      result.total_duration_seconds = Math.round(elapsed / 1000);
+      result.total_duration_seconds = Math.max(1, Math.ceil(elapsed / 1000));
       result.avg_response_time_ms = Math.round(elapsed / Math.max(result.work_requests_submitted, 1));
 
       // Determine status
@@ -120,7 +120,7 @@ class LoadTestHarnessService {
            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
           [
             instId,
-            `LoadTest Institution ${i}`,
+            `LoadTest Institution ${scenarioId} ${i}`,
             'institution',
             null,
             'active',

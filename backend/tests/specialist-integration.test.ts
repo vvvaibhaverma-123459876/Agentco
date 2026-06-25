@@ -14,6 +14,7 @@ import { TeamActivationService } from '../src/services/team-activation.service';
 import { AutonomyActionPlannerService } from '../src/services/autonomy-action-planner.service';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { db } from '../src/db/client';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('Specialist-Orchestrator Integration', () => {
   let teamActivation: TeamActivationService;
@@ -26,15 +27,22 @@ describe('Specialist-Orchestrator Integration', () => {
     executor = new ActionExecutorService();
   });
 
+  async function createGoal(text: string): Promise<string> {
+    const goalId = uuidv4();
+    await db.query(
+      `INSERT INTO autonomy_goals (
+        id, title, description, source, domain, expected_value, risk_level,
+        autonomy_level_allowed, status, proposed_by, depth
+      ) VALUES ($1, $2, $2, 'manual', 'test', 0.1, 'low', 'L1', 'active', 'jest', 0)`,
+      [goalId, text]
+    );
+    return goalId;
+  }
+
   describe('Specialist Spawning & Result Persistence', () => {
     test('should spawn researcher specialist and retrieve results', async () => {
       // Create parent goal
-      const parentGoalId = 'test-goal-' + Date.now();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, goal_text, status, depth, created_at)
-         VALUES ($1, $2, $3, $4, NOW())`,
-        [parentGoalId, 'Test research goal', 'active', 0]
-      );
+      const parentGoalId = await createGoal('Test research goal');
 
       // Spawn specialist
       const specialist = await teamActivation.activateSpecialist({
@@ -61,12 +69,7 @@ describe('Specialist-Orchestrator Integration', () => {
 
     test('should execute action via specialist and persist results', async () => {
       // Set up test
-      const parentGoalId = 'integration-test-' + Date.now();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, goal_text, status, depth, created_at)
-         VALUES ($1, $2, $3, $4, NOW())`,
-        [parentGoalId, 'Integration test goal', 'active', 0]
-      );
+      const parentGoalId = await createGoal('Integration test goal');
 
       // Spawn specialist
       const specialist = await teamActivation.activateSpecialist({
@@ -139,26 +142,22 @@ describe('Specialist-Orchestrator Integration', () => {
 
   describe('Result Flow: Specialist → Parent Goal', () => {
     test('should link specialist evidence to parent goal', async () => {
-      const parentGoalId = 'result-flow-test-' + Date.now();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, goal_text, status, depth, created_at)
-         VALUES ($1, $2, $3, $4, NOW())`,
-        [parentGoalId, 'Result flow test', 'active', 0]
-      );
+      const parentGoalId = await createGoal('Result flow test');
 
       // Insert evidence that specialist "created" (with null goal_id initially)
-      const evidenceId = 'evidence-' + Date.now();
+      const evidenceId = uuidv4();
       await db.query(
         `INSERT INTO autonomy_evidence
-         (id, source_id, url, title, source_type, is_public_access, retrieved_at)
-         VALUES ($1, $2, $3, $4, $5, $6, NOW())`,
+         (id, source_id, url, title, source_type, is_public_access, retrieved_at, content_hash)
+         VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7)`,
         [
           evidenceId,
-          'source-1',
+          uuidv4(),
           'https://example.com/test',
           'Test Evidence',
           'specialist_output',
           true,
+          `hash-${evidenceId}`,
         ]
       );
 
@@ -178,15 +177,10 @@ describe('Specialist-Orchestrator Integration', () => {
     });
 
     test('should link specialist claims to parent goal', async () => {
-      const parentGoalId = 'claim-flow-test-' + Date.now();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, goal_text, status, depth, created_at)
-         VALUES ($1, $2, $3, $4, NOW())`,
-        [parentGoalId, 'Claim flow test', 'active', 0]
-      );
+      const parentGoalId = await createGoal('Claim flow test');
 
       // Insert claim created by specialist
-      const claimId = 'claim-' + Date.now();
+      const claimId = uuidv4();
       await db.query(
         `INSERT INTO autonomy_claims
          (id, claim_id, text, status, confidence, support_source_ids)
@@ -220,7 +214,7 @@ describe('Specialist-Orchestrator Integration', () => {
   describe('Budget Enforcement', () => {
     test('specialist should respect token budget', async () => {
       const specialist = await teamActivation.activateSpecialist({
-        parentGoalId: 'budget-test-' + Date.now(),
+        parentGoalId: await createGoal('Budget test'),
         role: 'researcher',
         objective: 'Test budget enforcement',
         customBudget: { tokens: 100, iterations: 10, seconds: 60 },

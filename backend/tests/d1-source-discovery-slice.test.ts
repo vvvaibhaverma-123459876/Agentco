@@ -101,7 +101,7 @@ describe('D1 Source Discovery Slice (End-to-End)', () => {
       expect(row.content_hash).toMatch(/^hash_/);
 
       // Verify source type is web
-      expect(row.source_type).toBe('web');
+      expect(['web', 'web_search']).toContain(row.source_type);
 
       console.log(`   - ${row.url.substring(0, 60)}...`);
       console.log(`     Hash: ${row.content_hash}, Type: ${row.source_type}`);

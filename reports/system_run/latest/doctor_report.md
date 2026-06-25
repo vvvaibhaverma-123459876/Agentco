@@ -24,7 +24,7 @@
 | `prometheus` | `missing` | localhost:9090 |
 | `grafana` | `missing` | localhost:3005 |
 | `openai_env` | `real` | key_present=True |
-| `openai_connectivity` | `real` | {"latency_ms": 1677, "model": "gpt-4o-mini", "status": "ok", "success": true} |
+| `openai_connectivity` | `real` | {"latency_ms": 1382, "model": "gpt-4o-mini", "status": "ok", "success": true} |
 | `resolution_service` | `real` | resolution_service |
 | `sensitive_route_auth` | `real` | override read route protected |
 | `filesystem_reports` | `real` | /Users/Zet/Agentco/reports/system_run/latest |

@@ -43,6 +43,8 @@ export class ActionExecutorService {
     };
 
     try {
+      await this.ensureActionRecord(spec);
+
       switch (spec.actionType) {
         case ActionType.WEB_SEARCH:
           await this.handleWebSearch(spec, result);
@@ -91,6 +93,85 @@ export class ActionExecutorService {
     }
 
     return result;
+  }
+
+  private async ensureActionRecord(spec: ActionSpec): Promise<void> {
+    if (!this.isUuid(spec.actionId)) {
+      return;
+    }
+
+    if (this.isUuid(spec.goalId)) {
+      await db.query(
+        `INSERT INTO autonomy_goal_actions (
+          action_id, goal_id, action_type, objective, args, success_criteria,
+          risk_level, decided_by, decided_at, reasoning, status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'executing')
+        ON CONFLICT (action_id) DO NOTHING`,
+        [
+          spec.actionId,
+          spec.goalId,
+          spec.actionType,
+          spec.objective || spec.actionType,
+          JSON.stringify(spec.args || {}),
+          JSON.stringify(spec.successCriteria || []),
+          spec.riskLevel || null,
+          spec.decidedBy || null,
+          spec.decidedAt || new Date(),
+          spec.reasoning || null,
+        ]
+      );
+    }
+
+    const episodeId = uuidv4();
+    await db.query(
+      `INSERT INTO autonomy_episodes (
+        id, run_id, agent_id, title, domain, risk_level, autonomy_level,
+        intervention_required, trace_id, metadata
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, false, $8, $9)
+      ON CONFLICT (id) DO NOTHING`,
+      [
+        episodeId,
+        `action_executor_${spec.goalId}`,
+        spec.decidedBy || 'action_executor',
+        spec.objective || spec.actionType,
+        'action_loop',
+        spec.riskLevel || 'low',
+        1,
+        uuidv4(),
+        JSON.stringify({ goalId: spec.goalId }),
+      ]
+    );
+
+    await db.query(
+      `INSERT INTO autonomy_actions (
+        id, episode_id, step_index, action_type, tool_name, success, metadata
+      ) VALUES ($1, $2, 0, $3, $4, false, $5)
+      ON CONFLICT (id) DO NOTHING`,
+      [
+        spec.actionId,
+        episodeId,
+        this.toCanonicalAutonomyActionType(spec.actionType),
+        spec.actionType,
+        JSON.stringify({ objective: spec.objective, actionType: spec.actionType, args: spec.args || {} }),
+      ]
+    );
+  }
+
+  private toCanonicalAutonomyActionType(actionType: ActionType): string {
+    if (actionType === ActionType.UPDATE_MEMORY) {
+      return 'memory_write';
+    }
+    if (actionType === ActionType.TERMINATE || actionType === ActionType.REPLAN) {
+      return 'decision';
+    }
+    return 'tool_call';
+  }
+
+  private isUuid(value?: string): boolean {
+    return Boolean(
+      value &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    );
   }
 
   private async handleWebSearch(spec: ActionSpec, result: ActionResult): Promise<void> {

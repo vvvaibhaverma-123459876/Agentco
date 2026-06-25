@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
 import { deadlockDetectorService } from '../src/services/deadlock-detector.service';
 import { reputationScaleService } from '../src/services/reputation-scale.service';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('Phase 3: Civilization Layer Hardening', () => {
   let institutionId: string;
@@ -54,16 +55,23 @@ describe('Phase 3: Civilization Layer Hardening', () => {
     // Create test goals
     for (let i = 0; i < 5; i++) {
       const goalResult = await db.query(
-        `INSERT INTO autonomy_goals (id, institution_id, objective, goal_depth, goal_path, status, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        `INSERT INTO autonomy_goals
+           (id, title, description, source, proposed_by, domain, institution_id, objective,
+            goal_depth, goal_path, status, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          RETURNING id`,
         [
-          `phase3_goal_${i}_${Date.now()}`,
+          uuidv4(),
+          `Test goal ${i}`,
+          `Test goal ${i}`,
+          'manual',
+          'test',
+          'coordination',
           institutionId,
           `Test goal ${i}`,
           0,
           `/phase3_goal_${i}_${Date.now()}`,
-          'queued',
+          'active',
           new Date(),
           new Date(),
         ]
@@ -247,7 +255,7 @@ describe('Phase 3: Civilization Layer Hardening', () => {
           `phase3_spec_${i}_${Date.now()}`,
           institutionId,
           departmentIds[0],
-          `specialist_${i % 2}`,
+          `specialist_${i}`,
           0.5 + i * 0.1,
           true,
           new Date(),

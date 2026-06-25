@@ -13,6 +13,16 @@ import { v4 as uuidv4 } from 'uuid';
 describe('Team Activation Service', () => {
   const teamActivation = new TeamActivationService();
 
+  async function createGoal(id: string, text: string, depth = 0, parentGoalId?: string): Promise<void> {
+    await db.query(
+      `INSERT INTO autonomy_goals (
+        id, title, description, source, domain, expected_value, risk_level,
+        autonomy_level_allowed, status, proposed_by, depth, parent_goal_id
+      ) VALUES ($1, $2, $3, 'manual', 'test', 0.1, 'low', 'L1', $4, 'jest', $5, $6)`,
+      [id, text, text, 'active', depth, parentGoalId || null]
+    );
+  }
+
   beforeEach(async () => {
     // Clear test data
     await db.query('TRUNCATE autonomy_team_activations CASCADE');
@@ -52,10 +62,7 @@ describe('Team Activation Service', () => {
       const parentGoalId = uuidv4();
 
       // Create parent goal
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       const request: SpecialistActivationRequest = {
         parentGoalId,
@@ -86,10 +93,7 @@ describe('Team Activation Service', () => {
 
     it('should enforce iteration budget limits', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       const specialist = await teamActivation.activateSpecialist({
         parentGoalId,
@@ -122,10 +126,7 @@ describe('Team Activation Service', () => {
   describe('Specialist Lifecycle', () => {
     it('should create specialist instance with correct properties', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       const specialist = await teamActivation.activateSpecialist({
         parentGoalId,
@@ -142,10 +143,7 @@ describe('Team Activation Service', () => {
 
     it('should terminate specialist and record results', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       const specialist = await teamActivation.activateSpecialist({
         parentGoalId,
@@ -181,10 +179,7 @@ describe('Team Activation Service', () => {
 
     it('should get active specialists for a parent goal', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       // Activate multiple specialists
       const spec1 = await teamActivation.activateSpecialist({
@@ -209,17 +204,11 @@ describe('Team Activation Service', () => {
   describe('Depth Limits', () => {
     it('should prevent activation beyond depth limit', async () => {
       const rootGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [rootGoalId, 'Root goal', 0, 'active']
-      );
+      await createGoal(rootGoalId, 'Root goal');
 
       // Create goal at depth 2 (max depth allowed for specialists)
       const level2GoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status, parent_goal_id) VALUES ($1, $2, $3, $4, $5)`,
-        [level2GoalId, 'Level 2 goal', 2, 'active', rootGoalId]
-      );
+      await createGoal(level2GoalId, 'Level 2 goal', 2, rootGoalId);
 
       // Should not allow specialist at depth 2
       const result = await teamActivation.activateSpecialist({
@@ -235,10 +224,7 @@ describe('Team Activation Service', () => {
   describe('Concurrent Specialist Limit', () => {
     it('should prevent more than 3 active specialists per parent', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       // Activate 3 specialists (max)
       const spec1 = await teamActivation.activateSpecialist({
@@ -276,17 +262,23 @@ describe('Team Activation Service', () => {
     it('should aggregate specialist results to parent goal', async () => {
       const parentGoalId = uuidv4();
       const artifactId = uuidv4();
+      const actionId = uuidv4();
 
       // Create parent goal and artifact
+      await createGoal(parentGoalId, 'Parent goal');
+
       await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Parent goal', 0, 'active']
+        `INSERT INTO autonomy_goal_actions (
+          action_id, goal_id, action_type, objective, args, success_criteria,
+          risk_level, decided_by, decided_at, status
+        ) VALUES ($1, $2, $3, $4, '{}'::jsonb, '[]'::jsonb, $5, $6, NOW(), $7)`,
+        [actionId, parentGoalId, 'fetch_page', 'Fetch specialist evidence', 'low', 'jest', 'completed']
       );
 
       await db.query(
         `INSERT INTO autonomy_evidence (id, action_id, source_id, url, retrieved_at, content_hash, source_type, is_public_access)
          VALUES ($1, $2, $3, $4, NOW(), $5, $6, $7)`,
-        [artifactId, uuidv4(), uuidv4(), 'https://example.com', 'hash123', 'web', true]
+        [artifactId, actionId, uuidv4(), 'https://example.com', 'hash123', 'web', true]
       );
 
       // Aggregate results
@@ -312,10 +304,7 @@ describe('Team Activation Service', () => {
   describe('Default Budgets', () => {
     it('should apply default budgets when not specified', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       const specialist = await teamActivation.activateSpecialist({
         parentGoalId,
@@ -332,10 +321,7 @@ describe('Team Activation Service', () => {
 
     it('should override with custom budgets when specified', async () => {
       const parentGoalId = uuidv4();
-      await db.query(
-        `INSERT INTO autonomy_goals (id, text, depth, status) VALUES ($1, $2, $3, $4)`,
-        [parentGoalId, 'Test goal', 0, 'active']
-      );
+      await createGoal(parentGoalId, 'Test goal');
 
       const customBudget = {
         tokens: 999,

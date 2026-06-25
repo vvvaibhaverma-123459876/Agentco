@@ -1,5 +1,5 @@
 {
-  "latency_ms": 1677,
+  "latency_ms": 1513,
   "model": "gpt-4o-mini",
   "response": {
     "claim": "This is an Agentco OpenAI connectivity test.",

@@ -51,9 +51,6 @@ class CoalitionFormationService {
   private coalitions = new Map<string, Coalition>();
   private min_collaboration_threshold = 0.5; // Minimum for any team member
   private lead_reliability_threshold = 0.7; // Minimum for certified team lead
-  private provisional_lead_threshold = 0.5; // Minimum for provisional team lead (bootstrap)
-  private max_provisional_coalitions_per_lead = 2; // Limit on provisional teams per entity
-  private provisional_lead_tracking = new Map<string, number>(); // Track provisional coalitions
 
   constructor(reputationService?: ReputationLearningService) {
     this.reputation = reputationService || new ReputationLearningService();
@@ -151,27 +148,10 @@ class CoalitionFormationService {
         throw new Error(`Team lead ${team_lead_id} not found in reputation system`);
       }
 
-      // Check if certified lead (threshold 0.7) or provisional lead (threshold 0.5)
-      const is_certified_lead = lead_record.reliability >= this.lead_reliability_threshold;
-      const is_provisional_lead =
-        lead_record.reliability >= this.provisional_lead_threshold &&
-        !is_certified_lead;
-
-      if (!is_certified_lead && !is_provisional_lead) {
+      if (lead_record.reliability < this.lead_reliability_threshold) {
         throw new Error(
-          `Team lead reliability (${lead_record.reliability.toFixed(2)}) below provisional threshold ${this.provisional_lead_threshold}`
+          `Team lead reliability (${lead_record.reliability.toFixed(2)}) below required threshold ${this.lead_reliability_threshold}`
         );
-      }
-
-      // Track provisional coalitions (limit to 2 per entity to prevent abuse)
-      if (is_provisional_lead) {
-        const current_provisional = this.provisional_lead_tracking.get(team_lead_id) || 0;
-        if (current_provisional >= this.max_provisional_coalitions_per_lead) {
-          throw new Error(
-            `Provisional lead exceeded coalition limit (${current_provisional}/${this.max_provisional_coalitions_per_lead})`
-          );
-        }
-        this.provisional_lead_tracking.set(team_lead_id, current_provisional + 1);
       }
 
       const lead_member: TeamMember = {
@@ -213,8 +193,6 @@ class CoalitionFormationService {
         composition.cohesion_score * 0.1;
 
       // Add metadata about lead type
-      const lead_type = is_certified_lead ? 'certified' : 'provisional';
-
       const coalition: Coalition = {
         coalition_id,
         task_id,
@@ -270,7 +248,7 @@ class CoalitionFormationService {
 
       console.log(
         `[CoalitionFormation] Coalition ${coalition_id} formed for "${objective}" ` +
-          `(lead: ${team_lead_id} [${lead_type.toUpperCase()}], members: ${coalition.members.length}, score: ${formation_score.toFixed(2)})`
+          `(lead: ${team_lead_id} [CERTIFIED], members: ${coalition.members.length}, score: ${formation_score.toFixed(2)})`
       );
 
       return coalition;
@@ -297,20 +275,6 @@ class CoalitionFormationService {
       // Update coalition status
       coalition.status = success ? 'completed' : 'failed';
       coalition.completed_at = new Date();
-
-      // If provisional lead successfully completes, clear tracking
-      // This allows them to form another coalition
-      if (success && !coalition.members[0]) {
-        const team_lead = coalition.team_lead;
-        const lead_record = this.reputation.getReputation(team_lead);
-        if (lead_record && lead_record.reliability < this.lead_reliability_threshold) {
-          // Still provisional after success - decrement tracking
-          const current = this.provisional_lead_tracking.get(team_lead) || 0;
-          if (current > 0) {
-            this.provisional_lead_tracking.set(team_lead, current - 1);
-          }
-        }
-      }
 
       // Persist update (non-blocking)
       try {

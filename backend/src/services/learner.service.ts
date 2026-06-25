@@ -246,7 +246,13 @@ export class LearnerService {
 
       // Average length
       const lengthResult = await client.query(
-        `SELECT AVG(LENGTH(trajectory_json::text)) as avg_length FROM trajectory_store
+        `SELECT AVG(LENGTH(jsonb_build_object(
+            'state', state_json,
+            'action', action_json,
+            'observation', observation_json,
+            'reward', reward,
+            'done', done
+          )::text)) as avg_length FROM trajectory_store
          WHERE id = ANY($1)`,
         [trajectoryIds]
       );
@@ -280,37 +286,74 @@ export class LearnerService {
     const client = await pool.connect();
     try {
       const candidateId = uuidv4();
+      const candidateContext = context ?? {};
+
+      if (!candidateContext.metrics) {
+        const runResult = await client.query(
+          `SELECT baseline_metrics_json FROM learner_runs WHERE id = $1`,
+          [learnerRunId]
+        );
+        candidateContext.metrics = runResult.rows[0]?.baseline_metrics_json ?? {};
+      }
 
       // Generate improvement based on learner type
-      const improvement = this.computeImprovement(candidateType, context.metrics);
+      const improvement = this.computeImprovement(candidateType, candidateContext.metrics);
 
       // Create artifact ref and hash
       const artifactContent = JSON.stringify(improvement);
       const artifactHash = crypto.createHash('sha256').update(artifactContent).digest('hex');
-      const artifactRef = `candidate-${candidateId.substring(0, 8)}-v${(context.metrics.baseline_score || 50) + improvement.expectedImprovement}`;
+      const artifactRef = `candidate-${candidateId.substring(0, 8)}-v${(candidateContext.metrics.baseline_score || 50) + improvement.expectedImprovement}`;
+      const expectedImprovementJson = {
+        expectedImprovement: improvement.expectedImprovement,
+        baselineScore: candidateContext.metrics.baseline_score,
+        projectedScore: candidateContext.metrics.baseline_score + improvement.expectedImprovement,
+      };
+
+      const artifactResult = await client.query(
+        `INSERT INTO artifacts (
+          id, artifact_type, artifact_hash, artifact_json, lineage_json, is_simulation_derived, status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (artifact_hash) DO UPDATE
+          SET artifact_hash = EXCLUDED.artifact_hash
+        RETURNING id`,
+        [
+          uuidv4(),
+          candidateType,
+          artifactHash,
+          artifactContent,
+          JSON.stringify({ learnerRunId, candidateType }),
+          candidateContext.simulationTrained || false,
+          'created',
+        ]
+      );
+      const artifactId = artifactResult.rows[0]?.id ?? (
+        await client.query(`SELECT id FROM artifacts WHERE artifact_hash = $1`, [artifactHash])
+      ).rows[0].id;
 
       // Insert candidate
       await client.query(
         `INSERT INTO learner_candidates
-         (id, learner_run_id, candidate_type, artifact_ref, artifact_hash, rationale,
-          expected_improvement_json, risk_level, simulation_trained, status, trace_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+         (id, learner_run_id, candidate_type, artifact_id, artifact_ref, artifact_hash,
+          artifact_json, metrics_before_json, metrics_after_json, improvement_percent,
+          rationale, expected_improvement_json, risk_level, simulation_trained, status, trace_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
         [
           candidateId,
           learnerRunId,
           candidateType,
+          artifactId,
           artifactRef,
           artifactHash,
+          artifactContent,
+          JSON.stringify(candidateContext.metrics || {}),
+          JSON.stringify(expectedImprovementJson),
+          improvement.expectedImprovement,
           improvement.rationale,
-          JSON.stringify({
-            expectedImprovement: improvement.expectedImprovement,
-            baslineScore: context.metrics.baseline_score,
-            projectedScore: context.metrics.baseline_score + improvement.expectedImprovement,
-          }),
+          JSON.stringify(expectedImprovementJson),
           improvement.riskLevel,
-          context.simulationTrained || false,
+          candidateContext.simulationTrained || false,
           'generated',
-          context.traceId || null,
+          candidateContext.traceId || null,
         ]
       );
 

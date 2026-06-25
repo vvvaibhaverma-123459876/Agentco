@@ -142,7 +142,7 @@
       "status": "real"
     },
     {
-      "detail": "{\"latency_ms\": 1677, \"model\": \"gpt-4o-mini\", \"status\": \"ok\", \"success\": true}",
+      "detail": "{\"latency_ms\": 1382, \"model\": \"gpt-4o-mini\", \"status\": \"ok\", \"success\": true}",
       "remediation": "",
       "service": "openai_connectivity",
       "status": "real"

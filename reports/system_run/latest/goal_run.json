@@ -16,9 +16,9 @@
     "persistence": "file_report_with_live_llm",
     "records_generated": 11
   },
-  "latency_ms": 2416,
+  "latency_ms": 3156,
   "llm": {
-    "latency_ms": 2416,
+    "latency_ms": 3155,
     "model": "gpt-4o-mini",
     "simulated": false,
     "usage": {
@@ -41,7 +41,7 @@
   "prediction": {
     "brier_score": 0.0,
     "confidence": 0.65,
-    "id": "goal-run-1782396209",
+    "id": "goal-run-1782431475",
     "resolution": "escalate",
     "statement": "Northstar DataWorks onboarding should be escalated.",
     "trusted_confidence": 0.585

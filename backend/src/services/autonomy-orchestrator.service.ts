@@ -302,11 +302,11 @@ export class AutonomyOrchestratorService {
           goalId,
           'LEVEL_3 Autonomy Smoke Test',
           'Execute a controlled autonomy loop with persistence and eval',
-          'system',
+          'manual',
           'testing',
           0.8,
           'low',
-          3,
+          'L3',
           'proposed',
           'autonomy_orchestrator_smoke_test',
         ]
@@ -535,17 +535,23 @@ export class AutonomyOrchestratorService {
       // Create or get reward function
       const rewardFunctionId = uuidv4();
       const rewardFunctionName = 'default_reward_function';
+      const rewardFormula = {
+        type: 'linear',
+        weights: { completion: 0.4, safety: 0.6 },
+      };
       await db.query(
         `INSERT INTO reward_functions (
-          id, name, domain, version, formula_json, owner, risk_level, created_by
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          id, name, function_type, parameters, domain, version, formula_json, owner, risk_level, created_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
          ON CONFLICT (name, version) DO NOTHING`,
         [
           rewardFunctionId,
           rewardFunctionName,
+          'linear',
+          JSON.stringify(rewardFormula),
           'autonomy',
           '1.0',
-          JSON.stringify({ type: 'linear', weights: { completion: 0.4, safety: 0.6 } }),
+          JSON.stringify(rewardFormula),
           'system',
           'low',
           'autonomy_orchestrator',
@@ -562,13 +568,22 @@ export class AutonomyOrchestratorService {
       const rewardCalcId = uuidv4();
       await db.query(
         `INSERT INTO reward_calculations (
-          id, outcome_id, reward_function_id, reward_score, components_json
-        ) VALUES ($1, $2, $3, $4, $5)`,
+          id, outcome_id, function_id, reward_function_id, reward_value, reward_score, metrics_json, components_json
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           rewardCalcId,
           outcomeId,
           actualRewardFunctionId,
+          actualRewardFunctionId,
           0.8,
+          0.8,
+          JSON.stringify({
+            completion: 1.0,
+            correctness: 0.8,
+            calibration: 0.75,
+            safety: 1.0,
+            efficiency: 0.8,
+          }),
           JSON.stringify({
             completion: 1.0,
             correctness: 0.8,
@@ -633,8 +648,8 @@ export class AutonomyOrchestratorService {
       // Create eval run directly (simplified for smoke test)
       const evalRunId = uuidv4();
       await db.query(
-        `INSERT INTO eval_runs (id, suite_id, status, total_cases, started_at, created_at)
-         VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+        `INSERT INTO eval_runs (id, suite_id, status, total_cases, run_timestamp, started_at, created_at)
+         VALUES ($1, $2, $3, $4, NOW(), NOW(), NOW())`,
         [evalRunId, suiteId, 'completed', 1]
       );
       autonomyRun.evalRunId = evalRunId;

@@ -6,6 +6,7 @@ Handles HTTP server, budget tracking, and action execution.
 """
 
 from agents.core.base_agent import BaseAgent
+from agents.core.types import AgentOutput, RiskLevel
 from flask import Flask, request, jsonify
 import threading
 import json
@@ -246,6 +247,22 @@ class SpecialistAgent(BaseAgent):
         # Flask app for HTTP communication
         self.app = Flask(f"specialist_{specialist_id}")
         self.setup_routes()
+
+    def get_system_prompt(self) -> str:
+        return f"You are a bounded AgentCo autonomy specialist with role {self.role}."
+
+    def get_tools(self) -> list:
+        return []
+
+    async def execute_task(self, task: Dict[str, Any]) -> AgentOutput:
+        result = self.handle_action(task)
+        return AgentOutput(
+            content=json.dumps(result),
+            confidence_score=0.7,
+            risk_level=RiskLevel.LOW,
+            rationale=f"Executed bounded specialist action for role {self.role}.",
+            requires_human_approval=False,
+        )
 
     def setup_routes(self):
         """Register HTTP endpoints for orchestrator communication"""

@@ -47,6 +47,13 @@ export class TrustReputationService {
   ): Promise<ReputationEvent> {
     // Clamp impact to -1.0 to 1.0
     const clampedImpact = Math.max(-1.0, Math.min(1.0, impactValue));
+    const canonicalEventType = this.toCanonicalEventType(eventType);
+    const canonicalSourceRef = this.isUuid(sourceRef) ? sourceRef : undefined;
+    const evidenceJson = {
+      ...(evidence || {}),
+      ...(canonicalEventType !== eventType ? { original_event_type: eventType } : {}),
+      ...(sourceRef && !canonicalSourceRef ? { original_source_ref: sourceRef } : {}),
+    };
 
     // Impact confidence is 0.0 to 1.0
     const confidence = Math.max(0.0, Math.min(1.0, Math.abs(clampedImpact)));
@@ -61,18 +68,36 @@ export class TrustReputationService {
       [
         entityType,
         entityId,
-        eventType,
+        canonicalEventType,
         context,
         clampedImpact,
         confidence,
-        sourceRef || null,
+        canonicalSourceRef || null,
         sourceType || null,
-        JSON.stringify(evidence || {}),
+        JSON.stringify(evidenceJson),
         traceId || null
       ]
     );
 
     return result.rows[0];
+  }
+
+  private toCanonicalEventType(eventType: string): string {
+    const governanceEventMap: Record<string, string> = {
+      promotion_approved_by_governance: 'governance_review_quality',
+      promotion_blocked_by_emergency_freeze: 'unsafe_action_blocked',
+      promotion_blocked_by_protected_surface: 'protected_surface_violation',
+      promotion_blocked_by_trust_policy: 'governance_review_quality',
+    };
+
+    return governanceEventMap[eventType] ?? eventType;
+  }
+
+  private isUuid(value?: string): boolean {
+    return Boolean(
+      value &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    );
   }
 
   /**

@@ -152,11 +152,15 @@ export class TrajectoryStoreService {
     trajectory: Omit<TrajectoryStep, 'id' | 'episodeId' | 'stepIndex'>
   ): Promise<TrajectoryStep> {
     const id = uuidv4();
+    const isSuccessful =
+      trajectory.reward > 0 ||
+      trajectory.observation?.result === 'success' ||
+      trajectory.action?.success === true;
 
     const result = await db.query(
       `INSERT INTO trajectory_store (
-        id, episode_id, step_index, state_json, action_json, observation_json, reward, done, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now())
+        id, episode_id, step_index, state_json, action_json, observation_json, reward, done, is_successful, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, now())
        RETURNING id`,
       [
         id,
@@ -167,6 +171,7 @@ export class TrajectoryStoreService {
         JSON.stringify(trajectory.observation),
         trajectory.reward,
         trajectory.done,
+        isSuccessful,
       ]
     );
 

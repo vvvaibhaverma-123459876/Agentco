@@ -30,32 +30,25 @@ class DeadlockDetectorService {
     acquiredBy: string
   ): Promise<GoalLock | null> {
     try {
-      const result = await db.query(
-        `SELECT lock_id, acquired FROM acquire_goal_lock($1, $2, $3)`,
-        [goalId, institutionId, acquiredBy]
+      const existing = await db.query(
+        `SELECT id FROM goal_execution_locks
+         WHERE goal_id = $1 AND status = 'active'
+         LIMIT 1`,
+        [goalId]
       );
 
-      if (result.rows.length === 0) {
+      if (existing.rows.length > 0) {
         return null;
       }
 
-      const row = result.rows[0];
-      if (!row.acquired) {
-        return null; // Lock already held
-      }
-
-      // Fetch full lock details
+      const lockId = uuidv4();
       const lockResult = await db.query(
-        `SELECT id, goal_id, institution_id, acquired_by, acquired_at, status
-         FROM goal_execution_locks
-         WHERE id = $1`,
-        [row.lock_id]
+        `INSERT INTO goal_execution_locks
+           (id, goal_id, institution_id, acquired_by, acquired_at, status)
+         VALUES ($1, $2, $3, $4, $5, 'active')
+         RETURNING id, goal_id, institution_id, acquired_by, acquired_at, status`,
+        [lockId, goalId, institutionId, acquiredBy, new Date()]
       );
-
-      if (lockResult.rows.length === 0) {
-        return null;
-      }
-
       const lockRow = lockResult.rows[0];
       return {
         lock_id: lockRow.id,
@@ -76,11 +69,14 @@ class DeadlockDetectorService {
   async releaseGoalLock(lockId: string): Promise<boolean> {
     try {
       const result = await db.query(
-        `SELECT released FROM release_goal_lock($1)`,
-        [lockId]
+        `UPDATE goal_execution_locks
+         SET status = 'released', released_at = $2
+         WHERE id = $1 AND status = 'active'
+         RETURNING id`,
+        [lockId, new Date()]
       );
 
-      return result.rows[0]?.released || false;
+      return result.rows.length > 0;
     } catch (e) {
       throw new Error(`Failed to release goal lock: ${e}`);
     }
@@ -95,19 +91,40 @@ class DeadlockDetectorService {
   }> {
     try {
       const result = await db.query(
-        `SELECT has_cycle, goal_cycle FROM detect_circular_dependencies($1)`,
+        `SELECT source_goal_id, target_goal_id FROM goal_dependency_graph
+         WHERE source_goal_id IN (SELECT id FROM autonomy_goals WHERE institution_id = $1)
+            OR target_goal_id IN (SELECT id FROM autonomy_goals WHERE institution_id = $1)`,
         [institutionId]
       );
 
-      if (result.rows.length === 0) {
-        return { hasCycle: false };
+      const edges = new Map<string, string[]>();
+      for (const row of result.rows) {
+        const source = row.source_goal_id;
+        const target = row.target_goal_id;
+        edges.set(source, [...(edges.get(source) || []), target]);
       }
-
-      const row = result.rows[0];
-      return {
-        hasCycle: row.has_cycle,
-        cycle: row.goal_cycle,
+      const visiting = new Set<string>();
+      const visited = new Set<string>();
+      const stack: string[] = [];
+      const visit = (node: string): string[] | null => {
+        if (visiting.has(node)) return [...stack, node];
+        if (visited.has(node)) return null;
+        visiting.add(node);
+        stack.push(node);
+        for (const next of edges.get(node) || []) {
+          const cycle = visit(next);
+          if (cycle) return cycle;
+        }
+        stack.pop();
+        visiting.delete(node);
+        visited.add(node);
+        return null;
       };
+      for (const node of edges.keys()) {
+        const cycle = visit(node);
+        if (cycle) return { hasCycle: true, cycle: cycle.join(' -> ') };
+      }
+      return { hasCycle: false };
     } catch (e) {
       throw new Error(`Failed to detect circular dependencies: ${e}`);
     }

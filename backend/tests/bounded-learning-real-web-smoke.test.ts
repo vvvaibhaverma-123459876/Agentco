@@ -23,7 +23,7 @@ const SKIP_REAL_WEB = !process.env.RUN_REAL_WEB_TESTS;
 describe('Real-Web Smoke Test', () => {
   const orchestrator = new BoundedCivilizationLearningRun();
 
-  it.skipIf(SKIP_REAL_WEB)(
+  (SKIP_REAL_WEB ? it.skip : it)(
     'should fetch from allowlisted real source and extract content',
     async () => {
       console.log(`\n${'='.repeat(70)}`);

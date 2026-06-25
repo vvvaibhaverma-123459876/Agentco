@@ -8,6 +8,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { spawn, ChildProcess } from 'child_process';
 import { createWriteStream } from 'fs';
+import path from 'path';
 import { createHmac } from 'crypto';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
@@ -658,11 +659,19 @@ export class TeamActivationService {
         '--budget', JSON.stringify(budget),
       ];
 
-      const childProcess = spawn('python3', args, {
+      const repoRoot = path.resolve(__dirname, '../../..');
+      const pythonExecutable = process.env.AGENTCO_PYTHON || 'python3.13';
+      const pythonPath = process.env.PYTHONPATH
+        ? `${repoRoot}:${process.env.PYTHONPATH}`
+        : repoRoot;
+
+      const childProcess = spawn(pythonExecutable, args, {
+        cwd: repoRoot,
         detached: false,
         stdio: ['ignore', 'pipe', 'pipe'],
         env: {
           ...process.env,
+          PYTHONPATH: pythonPath,
           SPECIALIST_ID: specialistId,
           SPECIALIST_ROLE: role,
         },
@@ -711,7 +720,7 @@ export class TeamActivationService {
 
       // Store log file path in database metadata
       db.query(
-        `UPDATE autonomy_team_activations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{log_file}', to_jsonb($1))
+        `UPDATE autonomy_team_activations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{log_file}', to_jsonb($1::text))
          WHERE specialist_id = $2`,
         [logFilePath, specialistId]
       ).catch((err) => {
