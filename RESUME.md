@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 9 — adds approval-token/eval preflight)
+**Last updated:** 2026-06-25 (rev 10 — executes approved bounded agent spawn)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -90,13 +90,21 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   consume a ready decision into execution, or promote self-modifications. Covered by a real Postgres
   test for pending override, approved-without-eval, failed eval, passing eval, and no activation side
   effect.
+- ✅ **Approved free-run agent-spawn execution — DONE** (post-`3d8a6d5`): a `ready`
+  approval/eval preflight can now be consumed by `executeApprovedAgentSpawn()`. The method verifies
+  the approved override/eval gate again, starts a real Python specialist subprocess via
+  `TeamActivationService`, sends one signed `evaluate_progress` action to `/execute`, terminates the
+  process, updates the real `autonomy_team_activations` row to `completed`, and writes an
+  `approved_agent_spawn_execution` audit record in `autonomy_memory`. Added stdlib specialist
+  runtimes under `backend/agents/autonomy/` for the free-run roles (`claim_validator`, `researcher`,
+  `contradiction_hunter`). Covered by a real Postgres + subprocess test. Self-improvement proposals
+  still stop at preflight; no candidate generation, sandboxing, or promotion is done.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
-- **Next free-run boundary:** consume a `ready` approval/eval preflight result into a bounded
-  activation or candidate workflow; do not let the free-run auto-approve or auto-promote
-  self-modifications.
+- **Next free-run boundary:** create self-improvement candidates and sandbox validation from ready
+  preflight results; do not let the free-run auto-approve or auto-promote self-modifications.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).

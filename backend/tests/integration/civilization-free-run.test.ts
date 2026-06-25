@@ -533,6 +533,61 @@ d('civilization free-run (fixture, real Postgres)', () => {
     );
     expect(Number(activationsAfter.rows[0].n)).toBe(Number(activationsBefore.rows[0].n));
   }, 20000);
+
+  it('executes a ready agent-spawn approval as a bounded specialist lifecycle', async () => {
+    const weakness = {
+      kind: 'unpromoted_knowledge',
+      detail: 'approved agent spawn execution test',
+      recommendedGoal: {
+        title: 'Execute approved agent spawn',
+        description: 'Run a bounded approved specialist lifecycle.',
+        domain: 'calibration',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const agenda = await svc.createAgendaItem(goalId, weakness);
+    const [proposal] = await svc.proposeAgentSpawns(goalId, agenda, []);
+    const [queued] = await svc.enqueueGovernanceReviewRequests(goalId, [proposal], []);
+    const approved = await overrideQueue.resolve(queued.requestId, 'approved', 'human-governor-test', 'bounded lifecycle test');
+    const evalRunId = await seedFreeRunEvalScorecard(true);
+
+    const execution = await svc.executeApprovedAgentSpawn({
+      requestId: queued.requestId,
+      approvalToken: approved.approval_token!,
+      evalRunId,
+    });
+
+    expect(execution.status).toBe('completed');
+    expect(execution.role).toBe('claim_validator');
+    expect(execution.specialistId).toBeTruthy();
+    expect(execution.actionStatus).toBe('completed');
+
+    const activation = await db.query(
+      `SELECT parent_goal_id, specialist_role, status, iterations_used, results
+         FROM autonomy_team_activations
+        WHERE specialist_id = $1`,
+      [execution.specialistId]
+    );
+    expect(activation.rows).toHaveLength(1);
+    expect(activation.rows[0].parent_goal_id).toBe(goalId);
+    expect(activation.rows[0].specialist_role).toBe('claim_validator');
+    expect(activation.rows[0].status).toBe('completed');
+    expect(Number(activation.rows[0].iterations_used)).toBe(1);
+    expect(activation.rows[0].results.error).toBeUndefined();
+
+    const memory = await db.query(
+      `SELECT content
+         FROM autonomy_memory
+        WHERE content->>'type' = 'approved_agent_spawn_execution'
+          AND content->>'requestId' = $1
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [queued.requestId]
+    );
+    expect(memory.rows).toHaveLength(1);
+    expect(memory.rows[0].content.status).toBe('completed');
+    expect(memory.rows[0].content.specialistId).toBe(execution.specialistId);
+  }, 30000);
 });
 
 async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<string> {

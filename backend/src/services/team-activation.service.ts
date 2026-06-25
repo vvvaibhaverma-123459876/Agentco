@@ -709,15 +709,6 @@ export class TeamActivationService {
         }
       });
 
-      // Store log file path in database metadata
-      db.query(
-        `UPDATE autonomy_team_activations SET metadata = jsonb_set(COALESCE(metadata, '{}'::jsonb), '{log_file}', to_jsonb($1))
-         WHERE specialist_id = $2`,
-        [logFilePath, specialistId]
-      ).catch((err) => {
-        console.warn(`[TeamActivation] Failed to store log path for ${specialistId}: ${err.message}`);
-      });
-
       return childProcess;
     } catch (error: any) {
       console.error(`[TeamActivation] Failed to spawn specialist subprocess: ${error.message}`);

@@ -23,6 +23,8 @@ import { SourceQualityService } from './source-quality.service';
 import { getSpecialistRole } from '../types/specialist-roles';
 import { ProtectedSurfaceEnforcerService } from './protected-surface-enforcer.service';
 import { overrideQueue, OverrideRequest } from './override-queue.service';
+import { TeamActivationService } from './team-activation.service';
+import { ActionStatus, ActionType, RiskLevel } from '../types/action.types';
 
 export type FreeRunMode = 'fixture' | 'read_only_web';
 
@@ -151,12 +153,24 @@ export interface GovernanceApprovalReadiness {
   };
 }
 
+export interface ApprovedAgentSpawnExecution {
+  requestId: string;
+  proposalId?: string;
+  status: 'completed' | 'blocked' | 'failed';
+  blockedReason?: string;
+  specialistId?: string;
+  role?: string;
+  actionStatus?: string;
+  activationStatus?: string;
+}
+
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
 
 export class CivilizationFreeRunService {
   private phase0b = new Phase0bCalibrationService();
   private sourceQuality = new SourceQualityService();
   private protectedSurfaceEnforcer = new ProtectedSurfaceEnforcerService();
+  private teamActivation = new TeamActivationService();
 
   /** STEP 1: inspect civilization state and identify the most salient weakness + a recommended goal. */
   async selfAssess(): Promise<Weakness[]> {
@@ -815,6 +829,129 @@ export class CivilizationFreeRunService {
       [uuid(), JSON.stringify({ type: 'governance_approval_preflight', ...readiness })],
     );
     return readiness;
+  }
+
+  /**
+   * Consume a ready governance preflight into one bounded specialist lifecycle. This starts the
+   * real specialist subprocess, sends one signed evaluate_progress action, terminates the process,
+   * and records the execution. It only supports agent-spawn proposals; self-improvement still stops
+   * at preflight until a candidate/sandbox lifecycle exists.
+   */
+  async executeApprovedAgentSpawn(input: {
+    requestId: string;
+    approvalToken: string;
+    evalRunId: string;
+  }): Promise<ApprovedAgentSpawnExecution> {
+    const readiness = await this.assessGovernanceApprovalReadiness(input);
+    if (readiness.status !== 'ready') {
+      return this.recordApprovedAgentSpawnExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: readiness.blockedReason || 'governance preflight did not return ready',
+      });
+    }
+
+    const row = await db.query(
+      `SELECT context
+         FROM override_queue
+        WHERE request_id = $1
+          AND agent_id = 'civilization_free_run'
+          AND status = 'approved'`,
+      [input.requestId],
+    );
+    if (row.rows.length === 0) {
+      return this.recordApprovedAgentSpawnExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: 'approved override request disappeared before execution',
+      });
+    }
+
+    const context = row.rows[0].context || {};
+    if (context.proposal_type !== 'agent_spawn_proposal') {
+      return this.recordApprovedAgentSpawnExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: `proposal type ${context.proposal_type || 'unknown'} is not executable by agent-spawn lifecycle`,
+      });
+    }
+
+    const goalId = String(context.goal_id || '');
+    const role = String(context.role || '');
+    const objective = String(context.objective || '');
+    if (!goalId || !role || !objective) {
+      return this.recordApprovedAgentSpawnExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: 'agent-spawn queue context is missing goal_id, role, or objective',
+      });
+    }
+
+    const specialist = await this.teamActivation.activateSpecialist({
+      parentGoalId: goalId,
+      role,
+      objective,
+      customBudget: context.budget,
+    });
+    if (!specialist) {
+      return this.recordApprovedAgentSpawnExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'failed',
+        role,
+        blockedReason: 'TeamActivationService failed to activate specialist',
+      });
+    }
+
+    const action = await this.teamActivation.executeActionViaSpecialist(specialist.specialistId, {
+      actionId: uuid(),
+      actionType: ActionType.EVALUATE_PROGRESS,
+      goalId,
+      objective: `Approved free-run specialist activation check: ${objective}`,
+      args: {
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        evalRunId: input.evalRunId,
+      },
+      successCriteria: ['specialist process accepts a signed bounded action'],
+      riskLevel: RiskLevel.LOW,
+      decidedBy: 'civilization_free_run',
+      decidedAt: new Date(),
+      reasoning: 'Human approval token and promotion-eligible eval preflight were both verified.',
+    });
+
+    await this.teamActivation.terminateSpecialist(specialist.specialistId, {
+      artifacts: action?.createdArtifacts || [],
+      evidence: [],
+      claims: [],
+      error: action?.status === ActionStatus.COMPLETED ? undefined : 'specialist action did not complete',
+    });
+
+    return this.recordApprovedAgentSpawnExecution({
+      requestId: input.requestId,
+      proposalId: readiness.proposalId,
+      status: action?.status === ActionStatus.COMPLETED ? 'completed' : 'failed',
+      specialistId: specialist.specialistId,
+      role,
+      actionStatus: action?.status || 'missing',
+      activationStatus: action?.status === ActionStatus.COMPLETED ? 'completed' : 'failed',
+      blockedReason: action ? undefined : 'specialist did not return an action result',
+    });
+  }
+
+  private async recordApprovedAgentSpawnExecution(
+    execution: ApprovedAgentSpawnExecution,
+  ): Promise<ApprovedAgentSpawnExecution> {
+    await db.query(
+      `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+       VALUES ($1, NULL, $2, NOW(), NOW())`,
+      [uuid(), JSON.stringify({ type: 'approved_agent_spawn_execution', ...execution })],
+    );
+    return execution;
   }
 
   private async buildSelfImprovementProposal(

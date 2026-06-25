@@ -40,6 +40,8 @@ Proposal review is connected to the existing human override queue. Agent-spawn p
 
 Approval consumption now has a preflight gate. `assessGovernanceApprovalReadiness()` requires a matching approved `override_queue` row, the exact approval token, and a completed `eval_scorecards` row with `promotion_eligible = true`. It writes a `governance_approval_preflight` audit record to `autonomy_memory` and returns `ready` or a structured blocked reason. It does not execute the queued action.
 
+Approved agent-spawn proposals can now run one bounded specialist lifecycle after the preflight returns `ready`. `executeApprovedAgentSpawn()` starts the real Python specialist subprocess through `TeamActivationService`, sends one signed `evaluate_progress` action over HTTP, terminates the process, updates `autonomy_team_activations`, and writes an `approved_agent_spawn_execution` audit record. The included specialist runtime is a stdlib HTTP server under `backend/agents/autonomy/` for the free-run roles. It does not handle self-improvement proposals or promote artifacts.
+
 ## How It Is Tested
 
 ```bash
@@ -60,6 +62,7 @@ The integration test uses real Postgres and asserts that:
 - self-improvement proposals include affected files, tests, rollback plan, and protected-surface scan
 - proposal review requests are persisted in `override_queue` as pending, unapproved, blocked actions
 - approval-token preflight blocks pending requests, missing evals, and non-eligible scorecards, then returns ready only for approved requests with a promotion-eligible eval
+- ready agent-spawn approvals start a real specialist subprocess, execute one signed bounded action, terminate it, and persist a completed `autonomy_team_activations` row
 - grounded claims can be promoted
 - ungrounded claims are blocked
 - prediction registration is attempted
@@ -72,8 +75,8 @@ This is not the full civilization objective yet.
 - self-assessment is still single-pass; it does not yet compare trends across runs or apply learned severity thresholds
 - society agendas are persisted records, not a complete society scheduler
 - contradiction detection is conservative and direct-pattern based; it does not yet do semantic contradiction discovery with retrieval or LLM adjudication
-- agent spawn proposals have approval-token/eval preflight but are not yet connected to actual benchmark-gated activation
+- agent spawn proposals can execute one bounded approved lifecycle; they are not yet connected to longer task delegation or result promotion
 - self-improvement proposals have approval-token/eval preflight but are not yet connected to a candidate generator, sandbox, or promotion lifecycle
 - `read_only_web` depends on the external arXiv/LLM path and remains environment-limited
 
-Next integrated increments should consume a ready preflight result to run a bounded activation/candidate workflow without enabling autonomous promotion.
+Next integrated increments should add self-improvement candidate generation and sandbox validation without enabling autonomous promotion.
