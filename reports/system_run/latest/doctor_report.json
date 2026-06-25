@@ -3,17 +3,12 @@
   "disabled_capabilities": [],
   "fallbacks_used": [
     {
-      "fallback": "native_services",
-      "service": "docker_daemon",
-      "status": "blocked"
-    },
-    {
       "fallback": "memory_cache",
       "service": "redis",
       "status": "missing"
     },
     {
-      "fallback": "in_process_event_bus",
+      "fallback": "file_event_log",
       "service": "kafka",
       "status": "missing"
     },
@@ -35,55 +30,42 @@
   ],
   "mode_policy": {
     "allowed_fallbacks": {
-      "docker_daemon": "native_services",
       "grafana": "metrics_json_only",
-      "kafka": "in_process_event_bus",
-      "openai_connectivity": "disabled_live_llm",
+      "kafka": "file_event_log",
+      "openai_connectivity": "deterministic_fixture_llm",
+      "postgres": "file_backed_smoke_ledger",
       "prometheus": "json_metrics_writer",
       "redis": "memory_cache",
       "resolution_service": "disable_primary_ledger_resolution",
       "vault": "env_secret_provider"
     },
-    "db_writes_allowed": true,
-    "forbidden_fallbacks": [
-      "fake_llm",
-      "in_memory_db"
-    ],
-    "live_llm_allowed": true,
-    "name": "local_native",
+    "db_writes_allowed": false,
+    "forbidden_fallbacks": [],
+    "live_llm_allowed": false,
+    "name": "offline_fixture",
     "optional_services": [
-      "docker_daemon",
-      "kafka",
-      "redis",
-      "vault",
-      "prometheus",
-      "grafana",
-      "openai_connectivity",
-      "resolution_service"
-    ],
-    "required_services": [
-      "python",
       "node",
       "npm",
       "postgres",
-      "migration_dependencies",
-      "migrations",
-      "core_db_schema",
+      "core_db_schema"
+    ],
+    "required_services": [
+      "python",
       "filesystem_reports"
     ],
-    "simulated_data_allowed": false,
+    "simulated_data_allowed": true,
     "unsafe_actions_fail_closed": true
   },
-  "requested_mode": "local_native",
+  "requested_mode": "offline_fixture",
   "required_fixes": [],
   "run_best_effort": {
     "completed": true,
     "exit_code": 0,
-    "output_tail": "{\n  \"run_id\": \"goal-run-20260625T093328Z-93004d14\",\n  \"mode\": \"live_openai\",\n  \"success\": true,\n  \"latency_ms\": 2864.52,\n  \"error\": null\n}",
-    "selected_runtime_mode": "local_native"
+    "output_tail": "{\n  \"run_id\": \"goal-run-20260625T094108Z-4c7eee9b\",\n  \"mode\": \"simulated_offline\",\n  \"success\": true,\n  \"latency_ms\": 318.42,\n  \"error\": null\n}",
+    "selected_runtime_mode": "offline_fixture"
   },
-  "safe_next_command": "make run-best-effort",
-  "selected_runtime_mode": "local_native",
+  "safe_next_command": "make run-offline-fixture",
+  "selected_runtime_mode": "offline_fixture",
   "services": [
     {
       "detail": "3.13.9",
@@ -110,16 +92,16 @@
       "status": "real"
     },
     {
-      "detail": "> @agentco/backend@1.0.0 build\n> tsc",
-      "remediation": "Run npm run build",
+      "detail": "build command not run in this mode",
+      "remediation": "",
       "service": "backend_build",
-      "status": "real"
+      "status": "not_required"
     },
     {
-      "detail": " kB\n\u251c \u25cb /finance                             561 B          87.7 kB\n\u251c \u25cb /incidents                           554 B          87.7 kB\n\u251c \u25cb /override                            2.64 kB        89.8 kB\n\u2514 \u25cb /performance                         711 B          87.8 kB\n+ First Load JS shared by all            87.1 kB\n  \u251c chunks/23-5d6f0e407b4f0755.js        31.5 kB\n  \u251c chunks/fd9d1056-211f0c774853bd6b.js  53.6 kB\n  \u2514 other shared chunks (total)          1.95 kB\n\n\n\u25cb  (Static)  prerendered as static content",
-      "remediation": "Run npm run build",
+      "detail": "build command not run in this mode",
+      "remediation": "",
       "service": "frontend_build",
-      "status": "real"
+      "status": "not_required"
     },
     {
       "detail": "/usr/local/bin/docker",
@@ -128,10 +110,10 @@
       "status": "real"
     },
     {
-      "detail": "Cannot connect to the Docker daemon at unix:///Users/Zet/.docker/run/docker.sock. Is the docker daemon running?",
-      "remediation": "Start Docker Desktop/daemon or use local_native",
+      "detail": "docker daemon reachable",
+      "remediation": "",
       "service": "docker_daemon",
-      "status": "blocked"
+      "status": "real"
     },
     {
       "detail": "Docker Compose version v5.1.4",
@@ -200,10 +182,10 @@
       "status": "real"
     },
     {
-      "detail": "OpenAI-compatible call succeeded",
+      "detail": "live OpenAI check not requested",
       "remediation": "",
       "service": "openai_connectivity",
-      "status": "real"
+      "status": "not_required"
     },
     {
       "detail": "resolution_service login works",

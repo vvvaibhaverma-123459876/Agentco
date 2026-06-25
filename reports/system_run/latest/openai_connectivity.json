@@ -2,7 +2,7 @@
   "api_key_present": true,
   "base_url_present": true,
   "error": null,
-  "latency_ms": 1616.16,
+  "latency_ms": 1258.09,
   "model": "gpt-4o-mini",
   "provider_path": "openai_compatible_chat_completions",
   "response": {

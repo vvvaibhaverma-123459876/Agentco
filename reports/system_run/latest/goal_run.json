@@ -1,5 +1,5 @@
 {
-  "brier_score": 0.16,
+  "brier_score": 0.1296,
   "checks": {
     "all_citations_known": true,
     "cites_required_evidence": true,
@@ -16,12 +16,12 @@
   },
   "database": {
     "all_required_writes_ok": true,
-    "correlation_id": "04d2d561-74e9-4964-b97f-41482d36de9c",
+    "correlation_id": "ab99634f-28d7-4a69-8dde-1faef54e0c5b",
     "db_url_present": true,
     "operations": [
       {
         "error": null,
-        "id": "20c2a420-188b-4294-bb7e-da387bf3739a",
+        "id": "f9ee80d6-fe77-40d9-ae64-f81365f835d8",
         "name": "prediction_ledger_insert",
         "ok": true
       },
@@ -32,19 +32,19 @@
       },
       {
         "error": null,
-        "id": "goal-run-3faf9854a807",
+        "id": "goal-run-92e7f7f68add",
         "name": "legacy_prediction_resolution_insert",
         "ok": true
       },
       {
         "error": null,
-        "id": "ba02ebfc-15ce-4321-a977-1ee73413ba1a",
+        "id": "29ae87d6-d767-40f5-9aa2-06cc46b84b6d",
         "name": "trust_scores_insert",
         "ok": true
       },
       {
         "error": null,
-        "id": "392ef4df-7b8f-441b-95ca-89717ec7cfbb",
+        "id": "5d8e8952-b719-466a-9a09-ed3983f77225",
         "name": "event_history_insert",
         "ok": true
       },
@@ -66,45 +66,30 @@
     ]
   },
   "error": null,
-  "latency_ms": 2864.52,
+  "latency_ms": 307.03,
   "llm": {
-    "latency_ms": 2476.9,
-    "model": "gpt-4o-mini",
-    "simulated": false,
-    "usage": {
-      "completion_tokens": 161,
-      "completion_tokens_details": {
-        "accepted_prediction_tokens": 0,
-        "audio_tokens": 0,
-        "reasoning_tokens": 0,
-        "rejected_prediction_tokens": 0
-      },
-      "prompt_tokens": 402,
-      "prompt_tokens_details": {
-        "audio_tokens": 0,
-        "cached_tokens": 0
-      },
-      "total_tokens": 563
-    }
+    "provider": "deterministic_fixture",
+    "simulated": true
   },
-  "mode": "live_openai",
+  "mode": "simulated_offline",
   "raw_reasoning": {
     "cited_evidence_ids": [
       "ev1",
       "ev2"
     ],
-    "confidence": 0.6,
+    "confidence": 0.64,
     "decision": "escalate",
     "human_escalation_required": true,
     "missing_information": [
       "SOC 2 Type II report",
-      "Signed Data Processing Agreement (DPA)"
+      "signed DPA",
+      "subprocessor list"
     ],
-    "rationale": "The vendor claims SOC 2 alignment but has not provided a SOC 2 Type II report, and the DPA is unsigned and lacks subprocessors. This raises significant concerns about compliance and data protection.",
-    "risk_level": "high",
+    "rationale": "SOC 2 Type II evidence is missing and the DPA is unsigned with no subprocessor list. The similar-name breach item is not treated as evidence about this vendor.",
+    "risk_level": "medium",
     "unsupported_claims": [
-      "Confirmed SOC 2 Type II compliance",
-      "Confirmed breach at Northstar DataWorks"
+      "SOC 2 Type II certification remains unverified",
+      "ev3 is about a different company"
     ]
   },
   "reasoning": {
@@ -112,26 +97,22 @@
       "ev1",
       "ev2"
     ],
-    "confidence": 0.6,
-    "controller_applied": true,
-    "controller_corrections": [
-      "requested subprocessor list"
-    ],
+    "confidence": 0.64,
     "decision": "escalate",
     "human_escalation_required": true,
     "missing_information": [
       "SOC 2 Type II report",
-      "Signed Data Processing Agreement (DPA)",
+      "signed DPA",
       "subprocessor list"
     ],
-    "rationale": "Escalate because required SOC 2 Type II evidence and a complete signed DPA are missing. The similar-name breach item is not evidence of a breach at Northstar DataWorks.",
+    "rationale": "SOC 2 Type II evidence is missing and the DPA is unsigned with no subprocessor list. The similar-name breach item is not treated as evidence about this vendor.",
     "risk_level": "medium",
     "unsupported_claims": [
       "SOC 2 Type II certification remains unverified",
-      "ev3 is about a different company and does not establish a vendor breach"
+      "ev3 is about a different company"
     ]
   },
-  "run_id": "goal-run-20260625T093328Z-93004d14",
+  "run_id": "goal-run-20260625T094154Z-ac2100e8",
   "success": true,
   "task": {
     "domain": "vendor_risk",
@@ -161,5 +142,5 @@
     },
     "vendor": "Northstar DataWorks"
   },
-  "trusted_confidence": 0.4617
+  "trusted_confidence": 0.4925
 }

@@ -1,9 +1,9 @@
 # AgentCo Doctor Report
 
-- Requested mode: `local_native`
-- Selected runtime mode: `local_native`
+- Requested mode: `offline_fixture`
+- Selected runtime mode: `offline_fixture`
 - Can continue: `True`
-- Safe next command: `make run-best-effort`
+- Safe next command: `make run-offline-fixture`
 
 ## Services
 
@@ -13,10 +13,10 @@
 | `python_dependencies` | `real` | pytest importable |  |
 | `node` | `real` | /Users/Zet/.nvm/versions/node/v24.17.0/bin/node | Install node |
 | `npm` | `real` | /Users/Zet/.nvm/versions/node/v24.17.0/bin/npm | Install npm |
-| `backend_build` | `real` | > @agentco/backend@1.0.0 build > tsc | Run npm run build |
-| `frontend_build` | `real` |  kB ├ ○ /finance                             561 B          87.7 kB ├ ○ /incidents                           554 B          87.7 kB ├ ○ /override                            2.64 kB | Run npm run build |
+| `backend_build` | `not_required` | build command not run in this mode |  |
+| `frontend_build` | `not_required` | build command not run in this mode |  |
 | `docker_cli` | `real` | /usr/local/bin/docker | Install docker |
-| `docker_daemon` | `blocked` | Cannot connect to the Docker daemon at unix:///Users/Zet/.docker/run/docker.sock. Is the docker daemon running? | Start Docker Desktop/daemon or use local_native |
+| `docker_daemon` | `real` | docker daemon reachable |  |
 | `docker_compose` | `real` | Docker Compose version v5.1.4 |  |
 | `postgres` | `real` | agentco|agentco |  |
 | `migration_dependencies` | `real` | pg dependency declared; ts-node runnable (v10.9.2) |  |
@@ -28,7 +28,7 @@
 | `prometheus` | `missing` | localhost:9090 unreachable | Start Prometheus or use JSON metrics fallback |
 | `grafana` | `missing` | localhost:3005 unreachable | Start Grafana or skip dashboard UI |
 | `openai_env` | `real` | key_present=True, model=gpt-4o-mini | Set LLM_API_KEY or use offline_fixture |
-| `openai_connectivity` | `real` | OpenAI-compatible call succeeded |  |
+| `openai_connectivity` | `not_required` | live OpenAI check not requested |  |
 | `resolution_service` | `real` | resolution_service login works |  |
 | `backend_health` | `not_required` | backend not running during doctor |  |
 | `sensitive_route_auth` | `real` | static route check passed |  |
@@ -36,9 +36,8 @@
 
 ## Fallbacks Used
 
-- `docker_daemon` -> `native_services` (`blocked`)
 - `redis` -> `memory_cache` (`missing`)
-- `kafka` -> `in_process_event_bus` (`missing`)
+- `kafka` -> `file_event_log` (`missing`)
 - `vault` -> `env_secret_provider` (`missing`)
 - `prometheus` -> `json_metrics_writer` (`missing`)
 - `grafana` -> `metrics_json_only` (`missing`)
