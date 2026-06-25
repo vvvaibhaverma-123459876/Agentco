@@ -220,8 +220,12 @@ print("server.ts reaches:", len(server&allsv), "/", len(allsv))
 1. **Source-quality scoring** (HIGHEST leverage now, §1 gaps): grounding ≠ credibility. Add a
    credibility signal so the loop won't cite vanity/junk preprints just because the words match.
    This is what makes "evidence-governed" mean trustworthy, not merely traceable.
-2. **Close the learning loop** end-to-end (§5) — run the autonomy loop twice, assert the second
-   run's decision changes given stored reflections/reputation. The real unproven capability.
+2. ✅ **Learning loop CLOSED** (commit `39c2c44`). Proven with a control: a reused goal carrying a
+   lesson executed the flagged action 0× (overridden) vs the control's 1×. Diagnosis was that the
+   LLM ignores reflectionContext; fix is deterministic enforcement (forbid flagged action types).
+   Narrow honest claim: "stops repeating an action prior learning flagged as failing, across runs
+   of the same goal." NEXT increment if wanted: retrieve reflections by DOMAIN for fresh runs
+   (currently per-goalId via reuse); general learning beyond loop-avoidance is unproven.
 3. **Single `agentco` entrypoint** (§3) with the constitution boot-gate + `boot.test.ts`, and an
    env-gated Phase -1 that brings up infra (`AGENTCO_MANAGE_INFRA=1`) for dev convenience.
 4. **Fix the timer `.unref()`** so `--forceExit` is no longer needed (§2).
