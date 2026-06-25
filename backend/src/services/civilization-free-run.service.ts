@@ -29,6 +29,14 @@ export interface Weakness {
   recommendedGoal: { title: string; description: string; domain: string };
 }
 
+export interface SocietyAgendaItem {
+  agendaItemId: string;
+  societyId: string;
+  institutionId: string;
+  taskType: 'promote_supported_claims' | 'ingest_research_evidence';
+  executionDomain: 'calibration' | 'research';
+}
+
 export interface FreeRunReport {
   runId: string;
   mode: FreeRunMode;
@@ -38,6 +46,8 @@ export interface FreeRunReport {
   internalGoalId: string | null;
   agendaItemId: string | null;
   societyId: string;
+  institutionId: string;
+  taskType: string;
   claimsProcessed: number;
   claimsPromoted: number;
   claimsBlocked: number;
@@ -122,18 +132,23 @@ export class CivilizationFreeRunService {
     return goalId;
   }
 
-  /** STEP 3: route the goal to a society agenda (recorded in autonomy_memory for this slice). */
-  async createAgendaItem(goalId: string, weakness: Weakness): Promise<{ agendaItemId: string; societyId: string }> {
-    const societyId = weakness.recommendedGoal.domain === 'calibration' ? 'calibration_society' : 'scientific_society';
+  /** STEP 3: route the goal to a society agenda that determines the bounded task behavior. */
+  async createAgendaItem(goalId: string, weakness: Weakness): Promise<SocietyAgendaItem> {
+    const isCalibration = weakness.recommendedGoal.domain === 'calibration';
+    const societyId = isCalibration ? 'calibration_society' : 'scientific_society';
+    const institutionId = isCalibration ? 'evidence_promotion_institution' : 'research_ingestion_institution';
+    const taskType = isCalibration ? 'promote_supported_claims' : 'ingest_research_evidence';
+    const executionDomain = isCalibration ? 'calibration' : 'research';
     const agendaItemId = uuid();
     await db.query(
       `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at) VALUES ($1, NULL, $2, NOW(), NOW())`,
       [agendaItemId, JSON.stringify({
         type: 'society_agenda', agendaItemId, societyId, goalId,
+        institutionId, taskType, executionDomain,
         priority: 'high', reason: weakness.detail, status: 'assigned',
       })],
     );
-    return { agendaItemId, societyId };
+    return { agendaItemId, societyId, institutionId, taskType, executionDomain };
   }
 
   /**
@@ -141,29 +156,56 @@ export class CivilizationFreeRunService {
    * claim+evidence (CI-safe). In read_only_web mode the real autonomy loop runs (caller wires it).
    * Returns the claim ids produced under this goal.
    */
-  async executeBoundedTaskFixture(goalId: string): Promise<string[]> {
+  async executeBoundedTaskFixture(goalId: string, agenda: SocietyAgendaItem): Promise<string[]> {
     const sourceId = uuid();
     const actionId = uuid();
+    const routedTask = this.fixtureTaskForAgenda(agenda);
     await db.query(
       `INSERT INTO autonomy_goal_actions (id, action_id, goal_id, action_type, objective)
-       VALUES ($1,$2,$3,'generate_claim','free-run fixture bounded task')`,
-      [uuid(), actionId, goalId]);
-    // Deterministic, real-looking evidence (an abstract) and a grounded claim quoting it.
-    const abstract = 'We prove that bounded gaps between primes occur infinitely often, refining the GPY sieve.';
+       VALUES ($1,$2,$3,'generate_claim',$4)`,
+      [uuid(), actionId, goalId, routedTask.objective]);
     await db.query(
       `INSERT INTO autonomy_evidence (id, source_id, action_id, url, title, snippet, retrieved_at, content_hash, source_type, is_public_access, created_at)
        VALUES ($1,$2,$3,$4,$5,$6,NOW(),$7,'web',true,NOW())`,
-      [uuid(), sourceId, actionId, 'https://arxiv.org/abs/1311.4600', 'Small gaps between primes', abstract, 'hash_fixture']);
+      [uuid(), sourceId, actionId, routedTask.url, routedTask.title, routedTask.abstract, `hash_fixture_${agenda.executionDomain}`]);
     const claimId = uuid();
     await db.query(
       `INSERT INTO autonomy_claims (id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids)
        VALUES ($1,$2,$3,$4,'supported',0.7,$5,$6,$7)`,
-      [uuid(), claimId, actionId,
-       'Bounded gaps between primes occur infinitely often.',
+      [uuid(), claimId, actionId, routedTask.claim,
        JSON.stringify([sourceId]),
-       JSON.stringify(['bounded gaps between primes occur infinitely often']),
+       JSON.stringify([routedTask.supportSnippet]),
        JSON.stringify([actionId])]);
     return [claimId];
+  }
+
+  private fixtureTaskForAgenda(agenda: SocietyAgendaItem): {
+    objective: string;
+    url: string;
+    title: string;
+    abstract: string;
+    claim: string;
+    supportSnippet: string;
+  } {
+    if (agenda.taskType === 'promote_supported_claims') {
+      return {
+        objective: `free-run fixture bounded task: ${agenda.societyId}/${agenda.institutionId} performs evidence promotion`,
+        url: 'https://example.org/agentco/calibration-evidence',
+        title: 'Calibration evidence backlog review',
+        abstract: 'Calibration improves when promoted claims are checked against grounded evidence before prediction registration.',
+        claim: 'Calibration improves when promoted claims are checked against grounded evidence before prediction registration.',
+        supportSnippet: 'Calibration improves when promoted claims are checked against grounded evidence before prediction registration',
+      };
+    }
+
+    return {
+      objective: `free-run fixture bounded task: ${agenda.societyId}/${agenda.institutionId} ingests research evidence`,
+      url: 'https://arxiv.org/abs/1311.4600',
+      title: 'Small gaps between primes',
+      abstract: 'We prove that bounded gaps between primes occur infinitely often, refining the GPY sieve.',
+      claim: 'Bounded gaps between primes occur infinitely often.',
+      supportSnippet: 'bounded gaps between primes occur infinitely often',
+    };
   }
 
   /**
@@ -242,6 +284,9 @@ export class CivilizationFreeRunService {
       ``, `## Outcome`,
       `- internal goal: ${report.internalGoalId}`,
       `- agenda item: ${report.agendaItemId}`,
+      `- society: ${report.societyId}`,
+      `- institution: ${report.institutionId}`,
+      `- task type: ${report.taskType}`,
       `- claims processed: ${report.claimsProcessed}`,
       `- claims promoted: ${report.claimsPromoted}`,
       `- claims blocked: ${report.claimsBlocked}`,
@@ -251,6 +296,12 @@ export class CivilizationFreeRunService {
     fs.writeFileSync(path.join(dir, 'civilization_report.md'), md);
     fs.writeFileSync(path.join(dir, 'goals.jsonl'), extras.goals.map(g => JSON.stringify(g)).join('\n'));
     fs.writeFileSync(path.join(dir, 'claims.jsonl'), extras.claims.map(c => JSON.stringify(c)).join('\n'));
+    fs.writeFileSync(path.join(dir, 'events.jsonl'), [
+      { type: 'self_assessment', weaknesses: report.weaknesses },
+      { type: 'society_agenda', agendaItemId: report.agendaItemId, societyId: report.societyId, institutionId: report.institutionId, taskType: report.taskType },
+      { type: 'promotion_gate', claimsPromoted: report.claimsPromoted, claimsBlocked: report.claimsBlocked },
+      { type: 'prediction_registration', predictionsRegistered: report.predictionsRegistered },
+    ].map(e => JSON.stringify(e)).join('\n'));
     fs.writeFileSync(path.join(dir, 'report.json'), JSON.stringify(report, null, 2));
   }
 
@@ -264,7 +315,7 @@ export class CivilizationFreeRunService {
     const start = Date.now();
     const report: FreeRunReport = {
       runId, mode, startedAt: new Date().toISOString(), durationMs: 0,
-      weaknesses: [], internalGoalId: null, agendaItemId: null, societyId: '',
+      weaknesses: [], internalGoalId: null, agendaItemId: null, societyId: '', institutionId: '', taskType: '',
       claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, predictionsRegistered: 0,
       errors: [], reportDir: path.join(ARTIFACT_ROOT, runId),
     };
@@ -275,9 +326,11 @@ export class CivilizationFreeRunService {
       const agenda = await this.createAgendaItem(report.internalGoalId, top);
       report.agendaItemId = agenda.agendaItemId;
       report.societyId = agenda.societyId;
+      report.institutionId = agenda.institutionId;
+      report.taskType = agenda.taskType;
 
       const claimIds = mode === 'fixture'
-        ? await this.executeBoundedTaskFixture(report.internalGoalId)
+        ? await this.executeBoundedTaskFixture(report.internalGoalId, agenda)
         : (boundedTask ? await boundedTask(report.internalGoalId) : []);
       report.claimsProcessed = claimIds.length;
 
@@ -290,7 +343,16 @@ export class CivilizationFreeRunService {
       report.errors.push(e instanceof Error ? e.message : String(e));
     }
     report.durationMs = Date.now() - start;
-    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: [], predictions: report.predictionsRegistered });
+    const claimRows = report.internalGoalId
+      ? await db.query(
+        `SELECT c.claim_id, c.text, c.status, c.confidence, c.support_source_ids, c.support_snippets
+           FROM autonomy_claims c
+           JOIN autonomy_goal_actions a ON a.action_id = c.action_id
+          WHERE a.goal_id = $1
+          ORDER BY c.generated_at ASC`,
+        [report.internalGoalId])
+      : { rows: [] };
+    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, predictions: report.predictionsRegistered });
     return report;
   }
 }

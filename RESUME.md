@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 2 — adds grounded-claim fix, live-boot defect fixes, e2e smoke suite)
+**Last updated:** 2026-06-25 (rev 3 — adds free-run agenda-driven execution + report artifacts)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -45,6 +45,12 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   junk/vanity preprint (e.g. arXiv 1810.02188 "6m theorem") as long as the words match. Add a
   source-quality / credibility signal (citation count, venue, author reputation, peer-review status)
   so evidence-governance means *trustworthy* evidence, not just *traceable* evidence.
+- ✅ **Free-run agenda-driven execution — DONE** (post-`fc65461`): the goal-less free-run slice now
+  makes society agenda routing affect bounded task behavior. Agenda records include `societyId`,
+  `institutionId`, `taskType`, and `executionDomain`; fixture execution consumes that route and
+  produces calibration-promotion work for calibration agendas and research-ingestion work for
+  scientific agendas. Reports now write real `claims.jsonl` and `events.jsonl` artifacts. Covered by
+  `tests/integration/civilization-free-run.test.ts` with real Postgres assertions.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.

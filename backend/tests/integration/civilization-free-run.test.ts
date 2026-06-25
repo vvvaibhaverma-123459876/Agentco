@@ -34,11 +34,23 @@ d('civilization free-run (fixture, real Postgres)', () => {
     // #4 routed to a society agenda (persisted).
     expect(report.agendaItemId).toBeTruthy();
     expect(report.societyId).toMatch(/society/);
+    expect(report.institutionId).toBeTruthy();
+    expect(report.taskType).toMatch(/promote_supported_claims|ingest_research_evidence/);
+    const agenda = await db.query(`SELECT content FROM autonomy_memory WHERE id = $1`, [report.agendaItemId]);
+    expect(agenda.rows[0].content.societyId).toBe(report.societyId);
+    expect(agenda.rows[0].content.institutionId).toBe(report.institutionId);
+    expect(agenda.rows[0].content.taskType).toBe(report.taskType);
 
     // #5/#6/#7 bounded task produced a claim and the gate PROMOTED the grounded one.
     expect(report.claimsProcessed).toBe(1);
     expect(report.claimsPromoted).toBe(1);
     expect(report.claimsBlocked).toBe(0);
+    const action = await db.query(
+      `SELECT objective FROM autonomy_goal_actions WHERE goal_id = $1 ORDER BY created_at DESC LIMIT 1`,
+      [report.internalGoalId]
+    );
+    expect(action.rows[0].objective).toContain(report.societyId);
+    expect(action.rows[0].objective).toContain(report.institutionId);
 
     // #9 a prediction was registered for the promoted (now-trusted) claim.
     expect(report.predictionsRegistered).toBe(1);
@@ -47,7 +59,63 @@ d('civilization free-run (fixture, real Postgres)', () => {
     const md = path.join(report.reportDir, 'civilization_report.md');
     expect(fs.existsSync(md)).toBe(true);
     expect(fs.readFileSync(md, 'utf8')).toMatch(/Civilization Free-Run Report/);
+    const claimsJsonl = path.join(report.reportDir, 'claims.jsonl');
+    expect(fs.existsSync(claimsJsonl)).toBe(true);
+    expect(fs.readFileSync(claimsJsonl, 'utf8')).toMatch(/claim_id/);
+    const eventsJsonl = path.join(report.reportDir, 'events.jsonl');
+    expect(fs.existsSync(eventsJsonl)).toBe(true);
+    expect(fs.readFileSync(eventsJsonl, 'utf8')).toMatch(/society_agenda/);
   }, 30000);
+
+  it('uses the society agenda to drive the fixture bounded task route', async () => {
+    const calibrationWeakness = {
+      kind: 'unpromoted_knowledge',
+      detail: 'supported claims need promotion',
+      recommendedGoal: {
+        title: 'Promote supported claims',
+        description: 'Run the promotion gate.',
+        domain: 'calibration',
+      },
+    };
+    const researchWeakness = {
+      kind: 'thin_evidence',
+      detail: 'knowledge base has too few claims',
+      recommendedGoal: {
+        title: 'Gather research evidence',
+        description: 'Ingest grounded research.',
+        domain: 'research',
+      },
+    };
+
+    const calibrationGoalId = await svc.generateInternalGoal(calibrationWeakness);
+    const researchGoalId = await svc.generateInternalGoal(researchWeakness);
+    const calibrationAgenda = await svc.createAgendaItem(calibrationGoalId, calibrationWeakness);
+    const researchAgenda = await svc.createAgendaItem(researchGoalId, researchWeakness);
+
+    expect(calibrationAgenda.societyId).toBe('calibration_society');
+    expect(calibrationAgenda.institutionId).toBe('evidence_promotion_institution');
+    expect(calibrationAgenda.taskType).toBe('promote_supported_claims');
+    expect(researchAgenda.societyId).toBe('scientific_society');
+    expect(researchAgenda.institutionId).toBe('research_ingestion_institution');
+    expect(researchAgenda.taskType).toBe('ingest_research_evidence');
+
+    const [calibrationClaimId] = await svc.executeBoundedTaskFixture(calibrationGoalId, calibrationAgenda);
+    const [researchClaimId] = await svc.executeBoundedTaskFixture(researchGoalId, researchAgenda);
+
+    const rows = await db.query(
+      `SELECT g.goal_id, g.objective, c.claim_id, c.text
+         FROM autonomy_goal_actions g
+         JOIN autonomy_claims c ON c.action_id = g.action_id
+        WHERE c.claim_id = ANY($1)
+        ORDER BY c.generated_at ASC`,
+      [[calibrationClaimId, researchClaimId]]
+    );
+    const byClaim = new Map(rows.rows.map((r: { claim_id: string; objective: string; text: string }) => [r.claim_id, r]));
+    expect(byClaim.get(calibrationClaimId)!.objective).toContain('calibration_society/evidence_promotion_institution');
+    expect(byClaim.get(calibrationClaimId)!.text).toContain('Calibration improves');
+    expect(byClaim.get(researchClaimId)!.objective).toContain('scientific_society/research_ingestion_institution');
+    expect(byClaim.get(researchClaimId)!.text).toContain('Bounded gaps between primes');
+  }, 20000);
 
   it('#8 BLOCKS an unverified claim (snippet not traceable to its cited source)', async () => {
     // Set up a claim whose support snippet is NOT in its evidence => promotion must block it.
