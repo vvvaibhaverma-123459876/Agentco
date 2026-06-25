@@ -12,6 +12,7 @@ import path from 'path';
 import { v4 as uuid } from 'uuid';
 import { CivilizationFreeRunService } from '../../src/services/civilization-free-run.service';
 import { db } from '../../src/db/client';
+import { overrideQueue } from '../../src/services/override-queue.service';
 
 const RUN = process.env.RUN_LIVE_SMOKE === '1';
 const d = RUN ? describe : describe.skip;
@@ -460,4 +461,112 @@ d('civilization free-run (fixture, real Postgres)', () => {
     );
     expect(Number(activationsAfter.rows[0].n)).toBe(Number(activationsBefore.rows[0].n));
   }, 20000);
+
+  it('consumes approval tokens only through a promotion-eligible eval preflight and does not execute', async () => {
+    const weakness = {
+      kind: 'unpromoted_knowledge',
+      detail: 'approval preflight test',
+      recommendedGoal: {
+        title: 'Approval preflight',
+        description: 'Check approved governance requests against eval gates.',
+        domain: 'calibration',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const agenda = await svc.createAgendaItem(goalId, weakness);
+    const [proposal] = await svc.proposeAgentSpawns(goalId, agenda, []);
+    const [queued] = await svc.enqueueGovernanceReviewRequests(goalId, [proposal], []);
+    const activationsBefore = await db.query(
+      `SELECT count(*) AS n FROM autonomy_team_activations WHERE parent_goal_id = $1`,
+      [goalId]
+    );
+
+    const pending = await svc.assessGovernanceApprovalReadiness({
+      requestId: queued.requestId,
+    });
+    expect(pending.status).toBe('blocked');
+    expect(pending.blockedReason).toMatch(/not approved/);
+
+    const approved = await overrideQueue.resolve(queued.requestId, 'approved', 'human-governor-test', 'preflight test');
+    const noEval = await svc.assessGovernanceApprovalReadiness({
+      requestId: queued.requestId,
+      approvalToken: approved.approval_token,
+    });
+    expect(noEval.status).toBe('blocked');
+    expect(noEval.blockedReason).toMatch(/eval scorecard is required/);
+
+    const failedEvalRunId = await seedFreeRunEvalScorecard(false);
+    const failedEval = await svc.assessGovernanceApprovalReadiness({
+      requestId: queued.requestId,
+      approvalToken: approved.approval_token,
+      evalRunId: failedEvalRunId,
+    });
+    expect(failedEval.status).toBe('blocked');
+    expect(failedEval.blockedReason).toMatch(/not promotion eligible/);
+    expect(failedEval.scorecard?.promotionEligible).toBe(false);
+
+    const passedEvalRunId = await seedFreeRunEvalScorecard(true);
+    const ready = await svc.assessGovernanceApprovalReadiness({
+      requestId: queued.requestId,
+      approvalToken: approved.approval_token,
+      evalRunId: passedEvalRunId,
+    });
+    expect(ready.status).toBe('ready');
+    expect(ready.blockedReason).toBeUndefined();
+    expect(ready.scorecard?.promotionEligible).toBe(true);
+    expect(ready.proposalType).toBe('agent_spawn_proposal');
+
+    const memory = await db.query(
+      `SELECT content
+         FROM autonomy_memory
+        WHERE content->>'type' = 'governance_approval_preflight'
+          AND content->>'requestId' = $1
+        ORDER BY created_at DESC`,
+      [queued.requestId]
+    );
+    expect(memory.rows.length).toBeGreaterThanOrEqual(4);
+    expect(memory.rows[0].content.status).toBe('ready');
+
+    const activationsAfter = await db.query(
+      `SELECT count(*) AS n FROM autonomy_team_activations WHERE parent_goal_id = $1`,
+      [goalId]
+    );
+    expect(Number(activationsAfter.rows[0].n)).toBe(Number(activationsBefore.rows[0].n));
+  }, 20000);
 });
+
+async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<string> {
+  const suiteId = uuid();
+  const evalRunId = uuid();
+  await db.query(
+    `INSERT INTO eval_suites (id, name, domain, version, active)
+     VALUES ($1, $2, 'civilization_free_run', 1, TRUE)`,
+    [suiteId, `civilization-free-run-preflight-${uuid()}`]
+  );
+  await db.query(
+    `INSERT INTO eval_runs (id, suite_id, run_timestamp, status)
+     VALUES ($1, $2, NOW(), 'completed')`,
+    [evalRunId, suiteId]
+  );
+  const passScore = promotionEligible ? 1.0 : 0.4;
+  await db.query(
+    `INSERT INTO eval_scorecards (
+       id, eval_run_id, autonomy_score, safety_score, calibration_score, planning_score,
+       memory_score, tool_score, reward_score, regression_score, promotion_eligible
+     ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`,
+    [
+      uuid(),
+      evalRunId,
+      passScore,
+      promotionEligible ? 1.0 : 0.5,
+      passScore,
+      passScore,
+      passScore,
+      passScore,
+      passScore,
+      passScore,
+      promotionEligible,
+    ]
+  );
+  return evalRunId;
+}

@@ -131,6 +131,26 @@ export interface GovernanceQueueRequest {
   riskLevel: 'high' | 'critical';
 }
 
+export interface GovernanceApprovalReadiness {
+  requestId: string;
+  proposalId?: string;
+  proposalType?: 'agent_spawn_proposal' | 'self_improvement_proposal';
+  status: 'ready' | 'blocked';
+  blockedReason?: string;
+  evalRunId?: string;
+  scorecard?: {
+    promotionEligible: boolean;
+    autonomyScore: number | null;
+    safetyScore: number | null;
+    calibrationScore: number | null;
+    planningScore: number | null;
+    memoryScore: number | null;
+    toolScore: number | null;
+    rewardScore: number | null;
+    regressionScore: number | null;
+  };
+}
+
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
 
 export class CivilizationFreeRunService {
@@ -652,6 +672,149 @@ export class CivilizationFreeRunService {
       action: request.action,
       riskLevel: request.risk_level,
     };
+  }
+
+  /**
+   * Approval-token consumption preflight. This verifies a human-approved override and a real
+   * promotion-eligible eval scorecard, then records the readiness decision. It intentionally does
+   * not execute the approved action.
+   */
+  async assessGovernanceApprovalReadiness(input: {
+    requestId: string;
+    approvalToken?: string;
+    evalRunId?: string;
+  }): Promise<GovernanceApprovalReadiness> {
+    const override = await db.query(
+      `SELECT request_id, action, status, approval_token, context
+         FROM override_queue
+        WHERE request_id = $1
+          AND agent_id = 'civilization_free_run'`,
+      [input.requestId],
+    );
+    if (override.rows.length === 0) {
+      return this.recordGovernanceApprovalReadiness({
+        requestId: input.requestId,
+        status: 'blocked',
+        blockedReason: 'override request not found for civilization_free_run',
+      });
+    }
+
+    const row = override.rows[0];
+    const context = row.context || {};
+    const base = {
+      requestId: String(row.request_id),
+      proposalId: context.proposal_id ? String(context.proposal_id) : undefined,
+      proposalType: this.knownProposalType(context.proposal_type),
+    };
+
+    if (row.status !== 'approved') {
+      return this.recordGovernanceApprovalReadiness({
+        ...base,
+        status: 'blocked',
+        blockedReason: `override request is ${row.status}, not approved`,
+      });
+    }
+
+    const token = row.approval_token ? String(row.approval_token) : '';
+    if (!input.approvalToken || input.approvalToken !== token) {
+      return this.recordGovernanceApprovalReadiness({
+        ...base,
+        status: 'blocked',
+        blockedReason: 'approval token missing or does not match override_queue',
+      });
+    }
+
+    if (!input.evalRunId) {
+      return this.recordGovernanceApprovalReadiness({
+        ...base,
+        status: 'blocked',
+        blockedReason: 'promotion-eligible eval scorecard is required before execution',
+      });
+    }
+
+    const scorecard = await db.query(
+      `SELECT sc.promotion_eligible,
+              sc.autonomy_score, sc.safety_score, sc.calibration_score, sc.planning_score,
+              sc.memory_score, sc.tool_score, sc.reward_score, sc.regression_score,
+              er.status AS eval_status
+         FROM eval_scorecards sc
+         JOIN eval_runs er ON er.id = sc.eval_run_id
+        WHERE sc.eval_run_id = $1
+        ORDER BY sc.created_at DESC
+        LIMIT 1`,
+      [input.evalRunId],
+    );
+    if (scorecard.rows.length === 0) {
+      return this.recordGovernanceApprovalReadiness({
+        ...base,
+        status: 'blocked',
+        evalRunId: input.evalRunId,
+        blockedReason: 'eval scorecard not found',
+      });
+    }
+
+    const sc = scorecard.rows[0];
+    const normalizedScorecard = {
+      promotionEligible: Boolean(sc.promotion_eligible),
+      autonomyScore: this.nullableNumber(sc.autonomy_score),
+      safetyScore: this.nullableNumber(sc.safety_score),
+      calibrationScore: this.nullableNumber(sc.calibration_score),
+      planningScore: this.nullableNumber(sc.planning_score),
+      memoryScore: this.nullableNumber(sc.memory_score),
+      toolScore: this.nullableNumber(sc.tool_score),
+      rewardScore: this.nullableNumber(sc.reward_score),
+      regressionScore: this.nullableNumber(sc.regression_score),
+    };
+
+    if (sc.eval_status !== 'completed') {
+      return this.recordGovernanceApprovalReadiness({
+        ...base,
+        status: 'blocked',
+        evalRunId: input.evalRunId,
+        scorecard: normalizedScorecard,
+        blockedReason: `eval run is ${sc.eval_status}, not completed`,
+      });
+    }
+
+    if (!normalizedScorecard.promotionEligible) {
+      return this.recordGovernanceApprovalReadiness({
+        ...base,
+        status: 'blocked',
+        evalRunId: input.evalRunId,
+        scorecard: normalizedScorecard,
+        blockedReason: 'eval scorecard is not promotion eligible',
+      });
+    }
+
+    return this.recordGovernanceApprovalReadiness({
+      ...base,
+      status: 'ready',
+      evalRunId: input.evalRunId,
+      scorecard: normalizedScorecard,
+    });
+  }
+
+  private knownProposalType(raw: unknown): GovernanceApprovalReadiness['proposalType'] {
+    return raw === 'agent_spawn_proposal' || raw === 'self_improvement_proposal'
+      ? raw
+      : undefined;
+  }
+
+  private nullableNumber(raw: unknown): number | null {
+    if (raw === null || raw === undefined) return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  private async recordGovernanceApprovalReadiness(
+    readiness: GovernanceApprovalReadiness,
+  ): Promise<GovernanceApprovalReadiness> {
+    await db.query(
+      `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+       VALUES ($1, NULL, $2, NOW(), NOW())`,
+      [uuid(), JSON.stringify({ type: 'governance_approval_preflight', ...readiness })],
+    );
+    return readiness;
   }
 
   private async buildSelfImprovementProposal(

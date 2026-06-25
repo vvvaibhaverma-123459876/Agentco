@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 8 — connects free-run proposals to override queue)
+**Last updated:** 2026-06-25 (rev 9 — adds approval-token/eval preflight)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -81,12 +81,22 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   does **not** activate specialists, generate candidates, or apply changes. Reports now write
   `governance_queue_requests.jsonl` plus a queue event. Covered by a real Postgres test that asserts
   pending queue rows and no `autonomy_team_activations` side effect.
+- ✅ **Free-run approval-token/eval preflight — DONE** (post-`27327db`): approved governance queue
+  requests can now be checked by `assessGovernanceApprovalReadiness()`. The gate requires the real
+  `override_queue` row to be `approved`, the supplied approval token to match, and a completed
+  `eval_scorecards` row with `promotion_eligible = true`. Every check writes a
+  `governance_approval_preflight` audit record in `autonomy_memory` and returns either `ready` or a
+  structured blocked reason. It deliberately does **not** activate specialists, generate candidates,
+  consume a ready decision into execution, or promote self-modifications. Covered by a real Postgres
+  test for pending override, approved-without-eval, failed eval, passing eval, and no activation side
+  effect.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
-- **Next free-run boundary:** consume approval tokens only behind benchmark/eval gates; do not let
-  the free-run auto-approve, auto-activate specialists, or auto-promote self-modifications.
+- **Next free-run boundary:** consume a `ready` approval/eval preflight result into a bounded
+  activation or candidate workflow; do not let the free-run auto-approve or auto-promote
+  self-modifications.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).
