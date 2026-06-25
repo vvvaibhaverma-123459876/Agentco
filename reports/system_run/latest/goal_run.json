@@ -16,12 +16,12 @@
   },
   "database": {
     "all_required_writes_ok": true,
-    "correlation_id": "64640316-d14d-4e74-8db1-6395012a0ac9",
+    "correlation_id": "04d2d561-74e9-4964-b97f-41482d36de9c",
     "db_url_present": true,
     "operations": [
       {
         "error": null,
-        "id": "da0e07f6-cfef-4698-8af5-edbcb4ca678d",
+        "id": "20c2a420-188b-4294-bb7e-da387bf3739a",
         "name": "prediction_ledger_insert",
         "ok": true
       },
@@ -32,19 +32,19 @@
       },
       {
         "error": null,
-        "id": "goal-run-cb915f62b3ab",
+        "id": "goal-run-3faf9854a807",
         "name": "legacy_prediction_resolution_insert",
         "ok": true
       },
       {
         "error": null,
-        "id": "0a0c5362-6c6b-4551-8532-b15be6641cb8",
+        "id": "ba02ebfc-15ce-4321-a977-1ee73413ba1a",
         "name": "trust_scores_insert",
         "ok": true
       },
       {
         "error": null,
-        "id": "37a6e0c5-b664-420b-a6a0-fadb5cc3c879",
+        "id": "392ef4df-7b8f-441b-95ca-89717ec7cfbb",
         "name": "event_history_insert",
         "ok": true
       },
@@ -66,9 +66,9 @@
     ]
   },
   "error": null,
-  "latency_ms": 3451.46,
+  "latency_ms": 2864.52,
   "llm": {
-    "latency_ms": 2895.54,
+    "latency_ms": 2476.9,
     "model": "gpt-4o-mini",
     "simulated": false,
     "usage": {
@@ -131,7 +131,7 @@
       "ev3 is about a different company and does not establish a vendor breach"
     ]
   },
-  "run_id": "goal-run-20260625T091846Z-b77b2ffe",
+  "run_id": "goal-run-20260625T093328Z-93004d14",
   "success": true,
   "task": {
     "domain": "vendor_risk",

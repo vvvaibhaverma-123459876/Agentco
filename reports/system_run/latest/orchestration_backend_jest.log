@@ -1,0 +1,1139 @@
+Thu Jun 25 14:58:38 IST 2026
+
+> @agentco/backend@1.0.0 test
+> jest --passWithNoTests --runInBand --forceExit
+
+PASS tests/knowledge-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+    console.log
+      
+      ================================================================================
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:325:13)
+
+    console.log
+      📚 KNOWLEDGE BASE EXPANSION - PHASE 3
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:326:13)
+
+    console.log
+      ================================================================================
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:327:13)
+
+    console.log
+      ✅ Added 5 recent medical protocols
+
+      at KBExpansionService.addMedicalProtocols (src/services/kb-expansion.service.ts:117:13)
+
+    console.log
+      ✅ Added 5 AI/ML advances
+
+      at KBExpansionService.addAIAdvances (src/services/kb-expansion.service.ts:189:13)
+
+    console.log
+      ✅ Added 4 climate science facts
+
+      at KBExpansionService.addClimateScience (src/services/kb-expansion.service.ts:250:13)
+
+    console.log
+      ✅ Added 4 emerging technology facts
+
+      at KBExpansionService.addEmergingTech (src/services/kb-expansion.service.ts:311:13)
+
+    console.log
+      
+      📊 EXPANSION RESULTS:
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:344:13)
+
+    console.log
+         Facts added: 18
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:345:13)
+
+    console.log
+         New total: 25,137 facts
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:346:13)
+
+    console.log
+         Target: 50,000 facts
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:347:13)
+
+    console.log
+         Progress: 50.3%
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:348:13)
+
+    console.log
+         Quality: All facts 95%+ confidence ✅
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:349:13)
+
+    console.log
+         Status: 🟡 CONTINUING EXPANSION
+
+      at KBExpansionService.executeFullExpansion (src/services/kb-expansion.service.ts:350:13)
+
+{"level":30,"time":1782379721714,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/symbolic/classify","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721718,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":4.155874997377396,"msg":"request completed"}
+{"level":30,"time":1782379721733,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/symbolic/classify","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721734,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.9792909920215607,"msg":"request completed"}
+{"level":30,"time":1782379721746,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/knowledge/nodes","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721747,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":0.5661669969558716,"msg":"request completed"}
+{"level":30,"time":1782379721759,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/rag/augment","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721759,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.41475000977516174,"msg":"request completed"}
+{"level":30,"time":1782379721951,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/protected-surfaces/check?field=foo","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721952,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.2746659815311432,"msg":"request completed"}
+{"level":30,"time":1782379721964,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/ensemble/experts","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721964,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.26462501287460327,"msg":"request completed"}
+{"level":30,"time":1782379721975,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/plans/plan-1/validate","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721975,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.15687498450279236,"msg":"request completed"}
+{"level":30,"time":1782379721985,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/rollback/canary-1/snapshot","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721986,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":404},"responseTime":0.22316598892211914,"msg":"request completed"}
+{"level":30,"time":1782379721996,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/governance/voting-weight/agent-1","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379721996,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.23054200410842896,"msg":"request completed"}
+{"level":30,"time":1782379722006,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/perception/events","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/operations-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379722012,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":6.026708006858826,"msg":"request completed"}
+{"level":30,"time":1782379722022,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/perception/events","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722023,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.2787499725818634,"msg":"request completed"}
+{"level":30,"time":1782379722167,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/overrides","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/security.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379722172,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":401},"responseTime":5.268916994333267,"msg":"request completed"}
+{"level":30,"time":1782379722185,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/overrides","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722185,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":401},"responseTime":0.14412501454353333,"msg":"request completed"}
+{"level":30,"time":1782379722197,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/overrides/overdue","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722197,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":401},"responseTime":0.14375001192092896,"msg":"request completed"}
+{"level":30,"time":1782379722209,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/health","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722209,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.1938750147819519,"msg":"request completed"}
+{"level":30,"time":1782379722363,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/institutions-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+    console.log
+      
+      ✅ Institution Created: Institute of Mathematics
+
+      at InstitutionsService.createInstitution (src/services/institutions.service.ts:368:13)
+
+    console.log
+         Domain: mathematics
+
+      at InstitutionsService.createInstitution (src/services/institutions.service.ts:369:13)
+
+    console.log
+         ID: inst_mathematics_1782379722364
+
+      at InstitutionsService.createInstitution (src/services/institutions.service.ts:370:13)
+
+{"level":30,"time":1782379722367,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":3.9324159920215607,"msg":"request completed"}
+{"level":30,"time":1782379722379,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722380,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.2587500214576721,"msg":"request completed"}
+{"level":30,"time":1782379722390,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/goals","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722391,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":0.2925420105457306,"msg":"request completed"}
+{"level":30,"time":1782379722400,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/goals","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722401,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.24991601705551147,"msg":"request completed"}
+{"level":30,"time":1782379722411,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/goals/goal-1/activate","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722411,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.1875,"msg":"request completed"}
+{"level":30,"time":1782379722421,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/institutions/inst-1/goals","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722421,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.15299999713897705,"msg":"request completed"}
+{"level":30,"time":1782379722430,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/coalitions/recommend","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722437,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":7.305416017770767,"msg":"request completed"}
+{"level":30,"time":1782379722571,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/governed-api.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379722572,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":401},"responseTime":0.4529170095920563,"msg":"request completed"}
+{"level":30,"time":1782379722585,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722590,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":5.795875012874603,"msg":"request completed"}
+{"level":30,"time":1782379722591,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"POST","url":"/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722591,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":201},"responseTime":0.15279200673103333,"msg":"request completed"}
+{"level":30,"time":1782379722603,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722603,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":0.25975000858306885,"msg":"request completed"}
+{"level":30,"time":1782379722603,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"GET","url":"/audit/mutations","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722603,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":200},"responseTime":0.08841601014137268,"msg":"request completed"}
+{"level":30,"time":1782379722613,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722613,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":0.28583401441574097,"msg":"request completed"}
+{"level":30,"time":1782379722614,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"POST","url":"/institutions/805ca847-7939-405f-a17e-c4eb6f6338b3/agents","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722614,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":400},"responseTime":0.20724999904632568,"msg":"request completed"}
+{"level":30,"time":1782379722614,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-3","req":{"method":"POST","url":"/institutions/805ca847-7939-405f-a17e-c4eb6f6338b3/agents","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722614,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-3","res":{"statusCode":201},"responseTime":0.12254199385643005,"msg":"request completed"}
+{"level":30,"time":1782379722731,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/trust/score","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/trust-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379722732,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.6643329858779907,"msg":"request completed"}
+{"level":30,"time":1782379722744,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/trust/assess-risk","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722744,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.30945801734924316,"msg":"request completed"}
+{"level":30,"time":1782379722755,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/institutions/inst-1/reputation","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722755,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.2070000171661377,"msg":"request completed"}
+{"level":30,"time":1782379722766,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/trust/score","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722766,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":403},"responseTime":0.2335839867591858,"msg":"request completed"}
+{"level":30,"time":1782379722880,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/claims/register","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/rbac.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379722880,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":401},"responseTime":0.43662500381469727,"msg":"request completed"}
+{"level":30,"time":1782379722893,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/claims/register","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722893,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":403},"responseTime":0.2857920229434967,"msg":"request completed"}
+{"level":30,"time":1782379722893,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"POST","url":"/claims/register","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722893,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":201},"responseTime":0.2088329792022705,"msg":"request completed"}
+{"level":30,"time":1782379722904,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/claims/register","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722904,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":0.2915840148925781,"msg":"request completed"}
+{"level":30,"time":1782379722904,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"POST","url":"/claims/99b8c086-d31d-4b6b-885b-b84d10b27e26/resolve","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722905,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":403},"responseTime":0.24916699528694153,"msg":"request completed"}
+{"level":30,"time":1782379722915,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/credentials/issue","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722915,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":403},"responseTime":0.27983301877975464,"msg":"request completed"}
+{"level":30,"time":1782379722915,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"POST","url":"/claims/register","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722915,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":403},"responseTime":0.1194159984588623,"msg":"request completed"}
+{"level":30,"time":1782379722925,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/institutions","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722925,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":403},"responseTime":0.3446660041809082,"msg":"request completed"}
+{"level":30,"time":1782379722926,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","req":{"method":"GET","url":"/audit/security","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379722926,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-2","res":{"statusCode":200},"responseTime":0.11954200267791748,"msg":"request completed"}
+{"level":30,"time":1782379723062,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/calibration/dynamic/confidence","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/forecasting-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379723063,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.5732499957084656,"msg":"request completed"}
+{"level":30,"time":1782379723074,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/calibration/dynamic/confidence","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723074,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.2863750159740448,"msg":"request completed"}
+{"level":30,"time":1782379723087,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/calibration/drift","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723087,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.1540839970111847,"msg":"request completed"}
+{"level":30,"time":1782379723096,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/ensemble/vote","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723101,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":4.9529590010643005,"msg":"request completed"}
+{"level":30,"time":1782379723219,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/credential/agent-1/issue","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723219,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":403},"responseTime":0.18462499976158142,"msg":"request completed"}
+{"level":30,"time":1782379723230,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/credential/agent-1/issue","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723250,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":201},"responseTime":19.504541993141174,"msg":"request completed"}
+{"level":30,"time":1782379723262,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/credential/agent-1/verify","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723262,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.15279197692871094,"msg":"request completed"}
+{"level":30,"time":1782379723278,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/credential/agent-1/issue","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723279,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":404},"responseTime":0.561957985162735,"msg":"request completed"}
+PASS tests/credential-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+PASS tests/civilization-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379723390,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/civilization/solve","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723397,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":6.871916025876999,"msg":"request completed"}
+{"level":30,"time":1782379723409,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/civilization/solve","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723409,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.21933302283287048,"msg":"request completed"}
+{"level":30,"time":1782379723420,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/civilization/work","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723421,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":202},"responseTime":0.3734169900417328,"msg":"request completed"}
+{"level":30,"time":1782379723562,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/governance/rbac/check","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/governance-ext-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379723569,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":6.701999992132187,"msg":"request completed"}
+{"level":30,"time":1782379723580,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/governance/invariant/claim","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723581,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.3460000157356262,"msg":"request completed"}
+{"level":30,"time":1782379723591,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/safety/response","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723592,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.3307499885559082,"msg":"request completed"}
+{"level":30,"time":1782379723602,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/provenance/verify","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723603,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.8622500002384186,"msg":"request completed"}
+{"level":30,"time":1782379723710,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/calibration/metrics","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+PASS tests/calibration-routes.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Trust Scoring Service initialized for 9 domains
+
+      at TrustScoringService.initializeTrustScores (src/services/trust-scoring.service.ts:83:13)
+
+    console.log
+      ✅ Confidence Service initialized with 9 domains
+
+      at ConfidenceService.initializeDomainStats (src/services/confidence.service.ts:78:13)
+
+    console.log
+      ✅ Safety Service initialized with 12 registered facts
+
+      at SafetyService.registerKeyFacts (src/services/safety.service.ts:180:13)
+
+    console.log
+      📚 KB EXPANSION SERVICE INITIALIZED
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:43:13)
+
+    console.log
+         Current size: 25,119 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:44:13)
+
+    console.log
+         Target size: 50,000 facts
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:45:13)
+
+    console.log
+         Gap: 24,881 facts needed
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:46:13)
+
+    console.log
+         Quality threshold: 95%+ confidence
+
+      at KBExpansionService.initializeExpansion (src/services/kb-expansion.service.ts:47:13)
+
+    console.log
+      ✅ Dynamic Calibration initialized with 45 parameter combinations
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:113:13)
+
+    console.log
+         System will self-adjust calibration based on real performance feedback
+
+      at DynamicCalibrationService.initializeDynamicParameters (src/services/dynamic-calibration.service.ts:116:13)
+
+    console.log
+      ⏱️ Auto-calibration started (every 60 minutes)
+
+      at DynamicCalibrationService.startAutoCalibration (src/services/dynamic-calibration.service.ts:323:13)
+
+    console.log
+      ✅ Multi-Agent Ensemble initialized with 7 experts
+
+      at MultiAgentEnsembleService.initializeExperts (src/services/multi-agent-ensemble.service.ts:117:13)
+
+{"level":30,"time":1782379723711,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.5394580066204071,"msg":"request completed"}
+{"level":30,"time":1782379723722,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/calibration/metrics","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723723,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":400},"responseTime":0.28416699171066284,"msg":"request completed"}
+{"level":30,"time":1782379723734,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"POST","url":"/api/calibration/metric","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723734,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.2901250123977661,"msg":"request completed"}
+{"level":30,"time":1782379723744,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","req":{"method":"GET","url":"/api/calibration/claim-accuracy","hostname":"localhost:80","remoteAddress":"127.0.0.1"},"msg":"incoming request"}
+{"level":30,"time":1782379723744,"pid":34218,"hostname":"ZetAdmins-MacBook-Pro.local","reqId":"req-1","res":{"statusCode":200},"responseTime":0.14799997210502625,"msg":"request completed"}
+PASS tests/integration/memory-store.test.ts
+PASS tests/integration/event-bus.test.ts
+PASS tests/integration/audit-log.test.ts
+PASS tests/integration/override-queue.test.ts
+PASS tests/protected-surfaces.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+PASS tests/html-extract.test.ts
+PASS tests/learning-enforcement.test.ts
+PASS tests/service-identity.test.ts
+PASS tests/claim-grounding.test.ts
+PASS tests/protected-surface-enforcer.test.ts
+  ● Console
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+    console.log
+      ✅ Auto-derived 4 protected surfaces from policy.py
+
+      at ProtectedSurfaceEnforcerService.loadProtectedSurfaces (src/services/protected-surface-enforcer.service.ts:114:15)
+
+PASS tests/credential-canonical.test.ts
+PASS tests/task-dispatch.test.ts
+PASS tests/source-quality.test.ts
+
+Test Suites: 4 skipped, 25 passed, 25 of 29 total
+Tests:       26 skipped, 156 passed, 182 total
+Snapshots:   0 total
+Time:        4.581 s, estimated 14 s
+Ran all test suites.
+Force exiting Jest: Have you considered using `--detectOpenHandles` to detect async operations that kept running after all tests finished?
+npm test -- --runInBand --forceExit  5.48s user 1.30s system 110% cpu 6.117 total
+exit_code=0

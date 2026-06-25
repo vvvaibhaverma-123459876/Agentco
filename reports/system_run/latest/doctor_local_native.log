@@ -1,0 +1,6 @@
+Thu Jun 25 15:00:45 IST 2026
+python3.13 -m runtime.orchestration.doctor --mode local_native --run-builds
+AgentCo doctor selected local_native can_continue=True
+Report: /Users/Zet/Desktop/Agentco/reports/system_run/latest/doctor_report.md
+make doctor  20.80s user 6.14s system 161% cpu 16.723 total
+exit_code=0

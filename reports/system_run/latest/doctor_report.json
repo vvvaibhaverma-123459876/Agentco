@@ -1,0 +1,233 @@
+{
+  "can_continue": true,
+  "disabled_capabilities": [],
+  "fallbacks_used": [
+    {
+      "fallback": "native_services",
+      "service": "docker_daemon",
+      "status": "blocked"
+    },
+    {
+      "fallback": "memory_cache",
+      "service": "redis",
+      "status": "missing"
+    },
+    {
+      "fallback": "in_process_event_bus",
+      "service": "kafka",
+      "status": "missing"
+    },
+    {
+      "fallback": "env_secret_provider",
+      "service": "vault",
+      "status": "missing"
+    },
+    {
+      "fallback": "json_metrics_writer",
+      "service": "prometheus",
+      "status": "missing"
+    },
+    {
+      "fallback": "metrics_json_only",
+      "service": "grafana",
+      "status": "missing"
+    }
+  ],
+  "mode_policy": {
+    "allowed_fallbacks": {
+      "docker_daemon": "native_services",
+      "grafana": "metrics_json_only",
+      "kafka": "in_process_event_bus",
+      "openai_connectivity": "disabled_live_llm",
+      "prometheus": "json_metrics_writer",
+      "redis": "memory_cache",
+      "resolution_service": "disable_primary_ledger_resolution",
+      "vault": "env_secret_provider"
+    },
+    "db_writes_allowed": true,
+    "forbidden_fallbacks": [
+      "fake_llm",
+      "in_memory_db"
+    ],
+    "live_llm_allowed": true,
+    "name": "local_native",
+    "optional_services": [
+      "docker_daemon",
+      "kafka",
+      "redis",
+      "vault",
+      "prometheus",
+      "grafana",
+      "openai_connectivity",
+      "resolution_service"
+    ],
+    "required_services": [
+      "python",
+      "node",
+      "npm",
+      "postgres",
+      "migration_dependencies",
+      "migrations",
+      "core_db_schema",
+      "filesystem_reports"
+    ],
+    "simulated_data_allowed": false,
+    "unsafe_actions_fail_closed": true
+  },
+  "requested_mode": "local_native",
+  "required_fixes": [],
+  "run_best_effort": {
+    "completed": true,
+    "exit_code": 0,
+    "output_tail": "{\n  \"run_id\": \"goal-run-20260625T093328Z-93004d14\",\n  \"mode\": \"live_openai\",\n  \"success\": true,\n  \"latency_ms\": 2864.52,\n  \"error\": null\n}",
+    "selected_runtime_mode": "local_native"
+  },
+  "safe_next_command": "make run-best-effort",
+  "selected_runtime_mode": "local_native",
+  "services": [
+    {
+      "detail": "3.13.9",
+      "remediation": "Use Python 3.13 for AgentCo doctor/tests",
+      "service": "python",
+      "status": "real"
+    },
+    {
+      "detail": "pytest importable",
+      "remediation": "",
+      "service": "python_dependencies",
+      "status": "real"
+    },
+    {
+      "detail": "/Users/Zet/.nvm/versions/node/v24.17.0/bin/node",
+      "remediation": "Install node",
+      "service": "node",
+      "status": "real"
+    },
+    {
+      "detail": "/Users/Zet/.nvm/versions/node/v24.17.0/bin/npm",
+      "remediation": "Install npm",
+      "service": "npm",
+      "status": "real"
+    },
+    {
+      "detail": "> @agentco/backend@1.0.0 build\n> tsc",
+      "remediation": "Run npm run build",
+      "service": "backend_build",
+      "status": "real"
+    },
+    {
+      "detail": " kB\n\u251c \u25cb /finance                             561 B          87.7 kB\n\u251c \u25cb /incidents                           554 B          87.7 kB\n\u251c \u25cb /override                            2.64 kB        89.8 kB\n\u2514 \u25cb /performance                         711 B          87.8 kB\n+ First Load JS shared by all            87.1 kB\n  \u251c chunks/23-5d6f0e407b4f0755.js        31.5 kB\n  \u251c chunks/fd9d1056-211f0c774853bd6b.js  53.6 kB\n  \u2514 other shared chunks (total)          1.95 kB\n\n\n\u25cb  (Static)  prerendered as static content",
+      "remediation": "Run npm run build",
+      "service": "frontend_build",
+      "status": "real"
+    },
+    {
+      "detail": "/usr/local/bin/docker",
+      "remediation": "Install docker",
+      "service": "docker_cli",
+      "status": "real"
+    },
+    {
+      "detail": "Cannot connect to the Docker daemon at unix:///Users/Zet/.docker/run/docker.sock. Is the docker daemon running?",
+      "remediation": "Start Docker Desktop/daemon or use local_native",
+      "service": "docker_daemon",
+      "status": "blocked"
+    },
+    {
+      "detail": "Docker Compose version v5.1.4",
+      "remediation": "",
+      "service": "docker_compose",
+      "status": "real"
+    },
+    {
+      "detail": "agentco|agentco",
+      "remediation": "",
+      "service": "postgres",
+      "status": "real"
+    },
+    {
+      "detail": "pg dependency declared; ts-node runnable (v10.9.2)",
+      "remediation": "",
+      "service": "migration_dependencies",
+      "status": "real"
+    },
+    {
+      "detail": "backend TypeScript migration runner present",
+      "remediation": "",
+      "service": "migrations",
+      "status": "real"
+    },
+    {
+      "detail": "prediction_ledger|decision_log|event_history|trust_scores",
+      "remediation": "",
+      "service": "core_db_schema",
+      "status": "real"
+    },
+    {
+      "detail": "localhost:6379 unreachable",
+      "remediation": "Start Redis or use memory cache fallback",
+      "service": "redis",
+      "status": "missing"
+    },
+    {
+      "detail": "localhost:9092 unreachable",
+      "remediation": "Start Kafka or use in-process event bus fallback",
+      "service": "kafka",
+      "status": "missing"
+    },
+    {
+      "detail": "localhost:8200 unreachable",
+      "remediation": "Start Vault or use env secret provider fallback",
+      "service": "vault",
+      "status": "missing"
+    },
+    {
+      "detail": "localhost:9090 unreachable",
+      "remediation": "Start Prometheus or use JSON metrics fallback",
+      "service": "prometheus",
+      "status": "missing"
+    },
+    {
+      "detail": "localhost:3005 unreachable",
+      "remediation": "Start Grafana or skip dashboard UI",
+      "service": "grafana",
+      "status": "missing"
+    },
+    {
+      "detail": "key_present=True, model=gpt-4o-mini",
+      "remediation": "Set LLM_API_KEY or use offline_fixture",
+      "service": "openai_env",
+      "status": "real"
+    },
+    {
+      "detail": "OpenAI-compatible call succeeded",
+      "remediation": "",
+      "service": "openai_connectivity",
+      "status": "real"
+    },
+    {
+      "detail": "resolution_service login works",
+      "remediation": "",
+      "service": "resolution_service",
+      "status": "real"
+    },
+    {
+      "detail": "backend not running during doctor",
+      "remediation": "",
+      "service": "backend_health",
+      "status": "not_required"
+    },
+    {
+      "detail": "static route check passed",
+      "remediation": "",
+      "service": "sensitive_route_auth",
+      "status": "real"
+    },
+    {
+      "detail": "/Users/Zet/Desktop/Agentco/reports/system_run/latest",
+      "remediation": "",
+      "service": "filesystem_reports",
+      "status": "real"
+    }
+  ]
+}

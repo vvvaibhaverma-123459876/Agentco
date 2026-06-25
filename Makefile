@@ -1,11 +1,29 @@
-.PHONY: doctor dev dev-minimal dev-full migrate test verify verify-core verify-backend verify-frontend verify-calibration verify-resolution verify-reserve verify-dispatch verify-security verify-epistemic verify-jurisdiction verify-civilization verify-demo verify-acceptance smoke smoke-real demo business-demo business-sim clean
+.PHONY: doctor doctor-offline doctor-production run-best-effort run-offline-fixture dev dev-minimal dev-full migrate test verify verify-core verify-backend verify-frontend verify-calibration verify-resolution verify-reserve verify-dispatch verify-security verify-epistemic verify-jurisdiction verify-civilization verify-demo verify-acceptance smoke smoke-real demo business-demo business-sim clean
 
 PYTHON ?= python3
+PYTHON313 ?= python3.13
 DATABASE_URL ?= postgresql://agentco:password@localhost:5432/agentco
 BUSINESS_SIM_ARGS ?=
 
 doctor:
-	$(PYTHON) scripts/doctor.py
+	@command -v $(PYTHON313) >/dev/null || { echo "python3.13 is required for doctor. Install Python 3.13 or set PYTHON313=/path/to/python3.13"; exit 2; }
+	$(PYTHON313) -m runtime.orchestration.doctor --mode local_native --run-builds
+
+doctor-offline:
+	@command -v $(PYTHON313) >/dev/null || { echo "python3.13 is required for doctor-offline. Install Python 3.13 or set PYTHON313=/path/to/python3.13"; exit 2; }
+	$(PYTHON313) -m runtime.orchestration.doctor --mode offline_fixture
+
+doctor-production:
+	@command -v $(PYTHON313) >/dev/null || { echo "python3.13 is required for doctor-production. Install Python 3.13 or set PYTHON313=/path/to/python3.13"; exit 2; }
+	$(PYTHON313) -m runtime.orchestration.doctor --mode production --run-builds
+
+run-best-effort:
+	@command -v $(PYTHON313) >/dev/null || { echo "python3.13 is required for run-best-effort. Install Python 3.13 or set PYTHON313=/path/to/python3.13"; exit 2; }
+	$(PYTHON313) -m runtime.orchestration.run_best_effort
+
+run-offline-fixture:
+	@command -v $(PYTHON313) >/dev/null || { echo "python3.13 is required for run-offline-fixture. Install Python 3.13 or set PYTHON313=/path/to/python3.13"; exit 2; }
+	$(PYTHON313) -m runtime.orchestration.run_best_effort --mode offline_fixture
 
 dev: dev-minimal
 

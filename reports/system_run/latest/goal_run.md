@@ -1,6 +1,6 @@
 # AgentCo Goal Run Verification
 
-- Run ID: `goal-run-20260625T091846Z-b77b2ffe`
+- Run ID: `goal-run-20260625T093328Z-93004d14`
 - Mode: `live_openai`
 - Decision: `escalate`
 - Risk: `medium`
@@ -8,7 +8,7 @@
 - Trusted confidence: `0.4617`
 - Passed validation: `True`
 - Brier score: `0.16`
-- Latency ms: `3451.46`
+- Latency ms: `2864.52`
 
 ## Validation Checks
 
@@ -27,11 +27,11 @@
 
 ## Database Trail
 
-- `prediction_ledger_insert`: ok id=`da0e07f6-cfef-4698-8af5-edbcb4ca678d`
+- `prediction_ledger_insert`: ok id=`20c2a420-188b-4294-bb7e-da387bf3739a`
 - `prediction_ledger_resolution_update`: ok
-- `legacy_prediction_resolution_insert`: ok id=`goal-run-cb915f62b3ab`
-- `trust_scores_insert`: ok id=`0a0c5362-6c6b-4551-8532-b15be6641cb8`
-- `event_history_insert`: ok id=`37a6e0c5-b664-420b-a6a0-fadb5cc3c879`
+- `legacy_prediction_resolution_insert`: ok id=`goal-run-3faf9854a807`
+- `trust_scores_insert`: ok id=`ba02ebfc-15ce-4321-a977-1ee73413ba1a`
+- `event_history_insert`: ok id=`392ef4df-7b8f-441b-95ca-89717ec7cfbb`
 - `decision_log_insert`: ok
 - `autonomy_audit_events_insert`: ok
 - `autonomy_memory_learning_insert`: ok

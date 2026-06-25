@@ -1,0 +1,12 @@
+Thu Jun 25 15:03:11 IST 2026
+python3.13 -m runtime.orchestration.run_best_effort
+AgentCo run-best-effort selected local_native completed=True
+{
+  "run_id": "goal-run-20260625T093328Z-93004d14",
+  "mode": "live_openai",
+  "success": true,
+  "latency_ms": 2864.52,
+  "error": null
+}
+make run-best-effort  20.86s user 6.14s system 132% cpu 20.321 total
+exit_code=0

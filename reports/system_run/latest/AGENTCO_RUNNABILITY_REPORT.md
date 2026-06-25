@@ -28,6 +28,43 @@ Commit verified: `e53f018140a19318d0df2b42131b0f4b81c6e2f4`
 
 No secret values were printed or committed.
 
+## Runtime Orchestration
+
+AgentCo now has an explicit doctor/orchestration layer with runtime modes:
+
+`production`, `local_full`, `local_native`, `offline_fixture`, `ci_smoke`, and `degraded`.
+
+Latest local-native doctor result:
+
+| Field | Value |
+|---|---|
+| Selected runtime mode | `local_native` |
+| Can continue | `true` |
+| Safe next command | `make run-best-effort` |
+| Run type | `mixed`: real Postgres/OpenAI with explicit local fallbacks for missing optional infra |
+
+Service/fallback behavior observed in this environment:
+
+| Service | Status | Safe behavior |
+|---|---|---|
+| Docker daemon | `blocked` | Select `local_native`; do not require Docker when native Postgres is healthy |
+| Postgres | `real` | Use native Postgres for DB writes |
+| Core DB schema | `real` | Continue |
+| Kafka | `missing` | Use explicit in-process event bus fallback outside production |
+| Redis | `missing` | Use explicit memory cache fallback outside production |
+| Vault | `missing` | Use explicit env secret provider fallback outside production |
+| Prometheus | `missing` | Write JSON metrics artifacts |
+| Grafana | `missing` | Skip dashboard UI; keep metrics JSON |
+| OpenAI | `real` | Live LLM calls allowed in `local_native` |
+| Resolution service | `real` | Primary ledger resolution enabled |
+| Sensitive route auth | `real` | `/api/overrides` unauthenticated probe returns 401 |
+
+Artifacts:
+
+- `doctor_report.json`
+- `doctor_report.md`
+- `docs/runtime_capability_contract.md`
+
 ## Commands Executed
 
 | Command | Exit | Evidence |

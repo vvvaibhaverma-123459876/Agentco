@@ -1,0 +1,6 @@
+Thu Jun 25 14:58:25 IST 2026
+python3.13 -m runtime.orchestration.doctor --mode offline_fixture
+AgentCo doctor selected offline_fixture can_continue=True
+Report: /Users/Zet/Desktop/Agentco/reports/system_run/latest/doctor_report.md
+make doctor-offline  1.78s user 1.34s system 86% cpu 3.595 total
+exit_code=0
