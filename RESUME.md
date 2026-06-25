@@ -66,6 +66,13 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   improvement, tests to pass, rollback plan, risk level, and protected-surface scan output from
   `ProtectedSurfaceEnforcerService`. It writes `self_improvement_proposals.jsonl` and does **not**
   edit code, create deployable candidates, or promote changes. Covered by a real Postgres test.
+- ✅ **Free-run deep self-assessment — DONE** (post-`b8668ff`): the free-run pass now builds a
+  `CivilizationHealthSnapshot` from real Postgres state before choosing an internal goal. The
+  snapshot covers claim/evidence totals, supported/promoted backlog, unresolved contradiction links,
+  overdue unresolved Phase 0b predictions, and weak domains with multiple claims but no promoted
+  knowledge. Reports persist the snapshot in `civilization_report.md`, `events.jsonl`, and
+  `report.json`. Covered by a real Postgres test that seeds contradictions, stale predictions, and a
+  weak domain against the deployed schema.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.

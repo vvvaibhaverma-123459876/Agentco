@@ -60,6 +60,22 @@ export interface FreeRunReport {
   predictionsRegistered: number;
   errors: string[];
   reportDir: string;
+  healthSnapshot?: CivilizationHealthSnapshot;
+}
+
+export interface CivilizationHealthSnapshot {
+  claims: number;
+  promotedClaims: number;
+  supportedClaims: number;
+  evidenceItems: number;
+  unresolvedContradictions: number;
+  stalePredictions: number;
+  weakDomains: Array<{
+    domain: string;
+    claims: number;
+    promotedClaims: number;
+    supportedClaims: number;
+  }>;
 }
 
 export interface ContradictionFinding {
@@ -113,23 +129,52 @@ export class CivilizationFreeRunService {
 
   /** STEP 1: inspect civilization state and identify the most salient weakness + a recommended goal. */
   async selfAssess(): Promise<Weakness[]> {
-    const weaknesses: Weakness[] = [];
+    return this.weaknessesFromHealthSnapshot(await this.getHealthSnapshot());
+  }
 
-    const totals = await db.query(
-      `SELECT
-         (SELECT count(*) FROM autonomy_claims) AS claims,
-         (SELECT count(*) FROM autonomy_claims WHERE status = 'promoted') AS promoted,
-         (SELECT count(*) FROM autonomy_claims WHERE status = 'supported') AS supported,
-         (SELECT count(*) FROM autonomy_evidence) AS evidence`
-    );
-    const t = totals.rows[0];
-    const claims = Number(t.claims), promoted = Number(t.promoted), supported = Number(t.supported);
+  weaknessesFromHealthSnapshot(snapshot: CivilizationHealthSnapshot): Weakness[] {
+    const weaknesses: Weakness[] = [];
+    if (snapshot.unresolvedContradictions > 0) {
+      weaknesses.push({
+        kind: 'unresolved_contradictions',
+        detail: `${snapshot.unresolvedContradictions} claim(s) are contradicted or have unresolved contradiction links`,
+        recommendedGoal: {
+          title: 'Resolve contradicted claims before further promotion',
+          description: 'Review contradiction-linked claims and preserve only evidence-consistent knowledge.',
+          domain: 'calibration',
+        },
+      });
+    }
+
+    if (snapshot.stalePredictions > 0) {
+      weaknesses.push({
+        kind: 'stale_predictions',
+        detail: `${snapshot.stalePredictions} unresolved prediction(s) are past their expected resolution date`,
+        recommendedGoal: {
+          title: 'Resolve overdue calibration predictions',
+          description: 'Measure overdue predictions, record outcomes, and update calibration evidence.',
+          domain: 'calibration',
+        },
+      });
+    }
+
+    for (const domain of snapshot.weakDomains.slice(0, 2)) {
+      weaknesses.push({
+        kind: 'weak_domain',
+        detail: `${domain.domain} has ${domain.claims} claim(s), ${domain.supportedClaims} supported, and ${domain.promotedClaims} promoted`,
+        recommendedGoal: {
+          title: `Strengthen ${domain.domain} evidence quality`,
+          description: `Gather or validate grounded evidence for the weak ${domain.domain} domain until at least one claim can be promoted.`,
+          domain: domain.domain === 'unknown' ? 'research' : domain.domain,
+        },
+      });
+    }
 
     // Weakness: knowledge exists but little is promoted to trusted knowledge ("believe slowly" backlog).
-    if (supported > promoted) {
+    if (snapshot.supportedClaims > snapshot.promotedClaims) {
       weaknesses.push({
         kind: 'unpromoted_knowledge',
-        detail: `${supported} supported claims vs ${promoted} promoted — a promotion backlog`,
+        detail: `${snapshot.supportedClaims} supported claims vs ${snapshot.promotedClaims} promoted — a promotion backlog`,
         recommendedGoal: {
           title: 'Validate and promote high-confidence supported claims',
           description: 'Run the evidence promotion gate over supported claims and promote those that pass.',
@@ -139,10 +184,10 @@ export class CivilizationFreeRunService {
     }
 
     // Weakness: thin evidence base → go gather more.
-    if (claims < 10) {
+    if (snapshot.claims < 10) {
       weaknesses.push({
         kind: 'thin_evidence',
-        detail: `only ${claims} claims in the knowledge base`,
+        detail: `only ${snapshot.claims} claims in the knowledge base`,
         recommendedGoal: {
           title: 'Expand the evidence base with new grounded research',
           description: 'Investigate an under-covered topic and extract grounded, source-quality-weighted claims.',
@@ -163,6 +208,62 @@ export class CivilizationFreeRunService {
       });
     }
     return weaknesses;
+  }
+
+  async getHealthSnapshot(): Promise<CivilizationHealthSnapshot> {
+    const totals = await db.query(
+      `SELECT
+         (SELECT count(*) FROM autonomy_claims) AS claims,
+         (SELECT count(*) FROM autonomy_claims WHERE status = 'promoted') AS promoted,
+         (SELECT count(*) FROM autonomy_claims WHERE status = 'supported') AS supported,
+         (SELECT count(*) FROM autonomy_evidence) AS evidence,
+         (SELECT count(*)
+            FROM autonomy_claims
+           WHERE status = 'contradicted'
+              OR jsonb_array_length(COALESCE(contradicted_by, '[]'::jsonb)) > 0
+              OR jsonb_array_length(COALESCE(contradicts, '[]'::jsonb)) > 0) AS contradictions,
+         (SELECT count(*)
+            FROM predictions p
+            LEFT JOIN prediction_resolutions pr ON pr.prediction_id = p.prediction_id
+           WHERE pr.prediction_id IS NULL
+             AND p.expected_resolution_by < NOW()) AS stale_predictions`
+    );
+
+    const weakDomains = await db.query(
+      `SELECT COALESCE(g.domain, 'unknown') AS domain,
+              count(*)::int AS claims,
+              count(*) FILTER (WHERE c.status = 'promoted')::int AS promoted_claims,
+              count(*) FILTER (WHERE c.status = 'supported')::int AS supported_claims
+         FROM autonomy_claims c
+         LEFT JOIN autonomy_goal_actions a ON a.action_id = c.action_id
+         LEFT JOIN autonomy_goals g ON g.id = a.goal_id
+        GROUP BY COALESCE(g.domain, 'unknown')
+       HAVING count(*) >= 2
+          AND count(*) FILTER (WHERE c.status = 'promoted') = 0
+        ORDER BY count(*) DESC, COALESCE(g.domain, 'unknown') ASC
+        LIMIT 5`
+    );
+
+    const t = totals.rows[0];
+    return {
+      claims: Number(t.claims),
+      promotedClaims: Number(t.promoted),
+      supportedClaims: Number(t.supported),
+      evidenceItems: Number(t.evidence),
+      unresolvedContradictions: Number(t.contradictions),
+      stalePredictions: Number(t.stale_predictions),
+      weakDomains: weakDomains.rows.map((r: {
+        domain: string;
+        claims: number | string;
+        promoted_claims: number | string;
+        supported_claims: number | string;
+      }) => ({
+        domain: String(r.domain),
+        claims: Number(r.claims),
+        promotedClaims: Number(r.promoted_claims),
+        supportedClaims: Number(r.supported_claims),
+      })),
+    };
   }
 
   /** STEP 2: generate ONE internal goal from self-assessment (no user prompt). */
@@ -491,7 +592,7 @@ export class CivilizationFreeRunService {
       'docs/CIVILIZATION_FREE_RUN.md',
     ];
     const expectedImprovement = hasOnlyShallowSignals
-      ? 'Deepen self-assessment beyond claim counts by including stale predictions, weak domains, unresolved contradictions, and specialist coverage.'
+      ? 'Refine health-snapshot prioritization with cross-run trends, severity thresholds, and specialist coverage once enough free-run history exists.'
       : 'Tighten free-run execution policy using observed runtime outcomes while preserving evidence and governance gates.';
     const testsToPass = [
       'npx tsc --noEmit',
@@ -602,6 +703,7 @@ export class CivilizationFreeRunService {
       ``, `- run_id: ${report.runId}`, `- mode: ${report.mode}`, `- started: ${report.startedAt}`,
       `- duration_ms: ${report.durationMs}`, `- society: ${report.societyId}`,
       ``, `## Self-assessment`,
+      report.healthSnapshot ? `- health snapshot: ${JSON.stringify(report.healthSnapshot)}` : '',
       ...report.weaknesses.map(w => `- **${w.kind}**: ${w.detail} → goal: "${w.recommendedGoal.title}"`),
       ``, `## Outcome`,
       `- internal goal: ${report.internalGoalId}`,
@@ -626,7 +728,7 @@ export class CivilizationFreeRunService {
     fs.writeFileSync(path.join(dir, 'agent_spawn_proposals.jsonl'), extras.agentSpawnProposals.map(p => JSON.stringify(p)).join('\n'));
     fs.writeFileSync(path.join(dir, 'self_improvement_proposals.jsonl'), extras.selfImprovementProposals.map(p => JSON.stringify(p)).join('\n'));
     fs.writeFileSync(path.join(dir, 'events.jsonl'), [
-      { type: 'self_assessment', weaknesses: report.weaknesses },
+      { type: 'self_assessment', weaknesses: report.weaknesses, healthSnapshot: report.healthSnapshot },
       { type: 'society_agenda', agendaItemId: report.agendaItemId, societyId: report.societyId, institutionId: report.institutionId, taskType: report.taskType },
       { type: 'contradiction_detection', contradictionChecks: report.contradictionChecks, contradictionsDetected: report.contradictionsDetected },
       { type: 'agent_spawn_proposals', proposalsCreated: report.agentSpawnProposals },
@@ -655,7 +757,8 @@ export class CivilizationFreeRunService {
     let agentSpawnProposals: AgentSpawnProposal[] = [];
     let selfImprovementProposals: SelfImprovementProposal[] = [];
     try {
-      report.weaknesses = await this.selfAssess();
+      report.healthSnapshot = await this.getHealthSnapshot();
+      report.weaknesses = await this.weaknessesFromHealthSnapshot(report.healthSnapshot);
       const top = report.weaknesses[0];
       report.internalGoalId = await this.generateInternalGoal(top);
       const agenda = await this.createAgendaItem(report.internalGoalId, top);

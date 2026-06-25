@@ -130,6 +130,92 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(byClaim.get(researchClaimId)!.text).toContain('Bounded gaps between primes');
   }, 20000);
 
+  it('self-assesses contradictions, stale predictions, and weak domains from real Postgres state', async () => {
+    const weakDomainGoalId = await svc.generateInternalGoal({
+      kind: 'weak-domain-seed',
+      detail: 'seed weak domain',
+      recommendedGoal: {
+        title: 'Seed transfer domain',
+        description: 'Create a weak-domain test goal.',
+        domain: 'transfer_test_domain',
+      },
+    });
+    const priorSourceId = uuid(), priorActionId = uuid(), priorClaimId = uuid();
+    const newSourceId = uuid(), newActionId = uuid(), newClaimId = uuid();
+    const weakSourceIds = [uuid(), uuid()];
+    const weakActionIds = [uuid(), uuid()];
+    const weakClaimIds = [uuid(), uuid()];
+    const predictionId = `pred_health_${Date.now()}_${uuid().slice(0, 8)}`;
+
+    await db.query(
+      `INSERT INTO autonomy_goal_actions (id, action_id, goal_id, action_type, objective)
+       VALUES ($1,$2,$3,'generate_claim','health prior contradiction'),
+              ($4,$5,$6,'generate_claim','health incoming contradiction'),
+              ($7,$8,$9,'generate_claim','health weak domain one'),
+              ($10,$11,$12,'generate_claim','health weak domain two')`,
+      [
+        uuid(), priorActionId, uuid(),
+        uuid(), newActionId, uuid(),
+        uuid(), weakActionIds[0], weakDomainGoalId,
+        uuid(), weakActionIds[1], weakDomainGoalId,
+      ]
+    );
+    await db.query(
+      `INSERT INTO autonomy_evidence (id, source_id, action_id, url, title, snippet, retrieved_at, content_hash, source_type, is_public_access, created_at)
+       VALUES ($1,$2,$3,$4,'Prior',$5,NOW(),$6,'web',true,NOW()),
+              ($7,$8,$9,$10,'New',$11,NOW(),$12,'web',true,NOW()),
+              ($13,$14,$15,$16,'Weak one',$17,NOW(),$18,'web',true,NOW()),
+              ($19,$20,$21,$22,'Weak two',$23,NOW(),$24,'web',true,NOW())`,
+      [
+        uuid(), priorSourceId, priorActionId, 'https://example.org/health-prior', 'Health module claims conflict.', `h-${priorClaimId}`,
+        uuid(), newSourceId, newActionId, 'https://example.org/health-new', 'Health module claims conflict.', `h-${newClaimId}`,
+        uuid(), weakSourceIds[0], weakActionIds[0], 'https://example.org/weak-one', 'Transfer weak domain claim one.', `h-${weakClaimIds[0]}`,
+        uuid(), weakSourceIds[1], weakActionIds[1], 'https://example.org/weak-two', 'Transfer weak domain claim two.', `h-${weakClaimIds[1]}`,
+      ]
+    );
+    await db.query(
+      `INSERT INTO autonomy_claims (id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids)
+       VALUES ($1,$2,$3,$4,'supported',0.7,$5,$6,$7),
+              ($8,$9,$10,$11,'supported',0.7,$12,$13,$14),
+              ($15,$16,$17,$18,'supported',0.7,$19,$20,$21),
+              ($22,$23,$24,$25,'supported',0.7,$26,$27,$28)`,
+      [
+        uuid(), priorClaimId, priorActionId, 'Health module claims conflict.',
+        JSON.stringify([priorSourceId]), JSON.stringify(['Health module claims conflict']), JSON.stringify([priorActionId]),
+        uuid(), newClaimId, newActionId, 'Health module claims do not conflict.',
+        JSON.stringify([newSourceId]), JSON.stringify(['Health module claims do not conflict']), JSON.stringify([newActionId]),
+        uuid(), weakClaimIds[0], weakActionIds[0], 'Transfer weak domain claim one.',
+        JSON.stringify([weakSourceIds[0]]), JSON.stringify(['Transfer weak domain claim one']), JSON.stringify([weakActionIds[0]]),
+        uuid(), weakClaimIds[1], weakActionIds[1], 'Transfer weak domain claim two.',
+        JSON.stringify([weakSourceIds[1]]), JSON.stringify(['Transfer weak domain claim two']), JSON.stringify([weakActionIds[1]]),
+      ]
+    );
+    await db.query(
+      `INSERT INTO predictions (prediction_id, category, description, confidence, expected_resolution_by, hypothesis, created_by)
+       VALUES ($1, 'civilization_free_run', 'health snapshot stale prediction seed', 0.70, NOW() - INTERVAL '1 day', 'health-test', 'civilization_free_run_test')`,
+      [predictionId]
+    );
+
+    await svc.detectContradictions([newClaimId]);
+    const snapshot = await svc.getHealthSnapshot();
+    expect(snapshot.unresolvedContradictions).toBeGreaterThanOrEqual(1);
+    expect(snapshot.stalePredictions).toBeGreaterThanOrEqual(1);
+    expect(snapshot.weakDomains.some(d => d.domain === 'transfer_test_domain')).toBe(true);
+
+    const weaknesses = await svc.selfAssess();
+    expect(weaknesses.map(w => w.kind)).toEqual(expect.arrayContaining([
+      'unresolved_contradictions',
+      'stale_predictions',
+      'weak_domain',
+    ]));
+    const weakDomain = weaknesses.find(w => w.kind === 'weak_domain' && w.detail.includes('transfer_test_domain'));
+    expect(weakDomain?.recommendedGoal.domain).toBe('transfer_test_domain');
+
+    await db.query(`DELETE FROM prediction_resolutions WHERE prediction_id = $1`, [predictionId]);
+    await db.query(`DELETE FROM predictions WHERE prediction_id = $1`, [predictionId]);
+    await db.query(`DELETE FROM autonomy_goal_actions WHERE action_id = ANY($1)`, [[priorActionId, newActionId, ...weakActionIds]]);
+  }, 20000);
+
   it('#8 BLOCKS an unverified claim (snippet not traceable to its cited source)', async () => {
     // Set up a claim whose support snippet is NOT in its evidence => promotion must block it.
     const sourceId = uuid(), actionId = uuid(), claimId = uuid();
@@ -298,7 +384,7 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(proposal.rollbackPlan).toMatch(/Revert/);
     expect(proposal.protectedSurfaceCheck.requiresHumanApproval).toBe(true);
     expect(proposal.protectedSurfaceCheck.attempts.length).toBeGreaterThan(0);
-    expect(proposal.expectedImprovement).toMatch(/stale predictions|weak domains|unresolved contradictions/);
+    expect(proposal.expectedImprovement).toMatch(/health-snapshot prioritization|cross-run trends|severity thresholds/);
 
     const memory = await db.query(
       `SELECT content FROM autonomy_memory WHERE id = $1`,

@@ -13,7 +13,7 @@ DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco npx ts-node sc
 
 The runtime executes:
 
-1. self-assessment from real Postgres state
+1. self-assessment from a real Postgres health snapshot
 2. internal goal creation with `source = perception_derived`
 3. society agenda persistence in `autonomy_memory`
 4. agenda-driven bounded task execution
@@ -33,6 +33,8 @@ Agent spawning is proposal-only in the free-run pass. The runtime maps agenda an
 
 Self-improvement is also proposal-only. The free-run pass records a structured `self_improvement_proposal` with affected files, expected improvement, tests to pass, rollback plan, risk level, and protected-surface scan results from `ProtectedSurfaceEnforcerService`. It writes `self_improvement_proposals.jsonl`; it does not edit code, create deployable candidates, or promote changes.
 
+Self-assessment now computes a health snapshot from deployed tables instead of only counting claims. The snapshot includes total claims/evidence, supported/promoted backlog, unresolved contradiction links, overdue unresolved Phase 0b predictions, and weak domains with multiple claims but no promoted knowledge. The chosen internal goal is derived from those signals, and the report records the snapshot in `civilization_report.md`, `events.jsonl`, and `report.json`.
+
 ## How It Is Tested
 
 ```bash
@@ -45,6 +47,7 @@ The integration test uses real Postgres and asserts that:
 - the run starts without a user goal
 - the internal goal is persisted as perception-derived
 - the society agenda is persisted
+- the health snapshot detects unresolved contradictions, stale predictions, and weak domains from real Postgres state
 - the agenda route drives the bounded task objective and claim content
 - direct contradictions are detected and persisted before promotion
 - agent spawn proposals are persisted with governance review required and bounded budgets
@@ -59,7 +62,7 @@ The integration test uses real Postgres and asserts that:
 
 This is not the full civilization objective yet.
 
-- self-assessment still uses shallow claim/evidence backlog signals
+- self-assessment is still single-pass; it does not yet compare trends across runs or apply learned severity thresholds
 - society agendas are persisted records, not a complete society scheduler
 - contradiction detection is conservative and direct-pattern based; it does not yet do semantic contradiction discovery with retrieval or LLM adjudication
 - agent spawn proposals are not yet connected to a governance approval queue or benchmark activation lifecycle
