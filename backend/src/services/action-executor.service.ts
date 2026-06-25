@@ -185,7 +185,11 @@ export class ActionExecutorService {
               sourceId,
               url,
               fetchResult.title || 'Fetched Page',
-              fetchResult.content.substring(0, 2000),  // First 2000 chars for extraction
+              // Store CLEAN extracted text (arXiv abstract / stripped body), not raw HTML.
+              // Falls back to raw content if extraction yielded nothing.
+              (fetchResult.text && fetchResult.text.length > 20
+                ? fetchResult.text
+                : fetchResult.content).substring(0, 4000),
               fetchResult.contentHash,
               'web',
               true,

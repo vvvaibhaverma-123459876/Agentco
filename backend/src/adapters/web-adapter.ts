@@ -17,6 +17,8 @@ export interface FetchResult {
   status: number;
   title?: string;
   content: string;
+  /** Clean readable text extracted from `content` (arXiv abstract / stripped body). */
+  text?: string;
   contentHash: string;
   retrievedAt: Date;
 }

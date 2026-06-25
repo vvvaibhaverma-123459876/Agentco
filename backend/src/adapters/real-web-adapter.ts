@@ -15,6 +15,7 @@
  */
 
 import { WebAdapter, SearchResult, FetchResult } from './web-adapter';
+import { extractReadableText } from '../services/html-extract';
 
 const USER_AGENT = 'AgentCo-Research/1.0 (autonomous research agent)';
 const FETCH_TIMEOUT_MS = 8000;
@@ -311,14 +312,18 @@ export class RealWebAdapter implements WebAdapter {
       const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
       const title = titleMatch ? titleMatch[1].trim() : undefined;
 
-      // Compute content hash for deduplication
+      // Compute content hash for deduplication (over raw content — keep dedup semantics).
       const contentHash = this.computeHash(content);
+
+      // Extract clean readable text (arXiv abstract / stripped body) for grounding.
+      const text = extractReadableText(content, url);
 
       return {
         url,
         status: response.status,
         title,
         content: content.substring(0, MAX_CONTENT_SIZE),
+        text,
         contentHash,
         retrievedAt: new Date(),
       };
