@@ -19,10 +19,12 @@ import {
 import { WebAdapter } from '../adapters/web-adapter';
 import { TeamActivationService } from './team-activation.service';
 import { validateGrounding, GroundingSource } from './claim-grounding';
+import { SourceQualityService } from './source-quality.service';
 
 export class ActionExecutorService {
   private webAdapter: WebAdapter | null = null;
   private teamActivation = new TeamActivationService();
+  private sourceQuality = new SourceQualityService();
 
   /**
    * Inject web adapter (can be real or mock)
@@ -295,12 +297,36 @@ export class ActionExecutorService {
       return;
     }
 
+    // Weight confidence by SOURCE CREDIBILITY (grounding proves traceability, not credibility).
+    // Uses the WORST cited source (a claim is only as trustworthy as its weakest support) and
+    // never blocks — low-credibility just lowers confidence. Fail-soft: unknown => neutral (no penalty).
+    const baseConfidence = spec.args.confidence || 0.7;
+    let confidence = baseConfidence;
+    let sourceQualityTier = 'unknown';
+    try {
+      const srcRows = await db.query(
+        `SELECT url FROM autonomy_evidence WHERE source_id = ANY($1)`,
+        [supportSourceIds]
+      );
+      const scores = await Promise.all(
+        srcRows.rows.map((r: { url: string }) => this.sourceQuality.getQualityForUrl(String(r.url)))
+      );
+      if (scores.length > 0) {
+        const worst = scores.reduce((a, b) => (a.quality <= b.quality ? a : b));
+        confidence = Math.round(baseConfidence * (0.5 + worst.quality / 2) * 100) / 100; // weight ∈ [0.5,1]
+        sourceQualityTier = worst.tier;
+        console.log(`[Claim Quality] worst source: ${worst.tier} (${worst.reason}) → confidence ${baseConfidence} → ${confidence}`);
+      }
+    } catch (e: any) {
+      console.warn(`[Claim Quality] scoring failed (neutral): ${e.message}`);
+    }
+
     const claimId = uuidv4();
     const claim: Claim = {
       claimId,
       text: claimText,
       status: 'supported',
-      confidence: spec.args.confidence || 0.7,
+      confidence,
       supportSourceIds,
       supportSnippets: spec.args.supportSnippets || [],
       derivedFromActionIds: [spec.actionId],
