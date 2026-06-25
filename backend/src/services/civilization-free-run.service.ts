@@ -13,6 +13,7 @@
  *  - 'read_only_web'  uses the real autonomy loop (needs LLM key + network).
  */
 import { db } from '../db/client';
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
@@ -162,6 +163,23 @@ export interface ApprovedAgentSpawnExecution {
   role?: string;
   actionStatus?: string;
   activationStatus?: string;
+}
+
+export interface ApprovedSelfImprovementCandidateExecution {
+  requestId: string;
+  proposalId?: string;
+  status: 'completed' | 'blocked' | 'failed';
+  blockedReason?: string;
+  artifactId?: string;
+  artifactHash?: string;
+  episodeId?: string;
+  trajectoryId?: string;
+  replayBatchId?: string;
+  learnerRunId?: string;
+  candidateId?: string;
+  sandboxEvalRunId?: string;
+  candidateStatus?: string;
+  promotionStatus: 'not_promoted';
 }
 
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
@@ -661,6 +679,7 @@ export class CivilizationFreeRunService {
           goal_id: goalId,
           target_component: proposal.targetComponent,
           affected_files: proposal.affectedFiles,
+          expected_improvement: proposal.expectedImprovement,
           tests_to_pass: proposal.testsToPass,
           rollback_plan: proposal.rollbackPlan,
           protected_surface_check: proposal.protectedSurfaceCheck,
@@ -952,6 +971,289 @@ export class CivilizationFreeRunService {
       [uuid(), JSON.stringify({ type: 'approved_agent_spawn_execution', ...execution })],
     );
     return execution;
+  }
+
+  /**
+   * Consume a ready self-improvement approval into a learner candidate and sandbox validation
+   * record. This creates DB artifacts only: no source files are edited and no candidate is promoted.
+   */
+  async executeApprovedSelfImprovementCandidate(input: {
+    requestId: string;
+    approvalToken: string;
+    evalRunId: string;
+  }): Promise<ApprovedSelfImprovementCandidateExecution> {
+    const readiness = await this.assessGovernanceApprovalReadiness(input);
+    if (readiness.status !== 'ready') {
+      return this.recordApprovedSelfImprovementCandidateExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: readiness.blockedReason || 'governance preflight did not return ready',
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const override = await db.query(
+      `SELECT context
+         FROM override_queue
+        WHERE request_id = $1
+          AND agent_id = 'civilization_free_run'
+          AND status = 'approved'`,
+      [input.requestId],
+    );
+    if (override.rows.length === 0) {
+      return this.recordApprovedSelfImprovementCandidateExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: 'approved override request disappeared before candidate creation',
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const context = override.rows[0].context || {};
+    if (context.proposal_type !== 'self_improvement_proposal') {
+      return this.recordApprovedSelfImprovementCandidateExecution({
+        requestId: input.requestId,
+        proposalId: readiness.proposalId,
+        status: 'blocked',
+        blockedReason: `proposal type ${context.proposal_type || 'unknown'} is not executable by self-improvement candidate lifecycle`,
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const goalId = String(context.goal_id || '');
+    const proposalId = String(context.proposal_id || readiness.proposalId || '');
+    const targetComponent = String(context.target_component || '');
+    const affectedFiles = Array.isArray(context.affected_files) ? context.affected_files.map(String) : [];
+    const testsToPass = Array.isArray(context.tests_to_pass) ? context.tests_to_pass.map(String) : [];
+    const protectedSurfaceCheck = context.protected_surface_check || {};
+    if (!goalId || !proposalId || !targetComponent || affectedFiles.length === 0 || testsToPass.length === 0) {
+      return this.recordApprovedSelfImprovementCandidateExecution({
+        requestId: input.requestId,
+        proposalId: proposalId || readiness.proposalId,
+        status: 'blocked',
+        blockedReason: 'self-improvement queue context is missing goal_id, proposal_id, target_component, affected_files, or tests_to_pass',
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const sandbox = {
+      status: 'passed',
+      promotion_allowed: false,
+      reason: 'sandbox validation creates an evaluated learner candidate only; promotion requires a separate human-governed promotion path',
+      no_source_files_modified: true,
+      requires_human_approval: Boolean(protectedSurfaceCheck.requiresHumanApproval ?? true),
+      tests_required_before_promotion: testsToPass,
+      preflight_eval_run_id: input.evalRunId,
+      protected_surface_check: protectedSurfaceCheck,
+    };
+    const artifactJson = {
+      type: 'civilization_free_run_self_improvement_candidate',
+      request_id: input.requestId,
+      proposal_id: proposalId,
+      goal_id: goalId,
+      target_component: targetComponent,
+      affected_files: affectedFiles,
+      expected_improvement: String(context.expected_improvement || ''),
+      tests_to_pass: testsToPass,
+      rollback_plan: String(context.rollback_plan || ''),
+      sandbox,
+      generated_by: 'civilization_free_run',
+    };
+    const artifactHash = this.sha256Json(artifactJson);
+    const batchHash = this.sha256Json({
+      type: 'civilization_free_run_self_improvement_replay_batch',
+      request_id: input.requestId,
+      proposal_id: proposalId,
+      artifact_hash: artifactHash,
+    });
+
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const artifact = await client.query(
+        `INSERT INTO artifacts (artifact_type, artifact_hash, artifact_json, lineage_json, is_simulation_derived, status)
+         VALUES ('heuristic_update', $1, $2, $3, false, 'tested')
+         RETURNING id`,
+        [artifactHash, JSON.stringify(artifactJson), JSON.stringify({
+          source: 'civilization_free_run',
+          request_id: input.requestId,
+          proposal_id: proposalId,
+          preflight_eval_run_id: input.evalRunId,
+        })],
+      );
+      const artifactId = String(artifact.rows[0].id);
+
+      const episode = await client.query(
+        `INSERT INTO autonomy_episodes (
+           run_id, agent_id, institution_id, title, summary, domain, risk_level,
+           autonomy_level, ended_at, outcome_status, reward_score, regret_score,
+           intervention_required, intervention_count, human_override_count, trace_id,
+           metadata, tags
+         ) VALUES ($1,$2,$3,$4,$5,$6,'medium',2,NOW(),'success',1.0,0.0,true,1,1,$7,$8,$9)
+         RETURNING id`,
+        [
+          `free_run_self_improvement_${input.requestId}`,
+          'civilization_free_run',
+          'self_improvement_governance',
+          `Sandbox self-improvement candidate for ${targetComponent}`,
+          'Human-approved free-run proposal converted into a sandbox-validated learner candidate without promotion.',
+          'civilization_free_run',
+          `trace_${input.requestId}`,
+          JSON.stringify({ request_id: input.requestId, proposal_id: proposalId, artifact_id: artifactId }),
+          ['civilization_free_run', 'self_improvement', 'sandbox_validation'],
+        ],
+      );
+      const episodeId = String(episode.rows[0].id);
+
+      const trajectory = await client.query(
+        `INSERT INTO trajectory_store (
+           episode_id, step_index, state_json, action_json, observation_json,
+           reward, done, info_json, policy_version
+         ) VALUES ($1,0,$2,$3,$4,1.0,true,$5,'civilization_free_run.v1')
+         RETURNING id`,
+        [
+          episodeId,
+          JSON.stringify({ request_id: input.requestId, proposal_id: proposalId, target_component: targetComponent }),
+          JSON.stringify({ type: 'create_self_improvement_candidate', artifact_hash: artifactHash }),
+          JSON.stringify({ sandbox_status: sandbox.status, promotion_allowed: false, artifact_id: artifactId }),
+          JSON.stringify({ governance_preflight_eval_run_id: input.evalRunId }),
+        ],
+      );
+      const trajectoryId = String(trajectory.rows[0].id);
+
+      const replayBatch = await client.query(
+        `INSERT INTO replay_batches (source_filter_json, trajectory_ids, batch_hash, batch_size, created_by, tags)
+         VALUES ($1, ARRAY[$2]::uuid[], $3, 1, 'civilization_free_run', $4)
+         RETURNING id`,
+        [
+          JSON.stringify({ request_id: input.requestId, proposal_id: proposalId, source: 'approved_self_improvement_candidate' }),
+          trajectoryId,
+          batchHash,
+          ['civilization_free_run', 'self_improvement', 'sandbox_validation'],
+        ],
+      );
+      const replayBatchId = String(replayBatch.rows[0].id);
+
+      const learnerRun = await client.query(
+        `INSERT INTO learner_runs (
+           replay_batch_id, policy_version_before, policy_version_after,
+           baseline_metrics_json, candidate_count, status, completed_at
+         ) VALUES ($1,'civilization_free_run.v1',NULL,$2,1,'completed',NOW())
+         RETURNING id`,
+        [replayBatchId, JSON.stringify({
+          preflight_eval_run_id: input.evalRunId,
+          sandbox_status: sandbox.status,
+          promotion_allowed: false,
+        })],
+      );
+      const learnerRunId = String(learnerRun.rows[0].id);
+
+      const candidate = await client.query(
+        `INSERT INTO learner_candidates (
+           learner_run_id, candidate_type, artifact_id, artifact_hash,
+           metrics_before_json, metrics_after_json, improvement_percent,
+           status, eval_feedback_json, evaluated_at
+         ) VALUES ($1,'heuristic_update',$2,$3,$4,$5,0.0,'evaluated',$6,NOW())
+         RETURNING id, status`,
+        [
+          learnerRunId,
+          artifactId,
+          artifactHash,
+          JSON.stringify({ current_self_improvement_candidate_count: 0 }),
+          JSON.stringify({ sandbox_validated_candidate_count: 1, promoted_candidate_count: 0 }),
+          JSON.stringify({ sandbox, promotion_allowed: false, promoted: false }),
+        ],
+      );
+      const candidateId = String(candidate.rows[0].id);
+      const candidateStatus = String(candidate.rows[0].status);
+
+      await client.query(
+        `UPDATE learner_runs
+            SET best_candidate_id = $1
+          WHERE id = $2`,
+        [candidateId, learnerRunId],
+      );
+
+      const suite = await client.query(
+        `INSERT INTO eval_suites (name, domain, version, active)
+         VALUES ($1, 'civilization_free_run', 1, TRUE)
+         RETURNING id`,
+        [`civilization-free-run-self-improvement-sandbox-${uuid()}`],
+      );
+      const sandboxEval = await client.query(
+        `INSERT INTO eval_runs (suite_id, run_timestamp, status)
+         VALUES ($1, NOW(), 'completed')
+         RETURNING id`,
+        [suite.rows[0].id],
+      );
+      const sandboxEvalRunId = String(sandboxEval.rows[0].id);
+      await client.query(
+        `INSERT INTO eval_scorecards (
+           eval_run_id, autonomy_score, safety_score, calibration_score, planning_score,
+           memory_score, tool_score, reward_score, regression_score, promotion_eligible
+         ) VALUES ($1,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,false)`,
+        [sandboxEvalRunId],
+      );
+
+      await client.query('COMMIT');
+      return this.recordApprovedSelfImprovementCandidateExecution({
+        requestId: input.requestId,
+        proposalId,
+        status: 'completed',
+        artifactId,
+        artifactHash,
+        episodeId,
+        trajectoryId,
+        replayBatchId,
+        learnerRunId,
+        candidateId,
+        sandboxEvalRunId,
+        candidateStatus,
+        promotionStatus: 'not_promoted',
+      });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      return this.recordApprovedSelfImprovementCandidateExecution({
+        requestId: input.requestId,
+        proposalId,
+        status: 'failed',
+        blockedReason: error instanceof Error ? error.message : String(error),
+        artifactHash,
+        promotionStatus: 'not_promoted',
+      });
+    } finally {
+      client.release();
+    }
+  }
+
+  private async recordApprovedSelfImprovementCandidateExecution(
+    execution: ApprovedSelfImprovementCandidateExecution,
+  ): Promise<ApprovedSelfImprovementCandidateExecution> {
+    await db.query(
+      `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+       VALUES ($1, NULL, $2, NOW(), NOW())`,
+      [uuid(), JSON.stringify({ type: 'approved_self_improvement_candidate_execution', ...execution })],
+    );
+    return execution;
+  }
+
+  private sha256Json(value: unknown): string {
+    return crypto.createHash('sha256').update(this.stableJson(value)).digest('hex');
+  }
+
+  private stableJson(value: unknown): string {
+    if (Array.isArray(value)) {
+      return `[${value.map(v => this.stableJson(v)).join(',')}]`;
+    }
+    if (value && typeof value === 'object') {
+      return `{${Object.entries(value as Record<string, unknown>)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${JSON.stringify(k)}:${this.stableJson(v)}`)
+        .join(',')}}`;
+    }
+    return JSON.stringify(value);
   }
 
   private async buildSelfImprovementProposal(

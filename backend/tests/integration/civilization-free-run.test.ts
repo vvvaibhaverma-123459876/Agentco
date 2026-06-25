@@ -588,6 +588,134 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(memory.rows[0].content.status).toBe('completed');
     expect(memory.rows[0].content.specialistId).toBe(execution.specialistId);
   }, 30000);
+
+  it('creates a sandbox-validated learner candidate from approved self-improvement proposals without promotion', async () => {
+    const weakness = {
+      kind: 'thin_evidence',
+      detail: 'approved self-improvement candidate test',
+      recommendedGoal: {
+        title: 'Create governed self-improvement candidate',
+        description: 'Convert an approved free-run proposal into a sandbox candidate.',
+        domain: 'research',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const [proposal] = await svc.proposeSelfImprovements(goalId, [weakness], {
+      contradictionsDetected: 0,
+      agentSpawnProposals: 1,
+      errors: [],
+    });
+    const [queued] = await svc.enqueueGovernanceReviewRequests(goalId, [], [proposal]);
+    const approved = await overrideQueue.resolve(queued.requestId, 'approved', 'human-governor-test', 'candidate sandbox test');
+    const evalRunId = await seedFreeRunEvalScorecard(true);
+
+    const execution = await svc.executeApprovedSelfImprovementCandidate({
+      requestId: queued.requestId,
+      approvalToken: approved.approval_token!,
+      evalRunId,
+    });
+
+    expect(execution.status).toBe('completed');
+    expect(execution.proposalId).toBe(proposal.proposalId);
+    expect(execution.artifactId).toBeTruthy();
+    expect(execution.trajectoryId).toBeTruthy();
+    expect(execution.replayBatchId).toBeTruthy();
+    expect(execution.learnerRunId).toBeTruthy();
+    expect(execution.candidateId).toBeTruthy();
+    expect(execution.sandboxEvalRunId).toBeTruthy();
+    expect(execution.candidateStatus).toBe('evaluated');
+    expect(execution.promotionStatus).toBe('not_promoted');
+
+    const artifact = await db.query(
+      `SELECT artifact_type, artifact_hash, artifact_json, status
+         FROM artifacts
+        WHERE id = $1`,
+      [execution.artifactId]
+    );
+    expect(artifact.rows).toHaveLength(1);
+    expect(artifact.rows[0].artifact_type).toBe('heuristic_update');
+    expect(artifact.rows[0].artifact_hash).toBe(execution.artifactHash);
+    expect(artifact.rows[0].status).toBe('tested');
+    expect(artifact.rows[0].artifact_json.request_id).toBe(queued.requestId);
+    expect(artifact.rows[0].artifact_json.proposal_id).toBe(proposal.proposalId);
+    expect(artifact.rows[0].artifact_json.sandbox.promotion_allowed).toBe(false);
+    expect(artifact.rows[0].artifact_json.sandbox.no_source_files_modified).toBe(true);
+
+    const candidate = await db.query(
+      `SELECT candidate_type, artifact_id, artifact_hash, status, eval_feedback_json, promoted_at
+         FROM learner_candidates
+        WHERE id = $1`,
+      [execution.candidateId]
+    );
+    expect(candidate.rows).toHaveLength(1);
+    expect(candidate.rows[0].candidate_type).toBe('heuristic_update');
+    expect(candidate.rows[0].artifact_id).toBe(execution.artifactId);
+    expect(candidate.rows[0].artifact_hash).toBe(execution.artifactHash);
+    expect(candidate.rows[0].status).toBe('evaluated');
+    expect(candidate.rows[0].promoted_at).toBeNull();
+    expect(candidate.rows[0].eval_feedback_json.sandbox.status).toBe('passed');
+    expect(candidate.rows[0].eval_feedback_json.promotion_allowed).toBe(false);
+    expect(candidate.rows[0].eval_feedback_json.promoted).toBe(false);
+
+    const learnerRun = await db.query(
+      `SELECT replay_batch_id, best_candidate_id, candidate_count, status
+         FROM learner_runs
+        WHERE id = $1`,
+      [execution.learnerRunId]
+    );
+    expect(learnerRun.rows).toHaveLength(1);
+    expect(learnerRun.rows[0].replay_batch_id).toBe(execution.replayBatchId);
+    expect(learnerRun.rows[0].best_candidate_id).toBe(execution.candidateId);
+    expect(Number(learnerRun.rows[0].candidate_count)).toBe(1);
+    expect(learnerRun.rows[0].status).toBe('completed');
+
+    const replay = await db.query(
+      `SELECT trajectory_ids, batch_size
+         FROM replay_batches
+        WHERE id = $1`,
+      [execution.replayBatchId]
+    );
+    expect(replay.rows).toHaveLength(1);
+    expect(Number(replay.rows[0].batch_size)).toBe(1);
+    expect(replay.rows[0].trajectory_ids).toContain(execution.trajectoryId);
+
+    const trajectory = await db.query(
+      `SELECT episode_id, action_json, observation_json
+         FROM trajectory_store
+        WHERE id = $1`,
+      [execution.trajectoryId]
+    );
+    expect(trajectory.rows).toHaveLength(1);
+    expect(trajectory.rows[0].episode_id).toBe(execution.episodeId);
+    expect(trajectory.rows[0].action_json.type).toBe('create_self_improvement_candidate');
+    expect(trajectory.rows[0].observation_json.promotion_allowed).toBe(false);
+
+    const sandboxScorecard = await db.query(
+      `SELECT er.status, sc.promotion_eligible, sc.safety_score
+         FROM eval_runs er
+         JOIN eval_scorecards sc ON sc.eval_run_id = er.id
+        WHERE er.id = $1`,
+      [execution.sandboxEvalRunId]
+    );
+    expect(sandboxScorecard.rows).toHaveLength(1);
+    expect(sandboxScorecard.rows[0].status).toBe('completed');
+    expect(sandboxScorecard.rows[0].promotion_eligible).toBe(false);
+    expect(Number(sandboxScorecard.rows[0].safety_score)).toBe(1);
+
+    const memory = await db.query(
+      `SELECT content
+         FROM autonomy_memory
+        WHERE content->>'type' = 'approved_self_improvement_candidate_execution'
+          AND content->>'requestId' = $1
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [queued.requestId]
+    );
+    expect(memory.rows).toHaveLength(1);
+    expect(memory.rows[0].content.status).toBe('completed');
+    expect(memory.rows[0].content.candidateId).toBe(execution.candidateId);
+    expect(memory.rows[0].content.promotionStatus).toBe('not_promoted');
+  }, 30000);
 });
 
 async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<string> {

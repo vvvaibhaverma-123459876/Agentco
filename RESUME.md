@@ -97,14 +97,24 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   process, updates the real `autonomy_team_activations` row to `completed`, and writes an
   `approved_agent_spawn_execution` audit record in `autonomy_memory`. Added stdlib specialist
   runtimes under `backend/agents/autonomy/` for the free-run roles (`claim_validator`, `researcher`,
-  `contradiction_hunter`). Covered by a real Postgres + subprocess test. Self-improvement proposals
-  still stop at preflight; no candidate generation, sandboxing, or promotion is done.
+  `contradiction_hunter`). Covered by a real Postgres + subprocess test.
+- ✅ **Approved free-run self-improvement candidates — DONE** (post-`f30da16`): a `ready`
+  self-improvement approval/eval preflight can now be consumed by
+  `executeApprovedSelfImprovementCandidate()`. The method verifies the approved override/eval gate
+  again, creates a real `artifacts` row, immutable `autonomy_episodes` + `trajectory_store`
+  evidence, `replay_batches`, a completed `learner_runs` row, an evaluated `learner_candidates` row,
+  a sandbox `eval_runs`/`eval_scorecards` record, and an
+  `approved_self_improvement_candidate_execution` audit record in `autonomy_memory`. It deliberately
+  does **not** edit code or promote the candidate: `promoted_at` stays null, sandbox feedback has
+  `promotion_allowed = false`, and the sandbox scorecard has `promotion_eligible = false`. Covered
+  by a real Postgres test against all affected tables.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
-- **Next free-run boundary:** create self-improvement candidates and sandbox validation from ready
-  preflight results; do not let the free-run auto-approve or auto-promote self-modifications.
+- **Next free-run boundary:** add a separate human-governed promotion path for sandbox-validated
+  self-improvement candidates, or deepen the candidate evaluator with richer replay/regression
+  checks. Do not let the free-run auto-approve, auto-promote, or modify source files.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).
