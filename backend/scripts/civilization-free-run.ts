@@ -6,7 +6,7 @@
  *   npx ts-node scripts/civilization-free-run.ts --mode read_only_web    # real loop (needs LLM key)
  *
  * Runs WITHOUT a user-given goal: self-assessment → internal goal → society agenda → bounded task
- * → claim → promotion gate → prediction registration → report artifact.
+ * → claim → governed proposal queue → promotion gate → prediction registration → report artifact.
  */
 import { db } from '../src/db/client';
 import { civilizationFreeRun, FreeRunMode } from '../src/services/civilization-free-run.service';
@@ -40,6 +40,7 @@ async function main() {
   console.log(`internalGoal:${report.internalGoalId}`);
   console.log(`agenda:      ${report.agendaItemId} (${report.societyId})`);
   console.log(`claims:      processed=${report.claimsProcessed} promoted=${report.claimsPromoted} blocked=${report.claimsBlocked}`);
+  console.log(`queue:       governance_requests=${report.governanceQueueRequests}`);
   console.log(`predictions: ${report.predictionsRegistered}`);
   console.log(`report:      ${report.reportDir}/civilization_report.md`);
   if (report.errors.length) console.log(`errors:      ${report.errors.join('; ')}`);

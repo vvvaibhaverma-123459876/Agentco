@@ -22,6 +22,7 @@ import { validateGrounding, GroundingSource } from './claim-grounding';
 import { SourceQualityService } from './source-quality.service';
 import { getSpecialistRole } from '../types/specialist-roles';
 import { ProtectedSurfaceEnforcerService } from './protected-surface-enforcer.service';
+import { overrideQueue, OverrideRequest } from './override-queue.service';
 
 export type FreeRunMode = 'fixture' | 'read_only_web';
 
@@ -57,6 +58,7 @@ export interface FreeRunReport {
   contradictionsDetected: number;
   agentSpawnProposals: number;
   selfImprovementProposals: number;
+  governanceQueueRequests: number;
   predictionsRegistered: number;
   errors: string[];
   reportDir: string;
@@ -118,6 +120,15 @@ export interface SelfImprovementProposal {
       riskLevel: string;
     }>;
   };
+}
+
+export interface GovernanceQueueRequest {
+  proposalId: string;
+  proposalType: 'agent_spawn_proposal' | 'self_improvement_proposal';
+  requestId: string;
+  status: 'pending';
+  action: string;
+  riskLevel: 'high' | 'critical';
 }
 
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
@@ -571,6 +582,78 @@ export class CivilizationFreeRunService {
     return proposals;
   }
 
+  /**
+   * STEP 10: submit proposal-only outputs to the existing human override queue. This is an
+   * escalation path, not approval: pending override rows have no approval token and do not activate
+   * specialists, candidates, or code changes.
+   */
+  async enqueueGovernanceReviewRequests(
+    goalId: string,
+    agentSpawnProposals: AgentSpawnProposal[],
+    selfImprovementProposals: SelfImprovementProposal[],
+  ): Promise<GovernanceQueueRequest[]> {
+    const requests: GovernanceQueueRequest[] = [];
+
+    for (const proposal of agentSpawnProposals) {
+      const request = await overrideQueue.enqueue(
+        'civilization_free_run',
+        'agent_upgrade',
+        'high',
+        {
+          risk_score: 0.75,
+          proposal_type: 'agent_spawn_proposal',
+          proposal_id: proposal.proposalId,
+          goal_id: goalId,
+          role: proposal.role,
+          objective: proposal.objective,
+          budget: proposal.budget,
+          constraints: proposal.constraints,
+          blocked_until_approved: true,
+        },
+      );
+      requests.push(this.governanceQueueRequestFromOverride(proposal.proposalId, 'agent_spawn_proposal', request));
+    }
+
+    for (const proposal of selfImprovementProposals) {
+      const riskLevel = proposal.riskLevel === 'critical' ? 'critical' : 'high';
+      const request = await overrideQueue.enqueue(
+        'civilization_free_run',
+        'config_change',
+        riskLevel,
+        {
+          risk_score: riskLevel === 'critical' ? 1.0 : 0.85,
+          proposal_type: 'self_improvement_proposal',
+          proposal_id: proposal.proposalId,
+          goal_id: goalId,
+          target_component: proposal.targetComponent,
+          affected_files: proposal.affectedFiles,
+          tests_to_pass: proposal.testsToPass,
+          rollback_plan: proposal.rollbackPlan,
+          protected_surface_check: proposal.protectedSurfaceCheck,
+          blocked_until_approved: true,
+        },
+      );
+      requests.push(this.governanceQueueRequestFromOverride(proposal.proposalId, 'self_improvement_proposal', request));
+    }
+
+    return requests;
+  }
+
+  private governanceQueueRequestFromOverride(
+    proposalId: string,
+    proposalType: GovernanceQueueRequest['proposalType'],
+    request: OverrideRequest,
+  ): GovernanceQueueRequest {
+    return {
+      proposalId,
+      proposalType,
+      requestId: request.request_id,
+      status: 'pending',
+      action: request.action,
+      riskLevel: request.risk_level,
+    };
+  }
+
   private async buildSelfImprovementProposal(
     goalId: string,
     weaknesses: Weakness[],
@@ -695,7 +778,7 @@ export class CivilizationFreeRunService {
   }
 
   /** STEP 13-15: write the real report artifacts and return the report. */
-  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; agentSpawnProposals: unknown[]; selfImprovementProposals: unknown[]; predictions: number }): Promise<void> {
+  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; agentSpawnProposals: unknown[]; selfImprovementProposals: unknown[]; governanceQueueRequests: unknown[]; predictions: number }): Promise<void> {
     const dir = report.reportDir;
     fs.mkdirSync(dir, { recursive: true });
     const md = [
@@ -718,6 +801,7 @@ export class CivilizationFreeRunService {
       `- contradictions detected: ${report.contradictionsDetected}`,
       `- agent spawn proposals: ${report.agentSpawnProposals}`,
       `- self-improvement proposals: ${report.selfImprovementProposals}`,
+      `- governance queue requests: ${report.governanceQueueRequests}`,
       `- predictions registered: ${report.predictionsRegistered}`,
       report.errors.length ? `\n## Errors\n${report.errors.map(e => `- ${e}`).join('\n')}` : '',
     ].join('\n');
@@ -727,12 +811,14 @@ export class CivilizationFreeRunService {
     fs.writeFileSync(path.join(dir, 'contradictions.jsonl'), extras.contradictions.map(c => JSON.stringify(c)).join('\n'));
     fs.writeFileSync(path.join(dir, 'agent_spawn_proposals.jsonl'), extras.agentSpawnProposals.map(p => JSON.stringify(p)).join('\n'));
     fs.writeFileSync(path.join(dir, 'self_improvement_proposals.jsonl'), extras.selfImprovementProposals.map(p => JSON.stringify(p)).join('\n'));
+    fs.writeFileSync(path.join(dir, 'governance_queue_requests.jsonl'), extras.governanceQueueRequests.map(p => JSON.stringify(p)).join('\n'));
     fs.writeFileSync(path.join(dir, 'events.jsonl'), [
       { type: 'self_assessment', weaknesses: report.weaknesses, healthSnapshot: report.healthSnapshot },
       { type: 'society_agenda', agendaItemId: report.agendaItemId, societyId: report.societyId, institutionId: report.institutionId, taskType: report.taskType },
       { type: 'contradiction_detection', contradictionChecks: report.contradictionChecks, contradictionsDetected: report.contradictionsDetected },
       { type: 'agent_spawn_proposals', proposalsCreated: report.agentSpawnProposals },
       { type: 'self_improvement_proposals', proposalsCreated: report.selfImprovementProposals },
+      { type: 'governance_queue_requests', requestsCreated: report.governanceQueueRequests },
       { type: 'promotion_gate', claimsPromoted: report.claimsPromoted, claimsBlocked: report.claimsBlocked },
       { type: 'prediction_registration', predictionsRegistered: report.predictionsRegistered },
     ].map(e => JSON.stringify(e)).join('\n'));
@@ -750,12 +836,13 @@ export class CivilizationFreeRunService {
     const report: FreeRunReport = {
       runId, mode, startedAt: new Date().toISOString(), durationMs: 0,
       weaknesses: [], internalGoalId: null, agendaItemId: null, societyId: '', institutionId: '', taskType: '',
-      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, agentSpawnProposals: 0, selfImprovementProposals: 0, predictionsRegistered: 0,
+      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, agentSpawnProposals: 0, selfImprovementProposals: 0, governanceQueueRequests: 0, predictionsRegistered: 0,
       errors: [], reportDir: path.join(ARTIFACT_ROOT, runId),
     };
     let contradictions: ContradictionFinding[] = [];
     let agentSpawnProposals: AgentSpawnProposal[] = [];
     let selfImprovementProposals: SelfImprovementProposal[] = [];
+    let governanceQueueRequests: GovernanceQueueRequest[] = [];
     try {
       report.healthSnapshot = await this.getHealthSnapshot();
       report.weaknesses = await this.weaknessesFromHealthSnapshot(report.healthSnapshot);
@@ -786,6 +873,13 @@ export class CivilizationFreeRunService {
       });
       report.selfImprovementProposals = selfImprovementProposals.length;
 
+      governanceQueueRequests = await this.enqueueGovernanceReviewRequests(
+        report.internalGoalId,
+        agentSpawnProposals,
+        selfImprovementProposals,
+      );
+      report.governanceQueueRequests = governanceQueueRequests.length;
+
       const gate = await this.promotionGate(claimIds);
       report.claimsPromoted = gate.promoted.length;
       report.claimsBlocked = gate.blocked.length;
@@ -804,7 +898,7 @@ export class CivilizationFreeRunService {
           ORDER BY c.generated_at ASC`,
         [report.internalGoalId])
       : { rows: [] };
-    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, agentSpawnProposals, selfImprovementProposals, predictions: report.predictionsRegistered });
+    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, agentSpawnProposals, selfImprovementProposals, governanceQueueRequests, predictions: report.predictionsRegistered });
     return report;
   }
 }

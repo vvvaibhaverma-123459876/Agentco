@@ -49,6 +49,7 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(report.contradictionsDetected).toBe(0);
     expect(report.agentSpawnProposals).toBeGreaterThanOrEqual(1);
     expect(report.selfImprovementProposals).toBe(1);
+    expect(report.governanceQueueRequests).toBe(report.agentSpawnProposals + report.selfImprovementProposals);
     const action = await db.query(
       `SELECT objective FROM autonomy_goal_actions WHERE goal_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [report.internalGoalId]
@@ -78,6 +79,9 @@ d('civilization free-run (fixture, real Postgres)', () => {
     const selfImprovementJsonl = path.join(report.reportDir, 'self_improvement_proposals.jsonl');
     expect(fs.existsSync(selfImprovementJsonl)).toBe(true);
     expect(fs.readFileSync(selfImprovementJsonl, 'utf8')).toMatch(/self_assessment|review_required/);
+    const governanceQueueJsonl = path.join(report.reportDir, 'governance_queue_requests.jsonl');
+    expect(fs.existsSync(governanceQueueJsonl)).toBe(true);
+    expect(fs.readFileSync(governanceQueueJsonl, 'utf8')).toMatch(/agent_spawn_proposal|self_improvement_proposal/);
   }, 30000);
 
   it('uses the society agenda to drive the fixture bounded task route', async () => {
@@ -398,5 +402,62 @@ d('civilization free-run (fixture, real Postgres)', () => {
       `SELECT count(*) AS n FROM autonomy_memory WHERE content->>'type' = 'self_improvement_proposal'`
     );
     expect(Number(afterMemory.rows[0].n)).toBe(Number(beforeMemory.rows[0].n) + 1);
+  }, 20000);
+
+  it('queues free-run proposals for human governance without approving or executing them', async () => {
+    const weakness = {
+      kind: 'unpromoted_knowledge',
+      detail: 'supported claims need governed review',
+      recommendedGoal: {
+        title: 'Govern proposal review',
+        description: 'Submit proposal outputs to the human override queue.',
+        domain: 'calibration',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const agenda = await svc.createAgendaItem(goalId, weakness);
+    const activationsBefore = await db.query(
+      `SELECT count(*) AS n FROM autonomy_team_activations WHERE parent_goal_id = $1`,
+      [goalId]
+    );
+    const agentProposals = await svc.proposeAgentSpawns(goalId, agenda, []);
+    const selfImprovementProposals = await svc.proposeSelfImprovements(goalId, [weakness], {
+      contradictionsDetected: 0,
+      agentSpawnProposals: agentProposals.length,
+      errors: [],
+    });
+
+    const requests = await svc.enqueueGovernanceReviewRequests(goalId, agentProposals, selfImprovementProposals);
+
+    expect(requests).toHaveLength(agentProposals.length + selfImprovementProposals.length);
+    expect(requests.length).toBeGreaterThanOrEqual(2);
+    expect(requests.every(r => r.status === 'pending')).toBe(true);
+    expect(requests.map(r => r.proposalType).sort()).toEqual(expect.arrayContaining([
+      'agent_spawn_proposal',
+      'self_improvement_proposal',
+    ]));
+
+    const queueRows = await db.query(
+      `SELECT request_id, agent_id, action, status, approval_token, context
+         FROM override_queue
+        WHERE request_id = ANY($1)
+        ORDER BY created_at ASC`,
+      [requests.map(r => r.requestId)]
+    );
+    expect(queueRows.rows).toHaveLength(requests.length);
+    for (const row of queueRows.rows) {
+      expect(row.agent_id).toBe('civilization_free_run');
+      expect(row.status).toBe('pending');
+      expect(row.approval_token).toBeNull();
+      expect(row.context.goal_id).toBe(goalId);
+      expect(row.context.blocked_until_approved).toBe(true);
+      expect(['agent_upgrade', 'config_change']).toContain(row.action);
+    }
+
+    const activationsAfter = await db.query(
+      `SELECT count(*) AS n FROM autonomy_team_activations WHERE parent_goal_id = $1`,
+      [goalId]
+    );
+    expect(Number(activationsAfter.rows[0].n)).toBe(Number(activationsBefore.rows[0].n));
   }, 20000);
 });

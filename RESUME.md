@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 6 — adds governance-bound self-improvement proposals)
+**Last updated:** 2026-06-25 (rev 8 — connects free-run proposals to override queue)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -73,10 +73,20 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   knowledge. Reports persist the snapshot in `civilization_report.md`, `events.jsonl`, and
   `report.json`. Covered by a real Postgres test that seeds contradictions, stale predictions, and a
   weak domain against the deployed schema.
+- ✅ **Free-run governance queue escalation — DONE** (post-`8296f30`): agent-spawn and
+  self-improvement proposals now enqueue real pending rows in the existing `override_queue`.
+  Agent-spawn proposals use `agent_upgrade`; self-improvement proposals use `config_change`.
+  Queue context includes proposal ids, goal id, budgets/files/tests/rollback details, and
+  `blocked_until_approved = true`. The rows remain `pending` with no `approval_token`; the free-run
+  does **not** activate specialists, generate candidates, or apply changes. Reports now write
+  `governance_queue_requests.jsonl` plus a queue event. Covered by a real Postgres test that asserts
+  pending queue rows and no `autonomy_team_activations` side effect.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
+- **Next free-run boundary:** consume approval tokens only behind benchmark/eval gates; do not let
+  the free-run auto-approve, auto-activate specialists, or auto-promote self-modifications.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).
