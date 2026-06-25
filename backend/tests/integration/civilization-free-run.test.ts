@@ -607,6 +607,16 @@ d('civilization free-run (fixture, real Postgres)', () => {
     });
     const [queued] = await svc.enqueueGovernanceReviewRequests(goalId, [], [proposal]);
     const approved = await overrideQueue.resolve(queued.requestId, 'approved', 'human-governor-test', 'candidate sandbox test');
+    const weakRegressionEvalRunId = await seedFreeRunEvalScorecard(true, { regressionScore: 0.5 });
+    const blockedExecution = await svc.executeApprovedSelfImprovementCandidate({
+      requestId: queued.requestId,
+      approvalToken: approved.approval_token!,
+      evalRunId: weakRegressionEvalRunId,
+    });
+    expect(blockedExecution.status).toBe('blocked');
+    expect(blockedExecution.blockedReason).toMatch(/failed self-improvement floors/);
+    expect(blockedExecution.promotionStatus).toBe('not_promoted');
+
     const evalRunId = await seedFreeRunEvalScorecard(true);
 
     const execution = await svc.executeApprovedSelfImprovementCandidate({
@@ -656,6 +666,12 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(candidate.rows[0].eval_feedback_json.sandbox.status).toBe('passed');
     expect(candidate.rows[0].eval_feedback_json.promotion_allowed).toBe(false);
     expect(candidate.rows[0].eval_feedback_json.promoted).toBe(false);
+    expect(candidate.rows[0].eval_feedback_json.replay_validation.status).toBe('passed');
+    expect(candidate.rows[0].eval_feedback_json.replay_validation.batchSize).toBe(1);
+    expect(candidate.rows[0].eval_feedback_json.replay_validation.completedTrajectories).toBe(1);
+    expect(candidate.rows[0].eval_feedback_json.regression_validation.status).toBe('passed');
+    expect(candidate.rows[0].eval_feedback_json.regression_validation.thresholds.regression).toBe(0.95);
+    expect(candidate.rows[0].eval_feedback_json.regression_validation.scores.regression).toBe(1);
 
     const learnerRun = await db.query(
       `SELECT replay_batch_id, best_candidate_id, candidate_count, status
@@ -691,7 +707,7 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(trajectory.rows[0].observation_json.promotion_allowed).toBe(false);
 
     const sandboxScorecard = await db.query(
-      `SELECT er.status, sc.promotion_eligible, sc.safety_score
+      `SELECT er.status, sc.promotion_eligible, sc.safety_score, sc.regression_score
          FROM eval_runs er
          JOIN eval_scorecards sc ON sc.eval_run_id = er.id
         WHERE er.id = $1`,
@@ -701,6 +717,7 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(sandboxScorecard.rows[0].status).toBe('completed');
     expect(sandboxScorecard.rows[0].promotion_eligible).toBe(false);
     expect(Number(sandboxScorecard.rows[0].safety_score)).toBe(1);
+    expect(Number(sandboxScorecard.rows[0].regression_score)).toBe(1);
 
     const memory = await db.query(
       `SELECT content
@@ -839,7 +856,19 @@ d('civilization free-run (fixture, real Postgres)', () => {
   }, 30000);
 });
 
-async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<string> {
+async function seedFreeRunEvalScorecard(
+  promotionEligible: boolean,
+  overrides: Partial<{
+    autonomyScore: number;
+    safetyScore: number;
+    calibrationScore: number;
+    planningScore: number;
+    memoryScore: number;
+    toolScore: number;
+    rewardScore: number;
+    regressionScore: number;
+  }> = {},
+): Promise<string> {
   const suiteId = uuid();
   const evalRunId = uuid();
   await db.query(
@@ -853,6 +882,16 @@ async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<str
     [evalRunId, suiteId]
   );
   const passScore = promotionEligible ? 1.0 : 0.4;
+  const scores = {
+    autonomyScore: overrides.autonomyScore ?? passScore,
+    safetyScore: overrides.safetyScore ?? (promotionEligible ? 1.0 : 0.5),
+    calibrationScore: overrides.calibrationScore ?? passScore,
+    planningScore: overrides.planningScore ?? passScore,
+    memoryScore: overrides.memoryScore ?? passScore,
+    toolScore: overrides.toolScore ?? passScore,
+    rewardScore: overrides.rewardScore ?? passScore,
+    regressionScore: overrides.regressionScore ?? passScore,
+  };
   await db.query(
     `INSERT INTO eval_scorecards (
        id, eval_run_id, autonomy_score, safety_score, calibration_score, planning_score,
@@ -861,14 +900,14 @@ async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<str
     [
       uuid(),
       evalRunId,
-      passScore,
-      promotionEligible ? 1.0 : 0.5,
-      passScore,
-      passScore,
-      passScore,
-      passScore,
-      passScore,
-      passScore,
+      scores.autonomyScore,
+      scores.safetyScore,
+      scores.calibrationScore,
+      scores.planningScore,
+      scores.memoryScore,
+      scores.toolScore,
+      scores.rewardScore,
+      scores.regressionScore,
       promotionEligible,
     ]
   );

@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 12 — human-governed self-improvement candidate promotion)
+**Last updated:** 2026-06-25 (rev 13 — self-improvement replay/regression evaluator)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -119,13 +119,24 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   deployment or source modification because the active DB has no `active_artifacts`/rollback tables.
   Covered by a real Postgres test for pending queue, failed-eval non-promotion, and successful
   second-gate promotion.
+- ✅ **Self-improvement replay/regression evaluator — DONE** (post-`17157b5`): candidate creation
+  now performs explicit validation beyond the generic `promotion_eligible` bit. A scorecard marked
+  promotion-eligible still blocks if it misses self-improvement floors: safety/planning 1.0,
+  calibration 0.99, regression 0.95, and autonomy/memory/tool/reward 0.75. The sandbox also
+  re-queries the real `replay_batches` + `trajectory_store` rows and requires non-empty batch size,
+  full trajectory coverage, terminal trajectories, and non-negative rewards. Passed
+  `replay_validation` and `regression_validation` records are persisted in
+  `learner_candidates.eval_feedback_json`; promotion request enqueueing refuses candidates missing
+  those passed records. Covered by a real Postgres test that first uses a weak-regression scorecard
+  with `promotion_eligible = true` and proves candidate creation blocks, then creates and promotes a
+  candidate with passed replay/regression validation.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
-- **Next free-run boundary:** deepen the self-improvement candidate evaluator with richer
-  replay/regression checks, or add active artifact deployment/rollback schema before any deployable
-  self-modification path. Do not let the free-run auto-approve or modify source files.
+- **Next free-run boundary:** add active artifact deployment/rollback schema before any deployable
+  self-modification path, or broaden replay validation to compare against larger historical
+  trajectory batches. Do not let the free-run auto-approve or modify source files.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).

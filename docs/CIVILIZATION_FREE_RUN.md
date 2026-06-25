@@ -44,6 +44,8 @@ Approved agent-spawn proposals can now run one bounded specialist lifecycle afte
 
 Approved self-improvement proposals can now become sandbox-validated learner candidates after the same approval-token/eval preflight returns `ready`. `executeApprovedSelfImprovementCandidate()` creates a real `artifacts` row, immutable `autonomy_episodes` + `trajectory_store` evidence, `replay_batches`, a completed `learner_runs` row, an evaluated `learner_candidates` row, a sandbox `eval_runs`/`eval_scorecards` record, and an `approved_self_improvement_candidate_execution` audit record. The candidate is deliberately not promoted: `learner_candidates.status = 'evaluated'`, `promoted_at IS NULL`, sandbox feedback has `promotion_allowed = false`, and the sandbox scorecard has `promotion_eligible = false`.
 
+The self-improvement candidate sandbox now includes explicit replay/regression validation. Candidate creation blocks if the preflight scorecard fails hard floors even when `promotion_eligible = true` is present: safety >= 1.0, planning >= 1.0, calibration >= 0.99, regression >= 0.95, and autonomy/memory/tool/reward >= 0.75. It also re-queries the real replay batch and trajectory rows to require non-empty batch size, complete trajectory coverage, terminal trajectories, and non-negative rewards. These validations are persisted in `learner_candidates.eval_feedback_json` and are required before a promotion request can be queued.
+
 Sandbox-validated self-improvement candidates now have a separate human-governed promotion path. `enqueueSelfImprovementPromotionRequest()` creates a new pending `override_queue` row for an evaluated candidate with a tested, non-simulation artifact and passed sandbox feedback. `executeApprovedSelfImprovementPromotion()` requires that separate approval token plus a completed promotion-eligible eval before marking `learner_candidates.status = 'promoted'`, setting `promoted_at`, marking the `artifacts` row `promoted`, and writing an `approved_self_improvement_promotion_execution` audit record. This still does not deploy artifacts or modify source files; the active deployment/rollback tables are not present in the active schema.
 
 ## How It Is Tested
@@ -68,6 +70,7 @@ The integration test uses real Postgres and asserts that:
 - approval-token preflight blocks pending requests, missing evals, and non-eligible scorecards, then returns ready only for approved requests with a promotion-eligible eval
 - ready agent-spawn approvals start a real specialist subprocess, execute one signed bounded action, terminate it, and persist a completed `autonomy_team_activations` row
 - ready self-improvement approvals create a sandbox-validated learner candidate backed by artifact, trajectory, replay batch, learner run, candidate, sandbox eval, and audit-memory rows without promotion
+- self-improvement candidate creation blocks weak replay/regression scorecards even when the scorecard is marked promotion-eligible, then persists passed replay/regression validation in candidate feedback
 - sandbox-validated candidate promotion requires a second pending override, blocks on a non-eligible eval, and only promotes the real candidate/artifact rows after a separate approval plus promotion-eligible eval
 - grounded claims can be promoted
 - ungrounded claims are blocked
@@ -82,7 +85,7 @@ This is not the full civilization objective yet.
 - society agendas are persisted records, not a complete society scheduler
 - contradiction detection is conservative and direct-pattern based; it does not yet do semantic contradiction discovery with retrieval or LLM adjudication
 - agent spawn proposals can execute one bounded approved lifecycle; they are not yet connected to longer task delegation or result promotion
-- self-improvement proposals have approval-token/eval preflight, candidate generation, sandbox validation, and a separate human-governed candidate/artifact promotion path, but they are not connected to deployment, rollback, or source-code modification
+- self-improvement proposals have approval-token/eval preflight, candidate generation, replay/regression sandbox validation, and a separate human-governed candidate/artifact promotion path, but they are not connected to deployment, rollback, or source-code modification
 - `read_only_web` depends on the external arXiv/LLM path and remains environment-limited
 
-Next integrated increments should deepen the candidate evaluator with richer replay/regression checks or add active artifact deployment/rollback tables before any deployable self-modification path. Do not enable autonomous code modification.
+Next integrated increments should add active artifact deployment/rollback schema before any deployable self-modification path, or broaden replay validation to compare against larger historical trajectory batches. Do not enable autonomous code modification.
