@@ -185,3 +185,4 @@ kubeconfig
 
 # Demo run outputs
 examples/civilization_constitution_demo/artifacts/
+audit_artifacts/
