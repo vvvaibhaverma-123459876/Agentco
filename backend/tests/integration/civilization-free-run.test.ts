@@ -716,6 +716,127 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(memory.rows[0].content.candidateId).toBe(execution.candidateId);
     expect(memory.rows[0].content.promotionStatus).toBe('not_promoted');
   }, 30000);
+
+  it('promotes sandbox-validated self-improvement candidates only through a second human-governed gate', async () => {
+    const weakness = {
+      kind: 'thin_evidence',
+      detail: 'human-governed self-improvement promotion test',
+      recommendedGoal: {
+        title: 'Promote governed self-improvement candidate',
+        description: 'Require a second approval before promoting a sandbox candidate.',
+        domain: 'research',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const [proposal] = await svc.proposeSelfImprovements(goalId, [weakness], {
+      contradictionsDetected: 0,
+      agentSpawnProposals: 1,
+      errors: [],
+    });
+    const [candidateQueued] = await svc.enqueueGovernanceReviewRequests(goalId, [], [proposal]);
+    const candidateApproved = await overrideQueue.resolve(
+      candidateQueued.requestId,
+      'approved',
+      'human-governor-test',
+      'candidate creation for promotion test',
+    );
+    const candidateEvalRunId = await seedFreeRunEvalScorecard(true);
+    const candidateExecution = await svc.executeApprovedSelfImprovementCandidate({
+      requestId: candidateQueued.requestId,
+      approvalToken: candidateApproved.approval_token!,
+      evalRunId: candidateEvalRunId,
+    });
+    expect(candidateExecution.status).toBe('completed');
+
+    const promotionRequest = await svc.enqueueSelfImprovementPromotionRequest(candidateExecution.candidateId!);
+    expect(promotionRequest.candidateId).toBe(candidateExecution.candidateId);
+    expect(promotionRequest.artifactId).toBe(candidateExecution.artifactId);
+    expect(promotionRequest.status).toBe('pending');
+    expect(promotionRequest.riskLevel).toBe('critical');
+
+    const queuedPromotion = await db.query(
+      `SELECT status, approval_token, context
+         FROM override_queue
+        WHERE request_id = $1`,
+      [promotionRequest.requestId]
+    );
+    expect(queuedPromotion.rows).toHaveLength(1);
+    expect(queuedPromotion.rows[0].status).toBe('pending');
+    expect(queuedPromotion.rows[0].approval_token).toBeNull();
+    expect(queuedPromotion.rows[0].context.proposal_type).toBe('self_improvement_candidate_promotion');
+    expect(queuedPromotion.rows[0].context.blocked_until_approved).toBe(true);
+
+    const promotionApproved = await overrideQueue.resolve(
+      promotionRequest.requestId,
+      'approved',
+      'human-governor-test',
+      'promote sandbox candidate test',
+    );
+    const failingPromotionEvalRunId = await seedFreeRunEvalScorecard(false);
+    const blockedPromotion = await svc.executeApprovedSelfImprovementPromotion({
+      requestId: promotionRequest.requestId,
+      approvalToken: promotionApproved.approval_token!,
+      evalRunId: failingPromotionEvalRunId,
+    });
+    expect(blockedPromotion.status).toBe('blocked');
+    expect(blockedPromotion.blockedReason).toMatch(/not promotion eligible/);
+    expect(blockedPromotion.promotionStatus).toBe('not_promoted');
+
+    const stillUnpromoted = await db.query(
+      `SELECT c.status AS candidate_status, c.promoted_at, a.status AS artifact_status
+         FROM learner_candidates c
+         JOIN artifacts a ON a.id = c.artifact_id
+        WHERE c.id = $1`,
+      [candidateExecution.candidateId]
+    );
+    expect(stillUnpromoted.rows[0].candidate_status).toBe('evaluated');
+    expect(stillUnpromoted.rows[0].promoted_at).toBeNull();
+    expect(stillUnpromoted.rows[0].artifact_status).toBe('tested');
+
+    const passingPromotionEvalRunId = await seedFreeRunEvalScorecard(true);
+    const promotion = await svc.executeApprovedSelfImprovementPromotion({
+      requestId: promotionRequest.requestId,
+      approvalToken: promotionApproved.approval_token!,
+      evalRunId: passingPromotionEvalRunId,
+    });
+    expect(promotion.status).toBe('completed');
+    expect(promotion.candidateId).toBe(candidateExecution.candidateId);
+    expect(promotion.artifactId).toBe(candidateExecution.artifactId);
+    expect(promotion.candidateStatus).toBe('promoted');
+    expect(promotion.artifactStatus).toBe('promoted');
+    expect(promotion.promotionStatus).toBe('promoted');
+
+    const promoted = await db.query(
+      `SELECT c.status AS candidate_status, c.promoted_at, c.eval_feedback_json,
+              a.status AS artifact_status, a.lineage_json
+         FROM learner_candidates c
+         JOIN artifacts a ON a.id = c.artifact_id
+        WHERE c.id = $1`,
+      [candidateExecution.candidateId]
+    );
+    expect(promoted.rows).toHaveLength(1);
+    expect(promoted.rows[0].candidate_status).toBe('promoted');
+    expect(promoted.rows[0].promoted_at).not.toBeNull();
+    expect(promoted.rows[0].eval_feedback_json.promotion.request_id).toBe(promotionRequest.requestId);
+    expect(promoted.rows[0].eval_feedback_json.promotion.eval_run_id).toBe(passingPromotionEvalRunId);
+    expect(promoted.rows[0].eval_feedback_json.promotion.source_files_modified).toBe(false);
+    expect(promoted.rows[0].artifact_status).toBe('promoted');
+    expect(promoted.rows[0].lineage_json.promotion.request_id).toBe(promotionRequest.requestId);
+    expect(promoted.rows[0].lineage_json.promotion.deployed).toBe(false);
+
+    const memory = await db.query(
+      `SELECT content
+         FROM autonomy_memory
+        WHERE content->>'type' = 'approved_self_improvement_promotion_execution'
+          AND content->>'requestId' = $1
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [promotionRequest.requestId]
+    );
+    expect(memory.rows).toHaveLength(1);
+    expect(memory.rows[0].content.status).toBe('completed');
+    expect(memory.rows[0].content.promotionStatus).toBe('promoted');
+  }, 30000);
 });
 
 async function seedFreeRunEvalScorecard(promotionEligible: boolean): Promise<string> {

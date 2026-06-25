@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 10 — executes approved bounded agent spawn)
+**Last updated:** 2026-06-25 (rev 12 — human-governed self-improvement candidate promotion)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -14,9 +14,9 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
 - **Reachability from `backend/src/server.ts`: 65 / 78 services** (was 5).
 - **Orphans: 13** — all infra/leaf utilities (see §4), intentionally not REST-exposed.
 - **Tests:**
-  - Default `jest` (no infra): **132 pass, 0 fail**, 12 gated-skip.
-  - Full Postgres e2e (`RUN_LIVE_SMOKE=1` + real PG + OpenAI): **142 pass, 0 fail**, 2 skip
-    (Kafka publish — needs Kafka, runs under `RUN_KAFKA_SMOKE=1`).
+  - Default `jest` (no infra): **154 pass, 0 fail**, 25 gated-skip.
+  - Targeted free-run Postgres e2e (`RUN_LIVE_SMOKE=1` + real PG): **12 pass, 0 fail**.
+  - Kafka publish still needs Kafka and runs under `RUN_KAFKA_SMOKE=1`.
 - **`tsc --noEmit`: 0 errors.**
 - Each integration step has a real test (pure logic tested against the REAL function, never a
   copy) + route-level wiring via `build()`. Commits tagged B.1–B.7d, then the fixes below.
@@ -108,13 +108,24 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   does **not** edit code or promote the candidate: `promoted_at` stays null, sandbox feedback has
   `promotion_allowed = false`, and the sandbox scorecard has `promotion_eligible = false`. Covered
   by a real Postgres test against all affected tables.
+- ✅ **Human-governed self-improvement candidate promotion — DONE** (post-`468e682`): sandbox
+  candidates now have a separate second gate. `enqueueSelfImprovementPromotionRequest()` creates a
+  new pending `override_queue` row only for an evaluated candidate whose artifact is tested,
+  non-simulation-derived, and backed by passed sandbox feedback. `executeApprovedSelfImprovementPromotion()`
+  then requires that separate approval token plus a completed promotion-eligible eval before it
+  marks the real `learner_candidates` row `promoted`, sets `promoted_at`, marks the `artifacts` row
+  `promoted`, and writes `approved_self_improvement_promotion_execution` to `autonomy_memory`.
+  A failed promotion eval leaves the candidate `evaluated` and artifact `tested`. This is still not
+  deployment or source modification because the active DB has no `active_artifacts`/rollback tables.
+  Covered by a real Postgres test for pending queue, failed-eval non-promotion, and successful
+  second-gate promotion.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
-- **Next free-run boundary:** add a separate human-governed promotion path for sandbox-validated
-  self-improvement candidates, or deepen the candidate evaluator with richer replay/regression
-  checks. Do not let the free-run auto-approve, auto-promote, or modify source files.
+- **Next free-run boundary:** deepen the self-improvement candidate evaluator with richer
+  replay/regression checks, or add active artifact deployment/rollback schema before any deployable
+  self-modification path. Do not let the free-run auto-approve or modify source files.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).

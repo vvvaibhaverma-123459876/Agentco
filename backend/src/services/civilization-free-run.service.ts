@@ -134,10 +134,15 @@ export interface GovernanceQueueRequest {
   riskLevel: 'high' | 'critical';
 }
 
+type GovernanceProposalType =
+  | 'agent_spawn_proposal'
+  | 'self_improvement_proposal'
+  | 'self_improvement_candidate_promotion';
+
 export interface GovernanceApprovalReadiness {
   requestId: string;
   proposalId?: string;
-  proposalType?: 'agent_spawn_proposal' | 'self_improvement_proposal';
+  proposalType?: GovernanceProposalType;
   status: 'ready' | 'blocked';
   blockedReason?: string;
   evalRunId?: string;
@@ -180,6 +185,27 @@ export interface ApprovedSelfImprovementCandidateExecution {
   sandboxEvalRunId?: string;
   candidateStatus?: string;
   promotionStatus: 'not_promoted';
+}
+
+export interface SelfImprovementPromotionRequest {
+  candidateId: string;
+  artifactId: string;
+  requestId: string;
+  status: 'pending';
+  action: string;
+  riskLevel: 'high' | 'critical';
+}
+
+export interface ApprovedSelfImprovementPromotionExecution {
+  requestId: string;
+  candidateId?: string;
+  artifactId?: string;
+  status: 'completed' | 'blocked' | 'failed';
+  blockedReason?: string;
+  evalRunId?: string;
+  candidateStatus?: string;
+  artifactStatus?: string;
+  promotionStatus: 'promoted' | 'not_promoted';
 }
 
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
@@ -828,7 +854,9 @@ export class CivilizationFreeRunService {
   }
 
   private knownProposalType(raw: unknown): GovernanceApprovalReadiness['proposalType'] {
-    return raw === 'agent_spawn_proposal' || raw === 'self_improvement_proposal'
+    return raw === 'agent_spawn_proposal'
+      || raw === 'self_improvement_proposal'
+      || raw === 'self_improvement_candidate_promotion'
       ? raw
       : undefined;
   }
@@ -1235,6 +1263,254 @@ export class CivilizationFreeRunService {
       `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
        VALUES ($1, NULL, $2, NOW(), NOW())`,
       [uuid(), JSON.stringify({ type: 'approved_self_improvement_candidate_execution', ...execution })],
+    );
+    return execution;
+  }
+
+  /**
+   * Enqueue a separate human-governed promotion request for an evaluated sandbox candidate. This
+   * does not promote; it creates another blocked override row that must be approved independently.
+   */
+  async enqueueSelfImprovementPromotionRequest(candidateId: string): Promise<SelfImprovementPromotionRequest> {
+    const candidate = await db.query(
+      `SELECT c.id, c.status AS candidate_status, c.artifact_id, c.artifact_hash, c.eval_feedback_json,
+              a.artifact_type, a.status AS artifact_status, a.is_simulation_derived, a.artifact_json
+         FROM learner_candidates c
+         JOIN artifacts a ON a.id = c.artifact_id
+        WHERE c.id = $1`,
+      [candidateId],
+    );
+    if (candidate.rows.length === 0) {
+      throw new Error(`Learner candidate ${candidateId} not found`);
+    }
+
+    const row = candidate.rows[0];
+    this.assertPromotableSandboxCandidate(row, { requireEvaluated: true });
+
+    const request = await overrideQueue.enqueue(
+      'civilization_free_run',
+      'config_change',
+      'critical',
+      {
+        risk_score: 0.95,
+        proposal_type: 'self_improvement_candidate_promotion',
+        candidate_id: String(row.id),
+        artifact_id: String(row.artifact_id),
+        artifact_type: String(row.artifact_type),
+        artifact_hash: String(row.artifact_hash),
+        source_candidate_request_id: row.artifact_json?.request_id ? String(row.artifact_json.request_id) : undefined,
+        source_proposal_id: row.artifact_json?.proposal_id ? String(row.artifact_json.proposal_id) : undefined,
+        sandbox_status: row.eval_feedback_json?.sandbox?.status || 'unknown',
+        requires_human_approval: true,
+        blocked_until_approved: true,
+      },
+    );
+
+    const promotionRequest: SelfImprovementPromotionRequest = {
+      candidateId: String(row.id),
+      artifactId: String(row.artifact_id),
+      requestId: request.request_id,
+      status: 'pending',
+      action: request.action,
+      riskLevel: request.risk_level,
+    };
+    await db.query(
+      `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+       VALUES ($1, NULL, $2, NOW(), NOW())`,
+      [uuid(), JSON.stringify({ type: 'self_improvement_candidate_promotion_request', ...promotionRequest })],
+    );
+    return promotionRequest;
+  }
+
+  /**
+   * Promote a sandbox-validated candidate after a distinct human approval and promotion-eligible
+   * eval. Promotion here means marking the learning candidate/artifact as promoted; it does not
+   * deploy or modify source files because no active artifact deployment table exists in this DB.
+   */
+  async executeApprovedSelfImprovementPromotion(input: {
+    requestId: string;
+    approvalToken: string;
+    evalRunId: string;
+  }): Promise<ApprovedSelfImprovementPromotionExecution> {
+    const readiness = await this.assessGovernanceApprovalReadiness(input);
+    if (readiness.status !== 'ready') {
+      return this.recordApprovedSelfImprovementPromotionExecution({
+        requestId: input.requestId,
+        status: 'blocked',
+        blockedReason: readiness.blockedReason || 'governance preflight did not return ready',
+        evalRunId: input.evalRunId,
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const override = await db.query(
+      `SELECT context
+         FROM override_queue
+        WHERE request_id = $1
+          AND agent_id = 'civilization_free_run'
+          AND status = 'approved'`,
+      [input.requestId],
+    );
+    if (override.rows.length === 0) {
+      return this.recordApprovedSelfImprovementPromotionExecution({
+        requestId: input.requestId,
+        status: 'blocked',
+        blockedReason: 'approved override request disappeared before promotion',
+        evalRunId: input.evalRunId,
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const context = override.rows[0].context || {};
+    if (context.proposal_type !== 'self_improvement_candidate_promotion') {
+      return this.recordApprovedSelfImprovementPromotionExecution({
+        requestId: input.requestId,
+        status: 'blocked',
+        blockedReason: `proposal type ${context.proposal_type || 'unknown'} is not executable by self-improvement promotion lifecycle`,
+        evalRunId: input.evalRunId,
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const candidateId = String(context.candidate_id || '');
+    const artifactId = String(context.artifact_id || '');
+    if (!candidateId || !artifactId) {
+      return this.recordApprovedSelfImprovementPromotionExecution({
+        requestId: input.requestId,
+        status: 'blocked',
+        blockedReason: 'promotion queue context is missing candidate_id or artifact_id',
+        evalRunId: input.evalRunId,
+        promotionStatus: 'not_promoted',
+      });
+    }
+
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const candidate = await client.query(
+        `SELECT c.id, c.status AS candidate_status, c.artifact_id, c.artifact_hash, c.eval_feedback_json,
+                a.artifact_type, a.status AS artifact_status, a.is_simulation_derived, a.artifact_json
+           FROM learner_candidates c
+           JOIN artifacts a ON a.id = c.artifact_id
+          WHERE c.id = $1
+            AND a.id = $2
+          FOR UPDATE OF c, a`,
+        [candidateId, artifactId],
+      );
+      if (candidate.rows.length === 0) {
+        throw new Error('candidate/artifact pair not found for promotion request');
+      }
+
+      const row = candidate.rows[0];
+      this.assertPromotableSandboxCandidate(row, { requireEvaluated: true });
+
+      await client.query(
+        `UPDATE learner_candidates
+            SET status = 'promoted',
+                promoted_at = NOW(),
+                eval_feedback_json = jsonb_set(
+                  COALESCE(eval_feedback_json, '{}'::jsonb),
+                  '{promotion}',
+                  $2::jsonb,
+                  true
+                )
+          WHERE id = $1`,
+        [candidateId, JSON.stringify({
+          status: 'promoted',
+          request_id: input.requestId,
+          eval_run_id: input.evalRunId,
+          promoted_by: 'human_governed_free_run_promotion',
+          source_files_modified: false,
+        })],
+      );
+      await client.query(
+        `UPDATE artifacts
+            SET status = 'promoted',
+                lineage_json = jsonb_set(
+                  COALESCE(lineage_json, '{}'::jsonb),
+                  '{promotion}',
+                  $2::jsonb,
+                  true
+                )
+          WHERE id = $1`,
+        [artifactId, JSON.stringify({
+          request_id: input.requestId,
+          eval_run_id: input.evalRunId,
+          promoted_by: 'human_governed_free_run_promotion',
+          deployed: false,
+        })],
+      );
+      await client.query('COMMIT');
+
+      return this.recordApprovedSelfImprovementPromotionExecution({
+        requestId: input.requestId,
+        candidateId,
+        artifactId,
+        status: 'completed',
+        evalRunId: input.evalRunId,
+        candidateStatus: 'promoted',
+        artifactStatus: 'promoted',
+        promotionStatus: 'promoted',
+      });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      return this.recordApprovedSelfImprovementPromotionExecution({
+        requestId: input.requestId,
+        candidateId,
+        artifactId,
+        status: 'failed',
+        blockedReason: error instanceof Error ? error.message : String(error),
+        evalRunId: input.evalRunId,
+        promotionStatus: 'not_promoted',
+      });
+    } finally {
+      client.release();
+    }
+  }
+
+  private assertPromotableSandboxCandidate(
+    row: {
+      candidate_status: string;
+      artifact_status: string;
+      is_simulation_derived: boolean;
+      eval_feedback_json?: {
+        sandbox?: {
+          status?: string;
+          no_source_files_modified?: boolean;
+          requires_human_approval?: boolean;
+        };
+      };
+    },
+    options: { requireEvaluated: boolean },
+  ): void {
+    if (options.requireEvaluated && row.candidate_status !== 'evaluated') {
+      throw new Error(`candidate status is ${row.candidate_status}, not evaluated`);
+    }
+    if (row.artifact_status !== 'tested') {
+      throw new Error(`artifact status is ${row.artifact_status}, not tested`);
+    }
+    if (row.is_simulation_derived) {
+      throw new Error('simulation-derived artifacts cannot be promoted by free-run self-improvement');
+    }
+    const sandbox = row.eval_feedback_json?.sandbox || {};
+    if (sandbox.status !== 'passed') {
+      throw new Error(`sandbox status is ${sandbox.status || 'missing'}, not passed`);
+    }
+    if (sandbox.no_source_files_modified !== true) {
+      throw new Error('sandbox did not prove no source files were modified');
+    }
+    if (sandbox.requires_human_approval !== true) {
+      throw new Error('sandbox candidate does not carry the required human-approval flag');
+    }
+  }
+
+  private async recordApprovedSelfImprovementPromotionExecution(
+    execution: ApprovedSelfImprovementPromotionExecution,
+  ): Promise<ApprovedSelfImprovementPromotionExecution> {
+    await db.query(
+      `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+       VALUES ($1, NULL, $2, NOW(), NOW())`,
+      [uuid(), JSON.stringify({ type: 'approved_self_improvement_promotion_execution', ...execution })],
     );
     return execution;
   }
