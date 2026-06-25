@@ -3,25 +3,37 @@
     "endpoint": "/health",
     "auth": false,
     "status": 200,
-    "body_prefix": "{\"status\":\"ok\",\"timestamp\":\"2026-06-25T08:56:59.868Z\"}"
+    "body_prefix": "{\"status\":\"ok\",\"timestamp\":\"2026-06-25T09:20:26.239Z\"}"
   },
   {
     "endpoint": "/health",
     "auth": true,
     "status": 200,
-    "body_prefix": "{\"status\":\"ok\",\"timestamp\":\"2026-06-25T08:56:59.872Z\"}"
+    "body_prefix": "{\"status\":\"ok\",\"timestamp\":\"2026-06-25T09:20:26.240Z\"}"
   },
   {
     "endpoint": "/api/overrides",
     "auth": false,
-    "status": 200,
-    "body_prefix": "{\"items\":[{\"request_id\":\"3f3ce95c-023c-486b-90ac-5e5415472770\",\"agent_id\":\"civilization_free_run\",\"action\":\"agent_upgrade\",\"risk_score\":\"0.750\",\"risk_level\":\"high\",\"context\":{\"role\":\"researcher\",\"budget\":{\"tokens\":10000,\"seconds\":300,\"iterations\":30},\"goal_id\":\"1b6e5460-f7ea-47ce-aaf7-6b8b3f13838b\","
+    "status": 401,
+    "error": "{\"error\":\"valid service key required\"}"
   },
   {
     "endpoint": "/api/overrides",
     "auth": true,
     "status": 200,
     "body_prefix": "{\"items\":[{\"request_id\":\"3f3ce95c-023c-486b-90ac-5e5415472770\",\"agent_id\":\"civilization_free_run\",\"action\":\"agent_upgrade\",\"risk_score\":\"0.750\",\"risk_level\":\"high\",\"context\":{\"role\":\"researcher\",\"budget\":{\"tokens\":10000,\"seconds\":300,\"iterations\":30},\"goal_id\":\"1b6e5460-f7ea-47ce-aaf7-6b8b3f13838b\","
+  },
+  {
+    "endpoint": "/api/overrides/overdue",
+    "auth": false,
+    "status": 401,
+    "error": "{\"error\":\"valid service key required\"}"
+  },
+  {
+    "endpoint": "/api/overrides/overdue",
+    "auth": true,
+    "status": 200,
+    "body_prefix": "{\"items\":[],\"count\":0}"
   },
   {
     "endpoint": "/api/protected-surfaces/check?field=foo",

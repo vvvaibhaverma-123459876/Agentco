@@ -41,7 +41,21 @@ describe('minimal API key auth', () => {
     await app.close();
   });
 
-  test('read endpoint remains open', async () => {
+  test('rejects override reads without x-agentco-api-key before handler work', async () => {
+    const app = await build();
+    const res = await app.inject({ method: 'GET', url: '/api/overrides' });
+    expect(res.statusCode).toBe(401);
+    await app.close();
+  });
+
+  test('rejects overdue override reads without x-agentco-api-key before handler work', async () => {
+    const app = await build();
+    const res = await app.inject({ method: 'GET', url: '/api/overrides/overdue' });
+    expect(res.statusCode).toBe(401);
+    await app.close();
+  });
+
+  test('health read endpoint remains open', async () => {
     const app = await build();
     const res = await app.inject({ method: 'GET', url: '/health' });
     expect(res.statusCode).toBe(200);

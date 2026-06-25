@@ -1,6 +1,6 @@
 # AgentCo Goal Run Verification
 
-- Run ID: `goal-run-20260625T091055Z-ec7e30f7`
+- Run ID: `goal-run-20260625T091846Z-b77b2ffe`
 - Mode: `live_openai`
 - Decision: `escalate`
 - Risk: `medium`
@@ -8,7 +8,7 @@
 - Trusted confidence: `0.4617`
 - Passed validation: `True`
 - Brier score: `0.16`
-- Latency ms: `4102.07`
+- Latency ms: `3451.46`
 
 ## Validation Checks
 
@@ -27,12 +27,11 @@
 
 ## Database Trail
 
-- `prediction_ledger_insert`: ok id=`dcb484d0-aabe-4cd9-80d9-3449abcb6185`
-- `prediction_ledger_resolution_update`: failed error=`ERROR:  LEDGER RESOLUTION VIOLATION: only resolution_service may resolve predictions (current_user=agentco)
-CONTEXT:  PL/pgSQL function enforce_prediction_ledger_immutability() line 34 at RAISE`
-- `legacy_prediction_resolution_insert`: ok id=`goal-run-d4ebc9be1881`
-- `trust_scores_insert`: ok id=`1095999a-d646-4780-a7dd-08edf10d9899`
-- `event_history_insert`: ok id=`bab9cb38-61c3-42e9-8e30-7faa1595244d`
+- `prediction_ledger_insert`: ok id=`da0e07f6-cfef-4698-8af5-edbcb4ca678d`
+- `prediction_ledger_resolution_update`: ok
+- `legacy_prediction_resolution_insert`: ok id=`goal-run-cb915f62b3ab`
+- `trust_scores_insert`: ok id=`0a0c5362-6c6b-4551-8532-b15be6641cb8`
+- `event_history_insert`: ok id=`37a6e0c5-b664-420b-a6a0-fadb5cc3c879`
 - `decision_log_insert`: ok
 - `autonomy_audit_events_insert`: ok
 - `autonomy_memory_learning_insert`: ok

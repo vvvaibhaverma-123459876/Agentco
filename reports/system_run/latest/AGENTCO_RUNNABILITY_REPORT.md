@@ -99,7 +99,7 @@ Endpoint probe findings:
 | `/api/protected-surfaces/check?field=foo` | 401 | 200 | protected as expected |
 | `/api/ensemble/experts` | 401 | 403 | auth and scope checks active |
 | `/api/civilization/solve` | 400 | 400 | route exists, validates input |
-| `/api/overrides` | 200 | 200 | governance issue: override queue readable without auth |
+| `/api/overrides` | 401 | 200 | protected after fix |
 
 ## Frontend Results
 
@@ -163,18 +163,12 @@ Result: **completed successfully**
 | Policy/evidence checks | passed, including no breach conflation |
 | Audit/event records | `decision_log`, `event_history`, `autonomy_audit_events` inserts succeeded |
 | Human escalation | final decision `escalate`, `human_escalation_required=true` |
-| Resolution/scoring | legacy `prediction_resolutions` insert succeeded, Brier `0.16` |
+| Resolution/scoring | primary `prediction_ledger` resolution update and legacy `prediction_resolutions` insert succeeded, Brier `0.16` |
 | Learning/trust update | `trust_scores` and `autonomy_memory` inserts succeeded |
 
 Important nuance: the raw LLM output was not accepted directly. It escalated correctly but returned `risk_level=high` and placed forbidden phrases in `unsupported_claims`. The verification harness applied a deterministic policy controller that produced the final evidence-governed result while preserving the raw output. This is evidence-governed behavior, not just answer generation.
 
-Primary ledger resolution update failed:
-
-```text
-LEDGER RESOLUTION VIOLATION: only resolution_service may resolve predictions (current_user=agentco)
-```
-
-This is a real boundary. Resolution/scoring was still demonstrated through the legacy `predictions`/`prediction_resolutions` path and `trust_scores` insert, but the main `prediction_ledger` resolution service path needs a proper service-role execution command for end-to-end ledger scoring.
+Follow-up fix status: `FIX_MODULE_RUNNABILITY.md` records that the verifier now uses a separate `resolution_service` connection for primary ledger resolution. The final live run in `goal_run.json` has `prediction_ledger_resolution_update: ok`.
 
 ## Civilization Free-Run
 
@@ -197,11 +191,11 @@ This is a real vertical slice in fixture mode. It is not proof of unrestricted a
 | 2. Backend start? | yes. `node dist/server.js` started and health returned 200. |
 | 3. Frontend start/build? | build yes. Dev server was not necessary for proof; build/test/lint passed. |
 | 4. Database/infrastructure start? | native Postgres yes. Docker Compose stack no. Redis/Kafka/Vault/Prometheus/Grafana unavailable. |
-| 5. Migrations apply? | no through documented command; blocked by missing `psycopg2` and broken default `pip`. Existing DB schema is present. |
+| 5. Migrations apply? | yes after fix. `npm run db:migrate` now uses the backend TypeScript runner and completed successfully; all current migrations were skipped as already applied. |
 | 6. One real agent task end-to-end? | yes for the added goal-run harness: OpenAI + policy controller + DB trail. Also fixture free-run works. |
 | 7. OpenAI call via env? | yes using `LLM_API_KEY` from `.codex.env`. |
 | 8. Calibration ledger register predictions? | yes, `prediction_ledger_insert` succeeded. |
-| 9. Resolution/scoring run? | partial. legacy resolution/scoring succeeded; main ledger resolution update is blocked without `resolution_service`. |
+| 9. Resolution/scoring run? | yes after fix. primary ledger resolution passed through `resolution_service`; legacy resolution/scoring also succeeded. |
 | 10. Trust/controller update trusted confidence? | yes. policy controller produced final decision; `trust_scores_insert` succeeded with trusted confidence `0.4617`. |
 | 11. Audit/event records generated? | yes. `event_history`, `decision_log`, `autonomy_audit_events`, and `autonomy_memory` writes succeeded. |
 | 12. Evidence-governed not simulated? | yes in the goal run: final decision was constrained by evidence IDs, policy checks, hallucination traps, and DB records. |
@@ -308,7 +302,7 @@ This is a real vertical slice in fixture mode. It is not proof of unrestricted a
 | Audit/event/decision records | real |
 | Offline goal-run mode | simulated and clearly marked |
 | Docker Compose infra | broken/unavailable |
-| Main ledger resolution update | blocked by service-role guard |
+| Main ledger resolution update | real |
 | Kafka-dependent behavior | missing in this environment |
 | Broad cross-domain transfer | mostly aspirational |
 
@@ -317,20 +311,18 @@ This is a real vertical slice in fixture mode. It is not proof of unrestricted a
 | Issue | Root Cause | Suggested Fix |
 |---|---|---|
 | Docker stack cannot start | Docker daemon unavailable | Start Docker Desktop/daemon or document native-infra path |
-| Migrations fail | `psycopg2` missing | Pin Python env and install migration deps |
+| Python migration runner fails | `psycopg2` missing under default Python | Backend `npm run db:migrate` now uses the TypeScript runner; keep Python runner only as optional/legacy or pin its env |
 | `pip install` fails | local Python 3.14 `pyexpat` linkage | Use Python 3.13 env, repair Homebrew Python/libexpat, or commit a supported venv/uv workflow |
 | Default Python tests fail | `pytest` absent under Python 3.14 | Use Python 3.13 or install deps after fixing pip |
-| `/api/overrides` readable without auth | route lacks protection or mounted outside auth middleware | Require service key and scope for read routes |
-| Main ledger resolution update blocked | only `resolution_service` may resolve | Add documented `resolution_service` execution path for local verification |
+| `/api/overrides` was readable without auth | route lacked protection | Fixed: read routes now require `governance:mutate` |
+| Main ledger resolution update was blocked | verifier used app DB user instead of `resolution_service` | Fixed: verifier uses separate resolution-service DSN |
 | Live LLM raw output not fully compliant | model used high risk and unsupported-claim phrasing | Keep controller; optionally add stricter structured schema/retry |
 
 ## Minimal Fixes
 
-1. Pin and document a working Python version, preferably Python 3.13 here, and make `make migrate` use that interpreter or a project-local environment.
-2. Add a root dependency workflow (`requirements.txt`, `uv.lock`, or equivalent) that includes migration/test dependencies.
-3. Protect `/api/overrides` read access with API key and scope checks.
-4. Provide a safe local `resolution_service` command or role-switch path so primary `prediction_ledger` rows can be resolved and scored end-to-end.
-5. Document native Postgres mode separately from Docker Compose mode.
+1. Pin and document a working Python version, preferably Python 3.13 here, for broad Python tests and optional Python scripts.
+2. Add a root dependency workflow (`requirements.txt`, `uv.lock`, or equivalent) for Python runtime/test dependencies.
+3. Document native Postgres mode separately from Docker Compose mode.
 
 ## Larger Architecture Gaps
 

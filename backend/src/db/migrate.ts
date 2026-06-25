@@ -22,6 +22,26 @@ const MIGRATIONS_DIR = __dirname.endsWith('dist/db')
   ? path.join(__dirname, '../../src/db/migrations')
   : path.join(__dirname, 'migrations');
 
+function productionEnv(): boolean {
+  return process.env.AGENTCO_ENV === 'production';
+}
+
+function substituteEnvVars(sqlText: string): string {
+  const placeholder = "':RESOLUTION_SERVICE_PASSWORD'";
+  if (!sqlText.includes(placeholder)) return sqlText;
+
+  let password = process.env.RESOLUTION_SERVICE_PASSWORD;
+  if (!password) {
+    if (productionEnv()) {
+      throw new Error('RESOLUTION_SERVICE_PASSWORD must be set in production');
+    }
+    password = 'resolution-service-dev-password';
+    console.warn('RESOLUTION_SERVICE_PASSWORD not set; using dev-only password');
+  }
+
+  return sqlText.replaceAll(placeholder, `'${password.replaceAll("'", "''")}'`);
+}
+
 async function run(): Promise<void> {
   const pool = new Pool({ connectionString: DSN });
 
@@ -47,7 +67,7 @@ async function run(): Promise<void> {
       console.log(`[skip]  ${filename} (already applied)`);
       continue;
     }
-    const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, filename), 'utf8');
+    const sql = substituteEnvVars(fs.readFileSync(path.join(MIGRATIONS_DIR, filename), 'utf8'));
     const client = await pool.connect();
     try {
       await client.query('BEGIN');

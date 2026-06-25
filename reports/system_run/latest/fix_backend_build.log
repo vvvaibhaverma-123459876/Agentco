@@ -1,0 +1,7 @@
+Thu Jun 25 14:50:04 IST 2026
+
+> @agentco/backend@1.0.0 build
+> tsc
+
+npm run build  3.61s user 0.31s system 165% cpu 2.360 total
+exit_code=0

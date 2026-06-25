@@ -1,0 +1,5 @@
+Thu Jun 25 14:48:25 IST 2026
+......                                                                   [100%]
+6 passed in 0.05s
+python3.13 -m pytest tests/test_verify_agentco_goal_run.py -q  0.60s user 0.23s system 50% cpu 1.617 total
+exit_code=0

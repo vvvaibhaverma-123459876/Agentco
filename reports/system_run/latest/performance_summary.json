@@ -21,9 +21,11 @@
     "migration_command_failed": 0.35,
     "civilization_free_run_fixture": 3.37,
     "openai_connectivity": 2.49,
-    "goal_run_live_total": 4.1,
-    "goal_run_openai_call": 3.67,
-    "goal_run_tests_py313": 0.75
+    "goal_run_live_total": 3.45,
+    "goal_run_openai_call": 3.01,
+    "goal_run_tests_py313": 1.62,
+    "fix_backend_default_jest": 8.72,
+    "fix_migration_run": 1.39
   },
   "openai_usage": {
     "connectivity_total_tokens": 73,
@@ -41,7 +43,7 @@
     "decision_log_rows_inserted": 1,
     "autonomy_audit_rows_inserted": 1,
     "autonomy_memory_rows_inserted": 1,
-    "ledger_resolution_update": "blocked by resolution_service role guard"
+    "ledger_resolution_update": "passed through resolution_service connection"
   },
   "failures_or_blockers": 5,
   "container_health_summary": "Docker daemon unavailable; compose services not started. Native Postgres is healthy. Redis/Kafka/Vault/Prometheus/Grafana ports were not reachable."

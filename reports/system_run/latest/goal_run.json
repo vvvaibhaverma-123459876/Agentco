@@ -16,35 +16,35 @@
   },
   "database": {
     "all_required_writes_ok": true,
-    "correlation_id": "39d45349-29a6-4a33-a050-39b2e0efb33c",
+    "correlation_id": "64640316-d14d-4e74-8db1-6395012a0ac9",
     "db_url_present": true,
     "operations": [
       {
         "error": null,
-        "id": "dcb484d0-aabe-4cd9-80d9-3449abcb6185",
+        "id": "da0e07f6-cfef-4698-8af5-edbcb4ca678d",
         "name": "prediction_ledger_insert",
         "ok": true
       },
       {
-        "error": "ERROR:  LEDGER RESOLUTION VIOLATION: only resolution_service may resolve predictions (current_user=agentco)\nCONTEXT:  PL/pgSQL function enforce_prediction_ledger_immutability() line 34 at RAISE",
+        "error": null,
         "name": "prediction_ledger_resolution_update",
-        "ok": false
+        "ok": true
       },
       {
         "error": null,
-        "id": "goal-run-d4ebc9be1881",
+        "id": "goal-run-cb915f62b3ab",
         "name": "legacy_prediction_resolution_insert",
         "ok": true
       },
       {
         "error": null,
-        "id": "1095999a-d646-4780-a7dd-08edf10d9899",
+        "id": "0a0c5362-6c6b-4551-8532-b15be6641cb8",
         "name": "trust_scores_insert",
         "ok": true
       },
       {
         "error": null,
-        "id": "bab9cb38-61c3-42e9-8e30-7faa1595244d",
+        "id": "37a6e0c5-b664-420b-a6a0-fadb5cc3c879",
         "name": "event_history_insert",
         "ok": true
       },
@@ -66,13 +66,13 @@
     ]
   },
   "error": null,
-  "latency_ms": 4102.07,
+  "latency_ms": 3451.46,
   "llm": {
-    "latency_ms": 3667.08,
+    "latency_ms": 2895.54,
     "model": "gpt-4o-mini",
     "simulated": false,
     "usage": {
-      "completion_tokens": 163,
+      "completion_tokens": 161,
       "completion_tokens_details": {
         "accepted_prediction_tokens": 0,
         "audio_tokens": 0,
@@ -84,7 +84,7 @@
         "audio_tokens": 0,
         "cached_tokens": 0
       },
-      "total_tokens": 565
+      "total_tokens": 563
     }
   },
   "mode": "live_openai",
@@ -98,9 +98,9 @@
     "human_escalation_required": true,
     "missing_information": [
       "SOC 2 Type II report",
-      "Signed DPA with subprocessors"
+      "Signed Data Processing Agreement (DPA)"
     ],
-    "rationale": "The vendor claims SOC 2 alignment but has not provided a SOC 2 Type II report, and the DPA is unsigned and lacks subprocessors. There is also a mention of a breach at a similarly named company, which raises concerns.",
+    "rationale": "The vendor claims SOC 2 alignment but has not provided a SOC 2 Type II report, and the DPA is unsigned and lacks subprocessors. This raises significant concerns about compliance and data protection.",
     "risk_level": "high",
     "unsupported_claims": [
       "Confirmed SOC 2 Type II compliance",
@@ -114,12 +114,15 @@
     ],
     "confidence": 0.6,
     "controller_applied": true,
-    "controller_corrections": [],
+    "controller_corrections": [
+      "requested subprocessor list"
+    ],
     "decision": "escalate",
     "human_escalation_required": true,
     "missing_information": [
       "SOC 2 Type II report",
-      "Signed DPA with subprocessors"
+      "Signed Data Processing Agreement (DPA)",
+      "subprocessor list"
     ],
     "rationale": "Escalate because required SOC 2 Type II evidence and a complete signed DPA are missing. The similar-name breach item is not evidence of a breach at Northstar DataWorks.",
     "risk_level": "medium",
@@ -128,7 +131,7 @@
       "ev3 is about a different company and does not establish a vendor breach"
     ]
   },
-  "run_id": "goal-run-20260625T091055Z-ec7e30f7",
+  "run_id": "goal-run-20260625T091846Z-b77b2ffe",
   "success": true,
   "task": {
     "domain": "vendor_risk",

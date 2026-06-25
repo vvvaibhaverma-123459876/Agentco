@@ -17,7 +17,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'resolution_service') THEN
-        CREATE ROLE resolution_service WITH LOGIN PASSWORD 'local_dev_only_not_secret';
+        CREATE ROLE resolution_service WITH LOGIN PASSWORD ':RESOLUTION_SERVICE_PASSWORD';
     END IF;
 END
 $$;

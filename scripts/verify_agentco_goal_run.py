@@ -18,6 +18,7 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote, urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -231,6 +232,22 @@ def run_psql(db_url: str, sql: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(["psql", db_url, "-v", "ON_ERROR_STOP=1", "-Atc", sql], cwd=ROOT, text=True, capture_output=True, check=False)
 
 
+def resolution_service_db_url(db_url: str) -> str:
+    explicit = os.getenv("RESOLUTION_SERVICE_DATABASE_URL")
+    if explicit:
+        return explicit
+    parsed = urlparse(db_url)
+    host = parsed.hostname or "localhost"
+    port = parsed.port or 5432
+    database = parsed.path.lstrip("/") or "agentco"
+    password = os.getenv("RESOLUTION_SERVICE_PASSWORD")
+    if not password:
+        if os.getenv("AGENTCO_ENV") == "production":
+            raise RuntimeError("RESOLUTION_SERVICE_PASSWORD or RESOLUTION_SERVICE_DATABASE_URL must be set in production")
+        password = "resolution-service-dev-password"
+    return f"postgresql://resolution_service:{quote(password, safe='')}@{host}:{port}/{database}"
+
+
 def first_uuid(text: str) -> str | None:
     match = re.search(r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}", text)
     return match.group(0) if match else None
@@ -252,15 +269,19 @@ def write_db_trail(db_url: str, run_id: str, task: dict[str, Any], result: dict[
 insert into prediction_ledger
 (claim, probability, confidence_basis, producing_agent_id, producing_prompt_version, resolution_criterion, resolution_date, ground_truth_source, horizon_class, domain, claim_type, correlation_id, post_hoc)
 values
-({sql_literal('Northstar DataWorks onboarding decision should be escalate')}, {confidence:.4f}, {sql_literal(confidence_basis)}::jsonb, 'verify_agentco_goal_run', 'verify-agentco-goal-run-v1', {sql_literal('Synthetic ground truth expected_decision equals model decision')}, now() + interval '1 hour', 'synthetic_vendor_ground_truth', 'short', 'vendor_risk', 'vendor_onboarding_decision', '{correlation_id}', false)
+({sql_literal('Northstar DataWorks onboarding decision should be escalate')}, {confidence:.4f}, {sql_literal(confidence_basis)}::jsonb, 'verify_agentco_goal_run', 'verify-agentco-goal-run-v1', {sql_literal('Synthetic ground truth expected_decision equals model decision')}, now() - interval '1 second', 'synthetic_vendor_ground_truth', 'short', 'vendor_risk', 'vendor_onboarding_decision', '{correlation_id}', false)
 returning prediction_id;
-    """
+"""
     ledger = run_psql(db_url, ledger_sql)
     prediction_uuid = first_uuid(ledger.stdout) if ledger.returncode == 0 else None
     operations.append({"name": "prediction_ledger_insert", "ok": ledger.returncode == 0, "id": prediction_uuid, "error": ledger.stderr.strip()[:600] if ledger.returncode else None})
     if prediction_uuid:
         log_score = -math.log(max(0.0001, confidence if outcome else 1 - confidence))
-        resolved = run_psql(db_url, f"update prediction_ledger set resolved = true, resolved_outcome = {'true' if outcome else 'false'}, resolved_at = now(), resolved_by_service = 'verify_agentco_goal_run', brier_score = {brier:.4f}, log_score = {log_score:.4f} where prediction_id = '{prediction_uuid}';")
+        try:
+            svc_db_url = resolution_service_db_url(db_url)
+            resolved = run_psql(svc_db_url, f"update prediction_ledger set resolved = true, resolved_outcome = {'true' if outcome else 'false'}, resolved_at = now(), resolved_by_service = 'verify_agentco_goal_run', brier_score = {brier:.4f}, log_score = {log_score:.4f} where prediction_id = '{prediction_uuid}';")
+        except RuntimeError as exc:
+            resolved = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr=str(exc))
         operations.append({"name": "prediction_ledger_resolution_update", "ok": resolved.returncode == 0, "error": resolved.stderr.strip()[:600] if resolved.returncode else None})
 
     legacy_id = f"goal-run-{uuid.uuid4().hex[:12]}"
@@ -300,7 +321,7 @@ values ('verify_agentco_goal_run', 'escalation', {sql_literal('Synthetic vendor 
     memory = run_psql(db_url, f"insert into autonomy_memory (action_id, content) values (null, {sql_literal(memory_payload)}::jsonb);")
     operations.append({"name": "autonomy_memory_learning_insert", "ok": memory.returncode == 0, "error": memory.stderr.strip()[:600] if memory.returncode else None})
 
-    required = {"prediction_ledger_insert", "legacy_prediction_resolution_insert", "trust_scores_insert", "event_history_insert", "decision_log_insert", "autonomy_audit_events_insert", "autonomy_memory_learning_insert"}
+    required = {"prediction_ledger_insert", "prediction_ledger_resolution_update", "legacy_prediction_resolution_insert", "trust_scores_insert", "event_history_insert", "decision_log_insert", "autonomy_audit_events_insert", "autonomy_memory_learning_insert"}
     return {"db_url_present": True, "correlation_id": correlation_id, "operations": operations, "all_required_writes_ok": all(op["ok"] for op in operations if op["name"] in required)}
 
 
