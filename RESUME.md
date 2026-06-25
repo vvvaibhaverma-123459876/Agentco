@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 5 — adds governance-bound agent spawn proposals)
+**Last updated:** 2026-06-25 (rev 6 — adds governance-bound self-improvement proposals)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -61,6 +61,11 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   `SPECIALIST_ROLES`, persists `agent_spawn_proposal` records in `autonomy_memory`, writes
   `agent_spawn_proposals.jsonl`, and explicitly does **not** activate subprocess specialists or
   create `autonomy_team_activations`. Covered by a real Postgres test.
+- ✅ **Free-run self-improvement proposals — DONE** (post-`27ea31e`): the free-run pass now records
+  structured `self_improvement_proposal` records in `autonomy_memory` with affected files, expected
+  improvement, tests to pass, rollback plan, risk level, and protected-surface scan output from
+  `ProtectedSurfaceEnforcerService`. It writes `self_improvement_proposals.jsonl` and does **not**
+  edit code, create deployable candidates, or promote changes. Covered by a real Postgres test.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.

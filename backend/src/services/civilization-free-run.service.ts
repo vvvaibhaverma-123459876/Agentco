@@ -21,6 +21,7 @@ import { Phase0bCalibrationService } from './phase0b-calibration.service';
 import { validateGrounding, GroundingSource } from './claim-grounding';
 import { SourceQualityService } from './source-quality.service';
 import { getSpecialistRole } from '../types/specialist-roles';
+import { ProtectedSurfaceEnforcerService } from './protected-surface-enforcer.service';
 
 export type FreeRunMode = 'fixture' | 'read_only_web';
 
@@ -55,6 +56,7 @@ export interface FreeRunReport {
   contradictionChecks: number;
   contradictionsDetected: number;
   agentSpawnProposals: number;
+  selfImprovementProposals: number;
   predictionsRegistered: number;
   errors: string[];
   reportDir: string;
@@ -82,11 +84,32 @@ export interface AgentSpawnProposal {
   };
 }
 
+export interface SelfImprovementProposal {
+  proposalId: string;
+  goalId: string;
+  targetComponent: string;
+  affectedFiles: string[];
+  expectedImprovement: string;
+  testsToPass: string[];
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  rollbackPlan: string;
+  governanceStatus: 'review_required';
+  protectedSurfaceCheck: {
+    requiresHumanApproval: boolean;
+    attempts: Array<{
+      filePath: string;
+      requiresHumanApproval: boolean;
+      riskLevel: string;
+    }>;
+  };
+}
+
 const ARTIFACT_ROOT = path.resolve(__dirname, '..', '..', '..', 'audit_artifacts', 'civilization_free_run');
 
 export class CivilizationFreeRunService {
   private phase0b = new Phase0bCalibrationService();
   private sourceQuality = new SourceQualityService();
+  private protectedSurfaceEnforcer = new ProtectedSurfaceEnforcerService();
 
   /** STEP 1: inspect civilization state and identify the most salient weakness + a recommended goal. */
   async selfAssess(): Promise<Weakness[]> {
@@ -424,7 +447,91 @@ export class CivilizationFreeRunService {
   }
 
   /**
-   * STEP 9-10: promotion gate ("believe slowly"). A supported claim is PROMOTED only if it is
+   * STEP 9: propose safe self-improvements from observed free-run limits. This does not edit code;
+   * it records a governed proposal with affected files, tests, rollback plan, and protected scan.
+   */
+  async proposeSelfImprovements(
+    goalId: string,
+    weaknesses: Weakness[],
+    reportContext: {
+      contradictionsDetected: number;
+      agentSpawnProposals: number;
+      errors: string[];
+    },
+  ): Promise<SelfImprovementProposal[]> {
+    const proposals: SelfImprovementProposal[] = [];
+    const proposal = await this.buildSelfImprovementProposal(goalId, weaknesses, reportContext);
+    await db.query(
+      `INSERT INTO autonomy_memory (id, action_id, content, timestamp, created_at)
+       VALUES ($1, NULL, $2, NOW(), NOW())`,
+      [proposal.proposalId, JSON.stringify({ type: 'self_improvement_proposal', ...proposal })],
+    );
+    proposals.push(proposal);
+    return proposals;
+  }
+
+  private async buildSelfImprovementProposal(
+    goalId: string,
+    weaknesses: Weakness[],
+    reportContext: {
+      contradictionsDetected: number;
+      agentSpawnProposals: number;
+      errors: string[];
+    },
+  ): Promise<SelfImprovementProposal> {
+    const hasOnlyShallowSignals = weaknesses.some(w =>
+      ['thin_evidence', 'unpromoted_knowledge', 'maintain'].includes(w.kind)
+    );
+    const targetComponent = hasOnlyShallowSignals
+      ? 'civilization_free_run.self_assessment'
+      : 'civilization_free_run.execution_policy';
+    const affectedFiles = [
+      'backend/src/services/civilization-free-run.service.ts',
+      'backend/tests/integration/civilization-free-run.test.ts',
+      'docs/CIVILIZATION_FREE_RUN.md',
+    ];
+    const expectedImprovement = hasOnlyShallowSignals
+      ? 'Deepen self-assessment beyond claim counts by including stale predictions, weak domains, unresolved contradictions, and specialist coverage.'
+      : 'Tighten free-run execution policy using observed runtime outcomes while preserving evidence and governance gates.';
+    const testsToPass = [
+      'npx tsc --noEmit',
+      'RUN_LIVE_SMOKE=1 DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco npm test -- --runInBand --forceExit tests/integration/civilization-free-run.test.ts',
+      'npm test -- --runInBand --forceExit',
+    ];
+    const riskLevel: SelfImprovementProposal['riskLevel'] = reportContext.errors.length > 0 ? 'high' : 'medium';
+    const attempts = [];
+    for (const filePath of affectedFiles) {
+      const scan = await this.protectedSurfaceEnforcer.evaluateModificationAttempt(
+        filePath,
+        expectedImprovement,
+        riskLevel === 'medium' ? 'high' : riskLevel,
+      );
+      attempts.push({
+        filePath,
+        requiresHumanApproval: scan.requires_human_approval,
+        riskLevel: scan.risk_level,
+      });
+    }
+
+    return {
+      proposalId: uuid(),
+      goalId,
+      targetComponent,
+      affectedFiles,
+      expectedImprovement,
+      testsToPass,
+      riskLevel,
+      rollbackPlan: 'Revert the self-improvement commit and rerun tsc, the targeted free-run integration test, and the default Jest tier before resuming free-run execution.',
+      governanceStatus: 'review_required',
+      protectedSurfaceCheck: {
+        requiresHumanApproval: true,
+        attempts,
+      },
+    };
+  }
+
+  /**
+   * STEP 10-11: promotion gate ("believe slowly"). A supported claim is PROMOTED only if it is
    * grounded (snippet traces to a cited source), source credibility isn't 'low', and it is not
    * contradicted. Otherwise it stays blocked. Returns {promoted, blocked} claim ids.
    */
@@ -466,7 +573,7 @@ export class CivilizationFreeRunService {
     return { promoted, blocked };
   }
 
-  /** STEP 11: register predictions for promoted (now-trusted) claims that are testable. */
+  /** STEP 12: register predictions for promoted (now-trusted) claims that are testable. */
   async registerPredictions(promotedClaimIds: string[]): Promise<number> {
     let n = 0;
     for (const claimId of promotedClaimIds) {
@@ -486,8 +593,8 @@ export class CivilizationFreeRunService {
     return n;
   }
 
-  /** STEP 12-14: write the real report artifacts and return the report. */
-  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; agentSpawnProposals: unknown[]; predictions: number }): Promise<void> {
+  /** STEP 13-15: write the real report artifacts and return the report. */
+  async writeReport(report: FreeRunReport, extras: { goals: unknown[]; claims: unknown[]; contradictions: unknown[]; agentSpawnProposals: unknown[]; selfImprovementProposals: unknown[]; predictions: number }): Promise<void> {
     const dir = report.reportDir;
     fs.mkdirSync(dir, { recursive: true });
     const md = [
@@ -508,6 +615,7 @@ export class CivilizationFreeRunService {
       `- contradiction checks: ${report.contradictionChecks}`,
       `- contradictions detected: ${report.contradictionsDetected}`,
       `- agent spawn proposals: ${report.agentSpawnProposals}`,
+      `- self-improvement proposals: ${report.selfImprovementProposals}`,
       `- predictions registered: ${report.predictionsRegistered}`,
       report.errors.length ? `\n## Errors\n${report.errors.map(e => `- ${e}`).join('\n')}` : '',
     ].join('\n');
@@ -516,11 +624,13 @@ export class CivilizationFreeRunService {
     fs.writeFileSync(path.join(dir, 'claims.jsonl'), extras.claims.map(c => JSON.stringify(c)).join('\n'));
     fs.writeFileSync(path.join(dir, 'contradictions.jsonl'), extras.contradictions.map(c => JSON.stringify(c)).join('\n'));
     fs.writeFileSync(path.join(dir, 'agent_spawn_proposals.jsonl'), extras.agentSpawnProposals.map(p => JSON.stringify(p)).join('\n'));
+    fs.writeFileSync(path.join(dir, 'self_improvement_proposals.jsonl'), extras.selfImprovementProposals.map(p => JSON.stringify(p)).join('\n'));
     fs.writeFileSync(path.join(dir, 'events.jsonl'), [
       { type: 'self_assessment', weaknesses: report.weaknesses },
       { type: 'society_agenda', agendaItemId: report.agendaItemId, societyId: report.societyId, institutionId: report.institutionId, taskType: report.taskType },
       { type: 'contradiction_detection', contradictionChecks: report.contradictionChecks, contradictionsDetected: report.contradictionsDetected },
       { type: 'agent_spawn_proposals', proposalsCreated: report.agentSpawnProposals },
+      { type: 'self_improvement_proposals', proposalsCreated: report.selfImprovementProposals },
       { type: 'promotion_gate', claimsPromoted: report.claimsPromoted, claimsBlocked: report.claimsBlocked },
       { type: 'prediction_registration', predictionsRegistered: report.predictionsRegistered },
     ].map(e => JSON.stringify(e)).join('\n'));
@@ -538,11 +648,12 @@ export class CivilizationFreeRunService {
     const report: FreeRunReport = {
       runId, mode, startedAt: new Date().toISOString(), durationMs: 0,
       weaknesses: [], internalGoalId: null, agendaItemId: null, societyId: '', institutionId: '', taskType: '',
-      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, agentSpawnProposals: 0, predictionsRegistered: 0,
+      claimsProcessed: 0, claimsPromoted: 0, claimsBlocked: 0, contradictionChecks: 0, contradictionsDetected: 0, agentSpawnProposals: 0, selfImprovementProposals: 0, predictionsRegistered: 0,
       errors: [], reportDir: path.join(ARTIFACT_ROOT, runId),
     };
     let contradictions: ContradictionFinding[] = [];
     let agentSpawnProposals: AgentSpawnProposal[] = [];
+    let selfImprovementProposals: SelfImprovementProposal[] = [];
     try {
       report.weaknesses = await this.selfAssess();
       const top = report.weaknesses[0];
@@ -565,6 +676,13 @@ export class CivilizationFreeRunService {
       agentSpawnProposals = await this.proposeAgentSpawns(report.internalGoalId, agenda, contradictions);
       report.agentSpawnProposals = agentSpawnProposals.length;
 
+      selfImprovementProposals = await this.proposeSelfImprovements(report.internalGoalId, report.weaknesses, {
+        contradictionsDetected: report.contradictionsDetected,
+        agentSpawnProposals: report.agentSpawnProposals,
+        errors: report.errors,
+      });
+      report.selfImprovementProposals = selfImprovementProposals.length;
+
       const gate = await this.promotionGate(claimIds);
       report.claimsPromoted = gate.promoted.length;
       report.claimsBlocked = gate.blocked.length;
@@ -583,7 +701,7 @@ export class CivilizationFreeRunService {
           ORDER BY c.generated_at ASC`,
         [report.internalGoalId])
       : { rows: [] };
-    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, agentSpawnProposals, predictions: report.predictionsRegistered });
+    await this.writeReport(report, { goals: [{ id: report.internalGoalId }], claims: claimRows.rows, contradictions, agentSpawnProposals, selfImprovementProposals, predictions: report.predictionsRegistered });
     return report;
   }
 }

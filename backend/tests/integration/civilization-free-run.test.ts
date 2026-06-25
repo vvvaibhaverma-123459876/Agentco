@@ -48,6 +48,7 @@ d('civilization free-run (fixture, real Postgres)', () => {
     expect(report.contradictionChecks).toBe(1);
     expect(report.contradictionsDetected).toBe(0);
     expect(report.agentSpawnProposals).toBeGreaterThanOrEqual(1);
+    expect(report.selfImprovementProposals).toBe(1);
     const action = await db.query(
       `SELECT objective FROM autonomy_goal_actions WHERE goal_id = $1 ORDER BY created_at DESC LIMIT 1`,
       [report.internalGoalId]
@@ -74,6 +75,9 @@ d('civilization free-run (fixture, real Postgres)', () => {
     const proposalsJsonl = path.join(report.reportDir, 'agent_spawn_proposals.jsonl');
     expect(fs.existsSync(proposalsJsonl)).toBe(true);
     expect(fs.readFileSync(proposalsJsonl, 'utf8')).toMatch(/agent_spawn_proposal|claim_validator|researcher/);
+    const selfImprovementJsonl = path.join(report.reportDir, 'self_improvement_proposals.jsonl');
+    expect(fs.existsSync(selfImprovementJsonl)).toBe(true);
+    expect(fs.readFileSync(selfImprovementJsonl, 'utf8')).toMatch(/self_assessment|review_required/);
   }, 30000);
 
   it('uses the society agenda to drive the fixture bounded task route', async () => {
@@ -262,5 +266,51 @@ d('civilization free-run (fixture, real Postgres)', () => {
       [goalId]
     );
     expect(Number(after.rows[0].n)).toBe(Number(before.rows[0].n));
+  }, 20000);
+
+  it('creates governed self-improvement proposals without generating deployable candidates', async () => {
+    const weakness = {
+      kind: 'thin_evidence',
+      detail: 'only fixture-level self-assessment signals are available',
+      recommendedGoal: {
+        title: 'Improve free-run self-assessment',
+        description: 'Deepen self-assessment signals.',
+        domain: 'research',
+      },
+    };
+    const goalId = await svc.generateInternalGoal(weakness);
+    const beforeMemory = await db.query(
+      `SELECT count(*) AS n FROM autonomy_memory WHERE content->>'type' = 'self_improvement_proposal'`
+    );
+
+    const proposals = await svc.proposeSelfImprovements(goalId, [weakness], {
+      contradictionsDetected: 0,
+      agentSpawnProposals: 1,
+      errors: [],
+    });
+
+    expect(proposals).toHaveLength(1);
+    const proposal = proposals[0];
+    expect(proposal.governanceStatus).toBe('review_required');
+    expect(proposal.targetComponent).toBe('civilization_free_run.self_assessment');
+    expect(proposal.affectedFiles).toContain('backend/src/services/civilization-free-run.service.ts');
+    expect(proposal.testsToPass).toContain('npx tsc --noEmit');
+    expect(proposal.rollbackPlan).toMatch(/Revert/);
+    expect(proposal.protectedSurfaceCheck.requiresHumanApproval).toBe(true);
+    expect(proposal.protectedSurfaceCheck.attempts.length).toBeGreaterThan(0);
+    expect(proposal.expectedImprovement).toMatch(/stale predictions|weak domains|unresolved contradictions/);
+
+    const memory = await db.query(
+      `SELECT content FROM autonomy_memory WHERE id = $1`,
+      [proposal.proposalId]
+    );
+    expect(memory.rows).toHaveLength(1);
+    expect(memory.rows[0].content.type).toBe('self_improvement_proposal');
+    expect(memory.rows[0].content.governanceStatus).toBe('review_required');
+
+    const afterMemory = await db.query(
+      `SELECT count(*) AS n FROM autonomy_memory WHERE content->>'type' = 'self_improvement_proposal'`
+    );
+    expect(Number(afterMemory.rows[0].n)).toBe(Number(beforeMemory.rows[0].n) + 1);
   }, 20000);
 });
