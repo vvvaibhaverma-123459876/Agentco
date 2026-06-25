@@ -1,4 +1,5 @@
 import { db } from '../db/client';
+import type { PoolClient } from 'pg';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface RollbackAction {
@@ -32,16 +33,17 @@ export class RollbackService {
     newArtifactId: string,
     baselineMetrics?: Record<string, any>
   ): Promise<string> {
-    // Check if we have a previous artifact to rollback to
     const previousArtifactResult = await db.query(
-      `SELECT previous_artifact_id FROM active_artifacts WHERE artifact_type = 'autonomy_policy' LIMIT 1`
+      `SELECT artifact_id, previous_artifact_id
+         FROM active_artifacts
+        WHERE artifact_type = 'autonomy_policy'
+        LIMIT 1`
     );
 
-    const previousArtifactId =
-      previousArtifactResult.rows.length > 0 ? previousArtifactResult.rows[0].previous_artifact_id : null;
+    const previousArtifactId = previousArtifactResult.rows.length > 0
+      ? String(previousArtifactResult.rows[0].artifact_id)
+      : currentActiveArtifactId;
 
-    // Create snapshot
-    const snapshotId = uuidv4();
     const result = await db.query(
       `INSERT INTO deployment_snapshots (
         canary_plan_id, artifact_id_active, artifact_id_previous,
@@ -50,10 +52,13 @@ export class RollbackService {
        RETURNING id`,
       [
         canaryPlanId,
-        currentActiveArtifactId,
-        previousArtifactId || currentActiveArtifactId,
+        newArtifactId,
+        previousArtifactId,
         '1.0',
-        JSON.stringify(baselineMetrics || {}),
+        JSON.stringify({
+          ...(baselineMetrics || {}),
+          pending_artifact_id: newArtifactId,
+        }),
       ]
     );
 
@@ -61,6 +66,7 @@ export class RollbackService {
       throw new Error('Failed to create deployment snapshot');
     }
 
+    const snapshotId = String(result.rows[0].id);
     console.log(`[ROLLBACK] Created snapshot ${snapshotId} for canary ${canaryPlanId}`);
     return snapshotId;
   }
@@ -99,12 +105,29 @@ export class RollbackService {
    * This is the REAL state change that performs the rollback
    */
   async updateActiveArtifact(artifactId: string, artifactType: string = 'autonomy_policy'): Promise<void> {
-    // Get current active artifact
-    const currentResult = await db.query(
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      await this.updateActiveArtifactWithClient(client, artifactId, artifactType, 'rollback_service');
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  private async updateActiveArtifactWithClient(
+    client: PoolClient,
+    artifactId: string,
+    artifactType: string = 'autonomy_policy',
+    deployedBy: string = 'rollback_service',
+  ): Promise<void> {
+    const currentResult = await client.query(
       `SELECT artifact_id FROM active_artifacts WHERE artifact_type = $1 FOR UPDATE`,
       [artifactType]
     );
-
     const currentArtifactId = currentResult.rows.length > 0 ? currentResult.rows[0].artifact_id : null;
 
     if (currentArtifactId === artifactId) {
@@ -112,22 +135,24 @@ export class RollbackService {
       return;
     }
 
-    // Update with row-level lock held
-    const result = await db.query(
+    const result = await client.query(
       `UPDATE active_artifacts
-       SET artifact_id = $1, previous_artifact_id = $2, deployed_at = NOW(), deployment_count = deployment_count + 1
+       SET artifact_id = $1,
+           previous_artifact_id = $2,
+           deployed_by = $4,
+           deployed_at = NOW(),
+           deployment_count = deployment_count + 1
        WHERE artifact_type = $3
        RETURNING artifact_id`,
-      [artifactId, currentArtifactId, artifactType]
+      [artifactId, currentArtifactId, artifactType, deployedBy]
     );
 
     if (result.rows.length === 0) {
-      // Create if doesn't exist
-      await db.query(
+      await client.query(
         `INSERT INTO active_artifacts (
-          artifact_type, artifact_id, previous_artifact_id, deployed_by, deployment_count
-        ) VALUES ($1, $2, $3, $4, 1)`,
-        [artifactType, artifactId, currentArtifactId, 'rollback_service']
+          artifact_type, artifact_id, previous_artifact_id, deployed_by, deployment_count, deployed_at
+        ) VALUES ($1, $2, $3, $4, 1, NOW())`,
+        [artifactType, artifactId, currentArtifactId, deployedBy]
       );
 
       console.log(`[ROLLBACK] Created active artifact entry for ${artifactType}`);
@@ -145,39 +170,54 @@ export class RollbackService {
     triggeredBy: string,
     preMetrics?: Record<string, any>
   ): Promise<void> {
-    // Get snapshot to know what to rollback to
-    const snapshot = await this.getDeploymentSnapshot(canaryPlanId);
-    if (!snapshot) {
-      throw new Error(`No deployment snapshot found for canary ${canaryPlanId}`);
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const snapshotResult = await client.query(
+        `SELECT id, artifact_id_active, artifact_id_previous
+           FROM deployment_snapshots
+          WHERE canary_plan_id = $1
+          ORDER BY created_at DESC
+          LIMIT 1
+          FOR UPDATE`,
+        [canaryPlanId],
+      );
+      if (snapshotResult.rows.length === 0) {
+        throw new Error(`No deployment snapshot found for canary ${canaryPlanId}`);
+      }
+
+      const snapshot = snapshotResult.rows[0];
+      const artifactIdRolledBackFrom = String(snapshot.artifact_id_active);
+      const artifactIdRolledBackTo = String(snapshot.artifact_id_previous);
+
+      await this.updateActiveArtifactWithClient(client, artifactIdRolledBackTo, 'autonomy_policy', triggeredBy);
+
+      await client.query(
+        `INSERT INTO canary_rollback_events (
+          id, canary_plan_id, deployment_snapshot_id,
+          artifact_id_rolled_back_from, artifact_id_rolled_back_to,
+          reason, triggered_by, triggered_at, pre_rollback_metrics_json, created_at
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, NOW())`,
+        [
+          uuidv4(),
+          canaryPlanId,
+          snapshot.id,
+          artifactIdRolledBackFrom,
+          artifactIdRolledBackTo,
+          reason,
+          triggeredBy,
+          JSON.stringify(preMetrics || {}),
+        ]
+      );
+      await client.query('COMMIT');
+
+      console.log(`[ROLLBACK] Executed rollback for canary ${canaryPlanId}: ${artifactIdRolledBackFrom} → ${artifactIdRolledBackTo}`);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
-
-    const artifactIdRolledBackFrom = snapshot.artifactIdActive;
-    const artifactIdRolledBackTo = snapshot.artifactIdPrevious;
-
-    // Perform atomic rollback (change active artifact pointer)
-    await this.updateActiveArtifact(artifactIdRolledBackTo);
-
-    // Record rollback event in audit trail
-    const eventId = uuidv4();
-    await db.query(
-      `INSERT INTO canary_rollback_events (
-        id, canary_plan_id, deployment_snapshot_id,
-        artifact_id_rolled_back_from, artifact_id_rolled_back_to,
-        reason, triggered_by, triggered_at, pre_rollback_metrics_json, created_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, NOW())`,
-      [
-        eventId,
-        canaryPlanId,
-        snapshot.id,
-        artifactIdRolledBackFrom,
-        artifactIdRolledBackTo,
-        reason,
-        triggeredBy,
-        JSON.stringify(preMetrics || {}),
-      ]
-    );
-
-    console.log(`[ROLLBACK] Executed rollback for canary ${canaryPlanId}: ${artifactIdRolledBackFrom} → ${artifactIdRolledBackTo}`);
   }
 
   /**

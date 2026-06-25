@@ -46,7 +46,9 @@ Approved self-improvement proposals can now become sandbox-validated learner can
 
 The self-improvement candidate sandbox now includes explicit replay/regression validation. Candidate creation blocks if the preflight scorecard fails hard floors even when `promotion_eligible = true` is present: safety >= 1.0, planning >= 1.0, calibration >= 0.99, regression >= 0.95, and autonomy/memory/tool/reward >= 0.75. It also re-queries the real replay batch and trajectory rows to require non-empty batch size, complete trajectory coverage, terminal trajectories, and non-negative rewards. These validations are persisted in `learner_candidates.eval_feedback_json` and are required before a promotion request can be queued.
 
-Sandbox-validated self-improvement candidates now have a separate human-governed promotion path. `enqueueSelfImprovementPromotionRequest()` creates a new pending `override_queue` row for an evaluated candidate with a tested, non-simulation artifact and passed sandbox feedback. `executeApprovedSelfImprovementPromotion()` requires that separate approval token plus a completed promotion-eligible eval before marking `learner_candidates.status = 'promoted'`, setting `promoted_at`, marking the `artifacts` row `promoted`, and writing an `approved_self_improvement_promotion_execution` audit record. This still does not deploy artifacts or modify source files; the active deployment/rollback tables are not present in the active schema.
+Sandbox-validated self-improvement candidates now have a separate human-governed promotion path. `enqueueSelfImprovementPromotionRequest()` creates a new pending `override_queue` row for an evaluated candidate with a tested, non-simulation artifact and passed sandbox feedback. `executeApprovedSelfImprovementPromotion()` requires that separate approval token plus a completed promotion-eligible eval before marking `learner_candidates.status = 'promoted'`, setting `promoted_at`, marking the `artifacts` row `promoted`, and writing an `approved_self_improvement_promotion_execution` audit record. This still does not deploy artifacts or modify source files; promotion and deployment remain separate governed operations.
+
+Active artifact rollback infrastructure now exists separately from the free-run promotion path. Migration `064_active_artifact_rollback.sql` creates `deployment_snapshots`, `active_artifacts`, and immutable `canary_rollback_events` against the real `artifacts` table, and `RollbackService` can snapshot, update the active pointer, roll back to the previous artifact, and read rollback history. This is pointer-level rollback infrastructure only; free-run self-improvement still does not deploy artifacts or modify source files.
 
 ## How It Is Tested
 
@@ -72,6 +74,7 @@ The integration test uses real Postgres and asserts that:
 - ready self-improvement approvals create a sandbox-validated learner candidate backed by artifact, trajectory, replay batch, learner run, candidate, sandbox eval, and audit-memory rows without promotion
 - self-improvement candidate creation blocks weak replay/regression scorecards even when the scorecard is marked promotion-eligible, then persists passed replay/regression validation in candidate feedback
 - sandbox-validated candidate promotion requires a second pending override, blocks on a non-eligible eval, and only promotes the real candidate/artifact rows after a separate approval plus promotion-eligible eval
+- active artifact rollback infrastructure snapshots, switches, rolls back, and audits real artifact pointers with immutable rollback events
 - grounded claims can be promoted
 - ungrounded claims are blocked
 - prediction registration is attempted
@@ -85,7 +88,7 @@ This is not the full civilization objective yet.
 - society agendas are persisted records, not a complete society scheduler
 - contradiction detection is conservative and direct-pattern based; it does not yet do semantic contradiction discovery with retrieval or LLM adjudication
 - agent spawn proposals can execute one bounded approved lifecycle; they are not yet connected to longer task delegation or result promotion
-- self-improvement proposals have approval-token/eval preflight, candidate generation, replay/regression sandbox validation, and a separate human-governed candidate/artifact promotion path, but they are not connected to deployment, rollback, or source-code modification
+- self-improvement proposals have approval-token/eval preflight, candidate generation, replay/regression sandbox validation, a separate human-governed candidate/artifact promotion path, and rollback infrastructure, but they are not connected to a canary/deployment request or source-code modification
 - `read_only_web` depends on the external arXiv/LLM path and remains environment-limited
 
-Next integrated increments should add active artifact deployment/rollback schema before any deployable self-modification path, or broaden replay validation to compare against larger historical trajectory batches. Do not enable autonomous code modification.
+Next integrated increments should connect promoted self-improvement artifacts to an explicit human-governed canary/deployment request that uses `active_artifacts`, or broaden replay validation to compare against larger historical trajectory batches. Do not enable autonomous code modification.

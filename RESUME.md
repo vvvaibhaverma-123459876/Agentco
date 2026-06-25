@@ -1,6 +1,6 @@
 # AgentCo — Resume & Implementation Guide
 
-**Last updated:** 2026-06-25 (rev 13 — self-improvement replay/regression evaluator)
+**Last updated:** 2026-06-25 (rev 14 — active artifact rollback schema)
 **Audience:** any AI coding agent (or human) picking up this work.
 **Read first:** `CIVILIZATION_AUDIT.md` (the honest inventory this work is based on).
 
@@ -14,8 +14,9 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
 - **Reachability from `backend/src/server.ts`: 65 / 78 services** (was 5).
 - **Orphans: 13** — all infra/leaf utilities (see §4), intentionally not REST-exposed.
 - **Tests:**
-  - Default `jest` (no infra): **154 pass, 0 fail**, 25 gated-skip.
+  - Default `jest` (no infra): **154 pass, 0 fail**, 26 gated-skip.
   - Targeted free-run Postgres e2e (`RUN_LIVE_SMOKE=1` + real PG): **12 pass, 0 fail**.
+  - Targeted rollback Postgres e2e (`RUN_LIVE_SMOKE=1` + real PG): **1 pass, 0 fail**.
   - Kafka publish still needs Kafka and runs under `RUN_KAFKA_SMOKE=1`.
 - **`tsc --noEmit`: 0 errors.**
 - Each integration step has a real test (pure logic tested against the REAL function, never a
@@ -130,13 +131,23 @@ proven end-to-end against real Postgres + real OpenAI (`gpt-4o-mini`).
   those passed records. Covered by a real Postgres test that first uses a weak-regression scorecard
   with `promotion_eligible = true` and proves candidate creation blocks, then creates and promotes a
   candidate with passed replay/regression validation.
+- ✅ **Active artifact rollback schema — DONE** (post-`383c4d3`): migration
+  `064_active_artifact_rollback.sql` now creates real `deployment_snapshots`, `active_artifacts`,
+  and immutable `canary_rollback_events` tables against the deployed `artifacts` table. Repaired
+  `RollbackService` so active pointer updates run inside transactions, deployment snapshots record
+  candidate-vs-previous artifact ids correctly, rollback atomically restores the previous artifact
+  pointer, and rollback audit events are append-only. Covered by a real Postgres test that creates
+  artifact rows, activates a candidate artifact, snapshots, rolls back, verifies the active pointer,
+  reads rollback history, and proves rollback events cannot be updated. This is still pointer-level
+  rollback infrastructure only; no autonomous deployment or source-file modification is wired.
 - **Claim diversity:** near-duplicate claims; add dedup + prompt for distinct claims across sources.
 - **Web search dead:** DuckDuckGo scraper returns nothing; arXiv-only works. Add a search API key
   or replace the backend.
 - **Learning loop not proven closed end-to-end** (see §5).
-- **Next free-run boundary:** add active artifact deployment/rollback schema before any deployable
-  self-modification path, or broaden replay validation to compare against larger historical
-  trajectory batches. Do not let the free-run auto-approve or modify source files.
+- **Next free-run boundary:** connect promoted self-improvement artifacts to an explicit
+  human-governed canary/deployment request that uses `active_artifacts`, or broaden replay
+  validation to compare against larger historical trajectory batches. Do not let the free-run
+  auto-approve or modify source files.
 
 ### Integration method that works (repeat it for any remaining work)
 1. Pick an orphaned capability service (`CIVILIZATION_AUDIT.md` lists them).
