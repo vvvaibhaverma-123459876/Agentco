@@ -24,30 +24,22 @@ interface EnsembleResult {
 
 export class EnsembleService {
   async queryModels(question: string): Promise<ModelAnswer[]> {
-    const answers: ModelAnswer[] = [];
+    const personas = [
+      {
+        model: 'general_reasoning',
+        system: 'You are a careful general reasoning model. Answer concisely and calibrate confidence.',
+      },
+      {
+        model: 'specialized_reasoning',
+        system: 'You are a domain specialist. Focus on technical correctness, caveats, and uncertainty.',
+      },
+      {
+        model: 'knowledge_grounded',
+        system: 'You are an evidence-grounded reviewer. Avoid unsupported claims and flag uncertainty.',
+      },
+    ];
 
-    answers.push({
-      model: 'gpt4_reasoning',
-      answer: this.simulateGPT4(question),
-      confidence: 0.85,
-      reasoning: 'General reasoning model',
-    });
-
-    answers.push({
-      model: 'specialized_reasoning',
-      answer: this.simulateSpecializedReasoning(question),
-      confidence: 0.82,
-      reasoning: 'Specialized for logic/math problems',
-    });
-
-    answers.push({
-      model: 'knowledge_grounded',
-      answer: this.simulateKnowledgeGrounded(question),
-      confidence: 0.80,
-      reasoning: 'Knowledge-grounded reasoning',
-    });
-
-    return answers;
+    return Promise.all(personas.map((persona) => this.callLLM(persona.model, persona.system, question)));
   }
 
   async ensembleVote(question: string): Promise<EnsembleResult> {
@@ -174,28 +166,52 @@ export class EnsembleService {
     return matrix[b.length][a.length];
   }
 
-  private simulateGPT4(question: string): string {
-    const q = question.toLowerCase();
-    if (q.includes('capital') && q.includes('france')) return 'Paris';
-    if (q.includes('largest planet')) return 'Jupiter';
-    if (q.includes('bat') && q.includes('ball')) return '$0.05';
-    return 'General answer';
-  }
+  private async callLLM(modelLabel: string, systemPrompt: string, question: string): Promise<ModelAnswer> {
+    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for ensemble voting');
+    }
 
-  private simulateSpecializedReasoning(question: string): string {
-    const q = question.toLowerCase();
-    if (q.includes('capital') && q.includes('france')) return 'Paris';
-    if (q.includes('largest planet')) return 'Jupiter';
-    if (q.includes('bat') && q.includes('ball')) return '$0.05';
-    return 'Specialized answer';
-  }
+    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+    const model = process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini';
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.1,
+        response_format: { type: 'json_object' },
+        messages: [
+          { role: 'system', content: `${systemPrompt} Return JSON with keys answer, confidence, and reasoning. Confidence must be 0 to 1.` },
+          { role: 'user', content: question },
+        ],
+      }),
+    });
 
-  private simulateKnowledgeGrounded(question: string): string {
-    const q = question.toLowerCase();
-    if (q.includes('capital') && q.includes('france')) return 'Paris';
-    if (q.includes('largest planet')) return 'Jupiter';
-    if (q.includes('bat') && q.includes('ball')) return '$0.05';
-    return 'Knowledge answer';
+    if (!response.ok) {
+      throw new Error(`LLM ensemble call failed for ${modelLabel}: HTTP ${response.status}`);
+    }
+
+    const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+    const content = payload.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error(`LLM ensemble call returned empty content for ${modelLabel}`);
+    }
+
+    const parsed = JSON.parse(content) as { answer?: string; confidence?: number; reasoning?: string };
+    if (!parsed.answer || typeof parsed.confidence !== 'number') {
+      throw new Error(`LLM ensemble call returned invalid JSON for ${modelLabel}`);
+    }
+
+    return {
+      model: modelLabel,
+      answer: parsed.answer,
+      confidence: Math.max(0, Math.min(1, parsed.confidence)),
+      reasoning: parsed.reasoning || `${modelLabel} returned a calibrated answer`,
+    };
   }
 }
 
