@@ -20,6 +20,7 @@ import { db } from '../db/client';
 import { SourceDiscoveryEngine } from './source-discovery.service';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { ActionStatus } from '../types/action.types';
+import { assertDeterministicProviderAllowed } from '../runtime-mode';
 
 interface BoundedLearningRunConfig {
   goal: string;
@@ -82,6 +83,8 @@ export class BoundedCivilizationLearningRun {
   private warnings: string[] = [];
 
   async execute(config: BoundedLearningRunConfig): Promise<BoundedLearningRunResult> {
+    assertDeterministicProviderAllowed('bounded_learning.provider', config.provider);
+
     this.runId = `learning_run_${Date.now()}`;
     const startedAt = new Date();
 

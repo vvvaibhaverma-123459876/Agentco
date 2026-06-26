@@ -1,4 +1,9 @@
-import { activeRuntimeMode, assertNoProductionFallbackProviders, configuredProviders } from '../src/runtime-mode';
+import {
+  activeRuntimeMode,
+  assertDeterministicProviderAllowed,
+  assertNoProductionFallbackProviders,
+  configuredProviders,
+} from '../src/runtime-mode';
 
 describe('runtime provider classification', () => {
   test('NODE_ENV=production selects production mode', () => {
@@ -40,5 +45,21 @@ describe('runtime provider classification', () => {
       VAULT_ADDR: 'https://vault.example',
       VAULT_TOKEN: 'real-token',
     } as NodeJS.ProcessEnv)).toThrow(/deterministic_llm_fallback/);
+  });
+
+  test('production rejects direct deterministic provider override', () => {
+    expect(() => assertDeterministicProviderAllowed(
+      'bounded_learning.provider',
+      'deterministic_test_only',
+      { AGENTCO_ENV: 'production' } as NodeJS.ProcessEnv
+    )).toThrow(/deterministic_test_only/);
+  });
+
+  test('development permits deterministic provider override for tests only', () => {
+    expect(() => assertDeterministicProviderAllowed(
+      'bounded_learning.provider',
+      'deterministic_test_only',
+      { AGENTCO_ENV: 'development' } as NodeJS.ProcessEnv
+    )).not.toThrow();
   });
 });

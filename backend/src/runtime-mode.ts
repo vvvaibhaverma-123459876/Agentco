@@ -57,3 +57,27 @@ export function assertNoProductionFallbackProviders(env: NodeJS.ProcessEnv = pro
     );
   }
 }
+
+export function assertDeterministicProviderAllowed(
+  providerName: string,
+  providerValue: string | undefined,
+  env: NodeJS.ProcessEnv = process.env
+): void {
+  if (!isProductionEnv(env)) return;
+  if (!providerValue) return;
+
+  const normalized = providerValue.toLowerCase();
+  const deterministicProviders = new Set([
+    'deterministic_test_only',
+    'deterministic_llm_fallback',
+    'fake',
+    'mock',
+    'fixture',
+  ]);
+
+  if (deterministicProviders.has(normalized)) {
+    throw new Error(
+      `Refusing to use ${providerName}=${providerValue} in staging/production; deterministic, fake, mock, and fixture providers are test-only`
+    );
+  }
+}
