@@ -1,43 +1,19 @@
 {
-  "can_continue": true,
-  "disabled_capabilities": [],
-  "fallbacks_used": [
+  "can_continue": false,
+  "disabled_capabilities": [
+    "production_secret_posture:required_unavailable"
+  ],
+  "fallbacks_used": [],
+  "requested_mode": "production",
+  "required_fixes": [
     {
-      "fallback": "memory_cache",
-      "service": "redis",
-      "status": "missing"
-    },
-    {
-      "fallback": "in_process_event_bus",
-      "service": "kafka",
-      "status": "missing"
-    },
-    {
-      "fallback": "env_secret_provider",
-      "service": "vault",
-      "status": "missing"
-    },
-    {
-      "fallback": "json_metrics_writer",
-      "service": "prometheus",
-      "status": "missing"
-    },
-    {
-      "fallback": "metrics_json_only",
-      "service": "grafana",
-      "status": "missing"
+      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
+      "remediation": "Set non-default production secrets through Vault or the deployment secret manager",
+      "service": "production_secret_posture"
     }
   ],
-  "requested_mode": "local_native",
-  "required_fixes": [],
-  "run_best_effort": {
-    "completed": true,
-    "exit_code": 0,
-    "output_tail": "{\"mode\": \"live_openai\", \"simulated\": false, \"success\": true}",
-    "selected_runtime_mode": "local_native"
-  },
   "safe_next_command": "make run-best-effort",
-  "selected_runtime_mode": "local_native",
+  "selected_runtime_mode": "production",
   "services": [
     {
       "detail": "3.13.9",
@@ -109,31 +85,31 @@
       "detail": "localhost:6379",
       "remediation": "Use memory cache fallback",
       "service": "redis",
-      "status": "missing"
+      "status": "real"
     },
     {
       "detail": "localhost:9092",
       "remediation": "Use in-process event bus fallback",
       "service": "kafka",
-      "status": "missing"
+      "status": "real"
     },
     {
       "detail": "localhost:8200",
       "remediation": "Use env secret provider fallback",
       "service": "vault",
-      "status": "missing"
+      "status": "real"
     },
     {
       "detail": "localhost:9090",
       "remediation": "Use JSON metrics fallback",
       "service": "prometheus",
-      "status": "missing"
+      "status": "real"
     },
     {
       "detail": "localhost:3005",
       "remediation": "Skip dashboard UI",
       "service": "grafana",
-      "status": "missing"
+      "status": "real"
     },
     {
       "detail": "key_present=True",
@@ -142,7 +118,7 @@
       "status": "real"
     },
     {
-      "detail": "{\"latency_ms\": 1382, \"model\": \"gpt-4o-mini\", \"status\": \"ok\", \"success\": true}",
+      "detail": "{\"latency_ms\": 1663, \"model\": \"gpt-4o-mini\", \"status\": \"ok\", \"success\": true}",
       "remediation": "",
       "service": "openai_connectivity",
       "status": "real"
@@ -158,6 +134,12 @@
       "remediation": "Protect override reads",
       "service": "sensitive_route_auth",
       "status": "real"
+    },
+    {
+      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
+      "remediation": "Set non-default production secrets through Vault or the deployment secret manager",
+      "service": "production_secret_posture",
+      "status": "blocked"
     },
     {
       "detail": "/Users/Zet/Agentco/reports/system_run/latest",

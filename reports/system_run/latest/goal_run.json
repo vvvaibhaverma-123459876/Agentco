@@ -1,5 +1,22 @@
 {
   "audit": {
+    "db_records": {
+      "decision_log_id": "0d06c351-daf9-4869-b8f7-8e5a76f47409",
+      "event_ids": [
+        "80e6fb9e-f602-4ff5-abc4-518d307b99e6",
+        "fcf52474-ac4f-4141-8a8b-99dc261e1ae5",
+        "783db390-1cbd-4eb3-897f-9035ebb6d6cc",
+        "a3123efd-20f3-44f0-bf89-9db8d554d4de",
+        "d36d4c01-8352-4b76-b6c3-5f077fe083a2",
+        "865d7876-42d2-445e-82c4-f45e88aba6ab",
+        "a65e268f-75c6-4814-94cb-cd05ddf0739f",
+        "ddfef0d8-7e65-433e-b007-5cb87e27b650",
+        "40b315e7-dcbb-4879-98a4-578a1bbe636a",
+        "cfb64794-ab2e-4563-934d-0725c94e7c41",
+        "927156ea-e79a-4930-b085-ed4c2bef7043"
+      ],
+      "prediction_id": "0ee81656-d48e-48b3-b520-c7b318b5711c"
+    },
     "event_records": [
       "policy_controller_correction",
       "task_intake",
@@ -13,12 +30,34 @@
       "synthetic_resolution_scored",
       "learning_record_written"
     ],
-    "persistence": "file_report_with_live_llm",
+    "persistence": "db_backed",
     "records_generated": 11
   },
-  "latency_ms": 3156,
+  "db_persistence": {
+    "brier_score": 0.1225,
+    "decision_log_id": "0d06c351-daf9-4869-b8f7-8e5a76f47409",
+    "event_ids": [
+      "80e6fb9e-f602-4ff5-abc4-518d307b99e6",
+      "fcf52474-ac4f-4141-8a8b-99dc261e1ae5",
+      "783db390-1cbd-4eb3-897f-9035ebb6d6cc",
+      "a3123efd-20f3-44f0-bf89-9db8d554d4de",
+      "d36d4c01-8352-4b76-b6c3-5f077fe083a2",
+      "865d7876-42d2-445e-82c4-f45e88aba6ab",
+      "a65e268f-75c6-4814-94cb-cd05ddf0739f",
+      "ddfef0d8-7e65-433e-b007-5cb87e27b650",
+      "40b315e7-dcbb-4879-98a4-578a1bbe636a",
+      "cfb64794-ab2e-4563-934d-0725c94e7c41",
+      "927156ea-e79a-4930-b085-ed4c2bef7043"
+    ],
+    "events_written": 11,
+    "persistence": "db_backed",
+    "prediction_id": "0ee81656-d48e-48b3-b520-c7b318b5711c",
+    "prediction_resolved": true,
+    "session_id": "3de504c0-eb9a-4b9a-a8a8-144122d04339"
+  },
+  "latency_ms": 3183,
   "llm": {
-    "latency_ms": 3155,
+    "latency_ms": 3183,
     "model": "gpt-4o-mini",
     "simulated": false,
     "usage": {
@@ -39,9 +78,9 @@
   },
   "mode": "live_openai",
   "prediction": {
-    "brier_score": 0.0,
+    "brier_score": 0.1225,
     "confidence": 0.65,
-    "id": "goal-run-1782431475",
+    "id": "0ee81656-d48e-48b3-b520-c7b318b5711c",
     "resolution": "escalate",
     "statement": "Northstar DataWorks onboarding should be escalated.",
     "trusted_confidence": 0.585

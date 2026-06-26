@@ -2,15 +2,21 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import shutil
+import sys
 import time
 import urllib.request
+import uuid
 from pathlib import Path
+from urllib.parse import quote, urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_DIR = ROOT / "reports" / "system_run" / "latest"
+DEFAULT_DB_URL = "postgresql://agentco:password@localhost:5432/agentco"
 
 
 SYNTHETIC_VENDOR_TASK = {
@@ -56,6 +62,192 @@ def load_codex_env() -> None:
                 line = line[7:].strip()
             key, value = line.split("=", 1)
             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+def database_url() -> str:
+    return os.getenv("DATABASE_URL") or os.getenv("AGENTCO_TEST_DATABASE_URL") or DEFAULT_DB_URL
+
+
+def resolution_service_url(base_url: str) -> str:
+    explicit = os.getenv("RESOLUTION_SERVICE_DATABASE_URL")
+    if explicit:
+        return explicit
+    parsed = urlparse(base_url)
+    password = os.getenv("RESOLUTION_SERVICE_PASSWORD", "resolution-service-dev-password")
+    host = parsed.hostname or "localhost"
+    port = parsed.port or 5432
+    database = parsed.path.lstrip("/") or "agentco"
+    return f"postgresql://resolution_service:{quote(password, safe='')}@{host}:{port}/{database}"
+
+
+def canonical_audit_content(fields: dict) -> str:
+    order = [
+        "log_id",
+        "timestamp",
+        "prev_hash",
+        "agent_id",
+        "action_type",
+        "input_summary",
+        "output_summary",
+        "confidence_score",
+        "risk_level",
+        "human_approved",
+        "human_approver_id",
+        "downstream_events",
+        "session_id",
+    ]
+    return json.dumps({key: fields[key] for key in order}, separators=(",", ":"))
+
+
+def append_decision_log(cur, *, session_id: str, event_ids: list[str], report: dict) -> str:
+    cur.execute(
+        "select chain_hash from decision_log where chain_hash <> '' order by timestamp desc, log_id desc limit 1"
+    )
+    row = cur.fetchone()
+    prev_hash = row[0] if row else "0" * 64
+    log_id = str(uuid.uuid4())
+    timestamp = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime())
+    result = report["result"]
+    fields = {
+        "log_id": log_id,
+        "timestamp": timestamp,
+        "prev_hash": prev_hash,
+        "agent_id": "agentco_goal_verifier",
+        "action_type": "escalation",
+        "input_summary": f"vendor={report['task']['vendor']} domain={report['task']['domain']}",
+        "output_summary": f"decision={result.get('decision')} trusted_confidence={result.get('trusted_confidence')}",
+        "confidence_score": float(result.get("confidence", 0.0)),
+        "risk_level": result.get("risk_level", "medium") if result.get("risk_level") in {"low", "medium", "high", "critical"} else "medium",
+        "human_approved": False,
+        "human_approver_id": None,
+        "downstream_events": event_ids,
+        "session_id": session_id,
+    }
+    chain_hash = hashlib.sha256((prev_hash + canonical_audit_content(fields)).encode()).hexdigest()
+    cur.execute(
+        """
+        insert into decision_log
+          (log_id, agent_id, action_type, input_summary, output_summary, confidence_score,
+           risk_level, human_approved, human_approver_id, downstream_events, session_id,
+           timestamp, chain_hash, prev_hash)
+        values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::uuid[],%s::uuid,%s,%s,%s)
+        """,
+        [
+            log_id,
+            fields["agent_id"],
+            fields["action_type"],
+            fields["input_summary"],
+            fields["output_summary"],
+            fields["confidence_score"],
+            fields["risk_level"],
+            fields["human_approved"],
+            fields["human_approver_id"],
+            event_ids,
+            session_id,
+            timestamp,
+            chain_hash,
+            prev_hash,
+        ],
+    )
+    return log_id
+
+
+def persist_goal_run_to_db(report: dict) -> dict:
+    try:
+        import psycopg2
+    except Exception as exc:  # pragma: no cover - covered only in envs without psycopg2
+        raise RuntimeError("psycopg2 is required for DB-backed goal-run persistence") from exc
+
+    db_url = database_url()
+    service_url = resolution_service_url(db_url)
+    session_id = str(uuid.uuid4())
+    prediction_id = str(uuid.uuid4())
+    event_ids = [str(uuid.uuid4()) for _ in report["result"].get("audit_events", [])]
+    probability = float(report["prediction"]["confidence"])
+    outcome = report["prediction"]["resolution"] == report["result"].get("decision")
+    brier_score = (probability - (1.0 if outcome else 0.0)) ** 2
+
+    with psycopg2.connect(db_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                insert into prediction_ledger
+                  (prediction_id, claim, probability, confidence_basis, producing_agent_id,
+                   producing_prompt_version, resolution_criterion, resolution_date,
+                   ground_truth_source, horizon_class, domain, claim_type, correlation_id)
+                values (%s,%s,%s,%s::jsonb,%s,%s,%s,now() - interval '1 second',%s,%s,%s,%s,%s)
+                """,
+                [
+                    prediction_id,
+                    report["prediction"]["statement"],
+                    probability,
+                    json.dumps(
+                        {
+                            "trusted_confidence": report["prediction"]["trusted_confidence"],
+                            "evidence_ids": report["result"].get("cited_evidence_ids", []),
+                            "validation_score": report["validation"]["score"],
+                        },
+                        sort_keys=True,
+                    ),
+                    "agentco_goal_verifier",
+                    report["llm"].get("model", "unknown"),
+                    "Synthetic ground truth expected_decision equals verifier decision",
+                    "synthetic_goal_run_fixture",
+                    "short",
+                    report["task"]["domain"],
+                    "vendor_onboarding_decision",
+                    session_id,
+                ],
+            )
+            for event_id, event_name in zip(event_ids, report["result"].get("audit_events", [])):
+                cur.execute(
+                    """
+                    insert into event_history
+                      (event_id, event_type, producer_agent_id, timestamp, confidence_score,
+                       payload, correlation_id, risk_level, requires_ack, ttl_seconds)
+                    values (%s,%s,%s,now(),%s,%s::jsonb,%s,%s,false,86400)
+                    """,
+                    [
+                        event_id,
+                        f"goal_run.{event_name}",
+                        "agentco_goal_verifier",
+                        float(report["result"].get("confidence", 0.0)),
+                        json.dumps({"session_id": session_id, "prediction_id": prediction_id, "simulated": False}, sort_keys=True),
+                        session_id,
+                        "medium",
+                    ],
+                )
+            decision_log_id = append_decision_log(cur, session_id=session_id, event_ids=event_ids, report=report)
+
+    with psycopg2.connect(service_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                update prediction_ledger
+                   set resolved = true,
+                       resolved_outcome = %s,
+                       resolved_at = now(),
+                       resolved_by_service = current_user,
+                       brier_score = %s,
+                       log_score = 0,
+                       was_surprise = false
+                 where prediction_id = %s
+                """,
+                [outcome, brier_score, prediction_id],
+            )
+            if cur.rowcount != 1:
+                raise RuntimeError("resolution_service failed to resolve goal-run prediction")
+
+    return {
+        "persistence": "db_backed",
+        "session_id": session_id,
+        "prediction_id": prediction_id,
+        "decision_log_id": decision_log_id,
+        "event_ids": event_ids,
+        "events_written": len(event_ids),
+        "prediction_resolved": True,
+        "brier_score": round(brier_score, 6),
+    }
 
 
 def deterministic_vendor_decision(task: dict = SYNTHETIC_VENDOR_TASK) -> dict:
@@ -243,7 +435,8 @@ def build_run(offline: bool) -> dict:
     ]
     output["audit_events"] = list(dict.fromkeys(list(output.get("audit_events", [])) + event_trail))
     validation = validate_goal_output(output)
-    return {
+    prediction_id = str(uuid.uuid4())
+    report = {
         "success": validation["passed"],
         "mode": mode,
         "simulated": offline,
@@ -251,7 +444,7 @@ def build_run(offline: bool) -> dict:
         "result": output,
         "validation": validation,
         "prediction": {
-            "id": f"goal-run-{int(started)}",
+            "id": prediction_id,
             "statement": "Northstar DataWorks onboarding should be escalated.",
             "confidence": output.get("confidence"),
             "trusted_confidence": output.get("trusted_confidence"),
@@ -266,6 +459,19 @@ def build_run(offline: bool) -> dict:
         "llm": model_meta,
         "latency_ms": int((time.time() - started) * 1000),
     }
+    require_db = not offline and os.getenv("AGENTCO_GOAL_RUN_DB_PERSISTENCE", "1") != "0"
+    if require_db:
+        db_persistence = persist_goal_run_to_db(report)
+        report["db_persistence"] = db_persistence
+        report["prediction"]["id"] = db_persistence["prediction_id"]
+        report["prediction"]["brier_score"] = db_persistence["brier_score"]
+        report["audit"]["persistence"] = "db_backed"
+        report["audit"]["db_records"] = {
+            "decision_log_id": db_persistence["decision_log_id"],
+            "event_ids": db_persistence["event_ids"],
+            "prediction_id": db_persistence["prediction_id"],
+        }
+    return report
 
 
 def write_reports(report: dict) -> None:
@@ -294,6 +500,9 @@ def write_reports(report: dict) -> None:
         "tokens_used": report.get("llm", {}).get("usage", {}).get("total_tokens"),
         "predictions_registered": 1 if report.get("prediction") else 0,
         "audit_event_records": report.get("audit", {}).get("records_generated", 0),
+        "db_event_records": report.get("db_persistence", {}).get("events_written", 0),
+        "db_decision_log_records": 1 if report.get("db_persistence", {}).get("decision_log_id") else 0,
+        "db_prediction_resolved": bool(report.get("db_persistence", {}).get("prediction_resolved")),
         "failures": 0 if report["success"] else 1,
     }
     (REPORT_DIR / "performance_summary.json").write_text(json.dumps(perf, indent=2, sort_keys=True) + "\n")
@@ -304,6 +513,10 @@ def main() -> int:
     parser.add_argument("--offline", action="store_true")
     args = parser.parse_args()
     offline = args.offline or os.getenv("AGENTCO_VERIFY_OFFLINE") == "1"
+    if not offline and os.getenv("AGENTCO_GOAL_RUN_DB_PERSISTENCE", "1") != "0":
+        python313 = shutil.which("python3.13")
+        if python313 and Path(sys.executable).resolve() != Path(python313).resolve():
+            os.execv(python313, [python313, *sys.argv])
     try:
         report = build_run(offline)
     except Exception as exc:

@@ -122,6 +122,34 @@ def check_openai_env() -> Check:
     return Check("openai_env", "real" if present else "missing", f"key_present={present}", "Set LLM_API_KEY or use offline")
 
 
+def check_production_secret_posture() -> Check:
+    env = os.environ
+    failures: list[str] = []
+    dev_values = {
+        "AGENTCO_API_KEY": {"", "dev-api-key"},
+        "EVENT_BUS_SIGNING_KEY": {"", "dev-key-replace-in-production"},
+        "EVENT_BUS_HMAC_KEY": {"", "dev-insecure-key"},
+        "JWT_SECRET": {"", "change-me-generate-with-openssl-rand-hex-64"},
+        "VAULT_TOKEN": {"", "root"},
+        "RESERVE_SIGNING_KEY": {"dev-insecure-key"},
+    }
+    for key, rejected in dev_values.items():
+        if env.get(key, "") in rejected:
+            failures.append(key)
+    for key in ("DATABASE_URL", "AGENTCO_TEST_DATABASE_URL"):
+        value = env.get(key, "")
+        if "://agentco:password@" in value or "://postgres:password@" in value:
+            failures.append(key)
+    if failures:
+        return Check(
+            "production_secret_posture",
+            "blocked",
+            "dev-default or missing production secrets: " + ", ".join(sorted(set(failures))),
+            "Set non-default production secrets through Vault or the deployment secret manager",
+        )
+    return Check("production_secret_posture", "real", "no dev-default production secrets detected")
+
+
 def check_openai_connectivity(live: bool) -> Check:
     if not live:
         return Check("openai_connectivity", "not_required", "live check not requested")
@@ -188,6 +216,7 @@ def collect_checks(mode: str, live_openai: bool = False, run_builds: bool = Fals
         check_openai_connectivity(live_openai),
         check_resolution_service(),
         check_sensitive_route_auth(),
+        check_production_secret_posture(),
         check_reports_dir(),
     ]
 

@@ -1,4 +1,4 @@
-from runtime.orchestration.doctor import Check, build_report
+from runtime.orchestration.doctor import Check, build_report, check_production_secret_posture
 from runtime.orchestration.modes import choose_runtime_mode, classify_mode
 
 
@@ -16,6 +16,46 @@ def test_missing_openai_fake_only_offline():
     production = classify_mode("production", {"python": "real", "filesystem_reports": "real", "openai_connectivity": "missing"})
     assert any(f["fallback"] == "deterministic_fixture_llm" for f in offline["fallbacks_used"])
     assert not production["fallbacks_used"]
+
+
+def test_production_requires_real_infrastructure_no_fallbacks():
+    result = classify_mode(
+        "production",
+        {
+            "python": "real",
+            "node": "real",
+            "npm": "real",
+            "backend_build": "real",
+            "frontend_build": "real",
+            "postgres": "real",
+            "migrations": "real",
+            "core_db_schema": "real",
+            "redis": "missing",
+            "kafka": "missing",
+            "vault": "missing",
+            "prometheus": "missing",
+            "grafana": "missing",
+            "resolution_service": "real",
+            "sensitive_route_auth": "real",
+            "production_secret_posture": "real",
+            "filesystem_reports": "real",
+        },
+    )
+    assert result["can_continue"] is False
+    assert "redis:required_unavailable" in result["disabled_capabilities"]
+    assert not result["fallbacks_used"]
+
+
+def test_production_secret_posture_rejects_dev_defaults(monkeypatch):
+    monkeypatch.setenv("AGENTCO_API_KEY", "dev-api-key")
+    monkeypatch.setenv("EVENT_BUS_SIGNING_KEY", "dev-key-replace-in-production")
+    monkeypatch.setenv("EVENT_BUS_HMAC_KEY", "dev-insecure-key")
+    monkeypatch.setenv("JWT_SECRET", "change-me-generate-with-openssl-rand-hex-64")
+    monkeypatch.setenv("VAULT_TOKEN", "root")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://agentco:password@localhost:5432/agentco")
+    check = check_production_secret_posture()
+    assert check.status == "blocked"
+    assert "AGENTCO_API_KEY" in check.detail
 
 
 def test_resolution_service_missing_disables_primary_ledger_resolution():

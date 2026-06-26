@@ -25,7 +25,7 @@ doctor-offline:
 
 doctor-production:
 	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m runtime.orchestration.doctor --mode production
+	@$(PYTHON313) -m runtime.orchestration.doctor --mode production --live-openai --run-builds
 
 run-best-effort:
 	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)

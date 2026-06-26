@@ -1,8 +1,8 @@
 # AgentCo Doctor Report
 
-- Requested mode: `local_native`
-- Selected runtime mode: `local_native`
-- Can continue: `True`
+- Requested mode: `production`
+- Selected runtime mode: `production`
+- Can continue: `False`
 - Safe next command: `make run-best-effort`
 
 | Service | Status | Detail |
@@ -18,23 +18,20 @@
 | `postgres` | `real` | agentco|agentco |
 | `migrations` | `real` | ts-node src/db/migrate.ts |
 | `core_db_schema` | `real` | prediction_ledger|decision_log|override_queue |
-| `redis` | `missing` | localhost:6379 |
-| `kafka` | `missing` | localhost:9092 |
-| `vault` | `missing` | localhost:8200 |
-| `prometheus` | `missing` | localhost:9090 |
-| `grafana` | `missing` | localhost:3005 |
+| `redis` | `real` | localhost:6379 |
+| `kafka` | `real` | localhost:9092 |
+| `vault` | `real` | localhost:8200 |
+| `prometheus` | `real` | localhost:9090 |
+| `grafana` | `real` | localhost:3005 |
 | `openai_env` | `real` | key_present=True |
-| `openai_connectivity` | `real` | {"latency_ms": 1382, "model": "gpt-4o-mini", "status": "ok", "success": true} |
+| `openai_connectivity` | `real` | {"latency_ms": 1663, "model": "gpt-4o-mini", "status": "ok", "success": true} |
 | `resolution_service` | `real` | resolution_service |
 | `sensitive_route_auth` | `real` | override read route protected |
+| `production_secret_posture` | `blocked` | dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN |
 | `filesystem_reports` | `real` | /Users/Zet/Agentco/reports/system_run/latest |
 
 ## Fallbacks Used
-- `redis` -> `memory_cache` (`missing`)
-- `kafka` -> `in_process_event_bus` (`missing`)
-- `vault` -> `env_secret_provider` (`missing`)
-- `prometheus` -> `json_metrics_writer` (`missing`)
-- `grafana` -> `metrics_json_only` (`missing`)
+- None
 
 ## Disabled Capabilities
-- None
+- `production_secret_posture:required_unavailable`
