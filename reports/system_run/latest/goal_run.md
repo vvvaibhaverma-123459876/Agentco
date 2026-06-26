@@ -1,11 +1,11 @@
 # AgentCo Goal Run
 
-- Mode: `live_openai`
-- Simulated: `False`
+- Mode: `offline_fixture`
+- Simulated: `True`
 - Success: `True`
 - Decision: `escalate`
-- Confidence: `0.65`
-- Trusted confidence: `0.585`
+- Confidence: `0.68`
+- Trusted confidence: `0.61`
 
 ## Validation
 - `expected_decision`: `True`

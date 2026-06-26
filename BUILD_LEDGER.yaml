@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-26T06:22:34Z'
+  last_updated: '2026-06-26T06:45:32Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -77,13 +77,17 @@ layers:
       artifacts:
       - backend/src/runtime-mode.ts
       - backend/src/services/bounded-learning-run.service.ts
+      - runtime/orchestration/modes.py
+      - runtime/orchestration/run_best_effort.py
       tests:
       - backend/tests/runtime-mode.test.ts
       - backend/tests/bounded-learning-production-guard.test.ts
+      - runtime/orchestration/tests/test_modes.py
+      - runtime/orchestration/tests/test_run_best_effort.py
       gates_passed:
       - unit
-      notes: Backend server and bounded-learning service now reject deterministic/fake/mock/fixture providers in staging/production.
-        Python/runtime entry-point coverage remains incomplete.
+      notes: Backend server, bounded-learning service, and Python best-effort orchestration now reject or require explicit
+        fixture fallback outside offline/CI. Item remains in_progress until all runtime entry points are covered.
     - id: L0.ConnectionPoolManager
       status: in_progress
       depends_on: []

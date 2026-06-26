@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import os
 from typing import Mapping
 
 
@@ -167,6 +168,26 @@ def choose_runtime_mode(requested: str, service_status: Mapping[str, str]) -> st
     if postgres_ok:
         return "local_native"
     return "offline_fixture"
+
+
+def is_production_like_env(env: Mapping[str, str] | None = None) -> bool:
+    values = env if env is not None else os.environ
+    agentco_env = values.get("AGENTCO_ENV", "").lower()
+    node_env = values.get("NODE_ENV", "").lower()
+    return agentco_env in {"production", "staging"} or node_env == "production"
+
+
+def fixture_fallback_allowed(mode_name: str, env: Mapping[str, str] | None = None) -> bool:
+    if is_production_like_env(env):
+        return False
+    return mode_name in {"offline_fixture", "ci_smoke"}
+
+
+def assert_fixture_fallback_allowed(mode_name: str, env: Mapping[str, str] | None = None) -> None:
+    if not fixture_fallback_allowed(mode_name, env):
+        raise RuntimeError(
+            f"deterministic fixture fallback is only allowed in offline_fixture/ci_smoke outside staging/production; requested={mode_name}"
+        )
 
 
 def classify_mode(mode_name: str, service_status: Mapping[str, str]) -> dict:

@@ -1,5 +1,10 @@
 from runtime.orchestration.doctor import Check, build_report, check_production_secret_posture
-from runtime.orchestration.modes import choose_runtime_mode, classify_mode
+from runtime.orchestration.modes import (
+    assert_fixture_fallback_allowed,
+    choose_runtime_mode,
+    classify_mode,
+    fixture_fallback_allowed,
+)
 
 
 def test_docker_unavailable_native_postgres_selects_local_native():
@@ -82,3 +87,20 @@ def test_doctor_report_schema_and_fallback_status():
 def test_sensitive_routes_never_downgraded_by_degraded_mode():
     result = classify_mode("degraded", {"python": "real", "filesystem_reports": "real", "sensitive_route_auth": "broken"})
     assert "sensitive_route_auth:required_unavailable" in result["disabled_capabilities"]
+
+
+def test_fixture_fallback_only_allowed_in_offline_modes():
+    assert fixture_fallback_allowed("offline_fixture", {"AGENTCO_ENV": "development"})
+    assert fixture_fallback_allowed("ci_smoke", {"AGENTCO_ENV": "test"})
+    assert not fixture_fallback_allowed("local_native", {"AGENTCO_ENV": "development"})
+
+
+def test_fixture_fallback_forbidden_in_staging_and_production():
+    assert not fixture_fallback_allowed("offline_fixture", {"AGENTCO_ENV": "staging"})
+    assert not fixture_fallback_allowed("offline_fixture", {"NODE_ENV": "production"})
+    try:
+        assert_fixture_fallback_allowed("offline_fixture", {"AGENTCO_ENV": "production"})
+    except RuntimeError as exc:
+        assert "only allowed" in str(exc)
+    else:
+        raise AssertionError("production allowed deterministic fixture fallback")
