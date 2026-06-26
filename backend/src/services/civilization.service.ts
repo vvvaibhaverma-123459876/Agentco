@@ -13,6 +13,11 @@
  * └─ Unified Decision Framework (coherent reasoning)
  */
 
+import { symbolicService } from './symbolic.service';
+import { ensembleService } from './ensemble.service';
+import { ragService } from './rag.service';
+import { v4 as uuidv4 } from 'uuid';
+
 interface KnowledgeEntry {
   id: string;
   question: string;
@@ -249,17 +254,9 @@ export class CivilizationService {
    * STEP 3: Execute primary solver
    */
   private async executePrimarySolver(question: string, optimalService: any): Promise<any> {
-    // In real implementation, call actual services
-    // For now: simulate
     console.log(`[${optimalService.service}] Solving: ${question}`);
 
-    return {
-      service: optimalService.service,
-      answer: 'Simulated answer',
-      confidence: 0.85,
-      reasoning: 'Simulated reasoning',
-      method: 'simulated',
-    };
+    return this.callServiceSolver(optimalService.service, question);
   }
 
   /**
@@ -269,22 +266,18 @@ export class CivilizationService {
   private async broadcastForValidation(question: string, primaryResult: any): Promise<Map<string, any>> {
     console.log('\n[Civilization] Broadcasting to all services for validation...\n');
 
-    const services = ['symbolic', 'ensemble', 'rag', 'bayesian', 'trustworthiness'];
+    const services = ['symbolic', 'ensemble', 'rag'];
     const results = new Map<string, any>();
 
     for (const service of services) {
       if (service === primaryResult.service) continue; // Skip primary
 
-      // Simulate validation from other services
+      const validation = await this.validateWithService(service, question, primaryResult);
       const validationMessage: ServiceBusMessage = {
         from: service,
         to: 'primary',
         type: 'validation_result',
-        payload: {
-          agrees: Math.random() > 0.3,
-          confidence_delta: (Math.random() - 0.5) * 0.2,
-          concerns: [],
-        },
+        payload: validation,
         priority: 1,
         timestamp: Date.now(),
       };
@@ -296,6 +289,74 @@ export class CivilizationService {
     }
 
     return results;
+  }
+
+  private async callServiceSolver(service: string, question: string): Promise<any> {
+    if (service === 'symbolic') {
+      const result = await symbolicService.solve(question);
+      return {
+        service,
+        answer: result.solved ? result.answer : 'Unable to solve symbolically',
+        confidence: result.solved ? result.confidence : 0.1,
+        reasoning: result.reasoning,
+        method: result.method,
+      };
+    }
+
+    if (service === 'ensemble') {
+      const result = await ensembleService.ensembleVote(question);
+      return {
+        service,
+        answer: result.final_answer,
+        confidence: result.confidence,
+        reasoning: result.reasoning,
+        method: 'llm_ensemble',
+      };
+    }
+
+    if (service === 'rag') {
+      const result = await ragService.augmentAnswer(question, '', 0.2);
+      return {
+        service,
+        answer: result.final_answer || 'No retrieved evidence answer',
+        confidence: result.final_confidence,
+        reasoning: result.reasoning,
+        method: 'retrieval_augmented',
+      };
+    }
+
+    throw new Error(`Unknown civilization solver service: ${service}`);
+  }
+
+  private async validateWithService(service: string, question: string, primaryResult: any): Promise<any> {
+    try {
+      const result = await this.callServiceSolver(service, question);
+      const agrees = this.answersAgree(primaryResult.answer, result.answer);
+      return {
+        agrees,
+        confidence_delta: result.confidence - primaryResult.confidence,
+        concerns: agrees ? [] : [`${service} answer differs from ${primaryResult.service}`],
+        answer: result.answer,
+        confidence: result.confidence,
+        method: result.method,
+      };
+    } catch (error: any) {
+      return {
+        agrees: false,
+        confidence_delta: -primaryResult.confidence,
+        concerns: [`${service} validation failed: ${error.message}`],
+        answer: null,
+        confidence: 0,
+        method: 'validation_failed',
+      };
+    }
+  }
+
+  private answersAgree(left: string, right: string): boolean {
+    const normalize = (value: string) => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const a = normalize(left);
+    const b = normalize(right);
+    return Boolean(a && b && (a.includes(b) || b.includes(a)));
   }
 
   /**
@@ -354,7 +415,7 @@ export class CivilizationService {
    */
   private async recordLearning(question: string, result: any, validationResults: Map<string, any>): Promise<void> {
     const entry: KnowledgeEntry = {
-      id: `${Date.now()}_${Math.random()}`,
+      id: uuidv4(),
       question,
       answer: result.answer,
       confidence: result.confidence,
