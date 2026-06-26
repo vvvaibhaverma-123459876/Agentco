@@ -26,6 +26,30 @@ describe('production secret guard', () => {
       RESERVE_SIGNING_KEY: 'real-reserve-key',
     } as NodeJS.ProcessEnv)).not.toThrow();
   });
+
+  test('treats NODE_ENV=production as production even without AGENTCO_ENV', () => {
+    expect(() => assertProductionSecrets({
+      NODE_ENV: 'production',
+      AGENTCO_API_KEY: 'dev-api-key',
+      DATABASE_URL: 'postgresql://agentco:password@localhost:5432/agentco',
+      EVENT_BUS_SIGNING_KEY: 'dev-key-replace-in-production',
+      EVENT_BUS_HMAC_KEY: 'dev-insecure-key',
+      JWT_SECRET: 'change-me-generate-with-openssl-rand-hex-64',
+      VAULT_TOKEN: 'root',
+    } as NodeJS.ProcessEnv)).toThrow(/Refusing to start in production/);
+  });
+
+  test('treats AGENTCO_ENV=staging as production-like', () => {
+    expect(() => assertProductionSecrets({
+      AGENTCO_ENV: 'staging',
+      AGENTCO_API_KEY: 'dev-api-key',
+      DATABASE_URL: 'postgresql://agentco:password@localhost:5432/agentco',
+      EVENT_BUS_SIGNING_KEY: 'dev-key-replace-in-production',
+      EVENT_BUS_HMAC_KEY: 'dev-insecure-key',
+      JWT_SECRET: 'change-me-generate-with-openssl-rand-hex-64',
+      VAULT_TOKEN: 'root',
+    } as NodeJS.ProcessEnv)).toThrow(/Refusing to start in production/);
+  });
 });
 
 describe('minimal API key auth', () => {

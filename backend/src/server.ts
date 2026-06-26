@@ -12,6 +12,7 @@ import { learningRoutes } from './services/learning.service';
 import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { civilizationRequestValidator } from './middleware/civilization-request-validator';
 import { assertProductionSecrets } from './security';
+import { assertNoProductionFallbackProviders, activeRuntimeMode, configuredProviders } from './runtime-mode';
 import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
 import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
@@ -26,6 +27,7 @@ const HOST = process.env.HOST ?? '0.0.0.0';
 
 export async function build() {
   assertProductionSecrets();
+  assertNoProductionFallbackProviders();
   const app = Fastify({ logger: true });
 
   await app.register(cors, { origin: process.env.FRONTEND_URL ?? 'http://localhost:3000' });
@@ -105,6 +107,14 @@ export async function build() {
   // Basic health check
   app.get('/health', async () => ({
     status: 'ok',
+    timestamp: new Date().toISOString(),
+  }));
+
+  app.get('/health/runtime', async () => ({
+    status: 'ok',
+    runtime_mode: activeRuntimeMode(),
+    providers: configuredProviders(),
+    fallback_active: configuredProviders().some(provider => provider.status === 'fallback' || provider.status === 'simulated'),
     timestamp: new Date().toISOString(),
   }));
 

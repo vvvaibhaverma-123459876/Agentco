@@ -2,6 +2,14 @@
 
 AgentCo must report the difference between real infrastructure, explicit fallback behavior, simulated data, and blocked capabilities. Fallbacks are allowed only when they preserve governance boundaries and are visible in reports.
 
+Production-like mode is any of:
+
+- `AGENTCO_ENV=production`
+- `AGENTCO_ENV=staging`
+- `NODE_ENV=production`
+
+In production-like mode, startup must fail closed if simulated, mock, unsupported, or local fallback providers are selected.
+
 ## Status Terms
 
 | Term | Meaning |
@@ -54,3 +62,20 @@ AgentCo must report the difference between real infrastructure, explicit fallbac
 | Resolution-service credentials missing | Disable primary ledger resolution; keep unauthorized-resolution guard checks. |
 | Auth middleware missing | Fail closed in every mode. |
 
+## Backend Provider Guard
+
+The backend exposes active provider metadata at:
+
+```text
+GET /health/runtime
+```
+
+Provider classifications:
+
+| Provider | Real | Fallback/simulated | Production-like behavior |
+|---|---|---|---|
+| Web adapter | `real_web_adapter` | `mock_web_adapter` | startup fails |
+| LLM | configured real provider | `deterministic_llm_fallback` or missing provider | startup fails |
+| Secrets | Vault | env/local secret provider | startup fails |
+
+Test and development may use non-real providers only when those providers are explicitly reported and never represented as production infrastructure.

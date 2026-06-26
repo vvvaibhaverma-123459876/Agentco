@@ -46,6 +46,7 @@ async function request<T>(
       const method = options.method?.toUpperCase() ?? 'GET';
       if (API_KEY && !['GET', 'HEAD', 'OPTIONS'].includes(method)) {
         headers.set('x-api-key', API_KEY);
+        headers.set('x-agentco-api-key', API_KEY);
       }
 
       const response = await fetch(`${API_BASE_URL}${path}${toQuery(params)}`, {

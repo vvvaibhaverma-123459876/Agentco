@@ -182,8 +182,16 @@ def verify_request_signature(payload_bytes: bytes, signature: str, timestamp: st
     Returns:
         True if signature is valid and timestamp is recent
     """
-    # Get shared secret from environment
-    secret = os.environ.get('SPECIALIST_SHARED_SECRET', 'default-insecure-secret')
+    # Get shared secret from environment. Development/test keeps a local-only
+    # default so existing isolated tests can run; staging/production must fail
+    # closed instead of accepting a public shared secret.
+    secret = os.environ.get('SPECIALIST_SHARED_SECRET')
+    runtime_env = (os.environ.get('AGENTCO_ENV') or os.environ.get('NODE_ENV') or '').lower()
+    if not secret or secret == 'default-insecure-secret':
+        if runtime_env in {'staging', 'production'}:
+            print('[Auth] SPECIALIST_SHARED_SECRET is required in staging/production')
+            return False
+        secret = 'development-only-specialist-secret'
 
     # Check timestamp is recent (within 30 seconds to prevent replay attacks)
     try:

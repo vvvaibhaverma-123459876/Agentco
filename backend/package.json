@@ -7,7 +7,11 @@
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "jest --passWithNoTests",
+    "test": "jest",
+    "test:unit": "jest --testPathIgnorePatterns=/integration/ --runInBand",
+    "test:integration": "jest tests/integration --runInBand",
+    "test:e2e": "jest tests/e2e --runInBand",
+    "test:all": "jest --runInBand",
     "db:migrate": "ts-node src/db/migrate.ts",
     "lint": "eslint src --ext .ts"
   },

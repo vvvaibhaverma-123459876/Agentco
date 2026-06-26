@@ -1,8 +1,22 @@
-# AgentCo - Complete Autonomous Agent Civilization System
+# AgentCo - Evidence-Governed Agent Civilization
 
-**Status**: ✅ **PRODUCTION READY** (100% health, all critical bugs fixed)  
-**Latest Update**: 2026-06-24 (Critical Bug Fixes - All 5 + 2 Additional Issues Resolved)  
-**Architecture**: Full civilization stack with real autonomy orchestration, reputation learning, adaptive strategy, governance integration, and coalition formation
+**Status**: **local/runtime hardening in progress; not production certified**  
+**Latest Update**: 2026-06-26 (runtime integrity and production honesty pass)  
+**Architecture**: Evidence-governed autonomy services with calibration, governance, reputation, durable execution, and explicit runtime fallback controls.
+
+## Current Implementation Reality
+
+AgentCo is not currently certified as production-ready. Treat this repository as a runnable local/research system with hardened production guards, not as a turnkey production deployment.
+
+| Classification | Current state |
+| --- | --- |
+| Implemented and wired | Backend Fastify API, frontend build path, native Postgres migrations, audit/event services, OpenAI-compatible LLM adapter paths, evidence-governed goal-run verification, runtime doctor/offline fallback reporting, real web retrieval for hardened autonomy paths. |
+| Implemented but still being reconciled | Multiple task substrates exist. The deployable agent dispatch path uses `workflow_tasks`; `agent_tasks` is now exposed as a compatibility view for durable executor tooling. |
+| Partial | Civilization/free-run depth, cross-domain transfer measurement, production deployment posture, some calibration updater persistence paths, and broad e2e task execution coverage. |
+| Mock/simulation/demo only | Test-only mock web adapter, deterministic fixture LLM, simulator services, disabled route files, disabled migrations, benchmark smoke fixtures. These must not be used silently in staging or production. |
+| Unsupported/future | Disabled migrations (`*.sql.disabled`), production use without Vault/real secrets, review/decision durable task execution without real services, and any library-only agent not present in the runtime registry. |
+
+Production-like startup (`AGENTCO_ENV=staging`, `AGENTCO_ENV=production`, or `NODE_ENV=production`) fails closed if required secrets or non-real providers are selected.
 
 ### Recent Updates (June 24, 2026)
 - ✅ **Fixed 5 Critical Autonomy Bugs** preventing autonomous loop execution
@@ -26,14 +40,7 @@ AgentCo is a complete evidence-governed autonomous agent civilization system. It
 - **Coalition Formation** — Dynamic team assembly with specialization matching
 - **Real-Time Learning & Adaptation** — Reflection-based improvement from execution patterns
 
-All systems are **production-ready** with:
-- ✅ PostgreSQL database (53 migrations, fully normalized schema, FK constraints verified)
-- ✅ Real OpenAI GPT-4 integration for planning and reasoning
-- ✅ Web research integration (DuckDuckGo, Wikipedia, Hacker News, GitHub)
-- ✅ Comprehensive error handling and audit logging
-- ✅ Performance validation: 558 ops/sec, <2ms latency, 0 errors
-- ✅ Evidence-to-Claims Pipeline: Fully functional with proper FK constraints
-- ✅ Reflection-Based Learning: Tested and verified working across loop iterations
+The repository contains strong implemented pieces, but older status sections may describe earlier phase goals. Prefer current verification reports under `reports/system_run/latest/` when deciding what is real, partial, simulated, or unsupported.
 
 ---
 

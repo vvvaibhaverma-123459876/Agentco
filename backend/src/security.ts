@@ -3,7 +3,9 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 const DEV_API_KEY = 'dev-api-key';
 
 export function isProductionEnv(env: NodeJS.ProcessEnv = process.env): boolean {
-  return env.AGENTCO_ENV === 'production';
+  const agentcoEnv = (env.AGENTCO_ENV || '').toLowerCase();
+  const nodeEnv = (env.NODE_ENV || '').toLowerCase();
+  return agentcoEnv === 'production' || agentcoEnv === 'staging' || nodeEnv === 'production';
 }
 
 function hasDevPassword(value: string | undefined): boolean {

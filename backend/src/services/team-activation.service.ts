@@ -11,6 +11,7 @@ import { createWriteStream } from 'fs';
 import path from 'path';
 import net from 'net';
 import { createHmac } from 'crypto';
+import { isProductionEnv } from '../security';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
 import { ActionSpec, ActionResult } from '../types/action.types';
@@ -463,12 +464,17 @@ export class TeamActivationService {
     signature: string;
     timestamp: string;
   } {
-    const secret = process.env.SPECIALIST_SHARED_SECRET || 'default-insecure-secret';
+    const secret = process.env.SPECIALIST_SHARED_SECRET;
+    if (!secret || secret === 'default-insecure-secret') {
+      if (isProductionEnv()) {
+        throw new Error('SPECIALIST_SHARED_SECRET must be configured with a non-default value in staging/production');
+      }
+    }
     const timestamp = Math.floor(Date.now() / 1000).toString();
     const payloadStr = JSON.stringify(payload);
     const message = payloadStr + ':' + timestamp;
 
-    const signature = createHmac('sha256', secret)
+    const signature = createHmac('sha256', secret || 'development-only-specialist-secret')
       .update(message)
       .digest('hex');
 
