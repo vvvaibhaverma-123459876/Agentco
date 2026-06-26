@@ -123,7 +123,12 @@ describe('Governance-Reputation & Coalition Formation Integration', () => {
 
     it('should form coalition from governance', async () => {
       const initiator = uuidv4();
+      const collaborator = uuidv4();
       await reputation.initializeEntity(initiator, 'agent', ['research']);
+      await reputation.initializeEntity(collaborator, 'agent', ['analysis']);
+      for (let i = 0; i < 2; i++) {
+        await reputation.recordEvent(collaborator, 'coordination_success', 1.0, [initiator]);
+      }
 
       const coalition_req = await governance.formCoalition(
         initiator,
@@ -135,10 +140,74 @@ describe('Governance-Reputation & Coalition Formation Integration', () => {
       expect(coalition_req.initiator_id).toBe(initiator);
       expect(coalition_req.status).toBe('forming');
       expect(coalition_req.recruited_members).toContain(initiator);
+      expect(coalition_req.recruited_members).toContain(collaborator);
+    });
+
+    it('should evaluate policy proposal from live voter reputation instead of a fixed score', async () => {
+      const proposer = uuidv4();
+      const voterA = uuidv4();
+      const voterB = uuidv4();
+      await reputation.initializeEntity(proposer, 'agent', ['governance']);
+      await reputation.initializeEntity(voterA, 'agent', []);
+      await reputation.initializeEntity(voterB, 'agent', []);
+      await reputation.recordEvent(voterA, 'claim_verified', 1.0, []);
+      await reputation.recordEvent(voterB, 'claim_refuted', 1.0, []);
+
+      await governance.recordVote(voterA, testProposalId, 'approve');
+      await governance.recordVote(voterB, testProposalId, 'reject');
+
+      const evaluation = await governance.evaluatePolicyProposal(
+        testProposalId,
+        'Require evidence citations for all supported claims.',
+        proposer
+      );
+
+      expect(evaluation.eligible_to_propose).toBe(true);
+      expect(evaluation.average_voter_reliability).toBeCloseTo(0.5, 5);
+      expect(evaluation.recommendation).toContain('2 reputation records');
+      expect(evaluation.recommendation).not.toContain('0.70');
+    });
+
+    it('should return governance history from actual votes, decisions, and coalitions', async () => {
+      const proposer = uuidv4();
+      const voter = uuidv4();
+      await reputation.initializeEntity(proposer, 'agent', ['governance']);
+      await reputation.initializeEntity(voter, 'agent', ['research']);
+
+      await governance.recordVote(voter, testProposalId, 'approve');
+      await governance.makeGovernanceDecision(testProposalId, 'policy_approval', proposer);
+      await governance.formCoalition(proposer, 'Governed research', ['research']);
+
+      const proposerHistory = governance.getGovernanceHistory(proposer);
+      const voterHistory = governance.getGovernanceHistory(voter);
+
+      expect(proposerHistory.proposals).toContain(testProposalId);
+      expect(proposerHistory.coalitions_formed).toBe(1);
+      expect(voterHistory.votes_cast).toBe(1);
+      expect(voterHistory.approvals).toBe(1);
     });
   });
 
   describe('Coalition Formation', () => {
+    it('should find candidates from reputation records by specialization and collaboration', async () => {
+      const analyst = uuidv4();
+      const weakCollaborator = uuidv4();
+      const unrelated = uuidv4();
+      await reputation.initializeEntity(analyst, 'agent', ['analysis']);
+      await reputation.initializeEntity(weakCollaborator, 'agent', ['analysis']);
+      await reputation.initializeEntity(unrelated, 'agent', ['research']);
+
+      await reputation.recordEvent(analyst, 'coordination_success', 1.0, []);
+      await reputation.recordEvent(analyst, 'claim_verified', 1.0, []);
+      await reputation.recordEvent(weakCollaborator, 'coordination_failure', 1.0, []);
+
+      const candidates = await coalition.findCandidates(['analysis'], 0.55);
+
+      expect(candidates.map((candidate) => candidate.agent_id)).toContain(analyst);
+      expect(candidates.map((candidate) => candidate.agent_id)).not.toContain(weakCollaborator);
+      expect(candidates.map((candidate) => candidate.agent_id)).not.toContain(unrelated);
+    });
+
     it('should require team lead with sufficient reliability', async () => {
       const team_lead = uuidv4();
       await reputation.initializeEntity(team_lead, 'agent', []);
@@ -248,6 +317,27 @@ describe('Governance-Reputation & Coalition Formation Integration', () => {
 
       const active = coalition.getActiveCoalitions();
       expect(active.length).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should recommend team composition from available reputation records', async () => {
+      const lead = uuidv4();
+      const support = uuidv4();
+      await reputation.initializeEntity(lead, 'agent', ['research']);
+      await reputation.initializeEntity(support, 'agent', ['analysis']);
+
+      for (let i = 0; i < 5; i++) {
+        await reputation.recordEvent(lead, 'claim_verified', 1.0, []);
+      }
+      await reputation.recordEvent(lead, 'coordination_success', 1.0, []);
+      await reputation.recordEvent(support, 'coordination_success', 1.0, []);
+
+      const recommendation = await coalition.recommendTeamComposition('Evidence review', ['research', 'analysis']);
+
+      expect(recommendation.recommended_lead).toBe(lead);
+      expect(recommendation.recommended_team_size).toBeGreaterThanOrEqual(2);
+      expect(recommendation.predicted_success_rate).toBeGreaterThan(0.5);
+      expect(recommendation.reasoning).toContain('available candidates');
+      expect(recommendation.reasoning).not.toContain('Would analyze');
     });
   });
 

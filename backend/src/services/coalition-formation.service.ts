@@ -64,20 +64,38 @@ class CoalitionFormationService {
     min_collaboration: number = this.min_collaboration_threshold
   ): Promise<TeamMember[]> {
     try {
-      const candidates: TeamMember[] = [];
+      const required = new Set(required_specializations);
+      const activeMemberIds = new Set(
+        Array.from(this.coalitions.values())
+          .filter((coalition) => coalition.status === 'active' || coalition.status === 'forming')
+          .flatMap((coalition) => coalition.members.map((member) => member.agent_id))
+      );
 
-      // In a real system, query all agents with specialization_records
-      // For now, demonstrate the logic with placeholder data
       console.log(
         `[CoalitionFormation] Searching for candidates with specializations: ${required_specializations.join(', ')}`
       );
 
-      // Each candidate should have:
-      // - At least one matching specialization
-      // - Collaboration score >= min_collaboration
-      // - Not currently in critical role
-
-      return candidates;
+      return this.reputation
+        .listReputations()
+        .filter((record) => record.entity_type === 'agent')
+        .filter((record) => !activeMemberIds.has(record.entity_id))
+        .filter((record) => record.collaboration >= min_collaboration)
+        .filter((record) => required.size === 0 || record.specialization.some((spec) => required.has(spec)))
+        .map((record) => ({
+          agent_id: record.entity_id,
+          specializations: record.specialization,
+          collaboration_score: record.collaboration,
+          reliability_score: record.reliability,
+          innovation_score: record.innovation,
+          availability: true,
+        }))
+        .sort((a, b) => {
+          const aCoverage = a.specializations.filter((spec) => required.has(spec)).length;
+          const bCoverage = b.specializations.filter((spec) => required.has(spec)).length;
+          const aScore = aCoverage * 0.5 + a.collaboration_score * 0.25 + a.reliability_score * 0.25;
+          const bScore = bCoverage * 0.5 + b.collaboration_score * 0.25 + b.reliability_score * 0.25;
+          return bScore - aScore;
+        });
     } catch (e) {
       console.error(`[CoalitionFormation] Failed to find candidates: ${(e as any).message}`);
       return [];
@@ -167,7 +185,9 @@ class CoalitionFormationService {
       const candidates = await this.findCandidates(required_specializations, this.min_collaboration_threshold);
 
       // Filter candidates by collaboration threshold
-      const qualified = candidates.filter(c => c.collaboration_score >= this.min_collaboration_threshold);
+      const qualified = candidates
+        .filter(c => c.agent_id !== team_lead_id)
+        .filter(c => c.collaboration_score >= this.min_collaboration_threshold);
 
       // Rank by fit (specialization + collaboration)
       qualified.sort((a, b) => {
@@ -377,13 +397,65 @@ class CoalitionFormationService {
     reasoning: string;
   }> {
     try {
-      // In real system, would query all agents and rank by suitability
-      // For now, return placeholder
+      const candidates = await this.findCandidates(required_specializations, this.min_collaboration_threshold);
+      const leadCandidates = candidates
+        .filter((candidate) => candidate.reliability_score >= this.lead_reliability_threshold)
+        .sort((a, b) => {
+          const aCoverage = a.specializations.filter((spec) => required_specializations.includes(spec)).length;
+          const bCoverage = b.specializations.filter((spec) => required_specializations.includes(spec)).length;
+          const aScore = a.reliability_score * 0.45 + a.collaboration_score * 0.35 + aCoverage * 0.2;
+          const bScore = b.reliability_score * 0.45 + b.collaboration_score * 0.35 + bCoverage * 0.2;
+          return bScore - aScore;
+        });
+      const recommendedLead = leadCandidates[0] || null;
+      const selectedMembers = candidates
+        .filter((candidate) => candidate.agent_id !== recommendedLead?.agent_id)
+        .slice(0, 5);
+
+      const membersForScoring = recommendedLead ? [recommendedLead, ...selectedMembers] : selectedMembers;
+      const coveredSpecs = new Set(membersForScoring.flatMap((member) => member.specializations));
+      const specializationCoverage = required_specializations.length > 0
+        ? required_specializations.filter((spec) => coveredSpecs.has(spec)).length / required_specializations.length
+        : 1.0;
+      const avgReliability = membersForScoring.length > 0
+        ? membersForScoring.reduce((sum, member) => sum + member.reliability_score, 0) / membersForScoring.length
+        : 0;
+      const avgCollaboration = membersForScoring.length > 0
+        ? membersForScoring.reduce((sum, member) => sum + member.collaboration_score, 0) / membersForScoring.length
+        : 0;
+      const predictedSuccessRate = Math.max(
+        0,
+        Math.min(1, avgReliability * 0.4 + avgCollaboration * 0.35 + specializationCoverage * 0.25)
+      );
+
+      try {
+        await db.query(
+          `INSERT INTO coalition_composition_recommendations
+           (recommendation_id, task_objective, required_specializations, recommended_lead_id, recommended_team_size, predicted_success_rate, reasoning)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            uuidv4(),
+            objective,
+            JSON.stringify(required_specializations),
+            recommendedLead?.agent_id || null,
+            membersForScoring.length,
+            predictedSuccessRate,
+            recommendedLead
+              ? `Lead selected from live reputation pool. Coverage=${specializationCoverage.toFixed(2)}, avg reliability=${avgReliability.toFixed(2)}, avg collaboration=${avgCollaboration.toFixed(2)}`
+              : 'No available lead met the reliability threshold',
+          ]
+        );
+      } catch (dbErr: any) {
+        console.warn(`[CoalitionFormation] Recommendation persist failed: ${dbErr.message}`);
+      }
+
       return {
-        recommended_lead: null,
-        recommended_team_size: 4,
-        predicted_success_rate: 0.75,
-        reasoning: 'Would analyze all available agents and recommend based on specialization + collaboration scores',
+        recommended_lead: recommendedLead?.agent_id || null,
+        recommended_team_size: membersForScoring.length,
+        predicted_success_rate: predictedSuccessRate,
+        reasoning: recommendedLead
+          ? `Recommended ${recommendedLead.agent_id} from ${candidates.length} available candidates for "${objective}"; specialization coverage ${specializationCoverage.toFixed(2)}`
+          : `No available lead meets reliability threshold ${this.lead_reliability_threshold}; ${candidates.length} candidates considered`,
       };
     } catch (e) {
       console.error(`[CoalitionFormation] Failed to recommend: ${(e as any).message}`);

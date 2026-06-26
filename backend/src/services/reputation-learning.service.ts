@@ -411,6 +411,17 @@ class ReputationLearningService {
   }
 
   /**
+   * List current in-process reputation records.
+   *
+   * Services that make runtime governance/routing decisions use this as their
+   * candidate pool. Database-backed entities are loaded into this map through
+   * initializeEntity(), so callers do not need to invent placeholder agents.
+   */
+  listReputations(): ReputationRecord[] {
+    return Array.from(this.reputations.values());
+  }
+
+  /**
    * Predict future performance based on reputation
    */
   predictPerformance(entity_id: string): { predicted_quality: number; confidence: number } {
