@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { db } from '../src/db/client';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { LoopDetectorService, ActionHistory } from '../src/services/loop-detector.service';
-import { MockWebAdapter } from '../src/adapters/mock-web-adapter';
+import { MockWebAdapter } from './support/mock-web-adapter';
 import {
   ActionSpec,
   ActionType,

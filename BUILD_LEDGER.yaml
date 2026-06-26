@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-26T09:56:35Z'
+  last_updated: '2026-06-26T09:59:09Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -593,7 +593,7 @@ gates:
   sandbox_breach: unknown
   credential_key_independence: unknown
   e2e_civilization_slice: unknown
-  _no_stub_hit_count: '33'
+  _no_stub_hit_count: '23'
   _no_simulation_hit_count: '0'
 gate_findings:
   no_stub:
@@ -606,46 +606,10 @@ gate_findings:
     marker: mock
     excerpt: '`Refusing to use ${providerName}=${providerValue} in staging/production; deterministic, fake, mock, and fixture
       providers are test-only`'
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 2
-    marker: Mock
-    excerpt: '* Mock Web Adapter'
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 9
-    marker: mock
-    excerpt: import { MOCK_DATA } from './mock-data';
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 25
-    marker: mock
-    excerpt: // Find matching mock data
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 39
-    marker: mock
-    excerpt: 'snippet: `Results for "${query}". This is a deterministic mock result.`,'
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 46
-    marker: mock
-    excerpt: // Check if this exact URL is in mock data
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 49
-    marker: mock
-    excerpt: "console.log(`[MockWebAdapter] Fetch \"${url}\" \u2192 exact match in mock data`);"
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 76
-    marker: mock
-    excerpt: 'console.warn(`[MockWebAdapter] Invalid mock URL: ${mockUrl}`);'
-  - path: backend/src/adapters/mock-web-adapter.ts
-    line: 98
-    marker: mock
-    excerpt: 'content: `Content fetched from ${url}. This is deterministic mock data for testing.`,'
   - path: backend/src/adapters/web-adapter.ts
     line: 5
     marker: mock
     excerpt: '* Allows swapping between real web API calls and deterministic mock data for testing.'
-  - path: backend/src/adapters/mock-data.ts
-    line: 2
-    marker: Mock
-    excerpt: '* Mock Web Data'
   - path: backend/src/db/run_migrations.py
     line: 44
     marker: placeholder
@@ -670,10 +634,6 @@ gate_findings:
     line: 53
     marker: later
     excerpt: '* Save checkpoint at current step for later resumption'
-  - path: backend/src/services/autonomy-orchestrator.service.ts
-    line: 22
-    marker: mock
-    excerpt: import { MockWebAdapter } from '../adapters/mock-web-adapter';
   - path: runtime/orchestration/modes.py
     line: 45
     marker: fake_

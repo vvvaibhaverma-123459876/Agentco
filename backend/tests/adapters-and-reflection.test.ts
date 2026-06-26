@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { WebAdapter } from '../src/adapters/web-adapter';
-import { MockWebAdapter } from '../src/adapters/mock-web-adapter';
+import { MockWebAdapter } from './support/mock-web-adapter';
 import { RealWebAdapter } from '../src/adapters/real-web-adapter';
 import { ReflectionService, Reflection } from '../src/services/reflection.service';
 import { LoopDetectionResult, ActionHistory } from '../src/services/loop-detector.service';

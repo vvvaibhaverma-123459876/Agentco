@@ -19,8 +19,8 @@ import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '../types/action.types';
-import { MockWebAdapter } from '../adapters/mock-web-adapter';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
+import { WebAdapter } from '../adapters/web-adapter';
 import { SourceDiscoveryEngine } from './source-discovery.service';
 import { isProductionEnv } from '../security';
 
@@ -87,10 +87,8 @@ export class AutonomyOrchestratorService {
   private adaptiveStrategy = new AdaptiveStrategyService();
   private sourceDiscovery = new SourceDiscoveryEngine();
 
-  constructor() {
-    // Initialize web adapter based on environment
-    const adapter = process.env.NODE_ENV === 'test' ? new MockWebAdapter() : new RealWebAdapter();
-    this.actionExecutor.setWebAdapter(adapter);
+  constructor(webAdapter: WebAdapter = new RealWebAdapter()) {
+    this.actionExecutor.setWebAdapter(webAdapter);
   }
 
   /**
