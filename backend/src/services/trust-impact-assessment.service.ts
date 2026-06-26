@@ -109,31 +109,36 @@ export class TrustImpactAssessmentService {
     policyId: string,
     baselinePolicyId: string
   ): Promise<Partial<AssessmentMetrics>> {
-    // Query baseline metrics for the baseline policy
-    const baselineResult = await db.query(
-      `SELECT metric_name, metric_value FROM baseline_metrics
+    const [baselineMetrics, candidateMetrics] = await Promise.all([
+      this.getLatestBaselineMetrics(baselinePolicyId),
+      this.getLatestBaselineMetrics(policyId),
+    ]);
+
+    const latestAssessment = await db.query(
+      `SELECT calibration_regression, confidence_shift, false_positive_impact,
+              false_negative_impact, reputation_impact, dispute_impact,
+              simulation_leakage_risk, safety_threshold_compliance,
+              rollback_feasibility, audit_completeness
+       FROM trust_impact_assessments
        WHERE policy_id = $1
-       ORDER BY measurement_timestamp DESC`,
-      [baselinePolicyId]
+       ORDER BY created_at DESC
+       LIMIT 1`,
+      [policyId]
     );
+    const prior = latestAssessment.rows[0] || {};
+    const metricCoverage = this.metricCoverage(candidateMetrics);
 
-    const baselineMetrics: Record<string, number> = {};
-    for (const row of baselineResult.rows) {
-      baselineMetrics[row.metric_name] = row.metric_value;
-    }
-
-    // For now, return default comparison (in production, would evaluate new policy)
     return {
-      calibration_regression: 0.0, // No regression (best case)
-      confidence_shift: 0.0,
-      false_positive_impact: 0.0,
-      false_negative_impact: 0.0,
-      reputation_impact: 0.0,
-      dispute_impact: 0.0,
-      simulation_leakage_risk: 0.0,
-      safety_threshold_compliance: 1.0,
-      rollback_feasibility: 1.0,
-      audit_completeness: 1.0
+      calibration_regression: this.delta(candidateMetrics, baselineMetrics, ['calibration_error', 'ece', 'calibration_regression'], prior.calibration_regression ?? 0),
+      confidence_shift: this.delta(candidateMetrics, baselineMetrics, ['average_confidence', 'confidence'], prior.confidence_shift ?? 0),
+      false_positive_impact: this.delta(candidateMetrics, baselineMetrics, ['false_positive_rate', 'false_positive_impact'], prior.false_positive_impact ?? 0),
+      false_negative_impact: this.delta(candidateMetrics, baselineMetrics, ['false_negative_rate', 'false_negative_impact'], prior.false_negative_impact ?? 0),
+      reputation_impact: this.value(candidateMetrics, ['reputation_impact'], prior.reputation_impact ?? await this.assessReputationImpact(policyId)),
+      dispute_impact: this.value(candidateMetrics, ['dispute_impact', 'dispute_rate'], prior.dispute_impact ?? await this.assessDisputeImpact(policyId)),
+      simulation_leakage_risk: this.value(candidateMetrics, ['simulation_leakage_risk'], prior.simulation_leakage_risk ?? await this.assessSimulationLeakageRisk(policyId)),
+      safety_threshold_compliance: this.value(candidateMetrics, ['safety_threshold_compliance', 'safety_compliance'], prior.safety_threshold_compliance ?? 0),
+      rollback_feasibility: this.value(candidateMetrics, ['rollback_feasibility'], prior.rollback_feasibility ?? 0),
+      audit_completeness: Math.min(this.value(candidateMetrics, ['audit_completeness'], prior.audit_completeness ?? 0), metricCoverage),
     };
   }
 
@@ -162,27 +167,51 @@ export class TrustImpactAssessmentService {
    * Assess reputation impact of proposed change
    */
   async assessReputationImpact(policyId: string): Promise<number> {
-    // Query trust reputation ledger (if it exists) for expected impact
-    // For now, return neutral impact
-    return 0.0;
+    const result = await db.query(
+      `SELECT COALESCE(AVG(impact_value * impact_confidence), 0) AS weighted_impact
+       FROM trust_reputation_ledger
+       WHERE source_ref = $1 OR evidence_json->>'policy_id' = $1`,
+      [policyId]
+    );
+    return this.clamp(Number(result.rows[0]?.weighted_impact ?? 0), -1, 1);
   }
 
   /**
    * Assess dispute impact
    */
   async assessDisputeImpact(policyId: string): Promise<number> {
-    // Query society disputes to assess if change would reduce/increase disputes
-    // For now, return neutral impact
-    return 0.0;
+    const result = await db.query(
+      `SELECT
+         COUNT(*) FILTER (WHERE status IN ('raised', 'under_investigation', 'awaiting_evidence', 'in_consensus_formation', 'escalated_to_civilization')) AS open_count,
+         COUNT(*) AS total_count
+       FROM society_disputes
+       WHERE parties_json::text ILIKE $1
+          OR evidence_for_json::text ILIKE $1
+          OR evidence_against_json::text ILIKE $1
+          OR resolution_summary ILIKE $1`,
+      [`%${policyId}%`]
+    );
+    const open = Number(result.rows[0]?.open_count ?? 0);
+    const total = Number(result.rows[0]?.total_count ?? 0);
+    return total > 0 ? this.clamp(open / total, 0, 1) : 0;
   }
 
   /**
    * Assess simulation leakage risk
    */
   async assessSimulationLeakageRisk(policyId: string): Promise<number> {
-    // Check if policy would allow simulation-derived claims to affect real-world
-    // For now, return low risk (0.0 = no leakage)
-    return 0.0;
+    const result = await db.query(
+      `SELECT
+         COUNT(*) FILTER (WHERE simulation_derived = true) AS simulation_count,
+         COUNT(*) AS total_count
+       FROM replay_batches
+       WHERE source_filter_json::text ILIKE $1
+          OR tags::text ILIKE $1`,
+      [`%${policyId}%`]
+    );
+    const simulationCount = Number(result.rows[0]?.simulation_count ?? 0);
+    const total = Number(result.rows[0]?.total_count ?? 0);
+    return total > 0 ? this.clamp(simulationCount / total, 0, 1) : 0;
   }
 
   /**
@@ -291,10 +320,56 @@ export class TrustImpactAssessmentService {
 
     const metrics: Record<string, number> = {};
     for (const row of result.rows) {
-      metrics[row.metric_name] = row.metric_value;
+      if (metrics[row.metric_name] === undefined) {
+        metrics[row.metric_name] = Number(row.metric_value);
+      }
     }
 
     return metrics;
+  }
+
+  private value(metrics: Record<string, number>, names: string[], fallback: number): number {
+    for (const name of names) {
+      if (metrics[name] !== undefined && Number.isFinite(Number(metrics[name]))) {
+        return Number(metrics[name]);
+      }
+    }
+    return Number(fallback);
+  }
+
+  private delta(
+    candidate: Record<string, number>,
+    baseline: Record<string, number>,
+    names: string[],
+    fallback: number
+  ): number {
+    for (const name of names) {
+      if (candidate[name] !== undefined && baseline[name] !== undefined) {
+        return Number(candidate[name]) - Number(baseline[name]);
+      }
+    }
+    return Number(fallback);
+  }
+
+  private metricCoverage(metrics: Record<string, number>): number {
+    const expected = [
+      'calibration_error',
+      'average_confidence',
+      'false_positive_rate',
+      'false_negative_rate',
+      'reputation_impact',
+      'dispute_impact',
+      'simulation_leakage_risk',
+      'safety_threshold_compliance',
+      'rollback_feasibility',
+      'audit_completeness',
+    ];
+    const present = expected.filter((name) => metrics[name] !== undefined).length;
+    return present / expected.length;
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value));
   }
 
   /**
