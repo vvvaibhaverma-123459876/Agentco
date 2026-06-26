@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-26T09:59:09Z'
+  last_updated: '2026-06-26T10:23:15Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -552,14 +552,20 @@ layers:
       artifacts: []
       tests: []
     - id: L14.VerticalSlice
-      status: not_started
+      status: verified
       depends_on:
       - L14.CivilizationRuntime
       - L5.ResolutionService
       - L6.ProofOfCalibrationService
       - L13.GeneralityMetricTracker
-      artifacts: []
-      tests: []
+      artifacts:
+      - scripts/verify_civilization_vertical_slice.py
+      tests:
+      - reports/system_run/latest/civilization_vertical_slice.json
+      gates_passed:
+      - e2e
+      notes: Canonical civilization vertical slice passed against real Postgres, Kafka, OpenAI chat, OpenAI embeddings, resolution_service,
+        and Postgres-backed vector index.
   capability_growth_engine:
     status: not_started
     items:
@@ -580,11 +586,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 0
+  verified: 1
   in_progress: 35
-  not_started: 32
+  not_started: 31
   blocked: 0
-  percent_verified: 0.0
+  percent_verified: 1.49
 gates:
   no_stub: red
   no_simulation: green
@@ -592,7 +598,7 @@ gates:
   firewall: unknown
   sandbox_breach: unknown
   credential_key_independence: unknown
-  e2e_civilization_slice: unknown
+  e2e_civilization_slice: green
   _no_stub_hit_count: '23'
   _no_simulation_hit_count: '0'
 gate_findings:
