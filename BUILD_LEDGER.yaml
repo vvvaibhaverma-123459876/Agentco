@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-26T06:45:32Z'
+  last_updated: '2026-06-26T09:45:29Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -16,13 +16,15 @@ layers:
       artifacts:
       - runtime/orchestration/modes.py
       - backend/src/runtime-mode.ts
+      - backend/src/routes/system.routes.ts
       tests:
       - runtime/orchestration/tests/test_modes.py
       - backend/tests/runtime-mode.test.ts
+      - backend/tests/system-routes.test.ts
       gates_passed:
       - unit
-      notes: Existing local/offline modes are implemented; spec-required /system runtime APIs and full production capability
-        contract remain incomplete.
+      notes: Existing local/offline modes plus /system runtime, capability, fallback, build-status, and readiness APIs are
+        implemented. Full production capability contract remains incomplete.
     - id: L0.ServiceDoctor
       status: in_progress
       depends_on: []
@@ -49,13 +51,15 @@ layers:
       artifacts:
       - BUILD_LEDGER.yaml
       - scripts/build_ledger.py
+      - backend/src/routes/system.routes.ts
       tests:
       - tests/test_build_ledger.py
+      - backend/tests/system-routes.test.ts
       gates_passed:
       - unit
       - db_sync
-      notes: Ledger CLI, status rollups, remaining frontier, and DB sync are implemented; item remains in_progress until full
-        architecture status API/reporting gates are complete.
+      notes: Ledger CLI, status rollups, remaining frontier, DB sync, and backend build-status/readiness reporting are implemented.
+        Item remains in_progress until full architecture reporting gates are complete.
     - id: L0.MigrationRunner
       status: in_progress
       depends_on: []

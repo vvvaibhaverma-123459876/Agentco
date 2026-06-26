@@ -26,4 +26,19 @@ describe('system routes', () => {
     expect(body.meta.termination_predicate_met).toBe(false);
     await app.close();
   });
+
+  test('reports readiness without overclaiming production status', async () => {
+    const app = await build();
+
+    const response = await app.inject({ method: 'GET', url: '/system/readiness' });
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.verdict).toMatch(/partial|not_production_ready|fallbacks/);
+    expect(body.production_ready).toBe(false);
+    expect(body.termination_predicate_met).toBe(false);
+    expect(body.honesty.status).toBe('not_fully_verified');
+    expect(body.build_ledger.total_items).toBeGreaterThan(0);
+    await app.close();
+  });
 });

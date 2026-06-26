@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify';
 import fs from 'fs';
 import path from 'path';
 import YAML from 'yaml';
-import { activeRuntimeMode, configuredProviders } from '../runtime-mode';
+import { RuntimeProvider, activeRuntimeMode, configuredProviders } from '../runtime-mode';
 import { db } from '../db/client';
 
 function repoRoot(): string {
@@ -37,6 +37,29 @@ function summarizeLedger(ledger: any) {
   };
 }
 
+function fallbackProviders(providers: RuntimeProvider[]) {
+  return providers.filter(provider => provider.status === 'fallback' || provider.status === 'simulated');
+}
+
+function disabledCapabilities(providers: RuntimeProvider[]) {
+  return providers.filter(provider => provider.status === 'unsupported').map(provider => provider.name);
+}
+
+function readinessVerdict(ledgerSummary: ReturnType<typeof summarizeLedger>, providers: RuntimeProvider[]) {
+  const fallbackActive = fallbackProviders(providers).length > 0;
+  const disabled = disabledCapabilities(providers);
+  const terminationMet = ledgerSummary.meta?.termination_predicate_met === true;
+  const percentVerified = ledgerSummary.rollups.percent_verified;
+
+  if (activeRuntimeMode() === 'production' && (fallbackActive || disabled.length > 0 || !terminationMet)) {
+    return 'not_production_ready';
+  }
+  if (!terminationMet || percentVerified < 100) {
+    return fallbackActive || disabled.length > 0 ? 'partial_with_fallbacks' : 'partial';
+  }
+  return fallbackActive ? 'runnable_with_fallbacks' : 'ready';
+}
+
 export async function systemRoutes(fastify: FastifyInstance) {
   fastify.get('/system/health', async () => ({
     status: 'ok',
@@ -54,8 +77,8 @@ export async function systemRoutes(fastify: FastifyInstance) {
       runtime_mode: activeRuntimeMode(),
       providers,
       can_continue: !providers.some(provider => provider.status === 'unsupported'),
-      fallback_active: providers.some(provider => provider.status === 'fallback' || provider.status === 'simulated'),
-      disabled_capabilities: providers.filter(provider => provider.status === 'unsupported').map(provider => provider.name),
+      fallback_active: fallbackProviders(providers).length > 0,
+      disabled_capabilities: disabledCapabilities(providers),
     };
   });
 
@@ -92,4 +115,28 @@ export async function systemRoutes(fastify: FastifyInstance) {
   });
 
   fastify.get('/system/build-status', async () => summarizeLedger(loadBuildLedger()));
+
+  fastify.get('/system/readiness', async () => {
+    const providers = configuredProviders();
+    const ledger = summarizeLedger(loadBuildLedger());
+    const fallbacks = fallbackProviders(providers);
+    const disabled = disabledCapabilities(providers);
+    return {
+      verdict: readinessVerdict(ledger, providers),
+      runtime_mode: activeRuntimeMode(),
+      can_continue: disabled.length === 0,
+      production_ready: readinessVerdict(ledger, providers) === 'ready' && activeRuntimeMode() === 'production',
+      fallback_active: fallbacks.length > 0,
+      fallbacks,
+      disabled_capabilities: disabled,
+      build_ledger: ledger.rollups,
+      termination_predicate_met: ledger.meta?.termination_predicate_met === true,
+      honesty: {
+        verified_items: ledger.rollups.verified,
+        total_items: ledger.rollups.total_items,
+        percent_verified: ledger.rollups.percent_verified,
+        status: ledger.rollups.percent_verified === 100 ? 'fully_verified' : 'not_fully_verified',
+      },
+    };
+  });
 }
