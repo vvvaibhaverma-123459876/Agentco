@@ -13,7 +13,6 @@ import {
   ActionResult,
   ActionStatus,
   ActionType,
-  Evidence,
   Claim,
 } from '../types/action.types';
 import { WebAdapter } from '../adapters/web-adapter';
@@ -226,8 +225,7 @@ export class ActionExecutorService {
       }
     }
 
-    // Search failed - BLOCKED (no synthetic fallback)
-    // Return BLOCKED status instead of fake results
+    // Search failed: block without creating synthetic artifacts.
     result.status = ActionStatus.BLOCKED;
     result.blockedReason = `Web search failed for query: "${query}". No real search results available. Configure SEARCH_ENGINE_API_KEY or BING_SEARCH_API_KEY for real search capability.`;
     result.observations.searchQuery = query;
@@ -285,48 +283,15 @@ export class ActionExecutorService {
           return;
         }
       } catch (error: any) {
-        console.warn(`Web fetch failed: ${error.message}, recording fetch attempt`);
+        console.warn(`Web fetch failed: ${error.message}; no artifact will be recorded without real content`);
       }
     }
 
-    // Fallback: Record fetch attempt with placeholder content
-    const fetchId = uuidv4();
-    try {
-      const evidence: Evidence = {
-        sourceId: uuidv4(),
-        url,
-        retrievedAt: new Date(),
-        contentHash: `hash_fallback_${fetchId}`,
-        sourceType: 'web',
-        isPublicAccess: true,
-      };
-
-      await db.query(
-        `INSERT INTO autonomy_evidence (
-          id, action_id, source_id, url, title, retrieved_at, content_hash, source_type,
-          is_public_access, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
-        [
-          uuidv4(),
-          spec.actionId,
-          evidence.sourceId,
-          url,
-          'Fetch Attempted (Unavailable)',
-          evidence.retrievedAt,
-          evidence.contentHash,
-          'web',
-          evidence.isPublicAccess,
-        ]
-      );
-
-      result.observations.fetchId = fetchId;
-      result.observations.url = url;
-      result.createdArtifacts.push(evidence.sourceId);
-      result.observations.status = 'fetch_recorded';
-    } catch (error: any) {
-      result.status = ActionStatus.FAILED;
-      result.errors = [error.message];
-    }
+    result.status = ActionStatus.BLOCKED;
+    result.blockedReason = `Fetch failed for URL: "${url}". No real page content available, so no evidence artifact was created.`;
+    result.observations.url = url;
+    result.observations.status = 'fetch_blocked_no_real_content';
+    result.errors = [result.blockedReason];
   }
 
   private async handleExtractEvidence(spec: ActionSpec, result: ActionResult): Promise<void> {

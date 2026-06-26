@@ -74,13 +74,24 @@ class FetcherAgent(SpecialistAgent):
         estimated_tokens = len(content) // 4
         self.record_token_usage(estimated_tokens)
 
-        artifact_id = self.persist_evidence(
-            url=fetched['url'],
-            content=content,
-            title=title,
-            snippet=content[:200],
-            source_type='web_page',
-        )
+        try:
+            artifact_id = self.persist_evidence(
+                url=fetched['url'],
+                content=content,
+                title=title,
+                snippet=content[:200],
+                source_type='web_page',
+            )
+        except Exception as exc:
+            return {
+                'observations': {
+                    'url': url,
+                    'status': 'failed',
+                    'reason': f'Evidence persistence failed: {exc}',
+                },
+                'artifacts': [],
+                'errors': [f'Evidence persistence failed: {exc}'],
+            }
 
         return {
             'observations': {

@@ -88,16 +88,28 @@ class ResearcherAgent(SpecialistAgent):
         estimated_tokens = len(query) // 4 + 100
         self.record_token_usage(estimated_tokens)
 
-        artifacts = [
-            self.persist_evidence(
-                url=result['url'],
-                content=result.get('snippet', ''),
-                title=result.get('title', ''),
-                snippet=result.get('snippet', ''),
-                source_type='web_search',
-            )
-            for result in results
-        ]
+        try:
+            artifacts = [
+                self.persist_evidence(
+                    url=result['url'],
+                    content=result.get('snippet', ''),
+                    title=result.get('title', ''),
+                    snippet=result.get('snippet', ''),
+                    source_type='web_search',
+                )
+                for result in results
+            ]
+        except Exception as exc:
+            return {
+                'observations': {
+                    'query': query,
+                    'status': 'failed',
+                    'reason': f'Evidence persistence failed: {exc}',
+                    'resultsFound': len(results),
+                },
+                'artifacts': [],
+                'errors': [f'Evidence persistence failed: {exc}'],
+            }
 
         return {
             'observations': {
@@ -137,14 +149,24 @@ class ResearcherAgent(SpecialistAgent):
         estimated_tokens = len(content) // 4
         self.record_token_usage(estimated_tokens)
 
-        # Persist evidence to database with real ID
-        artifact_id = self.persist_evidence(
-            url=url,
-            content=content,
-            title=title,
-            snippet=content[:200],
-            source_type='web_page'
-        )
+        try:
+            artifact_id = self.persist_evidence(
+                url=url,
+                content=content,
+                title=title,
+                snippet=content[:200],
+                source_type='web_page'
+            )
+        except Exception as exc:
+            return {
+                'observations': {
+                    'url': url,
+                    'status': 'failed',
+                    'reason': f'Evidence persistence failed: {exc}',
+                },
+                'artifacts': [],
+                'errors': [f'Evidence persistence failed: {exc}'],
+            }
 
         return {
             'observations': {
@@ -188,13 +210,24 @@ class ResearcherAgent(SpecialistAgent):
         estimated_tokens = max(50, sum(len(point) for point in key_points) // 4)
         self.record_token_usage(estimated_tokens)
 
-        artifact_id = self.persist_evidence(
-            url=evidence.get('url', ''),
-            content='\n'.join(key_points),
-            title=f"Extraction from {evidence.get('title') or source_id}",
-            snippet=key_points[0][:200],
-            source_type='extracted_evidence',
-        )
+        try:
+            artifact_id = self.persist_evidence(
+                url=evidence.get('url', ''),
+                content='\n'.join(key_points),
+                title=f"Extraction from {evidence.get('title') or source_id}",
+                snippet=key_points[0][:200],
+                source_type='extracted_evidence',
+            )
+        except Exception as exc:
+            return {
+                'observations': {
+                    'sourceId': source_id,
+                    'status': 'failed',
+                    'reason': f'Evidence persistence failed: {exc}',
+                },
+                'artifacts': [],
+                'errors': [f'Evidence persistence failed: {exc}'],
+            }
 
         return {
             'observations': {
@@ -223,11 +256,24 @@ class ResearcherAgent(SpecialistAgent):
                 'artifacts': []
             }
 
-        # Generate claim ID
-        claim_id = str(uuid.uuid4())
-
         estimated_tokens = len(claim_text) // 4 + 50
         self.record_token_usage(estimated_tokens)
+        try:
+            claim_id = self.persist_claim(
+                claim_text=claim_text,
+                support_source_ids=support_source_ids,
+                confidence=float(spec.get('args', {}).get('confidence', 0.7)),
+                status='supported',
+            )
+        except Exception as exc:
+            return {
+                'observations': {
+                    'status': 'failed',
+                    'reason': f'Claim persistence failed: {exc}',
+                },
+                'artifacts': [],
+                'errors': [f'Claim persistence failed: {exc}'],
+            }
 
         return {
             'observations': {

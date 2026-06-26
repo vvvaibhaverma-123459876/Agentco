@@ -687,8 +687,7 @@ class SpecialistAgent(BaseAgent):
                         print(f"[Evidence] No connection available, retrying in {wait_time}s (attempt {attempt + 1}/3)")
                         time.sleep(wait_time)
                         continue
-                    print(f"[Evidence] DB unavailable after 3 attempts, returning stub ID: {evidence_id}")
-                    return evidence_id
+                    raise RuntimeError("Database unavailable after 3 attempts; evidence was not persisted")
 
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -795,8 +794,7 @@ class SpecialistAgent(BaseAgent):
         claim_id = str(uuid.uuid4())
 
         if not support_source_ids:
-            print(f"[Claim] No sources provided, returning stub ID: {claim_id}")
-            return claim_id
+            raise RuntimeError("Cannot persist supported claim without support_source_ids")
 
         # Retry logic with exponential backoff
         for attempt in range(3):
@@ -809,8 +807,7 @@ class SpecialistAgent(BaseAgent):
                         print(f"[Claim] No connection available, retrying in {wait_time}s (attempt {attempt + 1}/3)")
                         time.sleep(wait_time)
                         continue
-                    print(f"[Claim] DB unavailable after 3 attempts, returning stub ID: {claim_id}")
-                    return claim_id
+                    raise RuntimeError("Database unavailable after 3 attempts; claim was not persisted")
 
                 cursor = conn.cursor()
                 cursor.execute("""

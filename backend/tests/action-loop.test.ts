@@ -102,6 +102,28 @@ describe('Action Loop Integration', () => {
       expect(result.observations.resultsFound).toBeGreaterThan(0);
     });
 
+    it('should block FETCH_PAGE without real content instead of recording placeholder evidence', async () => {
+      const isolatedExecutor = new ActionExecutorService();
+      const spec: ActionSpec = {
+        actionId: uuidv4(),
+        actionType: ActionType.FETCH_PAGE,
+        goalId: uuidv4(),
+        objective: 'Fetch unavailable page',
+        args: { url: 'https://example.com/no-adapter' },
+        successCriteria: ['No placeholder artifact created'],
+        riskLevel: RiskLevel.LOW,
+        decidedBy: 'test',
+        decidedAt: new Date(),
+      };
+
+      const result = await isolatedExecutor.executeAction(spec);
+
+      expect(result.status).toBe(ActionStatus.BLOCKED);
+      expect(result.createdArtifacts).toHaveLength(0);
+      expect(result.observations.status).toBe('fetch_blocked_no_real_content');
+      expect(result.blockedReason).toContain('no evidence artifact was created');
+    });
+
     it('should execute GENERATE_CLAIM with evidence validation', async () => {
       const sourceId = uuidv4();
       const spec: ActionSpec = {
