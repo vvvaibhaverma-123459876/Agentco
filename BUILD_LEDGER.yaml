@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-26T10:23:15Z'
+  last_updated: '2026-06-26T10:30:19Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -111,26 +111,54 @@ layers:
       artifacts: []
       tests: []
   L1_identity_authority:
-    status: not_started
+    status: in_progress
     items:
     - id: L1.ActorRegistry
-      status: not_started
+      status: verified
       depends_on:
       - L0.MigrationRunner
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - unit
+      - integration
+      - typescript
+      notes: Actor registration is backed by Postgres and writes actor.registered event_history plus decision_log audit in
+        the same transaction.
     - id: L1.RoleRegistry
-      status: not_started
+      status: verified
       depends_on:
       - L1.ActorRegistry
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - integration
+      - typescript
+      notes: Canonical civilization roles are seeded and assignable to active actors with role.assigned event emission.
     - id: L1.PermissionService
-      status: not_started
+      status: verified
       depends_on:
       - L1.ActorRegistry
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - integration
+      - typescript
+      notes: Direct actor permission grants and /identity/verify authority decisions are persisted and audited; role-derived
+        permissions remain a future expansion under AuthorityChain.
     - id: L1.KeyRing
       status: in_progress
       depends_on:
@@ -586,11 +614,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 1
+  verified: 4
   in_progress: 35
-  not_started: 31
+  not_started: 28
   blocked: 0
-  percent_verified: 1.49
+  percent_verified: 5.97
 gates:
   no_stub: red
   no_simulation: green

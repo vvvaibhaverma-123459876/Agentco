@@ -21,6 +21,7 @@ import { institutionWorkAssignmentRoutes } from './routes/institution-work-assig
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
 import { phase3HardeningRoutes } from './routes/phase3-hardening.routes';
 import { systemRoutes } from './routes/system.routes';
+import { identityRoutes } from './routes/identity.routes';
 import { metricsService } from './services/autonomy-metrics.service';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -104,6 +105,7 @@ export async function build() {
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);
   await app.register(phase3HardeningRoutes);
+  await app.register(identityRoutes);
   await app.register(systemRoutes);
 
   // Basic health check
