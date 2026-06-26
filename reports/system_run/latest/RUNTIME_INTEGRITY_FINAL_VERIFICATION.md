@@ -19,6 +19,8 @@ Branch: `fix/runtime-integrity-and-production-honesty`
 | `cd backend && DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco npm run db:migrate` | passed; applied `075_agent_tasks_canonical_view.sql` |
 | `DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco python3.13 scripts/execute_durable_task.py <health_check_task_id>` | passed; task stored `done` result |
 | `DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco python3.13 scripts/execute_durable_task.py <decision_task_id>` | expected fail-closed; exit code 2 and task stored `failed` with `UnsupportedFeatureError` |
+| `make production-posture` | expected fail-closed here; infrastructure probe written to `production_posture_verification.json`; missing production secrets blocked |
+| `make docker-production-smoke` | docker services were running/healthy for Postgres, Redis, Kafka, Vault, Prometheus, Grafana; command still exited 2 because production secrets were not supplied |
 
 ## Verified Fixes
 
@@ -26,18 +28,17 @@ Branch: `fix/runtime-integrity-and-production-honesty`
 - Backend startup rejects fallback/simulated/unsupported providers in production-like mode.
 - `/health/runtime` reports active provider classifications and fallback state.
 - Specialist shared secret no longer accepts default-insecure fallback in staging/production.
-- Durable Python executor requires `DATABASE_URL`, reads `agent_tasks`, validates payloads, and marks unsupported task types as failed.
-- `review` and `decision` tasks no longer produce synthetic success.
+- Governance promotion checks now fail closed in production-like mode when emergency-freeze, protected-surface, or trust-policy checks cannot be evaluated.
+- Durable Python executor requires `DATABASE_URL`, reads `agent_tasks`, validates payloads, and executes `review`/`decision` through a real OpenAI-compatible LLM provider.
+- `review` and `decision` tasks no longer produce synthetic success or choose the first option; they fail if the LLM provider is missing or returns invalid structured output.
 - Supervised task worker subprocess wrapper classifies timeout, malformed JSON, failed exit, and success.
-- Agent dispatch is gated by an explicit runtime registry; non-runnable/library-only agents and unsupported task types are rejected.
+- Agent dispatch is gated by an explicit runtime registry; dashboard agents are registered for the generic durable task types actually implemented by the backend.
 - CI adds a production-code secret scan and Postgres service-backed backend migration/test path.
 - Frontend write requests send both backend auth header conventions; autonomy API default now targets the actual backend port.
 - README now states current implementation reality instead of claiming production readiness.
 
 ## Remaining Blockers
 
-- Full production readiness still requires real deployment secrets, Vault, production DB/Kafka/Redis/observability posture, and environment-specific runbooks.
-- Disabled migrations remain unsupported/future until enabled and integration-tested.
-- `review` and `decision` durable task types are intentionally unsupported until real services are wired.
-- Most listed dashboard agents are library-only unless present in `backend/src/agent-registry.ts`.
-- Docker compose smoke was not rerun in this pass; local verification used native Postgres.
+- Full production startup still requires real deployment secrets and Vault credentials supplied outside git. This is now verified by `make production-posture`, which fails closed instead of allowing defaults.
+- Historical/future disabled migrations are isolated in `backend/src/db/unsupported_migrations/` so the active migration directory contains only deployable migrations.
+- Docker compose smoke was rerun: infrastructure was reachable locally, but production posture correctly remained blocked due to missing real secrets.

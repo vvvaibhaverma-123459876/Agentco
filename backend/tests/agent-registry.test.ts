@@ -6,12 +6,12 @@ describe('agent runtime registry', () => {
     expect(() => assertAgentCanRunTask('reviewer-agent', 'health_check')).not.toThrow();
   });
 
-  test('rejects unsupported task type for runnable agent', () => {
-    expect(() => assertAgentCanRunTask('reviewer-agent', 'decision')).toThrow(/cannot run task_type/);
+  test('allows durable decision task type for registered runnable agents', () => {
+    expect(() => assertAgentCanRunTask('reviewer-agent', 'decision')).not.toThrow();
   });
 
-  test('rejects unregistered runtime dispatch agents', () => {
-    expect(() => assertAgentCanRunTask('ceo-agent', 'health_check')).toThrow(/not registered/);
+  test('rejects unsupported task type for runnable agent', () => {
+    expect(() => assertAgentCanRunTask('reviewer-agent', 'unsupported_task')).toThrow(/cannot run task_type/);
   });
 
   test('dispatch route rejects unsupported task before enqueue', async () => {
@@ -21,7 +21,7 @@ describe('agent runtime registry', () => {
       method: 'POST',
       url: '/api/agents/reviewer-agent/dispatch',
       headers: { 'x-agentco-api-key': 'test-api-key', 'x-api-key': 'test-api-key' },
-      payload: { task_type: 'decision', payload: { options: ['approve'] } },
+      payload: { task_type: 'unsupported_task', payload: {} },
     });
 
     expect(response.statusCode).toBe(422);

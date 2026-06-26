@@ -10,11 +10,11 @@ AgentCo is not currently certified as production-ready. Treat this repository as
 
 | Classification | Current state |
 | --- | --- |
-| Implemented and wired | Backend Fastify API, frontend build path, native Postgres migrations, audit/event services, OpenAI-compatible LLM adapter paths, evidence-governed goal-run verification, runtime doctor/offline fallback reporting, real web retrieval for hardened autonomy paths. |
-| Implemented but still being reconciled | Multiple task substrates exist. The deployable agent dispatch path uses `workflow_tasks`; `agent_tasks` is now exposed as a compatibility view for durable executor tooling. |
+| Implemented and wired | Backend Fastify API, frontend build path, native Postgres migrations, audit/event services, OpenAI-compatible LLM adapter paths, evidence-governed goal-run verification, runtime doctor/offline fallback reporting, real web retrieval for hardened autonomy paths, LLM-backed durable `review`/`decision` tasks with structured output validation. |
+| Implemented but still being reconciled | Multiple task substrates exist. The deployable agent dispatch path uses `workflow_tasks`; `agent_tasks` is exposed as a compatibility view for durable executor tooling. |
 | Partial | Civilization/free-run depth, cross-domain transfer measurement, production deployment posture, some calibration updater persistence paths, and broad e2e task execution coverage. |
 | Mock/simulation/demo only | Test-only mock web adapter, deterministic fixture LLM, simulator services, disabled route files, disabled migrations, benchmark smoke fixtures. These must not be used silently in staging or production. |
-| Unsupported/future | Disabled migrations (`*.sql.disabled`), production use without Vault/real secrets, review/decision durable task execution without real services, and any library-only agent not present in the runtime registry. |
+| Unsupported/future | Historical migration drafts archived under `backend/src/db/unsupported_migrations/`, production use without Vault/real secrets, and any task type not listed in `backend/src/agent-registry.ts`. |
 
 Production-like startup (`AGENTCO_ENV=staging`, `AGENTCO_ENV=production`, or `NODE_ENV=production`) fails closed if required secrets or non-real providers are selected.
 

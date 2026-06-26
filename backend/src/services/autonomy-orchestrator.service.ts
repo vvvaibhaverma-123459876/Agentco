@@ -22,6 +22,7 @@ import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '.
 import { MockWebAdapter } from '../adapters/mock-web-adapter';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { SourceDiscoveryEngine } from './source-discovery.service';
+import { isProductionEnv } from '../security';
 
 export interface AutonomyRun {
   id: string;
@@ -1178,7 +1179,12 @@ export class AutonomyOrchestratorService {
       return { active: false };
     } catch (error: any) {
       console.warn(`[GOVERNANCE] Failed to check emergency freeze: ${error.message}`);
-      // Conservative: assume freeze is NOT active if we can't check (fail open)
+      if (isProductionEnv()) {
+        return {
+          active: true,
+          reason: `Production fail-closed: emergency freeze check failed (${error.message})`,
+        };
+      }
       return { active: false };
     }
   }
@@ -1205,7 +1211,12 @@ export class AutonomyOrchestratorService {
       return { blocked: false, surfaces: [] };
     } catch (error: any) {
       console.warn(`[GOVERNANCE] Failed to check protected surfaces: ${error.message}`);
-      // Conservative: assume NOT blocked if we can't check (fail open)
+      if (isProductionEnv()) {
+        return {
+          blocked: true,
+          surfaces: [`production_fail_closed:${error.message}`],
+        };
+      }
       return { blocked: false, surfaces: [] };
     }
   }
@@ -1260,7 +1271,12 @@ export class AutonomyOrchestratorService {
       return { allowed: true };
     } catch (error: any) {
       console.warn(`[GOVERNANCE] Failed to check trust policies: ${error.message}`);
-      // Conservative: assume ALLOWED if we can't check (fail open to not block progress)
+      if (isProductionEnv()) {
+        return {
+          allowed: false,
+          reason: `Production fail-closed: trust policy check failed (${error.message})`,
+        };
+      }
       return { allowed: true };
     }
   }

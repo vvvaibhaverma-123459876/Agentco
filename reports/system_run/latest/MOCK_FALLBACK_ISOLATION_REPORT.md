@@ -34,7 +34,7 @@ The endpoint returns active runtime mode, provider classifications, and whether 
 
 ## Durable Task Execution
 
-`scripts/execute_durable_task.py` no longer has synthetic success for `review` or `decision` task types. Those paths now return explicit unsupported errors until real review/decision services are wired.
+`scripts/execute_durable_task.py` and `backend/src/services/durable-execution.service.ts` no longer have synthetic success for `review` or `decision` task types. Those paths now call a real OpenAI-compatible LLM provider, validate structured JSON, and fail if the provider is missing or the selected decision option is not present in the payload.
 
 ## Remaining Mock/Demo Code
 

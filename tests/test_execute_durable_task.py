@@ -1,9 +1,9 @@
 import pytest
 
+from scripts import execute_durable_task as executor
 from scripts.execute_durable_task import (
     PayloadValidationError,
     Task,
-    UnsupportedFeatureError,
     execute_task_logic,
     validate_payload,
 )
@@ -28,23 +28,59 @@ def test_calibration_payload_scores_real_binary_outcome():
     assert result["brier_score"] == pytest.approx(0.04)
 
 
-@pytest.mark.parametrize("task_type", ["review", "decision"])
-def test_review_and_decision_are_unsupported_not_fake_success(task_type):
+def test_review_requires_real_llm_not_fake_summary(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     task = Task(
         task_id="task-1",
         agent_id="reviewer-agent",
-        task_type=task_type,
-        payload={"options": ["approve"], "criteria": ["fast"]},
+        task_type="review",
+        payload={"subject": "Change set", "criteria": ["security"]},
     )
 
-    with pytest.raises(UnsupportedFeatureError, match="unsupported"):
+    with pytest.raises(RuntimeError, match="requires LLM_API_KEY"):
+        execute_task_logic(task)
+
+
+def test_decision_does_not_choose_first_option_without_llm(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    task = Task(
+        task_id="task-1",
+        agent_id="reviewer-agent",
+        task_type="decision",
+        payload={"options": ["approve", "reject"], "criteria": ["security"]},
+    )
+
+    with pytest.raises(RuntimeError, match="requires LLM_API_KEY"):
+        execute_task_logic(task)
+
+
+def test_decision_rejects_llm_option_not_in_payload(monkeypatch):
+    def fake_call(messages, timeout_seconds):
+        return {
+            "selected_option": "ship_anyway",
+            "rationale": "bad output",
+            "confidence": 0.9,
+            "evidence_ids_used": [],
+        }, 1, "fake-test-model"
+
+    monkeypatch.setattr(executor, "call_openai_json", fake_call)
+    task = Task(
+        task_id="task-1",
+        agent_id="reviewer-agent",
+        task_type="decision",
+        payload={"options": ["approve", "reject"], "criteria": ["security"]},
+    )
+
+    with pytest.raises(RuntimeError, match="option not present"):
         execute_task_logic(task)
 
 
 def test_unknown_task_type_is_unsupported():
     task = Task(task_id="task-1", agent_id="agent", task_type="unknown", payload={})
 
-    with pytest.raises(UnsupportedFeatureError, match="unsupported durable task_type"):
+    with pytest.raises(RuntimeError, match="unsupported durable task_type"):
         execute_task_logic(task)
 
 

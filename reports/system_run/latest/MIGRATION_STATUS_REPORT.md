@@ -10,9 +10,9 @@ Generated during branch `fix/runtime-integrity-and-production-honesty`.
 | --- | --- | --- |
 | `075_agent_tasks_canonical_view.sql` | enabled | Exposes the existing deployable `workflow_tasks` dispatch table as `agent_tasks` for durable executor tooling. |
 
-## Disabled Migrations
+## Unsupported Migration Archive
 
-Files ending in `.sql.disabled` are not part of the active schema and must not be treated as implemented runtime capability.
+Files ending in `.sql.disabled` have been moved out of the active migration directory to `backend/src/db/unsupported_migrations/`. They are not part of the active schema and must not be treated as implemented runtime capability.
 
 | Migration | Classification |
 | --- | --- |

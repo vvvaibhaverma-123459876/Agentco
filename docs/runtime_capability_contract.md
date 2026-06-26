@@ -79,3 +79,16 @@ Provider classifications:
 | Secrets | Vault | env/local secret provider | startup fails |
 
 Test and development may use non-real providers only when those providers are explicitly reported and never represented as production infrastructure.
+
+## Production Posture Verification
+
+Use:
+
+```bash
+make production-posture
+make docker-production-smoke
+```
+
+`make production-posture` verifies required production secrets are present without printing values and checks TCP reachability for Postgres, Redis, Kafka, Vault, Prometheus, and Grafana.
+
+`make docker-production-smoke` starts/reuses the local compose infrastructure and then runs the same posture gate. It exits nonzero if infrastructure is reachable but real production secrets are missing; that is intentional fail-closed behavior.
