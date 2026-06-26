@@ -504,9 +504,23 @@ class SpecialistAgent(BaseAgent):
         self.iterations_used += 1
         self.check_budget()
 
+    def select_server_backend(self) -> str:
+        """Return the configured specialist HTTP backend, or fail closed."""
+        server_mode = os.environ.get('AGENTCO_SPECIALIST_SERVER', 'waitress').strip().lower()
+        production = os.environ.get('AGENTCO_ENV') == 'production'
+        if server_mode == 'flask-dev' and production:
+            raise RuntimeError('Refusing to run Flask development server in production')
+        if server_mode not in {'waitress', 'flask-dev'}:
+            raise RuntimeError(f'Unsupported specialist server backend: {server_mode}')
+        return server_mode
+
     def run_server(self, port: int):
         """
-        Run Flask server in background thread
+        Run specialist HTTP server in a background thread.
+
+        Production and default local runs use Waitress, a real WSGI server.
+        Flask's development server is allowed only when explicitly requested
+        with AGENTCO_SPECIALIST_SERVER=flask-dev outside production.
 
         Args:
             port: Port number to listen on
@@ -514,8 +528,33 @@ class SpecialistAgent(BaseAgent):
         Returns:
             Thread reference
         """
+        server_mode = self.select_server_backend()
+
         def run():
-            self.app.run(host='127.0.0.1', port=port, debug=False, threaded=True)
+            if server_mode == 'flask-dev':
+                print(
+                    f"[{self.role}] Starting explicit flask-dev specialist server on 127.0.0.1:{port}; "
+                    "not production."
+                )
+                self.app.run(host='127.0.0.1', port=port, debug=False, threaded=True, use_reloader=False)
+                return
+
+            try:
+                from waitress import serve
+            except ImportError as exc:
+                raise RuntimeError(
+                    'waitress is required for specialist HTTP serving. '
+                    'Install requirements-runtime.txt or agents/requirements.txt.'
+                ) from exc
+
+            print(f"[{self.role}] Starting waitress specialist server on 127.0.0.1:{port}")
+            serve(
+                self.app,
+                host='127.0.0.1',
+                port=port,
+                threads=int(os.environ.get('AGENTCO_SPECIALIST_THREADS', '4')),
+                ident=f'agentco-specialist-{self.role}',
+            )
 
         thread = threading.Thread(target=run, daemon=True)
         thread.start()
