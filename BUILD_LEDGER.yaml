@@ -1,0 +1,577 @@
+meta:
+  schema_version: 1
+  generated_by: codex
+  last_updated: '2026-06-26T06:15:34Z'
+  source_docs:
+  - docs/CIVILIZATION_ARCHITECTURE.md
+  - docs/CODEX_BUILD_PLAN.md
+  termination_predicate_met: false
+layers:
+  L0_runtime_substrate:
+    status: in_progress
+    items:
+    - id: L0.RuntimeModeManager
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - runtime/orchestration/modes.py
+      - backend/src/runtime-mode.ts
+      tests:
+      - runtime/orchestration/tests/test_modes.py
+      - backend/tests/runtime-mode.test.ts
+      gates_passed:
+      - unit
+      notes: Existing local/offline modes are implemented; spec-required /system runtime APIs and full production capability
+        contract remain incomplete.
+    - id: L0.ServiceDoctor
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - runtime/orchestration/doctor.py
+      tests:
+      - runtime/orchestration/tests/test_modes.py
+      gates_passed:
+      - unit
+    - id: L0.ProductionPostureGate
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - scripts/verify_production_posture.py
+      tests:
+      - tests/test_verify_production_posture.py
+      gates_passed:
+      - unit
+      blockers:
+      - Real production secrets/Vault credentials must be supplied outside git.
+    - id: L0.BuildLedgerTooling
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - BUILD_LEDGER.yaml
+      - scripts/build_ledger.py
+      tests:
+      - tests/test_build_ledger.py
+      gates_passed: []
+    - id: L0.MigrationRunner
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/db/migrate.ts
+      tests:
+      - tests/test_migration_inventory.py
+      gates_passed:
+      - unit
+    - id: L0.FeatureGateService
+      status: not_started
+      depends_on:
+      - L0.RuntimeModeManager
+      artifacts: []
+      tests: []
+    - id: L0.DeterminismGuard
+      status: not_started
+      depends_on: []
+      artifacts: []
+      tests: []
+    - id: L0.ConnectionPoolManager
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/db/client.ts
+      tests: []
+    - id: L0.GracefulShutdownController
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/server.ts
+      tests: []
+    - id: L0.IdempotencyStore
+      status: not_started
+      depends_on:
+      - L3.EventLog
+      artifacts: []
+      tests: []
+  L1_identity_authority:
+    status: not_started
+    items:
+    - id: L1.ActorRegistry
+      status: not_started
+      depends_on:
+      - L0.MigrationRunner
+      artifacts: []
+      tests: []
+    - id: L1.RoleRegistry
+      status: not_started
+      depends_on:
+      - L1.ActorRegistry
+      artifacts: []
+      tests: []
+    - id: L1.PermissionService
+      status: not_started
+      depends_on:
+      - L1.ActorRegistry
+      artifacts: []
+      tests: []
+    - id: L1.KeyRing
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - reserve/keys/agentco_reserve_public.pem
+      tests: []
+      notes: Reserve key artifacts exist, but L1 key lifecycle/rotation/revocation service is not verified.
+    - id: L1.AuthorityChain
+      status: not_started
+      depends_on:
+      - L1.ActorRegistry
+      - L3.EventLog
+      artifacts: []
+      tests: []
+  L2_resources_budgets:
+    status: not_started
+    items:
+    - id: L2.ResourceLedger
+      status: not_started
+      depends_on:
+      - L1.ActorRegistry
+      - L3.EventLog
+      artifacts: []
+      tests: []
+    - id: L2.ReservationService
+      status: not_started
+      depends_on:
+      - L2.ResourceLedger
+      artifacts: []
+      tests: []
+    - id: L2.SpendGuardrailIntegration
+      status: in_progress
+      depends_on:
+      - L2.ResourceLedger
+      artifacts:
+      - runtime/base_agent/spend_guardrail.py
+      tests: []
+  L3_events_audit:
+    status: in_progress
+    items:
+    - id: L3.AuditLog
+      status: in_progress
+      depends_on:
+      - L0.MigrationRunner
+      artifacts:
+      - backend/src/services/audit-log.service.ts
+      tests:
+      - backend/tests/integration/audit-log.test.ts
+    - id: L3.EventBus
+      status: in_progress
+      depends_on:
+      - L0.RuntimeModeManager
+      artifacts:
+      - backend/src/services/event-bus.service.ts
+      tests:
+      - backend/tests/integration/event-bus.test.ts
+    - id: L3.TransactionalOutbox
+      status: not_started
+      depends_on:
+      - L3.EventLog
+      artifacts: []
+      tests: []
+    - id: L3.EventLog
+      status: not_started
+      depends_on:
+      - L1.ActorRegistry
+      artifacts: []
+      tests: []
+    - id: L3.HashChainAnchor
+      status: in_progress
+      depends_on:
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/audit-log.service.ts
+      tests:
+      - backend/tests/integration/audit-log.test.ts
+  L4_evidence_memory:
+    status: in_progress
+    items:
+    - id: L4.EvidenceRegistry
+      status: in_progress
+      depends_on:
+      - L3.EventLog
+      artifacts:
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/action-loop.test.ts
+    - id: L4.ClaimGroundingValidator
+      status: in_progress
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/claim-grounding.ts
+      tests: []
+    - id: L4.MemoryPromotionPipeline
+      status: not_started
+      depends_on:
+      - L5.ResolutionService
+      - L6.TrustScorer
+      artifacts: []
+      tests: []
+    - id: L4.VectorIndex
+      status: not_started
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts: []
+      tests: []
+  L5_claims_predictions:
+    status: in_progress
+    items:
+    - id: L5.ClaimRegistry
+      status: in_progress
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/action-loop.test.ts
+    - id: L5.PredictionLedger
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      - L3.EventLog
+      artifacts:
+      - calibration/ledger
+      tests:
+      - calibration/tests
+    - id: L5.SourceIndependenceChecker
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      - L4.EvidenceRegistry
+      artifacts:
+      - calibration/resolution
+      tests:
+      - evals/regression
+      blockers:
+      - Run and fix release-blocking Python independence tests under the new actor model.
+    - id: L5.ResolutionService
+      status: in_progress
+      depends_on:
+      - L5.SourceIndependenceChecker
+      artifacts:
+      - scripts/verify_resolution_service.py
+      tests:
+      - tests/integration/test_resolution_service_role_migration.py
+  L6_calibration_trust:
+    status: in_progress
+    items:
+    - id: L6.CalibrationScorer
+      status: in_progress
+      depends_on:
+      - L5.PredictionLedger
+      artifacts:
+      - calibration
+      tests:
+      - calibration/tests
+    - id: L6.TrustScorer
+      status: in_progress
+      depends_on:
+      - L6.CalibrationScorer
+      artifacts:
+      - calibration/trust
+      - backend/src/services/trust-impact-assessment.service.ts
+      tests:
+      - backend/tests/trust-impact-real-metrics.test.ts
+    - id: L6.ProofOfCalibrationService
+      status: in_progress
+      depends_on:
+      - L6.CalibrationScorer
+      - L1.KeyRing
+      artifacts:
+      - reserve
+      tests:
+      - reserve/tests
+    - id: L6.CommitmentChain
+      status: not_started
+      depends_on:
+      - L3.HashChainAnchor
+      artifacts: []
+      tests: []
+    - id: L6.ProofOfCompetenceService
+      status: not_started
+      depends_on:
+      - L12.SkillLibrary
+      artifacts: []
+      tests: []
+  L7_citizens_roles:
+    status: in_progress
+    items:
+    - id: L7.AgentRegistry
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/agent-registry.ts
+      tests:
+      - backend/tests/agent-registry.test.ts
+    - id: L7.CitizenRuntime
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      - L2.ResourceLedger
+      - L5.PredictionLedger
+      artifacts:
+      - agents/core/base_agent.py
+      - runtime/base_agent/base_agent_v2.py
+      tests:
+      - agents/tests
+      - runtime/tests
+    - id: L7.RoleSeparation
+      status: not_started
+      depends_on:
+      - L1.RoleRegistry
+      - L10.ProtectedSurfaceEnforcer
+      artifacts: []
+      tests: []
+  L8_tasks_execution:
+    status: in_progress
+    items:
+    - id: L8.DurableTaskExecution
+      status: in_progress
+      depends_on:
+      - L7.AgentRegistry
+      artifacts:
+      - backend/src/services/durable-execution.service.ts
+      - scripts/execute_durable_task.py
+      tests:
+      - backend/tests/durable-execution-real-tasks.test.ts
+      - tests/test_execute_durable_task.py
+    - id: L8.ActionExecutor
+      status: in_progress
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/action-loop.test.ts
+    - id: L8.ReasoningServiceRouter
+      status: in_progress
+      depends_on:
+      - L8.DurableTaskExecution
+      artifacts:
+      - backend/src/services/civilization.service.ts
+      tests:
+      - backend/tests/civilization-real-routing.test.ts
+    - id: L8.CivilizationAwareRAG
+      status: not_started
+      depends_on:
+      - L4.VectorIndex
+      - L5.ClaimRegistry
+      - L6.TrustScorer
+      artifacts: []
+      tests: []
+    - id: L8.SagaCoordinator
+      status: not_started
+      depends_on:
+      - L3.TransactionalOutbox
+      artifacts: []
+      tests: []
+  L9_institutions:
+    status: in_progress
+    items:
+    - id: L9.InstitutionRegistry
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/services/institutions.service.ts
+      tests:
+      - backend/tests/phase1-integration.test.ts
+    - id: L9.CoreInstitutions
+      status: not_started
+      depends_on:
+      - L9.InstitutionRegistry
+      artifacts: []
+      tests: []
+    - id: L9.InstitutionDecisions
+      status: in_progress
+      depends_on:
+      - L9.InstitutionRegistry
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/governance-reputation-integration.service.ts
+      tests:
+      - backend/tests/governance-coalition-integration.test.ts
+  L10_governance_constitution:
+    status: in_progress
+    items:
+    - id: L10.ConstitutionService
+      status: in_progress
+      depends_on:
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/calibration-constitution.service.ts
+      tests: []
+    - id: L10.ProtectedSurfaceEnforcer
+      status: in_progress
+      depends_on:
+      - L1.PermissionService
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/self-modification-validator.service.ts
+      tests:
+      - backend/tests/phase3-hardening.test.ts
+    - id: L10.RiskTierClassifier
+      status: not_started
+      depends_on:
+      - L10.ConstitutionService
+      artifacts: []
+      tests: []
+    - id: L10.KillSwitch
+      status: not_started
+      depends_on:
+      - L3.EventLog
+      artifacts: []
+      tests: []
+  L11_conflict_judiciary:
+    status: not_started
+    items:
+    - id: L11.DisputeRegistry
+      status: not_started
+      depends_on:
+      - L4.ContradictionLink
+      artifacts: []
+      tests: []
+    - id: L11.RulingService
+      status: not_started
+      depends_on:
+      - L11.DisputeRegistry
+      - L9.CoreInstitutions
+      artifacts: []
+      tests: []
+    - id: L11.PrecedentStore
+      status: not_started
+      depends_on:
+      - L11.RulingService
+      artifacts: []
+      tests: []
+  L12_learning_improvement:
+    status: in_progress
+    items:
+    - id: L12.LearningCandidateRegistry
+      status: in_progress
+      depends_on:
+      - L3.EventLog
+      artifacts:
+      - backend/src/services/learner.service.ts
+      tests:
+      - backend/tests/bounded-learning-integration.test.ts
+    - id: L12.RegressionTestGenerator
+      status: not_started
+      depends_on:
+      - L12.LearningCandidateRegistry
+      artifacts: []
+      tests: []
+    - id: L12.SandboxExecutor
+      status: in_progress
+      depends_on:
+      - L10.ProtectedSurfaceEnforcer
+      artifacts:
+      - selfcoding/resolver/sealed_resolver.py
+      tests: []
+    - id: L12.SkillLibrary
+      status: not_started
+      depends_on:
+      - L12.SandboxExecutor
+      - L6.ProofOfCompetenceService
+      artifacts: []
+      tests: []
+  L13_expansion_domain_onboarding:
+    status: not_started
+    items:
+    - id: L13.DomainRegistry
+      status: not_started
+      depends_on:
+      - L6.TrustScorer
+      - L9.CoreInstitutions
+      artifacts: []
+      tests: []
+    - id: L13.CapabilityExpansionGate
+      status: not_started
+      depends_on:
+      - L13.DomainRegistry
+      - L12.SkillLibrary
+      artifacts: []
+      tests: []
+    - id: L13.GeneralityMetricTracker
+      status: in_progress
+      depends_on:
+      - L13.DomainRegistry
+      artifacts:
+      - evals/north_star_cross_domain
+      tests:
+      - evals/north_star_cross_domain/tests
+  L14_civilization_coordinator:
+    status: in_progress
+    items:
+    - id: L14.CivilizationRuntime
+      status: in_progress
+      depends_on:
+      - L8.DurableTaskExecution
+      - L9.InstitutionRegistry
+      - L10.ConstitutionService
+      artifacts:
+      - backend/src/services/civilization-free-run.service.ts
+      tests: []
+    - id: L14.ContinuousScheduler
+      status: not_started
+      depends_on:
+      - L14.CivilizationRuntime
+      artifacts: []
+      tests: []
+    - id: L14.ReachabilityGate
+      status: not_started
+      depends_on:
+      - L14.CivilizationRuntime
+      artifacts: []
+      tests: []
+    - id: L14.VerticalSlice
+      status: not_started
+      depends_on:
+      - L14.CivilizationRuntime
+      - L5.ResolutionService
+      - L6.ProofOfCalibrationService
+      - L13.GeneralityMetricTracker
+      artifacts: []
+      tests: []
+  capability_growth_engine:
+    status: not_started
+    items:
+    - id: VCA.SkillPromotionLoop
+      status: not_started
+      depends_on:
+      - L12.SkillLibrary
+      - L13.CapabilityExpansionGate
+      - L10.ProtectedSurfaceEnforcer
+      artifacts: []
+      tests: []
+    - id: VCA.ProofOfCompetenceMinting
+      status: not_started
+      depends_on:
+      - L6.ProofOfCompetenceService
+      - L12.SkillLibrary
+      artifacts: []
+      tests: []
+rollups:
+  total_items: 67
+  verified: 0
+  in_progress: 34
+  not_started: 33
+  blocked: 0
+  percent_verified: 0.0
+gates:
+  no_stub: red
+  no_simulation: green
+  reachability: unknown
+  firewall: unknown
+  sandbox_breach: unknown
+  credential_key_independence: unknown
+  e2e_civilization_slice: unknown
+  _no_stub_hit_count: '30'
+  _no_simulation_hit_count: '0'

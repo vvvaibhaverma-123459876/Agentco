@@ -20,6 +20,7 @@ import { civilizationGovernanceRoutes } from './routes/civilization-governance.r
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
 import { phase3HardeningRoutes } from './routes/phase3-hardening.routes';
+import { systemRoutes } from './routes/system.routes';
 import { metricsService } from './services/autonomy-metrics.service';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -103,6 +104,7 @@ export async function build() {
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);
   await app.register(phase3HardeningRoutes);
+  await app.register(systemRoutes);
 
   // Basic health check
   app.get('/health', async () => ({
