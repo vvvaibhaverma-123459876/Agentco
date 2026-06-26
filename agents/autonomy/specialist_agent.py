@@ -18,6 +18,7 @@ import os
 import hmac
 import time
 from collections import defaultdict
+from urllib.parse import parse_qs, unquote, urlparse
 
 # Database connection pooling (optional - only if env vars present)
 try:
@@ -504,6 +505,95 @@ class SpecialistAgent(BaseAgent):
         self.iterations_used += 1
         self.check_budget()
 
+    def real_fetch_page(self, url: str) -> Dict[str, Any]:
+        """Fetch a real HTTP/HTTPS page or return a structured failure."""
+        valid, error = validate_url(url)
+        if not valid:
+            return {'status': 'blocked', 'reason': error, 'url': url}
+
+        try:
+            import requests
+            response = requests.get(
+                url,
+                headers={'User-Agent': 'AgentCo-Specialist/1.0 (+https://agentco.local)'},
+                timeout=12,
+                allow_redirects=True,
+            )
+            final_url = response.url
+            valid_final, final_error = validate_url(final_url)
+            if not valid_final:
+                return {'status': 'blocked', 'reason': f'Redirect rejected: {final_error}', 'url': url, 'final_url': final_url}
+            response.raise_for_status()
+            content_type = response.headers.get('content-type', '')
+            text = response.text
+            title = final_url
+            try:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(text, 'html.parser')
+                if soup.title and soup.title.string:
+                    title = soup.title.string.strip()[:300]
+                body_text = soup.get_text(separator=' ', strip=True)
+                if body_text:
+                    text = body_text
+            except Exception:
+                pass
+            if not text.strip():
+                return {'status': 'failed', 'reason': 'Fetched page had empty text content', 'url': final_url}
+            return {
+                'status': 'fetch_completed',
+                'url': final_url,
+                'title': title,
+                'content': text[:20000],
+                'content_type': content_type,
+                'content_length': len(text),
+            }
+        except Exception as exc:
+            return {'status': 'failed', 'reason': str(exc), 'url': url}
+
+    def real_web_search(self, query: str, max_results: int = 5) -> Dict[str, Any]:
+        """Run a real web search through DuckDuckGo HTML, or fail closed."""
+        valid, error = validate_search_query(query)
+        if not valid:
+            return {'status': 'blocked', 'reason': error, 'query': query, 'results': []}
+
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            response = requests.get(
+                'https://html.duckduckgo.com/html/',
+                params={'q': query},
+                headers={'User-Agent': 'AgentCo-Specialist/1.0 (+https://agentco.local)'},
+                timeout=12,
+            )
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
+            results = []
+            for anchor in soup.select('a.result__a'):
+                href = anchor.get('href') or ''
+                parsed = urlparse(href)
+                if parsed.netloc.endswith('duckduckgo.com') and parsed.path.startswith('/l/'):
+                    href = unquote(parse_qs(parsed.query).get('uddg', [''])[0])
+                valid_url, _ = validate_url(href)
+                if not valid_url:
+                    continue
+                snippet_node = anchor.find_parent('div', class_='result')
+                snippet = ''
+                if snippet_node:
+                    body = snippet_node.select_one('.result__snippet')
+                    snippet = body.get_text(' ', strip=True) if body else ''
+                results.append({
+                    'url': href,
+                    'title': anchor.get_text(' ', strip=True)[:300],
+                    'snippet': snippet[:500],
+                })
+                if len(results) >= max_results:
+                    break
+            if not results:
+                return {'status': 'failed', 'reason': 'No search results returned by real search provider', 'query': query, 'results': []}
+            return {'status': 'search_completed', 'query': query, 'results': results}
+        except Exception as exc:
+            return {'status': 'failed', 'reason': str(exc), 'query': query, 'results': []}
+
     def select_server_backend(self) -> str:
         """Return the configured specialist HTTP backend, or fail closed."""
         server_mode = os.environ.get('AGENTCO_SPECIALIST_SERVER', 'waitress').strip().lower()
@@ -603,8 +693,8 @@ class SpecialistAgent(BaseAgent):
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT INTO autonomy_evidence
-                    (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                    (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at, content_text)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
                 """, (
                     evidence_id,
                     str(uuid.uuid4()),  # source_id
@@ -613,7 +703,8 @@ class SpecialistAgent(BaseAgent):
                     snippet,
                     content_hash,
                     source_type,
-                    True  # is_public_access
+                    True,  # is_public_access
+                    content[:20000] if content else None,
                 ))
                 conn.commit()
                 print(f"[Evidence] Persisted: {evidence_id}")
@@ -659,6 +750,37 @@ class SpecialistAgent(BaseAgent):
 
         # Should never reach here
         raise RuntimeError(f"Evidence persistence failed unexpectedly")
+
+    def load_evidence_text(self, evidence_id: str) -> Optional[Dict[str, str]]:
+        """Load persisted evidence text for extraction."""
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return None
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id, url, title, snippet, COALESCE(content_text, snippet, title, '') AS content_text
+                FROM autonomy_evidence
+                WHERE id = %s OR source_id = %s
+                LIMIT 1
+                """,
+                (evidence_id, evidence_id),
+            )
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return {
+                'id': str(row[0]),
+                'url': row[1] or '',
+                'title': row[2] or '',
+                'snippet': row[3] or '',
+                'content_text': row[4] or '',
+            }
+        finally:
+            if conn:
+                return_db_connection(conn)
 
     def persist_claim(
         self,

@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { spawn, ChildProcess } from 'child_process';
 import { createWriteStream } from 'fs';
 import path from 'path';
+import net from 'net';
 import { createHmac } from 'crypto';
 import { db } from '../db/client';
 import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-roles';
@@ -185,7 +186,7 @@ export class TeamActivationService {
     // Create specialist instance
     const specialistId = uuidv4();
     const budget = request.customBudget || roleSpec.defaultBudgets;
-    const portNumber = this.findAvailablePort();
+    const portNumber = await this.findAvailablePort();
     const httpEndpoint = `http://127.0.0.1:${portNumber}`;
 
     const specialist: SpecialistInstance = {
@@ -761,10 +762,31 @@ export class TeamActivationService {
   }
 
   /**
-   * Find available port by assigning random port in safe range
+   * Ask the OS for an available loopback port.
+   *
+   * This avoids collisions from random port selection when multiple specialists
+   * spawn quickly or prior test processes are still winding down.
    */
-  private findAvailablePort(): number {
-    // Simple port assignment: use random port in 54321-55000 range
-    return 54321 + Math.floor(Math.random() * 679);
+  private async findAvailablePort(): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const server = net.createServer();
+      server.unref();
+      server.once('error', reject);
+      server.listen(0, '127.0.0.1', () => {
+        const address = server.address();
+        if (!address || typeof address === 'string') {
+          server.close(() => reject(new Error('OS did not return a TCP port')));
+          return;
+        }
+        const port = address.port;
+        server.close((error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(port);
+          }
+        });
+      });
+    });
   }
 }

@@ -7,7 +7,6 @@ Restricted tool access for safety.
 
 from agents.autonomy.specialist_agent import SpecialistAgent
 from typing import Dict, Any
-import uuid
 
 
 class FetcherAgent(SpecialistAgent):
@@ -57,22 +56,39 @@ class FetcherAgent(SpecialistAgent):
                 'artifacts': []
             }
 
-        # Simulate page fetch (in real implementation, would use web adapter)
-        content = f"Content from {url}. This is a fetcher result."
-        title = f"Page: {url.split('/')[-1]}"
+        fetched = self.real_fetch_page(url)
+        if fetched['status'] != 'fetch_completed':
+            return {
+                'observations': {
+                    'url': url,
+                    'status': fetched['status'],
+                    'reason': fetched.get('reason', 'fetch failed'),
+                },
+                'artifacts': [],
+                'errors': [fetched.get('reason', 'fetch failed')],
+            }
+        content = fetched['content']
+        title = fetched['title']
 
         # Estimate tokens
         estimated_tokens = len(content) // 4
         self.record_token_usage(estimated_tokens)
 
-        # Create evidence ID
-        artifact_id = str(uuid.uuid4())
+        artifact_id = self.persist_evidence(
+            url=fetched['url'],
+            content=content,
+            title=title,
+            snippet=content[:200],
+            source_type='web_page',
+        )
 
         return {
             'observations': {
                 'url': url,
                 'title': title,
-                'contentLength': len(content),
+                'contentLength': fetched['content_length'],
+                'contentType': fetched.get('content_type', ''),
+                'artifactId': artifact_id,
                 'status': 'fetch_completed'
             },
             'artifacts': [artifact_id]

@@ -8,6 +8,7 @@ Broadest tool access of all specialists.
 from agents.autonomy.specialist_agent import SpecialistAgent
 from typing import Dict, Any
 import uuid
+import re
 
 
 class ResearcherAgent(SpecialistAgent):
@@ -69,28 +70,40 @@ class ResearcherAgent(SpecialistAgent):
                 'artifacts': []
             }
 
-        # Simulate search (in real implementation, would use web adapter)
-        # For now, return stub result
-        results = [
-            {
-                'url': f'https://example.com/result-{i}',
-                'title': f'Result {i+1} for "{query}"',
-                'snippet': f'Snippet about {query} from result {i+1}'
+        search = self.real_web_search(query)
+        if search['status'] != 'search_completed':
+            return {
+                'observations': {
+                    'query': query,
+                    'status': search['status'],
+                    'reason': search.get('reason', 'search failed'),
+                    'resultsFound': 0,
+                },
+                'artifacts': [],
+                'errors': [search.get('reason', 'search failed')],
             }
-            for i in range(3)
-        ]
+        results = search['results']
 
         # Estimate tokens (rough approximation: 1 token per 4 chars)
         estimated_tokens = len(query) // 4 + 100
         self.record_token_usage(estimated_tokens)
 
-        # Create evidence IDs for each result
-        artifacts = [str(uuid.uuid4()) for _ in results]
+        artifacts = [
+            self.persist_evidence(
+                url=result['url'],
+                content=result.get('snippet', ''),
+                title=result.get('title', ''),
+                snippet=result.get('snippet', ''),
+                source_type='web_search',
+            )
+            for result in results
+        ]
 
         return {
             'observations': {
                 'query': query,
                 'resultsFound': len(results),
+                'results': results,
                 'status': 'search_completed'
             },
             'artifacts': artifacts
@@ -106,9 +119,19 @@ class ResearcherAgent(SpecialistAgent):
                 'artifacts': []
             }
 
-        # Simulate page fetch (in real implementation, would use web adapter)
-        content = f"Content from {url}. This is a simulated fetch result."
-        title = f"Page from {url.split('/')[-1]}"
+        fetched = self.real_fetch_page(url)
+        if fetched['status'] != 'fetch_completed':
+            return {
+                'observations': {
+                    'url': url,
+                    'status': fetched['status'],
+                    'reason': fetched.get('reason', 'fetch failed'),
+                },
+                'artifacts': [],
+                'errors': [fetched.get('reason', 'fetch failed')],
+            }
+        content = fetched['content']
+        title = fetched['title']
 
         # Estimate tokens (rough: 1 token per 4 chars)
         estimated_tokens = len(content) // 4
@@ -127,7 +150,8 @@ class ResearcherAgent(SpecialistAgent):
             'observations': {
                 'url': url,
                 'title': title,
-                'contentLength': len(content),
+                'contentLength': fetched['content_length'],
+                'contentType': fetched.get('content_type', ''),
                 'status': 'fetch_completed',
                 'artifactId': artifact_id
             },
@@ -144,26 +168,39 @@ class ResearcherAgent(SpecialistAgent):
                 'artifacts': []
             }
 
-        # Simulate extraction (in real implementation, would parse content)
-        extraction = {
-            'source_id': source_id,
-            'key_points': [
-                'Point 1 from source',
-                'Point 2 from source',
-                'Point 3 from source'
-            ]
-        }
+        evidence = self.load_evidence_text(source_id)
+        if not evidence:
+            return {
+                'observations': {'status': 'blocked', 'reason': 'Source evidence not found', 'sourceId': source_id},
+                'artifacts': [],
+                'errors': ['Source evidence not found']
+            }
+        content = evidence.get('content_text', '').strip()
+        if not content:
+            return {
+                'observations': {'status': 'blocked', 'reason': 'Source evidence has no extractable text', 'sourceId': source_id},
+                'artifacts': [],
+                'errors': ['Source evidence has no extractable text']
+            }
+        sentences = [s.strip() for s in re.split(r'(?<=[.!?])\s+', content) if len(s.strip()) >= 20]
+        key_points = sentences[:5] or [content[:500]]
 
-        estimated_tokens = 150
+        estimated_tokens = max(50, sum(len(point) for point in key_points) // 4)
         self.record_token_usage(estimated_tokens)
 
-        # Create extracted evidence ID
-        artifact_id = str(uuid.uuid4())
+        artifact_id = self.persist_evidence(
+            url=evidence.get('url', ''),
+            content='\n'.join(key_points),
+            title=f"Extraction from {evidence.get('title') or source_id}",
+            snippet=key_points[0][:200],
+            source_type='extracted_evidence',
+        )
 
         return {
             'observations': {
                 'sourceId': source_id,
-                'pointsExtracted': len(extraction['key_points']),
+                'pointsExtracted': len(key_points),
+                'keyPoints': key_points,
                 'status': 'extraction_completed'
             },
             'artifacts': [artifact_id]
