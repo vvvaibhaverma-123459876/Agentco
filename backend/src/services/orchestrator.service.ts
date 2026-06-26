@@ -87,22 +87,27 @@ export class OrchestratorService {
 
     // Step 4: Apply Bayesian calibration
     console.log('[Orchestrator] Computing Bayesian calibration');
+    const evidenceQuality = this.computeEvidenceQuality(ragResult.evidence_consensus.sources);
+    const sourceReliability = this.computeSourceReliability(ragResult.evidence_consensus.sources);
+    const calibrationError = this.estimateCalibrationError(primaryConfidence, ragResult.final_confidence);
+    const consistency = this.computeAgreement(primaryAnswer, ragResult.final_answer, ragResult.evidence_consensus.agreement_ratio);
+    const explainability = this.computeExplainability(evidenceUsed);
     const bayesianResult = await bayesianService.bayesianFusion(
       [
         { model: 'ensemble', answer: primaryAnswer, confidence: primaryConfidence },
         { model: 'rag', answer: ragResult.final_answer, confidence: ragResult.final_confidence },
       ],
-      0.85, // Evidence quality (simulated)
-      0.80, // Source reliability (simulated)
+      evidenceQuality,
+      sourceReliability,
     );
 
     // Step 5: Compute trustworthiness score
     console.log('[Orchestrator] Computing trustworthiness score');
     const trustScore = trustworthinessService.computeTrustScore(
       Math.min(1, primaryConfidence * 1.1), // Base accuracy (boosted by ensemble)
-      0.08, // Calibration error (simulated)
-      0.92, // Consistency (high multi-model agreement)
-      0.85, // Explainability (reasoning provided)
+      calibrationError,
+      consistency,
+      explainability,
       0.90, // Uncertainty quality
       0.92, // Conformal coverage
     );
@@ -130,6 +135,66 @@ export class OrchestratorService {
     );
 
     return bundle;
+  }
+
+  computeEvidenceQuality(sources: Array<{ relevance?: number; snippet?: string; url?: string }>): number {
+    if (sources.length === 0) {
+      return 0.2;
+    }
+    const avgRelevance = sources.reduce((sum, source) => sum + Math.max(0, Math.min(1, source.relevance ?? 0)), 0) / sources.length;
+    const provenanceCompleteness = sources.filter((source) => source.url && source.snippet).length / sources.length;
+    const sourceDiversity = new Set(sources.map((source) => {
+      try {
+        return new URL(source.url || '').hostname;
+      } catch {
+        return source.url || 'unknown';
+      }
+    })).size / sources.length;
+    return this.clamp(avgRelevance * 0.5 + provenanceCompleteness * 0.3 + sourceDiversity * 0.2, 0, 1);
+  }
+
+  computeSourceReliability(sources: Array<{ source?: string; url?: string }>): number {
+    if (sources.length === 0) {
+      return 0.2;
+    }
+    const reliabilityBySource: Record<string, number> = {
+      Wikipedia: 0.78,
+      ArXiv: 0.86,
+    };
+    const total = sources.reduce((sum, source) => {
+      const base = reliabilityBySource[source.source || ''] ?? 0.55;
+      const hasHttps = (source.url || '').startsWith('https://') ? 0.05 : 0;
+      return sum + Math.min(1, base + hasHttps);
+    }, 0);
+    return this.clamp(total / sources.length, 0, 1);
+  }
+
+  estimateCalibrationError(primaryConfidence: number, evidenceAdjustedConfidence: number): number {
+    return this.clamp(Math.abs(primaryConfidence - evidenceAdjustedConfidence), 0, 1);
+  }
+
+  computeAgreement(primaryAnswer: string, evidenceAnswer: string, evidenceAgreementRatio: number): number {
+    if (!evidenceAnswer) {
+      return 0.5;
+    }
+    const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const primary = normalize(primaryAnswer);
+    const evidence = normalize(evidenceAnswer);
+    const textualAgreement = primary && evidence && (primary.includes(evidence) || evidence.includes(primary)) ? 1 : 0;
+    return this.clamp(textualAgreement * 0.6 + evidenceAgreementRatio * 0.4, 0, 1);
+  }
+
+  computeExplainability(evidenceUsed: string[]): number {
+    if (evidenceUsed.length === 0) {
+      return 0.3;
+    }
+    const nonEmpty = evidenceUsed.filter((item) => item.trim().length > 0).length;
+    const detailScore = Math.min(1, evidenceUsed.join(' ').length / 300);
+    return this.clamp((nonEmpty / evidenceUsed.length) * 0.6 + detailScore * 0.4, 0, 1);
+  }
+
+  private clamp(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value));
   }
 
   /**
