@@ -34,6 +34,7 @@ function summarizeLedger(ledger: any) {
       percent_verified: total > 0 ? Math.round((verified / total) * 10000) / 100 : 0,
     },
     gates: ledger.gates,
+    gate_findings: ledger.gate_findings || {},
   };
 }
 

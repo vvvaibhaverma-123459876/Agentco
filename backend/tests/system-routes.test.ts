@@ -24,6 +24,8 @@ describe('system routes', () => {
     expect(body.rollups.total_items).toBeGreaterThan(0);
     expect(body.rollups.percent_verified).toBeLessThan(100);
     expect(body.meta.termination_predicate_met).toBe(false);
+    expect(body).toHaveProperty('gate_findings');
+    expect(body.gate_findings).toHaveProperty('no_stub');
     await app.close();
   });
 

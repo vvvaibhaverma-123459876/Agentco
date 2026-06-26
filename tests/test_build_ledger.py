@@ -36,3 +36,14 @@ def test_gates_report_no_stub_and_no_simulation_status():
     assert gates["no_stub"] in {"green", "red"}
     assert gates["no_simulation"] in {"green", "red"}
     assert "_no_stub_hit_count" in gates
+
+
+def test_gate_findings_include_actionable_locations():
+    findings = build_ledger.recompute_gate_findings()
+
+    assert "no_stub" in findings
+    assert isinstance(findings["no_stub"], list)
+    if findings["no_stub"]:
+        first = findings["no_stub"][0]
+        assert {"path", "line", "marker", "excerpt"}.issubset(first)
+        assert isinstance(first["line"], int)

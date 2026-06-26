@@ -11,7 +11,7 @@ import sys
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 import yaml
 
@@ -29,11 +29,22 @@ RUNTIME_DIRS = [
 ]
 EXCLUDED_PARTS = {"tests", "__tests__", "fixtures", "__pycache__", "unsupported_migrations"}
 BANNED_MARKER = re.compile(
-    r"TODO|FIXME|XXX|HACK|NotImplementedError|raise NotImplemented|placeholder|stub|"
-    r"mock(?!ito)|simulate|simulated|fake_|dummy|to ?be ?done|later\b",
+    r"\bTODO\b|\bFIXME\b|\bXXX\b|\bHACK\b|NotImplementedError|raise NotImplemented|"
+    r"\bplaceholder\b|\bstub\b|\bmock(?!ito)\b|\bfake_|\bdummy\b|to ?be ?done|\blater\b",
     re.IGNORECASE,
 )
 SIMULATED_REASONING = re.compile(r"method\s*[:=]\s*['\"]simulated['\"]|Simulated answer")
+MAX_GATE_FINDINGS = 50
+
+
+class ScanHit(NamedTuple):
+    path: str
+    line: int
+    marker: str
+    excerpt: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"path": self.path, "line": self.line, "marker": self.marker, "excerpt": self.excerpt}
 
 
 def load_ledger(path: Path = LEDGER_PATH) -> dict[str, Any]:
@@ -70,8 +81,8 @@ def recompute_rollups(ledger: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def scan_runtime(pattern: re.Pattern[str]) -> list[str]:
-    hits: list[str] = []
+def scan_runtime(pattern: re.Pattern[str], limit: int | None = None) -> list[ScanHit]:
+    hits: list[ScanHit] = []
     for root in RUNTIME_DIRS:
         if not root.exists():
             continue
@@ -85,9 +96,11 @@ def scan_runtime(pattern: re.Pattern[str]) -> list[str]:
             except OSError:
                 continue
             for line_no, line in enumerate(text.splitlines(), start=1):
-                if pattern.search(line):
-                    hits.append(f"{path}:{line_no}:{line.strip()[:160]}")
-                    break
+                match = pattern.search(line)
+                if match:
+                    hits.append(ScanHit(str(path), line_no, match.group(0), line.strip()[:160]))
+                    if limit is not None and len(hits) >= limit:
+                        return hits
     return hits
 
 
@@ -107,6 +120,13 @@ def recompute_gates(ledger: dict[str, Any]) -> dict[str, str]:
     return gates
 
 
+def recompute_gate_findings() -> dict[str, list[dict[str, Any]]]:
+    return {
+        "no_stub": [hit.to_dict() for hit in scan_runtime(BANNED_MARKER, limit=MAX_GATE_FINDINGS)],
+        "no_simulation": [hit.to_dict() for hit in scan_runtime(SIMULATED_REASONING, limit=MAX_GATE_FINDINGS)],
+    }
+
+
 def ready_frontier(ledger: dict[str, Any]) -> list[dict[str, Any]]:
     items = iter_items(ledger)
     by_id = {item["id"]: item for item in items}
@@ -124,6 +144,7 @@ def apply_computed_fields(ledger: dict[str, Any]) -> dict[str, Any]:
     ledger = dict(ledger)
     ledger["rollups"] = recompute_rollups(ledger)
     ledger["gates"] = recompute_gates(ledger)
+    ledger["gate_findings"] = recompute_gate_findings()
     meta = dict(ledger.get("meta", {}))
     meta["last_updated"] = datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     meta["termination_predicate_met"] = (
@@ -144,7 +165,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     if args.write:
         write_ledger(ledger)
     if args.json:
-        print(json.dumps({"meta": ledger["meta"], "rollups": ledger["rollups"], "gates": ledger["gates"]}, indent=2))
+        print(json.dumps({"meta": ledger["meta"], "rollups": ledger["rollups"], "gates": ledger["gates"], "gate_findings": ledger["gate_findings"]}, indent=2))
     else:
         rollups = ledger["rollups"]
         print(f"items: {rollups['verified']}/{rollups['total_items']} verified ({rollups['percent_verified']}%)")
