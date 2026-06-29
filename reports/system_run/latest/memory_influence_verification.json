@@ -1,0 +1,89 @@
+{
+  "agent_id": "agentco-memory-influence-c4cb9238-e491-436b-acd9-8d87d1d408cd",
+  "domain": "vendor_risk",
+  "latency_ms": 3692,
+  "llm": {
+    "latency_ms": 2229,
+    "model": "gpt-4o-mini",
+    "simulated": false,
+    "usage": {
+      "completion_tokens": 89,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens": 364,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "total_tokens": 453
+    }
+  },
+  "marker": "AGENTCO_MEMORY_INFLUENCE_174813C5C68B",
+  "memories_retrieved": 1,
+  "memory_context_chars": 555,
+  "memory_id": "6977a799-1cce-4398-bfaa-5255d7bcb0fa",
+  "memory_readback": {
+    "access_count": 1,
+    "active": true,
+    "exists": true,
+    "last_accessed": true,
+    "memory_type": "prediction_lesson"
+  },
+  "mode": "live_openai",
+  "model_output": {
+    "confidence": 0.62,
+    "decision": "escalate",
+    "memory_adjustment_applied": true,
+    "memory_marker": "AGENTCO_MEMORY_INFLUENCE_174813C5C68B",
+    "memory_used": true,
+    "missing_information": [
+      "SOC 2 Type II report",
+      "signed DPA",
+      "subprocessor list"
+    ]
+  },
+  "prediction": {
+    "claim": "AGENTCO_MEMORY_INFLUENCE_174813C5C68B: vendor onboarding should escalate when SOC 2 Type II and signed DPA are missing.",
+    "correlation_id": "6937d78c-ff15-4908-8e2e-b995b5a9f5d7",
+    "prediction_id": "80d80eaf-dedf-4f6e-a71f-c82b79d2fbda",
+    "probability": 0.88
+  },
+  "simulated": false,
+  "success": true,
+  "track_record": {
+    "agent_id": "agentco-memory-influence-c4cb9238-e491-436b-acd9-8d87d1d408cd",
+    "average_brier_score": 0.0144,
+    "average_log_score": 0.0,
+    "correct": 1,
+    "domain": "vendor_risk",
+    "recent_lessons": [
+      {
+        "calibration_adjustment": "AGENTCO_MEMORY_INFLUENCE_174813C5C68B: cap confidence at 0.62 and escalate until SOC 2 Type II, signed DPA, and subprocessors are supplied.",
+        "created_at": "2026-06-29T19:30:44.100348+05:30",
+        "domain_insight": "Missing SOC 2 Type II plus unsigned DPA is insufficient evidence for approval.",
+        "summary": "Prediction lesson for vendor_risk: stated 0.88, outcome=TRUE, log_score=0.0000. Lesson: AGENTCO_MEMORY_INFLUENCE_174813C5C68B: Escalate vendor onboarding when SOC 2 Type II and signed DPA are missing."
+      }
+    ],
+    "resolved": 1,
+    "total_predictions": 1,
+    "trusted_confidence_by_domain": {}
+  },
+  "validation": {
+    "checks": {
+      "confidence_cap_applied": true,
+      "decision_escalates": true,
+      "memory_context_contains_marker": true,
+      "missing_signed_dpa_requested": true,
+      "missing_soc2_requested": true,
+      "missing_subprocessors_requested": true,
+      "model_copied_marker": true,
+      "model_reported_memory_used": true
+    },
+    "passed": true,
+    "score": 1.0
+  }
+}

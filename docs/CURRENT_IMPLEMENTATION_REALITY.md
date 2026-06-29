@@ -66,12 +66,20 @@ That verifier proves bounded live cross-domain routing/evidence/calibration
 checks for the current fixtures. It does not prove open-ended general
 intelligence or durable transfer beyond those fixtures.
 
+The latest memory-influence verifier is documented in
+`reports/system_run/latest/memory_influence_verification.md`. It creates a real
+resolved prediction lesson, retrieves it through `MemoryReader`, injects it into
+a later live OpenAI prompt, and validates that the model copies the lesson
+marker, escalates, and applies the confidence cap. This proves bounded lesson
+reuse for one fixture, not open-ended autonomous self-improvement.
+
 ## Partial Or In Progress
 
 - Full L0-L14 architecture: `18/67` verified, many layers remain in progress.
 - Source independence scoring and Python independence tests need reconciliation with current actor model.
 - Production observability stack, Vault posture, Kafka/Redis real-service path, and Docker production smoke are not recently re-proven.
 - Cross-domain transfer has a bounded live verifier and deterministic smoke benchmark, but it is not a demonstrated general-intelligence metric.
+- Continuous learning has bounded live lesson-reuse verification, but not long-horizon autonomous improvement measurement.
 - Some older services are implemented but not yet proven through the current canonical coordinator path.
 
 ## Unsupported Or Future
