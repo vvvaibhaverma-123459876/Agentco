@@ -281,5 +281,40 @@ open-ended autonomous self-improvement or long-horizon capability growth.
 
 ## Remaining Verification Needed
 
-1. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
+## Production Infrastructure Smoke Follow-Up
+
+Command:
+
+```bash
+make docker-production-smoke
+```
+
+Result: failed with exit code `2`.
+
+Source artifact:
+
+- `reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`
+- `reports/system_run/latest/production_posture_verification.json`
+
+The Docker services were available and healthy for Postgres, Redis, Zookeeper,
+Kafka, Vault, Prometheus, and Grafana. The smoke target failed because
+`scripts/verify_production_posture.py` correctly returned `can_continue=false`
+for missing production secrets:
+
+- `AGENTCO_API_KEY`
+- `JWT_SECRET`
+- `EVENT_BUS_SIGNING_KEY`
+- `EVENT_BUS_HMAC_KEY`
+- `DATABASE_URL`
+- `VAULT_ADDR`
+- `VAULT_TOKEN`
+- `SPECIALIST_SHARED_SECRET`
+
+This means local infrastructure reachability is now re-proven, but production
+runnability remains blocked by real deployment secret configuration. The system
+is failing closed as intended.
+
+## Remaining Verification Needed
+
+1. Configure real deployment secrets and rerun `make docker-production-smoke`.
 2. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.

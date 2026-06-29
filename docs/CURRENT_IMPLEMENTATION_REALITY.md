@@ -73,11 +73,17 @@ a later live OpenAI prompt, and validates that the model copies the lesson
 marker, escalates, and applies the confidence cap. This proves bounded lesson
 reuse for one fixture, not open-ended autonomous self-improvement.
 
+The latest Docker production-infrastructure smoke is documented in
+`reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`. Docker, Postgres,
+Redis, Kafka, Vault, Prometheus, and Grafana were reachable/healthy, but the
+production posture gate correctly failed closed because production secrets were
+not configured.
+
 ## Partial Or In Progress
 
 - Full L0-L14 architecture: `18/67` verified, many layers remain in progress.
 - Source independence scoring and Python independence tests need reconciliation with current actor model.
-- Production observability stack, Vault posture, Kafka/Redis real-service path, and Docker production smoke are not recently re-proven.
+- Production observability stack, Vault, Kafka, Redis, and Docker services were recently smoke-tested as reachable, but production posture is still blocked by missing deployment secrets.
 - Cross-domain transfer has a bounded live verifier and deterministic smoke benchmark, but it is not a demonstrated general-intelligence metric.
 - Continuous learning has bounded live lesson-reuse verification, but not long-horizon autonomous improvement measurement.
 - Some older services are implemented but not yet proven through the current canonical coordinator path.
@@ -87,6 +93,7 @@ reuse for one fixture, not open-ended autonomous self-improvement.
 - Disabled migrations in `backend/src/db/unsupported_migrations/`.
 - Durable `review`/`decision` task types without real services.
 - Production use with env/local secret fallback.
+- Production startup without required deployment secrets.
 - Silent fallback to deterministic LLM or mock web adapter in staging/production.
 - Treating offline fixture results as real infrastructure evidence.
 
