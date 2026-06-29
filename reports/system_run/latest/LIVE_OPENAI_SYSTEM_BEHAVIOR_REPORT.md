@@ -135,8 +135,45 @@ AgentCo is not yet working as the full intended civilization. The broader goal s
 
 ## Next Verification Needed
 
-1. Run the north-star cross-domain benchmark and compare it to this live vendor-risk behavior.
-2. Add a live multi-domain goal-run variant, not only deterministic smoke.
-3. Prove that prediction lessons affect a later live run deterministically and safely.
-4. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
-5. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.
+## Cross-Domain Smoke Follow-Up
+
+Commands:
+
+```bash
+make north-star-smoke
+python3.13 -m pytest evals/north_star_cross_domain/tests -q
+```
+
+Result:
+
+| Command | Result |
+|---|---|
+| `make north-star-smoke` | Passed: `{"aggregate": 1.0, "domains": 4, "success": true}` |
+| `python3.13 -m pytest evals/north_star_cross_domain/tests -q` | Passed: `2 passed` |
+
+Source artifacts:
+
+- `results/north_star_cross_domain/latest.json`
+- `results/north_star_cross_domain/latest.md`
+
+The smoke benchmark covered four domains:
+
+| Domain | Decision | Confidence | Case score |
+|---|---|---:|---:|
+| `vendor_risk` | `escalate` | `0.650` | `1.000` |
+| `medical-triage-safe-info` | `escalate` | `0.525` | `1.000` |
+| `financial-risk-disclosure` | `escalate` | `0.600` | `1.000` |
+| `code-change-risk-review` | `reject` | `0.725` | `1.000` |
+
+Important limitation: the benchmark output explicitly reports
+`mode=deterministic_fake`, `is_smoke_skeleton=true`, and
+`not_proof_of_general_intelligence=true`. This is useful regression coverage for
+the cross-domain scoring contract, but it is not a live OpenAI cross-domain
+capability demonstration.
+
+## Remaining Verification Needed
+
+1. Add and run a live multi-domain goal-run variant, not only deterministic smoke.
+2. Prove that prediction lessons affect a later live run deterministically and safely.
+3. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
+4. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.
