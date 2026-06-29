@@ -6,6 +6,7 @@
  * Integrates web fetching, evidence storage, and claim generation
  */
 
+import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/client';
 import {
@@ -17,6 +18,7 @@ import {
 } from '../types/action.types';
 import { WebAdapter } from '../adapters/web-adapter';
 import { TeamActivationService } from './team-activation.service';
+import { evidenceRegistry } from './evidence-registry.service';
 
 export class ActionExecutorService {
   private webAdapter: WebAdapter | null = null;
@@ -173,6 +175,14 @@ export class ActionExecutorService {
     );
   }
 
+  private actorIdFromSpec(spec: ActionSpec): string | null {
+    return this.isUuid(spec.decidedBy) ? spec.decidedBy : null;
+  }
+
+  private contentHash(...parts: string[]): string {
+    return crypto.createHash('sha256').update(parts.join('\n')).digest('hex');
+  }
+
   private async handleWebSearch(spec: ActionSpec, result: ActionResult): Promise<void> {
     const query = spec.args.query;
     if (!query) {
@@ -190,25 +200,18 @@ export class ActionExecutorService {
         if (searchResults.length > 0) {
           // Store each search result as evidence
           for (const searchResult of searchResults) {
-            const sourceId = uuidv4();
-            await db.query(
-              `INSERT INTO autonomy_evidence (
-                id, source_id, action_id, url, title, snippet, retrieved_at,
-                content_hash, source_type, is_public_access, created_at
-              ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, NOW())`,
-              [
-                uuidv4(),
-                sourceId,
-                spec.actionId,
-                searchResult.url,
-                searchResult.title,
-                searchResult.snippet,
-                `hash_${searchResult.rank || 0}`,
-                'web_search',
-                true,
-              ]
-            );
-            result.createdArtifacts.push(sourceId);
+            const evidence = await evidenceRegistry.register({
+              action_id: spec.actionId,
+              actor_id: this.actorIdFromSpec(spec),
+              url: searchResult.url,
+              title: searchResult.title,
+              snippet: searchResult.snippet,
+              content_hash: this.contentHash(searchResult.url, searchResult.snippet ?? '', String(searchResult.rank ?? 0)),
+              source_type: 'web_search',
+              is_public_access: true,
+              metadata: { query, rank: searchResult.rank ?? null },
+            });
+            result.createdArtifacts.push(evidence.source_id);
           }
 
           result.observations.searchQuery = query;
@@ -251,29 +254,22 @@ export class ActionExecutorService {
 
         if (fetchResult) {
           // Store evidence in database with real content
-          const sourceId = uuidv4();
-          await db.query(
-            `INSERT INTO autonomy_evidence (
-              id, action_id, source_id, url, title, snippet, retrieved_at, content_hash,
-              source_type, is_public_access, created_at
-            ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, NOW())`,
-            [
-              uuidv4(),
-              spec.actionId,
-              sourceId,
-              url,
-              fetchResult.title || 'Fetched Page',
-              fetchResult.content.substring(0, 2000),  // First 2000 chars for extraction
-              fetchResult.contentHash,
-              'web',
-              true,
-            ]
-          );
+          const evidence = await evidenceRegistry.register({
+            action_id: spec.actionId,
+            actor_id: this.actorIdFromSpec(spec),
+            url,
+            title: fetchResult.title || 'Fetched Page',
+            snippet: fetchResult.content.substring(0, 2000),
+            content_hash: fetchResult.contentHash,
+            source_type: 'web',
+            is_public_access: true,
+            metadata: { content_length: fetchResult.content.length },
+          });
 
           result.observations.url = url;
           result.observations.title = fetchResult.title;
           result.observations.contentLength = fetchResult.content.length;
-          result.createdArtifacts.push(sourceId);
+          result.createdArtifacts.push(evidence.source_id);
           result.observations.status = 'fetch_completed';
           return;
         } else {
@@ -320,6 +316,15 @@ export class ActionExecutorService {
     if (supportSourceIds.length === 0) {
       result.status = ActionStatus.BLOCKED;
       result.blockedReason = 'Claims must be supported by at least one source (no unsupported claims)';
+      return;
+    }
+
+    const evidenceRows = await evidenceRegistry.getBySourceIds(supportSourceIds);
+    const foundSourceIds = new Set(evidenceRows.map(row => row.source_id));
+    const missingSourceIds = supportSourceIds.filter((sourceId: string) => !foundSourceIds.has(sourceId));
+    if (missingSourceIds.length > 0) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = `Claims must reference registered evidence sources; missing source ids: ${missingSourceIds.join(', ')}`;
       return;
     }
 

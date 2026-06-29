@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T09:07:20Z'
+  last_updated: '2026-06-29T09:15:41Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -339,13 +339,24 @@ layers:
     status: in_progress
     items:
     - id: L4.EvidenceRegistry
-      status: in_progress
+      status: verified
       depends_on:
       - L3.EventLog
       artifacts:
+      - backend/src/db/migrations/088_evidence_registry_events.sql
+      - backend/src/services/evidence-registry.service.ts
       - backend/src/services/action-executor.service.ts
       tests:
+      - backend/tests/evidence-registry.test.ts
       - backend/tests/action-loop.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical evidence registration writes autonomy_evidence rows with event_log and decision_log provenance. Action
+        executor WEB_SEARCH and FETCH_PAGE use the registry, and GENERATE_CLAIM now requires registered evidence source ids
+        instead of accepting arbitrary identifiers. This verifies the canonical action-loop path; legacy/direct evidence writers
+        are not expanded by this item.
     - id: L4.ClaimGroundingValidator
       status: in_progress
       depends_on:
@@ -713,11 +724,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 13
-  in_progress: 31
+  verified: 14
+  in_progress: 30
   not_started: 23
   blocked: 0
-  percent_verified: 19.4
+  percent_verified: 20.9
 gates:
   no_stub: red
   no_simulation: green
@@ -752,7 +763,7 @@ gate_findings:
     marker: placeholder
     excerpt: '# Replace placeholder (which is already surrounded by single quotes in SQL)'
   - path: backend/src/services/action-executor.service.ts
-    line: 26
+    line: 28
     marker: mock
     excerpt: '* Inject web adapter (can be real or mock)'
   - path: backend/src/services/planner.service.ts

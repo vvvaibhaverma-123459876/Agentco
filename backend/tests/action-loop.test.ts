@@ -125,7 +125,21 @@ describe('Action Loop Integration', () => {
     });
 
     it('should execute GENERATE_CLAIM with evidence validation', async () => {
-      const sourceId = uuidv4();
+      const fetchSpec: ActionSpec = {
+        actionId: uuidv4(),
+        actionType: ActionType.FETCH_PAGE,
+        goalId: uuidv4(),
+        objective: 'Fetch evidence source',
+        args: { url: 'https://example.com/evidence-source' },
+        successCriteria: ['Evidence source registered'],
+        riskLevel: RiskLevel.LOW,
+        decidedBy: 'test',
+        decidedAt: new Date(),
+      };
+      const fetchResult = await executor.executeAction(fetchSpec);
+      expect(fetchResult.status).toBe(ActionStatus.COMPLETED);
+      const sourceId = fetchResult.createdArtifacts[0];
+
       const spec: ActionSpec = {
         actionId: uuidv4(),
         actionType: ActionType.GENERATE_CLAIM,
@@ -147,6 +161,30 @@ describe('Action Loop Integration', () => {
       expect(result.status).toBe(ActionStatus.COMPLETED);
       expect(result.observations.claimId).toBeDefined();
       expect(result.createdArtifacts).toContain(result.observations.claimId);
+    });
+
+    it('should BLOCK claim generation when support source ids are not registered evidence', async () => {
+      const missingSourceId = uuidv4();
+      const spec: ActionSpec = {
+        actionId: uuidv4(),
+        actionType: ActionType.GENERATE_CLAIM,
+        goalId: uuidv4(),
+        objective: 'Generate claim with missing evidence',
+        args: {
+          claimText: 'Claim with unregistered source id',
+          supportSourceIds: [missingSourceId],
+        },
+        successCriteria: [],
+        riskLevel: RiskLevel.LOW,
+        decidedBy: 'test',
+        decidedAt: new Date(),
+      };
+
+      const result = await executor.executeAction(spec);
+
+      expect(result.status).toBe(ActionStatus.BLOCKED);
+      expect(result.blockedReason).toContain('registered evidence sources');
+      expect(result.blockedReason).toContain(missingSourceId);
     });
 
     it('should BLOCK claim generation without evidence sources', async () => {
@@ -344,7 +382,6 @@ describe('Action Loop Integration', () => {
       expect(searchResult.status).toBe(ActionStatus.COMPLETED);
 
       // Step 2: Fetch evidence
-      const evidenceId = uuidv4();
       const fetchSpec: ActionSpec = {
         actionId: uuidv4(),
         actionType: ActionType.FETCH_PAGE,
@@ -358,6 +395,8 @@ describe('Action Loop Integration', () => {
       };
       const fetchResult = await executor.executeAction(fetchSpec);
       expect(fetchResult.status).toBe(ActionStatus.COMPLETED);
+      const evidenceId = fetchResult.createdArtifacts[0];
+      expect(evidenceId).toBeDefined();
 
       // Step 3: Generate claim with evidence
       const claimSpec: ActionSpec = {
