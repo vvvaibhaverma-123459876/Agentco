@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import {
   CreateAccountInput,
+  ReservationInput,
   TransactionInput,
   resourceLedger,
 } from '../services/resource-ledger.service';
@@ -74,4 +75,58 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
       }
     }
   );
+
+  fastify.post(
+    '/resources/reservations',
+    async (request: FastifyRequest<{ Body: ReservationInput }>, reply) => {
+      try {
+        const reservation = await resourceLedger.reserve(request.body);
+        return reply.status(201).send({ reservation });
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post(
+    '/resources/reservations/:reservationId/settle',
+    async (
+      request: FastifyRequest<{
+        Params: { reservationId: string };
+        Body: { actor_id: string; idempotency_key: string };
+      }>,
+      reply
+    ) => {
+      try {
+        const transaction = await resourceLedger.settleReservation(
+          request.params.reservationId,
+          request.body.actor_id,
+          request.body.idempotency_key
+        );
+        return reply.status(201).send({ transaction });
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post(
+    '/resources/reservations/:reservationId/release',
+    async (
+      request: FastifyRequest<{ Params: { reservationId: string }; Body: { actor_id: string } }>,
+      reply
+    ) => {
+      try {
+        const reservation = await resourceLedger.releaseReservation(request.params.reservationId, request.body.actor_id);
+        return { reservation };
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post('/resources/reservations/expire', async (request: FastifyRequest<{ Body: { limit?: number } }>) => {
+    const expired = await resourceLedger.expireReservations(request.body?.limit);
+    return { expired };
+  });
 }

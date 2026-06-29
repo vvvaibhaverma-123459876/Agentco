@@ -149,4 +149,118 @@ describe('resource ledger', () => {
 
     await app.close();
   });
+
+  test('reserves, settles, and releases balances without leaking holds', async () => {
+    const actor = await createActor('resource-reservation-service');
+    const account = await resourceLedger.createAccount({
+      owner_actor_id: actor.id,
+      resource_type: 'llm_tokens',
+      unit: 'tokens',
+    });
+    await resourceLedger.credit({
+      account_id: account.id,
+      actor_id: actor.id,
+      amount: 500,
+      reason: 'reservation funding',
+      idempotency_key: `reservation-credit-${account.id}`,
+    });
+
+    const reservation = await resourceLedger.reserve({
+      account_id: account.id,
+      actor_id: actor.id,
+      amount: 200,
+      reason: 'planned LLM call',
+      idempotency_key: `reservation-${account.id}`,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    expect(reservation.status).toBe('reserved');
+
+    const afterReserve = await resourceLedger.getAccount(account.id);
+    expect(Number(afterReserve?.balance)).toBe(500);
+    expect(Number(afterReserve?.reserved_balance)).toBe(200);
+
+    await expect(
+      resourceLedger.debit({
+        account_id: account.id,
+        actor_id: actor.id,
+        amount: 350,
+        reason: 'would consume reserved tokens',
+        idempotency_key: `blocked-debit-${account.id}`,
+      })
+    ).rejects.toThrow(/insufficient llm_tokens balance/);
+
+    const settled = await resourceLedger.settleReservation(
+      reservation.id,
+      actor.id,
+      `settle-${reservation.id}`,
+    );
+    expect(Number(settled.balance_after)).toBe(300);
+
+    const settledAgain = await resourceLedger.settleReservation(
+      reservation.id,
+      actor.id,
+      `settle-${reservation.id}`,
+    );
+    expect(settledAgain.id).toBe(settled.id);
+
+    const afterSettle = await resourceLedger.getAccount(account.id);
+    expect(Number(afterSettle?.balance)).toBe(300);
+    expect(Number(afterSettle?.reserved_balance)).toBe(0);
+
+    const releaseReservation = await resourceLedger.reserve({
+      account_id: account.id,
+      actor_id: actor.id,
+      amount: 100,
+      reason: 'release test',
+      idempotency_key: `release-reservation-${account.id}`,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    await resourceLedger.releaseReservation(releaseReservation.id, actor.id);
+    const afterRelease = await resourceLedger.getAccount(account.id);
+    expect(Number(afterRelease?.balance)).toBe(300);
+    expect(Number(afterRelease?.reserved_balance)).toBe(0);
+  });
+
+  test('reservation routes are reachable and expired holds are released', async () => {
+    const app = await build();
+    const actor = await createActor('resource-reservation-route-service');
+    const account = await resourceLedger.createAccount({
+      owner_actor_id: actor.id,
+      resource_type: 'tool_calls',
+      unit: 'calls',
+    });
+    await resourceLedger.credit({
+      account_id: account.id,
+      actor_id: actor.id,
+      amount: 5,
+      reason: 'route reservation funding',
+      idempotency_key: `route-reservation-credit-${account.id}`,
+    });
+
+    const reserve = await app.inject({
+      method: 'POST',
+      url: '/resources/reservations',
+      headers: authHeaders(),
+      payload: {
+        account_id: account.id,
+        actor_id: actor.id,
+        amount: 2,
+        reason: 'route reserve',
+        idempotency_key: `route-reservation-${account.id}`,
+        expires_at: new Date(Date.now() + 60_000).toISOString(),
+      },
+    });
+    expect(reserve.statusCode).toBe(201);
+
+    const release = await app.inject({
+      method: 'POST',
+      url: `/resources/reservations/${reserve.json().reservation.id}/release`,
+      headers: authHeaders(),
+      payload: { actor_id: actor.id },
+    });
+    expect(release.statusCode).toBe(200);
+    expect(release.json().reservation.status).toBe('released');
+
+    await app.close();
+  });
 });
