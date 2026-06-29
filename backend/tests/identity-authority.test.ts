@@ -8,7 +8,7 @@ function authHeaders(): Record<string, string> {
 }
 
 async function applyIdentityMigration() {
-  for (const name of ['079_identity_authority.sql', '080_event_log.sql']) {
+  for (const name of ['079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql']) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
     await db.query(migration);
   }

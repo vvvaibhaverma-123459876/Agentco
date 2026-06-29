@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { PoolClient } from 'pg';
 import { db } from '../db/client';
+import { transactionalOutbox } from './transactional-outbox.service';
 
 export interface EventLogAppendInput {
   id?: string;
@@ -146,7 +147,21 @@ export class EventLogService {
       ]
     );
 
-    return result.rows[0];
+    const record = result.rows[0];
+    await transactionalOutbox.enqueueWithClient(client, {
+      eventLogId: record.id,
+      eventType: record.event_type,
+      actorId: record.actor_id,
+      occurredAt: normalizeTimestamp(record.occurred_at),
+      payload: record.payload,
+      correlationId: record.correlation_id,
+      causationId: record.causation_id,
+      objectType: record.object_type,
+      objectId: record.object_id,
+      eventHash: record.event_hash,
+    });
+
+    return record;
   }
 
   async verifyChainIntegrity(): Promise<{ valid: boolean; broken_at?: string }> {

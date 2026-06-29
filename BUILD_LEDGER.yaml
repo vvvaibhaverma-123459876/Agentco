@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T07:27:37Z'
+  last_updated: '2026-06-29T08:46:59Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -249,11 +249,22 @@ layers:
       tests:
       - backend/tests/integration/event-bus.test.ts
     - id: L3.TransactionalOutbox
-      status: not_started
+      status: verified
       depends_on:
       - L3.EventLog
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/083_transactional_outbox.sql
+      - backend/src/services/transactional-outbox.service.ts
+      - backend/src/services/event-log.service.ts
+      tests:
+      - backend/tests/transactional-outbox.test.ts
+      - backend/tests/event-log.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical event_log appends now atomically enqueue event_outbox rows in the same DB transaction. Relay verifies
+        success marking, retry state, and dead-lettering against real Postgres; Kafka relay smoke remains part of L3.EventBus.
     - id: L3.EventLog
       status: verified
       depends_on:
@@ -657,11 +668,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 8
+  verified: 9
   in_progress: 34
-  not_started: 25
+  not_started: 24
   blocked: 0
-  percent_verified: 11.94
+  percent_verified: 13.43
 gates:
   no_stub: red
   no_simulation: green
