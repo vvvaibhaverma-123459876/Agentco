@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T09:32:36Z'
+  last_updated: '2026-06-29T09:45:50Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -419,9 +419,18 @@ layers:
       - L1.ActorRegistry
       - L4.EvidenceRegistry
       artifacts:
+      - backend/src/services/source-discovery.service.ts
       - calibration/resolution
       tests:
+      - backend/tests/source-discovery.test.ts
       - evals/regression
+      gates_passed:
+      - unit
+      - backend_default
+      - typescript
+      notes: Source discovery now separates production live reachability checks from deterministic test reachability injection.
+        The backend default Jest tier no longer depends on public arXiv/GitHub/HN reachability for source registry/provenance
+        tests. Full source independence scoring remains in progress.
       blockers:
       - Run and fix release-blocking Python independence tests under the new actor model.
     - id: L5.ResolutionService

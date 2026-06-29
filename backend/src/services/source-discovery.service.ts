@@ -23,6 +23,8 @@
 
 import fetch from 'node-fetch';
 
+export type SourceReachabilityChecker = (url: string) => Promise<boolean>;
+
 interface DiscoveredSource {
   source_url: string;
   discovery_method: 'seed' | 'rss_feed' | 'sitemap' | 'link_extraction';
@@ -49,8 +51,10 @@ interface SourcePack {
 
 export class SourceDiscoveryEngine {
   private seedRegistry: Map<string, SourcePack> = new Map();
+  private readonly reachabilityChecker?: SourceReachabilityChecker;
 
-  constructor() {
+  constructor(options: { reachabilityChecker?: SourceReachabilityChecker } = {}) {
+    this.reachabilityChecker = options.reachabilityChecker;
     this.initializeSeedRegistry();
   }
 
@@ -368,6 +372,10 @@ export class SourceDiscoveryEngine {
    * Returns true if URL responds, false if unreachable
    */
   private async validateSourceReachability(url: string): Promise<boolean> {
+    if (this.reachabilityChecker) {
+      return this.reachabilityChecker(url);
+    }
+
     try {
       const response = await Promise.race([
         fetch(url, {

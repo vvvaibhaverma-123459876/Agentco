@@ -12,7 +12,12 @@ describe('SourceDiscoveryEngine (D1)', () => {
   let engine: SourceDiscoveryEngine;
 
   beforeEach(() => {
-    engine = new SourceDiscoveryEngine();
+    engine = new SourceDiscoveryEngine({
+      reachabilityChecker: async (url) => {
+        const parsed = new URL(url);
+        return ['http:', 'https:'].includes(parsed.protocol);
+      },
+    });
   });
 
   describe('Seed Registry', () => {
