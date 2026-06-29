@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 import { build } from '../src/server';
 import { db } from '../src/db/client';
 
@@ -8,7 +9,7 @@ function authHeaders(): Record<string, string> {
 }
 
 async function applyIdentityMigration() {
-  for (const name of ['079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql', '084_authority_chain.sql', '085_authority_chain_decision_actor_compatibility.sql']) {
+  for (const name of ['079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql', '084_authority_chain.sql', '085_authority_chain_decision_actor_compatibility.sql', '086_key_ring.sql']) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
     await db.query(migration);
   }
@@ -376,6 +377,208 @@ describe('identity authority routes', () => {
     );
     expect(event.rowCount).toBe(1);
     expect(event.rows[0].name).toBe('agentco-authority-service');
+
+    await app.close();
+  });
+
+  test('registers public Ed25519 keys and verifies signatures without storing private material', async () => {
+    const app = await build();
+    const suffix = Date.now().toString();
+    const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
+    const publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' }).toString();
+    const privateKeyPem = privateKey.export({ type: 'pkcs8', format: 'pem' }).toString();
+    const payload = JSON.stringify({ actor: 'key-ring', nonce: suffix });
+    const signature = crypto.sign(null, Buffer.from(payload, 'utf8'), privateKey).toString('base64');
+
+    const actorResponse = await app.inject({
+      method: 'POST',
+      url: '/identity/actors',
+      headers: authHeaders(),
+      payload: {
+        actor_type: 'service',
+        name: `identity-key-service-${suffix}`,
+        service_identity: {
+          service_name: `identity-key-service-${suffix}`,
+          scopes: ['identity.keys'],
+        },
+      },
+    });
+    expect(actorResponse.statusCode).toBe(201);
+    const actorId = actorResponse.json().actor.id;
+
+    const privateRejected = await app.inject({
+      method: 'POST',
+      url: '/identity/keys',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'identity',
+        public_key_pem: privateKeyPem,
+      },
+    });
+    expect(privateRejected.statusCode).toBe(400);
+    expect(privateRejected.json().error).toMatch(/private key material is not accepted|Ed25519 public key/);
+
+    const registered = await app.inject({
+      method: 'POST',
+      url: '/identity/keys',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'identity',
+        public_key_pem: publicKeyPem,
+      },
+    });
+    expect(registered.statusCode).toBe(201);
+    expect(registered.json().key.fingerprint_sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(registered.json().key.public_key_pem).toContain('PUBLIC KEY');
+    expect(registered.body).not.toContain('PRIVATE KEY');
+
+    const valid = await app.inject({
+      method: 'POST',
+      url: '/identity/keys/verify-signature',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'identity',
+        payload,
+        signature_base64: signature,
+      },
+    });
+    expect(valid.statusCode).toBe(200);
+    expect(valid.json()).toMatchObject({
+      valid: true,
+      reason: 'signature_valid',
+      key_id: registered.json().key.id,
+    });
+
+    const tampered = await app.inject({
+      method: 'POST',
+      url: '/identity/keys/verify-signature',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'identity',
+        payload: `${payload}tampered`,
+        signature_base64: signature,
+      },
+    });
+    expect(tampered.statusCode).toBe(403);
+    expect(tampered.json().reason).toBe('signature_invalid');
+
+    const event = await db.query(
+      `SELECT id
+         FROM event_log
+        WHERE event_type = 'identity.key_registered'
+          AND payload->>'fingerprint_sha256' = $1`,
+      [registered.json().key.fingerprint_sha256]
+    );
+    expect(event.rowCount).toBe(1);
+
+    await app.close();
+  });
+
+  test('rotates active keys and revokes key verification capability', async () => {
+    const app = await build();
+    const suffix = Date.now().toString();
+    const first = crypto.generateKeyPairSync('ed25519');
+    const second = crypto.generateKeyPairSync('ed25519');
+    const firstPublicPem = first.publicKey.export({ type: 'spki', format: 'pem' }).toString();
+    const secondPublicPem = second.publicKey.export({ type: 'spki', format: 'pem' }).toString();
+    const payload = `rotation-${suffix}`;
+    const firstSignature = crypto.sign(null, Buffer.from(payload, 'utf8'), first.privateKey).toString('base64');
+    const secondSignature = crypto.sign(null, Buffer.from(payload, 'utf8'), second.privateKey).toString('base64');
+
+    const actorResponse = await app.inject({
+      method: 'POST',
+      url: '/identity/actors',
+      headers: authHeaders(),
+      payload: {
+        actor_type: 'service',
+        name: `identity-key-rotation-service-${suffix}`,
+        service_identity: {
+          service_name: `identity-key-rotation-service-${suffix}`,
+          scopes: ['identity.keys'],
+        },
+      },
+    });
+    expect(actorResponse.statusCode).toBe(201);
+    const actorId = actorResponse.json().actor.id;
+
+    const firstRegistered = await app.inject({
+      method: 'POST',
+      url: '/identity/keys',
+      headers: authHeaders(),
+      payload: { actor_id: actorId, key_purpose: 'event_signing', public_key_pem: firstPublicPem },
+    });
+    expect(firstRegistered.statusCode).toBe(201);
+
+    const rotated = await app.inject({
+      method: 'POST',
+      url: '/identity/keys',
+      headers: authHeaders(),
+      payload: { actor_id: actorId, key_purpose: 'event_signing', public_key_pem: secondPublicPem },
+    });
+    expect(rotated.statusCode).toBe(201);
+
+    const oldKey = await db.query(
+      `SELECT status, replaced_by_key_id
+         FROM actor_key_ring
+        WHERE id = $1`,
+      [firstRegistered.json().key.id]
+    );
+    expect(oldKey.rows[0].status).toBe('rotated');
+    expect(oldKey.rows[0].replaced_by_key_id).toBe(rotated.json().key.id);
+
+    const oldSignature = await app.inject({
+      method: 'POST',
+      url: '/identity/keys/verify-signature',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'event_signing',
+        payload,
+        signature_base64: firstSignature,
+      },
+    });
+    expect(oldSignature.statusCode).toBe(403);
+    expect(oldSignature.json().reason).toBe('signature_invalid');
+
+    const newSignature = await app.inject({
+      method: 'POST',
+      url: '/identity/keys/verify-signature',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'event_signing',
+        payload,
+        signature_base64: secondSignature,
+      },
+    });
+    expect(newSignature.statusCode).toBe(200);
+
+    const revoked = await app.inject({
+      method: 'POST',
+      url: `/identity/keys/${rotated.json().key.id}/revoke`,
+      headers: authHeaders(),
+      payload: { revoked_by: actorId },
+    });
+    expect(revoked.statusCode).toBe(200);
+    expect(revoked.json().key.status).toBe('revoked');
+
+    const afterRevoke = await app.inject({
+      method: 'POST',
+      url: '/identity/keys/verify-signature',
+      headers: authHeaders(),
+      payload: {
+        actor_id: actorId,
+        key_purpose: 'event_signing',
+        payload,
+        signature_base64: secondSignature,
+      },
+    });
+    expect(afterRevoke.statusCode).toBe(403);
+    expect(afterRevoke.json().reason).toBe('active_key_missing');
 
     await app.close();
   });

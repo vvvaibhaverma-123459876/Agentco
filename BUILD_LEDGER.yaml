@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T08:55:39Z'
+  last_updated: '2026-06-29T08:59:29Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -160,13 +160,22 @@ layers:
       notes: Direct actor permission grants and /identity/verify authority decisions are persisted and audited; role-derived
         permissions remain a future expansion under AuthorityChain.
     - id: L1.KeyRing
-      status: in_progress
+      status: verified
       depends_on:
       - L1.ActorRegistry
       artifacts:
       - reserve/keys/agentco_reserve_public.pem
-      tests: []
-      notes: Reserve key artifacts exist, but L1 key lifecycle/rotation/revocation service is not verified.
+      - backend/src/db/migrations/086_key_ring.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Public Ed25519 key lifecycle is backed by actor_key_ring with register/rotate/revoke and signature verification.
+        Backend rejects private key material and does not store or return signing secrets.
     - id: L1.AuthorityChain
       status: verified
       depends_on:
@@ -680,11 +689,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 10
-  in_progress: 34
+  verified: 11
+  in_progress: 33
   not_started: 23
   blocked: 0
-  percent_verified: 14.93
+  percent_verified: 16.42
 gates:
   no_stub: red
   no_simulation: green

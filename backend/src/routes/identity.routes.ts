@@ -5,6 +5,8 @@ import {
   AssignRoleInput,
   GrantPermissionInput,
   GrantDelegationInput,
+  RegisterKeyInput,
+  VerifySignatureInput,
 } from '../services/identity-authority.service';
 
 function errorStatus(error: unknown): number {
@@ -13,6 +15,7 @@ function errorStatus(error: unknown): number {
     message.includes('required') ||
     message.includes('invalid') ||
     message.includes('must') ||
+    message.includes('not accepted') ||
     message.includes('unknown') ||
     message.includes('not found') ||
     message.includes('not active')
@@ -70,6 +73,42 @@ export async function identityRoutes(fastify: FastifyInstance) {
       try {
         const result = await identityAuthorityService.grantDelegation(request.body);
         return reply.status(201).send(result);
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post(
+    '/identity/keys',
+    async (request: FastifyRequest<{ Body: RegisterKeyInput }>, reply) => {
+      try {
+        const key = await identityAuthorityService.registerKey(request.body);
+        return reply.status(201).send({ key });
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post(
+    '/identity/keys/:keyId/revoke',
+    async (request: FastifyRequest<{ Params: { keyId: string }; Body: { revoked_by?: string | null } }>, reply) => {
+      try {
+        const key = await identityAuthorityService.revokeKey(request.params.keyId, request.body?.revoked_by);
+        return reply.status(200).send({ key });
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post(
+    '/identity/keys/verify-signature',
+    async (request: FastifyRequest<{ Body: VerifySignatureInput }>, reply) => {
+      try {
+        const result = await identityAuthorityService.verifySignature(request.body);
+        return reply.status(result.valid ? 200 : 403).send(result);
       } catch (error) {
         return sendError(reply, error);
       }

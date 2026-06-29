@@ -67,6 +67,36 @@ export interface GrantDelegationInput {
   correlation_id?: string;
 }
 
+export interface RegisterKeyInput {
+  actor_id: string;
+  key_purpose: 'identity' | 'event_signing' | 'credential_signing' | 'delegation';
+  public_key_pem: string;
+  created_by?: string | null;
+  correlation_id?: string;
+}
+
+export interface VerifySignatureInput {
+  actor_id: string;
+  key_purpose: 'identity' | 'event_signing' | 'credential_signing' | 'delegation';
+  payload: string;
+  signature_base64: string;
+}
+
+export interface KeyRingRecord {
+  id: string;
+  actor_id: string;
+  key_purpose: string;
+  algorithm: 'ed25519';
+  public_key_pem: string;
+  fingerprint_sha256: string;
+  status: 'active' | 'rotated' | 'revoked';
+  created_by: string | null;
+  replaced_by_key_id: string | null;
+  event_log_id: string;
+  created_at: string;
+  revoked_at: string | null;
+}
+
 export interface AuthorityChainStep {
   source: 'direct_permission' | 'role_permission' | 'delegation' | 'actor_status' | 'missing_permission';
   actor_id: string;
@@ -100,6 +130,7 @@ const ACTOR_TYPES: Set<string> = new Set([
   'auditor',
   'governor',
 ]);
+const KEY_PURPOSES = new Set(['identity', 'event_signing', 'credential_signing', 'delegation']);
 
 function requireUuid(value: string, field: string): void {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)) {
@@ -116,6 +147,12 @@ function normalizeScope(scope?: string): string {
 function toBuffer(pem?: string | null): Buffer | null {
   if (!pem) return null;
   return Buffer.from(pem, 'utf8');
+}
+
+function fingerprintPublicKey(publicKeyPem: string): string {
+  const key = crypto.createPublicKey(publicKeyPem);
+  const der = key.export({ type: 'spki', format: 'der' });
+  return crypto.createHash('sha256').update(der).digest('hex');
 }
 
 function auditContent(fields: Record<string, unknown>): string {
@@ -366,6 +403,168 @@ export class IdentityAuthorityService {
     }
   }
 
+  async registerKey(input: RegisterKeyInput): Promise<KeyRingRecord> {
+    this.validateRegisterKey(input);
+    const fingerprint = fingerprintPublicKey(input.public_key_pem);
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      await this.requireActiveActor(client, input.actor_id);
+      const createdBy = input.created_by ?? input.actor_id;
+      await this.requireActiveActor(client, createdBy);
+
+      const current = await client.query<{ id: string }>(
+        `SELECT id
+           FROM actor_key_ring
+          WHERE actor_id = $1 AND key_purpose = $2 AND status = 'active'
+          FOR UPDATE`,
+        [input.actor_id, input.key_purpose]
+      );
+
+      const eventId = await this.writeEventAndAudit(client, {
+        actorId: createdBy,
+        eventType: current.rowCount ? 'identity.key_rotated' : 'identity.key_registered',
+        payload: {
+          actor_id: input.actor_id,
+          key_purpose: input.key_purpose,
+          algorithm: 'ed25519',
+          fingerprint_sha256: fingerprint,
+          replaced_key_id: current.rows[0]?.id ?? null,
+        },
+        correlationId: input.correlation_id,
+        inputSummary: `${current.rowCount ? 'rotate' : 'register'} key purpose=${input.key_purpose}`,
+        outputSummary: `fingerprint_sha256=${fingerprint}`,
+      });
+
+      if ((current.rowCount ?? 0) > 0) {
+        await client.query(
+          `UPDATE actor_key_ring
+              SET status = 'rotated',
+                  revoked_at = now()
+            WHERE id = $1`,
+          [current.rows[0].id]
+        );
+      }
+
+      const inserted = await client.query<KeyRingRecord>(
+        `INSERT INTO actor_key_ring
+           (actor_id, key_purpose, algorithm, public_key_pem, fingerprint_sha256, created_by, event_log_id)
+         VALUES ($1,$2,'ed25519',$3,$4,$5,$6)
+         RETURNING id, actor_id, key_purpose, algorithm, public_key_pem, fingerprint_sha256, status,
+                   created_by, replaced_by_key_id, event_log_id, created_at, revoked_at`,
+        [input.actor_id, input.key_purpose, input.public_key_pem, fingerprint, createdBy, eventId]
+      );
+      const key = inserted.rows[0];
+
+      if ((current.rowCount ?? 0) > 0) {
+        await client.query(
+          `UPDATE actor_key_ring
+              SET replaced_by_key_id = $1
+            WHERE id = $2`,
+          [key.id, current.rows[0].id]
+        );
+      }
+
+      await client.query('COMMIT');
+      return key;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async revokeKey(keyId: string, revokedBy?: string | null): Promise<KeyRingRecord> {
+    requireUuid(keyId, 'key_id');
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const current = await client.query<KeyRingRecord>(
+        `SELECT id, actor_id, key_purpose, algorithm, public_key_pem, fingerprint_sha256, status,
+                created_by, replaced_by_key_id, event_log_id, created_at, revoked_at
+           FROM actor_key_ring
+          WHERE id = $1
+          FOR UPDATE`,
+        [keyId]
+      );
+      if (current.rowCount !== 1) throw new Error(`key not found: ${keyId}`);
+      const existing = current.rows[0];
+      const actorId = revokedBy ?? existing.actor_id;
+      await this.requireActiveActor(client, actorId);
+      if (existing.status !== 'active') {
+        await client.query('COMMIT');
+        return existing;
+      }
+
+      await this.writeEventAndAudit(client, {
+        actorId,
+        eventType: 'identity.key_revoked',
+        payload: {
+          key_id: keyId,
+          actor_id: existing.actor_id,
+          key_purpose: existing.key_purpose,
+          fingerprint_sha256: existing.fingerprint_sha256,
+        },
+        inputSummary: `revoke key purpose=${existing.key_purpose}`,
+        outputSummary: `key_id=${keyId}`,
+      });
+
+      const updated = await client.query<KeyRingRecord>(
+        `UPDATE actor_key_ring
+            SET status = 'revoked',
+                revoked_at = now()
+          WHERE id = $1
+          RETURNING id, actor_id, key_purpose, algorithm, public_key_pem, fingerprint_sha256, status,
+                    created_by, replaced_by_key_id, event_log_id, created_at, revoked_at`,
+        [keyId]
+      );
+      await client.query('COMMIT');
+      return updated.rows[0];
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  async verifySignature(input: VerifySignatureInput): Promise<{ valid: boolean; reason: string; key_id?: string; fingerprint_sha256?: string }> {
+    requireUuid(input.actor_id, 'actor_id');
+    if (!KEY_PURPOSES.has(input.key_purpose)) throw new Error(`invalid key_purpose: ${input.key_purpose}`);
+    if (!input.payload) throw new Error('payload is required');
+    if (!input.signature_base64) throw new Error('signature_base64 is required');
+
+    const key = await db.query<KeyRingRecord>(
+      `SELECT id, actor_id, key_purpose, algorithm, public_key_pem, fingerprint_sha256, status,
+              created_by, replaced_by_key_id, event_log_id, created_at, revoked_at
+         FROM actor_key_ring
+        WHERE actor_id = $1 AND key_purpose = $2 AND status = 'active'
+        ORDER BY created_at DESC
+        LIMIT 1`,
+      [input.actor_id, input.key_purpose]
+    );
+    if (key.rowCount !== 1) return { valid: false, reason: 'active_key_missing' };
+
+    try {
+      const publicKey = crypto.createPublicKey(key.rows[0].public_key_pem);
+      const valid = crypto.verify(null, Buffer.from(input.payload, 'utf8'), publicKey, Buffer.from(input.signature_base64, 'base64'));
+      return {
+        valid,
+        reason: valid ? 'signature_valid' : 'signature_invalid',
+        key_id: key.rows[0].id,
+        fingerprint_sha256: key.rows[0].fingerprint_sha256,
+      };
+    } catch {
+      return {
+        valid: false,
+        reason: 'signature_invalid',
+        key_id: key.rows[0].id,
+        fingerprint_sha256: key.rows[0].fingerprint_sha256,
+      };
+    }
+  }
+
   async verifyAuthority(actorId: string, permissionName: string, scope = '*'): Promise<AuthorityDecision> {
     requireUuid(actorId, 'actor_id');
     if (!permissionName?.trim()) throw new Error('permission_name is required');
@@ -557,6 +756,16 @@ export class IdentityAuthorityService {
       if (!input.service_identity.service_name?.trim()) throw new Error('service_name is required');
       if (!Array.isArray(input.service_identity.scopes)) throw new Error('service scopes must be an array');
     }
+  }
+
+  private validateRegisterKey(input: RegisterKeyInput): void {
+    requireUuid(input.actor_id, 'actor_id');
+    if (input.created_by) requireUuid(input.created_by, 'created_by');
+    if (!KEY_PURPOSES.has(input.key_purpose)) throw new Error(`invalid key_purpose: ${input.key_purpose}`);
+    if (!input.public_key_pem?.trim()) throw new Error('public_key_pem is required');
+    const key = crypto.createPublicKey(input.public_key_pem);
+    if (key.asymmetricKeyType !== 'ed25519') throw new Error('public_key_pem must be an Ed25519 public key');
+    if (/PRIVATE KEY/.test(input.public_key_pem)) throw new Error('private key material is not accepted');
   }
 
   private async requireActiveActor(client: PoolClient, actorId: string): Promise<void> {
