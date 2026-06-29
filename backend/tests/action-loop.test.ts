@@ -148,6 +148,7 @@ describe('Action Loop Integration', () => {
         args: {
           claimText: 'AI autonomy is advancing rapidly',
           supportSourceIds: [sourceId],
+          supportSnippets: ['Recent advances in autonomous AI systems show significant progress'],
           confidence: 0.8,
         },
         successCriteria: ['Claim backed by source'],
@@ -183,7 +184,7 @@ describe('Action Loop Integration', () => {
       const result = await executor.executeAction(spec);
 
       expect(result.status).toBe(ActionStatus.BLOCKED);
-      expect(result.blockedReason).toContain('registered evidence sources');
+      expect(result.blockedReason).toContain('source id is not registered evidence');
       expect(result.blockedReason).toContain(missingSourceId);
     });
 
@@ -407,6 +408,7 @@ describe('Action Loop Integration', () => {
         args: {
           claimText: 'AI autonomy research shows rapid progress',
           supportSourceIds: [evidenceId],
+          supportSnippets: ['Recent advances in autonomous AI systems show significant progress'],
           confidence: 0.85,
         },
         successCriteria: ['Claim backed by evidence'],
@@ -486,7 +488,7 @@ describe('Action Loop Integration', () => {
           objective: `Test ${actionType}`,
           args:
             actionType === ActionType.GENERATE_CLAIM
-              ? { claimText: 'test', supportSourceIds: ['test'] }
+              ? { claimText: 'test', supportSourceIds: ['test'], supportSnippets: ['test'] }
               : actionType === ActionType.FETCH_PAGE
                 ? { url: 'https://example.com' }
                 : { query: 'test' },

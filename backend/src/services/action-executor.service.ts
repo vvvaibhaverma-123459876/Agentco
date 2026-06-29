@@ -19,6 +19,7 @@ import {
 import { WebAdapter } from '../adapters/web-adapter';
 import { TeamActivationService } from './team-activation.service';
 import { evidenceRegistry } from './evidence-registry.service';
+import { claimGrounding } from './claim-grounding.service';
 
 export class ActionExecutorService {
   private webAdapter: WebAdapter | null = null;
@@ -319,12 +320,14 @@ export class ActionExecutorService {
       return;
     }
 
-    const evidenceRows = await evidenceRegistry.getBySourceIds(supportSourceIds);
-    const foundSourceIds = new Set(evidenceRows.map(row => row.source_id));
-    const missingSourceIds = supportSourceIds.filter((sourceId: string) => !foundSourceIds.has(sourceId));
-    if (missingSourceIds.length > 0) {
+    const grounding = await claimGrounding.validate({
+      claimText,
+      supportSourceIds,
+      supportSnippets: spec.args.supportSnippets || [],
+    });
+    if (!grounding.valid) {
       result.status = ActionStatus.BLOCKED;
-      result.blockedReason = `Claims must reference registered evidence sources; missing source ids: ${missingSourceIds.join(', ')}`;
+      result.blockedReason = `Claim grounding failed: ${grounding.errors.join('; ')}`;
       return;
     }
 
@@ -344,8 +347,8 @@ export class ActionExecutorService {
     // Store claim in database
     await db.query(
       `INSERT INTO autonomy_claims (
-        id, claim_id, action_id, text, status, confidence, support_source_ids, derived_from_action_ids
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         uuidv4(),
         claimId,
@@ -354,6 +357,7 @@ export class ActionExecutorService {
         claim.status,
         claim.confidence,
         JSON.stringify(claim.supportSourceIds),
+        JSON.stringify(claim.supportSnippets),
         JSON.stringify(claim.derivedFromActionIds),
       ]
     );

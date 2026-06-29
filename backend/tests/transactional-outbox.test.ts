@@ -57,6 +57,7 @@ describe('transactional outbox', () => {
       actor_id: actor.id,
       payload: { actor_id: actor.id, permission_name: 'test.permission' },
     });
+    await db.query(`UPDATE event_outbox SET created_at = now() - interval '1 day' WHERE event_log_id = $1`, [event.id]);
     const published: Array<{ topic: string; envelope: OutboxEnvelope }> = [];
 
     const result = await transactionalOutbox.relayBatch({
@@ -84,6 +85,7 @@ describe('transactional outbox', () => {
       actor_id: actor.id,
       payload: { actor_id: actor.id },
     });
+    await db.query(`UPDATE event_outbox SET created_at = now() - interval '1 day' WHERE event_log_id = $1`, [event.id]);
 
     const result = await transactionalOutbox.relayBatch({
       async publish(_topic, envelope) {
@@ -110,6 +112,7 @@ describe('transactional outbox', () => {
       actor_id: actor.id,
       payload: { poison: true },
     });
+    await db.query(`UPDATE event_outbox SET created_at = now() - interval '1 day' WHERE event_log_id = $1`, [event.id]);
 
     const result = await transactionalOutbox.relayBatch({
       async publish(_topic, envelope) {

@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T09:15:41Z'
+  last_updated: '2026-06-29T09:32:36Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -358,19 +358,35 @@ layers:
         instead of accepting arbitrary identifiers. This verifies the canonical action-loop path; legacy/direct evidence writers
         are not expanded by this item.
     - id: L4.ClaimGroundingValidator
-      status: in_progress
+      status: verified
       depends_on:
       - L4.EvidenceRegistry
       artifacts:
-      - backend/src/services/claim-grounding.ts
-      tests: []
+      - backend/src/services/claim-grounding.service.ts
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/claim-grounding.test.ts
+      - backend/tests/action-loop.test.ts
+      gates_passed:
+      - integration
+      - typescript
+      notes: Supported autonomy claims now require registered evidence ids and grounded support snippets. The validator accepts
+        only snippets that are token-subsequences of registered evidence text and blocks absent or fabricated snippets before
+        writing supported claims.
     - id: L4.MemoryPromotionPipeline
-      status: not_started
+      status: verified
       depends_on:
       - L5.ResolutionService
       - L6.TrustScorer
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/services/memory-promotion-pipeline.service.ts
+      tests:
+      - backend/tests/civilization-learning-e2e.test.ts
+      gates_passed:
+      - e2e
+      - typescript
+      notes: Resolved non-post-hoc predictions with computed trust scores are promoted into append-only agent_memories as
+        prediction_lesson entries. Promotion emits canonical event_log and decision_log records.
     - id: L4.VectorIndex
       status: not_started
       depends_on:
@@ -409,13 +425,22 @@ layers:
       blockers:
       - Run and fix release-blocking Python independence tests under the new actor model.
     - id: L5.ResolutionService
-      status: in_progress
+      status: verified
       depends_on:
       - L5.SourceIndependenceChecker
       artifacts:
+      - backend/src/services/resolution-service.service.ts
       - scripts/verify_resolution_service.py
       tests:
+      - backend/tests/civilization-learning-e2e.test.ts
       - tests/integration/test_resolution_service_role_migration.py
+      gates_passed:
+      - e2e
+      - integration
+      - typescript
+      notes: Prediction registration uses the canonical prediction_ledger and resolution writes require the resolution_service
+        DB role. The E2E slice proves ordinary agentco updates are blocked while an authorized resolution_service connection
+        writes write-once outcome, Brier score, log score, event_log, and decision_log records.
   L6_calibration_trust:
     status: in_progress
     items:
@@ -428,14 +453,21 @@ layers:
       tests:
       - calibration/tests
     - id: L6.TrustScorer
-      status: in_progress
+      status: verified
       depends_on:
       - L6.CalibrationScorer
       artifacts:
+      - backend/src/services/persistent-trust-scorer.service.ts
       - calibration/trust
       - backend/src/services/trust-impact-assessment.service.ts
       tests:
+      - backend/tests/civilization-learning-e2e.test.ts
       - backend/tests/trust-impact-real-metrics.test.ts
+      gates_passed:
+      - e2e
+      - typescript
+      notes: Resolved prediction outcomes now produce immutable trust_scores windows plus trust_reputation_ledger events.
+        The scorer is sample-size conservative and force-downgrades low-sample windows instead of overclaiming calibration.
     - id: L6.ProofOfCalibrationService
       status: in_progress
       depends_on:
@@ -700,10 +732,13 @@ layers:
       - scripts/verify_civilization_vertical_slice.py
       tests:
       - reports/system_run/latest/civilization_vertical_slice.json
+      - backend/tests/civilization-learning-e2e.test.ts
       gates_passed:
       - e2e
-      notes: Canonical civilization vertical slice passed against real Postgres, Kafka, OpenAI chat, OpenAI embeddings, resolution_service,
-        and Postgres-backed vector index.
+      notes: Existing vertical slice remains verified. The current canonical learning E2E additionally proves evidence registration,
+        grounded claim generation, prediction registration, authorized resolution_service scoring, persistent trust scoring,
+        prediction_lesson memory promotion, event_log records, and decision_log audit records against native Postgres. Kafka/OpenAI/vector
+        production smoke is not re-proven by this focused backend test.
   capability_growth_engine:
     status: not_started
     items:
@@ -724,11 +759,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 14
-  in_progress: 30
-  not_started: 23
+  verified: 18
+  in_progress: 27
+  not_started: 22
   blocked: 0
-  percent_verified: 20.9
+  percent_verified: 26.87
 gates:
   no_stub: red
   no_simulation: green
@@ -763,7 +798,7 @@ gate_findings:
     marker: placeholder
     excerpt: '# Replace placeholder (which is already surrounded by single quotes in SQL)'
   - path: backend/src/services/action-executor.service.ts
-    line: 28
+    line: 29
     marker: mock
     excerpt: '* Inject web adapter (can be real or mock)'
   - path: backend/src/services/planner.service.ts
