@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { PoolClient } from 'pg';
 import { db } from '../db/client';
+import { auditLog } from './audit-log.service';
 import { eventLog } from './event-log.service';
 
 export type ResourceType =
@@ -89,10 +90,6 @@ function requireAmount(value: number): void {
   if (!Number.isFinite(value) || value <= 0) {
     throw new Error('amount must be a positive finite number');
   }
-}
-
-function auditContent(fields: Record<string, unknown>): string {
-  return JSON.stringify(fields, Object.keys(fields).sort());
 }
 
 export class ResourceLedgerService {
@@ -603,19 +600,7 @@ export class ResourceLedgerService {
       occurred_at: timestamp,
     });
 
-    const previous = await client.query<{ chain_hash: string }>(
-      `SELECT chain_hash
-         FROM decision_log
-        WHERE chain_hash <> ''
-        ORDER BY timestamp DESC, log_id DESC
-        LIMIT 1`
-    );
-    const prevHash = previous.rows[0]?.chain_hash ?? '0'.repeat(64);
-    const logId = crypto.randomUUID();
-    const content = auditContent({
-      log_id: logId,
-      timestamp,
-      prev_hash: prevHash,
+    await auditLog.appendWithClient(client, {
       agent_id: input.actorId,
       action_type: 'event_published',
       input_summary: input.inputSummary,
@@ -623,30 +608,9 @@ export class ResourceLedgerService {
       confidence_score: 1,
       risk_level: 'low',
       human_approved: false,
-      human_approver_id: null,
       downstream_events: [canonicalEvent.id],
       session_id: sessionId,
-    });
-    const chainHash = crypto.createHash('sha256').update(prevHash + content).digest('hex');
-
-    await client.query(
-      `INSERT INTO decision_log
-         (log_id, agent_id, action_type, input_summary, output_summary,
-          confidence_score, risk_level, human_approved, downstream_events,
-          session_id, timestamp, chain_hash, prev_hash)
-       VALUES ($1,$2,'event_published',$3,$4,1.0,'low',false,$5::uuid[],$6,$7,$8,$9)`,
-      [
-        logId,
-        input.actorId,
-        input.inputSummary,
-        input.outputSummary,
-        [canonicalEvent.id],
-        sessionId,
-        timestamp,
-        chainHash,
-        prevHash,
-      ]
-    );
+    }, { timestamp });
 
     return canonicalEvent.id;
   }

@@ -500,7 +500,7 @@ class PostgresSpendLedger:
             "downstream_events": [event_id],
             "session_id": correlation_id,
         }
-        chain_hash = hashlib.sha256((prev_audit_hash + json.dumps(audit_fields, sort_keys=True)).encode()).hexdigest()
+        chain_hash = hashlib.sha256((prev_audit_hash + json.dumps(audit_fields, separators=(",", ":"))).encode()).hexdigest()
         cur.execute(
             """
             INSERT INTO decision_log

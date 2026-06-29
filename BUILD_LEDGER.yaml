@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T08:59:29Z'
+  last_updated: '2026-06-29T09:03:34Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -254,13 +254,26 @@ layers:
     status: in_progress
     items:
     - id: L3.AuditLog
-      status: in_progress
+      status: verified
       depends_on:
       - L0.MigrationRunner
       artifacts:
       - backend/src/services/audit-log.service.ts
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/services/resource-ledger.service.ts
+      - runtime/base_agent/spend_ledger.py
       tests:
       - backend/tests/integration/audit-log.test.ts
+      - backend/tests/identity-authority.test.ts
+      - backend/tests/resource-ledger.test.ts
+      - runtime/tests/test_spend_guardrail_ledger.py
+      gates_passed:
+      - integration
+      - python
+      - typescript
+      notes: AuditLogService now provides the canonical transactional decision_log writer. Identity and resource services
+        use appendWithClient inside their DB transactions, and the Python spend ledger emits the same canonical hash format.
+        Post-run chain verification passed after TypeScript and Python writers both appended rows.
     - id: L3.EventBus
       status: in_progress
       depends_on:
@@ -689,11 +702,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 11
-  in_progress: 33
+  verified: 12
+  in_progress: 32
   not_started: 23
   blocked: 0
-  percent_verified: 16.42
+  percent_verified: 17.91
 gates:
   no_stub: red
   no_simulation: green
