@@ -1,5 +1,7 @@
 # PART B — CODEX END-TO-END PRODUCTION BUILD PLAN
 
+> **Current build status (2026-06-29):** this plan remains the target process. It is not complete. The durable ledger currently reports `18/67 verified (26.87%)`; see `BUILD_LEDGER.yaml` and `docs/CURRENT_IMPLEMENTATION_REALITY.md`.
+
 ## B.0 Codex operating contract (read first, obey always)
 
 1. **Completeness only.** No stub, mock-in-prod, placeholder, `NotImplementedError`, `pass`-only body,

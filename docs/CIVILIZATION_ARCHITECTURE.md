@@ -1,5 +1,7 @@
 # AgentCo — Civilization-Centric Architecture Redesign + Codex End-to-End Production Build Plan
 
+> **Implementation status:** this is the target civilization architecture and build specification, not a claim that all layers are complete. Current verified state is tracked in `BUILD_LEDGER.yaml` and summarized in `docs/CURRENT_IMPLEMENTATION_REALITY.md`. As of 2026-06-29, the ledger is `18/67 verified (26.87%)`.
+
 **Status of this document:** authoritative build spec. It is meant to be committed to the repo
 (e.g. `/docs/CIVILIZATION_ARCHITECTURE.md` + `/docs/CODEX_BUILD_PLAN.md`) and consumed directly by an
 autonomous coding agent ("Codex"). Every requirement here is a hard requirement.
@@ -591,4 +593,3 @@ Domain-onboarding, Skill (proposed → eval → canary → promoted | rolled_bac
 an explicit transition table with guarded transitions; illegal transitions raise and are audited.
 
 ---
-

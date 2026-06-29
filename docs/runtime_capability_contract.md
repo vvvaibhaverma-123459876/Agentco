@@ -2,6 +2,8 @@
 
 AgentCo must report the difference between real infrastructure, explicit fallback behavior, simulated data, and blocked capabilities. Fallbacks are allowed only when they preserve governance boundaries and are visible in reports.
 
+Current implementation reality is summarized in `docs/CURRENT_IMPLEMENTATION_REALITY.md`. This contract defines required behavior; it is not by itself evidence that every production dependency is currently available.
+
 Production-like mode is any of:
 
 - `AGENTCO_ENV=production`

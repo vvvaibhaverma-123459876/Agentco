@@ -1,5 +1,7 @@
 # AgentCo V2 — System Architecture
 
+> **Current implementation note (2026-06-29):** this document describes important invariants and target architecture, but it is not a completion report. The current verified implementation state is `18/67` build-ledger items verified. Read [docs/CURRENT_IMPLEMENTATION_REALITY.md](docs/CURRENT_IMPLEMENTATION_REALITY.md) and [BUILD_LEDGER.yaml](BUILD_LEDGER.yaml) before making production or completeness claims.
+
 ## Core Invariants (hardcoded, not in prompts)
 
 1. **Only reality promotes.** Beliefs reach `reality_validated` ONLY via externally-scored, pre-registered, out-of-sample predictions resolved by an independent ground truth source. No simulation volume crosses this line.
