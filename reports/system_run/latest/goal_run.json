@@ -1,77 +1,117 @@
 {
   "audit": {
+    "db_records": {
+      "decision_log_id": "9d2068ed-f40c-4fbf-a29b-2acca29bef1d",
+      "event_ids": [
+        "219a819f-0d44-46b3-8056-c33323fc49a8",
+        "1f14e8b7-b8b1-4c8e-b640-36ef69873869",
+        "07ac3bd5-35d1-4cda-af11-382b8a483682",
+        "f58d2c87-4d04-40e7-a61d-4dcad41d876f",
+        "39bd55ca-0e66-4f7d-825b-c2bbbc789bea",
+        "200a695b-a526-4ae1-ae01-e6d2c6b8a64b",
+        "b7336163-59d7-45fc-b50e-5ae2a32f5d46",
+        "f5ca4a8b-1a89-47b7-944b-902158938a3b",
+        "01cf190e-58c0-4f0e-9931-e584e6fe12cd",
+        "4c54534b-10f5-4511-bb55-32e1bb7c1c6d",
+        "884240d3-387d-44db-b257-d11994bcad64"
+      ],
+      "prediction_id": "621c34ea-a9cc-4b9e-bc10-a2cbe04f468c"
+    },
     "event_records": [
+      "policy_controller_correction",
       "task_intake",
       "evidence_parsed",
       "prediction_preregistered",
+      "llm_reasoning_completed",
       "structured_output_validated",
       "trust_adjusted_confidence",
       "policy_checked",
       "human_escalation_selected",
       "synthetic_resolution_scored",
-      "learning_record_written",
-      "deterministic_reasoning_completed"
+      "learning_record_written"
     ],
-    "persistence": "file_backed",
-    "records_generated": 10
+    "persistence": "db_backed",
+    "records_generated": 11
   },
-  "latency_ms": 0,
+  "db_persistence": {
+    "brier_score": 0.1225,
+    "decision_log_id": "9d2068ed-f40c-4fbf-a29b-2acca29bef1d",
+    "event_ids": [
+      "219a819f-0d44-46b3-8056-c33323fc49a8",
+      "1f14e8b7-b8b1-4c8e-b640-36ef69873869",
+      "07ac3bd5-35d1-4cda-af11-382b8a483682",
+      "f58d2c87-4d04-40e7-a61d-4dcad41d876f",
+      "39bd55ca-0e66-4f7d-825b-c2bbbc789bea",
+      "200a695b-a526-4ae1-ae01-e6d2c6b8a64b",
+      "b7336163-59d7-45fc-b50e-5ae2a32f5d46",
+      "f5ca4a8b-1a89-47b7-944b-902158938a3b",
+      "01cf190e-58c0-4f0e-9931-e584e6fe12cd",
+      "4c54534b-10f5-4511-bb55-32e1bb7c1c6d",
+      "884240d3-387d-44db-b257-d11994bcad64"
+    ],
+    "events_written": 11,
+    "persistence": "db_backed",
+    "prediction_id": "621c34ea-a9cc-4b9e-bc10-a2cbe04f468c",
+    "prediction_resolved": true,
+    "session_id": "0a27d3d3-abf9-4354-b1fd-e0122169699c"
+  },
+  "latency_ms": 2178,
   "llm": {
-    "latency_ms": 0,
-    "model": "deterministic_fixture",
-    "simulated": true,
-    "usage": {}
+    "latency_ms": 2177,
+    "model": "gpt-4o-mini",
+    "simulated": false,
+    "usage": {
+      "completion_tokens": 128,
+      "completion_tokens_details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0
+      },
+      "prompt_tokens": 222,
+      "prompt_tokens_details": {
+        "audio_tokens": 0,
+        "cached_tokens": 0
+      },
+      "total_tokens": 350
+    }
   },
-  "mode": "offline_fixture",
+  "mode": "live_openai",
   "prediction": {
-    "brier_score": 0.0,
-    "confidence": 0.68,
-    "id": "51a9cde4-108d-4999-b6bc-b9527d54f872",
+    "brier_score": 0.1225,
+    "confidence": 0.65,
+    "id": "621c34ea-a9cc-4b9e-bc10-a2cbe04f468c",
     "resolution": "escalate",
     "statement": "Northstar DataWorks onboarding should be escalated.",
-    "trusted_confidence": 0.61
+    "trusted_confidence": 0.585
   },
   "result": {
     "audit_events": [
+      "policy_controller_correction",
       "task_intake",
       "evidence_parsed",
       "prediction_preregistered",
+      "llm_reasoning_completed",
       "structured_output_validated",
       "trust_adjusted_confidence",
       "policy_checked",
       "human_escalation_selected",
       "synthetic_resolution_scored",
-      "learning_record_written",
-      "deterministic_reasoning_completed"
+      "learning_record_written"
     ],
     "cited_evidence_ids": [
       "ev1",
-      "ev2"
+      "ev2",
+      "ev3"
     ],
     "claims": [
       {
-        "status": "supported",
-        "support_source_ids": [
-          "ev1"
-        ],
-        "text": "SOC 2 Type II evidence is missing; only SOC 2 alignment is claimed."
-      },
-      {
-        "status": "supported",
-        "support_source_ids": [
-          "ev2"
-        ],
-        "text": "The DPA is unsigned and lacks subprocessors."
-      },
-      {
-        "status": "supported",
-        "support_source_ids": [
-          "ev3"
-        ],
-        "text": "The breach article is not used as evidence against Northstar DataWorks because it names a different company."
+        "status": "unsupported",
+        "support_source_ids": [],
+        "text": "Vendor claims SOC 2 alignment"
       }
     ],
-    "confidence": 0.68,
+    "confidence": 0.65,
     "decision": "escalate",
     "missing_information": [
       "SOC 2 Type II report",
@@ -79,14 +119,18 @@
       "subprocessor list"
     ],
     "policy_checks": {
-      "do_not_conflate_similar_company_names": "passed",
-      "requires_signed_dpa": "missing",
-      "requires_soc2_type2": "missing"
+      "do_not_conflate_similar_company_names": true,
+      "requires_signed_dpa": true,
+      "requires_soc2_type2": true,
+      "unknown_certification_requires_escalation": true
     },
-    "risk_level": "medium",
-    "trusted_confidence": 0.61
+    "policy_controller_corrections": [
+      "added_missing_subprocessor_list_from_ev2"
+    ],
+    "risk_level": "high",
+    "trusted_confidence": 0.585
   },
-  "simulated": true,
+  "simulated": false,
   "success": true,
   "task": {
     "domain": "vendor_risk",
