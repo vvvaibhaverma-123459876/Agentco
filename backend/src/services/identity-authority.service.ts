@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { PoolClient } from 'pg';
 import { db } from '../db/client';
+import { eventLog } from './event-log.service';
 
 export type ActorType =
   | 'human'
@@ -387,9 +388,17 @@ export class IdentityAuthorityService {
       outputSummary: string;
     }
   ): Promise<void> {
-    const eventId = crypto.randomUUID();
     const timestamp = new Date().toISOString();
     const sessionId = input.correlationId ?? crypto.randomUUID();
+    const canonicalEvent = await eventLog.appendWithClient(client, {
+      event_type: input.eventType,
+      actor_id: input.actorId,
+      object_type: input.eventType.split('.')[0],
+      payload: input.payload,
+      correlation_id: sessionId,
+      occurred_at: timestamp,
+    });
+    const eventId = canonicalEvent.id;
 
     await client.query(
       `INSERT INTO event_history

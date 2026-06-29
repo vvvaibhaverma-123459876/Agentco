@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-26T10:30:19Z'
+  last_updated: '2026-06-29T06:55:12Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -223,11 +223,22 @@ layers:
       artifacts: []
       tests: []
     - id: L3.EventLog
-      status: not_started
+      status: verified
       depends_on:
       - L1.ActorRegistry
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/080_event_log.sql
+      - backend/src/services/event-log.service.ts
+      - backend/src/services/identity-authority.service.ts
+      tests:
+      - backend/tests/event-log.test.ts
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical event_log is hash-chained, actor-bound, append-only by DB permission, and exercised by L1 identity
+        mutations in the same transaction as event_history and decision_log writes.
     - id: L3.HashChainAnchor
       status: in_progress
       depends_on:
@@ -614,11 +625,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 4
+  verified: 5
   in_progress: 35
-  not_started: 28
+  not_started: 27
   blocked: 0
-  percent_verified: 5.97
+  percent_verified: 7.46
 gates:
   no_stub: red
   no_simulation: green

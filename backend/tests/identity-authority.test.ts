@@ -8,11 +8,10 @@ function authHeaders(): Record<string, string> {
 }
 
 async function applyIdentityMigration() {
-  const migration = fs.readFileSync(
-    path.resolve(__dirname, '../src/db/migrations/079_identity_authority.sql'),
-    'utf8'
-  );
-  await db.query(migration);
+  for (const name of ['079_identity_authority.sql', '080_event_log.sql']) {
+    const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
+    await db.query(migration);
+  }
 }
 
 describe('identity authority routes', () => {
@@ -54,6 +53,18 @@ describe('identity authority routes', () => {
       [actor.id]
     );
     expect(event.rowCount).toBe(1);
+
+    const canonicalEvent = await db.query(
+      `SELECT id, actor_id, event_hash, prev_hash
+         FROM event_log
+        WHERE id = $1
+          AND event_type = 'actor.registered'
+          AND actor_id = $2`,
+      [event.rows[0].event_id, actor.id]
+    );
+    expect(canonicalEvent.rowCount).toBe(1);
+    expect(canonicalEvent.rows[0].event_hash).toMatch(/^[0-9a-f]{64}$/);
+    expect(canonicalEvent.rows[0].prev_hash).toMatch(/^[0-9a-f]{64}$/);
 
     const audit = await db.query(
       `SELECT log_id
@@ -171,6 +182,16 @@ describe('identity authority routes', () => {
     );
     expect(event.rowCount).toBe(1);
     expect(event.rows[0].payload.assignment_id).toBe(roleResponse.json().assignment_id);
+
+    const canonicalEvent = await db.query(
+      `SELECT id
+         FROM event_log
+        WHERE id = $1
+          AND event_type = 'role.assigned'
+          AND actor_id = $2`,
+      [event.rows[0].event_id, actorId]
+    );
+    expect(canonicalEvent.rowCount).toBe(1);
 
     await app.close();
   });
