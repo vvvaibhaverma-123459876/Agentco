@@ -4,6 +4,7 @@ import {
   RegisterActorInput,
   AssignRoleInput,
   GrantPermissionInput,
+  GrantDelegationInput,
 } from '../services/identity-authority.service';
 
 function errorStatus(error: unknown): number {
@@ -56,6 +57,18 @@ export async function identityRoutes(fastify: FastifyInstance) {
     async (request: FastifyRequest<{ Body: GrantPermissionInput }>, reply) => {
       try {
         const result = await identityAuthorityService.grantPermission(request.body);
+        return reply.status(201).send(result);
+      } catch (error) {
+        return sendError(reply, error);
+      }
+    }
+  );
+
+  fastify.post(
+    '/identity/delegations/grant',
+    async (request: FastifyRequest<{ Body: GrantDelegationInput }>, reply) => {
+      try {
+        const result = await identityAuthorityService.grantDelegation(request.body);
         return reply.status(201).send(result);
       } catch (error) {
         return sendError(reply, error);

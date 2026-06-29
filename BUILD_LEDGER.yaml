@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T08:46:59Z'
+  last_updated: '2026-06-29T08:55:39Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -168,12 +168,24 @@ layers:
       tests: []
       notes: Reserve key artifacts exist, but L1 key lifecycle/rotation/revocation service is not verified.
     - id: L1.AuthorityChain
-      status: not_started
+      status: verified
       depends_on:
       - L1.ActorRegistry
       - L3.EventLog
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/084_authority_chain.sql
+      - backend/src/db/migrations/085_authority_chain_decision_actor_compatibility.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Authority verification resolves direct grants, role-derived permissions, and explicit principal-to-delegate grants
+        with persisted authority_decision_chains plus canonical event_log/outbox provenance. Missing actors deny safely through
+        the agentco-authority-service event actor.
   L2_resources_budgets:
     status: in_progress
     items:
@@ -668,11 +680,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 9
+  verified: 10
   in_progress: 34
-  not_started: 24
+  not_started: 23
   blocked: 0
-  percent_verified: 13.43
+  percent_verified: 14.93
 gates:
   no_stub: red
   no_simulation: green

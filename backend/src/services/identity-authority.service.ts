@@ -57,12 +57,37 @@ export interface GrantPermissionInput {
   correlation_id?: string;
 }
 
+export interface GrantDelegationInput {
+  principal_actor_id: string;
+  delegate_actor_id: string;
+  permission_name: string;
+  granted_by?: string | null;
+  scope?: string;
+  valid_to?: string | null;
+  correlation_id?: string;
+}
+
+export interface AuthorityChainStep {
+  source: 'direct_permission' | 'role_permission' | 'delegation' | 'actor_status' | 'missing_permission';
+  actor_id: string;
+  permission_name: string;
+  scope: string;
+  role_name?: string;
+  principal_actor_id?: string;
+  delegate_actor_id?: string;
+  delegation_id?: string;
+  grant_id?: string;
+}
+
 export interface AuthorityDecision {
   actor_id: string;
   permission_name: string;
   scope: string;
   allowed: boolean;
   reason: string;
+  chain: AuthorityChainStep[];
+  decision_chain_id?: string;
+  event_log_id?: string;
 }
 
 const ACTOR_TYPES: Set<string> = new Set([
@@ -268,6 +293,79 @@ export class IdentityAuthorityService {
     }
   }
 
+  async grantDelegation(input: GrantDelegationInput): Promise<{ delegation_id: string }> {
+    requireUuid(input.principal_actor_id, 'principal_actor_id');
+    requireUuid(input.delegate_actor_id, 'delegate_actor_id');
+    if (input.granted_by) requireUuid(input.granted_by, 'granted_by');
+    if (input.principal_actor_id === input.delegate_actor_id) throw new Error('principal_actor_id and delegate_actor_id must differ');
+    if (!input.permission_name?.trim()) throw new Error('permission_name is required');
+    const scope = normalizeScope(input.scope);
+    if (input.valid_to && Number.isNaN(new Date(input.valid_to).getTime())) {
+      throw new Error('valid_to must be a valid timestamp');
+    }
+
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      await this.requireActiveActor(client, input.principal_actor_id);
+      await this.requireActiveActor(client, input.delegate_actor_id);
+      const grantedBy = input.granted_by ?? input.principal_actor_id;
+      await this.requireActiveActor(client, grantedBy);
+      if (grantedBy !== input.principal_actor_id) {
+        const grantor = await this.resolveAuthority(client, grantedBy, 'governance.approve', '*');
+        if (!grantor.allowed) throw new Error(`delegation grantor lacks governance.approve: ${grantor.reason}`);
+      }
+
+      const permission = await this.getPermission(client, input.permission_name);
+      if (!permission) throw new Error(`unknown permission: ${input.permission_name}`);
+
+      const principalAuthority = await this.resolveAuthority(client, input.principal_actor_id, input.permission_name, scope);
+      if (!principalAuthority.allowed) {
+        throw new Error(`principal lacks delegated permission: ${principalAuthority.reason}`);
+      }
+
+      const eventId = await this.writeEventAndAudit(client, {
+        actorId: grantedBy,
+        eventType: 'identity.delegation_granted',
+        payload: {
+          principal_actor_id: input.principal_actor_id,
+          delegate_actor_id: input.delegate_actor_id,
+          permission_name: input.permission_name,
+          scope,
+          granted_by: grantedBy,
+          valid_to: input.valid_to ?? null,
+        },
+        correlationId: input.correlation_id,
+        inputSummary: `grant delegation permission=${input.permission_name} scope=${scope}`,
+        outputSummary: `delegate_actor_id=${input.delegate_actor_id}`,
+      });
+
+      const result = await client.query<{ id: string }>(
+        `INSERT INTO authority_delegation_grants
+           (principal_actor_id, delegate_actor_id, permission_id, scope, granted_by, valid_to, event_log_id)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)
+         RETURNING id`,
+        [
+          input.principal_actor_id,
+          input.delegate_actor_id,
+          permission.id,
+          scope,
+          grantedBy,
+          input.valid_to ?? null,
+          eventId,
+        ]
+      );
+
+      await client.query('COMMIT');
+      return { delegation_id: result.rows[0].id };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   async verifyAuthority(actorId: string, permissionName: string, scope = '*'): Promise<AuthorityDecision> {
     requireUuid(actorId, 'actor_id');
     if (!permissionName?.trim()) throw new Error('permission_name is required');
@@ -276,64 +374,167 @@ export class IdentityAuthorityService {
     const client = await db.connect();
     try {
       await client.query('BEGIN');
-      const actor = await client.query<{ status: string }>(
-        'SELECT status FROM actors WHERE id = $1',
-        [actorId]
-      );
-      if (actor.rowCount !== 1) {
-        const decision = {
-          actor_id: actorId,
-          permission_name: permissionName,
-          scope: requestedScope,
-          allowed: false,
-          reason: 'actor_not_found',
-        };
-        await this.writeAuthorityEvent(client, decision);
-        await client.query('COMMIT');
-        return decision;
-      }
-      if (actor.rows[0].status !== 'active') {
-        const decision = {
-          actor_id: actorId,
-          permission_name: permissionName,
-          scope: requestedScope,
-          allowed: false,
-          reason: `actor_${actor.rows[0].status}`,
-        };
-        await this.writeAuthorityEvent(client, decision);
-        await client.query('COMMIT');
-        return decision;
-      }
-
-      const direct = await client.query(
-        `SELECT 1
-           FROM actor_permissions ap
-           JOIN permissions p ON p.id = ap.permission_id
-          WHERE ap.actor_id = $1
-            AND p.name = $2
-            AND ap.revoked_at IS NULL
-            AND (ap.expires_at IS NULL OR ap.expires_at > now())
-            AND (ap.scope = '*' OR ap.scope = $3)
-          LIMIT 1`,
-        [actorId, permissionName, requestedScope]
-      );
-
-      const decision = {
-        actor_id: actorId,
-        permission_name: permissionName,
-        scope: requestedScope,
-        allowed: (direct.rowCount ?? 0) > 0,
-        reason: (direct.rowCount ?? 0) > 0 ? 'permission_granted' : 'permission_missing',
-      };
-      await this.writeAuthorityEvent(client, decision);
+      const decision = await this.resolveAuthority(client, actorId, permissionName, requestedScope);
+      const { decisionChainId, eventLogId } = await this.writeAuthorityEvent(client, decision);
       await client.query('COMMIT');
-      return decision;
+      return { ...decision, decision_chain_id: decisionChainId, event_log_id: eventLogId };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
     } finally {
       client.release();
     }
+  }
+
+  private async resolveAuthority(
+    client: PoolClient,
+    actorId: string,
+    permissionName: string,
+    requestedScope: string
+  ): Promise<AuthorityDecision> {
+    const actor = await client.query<{ status: string }>(
+      'SELECT status FROM actors WHERE id = $1',
+      [actorId]
+    );
+    if (actor.rowCount !== 1) {
+      return {
+        actor_id: actorId,
+        permission_name: permissionName,
+        scope: requestedScope,
+        allowed: false,
+        reason: 'actor_not_found',
+        chain: [{ source: 'actor_status', actor_id: actorId, permission_name: permissionName, scope: requestedScope }],
+      };
+    }
+    if (actor.rows[0].status !== 'active') {
+      return {
+        actor_id: actorId,
+        permission_name: permissionName,
+        scope: requestedScope,
+        allowed: false,
+        reason: `actor_${actor.rows[0].status}`,
+        chain: [{ source: 'actor_status', actor_id: actorId, permission_name: permissionName, scope: requestedScope }],
+      };
+    }
+
+    const permission = await this.getPermission(client, permissionName);
+    if (!permission) {
+      return {
+        actor_id: actorId,
+        permission_name: permissionName,
+        scope: requestedScope,
+        allowed: false,
+        reason: 'permission_unknown',
+        chain: [{ source: 'missing_permission', actor_id: actorId, permission_name: permissionName, scope: requestedScope }],
+      };
+    }
+
+    const direct = await client.query<{ id: string; scope: string }>(
+      `SELECT ap.id, ap.scope
+         FROM actor_permissions ap
+        WHERE ap.actor_id = $1
+          AND ap.permission_id = $2
+          AND ap.revoked_at IS NULL
+          AND (ap.expires_at IS NULL OR ap.expires_at > now())
+          AND (ap.scope = '*' OR ap.scope = $3)
+        LIMIT 1`,
+      [actorId, permission.id, requestedScope]
+    );
+    if ((direct.rowCount ?? 0) > 0) {
+      return {
+        actor_id: actorId,
+        permission_name: permissionName,
+        scope: requestedScope,
+        allowed: true,
+        reason: 'direct_permission_granted',
+        chain: [{
+          source: 'direct_permission',
+          actor_id: actorId,
+          permission_name: permissionName,
+          scope: direct.rows[0].scope,
+          grant_id: direct.rows[0].id,
+        }],
+      };
+    }
+
+    const role = await client.query<{ role_name: string; scope: string }>(
+      `SELECT r.role_name, rp.scope
+         FROM role_assignments ra
+         JOIN roles r ON r.id = ra.role_id
+         JOIN role_permissions rp ON rp.role_id = r.id
+        WHERE ra.actor_id = $1
+          AND rp.permission_id = $2
+          AND ra.revoked_at IS NULL
+          AND ra.valid_from <= now()
+          AND (ra.valid_to IS NULL OR ra.valid_to > now())
+          AND (rp.scope = '*' OR rp.scope = $3)
+        ORDER BY r.risk_tier DESC, r.role_name ASC
+        LIMIT 1`,
+      [actorId, permission.id, requestedScope]
+    );
+    if ((role.rowCount ?? 0) > 0) {
+      return {
+        actor_id: actorId,
+        permission_name: permissionName,
+        scope: requestedScope,
+        allowed: true,
+        reason: 'role_permission_granted',
+        chain: [{
+          source: 'role_permission',
+          actor_id: actorId,
+          permission_name: permissionName,
+          scope: role.rows[0].scope,
+          role_name: role.rows[0].role_name,
+        }],
+      };
+    }
+
+    const delegation = await client.query<{
+      id: string;
+      principal_actor_id: string;
+      delegate_actor_id: string;
+      scope: string;
+    }>(
+      `SELECT dg.id, dg.principal_actor_id, dg.delegate_actor_id, dg.scope
+         FROM authority_delegation_grants dg
+         JOIN actors principal ON principal.id = dg.principal_actor_id AND principal.status = 'active'
+        WHERE dg.delegate_actor_id = $1
+          AND dg.permission_id = $2
+          AND dg.revoked_at IS NULL
+          AND dg.valid_from <= now()
+          AND (dg.valid_to IS NULL OR dg.valid_to > now())
+          AND (dg.scope = '*' OR dg.scope = $3)
+        ORDER BY dg.created_at DESC
+        LIMIT 1`,
+      [actorId, permission.id, requestedScope]
+    );
+    if ((delegation.rowCount ?? 0) > 0) {
+      return {
+        actor_id: actorId,
+        permission_name: permissionName,
+        scope: requestedScope,
+        allowed: true,
+        reason: 'delegated_permission_granted',
+        chain: [{
+          source: 'delegation',
+          actor_id: actorId,
+          permission_name: permissionName,
+          scope: delegation.rows[0].scope,
+          delegation_id: delegation.rows[0].id,
+          principal_actor_id: delegation.rows[0].principal_actor_id,
+          delegate_actor_id: delegation.rows[0].delegate_actor_id,
+        }],
+      };
+    }
+
+    return {
+      actor_id: actorId,
+      permission_name: permissionName,
+      scope: requestedScope,
+      allowed: false,
+      reason: 'permission_missing',
+      chain: [],
+    };
   }
 
   private validateRegisterActor(input: RegisterActorInput): void {
@@ -367,14 +568,88 @@ export class IdentityAuthorityService {
     if (result.rows[0].status !== 'active') throw new Error(`actor is not active: ${actorId}`);
   }
 
-  private async writeAuthorityEvent(client: PoolClient, decision: AuthorityDecision): Promise<void> {
-    await this.writeEventAndAudit(client, {
-      actorId: decision.actor_id,
+  private async getPermission(client: PoolClient, permissionName: string): Promise<{ id: string; name: string } | null> {
+    const permission = await client.query<{ id: string; name: string }>(
+      'SELECT id, name FROM permissions WHERE name = $1',
+      [permissionName]
+    );
+    return permission.rows[0] ?? null;
+  }
+
+  private async writeAuthorityEvent(
+    client: PoolClient,
+    decision: AuthorityDecision
+  ): Promise<{ decisionChainId: string; eventLogId: string }> {
+    const eventActorId = await this.eventActorForAuthorityDecision(client, decision);
+    const eventLogId = await this.writeEventAndAudit(client, {
+      actorId: eventActorId,
       eventType: 'identity.authority_verified',
       payload: { ...decision },
       inputSummary: `verify permission=${decision.permission_name} scope=${decision.scope}`,
       outputSummary: `allowed=${decision.allowed} reason=${decision.reason}`,
     });
+
+    const permission = await this.getPermission(client, decision.permission_name);
+    const result = await client.query<{ id: string }>(
+      `INSERT INTO authority_decision_chains
+         (actor_id, requested_actor_id, permission_id, permission_name, scope, allowed, reason, chain, event_log_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8::jsonb,$9)
+       RETURNING id`,
+      [
+        await this.persistedDecisionActorId(client, decision.actor_id),
+        decision.actor_id,
+        permission?.id ?? null,
+        decision.permission_name,
+        decision.scope,
+        decision.allowed,
+        decision.reason,
+        JSON.stringify(decision.chain),
+        eventLogId,
+      ]
+    );
+    return { decisionChainId: result.rows[0].id, eventLogId };
+  }
+
+  private async persistedDecisionActorId(client: PoolClient, actorId: string): Promise<string | null> {
+    const result = await client.query('SELECT 1 FROM actors WHERE id = $1', [actorId]);
+    return result.rowCount === 1 ? actorId : null;
+  }
+
+  private async eventActorForAuthorityDecision(client: PoolClient, decision: AuthorityDecision): Promise<string> {
+    const actor = await client.query<{ status: string }>('SELECT status FROM actors WHERE id = $1', [decision.actor_id]);
+    if (actor.rowCount === 1 && actor.rows[0].status === 'active') {
+      return decision.actor_id;
+    }
+    return this.ensureAuthorityServiceActor(client);
+  }
+
+  private async ensureAuthorityServiceActor(client: PoolClient): Promise<string> {
+    const name = 'agentco-authority-service';
+    const existing = await client.query<{ id: string }>(
+      `SELECT id FROM actors
+        WHERE actor_type = 'service'
+          AND name = $1
+          AND status = 'active'
+        LIMIT 1`,
+      [name]
+    );
+    if ((existing.rowCount ?? 0) > 0) return existing.rows[0].id;
+
+    const created = await client.query<{ id: string }>(
+      `INSERT INTO actors (actor_type, name, metadata_json)
+       VALUES ('service',$1,$2::jsonb)
+       ON CONFLICT (actor_type, name) WHERE status = 'active'
+       DO UPDATE SET updated_at = actors.updated_at
+       RETURNING id`,
+      [name, JSON.stringify({ created_by: 'IdentityAuthorityService', purpose: 'authority denial provenance' })]
+    );
+    await client.query(
+      `INSERT INTO service_identities (actor_id, service_name, scopes)
+       VALUES ($1,$2,$3::jsonb)
+       ON CONFLICT (actor_id) DO NOTHING`,
+      [created.rows[0].id, name, JSON.stringify(['identity.authority.verify'])]
+    );
+    return created.rows[0].id;
   }
 
   private async writeEventAndAudit(
@@ -387,7 +662,7 @@ export class IdentityAuthorityService {
       inputSummary: string;
       outputSummary: string;
     }
-  ): Promise<void> {
+  ): Promise<string> {
     const timestamp = new Date().toISOString();
     const sessionId = input.correlationId ?? crypto.randomUUID();
     const canonicalEvent = await eventLog.appendWithClient(client, {
@@ -458,6 +733,7 @@ export class IdentityAuthorityService {
         prevHash,
       ]
     );
+    return eventId;
   }
 }
 
