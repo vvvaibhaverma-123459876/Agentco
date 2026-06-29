@@ -5,7 +5,7 @@
  * Allows autonomy loop to run without network dependency.
  */
 
-import { WebAdapter, SearchResult, FetchResult } from './web-adapter';
+import { WebAdapter, SearchResult, FetchResult } from '../../src/adapters/web-adapter';
 import { MOCK_DATA } from './mock-data';
 
 export class MockWebAdapter implements WebAdapter {

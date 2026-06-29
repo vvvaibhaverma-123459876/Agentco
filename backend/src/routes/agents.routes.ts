@@ -7,6 +7,7 @@ import { durableExecution } from '../services/durable-execution.service';
 import { query } from '../db/client';
 import { requireApiKey } from '../security';
 import crypto from 'crypto';
+import { assertAgentCanRunTask, listAgentRegistry } from '../agent-registry';
 
 // Model resolved from local model-tier map (matches runtime/base_agent/model_tiers.py).
 // No cloud model ids here.
@@ -59,9 +60,11 @@ const ALL_AGENTS = [
 export async function agentRoutes(fastify: FastifyInstance) {
   // ── GET /api/agents ──────────────────────────────────────────────────
   fastify.get('/api/agents', async (_req, reply) => {
+    const registry = new Map(listAgentRegistry().map(entry => [entry.agentId, entry]));
     const agents = await Promise.all(
       ALL_AGENTS.map(async (a) => ({
         ...a,
+        runtime: registry.get(a.id) ?? { runtimeStatus: 'library_only', allowedTaskTypes: [] },
         model: modelFor(a.id),
         state: await memoryStore.getAgentState(a.id) ?? {
           status: 'idle', lifecycle_state: 'production',
@@ -99,6 +102,14 @@ export async function agentRoutes(fastify: FastifyInstance) {
 
     const { task_type, payload = {} } = req.body ?? {};
     if (!task_type) return reply.status(400).send({ error: 'task_type is required' });
+    try {
+      assertAgentCanRunTask(id, task_type);
+    } catch (error) {
+      return reply.status(422).send({
+        error: error instanceof Error ? error.message : String(error),
+        status: 'unsupported',
+      });
+    }
 
     if (process.env.AGENTCO_REQUIRE_SCOPES === 'true') {
       const scopes = String(req.headers['x-agentco-scope'] ?? '').split(/\s+/);

@@ -51,6 +51,8 @@ export interface CoalitionFormationRequest {
 class GovernanceReputationIntegrationService {
   private reputation: ReputationLearningService;
   private voting_cache = new Map<string, ReputationWeightedVote[]>();
+  private decision_cache = new Map<string, GovernanceDecision>();
+  private coalition_cache = new Map<string, CoalitionFormationRequest>();
   private coalition_threshold = 0.6; // Minimum collaboration score to recruit
 
   constructor(reputationService?: ReputationLearningService) {
@@ -222,6 +224,7 @@ class GovernanceReputationIntegrationService {
       console.log(
         `[GovernanceReputation] Decision on ${proposal_type}: ${decision.toUpperCase()} (${approve_normalized.toFixed(2)} approval)`
       );
+      this.decision_cache.set(governance_decision.decision_id, governance_decision);
 
       return governance_decision;
     } catch (e) {
@@ -274,11 +277,25 @@ class GovernanceReputationIntegrationService {
         throw new Error(`Initiator ${initiator_id} not found in reputation system`);
       }
 
-      // Find compatible members based on specialization + collaboration
-      const recruited_members: string[] = [initiator_id];
+      const required = new Set(required_specializations);
+      const candidates = this.reputation
+        .listReputations()
+        .filter((record) => record.entity_id !== initiator_id)
+        .filter((record) => record.collaboration >= this.coalition_threshold)
+        .filter((record) => required.size === 0 || record.specialization.some((spec) => required.has(spec)))
+        .sort((a, b) => {
+          const aCoverage = a.specialization.filter((spec) => required.has(spec)).length;
+          const bCoverage = b.specialization.filter((spec) => required.has(spec)).length;
+          const aScore = aCoverage * 0.5 + a.collaboration * 0.3 + a.reliability * 0.2;
+          const bScore = bCoverage * 0.5 + b.collaboration * 0.3 + b.reliability * 0.2;
+          return bScore - aScore;
+        });
 
-      // In a real system, this would query all entities and match specializations
-      // For now, we'll record the formation request
+      const recruited_members = [
+        initiator_id,
+        ...candidates.slice(0, Math.max(0, required_specializations.length || 3)).map((candidate) => candidate.entity_id),
+      ];
+
       const coalition: CoalitionFormationRequest = {
         coalition_id,
         initiator_id,
@@ -315,7 +332,18 @@ class GovernanceReputationIntegrationService {
         coalition_id,
         objective,
         members_count: recruited_members.length,
+        required_specializations,
       });
+
+      for (const member_id of recruited_members.filter((id) => id !== initiator_id)) {
+        await this.reputation.recordEvent(member_id, 'coordination_success', 0.4, [initiator_id], {
+          coalition_id,
+          objective,
+          role: 'recruited_member',
+        });
+      }
+
+      this.coalition_cache.set(coalition_id, coalition);
 
       console.log(`[GovernanceReputation] Coalition ${coalition_id} formed by ${initiator_id} for "${objective}"`);
 
@@ -350,16 +378,22 @@ class GovernanceReputationIntegrationService {
         };
       }
 
-      // Get voting pool (all entities in system)
-      const reputation_map = new Map<string, any>();
-      // In real system, would query all reputation records
-      // For now, estimate average reliability of recent voters
-      const average_reliability = 0.7; // Placeholder
+      const votes = this.voting_cache.get(proposal_id) || [];
+      const votingPool = votes.length > 0
+        ? votes.map((vote) => vote.voter_reliability)
+        : this.reputation.listReputations().map((record) => record.reliability);
+
+      const average_reliability = votingPool.length > 0
+        ? votingPool.reduce((sum, reliability) => sum + reliability, 0) / votingPool.length
+        : 0;
+      const reliabilityLabel = votingPool.length > 0
+        ? `${votingPool.length} reputation record${votingPool.length === 1 ? '' : 's'}`
+        : 'no eligible voter reputation records';
 
       return {
         eligible_to_propose: true,
         average_voter_reliability: average_reliability,
-        recommendation: `Proposal eligible. Proposer innovation: ${innovation.toFixed(2)}. Average voter reliability: ${average_reliability.toFixed(2)}`,
+        recommendation: `Proposal eligible. Policy length: ${policy_content.length} chars. Proposer innovation: ${innovation.toFixed(2)}. Average voter reliability from ${reliabilityLabel}: ${average_reliability.toFixed(2)}`,
       };
     } catch (e) {
       console.error(`[GovernanceReputation] Failed to evaluate proposal: ${(e as any).message}`);
@@ -382,14 +416,16 @@ class GovernanceReputationIntegrationService {
     coalitions_formed: number;
   } {
     try {
-      // Would query database in real implementation
-      // For now return placeholder
+      const votes = Array.from(this.voting_cache.values()).flat().filter((vote) => vote.voter_id === entity_id);
+      const proposedDecisions = Array.from(this.decision_cache.values()).filter((decision) => decision.proposed_by === entity_id);
+      const formedCoalitions = Array.from(this.coalition_cache.values()).filter((coalition) => coalition.initiator_id === entity_id);
+
       return {
-        proposals: [],
-        votes_cast: 0,
-        approvals: 0,
-        rejections: 0,
-        coalitions_formed: 0,
+        proposals: proposedDecisions.map((decision) => decision.proposal_id),
+        votes_cast: votes.length,
+        approvals: votes.filter((vote) => vote.vote === 'approve').length,
+        rejections: votes.filter((vote) => vote.vote === 'reject').length,
+        coalitions_formed: formedCoalitions.length,
       };
     } catch (e) {
       console.error(`[GovernanceReputation] Failed to get history: ${(e as any).message}`);

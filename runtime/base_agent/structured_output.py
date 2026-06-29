@@ -46,18 +46,24 @@ def get_validated_output(
         if guardrail is not None:
             guardrail.check_before_call()  # raises SpendCapExceeded if over limit
 
-        resp = client.chat.completions.create(
-            model=model,
-            messages=current_messages,
-            temperature=0.2,
-        )
+        try:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=current_messages,
+                temperature=0.2,
+            )
+        except Exception:
+            if guardrail is not None and hasattr(guardrail, "release_pending_reservation"):
+                guardrail.release_pending_reservation()
+            raise
 
         if guardrail is not None:
             usage = getattr(resp, "usage", None)
+            total = 0
             if usage is not None:
                 total = getattr(usage, "total_tokens", 0) or 0
-                if isinstance(total, int):
-                    guardrail.record_usage(total)
+            if isinstance(total, int):
+                guardrail.record_usage(total)
 
         raw = resp.choices[0].message.content or ""
         try:

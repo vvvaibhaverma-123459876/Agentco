@@ -1,0 +1,19 @@
+{
+  "runId": "learning_run_1782302924921",
+  "status": "success",
+  "goalText": "Learn about transformer models and neural networks",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 1,
+  "sourcesAllowed": 1,
+  "sourcesFetched": 2,
+  "documentsFetched": 2,
+  "claimsExtracted": 6,
+  "claimsPersisted": 6,
+  "claimsRouted": 6,
+  "auditEventsLogged": 24,
+  "errors": [],
+  "warnings": [],
+  "startedAt": "2026-06-24T12:08:44.921Z",
+  "completedAt": "2026-06-24T12:08:50.754Z",
+  "durationMs": 5833
+}

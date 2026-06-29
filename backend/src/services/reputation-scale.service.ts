@@ -47,26 +47,50 @@ class ReputationScaleService {
 
           for (const update of batch) {
             valueClauses.push(
-              `($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3})`
+              `($${paramIndex}, $${paramIndex + 1}, $${paramIndex + 2}, $${paramIndex + 3}, $${paramIndex + 4}, $${paramIndex + 5}, $${paramIndex + 6}, $${paramIndex + 7}, $${paramIndex + 8}, $${paramIndex + 9})`
             );
+            const eventId = uuidv4();
             values.push(
+              eventId,
               update.specialist_id,
+              'reputation_update',
+              Math.abs(update.new_reputation - 0.5),
+              eventId,
+              'specialist',
+              0.5,
               update.new_reputation,
-              new Date(),
-              update.change_reason
+              update.change_reason,
+              new Date()
             );
-            paramIndex += 4;
+            paramIndex += 10;
           }
 
           // Batch insert into reputation audit log
+          for (const update of batch) {
+            await db.query(
+              `INSERT INTO reputation_scores
+                 (entity_id, entity_type, current_score, reliability, speed, innovation,
+                  collaboration, performance_history, specialization, last_updated, created_at)
+               VALUES ($1, 'specialist', $2, $3, 0.5, 0.5, 0.5, '[]', '[]', $4, $4)
+               ON CONFLICT (entity_id) DO UPDATE
+               SET current_score = EXCLUDED.current_score,
+                   reliability = EXCLUDED.reliability,
+                   last_updated = EXCLUDED.last_updated`,
+              [
+                update.specialist_id,
+                update.new_reputation * 100,
+                update.new_reputation,
+                new Date(),
+              ]
+            );
+          }
+
           await db.query(
             `INSERT INTO reputation_audit_log
-              (id, entity_id, entity_type, new_reputation, change_reason, audit_timestamp)
+              (event_id, entity_id, event_type, magnitude, id, entity_type,
+               previous_reputation, new_reputation, change_reason, audit_timestamp)
              VALUES ${valueClauses.map((vc, idx) => vc).join(',')}`,
-            values.flatMap((v, idx) => {
-              if (idx % 4 === 0) return [uuidv4()];
-              return [v];
-            })
+            values
           );
 
           updated += batch.length;
@@ -222,7 +246,7 @@ class ReputationScaleService {
         [institutionId, specialistRole, reputation]
       );
 
-      return result.rows[0]?.percentile || 0;
+      return Number(result.rows[0]?.percentile || 0);
     } catch (e) {
       throw new Error(`Failed to calculate percentile: ${e}`);
     }
@@ -315,13 +339,23 @@ class ReputationScaleService {
       const avgRep = result.rows[0]?.avg_reputation || 0.5;
       const roundedRep = Math.round(avgRep * 100) / 100;
 
-      // Update department reputation
-      await db.query(
-        `UPDATE departments
-         SET reputation_score = $1, updated_at = $2
-         WHERE id = $3`,
-        [roundedRep, new Date(), departmentId]
-      );
+      const client = await db.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query("SELECT set_config('civilization.reputation_update_authorized', 'true', true)");
+        await client.query(
+          `UPDATE departments
+           SET reputation_score = $1, updated_at = $2
+           WHERE id = $3`,
+          [roundedRep, new Date(), departmentId]
+        );
+        await client.query('COMMIT');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
 
       return roundedRep;
     } catch (e) {
@@ -371,12 +405,23 @@ class ReputationScaleService {
 
       const instAvg = Math.round((instResult.rows[0]?.avg_reputation || 0.5) * 100) / 100;
 
-      await db.query(
-        `UPDATE institutions
-         SET reputation_score = $1, updated_at = $2
-         WHERE id = $3`,
-        [instAvg, new Date(), institutionId]
-      );
+      const client = await db.connect();
+      try {
+        await client.query('BEGIN');
+        await client.query("SELECT set_config('civilization.reputation_update_authorized', 'true', true)");
+        await client.query(
+          `UPDATE institutions
+           SET reputation_score = $1, updated_at = $2
+           WHERE id = $3`,
+          [instAvg, new Date(), institutionId]
+        );
+        await client.query('COMMIT');
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     } catch (e) {
       throw new Error(`Failed to cascade reputation update: ${e}`);
     }

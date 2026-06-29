@@ -75,120 +75,99 @@ export class RAGService {
     }
   }
 
-  /**
-   * Retrieve evidence from Wikipedia and ArXiv
-   * In production, this would call real APIs
-   * For now: simulate with knowledge base
-   */
   private async retrieveEvidence(question: string): Promise<SearchResult[]> {
-    // Simulated evidence retrieval (in production, call real APIs)
-    const evidence: SearchResult[] = [];
+    const [wikipedia, arxiv] = await Promise.all([
+      this.searchWikipedia(question),
+      this.searchArXiv(question),
+    ]);
 
-    // Wikipedia results (simulated)
-    evidence.push(
-      ...this.simulateWikipediaSearch(question),
-    );
-
-    // ArXiv results (simulated)
-    evidence.push(
-      ...this.simulateArXivSearch(question),
-    );
-
-    return evidence;
+    return [...wikipedia, ...arxiv];
   }
 
-  private simulateWikipediaSearch(question: string): SearchResult[] {
-    // In production, call Wikipedia API
-    // For now: return high-quality simulated results
-    const normalizedQ = question.toLowerCase();
+  private async searchWikipedia(question: string): Promise<SearchResult[]> {
+    try {
+      const url = new URL('https://en.wikipedia.org/w/rest.php/v1/search/page');
+      url.searchParams.set('q', question);
+      url.searchParams.set('limit', '3');
 
-    const knowledge_base: Record<string, SearchResult[]> = {
-      'capital of france': [
-        {
-          source: 'Wikipedia',
-          title: 'Paris',
-          snippet: 'Paris is the capital and most populous city of France, located in the north-central part of the country.',
-          relevance: 0.95,
-          url: 'https://en.wikipedia.org/wiki/Paris',
-        },
-      ],
-      'wrote to kill a mockingbird': [
-        {
-          source: 'Wikipedia',
-          title: "To Kill a Mockingbird",
-          snippet: "To Kill a Mockingbird is a novel by Harper Lee published in 1960. It was immediately successful and has become a classic of modern American literature.",
-          relevance: 0.95,
-          url: 'https://en.wikipedia.org/wiki/To_Kill_a_Mockingbird',
-        },
-      ],
-      'largest planet in solar system': [
-        {
-          source: 'Wikipedia',
-          title: 'Jupiter',
-          snippet: 'Jupiter is the fifth planet from the Sun and the largest in the Solar System. It is a gas giant with a mass more than 2.5 times that of all the other planets combined.',
-          relevance: 0.93,
-          url: 'https://en.wikipedia.org/wiki/Jupiter',
-        },
-      ],
-    };
-
-    for (const [key, results] of Object.entries(knowledge_base)) {
-      if (normalizedQ.includes(key) || key.includes(normalizedQ)) {
-        return results;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'AgentCo-RAG/1.0 (evidence verification)' },
+      });
+      if (!response.ok) {
+        throw new Error(`Wikipedia returned HTTP ${response.status}`);
       }
-    }
 
-    return [];
+      const payload = await response.json() as {
+        pages?: Array<{ title?: string; excerpt?: string; key?: string; description?: string }>;
+      };
+
+      return (payload.pages || [])
+        .filter((page) => page.title || page.excerpt)
+        .map((page, index) => ({
+          source: 'Wikipedia',
+          title: page.title || page.key || 'Wikipedia result',
+          snippet: this.stripMarkup(page.excerpt || page.description || page.title || ''),
+          relevance: Math.max(0.5, 0.95 - index * 0.1),
+          url: `https://en.wikipedia.org/wiki/${encodeURIComponent(page.key || page.title || '')}`,
+        }));
+    } catch (err: any) {
+      console.warn(`[RAG] Wikipedia retrieval failed: ${err.message}`);
+      return [];
+    }
   }
 
-  private simulateArXivSearch(question: string): SearchResult[] {
-    // Simulate ArXiv search results for academic questions
-    const normalizedQ = question.toLowerCase();
+  private async searchArXiv(question: string): Promise<SearchResult[]> {
+    try {
+      const url = new URL('https://export.arxiv.org/api/query');
+      url.searchParams.set('search_query', `all:${question}`);
+      url.searchParams.set('start', '0');
+      url.searchParams.set('max_results', '3');
 
-    const academic_knowledge_base: Record<string, SearchResult[]> = {
-      'machine learning': [
-        {
-          source: 'ArXiv',
-          title: 'A Survey on Machine Learning',
-          snippet: 'Machine learning is a subset of artificial intelligence that focuses on learning from data.',
-          relevance: 0.92,
-          url: 'https://arxiv.org/abs/1808.07747',
-        },
-      ],
-      'neural network': [
-        {
-          source: 'ArXiv',
-          title: 'Deep Learning',
-          snippet: 'Deep neural networks are powerful machine learning models that can learn hierarchical representations.',
-          relevance: 0.90,
-          url: 'https://arxiv.org/abs/1512.03385',
-        },
-      ],
-      'artificial intelligence': [
-        {
-          source: 'ArXiv',
-          title: 'AI: A Modern Approach',
-          snippet: 'Artificial Intelligence encompasses broad areas of automated decision making and learning systems.',
-          relevance: 0.88,
-          url: 'https://arxiv.org/abs/1709.07871',
-        },
-      ],
-    };
-
-    for (const [key, results] of Object.entries(academic_knowledge_base)) {
-      if (normalizedQ.includes(key) || key.includes(normalizedQ)) {
-        return results;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'AgentCo-RAG/1.0 (evidence verification)' },
+      });
+      if (!response.ok) {
+        throw new Error(`arXiv returned HTTP ${response.status}`);
       }
-    }
 
-    // Return generic academic result if no match
-    return [{
-      source: 'ArXiv',
-      title: `Academic research on ${question}`,
-      snippet: `Research papers related to: ${question}`,
-      relevance: 0.75,
-      url: `https://arxiv.org/search/?query=${encodeURIComponent(question)}&searchtype=all`,
-    }];
+      const xml = await response.text();
+      const entries = Array.from(xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g));
+
+      return entries.map((entry, index) => {
+        const body = entry[1];
+        const title = this.extractXmlText(body, 'title') || 'arXiv result';
+        const summary = this.extractXmlText(body, 'summary') || title;
+        const id = this.extractXmlText(body, 'id');
+        return {
+          source: 'ArXiv',
+          title: title.replace(/\s+/g, ' ').trim(),
+          snippet: summary.replace(/\s+/g, ' ').trim().slice(0, 500),
+          relevance: Math.max(0.45, 0.9 - index * 0.1),
+          url: id || `https://arxiv.org/search/?query=${encodeURIComponent(question)}&searchtype=all`,
+        };
+      });
+    } catch (err: any) {
+      console.warn(`[RAG] arXiv retrieval failed: ${err.message}`);
+      return [];
+    }
+  }
+
+  private stripMarkup(value: string): string {
+    return value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  }
+
+  private extractXmlText(xml: string, tag: string): string {
+    const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
+    return match ? this.decodeXml(match[1]) : '';
+  }
+
+  private decodeXml(value: string): string {
+    return value
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
   }
 
   /**

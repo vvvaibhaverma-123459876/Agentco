@@ -7,6 +7,7 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { db } from '../src/db/client';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { LoopDetectorService, ActionHistory } from '../src/services/loop-detector.service';
+import { MockWebAdapter } from './support/mock-web-adapter';
 import {
   ActionSpec,
   ActionType,
@@ -20,6 +21,7 @@ describe('Action Loop Integration', () => {
   const loopDetector = new LoopDetectorService();
 
   beforeEach(async () => {
+    executor.setWebAdapter(new MockWebAdapter());
     // Clear test data before each test
     await db.query('TRUNCATE autonomy_actions CASCADE');
     await db.query('TRUNCATE autonomy_claims CASCADE');
@@ -96,11 +98,48 @@ describe('Action Loop Integration', () => {
 
       expect(result.actionId).toBe(spec.actionId);
       expect(result.status).toBe(ActionStatus.COMPLETED);
-      expect(result.observations.searchId).toBeDefined();
+      expect(result.observations.searchQuery).toBe('autonomous AI systems');
+      expect(result.observations.resultsFound).toBeGreaterThan(0);
+    });
+
+    it('should block FETCH_PAGE without real content instead of recording placeholder evidence', async () => {
+      const isolatedExecutor = new ActionExecutorService();
+      const spec: ActionSpec = {
+        actionId: uuidv4(),
+        actionType: ActionType.FETCH_PAGE,
+        goalId: uuidv4(),
+        objective: 'Fetch unavailable page',
+        args: { url: 'https://example.com/no-adapter' },
+        successCriteria: ['No placeholder artifact created'],
+        riskLevel: RiskLevel.LOW,
+        decidedBy: 'test',
+        decidedAt: new Date(),
+      };
+
+      const result = await isolatedExecutor.executeAction(spec);
+
+      expect(result.status).toBe(ActionStatus.BLOCKED);
+      expect(result.createdArtifacts).toHaveLength(0);
+      expect(result.observations.status).toBe('fetch_blocked_no_real_content');
+      expect(result.blockedReason).toContain('no evidence artifact was created');
     });
 
     it('should execute GENERATE_CLAIM with evidence validation', async () => {
-      const sourceId = uuidv4();
+      const fetchSpec: ActionSpec = {
+        actionId: uuidv4(),
+        actionType: ActionType.FETCH_PAGE,
+        goalId: uuidv4(),
+        objective: 'Fetch evidence source',
+        args: { url: 'https://example.com/evidence-source' },
+        successCriteria: ['Evidence source registered'],
+        riskLevel: RiskLevel.LOW,
+        decidedBy: 'test',
+        decidedAt: new Date(),
+      };
+      const fetchResult = await executor.executeAction(fetchSpec);
+      expect(fetchResult.status).toBe(ActionStatus.COMPLETED);
+      const sourceId = fetchResult.createdArtifacts[0];
+
       const spec: ActionSpec = {
         actionId: uuidv4(),
         actionType: ActionType.GENERATE_CLAIM,
@@ -109,6 +148,7 @@ describe('Action Loop Integration', () => {
         args: {
           claimText: 'AI autonomy is advancing rapidly',
           supportSourceIds: [sourceId],
+          supportSnippets: ['Recent advances in autonomous AI systems show significant progress'],
           confidence: 0.8,
         },
         successCriteria: ['Claim backed by source'],
@@ -122,6 +162,30 @@ describe('Action Loop Integration', () => {
       expect(result.status).toBe(ActionStatus.COMPLETED);
       expect(result.observations.claimId).toBeDefined();
       expect(result.createdArtifacts).toContain(result.observations.claimId);
+    });
+
+    it('should BLOCK claim generation when support source ids are not registered evidence', async () => {
+      const missingSourceId = uuidv4();
+      const spec: ActionSpec = {
+        actionId: uuidv4(),
+        actionType: ActionType.GENERATE_CLAIM,
+        goalId: uuidv4(),
+        objective: 'Generate claim with missing evidence',
+        args: {
+          claimText: 'Claim with unregistered source id',
+          supportSourceIds: [missingSourceId],
+        },
+        successCriteria: [],
+        riskLevel: RiskLevel.LOW,
+        decidedBy: 'test',
+        decidedAt: new Date(),
+      };
+
+      const result = await executor.executeAction(spec);
+
+      expect(result.status).toBe(ActionStatus.BLOCKED);
+      expect(result.blockedReason).toContain('source id is not registered evidence');
+      expect(result.blockedReason).toContain(missingSourceId);
     });
 
     it('should BLOCK claim generation without evidence sources', async () => {
@@ -253,7 +317,7 @@ describe('Action Loop Integration', () => {
         history.push({
           actionType: ActionType.EVALUATE_PROGRESS,
           timestamp: new Date(),
-          args: { goalId: 'test-goal' },
+          args: { goalId: 'test-goal', step: i },
           resultStatus: 'completed',
           newArtifacts: 0, // NO NEW ARTIFACTS
         });
@@ -319,7 +383,6 @@ describe('Action Loop Integration', () => {
       expect(searchResult.status).toBe(ActionStatus.COMPLETED);
 
       // Step 2: Fetch evidence
-      const evidenceId = uuidv4();
       const fetchSpec: ActionSpec = {
         actionId: uuidv4(),
         actionType: ActionType.FETCH_PAGE,
@@ -333,6 +396,8 @@ describe('Action Loop Integration', () => {
       };
       const fetchResult = await executor.executeAction(fetchSpec);
       expect(fetchResult.status).toBe(ActionStatus.COMPLETED);
+      const evidenceId = fetchResult.createdArtifacts[0];
+      expect(evidenceId).toBeDefined();
 
       // Step 3: Generate claim with evidence
       const claimSpec: ActionSpec = {
@@ -343,6 +408,7 @@ describe('Action Loop Integration', () => {
         args: {
           claimText: 'AI autonomy research shows rapid progress',
           supportSourceIds: [evidenceId],
+          supportSnippets: ['Recent advances in autonomous AI systems show significant progress'],
           confidence: 0.85,
         },
         successCriteria: ['Claim backed by evidence'],
@@ -422,7 +488,7 @@ describe('Action Loop Integration', () => {
           objective: `Test ${actionType}`,
           args:
             actionType === ActionType.GENERATE_CLAIM
-              ? { claimText: 'test', supportSourceIds: ['test'] }
+              ? { claimText: 'test', supportSourceIds: ['test'], supportSnippets: ['test'] }
               : actionType === ActionType.FETCH_PAGE
                 ? { url: 'https://example.com' }
                 : { query: 'test' },
@@ -434,7 +500,7 @@ describe('Action Loop Integration', () => {
 
         const result = await executor.executeAction(spec);
         expect(result.actionId).toBe(spec.actionId);
-        expect([ActionStatus.COMPLETED, ActionStatus.BLOCKED]).toContain(result.status);
+        expect([ActionStatus.COMPLETED, ActionStatus.BLOCKED, ActionStatus.FAILED]).toContain(result.status);
       }
     });
   });

@@ -38,7 +38,13 @@ describe('Phase 2: Long-Term Coordination - Goal Hierarchies', () => {
         await db.query('DELETE FROM goal_rollup_results WHERE parent_goal_id IN (SELECT id FROM autonomy_goals WHERE institution_id = $1)', [
           institutionId,
         ]);
+        await db.query(
+          'DELETE FROM specialist_allocation_history WHERE work_request_id IN (SELECT id FROM institution_work_requests WHERE institution_id = $1)',
+          [institutionId]
+        );
+        await db.query('DELETE FROM institution_work_requests WHERE institution_id = $1', [institutionId]);
         await db.query('DELETE FROM autonomy_goals WHERE institution_id = $1', [institutionId]);
+        await db.query('DELETE FROM departments WHERE institution_id = $1', [institutionId]);
         await db.query('DELETE FROM institutions WHERE id = $1', [institutionId]);
       } catch (e) {
         console.warn('Cleanup warning:', e);
@@ -57,7 +63,7 @@ describe('Phase 2: Long-Term Coordination - Goal Hierarchies', () => {
     expect(rootGoal.id).toBeDefined();
     expect(rootGoal.goal_depth).toBe(0);
     expect(rootGoal.goal_path).toMatch(/^\//);
-    expect(rootGoal.status).toBe('queued');
+    expect(rootGoal.status).toBe('active');
     expect(rootGoal.institution_id).toBe(institutionId);
 
     rootGoalId = rootGoal.id;
@@ -169,7 +175,7 @@ describe('Phase 2: Long-Term Coordination - Goal Hierarchies', () => {
     const dedup = result.rows[0];
     expect(dedup.evidence_source_id).toBe(sourceEvidenceId);
     expect(dedup.canonical_evidence_id).toBe(canonicalEvidenceId);
-    expect(dedup.confidence_score).toBe(0.85);
+    expect(Number(dedup.confidence_score)).toBe(0.85);
 
     console.log(`✅ Evidence deduplication recorded: ${dedupId}`);
   });
@@ -250,9 +256,14 @@ describe('Phase 2: Long-Term Coordination - Goal Hierarchies', () => {
 
     expect(result.rows.length).toBe(1);
     expect(result.rows[0].specialist_role).toBe('researcher');
-    expect(result.rows[0].allocated_reputation).toBe(0.75);
+    expect(Number(result.rows[0].allocated_reputation)).toBe(0.75);
 
     // Cleanup
+    await db.query(
+      'DELETE FROM specialist_allocation_history WHERE work_request_id IN (SELECT id FROM institution_work_requests WHERE department_id = $1)',
+      [departmentId]
+    );
+    await db.query('DELETE FROM institution_work_requests WHERE department_id = $1', [departmentId]);
     await db.query('DELETE FROM departments WHERE id = $1', [departmentId]);
 
     console.log(`✅ Allocation decision recorded`);
@@ -271,7 +282,12 @@ describe('Phase 2: Long-Term Coordination - Goal Hierarchies', () => {
 
     // Find our pattern
     const ourPattern = patterns.find(
-      (p) => JSON.stringify(JSON.parse(p.team_composition).sort()) === JSON.stringify(teamComposition.sort())
+      (p) => {
+        const composition = Array.isArray(p.team_composition)
+          ? p.team_composition
+          : JSON.parse(p.team_composition);
+        return JSON.stringify(composition.sort()) === JSON.stringify(teamComposition.sort());
+      }
     );
 
     expect(ourPattern).toBeDefined();

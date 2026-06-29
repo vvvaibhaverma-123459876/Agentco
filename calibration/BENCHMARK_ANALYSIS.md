@@ -1,3 +1,5 @@
+> **Historical/superseded status notice (2026-06-29):** This document is retained for audit history. Do not treat production-ready, complete, or deployment-ready language below as current truth. Current implementation status is tracked in `BUILD_LEDGER.yaml` and summarized in `docs/CURRENT_IMPLEMENTATION_REALITY.md`. As of 2026-06-29, AgentCo is local-native runnable, not production certified, with 18/67 ledger items verified.
+
 # Agentco Calibration Benchmark Analysis
 **Date:** June 22, 2026  
 **Status:** Framework Complete - Ready for Real Model Integration

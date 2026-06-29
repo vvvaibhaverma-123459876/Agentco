@@ -183,21 +183,18 @@ export class MultiAgentEnsembleService {
     question: string,
     analysis: QuestionAnalysis
   ): Promise<ExpertResponse> {
-    // Simulate expert reasoning (in production, would call actual expert model)
     const reasoning_chain = this.generateReasoningChain(expert, question, analysis);
 
     // Expert confidence based on their expertise level and question alignment
     const domain_alignment = this.calculateDomainAlignment(expert.domain, analysis);
-    const confidence = expert.expertise_level * domain_alignment;
-
-    // Simulate answer (in production, would be actual model output)
-    const answer = this.simulateExpertAnswer(expert, question, reasoning_chain);
+    const response = await this.callExpertLLM(expert, question, reasoning_chain);
+    const confidence = Math.min(response.confidence, expert.expertise_level * domain_alignment);
 
     return {
       expert_domain: expert.domain,
-      answer,
+      answer: response.answer,
       confidence,
-      reasoning_chain,
+      reasoning_chain: response.reasoning_chain.length > 0 ? response.reasoning_chain : reasoning_chain,
       evidence_quality: confidence * 0.9, // Expert credibility
     };
   }
@@ -268,20 +265,66 @@ export class MultiAgentEnsembleService {
     );
   }
 
-  /**
-   * Simulate expert answer (in production, actual expert model)
-   */
-  private simulateExpertAnswer(
+  private async callExpertLLM(
     expert: ExpertAgent,
     question: string,
     reasoning: string[]
-  ): string {
-    // In production, this would call actual specialized model
-    // For now, simulate expert-level answer
-    return `[${expert.domain} Expert Analysis]\n` +
-      `Following ${expert.reasoning_strength} reasoning:\n` +
-      `${reasoning.join('\n')}\n` +
-      `Answer based on ${expert.specialization}`;
+  ): Promise<{ answer: string; confidence: number; reasoning_chain: string[] }> {
+    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for multi-agent expert responses');
+    }
+
+    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
+    const model = process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini';
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        temperature: 0.1,
+        response_format: { type: 'json_object' },
+        messages: [
+          {
+            role: 'system',
+            content:
+              `You are the ${expert.domain} specialist in a bounded AgentCo expert ensemble. ` +
+              `Specialization: ${expert.specialization}. Return JSON with keys answer, confidence, and reasoning_chain. ` +
+              `confidence must be 0 to 1 and reasoning_chain must be an array of concise evidence-grounded steps.`,
+          },
+          {
+            role: 'user',
+            content:
+              `Question: ${question}\n` +
+              `Preferred reasoning structure:\n${reasoning.join('\n')}`,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Expert LLM call failed for ${expert.domain}: HTTP ${response.status}`);
+    }
+
+    const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
+    const content = payload.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error(`Expert LLM call returned empty content for ${expert.domain}`);
+    }
+
+    const parsed = JSON.parse(content) as { answer?: string; confidence?: number; reasoning_chain?: string[] };
+    if (!parsed.answer || typeof parsed.confidence !== 'number') {
+      throw new Error(`Expert LLM call returned invalid JSON for ${expert.domain}`);
+    }
+
+    return {
+      answer: parsed.answer,
+      confidence: Math.max(0, Math.min(1, parsed.confidence)),
+      reasoning_chain: Array.isArray(parsed.reasoning_chain) ? parsed.reasoning_chain : [],
+    };
   }
 
   /**
@@ -449,8 +492,14 @@ class ConsensusBuilder {
     // Improvement over baseline
     const improvement = finalConfidence - baselineConfidence;
 
+    const finalAnswer = expertResponses
+      .slice()
+      .sort((a, b) => b.confidence - a.confidence)
+      .map((response) => `[${response.expert_domain} confidence=${response.confidence.toFixed(2)}] ${response.answer}`)
+      .join('\n\n');
+
     return {
-      final_answer: expertResponses[0].answer, // In production, would synthesize
+      final_answer: finalAnswer,
       consensus_confidence: finalConfidence,
       expert_agreement: expertAgreement,
       reasoning_synthesis: reasoningSynthesis,

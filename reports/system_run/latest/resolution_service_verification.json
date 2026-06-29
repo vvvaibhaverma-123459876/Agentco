@@ -1,0 +1,17 @@
+{
+  "guard_not_bypassed": true,
+  "notes": "Verifier proves the guard from live trigger metadata and probes configured credentials; it does not print credentials.",
+  "ordinary_agent_path": {
+    "detail": "agentco",
+    "status": "success"
+  },
+  "resolution_service_path": {
+    "detail": "resolution_service",
+    "status": "success"
+  },
+  "result": "success",
+  "unauthorized_resolution_guard": {
+    "detail": "trigger enforces resolution_service current_user on resolution writes",
+    "status": "success"
+  }
+}

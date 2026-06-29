@@ -26,6 +26,8 @@ import os
 import time
 from typing import Any, Optional
 
+from runtime.base_agent.spend_ledger import SpendLedgerBlocked, configured_spend_ledger
+
 _DEFAULT_MAX_TOKENS: int = int(os.environ.get("LLM_MAX_TOKENS_PER_RUN", "100000"))
 _DEFAULT_RPM: int = int(os.environ.get("LLM_RATE_LIMIT_RPM", "60"))
 
@@ -50,15 +52,20 @@ class SpendGuardrail:
         max_calls_per_minute: int = _DEFAULT_RPM,
         agent_id: str = "unknown",
         escalation: Optional[Any] = None,
+        model_name: str = "unknown",
+        ledger: Optional[Any] = None,
     ) -> None:
         self._max_tokens = max_tokens
         self._rpm_cap = max_calls_per_minute
         self._agent_id = agent_id
         self._escalation = escalation
+        self._model_name = model_name
 
         self._tokens_used: int = 0
         self._calls_this_window: int = 0
         self._window_start: float = time.monotonic()
+        self._ledger = ledger if ledger is not None else configured_spend_ledger(agent_id, model_name, max_tokens)
+        self._pending_reservation: Optional[Any] = None
 
     # ------------------------------------------------------------------
     # Public interface
@@ -96,10 +103,36 @@ class SpendGuardrail:
             )
 
         self._calls_this_window += 1
+        if self._ledger is not None:
+            reservation_amount = int(os.environ.get("LLM_LEDGER_RESERVATION_TOKENS", str(self._max_tokens)))
+            reservation_amount = max(1, min(reservation_amount, self._max_tokens))
+            try:
+                self._pending_reservation = self._ledger.reserve(
+                    reservation_amount,
+                    idempotency_key=f"llm-call-reserve:{self._agent_id}:{time.time_ns()}",
+                    ttl_seconds=int(os.environ.get("LLM_LEDGER_RESERVATION_TTL_SECONDS", "300")),
+                )
+            except SpendLedgerBlocked as exc:
+                self._escalate_and_raise(str(exc), reason="spend_ledger_blocked")
 
     def record_usage(self, total_tokens: int) -> None:
         """Accumulate token usage from one LLM call response."""
-        self._tokens_used += max(0, total_tokens)
+        used = max(0, total_tokens)
+        self._tokens_used += used
+        if self._ledger is not None and self._pending_reservation is not None:
+            reservation_id = self._pending_reservation.reservation_id
+            self._ledger.settle(
+                reservation_id,
+                used,
+                idempotency_key=f"llm-call-settle:{self._agent_id}:{reservation_id}",
+            )
+            self._pending_reservation = None
+
+    def release_pending_reservation(self) -> None:
+        if self._ledger is not None and self._pending_reservation is not None:
+            reservation_id = self._pending_reservation.reservation_id
+            self._ledger.release(reservation_id)
+            self._pending_reservation = None
 
     # ------------------------------------------------------------------
     # Internal helpers

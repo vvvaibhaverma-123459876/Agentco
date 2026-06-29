@@ -5,9 +5,23 @@
  */
 
 import { TeamActivationService, SpecialistActivationRequest } from '../src/services/team-activation.service';
+import { db } from '../src/db/client';
+import { v4 as uuidv4 } from 'uuid';
 
 describe('Specialist Subprocess Spawning', () => {
   let teamActivation: TeamActivationService;
+
+  async function createGoal(text: string): Promise<string> {
+    const goalId = uuidv4();
+    await db.query(
+      `INSERT INTO autonomy_goals (
+        id, title, description, source, domain, expected_value, risk_level,
+        autonomy_level_allowed, status, proposed_by, depth
+      ) VALUES ($1, $2, $2, 'manual', 'test', 0.1, 'low', 'L1', 'active', 'jest', 0)`,
+      [goalId, text]
+    );
+    return goalId;
+  }
 
   beforeAll(() => {
     teamActivation = new TeamActivationService();
@@ -19,8 +33,9 @@ describe('Specialist Subprocess Spawning', () => {
   });
 
   test('should spawn a researcher specialist with HTTP endpoint', async () => {
+    const parentGoalId = await createGoal('test-goal-1');
     const request: SpecialistActivationRequest = {
-      parentGoalId: 'test-goal-1',
+      parentGoalId,
       role: 'researcher',
       objective: 'Test research task',
     };
@@ -37,8 +52,9 @@ describe('Specialist Subprocess Spawning', () => {
   }, 10000);
 
   test('should make HTTP request to specialist /status endpoint', async () => {
+    const parentGoalId = await createGoal('test-goal-2');
     const request: SpecialistActivationRequest = {
-      parentGoalId: 'test-goal-2',
+      parentGoalId,
       role: 'researcher',
       objective: 'Test status check',
     };
@@ -58,8 +74,9 @@ describe('Specialist Subprocess Spawning', () => {
   }, 10000);
 
   test('should execute action via specialist /execute endpoint', async () => {
+    const parentGoalId = await createGoal('test-goal-3');
     const request: SpecialistActivationRequest = {
-      parentGoalId: 'test-goal-3',
+      parentGoalId,
       role: 'researcher',
       objective: 'Test action execution',
     };
@@ -100,7 +117,7 @@ describe('Specialist Subprocess Spawning', () => {
   });
 
   test('should enforce max concurrent specialists per goal', async () => {
-    const parentGoalId = 'test-goal-5';
+    const parentGoalId = await createGoal('test-goal-5');
 
     // Spawn 3 specialists
     const spec1 = await teamActivation.activateSpecialist({

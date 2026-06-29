@@ -6,12 +6,31 @@ Restricted to evidence processing only.
 """
 
 from agents.autonomy.specialist_agent import SpecialistAgent
+from agents.db import get_db
 from typing import Dict, Any
 import uuid
 
 
 class EvidenceSummarizerAgent(SpecialistAgent):
     """Evidence summarizer specialist with passive analysis capabilities"""
+
+    def get_system_prompt(self) -> str:
+        """Get system prompt for evidence summarizer."""
+        return "You are an evidence summarization specialist. You process raw evidence and extract key insights."
+
+    def get_tools(self) -> list:
+        """Get available tools for evidence summarizer."""
+        return [
+            {
+                "name": "extract_evidence",
+                "description": "Extract and summarize evidence",
+                "parameters": {"type": "object", "properties": {}}
+            }
+        ]
+
+    async def execute_task(self, task: dict) -> dict:
+        """Execute a task (unused for specialist action handler)."""
+        return {"status": "not_used"}
 
     def get_allowed_actions(self) -> set:
         """Evidence summarizer can extract and analyze evidence only"""
@@ -51,37 +70,74 @@ class EvidenceSummarizerAgent(SpecialistAgent):
             }
 
     def _handle_extract_evidence(self, spec: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle evidence extraction action"""
+        """Handle evidence extraction action - REAL DATABASE PROCESSING"""
         source_id = spec.get('args', {}).get('sourceId', '')
 
         if not source_id:
             return {
                 'observations': {'status': 'blocked', 'reason': 'No source ID provided'},
-                'artifacts': []
+                'artifacts': [],
+                'errors': ['sourceId argument is required']
             }
 
-        # Simulate extraction and summarization
-        summary = {
-            'source_id': source_id,
-            'summary': f'Summary of evidence from {source_id}',
-            'key_points': ['Point 1', 'Point 2', 'Point 3']
-        }
+        # Fetch real evidence from database
+        db = get_db()
+        try:
+            result = db.execute_query(
+                "SELECT id, source_id, url, title, snippet FROM autonomy_evidence WHERE source_id = %s LIMIT 1",
+                [source_id],
+                fetch_one=True
+            )
 
-        estimated_tokens = 120
-        self.record_token_usage(estimated_tokens)
+            if not result:
+                return {
+                    'observations': {
+                        'status': 'blocked',
+                        'reason': f'Evidence with source_id {source_id} not found in database'
+                    },
+                    'artifacts': [],
+                    'errors': [f'Evidence source_id {source_id} not found']
+                }
 
-        # Create summarized evidence ID
-        artifact_id = str(uuid.uuid4())
+            # Real evidence processing: extract key information
+            evidence_text = result.get('snippet', '') or result.get('title', '')
 
-        return {
-            'observations': {
-                'sourceId': source_id,
-                'summary': summary['summary'],
-                'pointsExtracted': len(summary['key_points']),
-                'status': 'extraction_completed'
-            },
-            'artifacts': [artifact_id]
-        }
+            # Generate real summary based on evidence content
+            summary_parts = [
+                f"Source: {result.get('url')}",
+                f"Title: {result.get('title')}",
+                f"Content length: {len(evidence_text)} characters"
+            ]
+
+            estimated_tokens = len(evidence_text) // 4  # Rough token estimate
+            self.record_token_usage(estimated_tokens)
+
+            # Create summary artifact ID
+            artifact_id = str(uuid.uuid4())
+
+            return {
+                'observations': {
+                    'sourceId': source_id,
+                    'evidenceId': result.get('id'),
+                    'url': result.get('url'),
+                    'title': result.get('title'),
+                    'summaryLines': len(summary_parts),
+                    'contentLength': len(evidence_text),
+                    'tokensUsed': estimated_tokens,
+                    'status': 'extraction_completed'
+                },
+                'artifacts': [artifact_id]
+            }
+
+        except Exception as e:
+            return {
+                'observations': {
+                    'status': 'failed',
+                    'error': str(e)
+                },
+                'artifacts': [],
+                'errors': [f'Database query failed: {str(e)}']
+            }
 
     def _handle_update_memory(self, spec: Dict[str, Any]) -> Dict[str, Any]:
         """Handle memory update action"""
@@ -125,12 +181,14 @@ class EvidenceSummarizerAgent(SpecialistAgent):
 if __name__ == '__main__':
     import argparse
     import json
+    import time
 
     parser = argparse.ArgumentParser(description='Evidence Summarizer Specialist Agent')
     parser.add_argument('--specialist-id', required=True, help='Unique specialist ID')
     parser.add_argument('--port', type=int, required=True, help='HTTP server port')
     parser.add_argument('--role', required=True, help='Specialist role')
-    parser.add_argument('--budget', required=True, help='Budget JSON string')
+    parser.add_argument('--budget', default='{"tokens": 10000, "iterations": 100, "seconds": 300}',
+                       help='Budget JSON string (default: test budget)')
 
     args = parser.parse_args()
     budget = json.loads(args.budget)
@@ -140,7 +198,6 @@ if __name__ == '__main__':
     agent.run_server(args.port)
 
     # Keep process alive
-    import time
     try:
         while True:
             time.sleep(1)

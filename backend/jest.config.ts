@@ -5,6 +5,7 @@ const config: Config = {
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
   testMatch: ['**/*.test.ts'],
+  setupFiles: ['<rootDir>/tests/setup-env.ts'],
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: { rootDir: '.' } }],
   },

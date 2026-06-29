@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import uuid
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 from typing import Optional
 
@@ -48,6 +49,14 @@ def _agent_score_and_count(agent_id: str, ledger) -> tuple[Optional[float], int]
     return reserve_score.overall_log_score, reserve_score.total_sample_count
 
 
+def _as_float(value) -> Optional[float]:
+    if value is None:
+        return None
+    if isinstance(value, Decimal):
+        return float(value)
+    return float(value)
+
+
 def propagate_institution(institution_id: str, ledger, db) -> dict:
     """
     Compute and persist department_score for each dept, then institution_score.
@@ -69,7 +78,7 @@ def propagate_institution(institution_id: str, ledger, db) -> dict:
                     (institution_id,),
                 )
                 inst_row = cur.fetchone()
-                old_inst_score = inst_row[0] if inst_row else None
+                old_inst_score = _as_float(inst_row[0]) if inst_row else None
 
                 # Load departments
                 cur.execute(
@@ -107,7 +116,8 @@ def propagate_institution(institution_id: str, ledger, db) -> dict:
 
         # Compute department scores (no N+1 queries)
         dept_scores: dict[str, Optional[float]] = {}
-        for dept_id, dept_name, old_dept_score in depts:
+        for dept_id, dept_name, old_dept_score_raw in depts:
+            old_dept_score = _as_float(old_dept_score_raw)
             members = dept_agents.get(dept_id, [])
 
             if not members:
@@ -190,7 +200,10 @@ def _persist_score_update(
 
         # Use an explicit transaction so SET LOCAL survives to the UPDATE.
         old_autocommit = db.autocommit
-        db.autocommit = False
+        changed_autocommit = False
+        if old_autocommit:
+            db.autocommit = False
+            changed_autocommit = True
         try:
             with db.cursor() as cur:
                 # 1. Write memory event
@@ -219,7 +232,8 @@ def _persist_score_update(
             db.rollback()
             raise RuntimeError(f"Database error persisting score update: {e}")
         finally:
-            db.autocommit = old_autocommit
+            if changed_autocommit:
+                db.autocommit = old_autocommit
     except RuntimeError:
         raise
     except Exception as e:

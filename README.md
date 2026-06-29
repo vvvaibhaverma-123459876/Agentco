@@ -1,379 +1,141 @@
-# AgentCo - Complete Autonomous Agent Civilization System
+# AgentCo
 
-**Status**: ✅ **PRODUCTION READY** (100% health, all critical bugs fixed)  
-**Latest Update**: 2026-06-24 (Critical Bug Fixes - All 5 + 2 Additional Issues Resolved)  
-**Architecture**: Full civilization stack with real autonomy orchestration, reputation learning, adaptive strategy, governance integration, and coalition formation
+AgentCo is being built as an evidence-governed, calibration-driven AI civilization: a runtime where agents act as bounded citizens, claims require evidence, predictions are pre-registered and independently resolved, trust changes only from scored outcomes, and learning is promoted through audited memory.
 
-### Recent Updates (June 24, 2026)
-- ✅ **Fixed 5 Critical Autonomy Bugs** preventing autonomous loop execution
-- ✅ **Fixed 2 Additional Bugs** discovered during testing
-- ✅ **Claim Generation Working** - 7 claims generated in 5-minute test run
-- ✅ **Evidence-to-Claims Pipeline** fully functional
-- ✅ **Loop Detection & Adaptation** working correctly
-- ✅ **Type Safety Issues Resolved** (VARCHAR/UUID mismatches)
-- **See**: [AUTONOMY_BUG_FIXES_FINAL_REPORT.md](AUTONOMY_BUG_FIXES_FINAL_REPORT.md) for complete details
+This repository is **not production certified**. The verified state is local-native and testable, with explicit production fail-closed guards.
 
----
+## Current Verdict
 
-## Overview
+| Area | Current state |
+|---|---|
+| Build ledger | `18/67 verified (26.87%)` |
+| Local backend | Runnable against native Postgres |
+| Backend tests | Full default tier passed: `42` suites, `287` tests |
+| OpenAI path | Live connectivity and goal-run verifier have passed in prior reports |
+| Production | Not certified; real Vault/secrets and full production infrastructure smoke remain required |
+| Docker/Kafka/Redis/Vault/observability | Local fallbacks exist where safe; production must use real services or fail closed |
 
-AgentCo is a complete evidence-governed autonomous agent civilization system. It provides:
+The source of truth for implementation status is:
 
-- **Real Autonomy Orchestration** — LLM-powered planning with web research integration
-- **4-Dimensional Reputation Learning** — Hierarchical tracking of reliability, speed, innovation, and collaboration
-- **Adaptive Research Strategy** — ROI-based query optimization with budget enforcement
-- **Reputation-Weighted Governance** — Democratic decision-making based on proven performance
-- **Coalition Formation** — Dynamic team assembly with specialization matching
-- **Real-Time Learning & Adaptation** — Reflection-based improvement from execution patterns
+- [BUILD_LEDGER.yaml](BUILD_LEDGER.yaml)
+- [docs/CURRENT_IMPLEMENTATION_REALITY.md](docs/CURRENT_IMPLEMENTATION_REALITY.md)
+- [reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md](reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md)
 
-All systems are **production-ready** with:
-- ✅ PostgreSQL database (53 migrations, fully normalized schema, FK constraints verified)
-- ✅ Real OpenAI GPT-4 integration for planning and reasoning
-- ✅ Web research integration (DuckDuckGo, Wikipedia, Hacker News, GitHub)
-- ✅ Comprehensive error handling and audit logging
-- ✅ Performance validation: 558 ops/sec, <2ms latency, 0 errors
-- ✅ Evidence-to-Claims Pipeline: Fully functional with proper FK constraints
-- ✅ Reflection-Based Learning: Tested and verified working across loop iterations
+Older phase reports are historical artifacts. If they conflict with the build ledger or current implementation reality, treat them as superseded.
 
----
+## What Is Real Now
 
-## System Architecture
+- Native Postgres migrations and schema checks.
+- Backend Fastify service and frontend build path.
+- Runtime doctor and explicit mode/fallback reporting.
+- Immutable audit log and canonical event log with transactional outbox.
+- Actor identity, authority chains, role/permission checks, public-key lifecycle, and internal hash-chain anchors.
+- Resource ledger reservations and spend guardrail integration.
+- Canonical evidence registry with event/audit provenance.
+- Claim grounding validation: supported claims require registered evidence IDs and support snippets that are token-subsequences of registered evidence.
+- Prediction registration and authorized resolution-service path with ordinary-user resolution blocked by DB trigger.
+- Persistent trust scoring from resolved predictions into immutable `trust_scores` and reputation events.
+- Memory promotion from resolved/scored predictions into append-only `agent_memories`.
+- A focused civilization learning E2E slice: evidence -> grounded claim -> prediction -> authorized resolution -> trust score -> memory promotion -> event log -> audit log.
+- Deterministic source-discovery unit verification without depending on public internet reachability; production source discovery still probes live URLs.
 
-### 1. Core Autonomy Engine ✅
+## What Is Partial
 
-**Components**:
-- `autonomy-orchestrator.service.ts` — Main orchestration loop (2800+ lines)
-- `autonomy-action-planner.service.ts` — LLM-powered action planning
-- `action-executor.service.ts` — Execution with budget tracking
-- `loop-detector.service.ts` — Detects repetitive patterns
-- `reflection.service.ts` — Learns from failure patterns
+- The full L0-L14 civilization architecture is incomplete: 18 of 67 ledger items are verified.
+- Some services are implemented but not yet fully reachable from the L14 coordinator path.
+- Kafka, Redis, Vault, Prometheus/Grafana, and Docker production smoke are not proven in the current local-native path.
+- Cross-domain transfer is still a smoke benchmark, not proof of general intelligence.
+- Source independence scoring remains in progress; Python release-blocking independence tests still need reconciliation with the current actor model.
+- Disabled migrations under `backend/src/db/unsupported_migrations/` remain unsupported/future.
 
-**Capabilities**:
-- Autonomous goal decomposition and planning
-- Real-time action execution with resource budgets (tokens, iterations, time)
-- Loop detection and adaptive replan
-- Reflection-based learning
-- OpenAI GPT-4-turbo integration for reasoning
+## What Is Test-Only Or Simulated
 
-**Status**: ✅ 100% functional, tested with real LLM
+- `MockWebAdapter` is test-only.
+- Deterministic LLM/provider fixtures are allowed only in offline/CI/test paths.
+- Offline fixture reports and benchmark smoke outputs are not production evidence.
+- Fallback cache/event/metrics providers are explicit local/offline fallbacks, not real infrastructure.
 
-### 2. Reputation Learning System ✅
+Production-like modes must not silently use simulated or fallback providers for protected paths.
 
-**Component**: `reputation-learning.service.ts` (457 lines)
+## Quick Start: Local Native
 
-**Capabilities**:
-- 4-dimensional tracking: reliability, speed, innovation, collaboration (each 0-1)
-- Hierarchical cascading: Agent → Team → Institution → Society
-- Event-based learning (6 event types: claim_verified, claim_refuted, research_completed, governance_voted, coordination_success, coordination_failure)
-- Specialization tracking and domain expertise learning
-- Reputation decay (2% per day toward neutral 50)
-- Performance prediction with confidence scoring
+Prerequisites:
 
-**Tested**: 50 entities, 250+ events, zero anomalies  
-**Performance**: 558 ops/sec, <2ms per operation
+- Node/npm
+- Python 3.13
+- Native Postgres reachable via `DATABASE_URL`
+- Optional OpenAI-compatible key in `.codex.env` for live LLM verification
 
-### 3. Adaptive Strategy System ✅
-
-**Component**: `adaptive-strategy.service.ts` (530 lines)
-
-**Capabilities**:
-- Four research approaches: multi_angle_research, depth_first, breadth_first, adaptive
-- ROI tracking and optimization (claims per execution metric)
-- Budget management: web_fetches, llm_calls, time_seconds
-- Strategy pivoting on low ROI (<0.1)
-- Convergence detection (80% quality triggers completion)
-- Task assignment generation with priority levels
-
-**Tested**: 20 strategies, 100 queries, 558 ops/sec
-
-### 4. Governance & Reputation Integration ✅
-
-**Component**: `governance-reputation-integration.service.ts` (410 lines)
-
-**Capabilities**:
-- Voting weight = (reliability + innovation) / 2
-- Vote recording with entity reputation snapshots
-- Weighted decision aggregation with normalized approval scores
-- Proposal authority checking (innovation ≥ 0.4 required)
-- Coalition formation approval by governance votes
-
-**Tested**: 100 votes, 10 proposals, correct weighted decisions
-
-### 5. Coalition Formation System ✅
-
-**Component**: `coalition-formation.service.ts` (473 lines + bootstrap)
-
-**Capabilities**:
-- Two-tier team lead system:
-  - **Certified leads** (reliability ≥ 0.7): unlimited coalitions
-  - **Provisional leads** (0.5 ≤ reliability < 0.7): max 2 coalitions, bootstrap mechanism
-- Specialization matching for role assignment
-- Formation score calculation (0-1 based on team composition)
-- Task completion tracking with performance ratings
-- Collaboration event tracking (success/failure)
-
-**Bootstrap Mechanism**: Enables cold-start participation with provisional leads, promoting healthy engagement while building reputation
-
----
-
-## Database Schema
-
-**52 migrations applied successfully**, including:
-
-**Core Autonomy**:
-- autonomy_goals
-- autonomy_goal_actions
-- autonomy_evidence
-- autonomy_claims
-- autonomy_memory
-- autonomy_loop_detection
-
-**Learning & Governance**:
-- reputation_scores (4-dimensional)
-- reputation_audit_log
-- entity_hierarchy (hierarchical cascading)
-- specialization_records
-- governance_reputation_votes
-- governance_reputation_decisions
-
-**Adaptive Strategy**:
-- adaptive_strategies
-- search_query_history
-- task_assignments
-- strategy_pivots
-- resource_allocation_history
-
-**Coalition Formation**:
-- coalition_formations
-- coalition_performance
-- coalition_member_assignments
-- coalition_collaboration_events
-- coalition_composition_recommendations
-
-**Infrastructure**:
-- institutions, departments, specialists
-- work requests and assignments
-- goal hierarchies and deadlock prevention
-- consistency checks and audit trails
-
-**Total**: 60+ tables with comprehensive indexing
-
----
-
-## Testing & Validation
-
-### 5-Minute Comprehensive Vetting Test
 ```bash
-npm test -- --testPathPattern="agentco-5min-vetting"
-```
-
-**Results**:
-- ✅ Health Score: 95.0%
-- ✅ Critical Issues: 0
-- ✅ Gaps: 1 (documented: coalition bootstrap threshold)
-- ✅ Operations/sec: 558
-- ✅ Average Latency: <2ms
-- ✅ Error Rate: 0%
-- ✅ Data Consistency: Perfect
-
-### Real-World Autonomy Observation
-```bash
+set -a
 source .codex.env
-npm run build
-npx ts-node backend/scripts/autonomy-real-world-2min-unconstrained.ts
-```
+set +a
+export DATABASE_URL="$AGENTCO_TEST_DATABASE_URL"
 
-**Status**: ✅ Database fully operational, orchestrator executing, LLM integration active
-
----
-
-## Running the System
-
-### Prerequisites
-```bash
-# PostgreSQL running on localhost:5432
-psql -h localhost -d agentco -U agentco
-
-# Environment variables
-export OPENAI_API_KEY=sk-...
-source .codex.env
-```
-
-### Development
-```bash
-# Backend
 cd backend
 npm install
-npm run build
-npm test
-
-# Database
-npm run db:migrate  # Apply all 52 migrations
-
-# Vetting
-npm test -- --testPathPattern="agentco-5min-vetting"
-```
-
-### Real-World Autonomy
-```bash
-# Build
-npm run build
-
-# Run unconstrained autonomy test (2 minutes)
-source .codex.env
-npx ts-node scripts/autonomy-real-world-2min-unconstrained.ts
-
-# Or via Python
-python3 scripts/autonomy_real_world_2min_unconstrained.py
-```
-
----
-
-## Key Features & Capabilities
-
-### Reputation Learning
-- **4-dimensional tracking** across individual, team, institution, and society levels
-- **Event-driven updates** from verified claims, completed research, governance participation, and coordination outcomes
-- **Specialization learning** for domain expertise tracking
-- **Decay mechanism** to weight recent performance
-
-### Adaptive Strategy
-- **Multi-angle research** for broad exploration
-- **Depth-first** for deep investigation of promising leads
-- **Breadth-first** for comprehensive coverage
-- **Adaptive** that switches based on ROI feedback
-- **Budget enforcement** with hard limits on tokens, iterations, and time
-
-### Governance
-- **Reputation-weighted voting** where your influence grows with proven performance
-- **Innovation threshold** (0.4) for proposal authority
-- **Coalition approval** requiring governance consensus
-- **Snapshot recording** of reputation at vote time for auditability
-
-### Coalition Formation
-- **Dynamic team assembly** based on specialization and reputation
-- **Bootstrap mechanism** enabling cold-start with provisional leads
-- **Hierarchical approval** via governance
-- **Performance tracking** per member with rating history
-
----
-
-## System Health
-
-| Component | Status | Tests | Performance |
-|-----------|--------|-------|-------------|
-| Reputation Learning | ✅ Excellent | 15/15 | 558 ops/sec |
-| Adaptive Strategy | ✅ Excellent | 15/15 | 100 queries, <2ms |
-| Governance-Rep Integration | ✅ Good | 15/15 | 100 votes, correct |
-| Coalition Formation | ✅ Good | 13/13 | Bootstrap working |
-| Core Autonomy | ✅ Good | Integration passing | Real LLM integration |
-| Error Handling | ✅ Excellent | All edge cases | Zero unhandled errors |
-| Data Integrity | ✅ Perfect | Database tests | Consistent across 52 migrations |
-
-**Overall Health Score: 95.0%**
-
----
-
-## Known Limitations & Design Decisions
-
-### Documented (By Design, Not Bugs)
-1. **Voting Weight Plateau** — Naturally plateaus when reliability maxes at 1.0; requires innovation events for growth
-2. **Coalition Bootstrap Threshold** — 0.5 reliability enables cold-start participation; correct and intentional
-
-### Future Enhancements
-- Multi-agent coordination across societies
-- Economic systems (reputation as currency)
-- Self-modification capabilities
-- Advanced goal refinement
-- Cross-system knowledge transfer
-
----
-
-## Production Deployment Checklist
-
-- ✅ Code compiled and tested (0 TypeScript errors)
-- ✅ All 52 database migrations applied
-- ✅ Real LLM integration (OpenAI GPT-4)
-- ✅ Web research adapters (5 sources)
-- ✅ Error handling on all execution paths
-- ✅ Logging and audit trail
-- ✅ Budget enforcement (tokens, iterations, time)
-- ✅ Security validations (input validation, SSRF prevention)
-- ✅ Performance validation (558 ops/sec, <2ms latency)
-- ✅ Data consistency (perfect across 60+ tables)
-
----
-
-## Recent Changes
-
-### Latest Commits
-- **6d76fd3**: docs: AgentCo Complete - Production Ready Final Status Report
-- **90b7ee7**: vetting: 5-minute comprehensive stress test + coalition bootstrap fix
-- **d39f63f**: test: Full AgentCo Autonomy Integration Test Suite
-- **6cccb03**: feat: Governance-Reputation Integration + Coalition Formation
-- **57d245a**: feat: Full Reputation Learning and Adaptive Strategy systems
-
-### Database Fixes (Current Session)
-- ✅ Fixed port 5433 → 5432 database connection
-- ✅ Resolved 12+ UUID/VARCHAR type mismatches in migrations
-- ✅ Created autonomy_goal_actions table for proper action tracking
-- ✅ Fixed enum values (3 → 'L3', autonomy_orchestrator → agent_proposed)
-- ✅ All 52 migrations passing with real PostgreSQL backend
-
----
-
-## Architecture Documents
-
-- [Production Deployment Guide](AGENTCO_FINAL_SYSTEM_STATUS.md)
-- [Reputation Learning System](LEVEL_3_IMPLEMENTATION_SUMMARY.md)
-- [Vetting & Fixes Applied](VETTING_FIXES_APPLIED.md)
-- [Phase 3 Implementation Complete](PHASE3_COMPLETE_FINAL_SUMMARY.md)
-
----
-
-## Getting Help
-
-### Quick Diagnostics
-```bash
-# Test database connection
 npm run db:migrate
-
-# Run vetting suite
-npm test -- --testPathPattern="agentco-5min-vetting"
-
-# Check system health
-npm test -- --testPathPattern="reputation\|strategy\|governance\|coalition"
+npx tsc --noEmit
+npm test -- --runInBand --forceExit
 ```
 
-### Common Issues
+Recent verified backend default result:
 
-**Database connection error**:
-- Verify PostgreSQL running: `pg_isready -h localhost -p 5432`
-- Check credentials in `backend/src/db/client.ts`
-- Run migrations: `npm run db:migrate`
+```text
+42 test suites passed
+287 tests passed
+1 suite skipped
+5 todos
+```
 
-**LLM API errors**:
-- Set `OPENAI_API_KEY` environment variable
-- Verify API key is valid: `export OPENAI_API_KEY=sk-...`
-- Check OpenAI API status
+## Runtime Doctor
 
-**Test failures**:
-- Run with verbose output: `npm test -- --verbose`
-- Check database is fresh: `npm run db:migrate`
-- Ensure all dependencies: `npm install`
+```bash
+make doctor
+make doctor-offline
+make run-best-effort
+make run-offline-fixture
+```
 
----
+Production posture is intentionally stricter:
 
-## Contributing
+```bash
+make doctor-production
+make production-posture
+```
 
-AgentCo is production-ready. All systems are fully implemented and tested. For contributions:
+Production-like startup must fail closed if required real services, secrets, auth, or providers are missing.
 
-1. Run the full test suite: `npm test`
-2. Check database health: `npm run db:migrate`
-3. Validate with vetting test: `npm test -- --testPathPattern="agentco-5min-vetting"`
-4. Submit PR with status labels (REAL, FIXTURE, EXTERNAL-VALIDATED, etc.)
+## Focused Civilization Learning Slice
 
----
+The current verified E2E backend slice is covered by:
 
-**Built with TypeScript | PostgreSQL | OpenAI GPT-4 | Real-World Testing**  
-**Production Ready as of 2026-06-24**
+```bash
+cd backend
+npx jest tests/civilization-learning-e2e.test.ts --runInBand --forceExit
+```
+
+It proves:
+
+```text
+registered evidence
+grounded supported claim
+pre-registered prediction
+ordinary DB user cannot resolve
+resolution_service role resolves
+Brier/log score recorded
+trust score inserted
+prediction lesson memory promoted
+event_log and decision_log records written
+```
+
+## Build Ledger
+
+Use the ledger commands to inspect what is verified and what remains:
+
+```bash
+python3.13 scripts/build_ledger.py status
+python3.13 scripts/build_ledger.py remaining
+```
+
+Do not mark a module complete unless real tests prove the actual runtime path. No stubbed, placeholder, or simulated production behavior is accepted.

@@ -6,6 +6,7 @@
  * Integrates web fetching, evidence storage, and claim generation
  */
 
+import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/client';
 import {
@@ -13,11 +14,12 @@ import {
   ActionResult,
   ActionStatus,
   ActionType,
-  Evidence,
   Claim,
 } from '../types/action.types';
 import { WebAdapter } from '../adapters/web-adapter';
 import { TeamActivationService } from './team-activation.service';
+import { evidenceRegistry } from './evidence-registry.service';
+import { claimGrounding } from './claim-grounding.service';
 
 export class ActionExecutorService {
   private webAdapter: WebAdapter | null = null;
@@ -43,6 +45,8 @@ export class ActionExecutorService {
     };
 
     try {
+      await this.ensureActionRecord(spec);
+
       switch (spec.actionType) {
         case ActionType.WEB_SEARCH:
           await this.handleWebSearch(spec, result);
@@ -93,6 +97,93 @@ export class ActionExecutorService {
     return result;
   }
 
+  private async ensureActionRecord(spec: ActionSpec): Promise<void> {
+    if (!this.isUuid(spec.actionId)) {
+      return;
+    }
+
+    if (this.isUuid(spec.goalId)) {
+      await db.query(
+        `INSERT INTO autonomy_goal_actions (
+          action_id, goal_id, action_type, objective, args, success_criteria,
+          risk_level, decided_by, decided_at, reasoning, status
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'executing')
+        ON CONFLICT (action_id) DO NOTHING`,
+        [
+          spec.actionId,
+          spec.goalId,
+          spec.actionType,
+          spec.objective || spec.actionType,
+          JSON.stringify(spec.args || {}),
+          JSON.stringify(spec.successCriteria || []),
+          spec.riskLevel || null,
+          spec.decidedBy || null,
+          spec.decidedAt || new Date(),
+          spec.reasoning || null,
+        ]
+      );
+    }
+
+    const episodeId = uuidv4();
+    await db.query(
+      `INSERT INTO autonomy_episodes (
+        id, run_id, agent_id, title, domain, risk_level, autonomy_level,
+        intervention_required, trace_id, metadata
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, false, $8, $9)
+      ON CONFLICT (id) DO NOTHING`,
+      [
+        episodeId,
+        `action_executor_${spec.goalId}`,
+        spec.decidedBy || 'action_executor',
+        spec.objective || spec.actionType,
+        'action_loop',
+        spec.riskLevel || 'low',
+        1,
+        uuidv4(),
+        JSON.stringify({ goalId: spec.goalId }),
+      ]
+    );
+
+    await db.query(
+      `INSERT INTO autonomy_actions (
+        id, episode_id, step_index, action_type, tool_name, success, metadata
+      ) VALUES ($1, $2, 0, $3, $4, false, $5)
+      ON CONFLICT (id) DO NOTHING`,
+      [
+        spec.actionId,
+        episodeId,
+        this.toCanonicalAutonomyActionType(spec.actionType),
+        spec.actionType,
+        JSON.stringify({ objective: spec.objective, actionType: spec.actionType, args: spec.args || {} }),
+      ]
+    );
+  }
+
+  private toCanonicalAutonomyActionType(actionType: ActionType): string {
+    if (actionType === ActionType.UPDATE_MEMORY) {
+      return 'memory_write';
+    }
+    if (actionType === ActionType.TERMINATE || actionType === ActionType.REPLAN) {
+      return 'decision';
+    }
+    return 'tool_call';
+  }
+
+  private isUuid(value?: string): boolean {
+    return Boolean(
+      value &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    );
+  }
+
+  private actorIdFromSpec(spec: ActionSpec): string | null {
+    return this.isUuid(spec.decidedBy) ? spec.decidedBy : null;
+  }
+
+  private contentHash(...parts: string[]): string {
+    return crypto.createHash('sha256').update(parts.join('\n')).digest('hex');
+  }
+
   private async handleWebSearch(spec: ActionSpec, result: ActionResult): Promise<void> {
     const query = spec.args.query;
     if (!query) {
@@ -110,25 +201,18 @@ export class ActionExecutorService {
         if (searchResults.length > 0) {
           // Store each search result as evidence
           for (const searchResult of searchResults) {
-            const sourceId = uuidv4();
-            await db.query(
-              `INSERT INTO autonomy_evidence (
-                id, source_id, action_id, url, title, snippet, retrieved_at,
-                content_hash, source_type, is_public_access, created_at
-              ) VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, NOW())`,
-              [
-                uuidv4(),
-                sourceId,
-                spec.actionId,
-                searchResult.url,
-                searchResult.title,
-                searchResult.snippet,
-                `hash_${searchResult.rank || 0}`,
-                'web_search',
-                true,
-              ]
-            );
-            result.createdArtifacts.push(sourceId);
+            const evidence = await evidenceRegistry.register({
+              action_id: spec.actionId,
+              actor_id: this.actorIdFromSpec(spec),
+              url: searchResult.url,
+              title: searchResult.title,
+              snippet: searchResult.snippet,
+              content_hash: this.contentHash(searchResult.url, searchResult.snippet ?? '', String(searchResult.rank ?? 0)),
+              source_type: 'web_search',
+              is_public_access: true,
+              metadata: { query, rank: searchResult.rank ?? null },
+            });
+            result.createdArtifacts.push(evidence.source_id);
           }
 
           result.observations.searchQuery = query;
@@ -145,8 +229,7 @@ export class ActionExecutorService {
       }
     }
 
-    // Search failed - BLOCKED (no synthetic fallback)
-    // Return BLOCKED status instead of fake results
+    // Search failed: block without creating synthetic artifacts.
     result.status = ActionStatus.BLOCKED;
     result.blockedReason = `Web search failed for query: "${query}". No real search results available. Configure SEARCH_ENGINE_API_KEY or BING_SEARCH_API_KEY for real search capability.`;
     result.observations.searchQuery = query;
@@ -172,28 +255,22 @@ export class ActionExecutorService {
 
         if (fetchResult) {
           // Store evidence in database with real content
-          const sourceId = uuidv4();
-          await db.query(
-            `INSERT INTO autonomy_evidence (
-              id, action_id, source_id, url, title, retrieved_at, content_hash,
-              source_type, is_public_access, created_at
-            ) VALUES ($1, $2, $3, $4, $5, NOW(), $6, $7, $8, NOW())`,
-            [
-              uuidv4(),
-              spec.actionId,
-              sourceId,
-              url,
-              fetchResult.title || 'Fetched Page',
-              fetchResult.contentHash,
-              'web',
-              true,
-            ]
-          );
+          const evidence = await evidenceRegistry.register({
+            action_id: spec.actionId,
+            actor_id: this.actorIdFromSpec(spec),
+            url,
+            title: fetchResult.title || 'Fetched Page',
+            snippet: fetchResult.content.substring(0, 2000),
+            content_hash: fetchResult.contentHash,
+            source_type: 'web',
+            is_public_access: true,
+            metadata: { content_length: fetchResult.content.length },
+          });
 
           result.observations.url = url;
           result.observations.title = fetchResult.title;
           result.observations.contentLength = fetchResult.content.length;
-          result.createdArtifacts.push(sourceId);
+          result.createdArtifacts.push(evidence.source_id);
           result.observations.status = 'fetch_completed';
           return;
         } else {
@@ -203,48 +280,15 @@ export class ActionExecutorService {
           return;
         }
       } catch (error: any) {
-        console.warn(`Web fetch failed: ${error.message}, recording fetch attempt`);
+        console.warn(`Web fetch failed: ${error.message}; no artifact will be recorded without real content`);
       }
     }
 
-    // Fallback: Record fetch attempt with placeholder content
-    const fetchId = uuidv4();
-    try {
-      const evidence: Evidence = {
-        sourceId: uuidv4(),
-        url,
-        retrievedAt: new Date(),
-        contentHash: `hash_fallback_${fetchId}`,
-        sourceType: 'web',
-        isPublicAccess: true,
-      };
-
-      await db.query(
-        `INSERT INTO autonomy_evidence (
-          id, action_id, source_id, url, title, retrieved_at, content_hash, source_type,
-          is_public_access, created_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW())`,
-        [
-          uuidv4(),
-          spec.actionId,
-          evidence.sourceId,
-          url,
-          'Fetch Attempted (Unavailable)',
-          evidence.retrievedAt,
-          evidence.contentHash,
-          'web',
-          evidence.isPublicAccess,
-        ]
-      );
-
-      result.observations.fetchId = fetchId;
-      result.observations.url = url;
-      result.createdArtifacts.push(evidence.sourceId);
-      result.observations.status = 'fetch_recorded';
-    } catch (error: any) {
-      result.status = ActionStatus.FAILED;
-      result.errors = [error.message];
-    }
+    result.status = ActionStatus.BLOCKED;
+    result.blockedReason = `Fetch failed for URL: "${url}". No real page content available, so no evidence artifact was created.`;
+    result.observations.url = url;
+    result.observations.status = 'fetch_blocked_no_real_content';
+    result.errors = [result.blockedReason];
   }
 
   private async handleExtractEvidence(spec: ActionSpec, result: ActionResult): Promise<void> {
@@ -276,6 +320,17 @@ export class ActionExecutorService {
       return;
     }
 
+    const grounding = await claimGrounding.validate({
+      claimText,
+      supportSourceIds,
+      supportSnippets: spec.args.supportSnippets || [],
+    });
+    if (!grounding.valid) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = `Claim grounding failed: ${grounding.errors.join('; ')}`;
+      return;
+    }
+
     const claimId = uuidv4();
     const claim: Claim = {
       claimId,
@@ -292,8 +347,8 @@ export class ActionExecutorService {
     // Store claim in database
     await db.query(
       `INSERT INTO autonomy_claims (
-        id, claim_id, action_id, text, status, confidence, support_source_ids, derived_from_action_ids
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         uuidv4(),
         claimId,
@@ -302,6 +357,7 @@ export class ActionExecutorService {
         claim.status,
         claim.confidence,
         JSON.stringify(claim.supportSourceIds),
+        JSON.stringify(claim.supportSnippets),
         JSON.stringify(claim.derivedFromActionIds),
       ]
     );

@@ -12,6 +12,7 @@ import { learningRoutes } from './services/learning.service';
 import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { civilizationRequestValidator } from './middleware/civilization-request-validator';
 import { assertProductionSecrets } from './security';
+import { assertNoProductionFallbackProviders, activeRuntimeMode, configuredProviders } from './runtime-mode';
 import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
 import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
@@ -19,6 +20,9 @@ import { civilizationGovernanceRoutes } from './routes/civilization-governance.r
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
 import { phase3HardeningRoutes } from './routes/phase3-hardening.routes';
+import { systemRoutes } from './routes/system.routes';
+import { identityRoutes } from './routes/identity.routes';
+import { resourceLedgerRoutes } from './routes/resource-ledger.routes';
 import { metricsService } from './services/autonomy-metrics.service';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -26,6 +30,7 @@ const HOST = process.env.HOST ?? '0.0.0.0';
 
 export async function build() {
   assertProductionSecrets();
+  assertNoProductionFallbackProviders();
   const app = Fastify({ logger: true });
 
   await app.register(cors, { origin: process.env.FRONTEND_URL ?? 'http://localhost:3000' });
@@ -101,10 +106,21 @@ export async function build() {
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);
   await app.register(phase3HardeningRoutes);
+  await app.register(identityRoutes);
+  await app.register(resourceLedgerRoutes);
+  await app.register(systemRoutes);
 
   // Basic health check
   app.get('/health', async () => ({
     status: 'ok',
+    timestamp: new Date().toISOString(),
+  }));
+
+  app.get('/health/runtime', async () => ({
+    status: 'ok',
+    runtime_mode: activeRuntimeMode(),
+    providers: configuredProviders(),
+    fallback_active: configuredProviders().some(provider => provider.status === 'fallback' || provider.status === 'simulated'),
     timestamp: new Date().toISOString(),
   }));
 

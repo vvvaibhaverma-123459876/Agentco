@@ -10,7 +10,8 @@
  * verifyChainIntegrity() can re-derive the same hash from the stored DB values.
  */
 import crypto from 'crypto';
-import { query } from '../db/client';
+import { PoolClient } from 'pg';
+import { db, query } from '../db/client';
 
 export interface AuditEntry {
   agent_id: string;
@@ -55,6 +56,10 @@ function canonicalContent(fields: {
   return JSON.stringify(fields);
 }
 
+function normalizeTimestamp(value: string | Date): string {
+  return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
+}
+
 export class AuditLogService {
   /**
    * Append an immutable audit entry. Returns the log_id.
@@ -65,64 +70,83 @@ export class AuditLogService {
 
     const log_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
+    const client = await db.connect();
 
     try {
-      // Fetch the last *chained* row's hash (skip pre-migration rows with empty chain_hash)
-      const rows = await query<{ chain_hash: string }>(
-        `SELECT chain_hash FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp DESC, log_id DESC LIMIT 1`
-      );
-      const prev_hash = rows.length > 0 ? rows[0].chain_hash
-        : '0000000000000000000000000000000000000000000000000000000000000000';
+      await client.query('BEGIN');
+      const record = await this.appendWithClient(client, entry, { log_id, timestamp });
+      await client.query('COMMIT');
+      return record.log_id;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => undefined);
+      console.error('[AUDIT_FAILURE]', err, entry);
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
 
-      const human_approved = entry.human_approved ?? false;
-      const human_approver_id = entry.human_approver_id ?? null;
-      const downstream_events = entry.downstream_events ?? [];
-      const session_id = entry.session_id ?? null;
+  async appendWithClient(
+    client: PoolClient,
+    entry: AuditEntry,
+    options: { log_id?: string; timestamp?: string } = {}
+  ): Promise<AuditRecord> {
+    this.validateEntry(entry);
+    const log_id = options.log_id ?? crypto.randomUUID();
+    const timestamp = normalizeTimestamp(options.timestamp ?? new Date().toISOString());
+    const previous = await client.query<{ chain_hash: string }>(
+      `SELECT chain_hash FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp DESC, log_id DESC LIMIT 1`
+    );
+    const prev_hash = previous.rows[0]?.chain_hash ?? '0'.repeat(64);
 
-      const content = canonicalContent({
-        log_id, timestamp, prev_hash,
-        agent_id: entry.agent_id,
-        action_type: entry.action_type,
-        input_summary: entry.input_summary,
-        output_summary: entry.output_summary,
-        confidence_score: entry.confidence_score,
-        risk_level: entry.risk_level,
+    const human_approved = entry.human_approved ?? false;
+    const human_approver_id = entry.human_approver_id ?? null;
+    const downstream_events = entry.downstream_events ?? [];
+    const session_id = entry.session_id ?? null;
+    const content = canonicalContent({
+      log_id,
+      timestamp,
+      prev_hash,
+      agent_id: entry.agent_id,
+      action_type: entry.action_type,
+      input_summary: entry.input_summary,
+      output_summary: entry.output_summary,
+      confidence_score: entry.confidence_score,
+      risk_level: entry.risk_level,
+      human_approved,
+      human_approver_id,
+      downstream_events,
+      session_id,
+    });
+    const chain_hash = crypto.createHash('sha256').update(prev_hash + content).digest('hex');
+
+    const result = await client.query<AuditRecord>(
+      `INSERT INTO decision_log
+         (log_id, agent_id, action_type, input_summary, output_summary,
+          confidence_score, risk_level, human_approved, human_approver_id,
+          downstream_events, session_id, timestamp, chain_hash, prev_hash)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+       RETURNING log_id, agent_id, action_type, input_summary, output_summary,
+                 confidence_score, risk_level, human_approved, human_approver_id,
+                 downstream_events, session_id, timestamp, chain_hash, prev_hash`,
+      [
+        log_id,
+        entry.agent_id,
+        entry.action_type,
+        entry.input_summary,
+        entry.output_summary,
+        entry.confidence_score,
+        entry.risk_level,
         human_approved,
         human_approver_id,
         downstream_events,
         session_id,
-      });
-      const chain_hash = crypto.createHash('sha256').update(prev_hash + content).digest('hex');
-
-      await query(
-        `INSERT INTO decision_log
-           (log_id, agent_id, action_type, input_summary, output_summary,
-            confidence_score, risk_level, human_approved, human_approver_id,
-            downstream_events, session_id, timestamp, chain_hash, prev_hash)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,
-        [
-          log_id,
-          entry.agent_id,
-          entry.action_type,
-          entry.input_summary,
-          entry.output_summary,
-          entry.confidence_score,
-          entry.risk_level,
-          human_approved,
-          human_approver_id,
-          downstream_events,
-          session_id,
-          timestamp,
-          chain_hash,
-          prev_hash,
-        ]
-      );
-
-      return log_id;
-    } catch (err) {
-      console.error('[AUDIT_FAILURE]', err, entry);
-      throw err;
-    }
+        timestamp,
+        chain_hash,
+        prev_hash,
+      ]
+    );
+    return result.rows[0];
   }
 
   async query(filters: {

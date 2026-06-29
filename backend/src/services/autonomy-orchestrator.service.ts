@@ -18,9 +18,11 @@ import { ReflectionService } from './reflection.service';
 import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
-import { ActionSpec, ActionResult, ActionStatus, ActionType } from '../types/action.types';
-import { MockWebAdapter } from '../adapters/mock-web-adapter';
+import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '../types/action.types';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
+import { WebAdapter } from '../adapters/web-adapter';
+import { SourceDiscoveryEngine } from './source-discovery.service';
+import { isProductionEnv } from '../security';
 
 export interface AutonomyRun {
   id: string;
@@ -83,11 +85,116 @@ export class AutonomyOrchestratorService {
   private teamActivation = new TeamActivationService();
   private reputation = new ReputationLearningService();
   private adaptiveStrategy = new AdaptiveStrategyService();
+  private sourceDiscovery = new SourceDiscoveryEngine();
 
-  constructor() {
-    // Initialize web adapter based on environment
-    const adapter = process.env.NODE_ENV === 'test' ? new MockWebAdapter() : new RealWebAdapter();
-    this.actionExecutor.setWebAdapter(adapter);
+  constructor(webAdapter: WebAdapter = new RealWebAdapter()) {
+    this.actionExecutor.setWebAdapter(webAdapter);
+  }
+
+  /**
+   * Discover sources from a source pack and execute FETCH_PAGE actions for them
+   * Bypasses the planner - directly fetches from discovered URLs
+   * Used on first iteration to populate real evidence without relying on planner URL generation
+   */
+  private async injectDiscoveredSourceActions(
+    goalId: string,
+    sourcePack: string = 'technical',
+    maxUrls: number = 3
+  ): Promise<{ discoveredCount: number; fetchedCount: number; evidenceCreated: number }> {
+    let fetchedCount = 0;
+    let evidenceCreated = 0;
+
+    try {
+      console.log(`\n[D1] Discovering sources from '${sourcePack}' pack...`);
+      const discovered = await this.sourceDiscovery.discoverSourcesFromPack(sourcePack, maxUrls);
+
+      console.log(`[D1] Discovered ${discovered.length} sources, fetching them...`);
+
+      // Execute FETCH_PAGE for each discovered URL
+      for (const source of discovered) {
+        try {
+          // Create action spec for FETCH_PAGE
+          const actionId = uuidv4();
+          const action: ActionSpec = {
+            actionId,
+            actionType: ActionType.FETCH_PAGE,
+            objective: `Fetch page from discovered source: ${source.source_domain}`,
+            args: {
+              url: source.source_url,
+              sourcePackOrigin: source.source_pack,
+              discoveryMethod: source.discovery_method,
+            },
+            successCriteria: ['content_extracted', 'url_resolved'],
+            riskLevel: RiskLevel.LOW,
+            decidedBy: 'source_discovery_engine',
+            decidedAt: new Date(),
+          };
+
+          // Store action in database
+          await db.query(
+            `INSERT INTO autonomy_goal_actions (
+              id, action_id, goal_id, action_type, objective, args, success_criteria,
+              risk_level, decided_by, decided_at, status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+            [
+              uuidv4(),
+              action.actionId,
+              goalId,
+              action.actionType,
+              action.objective,
+              JSON.stringify(action.args),
+              JSON.stringify(action.successCriteria),
+              action.riskLevel,
+              action.decidedBy,
+              action.decidedAt,
+              'planned',
+            ]
+          );
+
+          // Execute action immediately
+          const result = await this.actionExecutor.executeAction(action);
+
+          if (result.status === ActionStatus.COMPLETED) {
+            fetchedCount++;
+            evidenceCreated += result.createdArtifacts.length;
+
+            console.log(
+              `[D1] ✅ Fetched: ${source.source_domain} - ` +
+                `${result.observations.contentLength || 0} bytes, ` +
+                `${result.createdArtifacts.length} evidence created`
+            );
+          } else {
+            console.log(`[D1] ⚠️  Fetch failed for: ${source.source_domain} - ${result.blockedReason || result.errors?.[0]}`);
+          }
+
+          // Update action with result
+          if (result.completedAt) {
+            await db.query(
+              `UPDATE autonomy_goal_actions SET status = $1, executed_at = $2, result = $3
+               WHERE action_id = $4`,
+              [
+                result.status,
+                result.completedAt,
+                JSON.stringify({
+                  observations: result.observations,
+                  createdArtifacts: result.createdArtifacts,
+                  errors: result.errors || []
+                }),
+                action.actionId,
+              ]
+            );
+          }
+        } catch (error: any) {
+          console.warn(`[D1] Error fetching ${source.source_url}: ${error.message}`);
+        }
+      }
+
+      console.log(`[D1] Completed: fetched ${fetchedCount}/${discovered.length}, created ${evidenceCreated} evidence`);
+      return { discoveredCount: discovered.length, fetchedCount, evidenceCreated };
+    } catch (error: any) {
+      console.warn(`[D1] Source discovery failed: ${error.message}`);
+      return { discoveredCount: 0, fetchedCount: 0, evidenceCreated: 0 };
+    }
   }
 
   /**
@@ -194,11 +301,11 @@ export class AutonomyOrchestratorService {
           goalId,
           'LEVEL_3 Autonomy Smoke Test',
           'Execute a controlled autonomy loop with persistence and eval',
-          'system',
+          'manual',
           'testing',
           0.8,
           'low',
-          3,
+          'L3',
           'proposed',
           'autonomy_orchestrator_smoke_test',
         ]
@@ -427,17 +534,23 @@ export class AutonomyOrchestratorService {
       // Create or get reward function
       const rewardFunctionId = uuidv4();
       const rewardFunctionName = 'default_reward_function';
+      const rewardFormula = {
+        type: 'linear',
+        weights: { completion: 0.4, safety: 0.6 },
+      };
       await db.query(
         `INSERT INTO reward_functions (
-          id, name, domain, version, formula_json, owner, risk_level, created_by
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          id, name, function_type, parameters, domain, version, formula_json, owner, risk_level, created_by
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
          ON CONFLICT (name, version) DO NOTHING`,
         [
           rewardFunctionId,
           rewardFunctionName,
+          'linear',
+          JSON.stringify(rewardFormula),
           'autonomy',
           '1.0',
-          JSON.stringify({ type: 'linear', weights: { completion: 0.4, safety: 0.6 } }),
+          JSON.stringify(rewardFormula),
           'system',
           'low',
           'autonomy_orchestrator',
@@ -454,13 +567,22 @@ export class AutonomyOrchestratorService {
       const rewardCalcId = uuidv4();
       await db.query(
         `INSERT INTO reward_calculations (
-          id, outcome_id, reward_function_id, reward_score, components_json
-        ) VALUES ($1, $2, $3, $4, $5)`,
+          id, outcome_id, function_id, reward_function_id, reward_value, reward_score, metrics_json, components_json
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           rewardCalcId,
           outcomeId,
           actualRewardFunctionId,
+          actualRewardFunctionId,
           0.8,
+          0.8,
+          JSON.stringify({
+            completion: 1.0,
+            correctness: 0.8,
+            calibration: 0.75,
+            safety: 1.0,
+            efficiency: 0.8,
+          }),
           JSON.stringify({
             completion: 1.0,
             correctness: 0.8,
@@ -525,8 +647,8 @@ export class AutonomyOrchestratorService {
       // Create eval run directly (simplified for smoke test)
       const evalRunId = uuidv4();
       await db.query(
-        `INSERT INTO eval_runs (id, suite_id, status, total_cases, started_at, created_at)
-         VALUES ($1, $2, $3, $4, NOW(), NOW())`,
+        `INSERT INTO eval_runs (id, suite_id, status, total_cases, run_timestamp, started_at, created_at)
+         VALUES ($1, $2, $3, $4, NOW(), NOW(), NOW())`,
         [evalRunId, suiteId, 'completed', 1]
       );
       autonomyRun.evalRunId = evalRunId;
@@ -784,6 +906,33 @@ export class AutonomyOrchestratorService {
         }));
         const evidenceCount = evidenceSources.length;
 
+        // On first iteration with no evidence, inject discovered sources from seed registry
+        // This bypasses the planner and provides real evidence without needing search API
+        let didBootstrap = false;
+        if (iteration === 0 && evidenceCount === 0) {
+          console.log(`\n[Iteration 1] Bootstrapping with discovered sources...`);
+          const d1Result = await this.injectDiscoveredSourceActions(goalId, 'technical', 3);
+          console.log(`[Iteration 1] D1 bootstrap: discovered=${d1Result.discoveredCount}, fetched=${d1Result.fetchedCount}, evidence=${d1Result.evidenceCreated}`);
+          actionsExecuted += d1Result.fetchedCount;
+          didBootstrap = d1Result.evidenceCreated > 0;
+
+          if (didBootstrap) {
+            // Re-fetch evidence for use in subsequent planner calls
+            const updatedEvidenceResult = await db.query(
+              `SELECT source_id, url, snippet FROM autonomy_evidence WHERE action_id IN (
+                SELECT action_id FROM autonomy_goal_actions WHERE goal_id = $1
+              ) ORDER BY created_at DESC LIMIT 10`,
+              [goalId]
+            );
+            evidenceSources.length = 0;
+            evidenceSources.push(...updatedEvidenceResult.rows.map(r => ({
+              sourceId: r.source_id,
+              url: r.url,
+              snippet: r.snippet,
+            })));
+          }
+        }
+
         // Check for loops
         const loopDetection = this.loopDetector.detectLoop(actionHistory);
 
@@ -1028,7 +1177,12 @@ export class AutonomyOrchestratorService {
       return { active: false };
     } catch (error: any) {
       console.warn(`[GOVERNANCE] Failed to check emergency freeze: ${error.message}`);
-      // Conservative: assume freeze is NOT active if we can't check (fail open)
+      if (isProductionEnv()) {
+        return {
+          active: true,
+          reason: `Production fail-closed: emergency freeze check failed (${error.message})`,
+        };
+      }
       return { active: false };
     }
   }
@@ -1055,7 +1209,12 @@ export class AutonomyOrchestratorService {
       return { blocked: false, surfaces: [] };
     } catch (error: any) {
       console.warn(`[GOVERNANCE] Failed to check protected surfaces: ${error.message}`);
-      // Conservative: assume NOT blocked if we can't check (fail open)
+      if (isProductionEnv()) {
+        return {
+          blocked: true,
+          surfaces: [`production_fail_closed:${error.message}`],
+        };
+      }
       return { blocked: false, surfaces: [] };
     }
   }
@@ -1110,7 +1269,12 @@ export class AutonomyOrchestratorService {
       return { allowed: true };
     } catch (error: any) {
       console.warn(`[GOVERNANCE] Failed to check trust policies: ${error.message}`);
-      // Conservative: assume ALLOWED if we can't check (fail open to not block progress)
+      if (isProductionEnv()) {
+        return {
+          allowed: false,
+          reason: `Production fail-closed: trust policy check failed (${error.message})`,
+        };
+      }
       return { allowed: true };
     }
   }

@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { WebAdapter } from '../src/adapters/web-adapter';
-import { MockWebAdapter } from '../src/adapters/mock-web-adapter';
+import { MockWebAdapter } from './support/mock-web-adapter';
 import { RealWebAdapter } from '../src/adapters/real-web-adapter';
 import { ReflectionService, Reflection } from '../src/services/reflection.service';
 import { LoopDetectionResult, ActionHistory } from '../src/services/loop-detector.service';
@@ -65,7 +65,7 @@ describe('Web Adapters', () => {
 
       expect(result).not.toBeNull();
       expect(result?.status).toBe(200);
-      expect(result?.content).toContain('deterministic mock data');
+      expect(result?.content).toContain('State of AI Autonomy');
     });
 
     it('should return fallback for completely unknown URLs', async () => {
@@ -99,9 +99,7 @@ describe('Web Adapters', () => {
     });
 
     it('should gracefully handle missing API key', async () => {
-      const results = await adapter.search('test query');
-      // Returns empty when no API key configured
-      expect(Array.isArray(results)).toBe(true);
+      await expect(adapter.search('test query')).rejects.toThrow(/No fallback to synthetic/);
     });
 
     it('should handle fetch timeout gracefully', async () => {
@@ -134,6 +132,10 @@ describe('Web Adapters', () => {
         });
 
         it('should implement search() method returning array', async () => {
+          if (adapter instanceof RealWebAdapter && !process.env.RUN_REAL_WEB_TESTS) {
+            await expect(adapter.search('test')).rejects.toThrow(/No fallback to synthetic/);
+            return;
+          }
           const results = await adapter.search('test');
           expect(Array.isArray(results)).toBe(true);
           results.forEach((result) => {
@@ -200,9 +202,9 @@ describe('ReflectionService', () => {
       const reflection = service.generateReflection('goal-123', loopDetection, history);
 
       expect(reflection.summary).toContain('Identical action repeat');
-      expect(reflection.failurePattern).toContain('WEB_SEARCH');
+      expect(reflection.failurePattern).toContain('web_search');
       expect(reflection.failurePattern).toContain('3 times');
-      expect(reflection.suggestedStrategy).toContain('different');
+      expect(reflection.suggestedStrategy).toContain('TRY');
       expect(reflection.confidence).toBeGreaterThan(0);
     });
 
@@ -213,19 +215,17 @@ describe('ReflectionService', () => {
         streak: 3,
       };
 
-      const history: ActionHistory[] = [
-        {
+      const history: ActionHistory[] = Array(3).fill(null).map(() => ({
           actionType: ActionType.WEB_SEARCH,
           timestamp: new Date(),
           args: { query: 'autonomy' },
           resultStatus: 'completed',
           newArtifacts: 0,
-        },
-      ];
+        }));
 
       const reflection = service.generateReflection('goal-123', loopDetection, history);
 
-      expect(reflection.suggestedStrategy).toContain('search query');
+      expect(reflection.suggestedStrategy).toContain('web_search with that query failed');
     });
 
     it('should suggest fetch for repeated evaluation', () => {
@@ -235,19 +235,17 @@ describe('ReflectionService', () => {
         streak: 3,
       };
 
-      const history: ActionHistory[] = [
-        {
+      const history: ActionHistory[] = Array(3).fill(null).map(() => ({
           actionType: ActionType.EVALUATE_PROGRESS,
           timestamp: new Date(),
           args: {},
           resultStatus: 'completed',
           newArtifacts: 0,
-        },
-      ];
+        }));
 
       const reflection = service.generateReflection('goal-123', loopDetection, history);
 
-      expect(reflection.suggestedStrategy).toContain('different action');
+      expect(reflection.suggestedStrategy).toContain('web_search');
     });
   });
 
@@ -325,7 +323,7 @@ describe('ReflectionService', () => {
 
       const reflection = service.generateReflection('goal-123', loopDetection, history);
 
-      expect(reflection.suggestedStrategy).toContain('single type repeated');
+      expect(reflection.suggestedStrategy).toContain('Same action type');
     });
 
     it('should recognize when multiple action types all fail', () => {
@@ -345,7 +343,7 @@ describe('ReflectionService', () => {
 
       const reflection = service.generateReflection('goal-123', loopDetection, history);
 
-      expect(reflection.suggestedStrategy).toContain('multiple types');
+      expect(reflection.suggestedStrategy).toContain('Multiple action types');
     });
   });
 
@@ -400,7 +398,7 @@ describe('ReflectionService', () => {
 
       const text = service.formatForContext(reflections);
 
-      expect(text).toContain('Recent Learnings');
+      expect(text).toContain('CRITICAL LEARNINGS');
       expect(text).toContain('75%');
       expect(text).toContain('85%');
       expect(text).toContain('Same query 3x');

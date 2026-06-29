@@ -1,0 +1,19 @@
+{
+  "runId": "learning_run_1782302581578",
+  "status": "success",
+  "goalText": "Learn about AI research and machine learning",
+  "sourcePack": "technical",
+  "sourcesDiscovered": 1,
+  "sourcesAllowed": 1,
+  "sourcesFetched": 1,
+  "documentsFetched": 1,
+  "claimsExtracted": 0,
+  "claimsPersisted": 0,
+  "claimsRouted": 0,
+  "auditEventsLogged": 9,
+  "errors": [],
+  "warnings": [],
+  "startedAt": "2026-06-24T12:03:01.578Z",
+  "completedAt": "2026-06-24T12:03:09.414Z",
+  "durationMs": 7836
+}

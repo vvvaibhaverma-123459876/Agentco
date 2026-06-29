@@ -1,0 +1,881 @@
+meta:
+  schema_version: 1
+  generated_by: codex
+  last_updated: '2026-06-29T09:45:50Z'
+  source_docs:
+  - docs/CIVILIZATION_ARCHITECTURE.md
+  - docs/CODEX_BUILD_PLAN.md
+  termination_predicate_met: false
+layers:
+  L0_runtime_substrate:
+    status: in_progress
+    items:
+    - id: L0.RuntimeModeManager
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - runtime/orchestration/modes.py
+      - backend/src/runtime-mode.ts
+      - backend/src/routes/system.routes.ts
+      tests:
+      - runtime/orchestration/tests/test_modes.py
+      - backend/tests/runtime-mode.test.ts
+      - backend/tests/system-routes.test.ts
+      gates_passed:
+      - unit
+      notes: Existing local/offline modes plus /system runtime, capability, fallback, build-status, and readiness APIs are
+        implemented. Full production capability contract remains incomplete.
+    - id: L0.ServiceDoctor
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - runtime/orchestration/doctor.py
+      tests:
+      - runtime/orchestration/tests/test_modes.py
+      gates_passed:
+      - unit
+    - id: L0.ProductionPostureGate
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - scripts/verify_production_posture.py
+      tests:
+      - tests/test_verify_production_posture.py
+      gates_passed:
+      - unit
+      blockers:
+      - Real production secrets/Vault credentials must be supplied outside git.
+    - id: L0.BuildLedgerTooling
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - BUILD_LEDGER.yaml
+      - scripts/build_ledger.py
+      - backend/src/routes/system.routes.ts
+      tests:
+      - tests/test_build_ledger.py
+      - backend/tests/system-routes.test.ts
+      gates_passed:
+      - unit
+      - db_sync
+      notes: Ledger CLI, status rollups, remaining frontier, DB sync, and backend build-status/readiness reporting are implemented.
+        Item remains in_progress until full architecture reporting gates are complete.
+    - id: L0.MigrationRunner
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/db/migrate.ts
+      tests:
+      - tests/test_migration_inventory.py
+      gates_passed:
+      - unit
+    - id: L0.FeatureGateService
+      status: not_started
+      depends_on:
+      - L0.RuntimeModeManager
+      artifacts: []
+      tests: []
+    - id: L0.DeterminismGuard
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/runtime-mode.ts
+      - backend/src/services/bounded-learning-run.service.ts
+      - runtime/orchestration/modes.py
+      - runtime/orchestration/run_best_effort.py
+      tests:
+      - backend/tests/runtime-mode.test.ts
+      - backend/tests/bounded-learning-production-guard.test.ts
+      - runtime/orchestration/tests/test_modes.py
+      - runtime/orchestration/tests/test_run_best_effort.py
+      gates_passed:
+      - unit
+      notes: Backend server, bounded-learning service, and Python best-effort orchestration now reject or require explicit
+        fixture fallback outside offline/CI. Item remains in_progress until all runtime entry points are covered.
+    - id: L0.ConnectionPoolManager
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/db/client.ts
+      tests: []
+    - id: L0.GracefulShutdownController
+      status: in_progress
+      depends_on: []
+      artifacts:
+      - backend/src/server.ts
+      tests: []
+    - id: L0.IdempotencyStore
+      status: not_started
+      depends_on:
+      - L3.EventLog
+      artifacts: []
+      tests: []
+  L1_identity_authority:
+    status: in_progress
+    items:
+    - id: L1.ActorRegistry
+      status: verified
+      depends_on:
+      - L0.MigrationRunner
+      artifacts:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - unit
+      - integration
+      - typescript
+      notes: Actor registration is backed by Postgres and writes actor.registered event_history plus decision_log audit in
+        the same transaction.
+    - id: L1.RoleRegistry
+      status: verified
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - integration
+      - typescript
+      notes: Canonical civilization roles are seeded and assignable to active actors with role.assigned event emission.
+    - id: L1.PermissionService
+      status: verified
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - integration
+      - typescript
+      notes: Direct actor permission grants and /identity/verify authority decisions are persisted and audited; role-derived
+        permissions remain a future expansion under AuthorityChain.
+    - id: L1.KeyRing
+      status: verified
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - reserve/keys/agentco_reserve_public.pem
+      - backend/src/db/migrations/086_key_ring.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Public Ed25519 key lifecycle is backed by actor_key_ring with register/rotate/revoke and signature verification.
+        Backend rejects private key material and does not store or return signing secrets.
+    - id: L1.AuthorityChain
+      status: verified
+      depends_on:
+      - L1.ActorRegistry
+      - L3.EventLog
+      artifacts:
+      - backend/src/db/migrations/084_authority_chain.sql
+      - backend/src/db/migrations/085_authority_chain_decision_actor_compatibility.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/identity.routes.ts
+      tests:
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Authority verification resolves direct grants, role-derived permissions, and explicit principal-to-delegate grants
+        with persisted authority_decision_chains plus canonical event_log/outbox provenance. Missing actors deny safely through
+        the agentco-authority-service event actor.
+  L2_resources_budgets:
+    status: in_progress
+    items:
+    - id: L2.ResourceLedger
+      status: verified
+      depends_on:
+      - L1.ActorRegistry
+      - L3.EventLog
+      artifacts:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/db/migrations/082_resource_reservations.sql
+      - backend/src/services/resource-ledger.service.ts
+      - backend/src/routes/resource-ledger.routes.ts
+      tests:
+      - backend/tests/resource-ledger.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical L2 ledger uses civilization_resource_accounts/transactions to avoid legacy table collision, prevents
+        overdraft under row lock, enforces idempotency keys, and writes event_log plus decision_log audit in the same transaction.
+    - id: L2.ReservationService
+      status: verified
+      depends_on:
+      - L2.ResourceLedger
+      artifacts:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/services/resource-ledger.service.ts
+      - backend/src/routes/resource-ledger.routes.ts
+      tests:
+      - backend/tests/resource-ledger.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Reservations use two-phase reserve/settle/release with expiring holds, idempotent creation, row locks, and event_log
+        plus decision_log audit for every state transition.
+    - id: L2.SpendGuardrailIntegration
+      status: verified
+      depends_on:
+      - L2.ResourceLedger
+      artifacts:
+      - runtime/base_agent/spend_guardrail.py
+      - runtime/base_agent/spend_ledger.py
+      - runtime/base_agent/structured_output.py
+      - runtime/base_agent/base_agent_v2.py
+      tests:
+      - runtime/tests/test_spend_guardrail_ledger.py
+      - runtime/tests/test_config_driven_tiers.py
+      gates_passed:
+      - db_migration
+      - integration
+      - python
+      notes: SpendGuardrail can optionally enforce real L2 llm_tokens budget through Postgres-backed reservations when AGENTCO_SPEND_LEDGER_ENABLED=1.
+        Ledger mode fails closed on missing budget and releases holds on provider failure.
+  L3_events_audit:
+    status: in_progress
+    items:
+    - id: L3.AuditLog
+      status: verified
+      depends_on:
+      - L0.MigrationRunner
+      artifacts:
+      - backend/src/services/audit-log.service.ts
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/services/resource-ledger.service.ts
+      - runtime/base_agent/spend_ledger.py
+      tests:
+      - backend/tests/integration/audit-log.test.ts
+      - backend/tests/identity-authority.test.ts
+      - backend/tests/resource-ledger.test.ts
+      - runtime/tests/test_spend_guardrail_ledger.py
+      gates_passed:
+      - integration
+      - python
+      - typescript
+      notes: AuditLogService now provides the canonical transactional decision_log writer. Identity and resource services
+        use appendWithClient inside their DB transactions, and the Python spend ledger emits the same canonical hash format.
+        Post-run chain verification passed after TypeScript and Python writers both appended rows.
+    - id: L3.EventBus
+      status: in_progress
+      depends_on:
+      - L0.RuntimeModeManager
+      artifacts:
+      - backend/src/services/event-bus.service.ts
+      tests:
+      - backend/tests/integration/event-bus.test.ts
+    - id: L3.TransactionalOutbox
+      status: verified
+      depends_on:
+      - L3.EventLog
+      artifacts:
+      - backend/src/db/migrations/083_transactional_outbox.sql
+      - backend/src/services/transactional-outbox.service.ts
+      - backend/src/services/event-log.service.ts
+      tests:
+      - backend/tests/transactional-outbox.test.ts
+      - backend/tests/event-log.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical event_log appends now atomically enqueue event_outbox rows in the same DB transaction. Relay verifies
+        success marking, retry state, and dead-lettering against real Postgres; Kafka relay smoke remains part of L3.EventBus.
+    - id: L3.EventLog
+      status: verified
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/db/migrations/080_event_log.sql
+      - backend/src/services/event-log.service.ts
+      - backend/src/services/identity-authority.service.ts
+      tests:
+      - backend/tests/event-log.test.ts
+      - backend/tests/identity-authority.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical event_log is hash-chained, actor-bound, append-only by DB permission, and exercised by L1 identity
+        mutations in the same transaction as event_history and decision_log writes.
+    - id: L3.HashChainAnchor
+      status: verified
+      depends_on:
+      - L3.AuditLog
+      artifacts:
+      - backend/src/db/migrations/087_hash_chain_anchors.sql
+      - backend/src/services/hash-chain-anchor.service.ts
+      - backend/src/services/audit-log.service.ts
+      tests:
+      - backend/tests/hash-chain-anchor.test.ts
+      - backend/tests/integration/audit-log.test.ts
+      - backend/tests/event-log.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Internal Postgres anchors snapshot event_log and decision_log chain heads plus a combined root. Verification
+        detects invalid chains, stored-root tampering, and head movement after anchoring. This is not an external L6 commitment
+        anchor.
+  L4_evidence_memory:
+    status: in_progress
+    items:
+    - id: L4.EvidenceRegistry
+      status: verified
+      depends_on:
+      - L3.EventLog
+      artifacts:
+      - backend/src/db/migrations/088_evidence_registry_events.sql
+      - backend/src/services/evidence-registry.service.ts
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/evidence-registry.test.ts
+      - backend/tests/action-loop.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical evidence registration writes autonomy_evidence rows with event_log and decision_log provenance. Action
+        executor WEB_SEARCH and FETCH_PAGE use the registry, and GENERATE_CLAIM now requires registered evidence source ids
+        instead of accepting arbitrary identifiers. This verifies the canonical action-loop path; legacy/direct evidence writers
+        are not expanded by this item.
+    - id: L4.ClaimGroundingValidator
+      status: verified
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/claim-grounding.test.ts
+      - backend/tests/action-loop.test.ts
+      gates_passed:
+      - integration
+      - typescript
+      notes: Supported autonomy claims now require registered evidence ids and grounded support snippets. The validator accepts
+        only snippets that are token-subsequences of registered evidence text and blocks absent or fabricated snippets before
+        writing supported claims.
+    - id: L4.MemoryPromotionPipeline
+      status: verified
+      depends_on:
+      - L5.ResolutionService
+      - L6.TrustScorer
+      artifacts:
+      - backend/src/services/memory-promotion-pipeline.service.ts
+      tests:
+      - backend/tests/civilization-learning-e2e.test.ts
+      gates_passed:
+      - e2e
+      - typescript
+      notes: Resolved non-post-hoc predictions with computed trust scores are promoted into append-only agent_memories as
+        prediction_lesson entries. Promotion emits canonical event_log and decision_log records.
+    - id: L4.VectorIndex
+      status: not_started
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts: []
+      tests: []
+  L5_claims_predictions:
+    status: in_progress
+    items:
+    - id: L5.ClaimRegistry
+      status: in_progress
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/action-loop.test.ts
+    - id: L5.PredictionLedger
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      - L3.EventLog
+      artifacts:
+      - calibration/ledger
+      tests:
+      - calibration/tests
+    - id: L5.SourceIndependenceChecker
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/source-discovery.service.ts
+      - calibration/resolution
+      tests:
+      - backend/tests/source-discovery.test.ts
+      - evals/regression
+      gates_passed:
+      - unit
+      - backend_default
+      - typescript
+      notes: Source discovery now separates production live reachability checks from deterministic test reachability injection.
+        The backend default Jest tier no longer depends on public arXiv/GitHub/HN reachability for source registry/provenance
+        tests. Full source independence scoring remains in progress.
+      blockers:
+      - Run and fix release-blocking Python independence tests under the new actor model.
+    - id: L5.ResolutionService
+      status: verified
+      depends_on:
+      - L5.SourceIndependenceChecker
+      artifacts:
+      - backend/src/services/resolution-service.service.ts
+      - scripts/verify_resolution_service.py
+      tests:
+      - backend/tests/civilization-learning-e2e.test.ts
+      - tests/integration/test_resolution_service_role_migration.py
+      gates_passed:
+      - e2e
+      - integration
+      - typescript
+      notes: Prediction registration uses the canonical prediction_ledger and resolution writes require the resolution_service
+        DB role. The E2E slice proves ordinary agentco updates are blocked while an authorized resolution_service connection
+        writes write-once outcome, Brier score, log score, event_log, and decision_log records.
+  L6_calibration_trust:
+    status: in_progress
+    items:
+    - id: L6.CalibrationScorer
+      status: in_progress
+      depends_on:
+      - L5.PredictionLedger
+      artifacts:
+      - calibration
+      tests:
+      - calibration/tests
+    - id: L6.TrustScorer
+      status: verified
+      depends_on:
+      - L6.CalibrationScorer
+      artifacts:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - calibration/trust
+      - backend/src/services/trust-impact-assessment.service.ts
+      tests:
+      - backend/tests/civilization-learning-e2e.test.ts
+      - backend/tests/trust-impact-real-metrics.test.ts
+      gates_passed:
+      - e2e
+      - typescript
+      notes: Resolved prediction outcomes now produce immutable trust_scores windows plus trust_reputation_ledger events.
+        The scorer is sample-size conservative and force-downgrades low-sample windows instead of overclaiming calibration.
+    - id: L6.ProofOfCalibrationService
+      status: in_progress
+      depends_on:
+      - L6.CalibrationScorer
+      - L1.KeyRing
+      artifacts:
+      - reserve
+      tests:
+      - reserve/tests
+    - id: L6.CommitmentChain
+      status: not_started
+      depends_on:
+      - L3.HashChainAnchor
+      artifacts: []
+      tests: []
+    - id: L6.ProofOfCompetenceService
+      status: not_started
+      depends_on:
+      - L12.SkillLibrary
+      artifacts: []
+      tests: []
+  L7_citizens_roles:
+    status: in_progress
+    items:
+    - id: L7.AgentRegistry
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/agent-registry.ts
+      tests:
+      - backend/tests/agent-registry.test.ts
+    - id: L7.CitizenRuntime
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      - L2.ResourceLedger
+      - L5.PredictionLedger
+      artifacts:
+      - agents/core/base_agent.py
+      - runtime/base_agent/base_agent_v2.py
+      tests:
+      - agents/tests
+      - runtime/tests
+    - id: L7.RoleSeparation
+      status: not_started
+      depends_on:
+      - L1.RoleRegistry
+      - L10.ProtectedSurfaceEnforcer
+      artifacts: []
+      tests: []
+  L8_tasks_execution:
+    status: in_progress
+    items:
+    - id: L8.DurableTaskExecution
+      status: in_progress
+      depends_on:
+      - L7.AgentRegistry
+      artifacts:
+      - backend/src/services/durable-execution.service.ts
+      - scripts/execute_durable_task.py
+      tests:
+      - backend/tests/durable-execution-real-tasks.test.ts
+      - tests/test_execute_durable_task.py
+    - id: L8.ActionExecutor
+      status: in_progress
+      depends_on:
+      - L4.EvidenceRegistry
+      artifacts:
+      - backend/src/services/action-executor.service.ts
+      tests:
+      - backend/tests/action-loop.test.ts
+    - id: L8.ReasoningServiceRouter
+      status: in_progress
+      depends_on:
+      - L8.DurableTaskExecution
+      artifacts:
+      - backend/src/services/civilization.service.ts
+      tests:
+      - backend/tests/civilization-real-routing.test.ts
+    - id: L8.CivilizationAwareRAG
+      status: not_started
+      depends_on:
+      - L4.VectorIndex
+      - L5.ClaimRegistry
+      - L6.TrustScorer
+      artifacts: []
+      tests: []
+    - id: L8.SagaCoordinator
+      status: not_started
+      depends_on:
+      - L3.TransactionalOutbox
+      artifacts: []
+      tests: []
+  L9_institutions:
+    status: in_progress
+    items:
+    - id: L9.InstitutionRegistry
+      status: in_progress
+      depends_on:
+      - L1.ActorRegistry
+      artifacts:
+      - backend/src/services/institutions.service.ts
+      tests:
+      - backend/tests/phase1-integration.test.ts
+    - id: L9.CoreInstitutions
+      status: not_started
+      depends_on:
+      - L9.InstitutionRegistry
+      artifacts: []
+      tests: []
+    - id: L9.InstitutionDecisions
+      status: in_progress
+      depends_on:
+      - L9.InstitutionRegistry
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/governance-reputation-integration.service.ts
+      tests:
+      - backend/tests/governance-coalition-integration.test.ts
+  L10_governance_constitution:
+    status: in_progress
+    items:
+    - id: L10.ConstitutionService
+      status: in_progress
+      depends_on:
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/calibration-constitution.service.ts
+      tests: []
+    - id: L10.ProtectedSurfaceEnforcer
+      status: in_progress
+      depends_on:
+      - L1.PermissionService
+      - L3.AuditLog
+      artifacts:
+      - backend/src/services/self-modification-validator.service.ts
+      tests:
+      - backend/tests/phase3-hardening.test.ts
+    - id: L10.RiskTierClassifier
+      status: not_started
+      depends_on:
+      - L10.ConstitutionService
+      artifacts: []
+      tests: []
+    - id: L10.KillSwitch
+      status: not_started
+      depends_on:
+      - L3.EventLog
+      artifacts: []
+      tests: []
+  L11_conflict_judiciary:
+    status: not_started
+    items:
+    - id: L11.DisputeRegistry
+      status: not_started
+      depends_on:
+      - L4.ContradictionLink
+      artifacts: []
+      tests: []
+    - id: L11.RulingService
+      status: not_started
+      depends_on:
+      - L11.DisputeRegistry
+      - L9.CoreInstitutions
+      artifacts: []
+      tests: []
+    - id: L11.PrecedentStore
+      status: not_started
+      depends_on:
+      - L11.RulingService
+      artifacts: []
+      tests: []
+  L12_learning_improvement:
+    status: in_progress
+    items:
+    - id: L12.LearningCandidateRegistry
+      status: in_progress
+      depends_on:
+      - L3.EventLog
+      artifacts:
+      - backend/src/services/learner.service.ts
+      tests:
+      - backend/tests/bounded-learning-integration.test.ts
+    - id: L12.RegressionTestGenerator
+      status: not_started
+      depends_on:
+      - L12.LearningCandidateRegistry
+      artifacts: []
+      tests: []
+    - id: L12.SandboxExecutor
+      status: in_progress
+      depends_on:
+      - L10.ProtectedSurfaceEnforcer
+      artifacts:
+      - selfcoding/resolver/sealed_resolver.py
+      tests: []
+    - id: L12.SkillLibrary
+      status: not_started
+      depends_on:
+      - L12.SandboxExecutor
+      - L6.ProofOfCompetenceService
+      artifacts: []
+      tests: []
+  L13_expansion_domain_onboarding:
+    status: not_started
+    items:
+    - id: L13.DomainRegistry
+      status: not_started
+      depends_on:
+      - L6.TrustScorer
+      - L9.CoreInstitutions
+      artifacts: []
+      tests: []
+    - id: L13.CapabilityExpansionGate
+      status: not_started
+      depends_on:
+      - L13.DomainRegistry
+      - L12.SkillLibrary
+      artifacts: []
+      tests: []
+    - id: L13.GeneralityMetricTracker
+      status: in_progress
+      depends_on:
+      - L13.DomainRegistry
+      artifacts:
+      - evals/north_star_cross_domain
+      tests:
+      - evals/north_star_cross_domain/tests
+  L14_civilization_coordinator:
+    status: in_progress
+    items:
+    - id: L14.CivilizationRuntime
+      status: in_progress
+      depends_on:
+      - L8.DurableTaskExecution
+      - L9.InstitutionRegistry
+      - L10.ConstitutionService
+      artifacts:
+      - backend/src/services/civilization-free-run.service.ts
+      tests: []
+    - id: L14.ContinuousScheduler
+      status: not_started
+      depends_on:
+      - L14.CivilizationRuntime
+      artifacts: []
+      tests: []
+    - id: L14.ReachabilityGate
+      status: not_started
+      depends_on:
+      - L14.CivilizationRuntime
+      artifacts: []
+      tests: []
+    - id: L14.VerticalSlice
+      status: verified
+      depends_on:
+      - L14.CivilizationRuntime
+      - L5.ResolutionService
+      - L6.ProofOfCalibrationService
+      - L13.GeneralityMetricTracker
+      artifacts:
+      - scripts/verify_civilization_vertical_slice.py
+      tests:
+      - reports/system_run/latest/civilization_vertical_slice.json
+      - backend/tests/civilization-learning-e2e.test.ts
+      gates_passed:
+      - e2e
+      notes: Existing vertical slice remains verified. The current canonical learning E2E additionally proves evidence registration,
+        grounded claim generation, prediction registration, authorized resolution_service scoring, persistent trust scoring,
+        prediction_lesson memory promotion, event_log records, and decision_log audit records against native Postgres. Kafka/OpenAI/vector
+        production smoke is not re-proven by this focused backend test.
+  capability_growth_engine:
+    status: not_started
+    items:
+    - id: VCA.SkillPromotionLoop
+      status: not_started
+      depends_on:
+      - L12.SkillLibrary
+      - L13.CapabilityExpansionGate
+      - L10.ProtectedSurfaceEnforcer
+      artifacts: []
+      tests: []
+    - id: VCA.ProofOfCompetenceMinting
+      status: not_started
+      depends_on:
+      - L6.ProofOfCompetenceService
+      - L12.SkillLibrary
+      artifacts: []
+      tests: []
+rollups:
+  total_items: 67
+  verified: 18
+  in_progress: 27
+  not_started: 22
+  blocked: 0
+  percent_verified: 26.87
+gates:
+  no_stub: red
+  no_simulation: green
+  reachability: unknown
+  firewall: unknown
+  sandbox_breach: unknown
+  credential_key_independence: unknown
+  e2e_civilization_slice: green
+  _no_stub_hit_count: '23'
+  _no_simulation_hit_count: '0'
+gate_findings:
+  no_stub:
+  - path: backend/src/runtime-mode.ts
+    line: 74
+    marker: mock
+    excerpt: '''mock'','
+  - path: backend/src/runtime-mode.ts
+    line: 80
+    marker: mock
+    excerpt: '`Refusing to use ${providerName}=${providerValue} in staging/production; deterministic, fake, mock, and fixture
+      providers are test-only`'
+  - path: backend/src/adapters/web-adapter.ts
+    line: 5
+    marker: mock
+    excerpt: '* Allows swapping between real web API calls and deterministic mock data for testing.'
+  - path: backend/src/db/run_migrations.py
+    line: 44
+    marker: placeholder
+    excerpt: The placeholder is already inside quotes in the SQL, so we replace just the placeholder.
+  - path: backend/src/db/run_migrations.py
+    line: 60
+    marker: placeholder
+    excerpt: '# Replace placeholder (which is already surrounded by single quotes in SQL)'
+  - path: backend/src/services/action-executor.service.ts
+    line: 29
+    marker: mock
+    excerpt: '* Inject web adapter (can be real or mock)'
+  - path: backend/src/services/planner.service.ts
+    line: 190
+    marker: later
+    excerpt: issues.push(`Step ${step.step_index} depends on later step ${depIndex}`);
+  - path: backend/src/services/reputation-learning.service.ts
+    line: 418
+    marker: placeholder
+    excerpt: '* initializeEntity(), so callers do not need to invent placeholder agents.'
+  - path: backend/src/services/crash-recovery.service.ts
+    line: 53
+    marker: later
+    excerpt: '* Save checkpoint at current step for later resumption'
+  - path: runtime/orchestration/modes.py
+    line: 45
+    marker: fake_
+    excerpt: ("fake_llm", "file_ledger", "in_memory_db", "auth_bypass", "env_secrets"),
+  - path: runtime/orchestration/modes.py
+    line: 64
+    marker: fake_
+    excerpt: ("fake_llm", "in_memory_db"),
+  - path: runtime/orchestration/modes.py
+    line: 84
+    marker: fake_
+    excerpt: ("fake_llm", "in_memory_db"),
+  - path: runtime/base_agent/base_agent_v2.py
+    line: 132
+    marker: raise NotImplemented
+    excerpt: raise NotImplementedError
+  - path: agents/conftest.py
+    line: 18
+    marker: placeholder
+    excerpt: Uses OpenAI provider with a placeholder key so the OpenAI SDK constructor
+  - path: agents/conftest.py
+    line: 20
+    marker: mock
+    excerpt: "that do not patch the client \u2014 tests that call act() must mock client_for."
+  - path: agents/conftest.py
+    line: 23
+    marker: placeholder
+    excerpt: monkeypatch.setenv("LLM_API_KEY", "test-placeholder-not-real")
+  - path: agents/ingestion_real.py
+    line: 6
+    marker: stub
+    excerpt: and database persistence. Replaces the stub ingestion/claim_extractor.py.
+  - path: agents/civilization_service.py
+    line: 408
+    marker: STUB
+    excerpt: '## Execution Summary (STUB = zero counts, not fabricated)'
+  - path: agents/civilization_service.py
+    line: 411
+    marker: stub
+    excerpt: '- Claims Extracted: {result.claims_extracted} (extraction stub not yet implemented)'
+  - path: agents/autonomy/specialist_agent.py
+    line: 485
+    marker: raise NotImplemented
+    excerpt: raise NotImplementedError(f"handle_action not implemented for {self.role}")
+  - path: reserve/oracle/oracle_layer.py
+    line: 20
+    marker: later
+    excerpt: are later overridden by stronger downstream sources suffer reputational cost.
+  - path: reserve/credentials/proof_of_calibration.py
+    line: 230
+    marker: placeholder
+    excerpt: 'hmac_sha256="",       # placeholder; filled below (legacy)'
+  - path: reserve/credentials/proof_of_calibration.py
+    line: 231
+    marker: placeholder
+    excerpt: 'ed25519_signature="", # placeholder; filled below'
+  no_simulation: []

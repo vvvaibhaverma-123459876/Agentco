@@ -1,0 +1,135 @@
+{
+  "audit": {
+    "event_records": [
+      "task_intake",
+      "evidence_parsed",
+      "prediction_preregistered",
+      "structured_output_validated",
+      "trust_adjusted_confidence",
+      "policy_checked",
+      "human_escalation_selected",
+      "synthetic_resolution_scored",
+      "learning_record_written",
+      "deterministic_reasoning_completed"
+    ],
+    "persistence": "file_backed",
+    "records_generated": 10
+  },
+  "latency_ms": 0,
+  "llm": {
+    "latency_ms": 0,
+    "model": "deterministic_fixture",
+    "simulated": true,
+    "usage": {}
+  },
+  "mode": "offline_fixture",
+  "prediction": {
+    "brier_score": 0.0,
+    "confidence": 0.68,
+    "id": "51a9cde4-108d-4999-b6bc-b9527d54f872",
+    "resolution": "escalate",
+    "statement": "Northstar DataWorks onboarding should be escalated.",
+    "trusted_confidence": 0.61
+  },
+  "result": {
+    "audit_events": [
+      "task_intake",
+      "evidence_parsed",
+      "prediction_preregistered",
+      "structured_output_validated",
+      "trust_adjusted_confidence",
+      "policy_checked",
+      "human_escalation_selected",
+      "synthetic_resolution_scored",
+      "learning_record_written",
+      "deterministic_reasoning_completed"
+    ],
+    "cited_evidence_ids": [
+      "ev1",
+      "ev2"
+    ],
+    "claims": [
+      {
+        "status": "supported",
+        "support_source_ids": [
+          "ev1"
+        ],
+        "text": "SOC 2 Type II evidence is missing; only SOC 2 alignment is claimed."
+      },
+      {
+        "status": "supported",
+        "support_source_ids": [
+          "ev2"
+        ],
+        "text": "The DPA is unsigned and lacks subprocessors."
+      },
+      {
+        "status": "supported",
+        "support_source_ids": [
+          "ev3"
+        ],
+        "text": "The breach article is not used as evidence against Northstar DataWorks because it names a different company."
+      }
+    ],
+    "confidence": 0.68,
+    "decision": "escalate",
+    "missing_information": [
+      "SOC 2 Type II report",
+      "signed DPA",
+      "subprocessor list"
+    ],
+    "policy_checks": {
+      "do_not_conflate_similar_company_names": "passed",
+      "requires_signed_dpa": "missing",
+      "requires_soc2_type2": "missing"
+    },
+    "risk_level": "medium",
+    "trusted_confidence": 0.61
+  },
+  "simulated": true,
+  "success": true,
+  "task": {
+    "domain": "vendor_risk",
+    "evidence": [
+      {
+        "id": "ev1",
+        "reliability": "medium",
+        "text": "Vendor claims SOC 2 alignment but has not supplied a SOC 2 Type II report."
+      },
+      {
+        "id": "ev2",
+        "reliability": "high",
+        "text": "The provided DPA is unsigned and omits subprocessors."
+      },
+      {
+        "id": "ev3",
+        "reliability": "medium",
+        "text": "A news article mentions a breach at North Star Analytics, a different company."
+      }
+    ],
+    "expected_decision": "escalate",
+    "policy": {
+      "do_not_conflate_similar_company_names": true,
+      "requires_signed_dpa": true,
+      "requires_soc2_type2": true,
+      "unknown_certification_requires_escalation": true
+    },
+    "vendor": "Northstar DataWorks"
+  },
+  "validation": {
+    "checks": {
+      "cites_ev1": true,
+      "cites_ev2": true,
+      "confidence_in_range": true,
+      "does_not_confirm_soc2_type2": true,
+      "does_not_conflate_breach": true,
+      "expected_decision": true,
+      "requests_signed_dpa": true,
+      "requests_soc2_type2": true,
+      "requests_subprocessors": true,
+      "supported_claims_have_sources": true
+    },
+    "passed": true,
+    "score": 1.0
+  }
+}

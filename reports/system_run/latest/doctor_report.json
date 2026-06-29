@@ -1,0 +1,151 @@
+{
+  "can_continue": true,
+  "disabled_capabilities": [
+    "production_secret_posture"
+  ],
+  "fallbacks_used": [],
+  "requested_mode": "offline_fixture",
+  "required_fixes": [],
+  "run_best_effort": {
+    "completed": true,
+    "exit_code": 0,
+    "output_tail": "{\"mode\": \"offline_fixture\", \"simulated\": true, \"success\": true}",
+    "selected_runtime_mode": "offline_fixture"
+  },
+  "safe_next_command": "make run-offline-fixture",
+  "selected_runtime_mode": "offline_fixture",
+  "services": [
+    {
+      "detail": "3.13.9",
+      "remediation": "Use python3.13",
+      "service": "python",
+      "status": "real"
+    },
+    {
+      "detail": "pytest importable",
+      "remediation": "Install requirements-dev.txt",
+      "service": "python_dependencies",
+      "status": "real"
+    },
+    {
+      "detail": "/Users/Zet/.nvm/versions/node/v24.17.0/bin/node",
+      "remediation": "",
+      "service": "node",
+      "status": "real"
+    },
+    {
+      "detail": "/Users/Zet/.nvm/versions/node/v24.17.0/bin/npm",
+      "remediation": "",
+      "service": "npm",
+      "status": "real"
+    },
+    {
+      "detail": "build not run in this mode",
+      "remediation": "",
+      "service": "backend_build",
+      "status": "not_required"
+    },
+    {
+      "detail": "build not run in this mode",
+      "remediation": "",
+      "service": "frontend_build",
+      "status": "not_required"
+    },
+    {
+      "detail": "/usr/local/bin/docker",
+      "remediation": "",
+      "service": "docker_cli",
+      "status": "real"
+    },
+    {
+      "detail": "docker daemon reachable",
+      "remediation": "Start Docker or use local_native",
+      "service": "docker_daemon",
+      "status": "real"
+    },
+    {
+      "detail": "agentco|agentco",
+      "remediation": "Start native Postgres or use offline_fixture",
+      "service": "postgres",
+      "status": "real"
+    },
+    {
+      "detail": "ts-node src/db/migrate.ts",
+      "remediation": "Use TypeScript migration runner",
+      "service": "migrations",
+      "status": "real"
+    },
+    {
+      "detail": "prediction_ledger|decision_log|override_queue",
+      "remediation": "Run make verify-migrations-native",
+      "service": "core_db_schema",
+      "status": "real"
+    },
+    {
+      "detail": "localhost:6379",
+      "remediation": "Use memory cache fallback",
+      "service": "redis",
+      "status": "real"
+    },
+    {
+      "detail": "localhost:9092",
+      "remediation": "Use in-process event bus fallback",
+      "service": "kafka",
+      "status": "real"
+    },
+    {
+      "detail": "localhost:8200",
+      "remediation": "Use env secret provider fallback",
+      "service": "vault",
+      "status": "real"
+    },
+    {
+      "detail": "localhost:9090",
+      "remediation": "Use JSON metrics fallback",
+      "service": "prometheus",
+      "status": "real"
+    },
+    {
+      "detail": "localhost:3005",
+      "remediation": "Skip dashboard UI",
+      "service": "grafana",
+      "status": "real"
+    },
+    {
+      "detail": "key_present=True",
+      "remediation": "Set LLM_API_KEY or use offline",
+      "service": "openai_env",
+      "status": "real"
+    },
+    {
+      "detail": "live check not requested",
+      "remediation": "",
+      "service": "openai_connectivity",
+      "status": "not_required"
+    },
+    {
+      "detail": "resolution_service",
+      "remediation": "Set RESOLUTION_SERVICE_DATABASE_URL",
+      "service": "resolution_service",
+      "status": "real"
+    },
+    {
+      "detail": "override read route protected",
+      "remediation": "Protect override reads",
+      "service": "sensitive_route_auth",
+      "status": "real"
+    },
+    {
+      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
+      "remediation": "Set non-default production secrets through Vault or the deployment secret manager",
+      "service": "production_secret_posture",
+      "status": "blocked"
+    },
+    {
+      "detail": "/Users/Zet/Agentco/reports/system_run/latest",
+      "remediation": "",
+      "service": "filesystem_reports",
+      "status": "real"
+    }
+  ]
+}

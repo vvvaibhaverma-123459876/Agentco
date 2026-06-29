@@ -8,7 +8,7 @@ export interface GoalNode {
   objective: string;
   goal_depth: number;
   goal_path: string;
-  status: 'queued' | 'in_progress' | 'completed' | 'failed';
+  status: 'active' | 'blocked' | 'completed' | 'retired';
   evidence_count: number;
   claim_count: number;
   rollup_status?: 'ready_for_rollup' | 'rolled_up';
@@ -38,10 +38,25 @@ class GoalHierarchyService {
     try {
       const result = await db.query(
         `INSERT INTO autonomy_goals
-          (id, institution_id, objective, goal_depth, goal_path, status, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          (id, title, description, source, proposed_by, domain, institution_id, objective,
+           goal_depth, goal_path, status, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          RETURNING *`,
-        [goalId, institutionId, objective, 0, `/${goalId}`, 'queued', now, now]
+        [
+          goalId,
+          objective,
+          objective,
+          'manual',
+          'system',
+          'coordination',
+          institutionId,
+          objective,
+          0,
+          `/${goalId}`,
+          'active',
+          now,
+          now,
+        ]
       );
 
       return this.formatGoalNode(result.rows[0]);
@@ -76,10 +91,26 @@ class GoalHierarchyService {
 
       const result = await db.query(
         `INSERT INTO autonomy_goals
-          (id, parent_goal_id, institution_id, objective, goal_depth, goal_path, status, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          (id, title, description, source, proposed_by, domain, parent_goal_id, institution_id,
+           objective, goal_depth, goal_path, status, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
          RETURNING *`,
-        [goalId, parentGoalId, parent.institution_id, objective, newDepth, newPath, 'queued', now, now]
+        [
+          goalId,
+          objective,
+          objective,
+          'manual',
+          'system',
+          'coordination',
+          parentGoalId,
+          parent.institution_id,
+          objective,
+          newDepth,
+          newPath,
+          'active',
+          now,
+          now,
+        ]
       );
 
       return this.formatGoalNode(result.rows[0]);
@@ -120,10 +151,26 @@ class GoalHierarchyService {
 
       const result = await db.query(
         `INSERT INTO autonomy_goals
-          (id, parent_goal_id, institution_id, objective, goal_depth, goal_path, status, created_at, updated_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          (id, title, description, source, proposed_by, domain, parent_goal_id, institution_id,
+           objective, goal_depth, goal_path, status, created_at, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
          RETURNING *`,
-        [goalId, parentSubGoalId, parent.institution_id, objective, newDepth, newPath, 'queued', now, now]
+        [
+          goalId,
+          objective,
+          objective,
+          'manual',
+          'system',
+          'coordination',
+          parentSubGoalId,
+          parent.institution_id,
+          objective,
+          newDepth,
+          newPath,
+          'active',
+          now,
+          now,
+        ]
       );
 
       return this.formatGoalNode(result.rows[0]);
@@ -348,6 +395,38 @@ class GoalHierarchyService {
     try {
       const allocId = uuidv4();
       const now = new Date();
+      const existingRequest = await db.query(
+        'SELECT id FROM institution_work_requests WHERE id = $1',
+        [workRequestId]
+      );
+      if (existingRequest.rows.length === 0) {
+        const department = await db.query(
+          'SELECT institution_id FROM departments WHERE id = $1',
+          [departmentId]
+        );
+        if (department.rows.length === 0) {
+          throw new Error(`Department not found for allocation: ${departmentId}`);
+        }
+        await db.query(
+          `INSERT INTO institution_work_requests
+             (id, institution_id, department_id, objective, required_specialists,
+              budget_tokens, budget_iterations, budget_seconds, status, created_at, updated_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+          [
+            workRequestId,
+            department.rows[0].institution_id,
+            departmentId,
+            `Allocation decision for ${specialistRole}`,
+            JSON.stringify([specialistRole]),
+            0,
+            0,
+            0,
+            'queued',
+            now,
+            now,
+          ]
+        );
+      }
 
       await db.query(
         `INSERT INTO specialist_allocation_history
@@ -374,7 +453,12 @@ class GoalHierarchyService {
          LIMIT 10`
       );
 
-      return result.rows;
+      return result.rows.map((row) => ({
+        ...row,
+        success_count: Number(row.success_count),
+        total_deployments: Number(row.total_deployments),
+        avg_performance: Number(row.avg_performance),
+      }));
     } catch (e) {
       throw new Error(`Failed to get team patterns: ${e}`);
     }
@@ -402,7 +486,7 @@ class GoalHierarchyService {
           `UPDATE specialist_team_patterns
            SET success_count = success_count + 1,
                total_deployments = total_deployments + 1,
-               avg_performance = ($1 * success_count + $2) / total_deployments,
+               avg_performance = (($1::numeric * success_count) + $2::numeric) / (total_deployments + 1),
                last_used = CURRENT_TIMESTAMP
            WHERE id = $3`,
           [performance, performance, patternId]

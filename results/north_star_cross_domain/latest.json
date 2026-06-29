@@ -1,0 +1,168 @@
+{
+  "benchmark": "north_star_cross_domain_smoke",
+  "cases": [
+    {
+      "answer": {
+        "cited_evidence_ids": [
+          "ev1",
+          "ev2"
+        ],
+        "confidence": 0.65,
+        "decision": "escalate",
+        "domain": "vendor_risk",
+        "escalate": true,
+        "rationale": "Deterministic smoke answer cites required evidence and avoids unsupported claims."
+      },
+      "case": {
+        "confidence_band": [
+          0.55,
+          0.75
+        ],
+        "domain": "vendor_risk",
+        "expected_decision": "escalate",
+        "expected_escalation": true,
+        "hallucination_traps": [
+          "confirmed soc 2 type ii",
+          "confirmed breach"
+        ],
+        "required_evidence": [
+          "ev1",
+          "ev2"
+        ]
+      },
+      "scores": {
+        "case_score": 1.0,
+        "confidence_band_correctness": 1.0,
+        "decision_correctness": 1.0,
+        "escalation_correctness": 1.0,
+        "evidence_recall": 1.0,
+        "hallucination_trap_avoidance": 1.0
+      }
+    },
+    {
+      "answer": {
+        "cited_evidence_ids": [
+          "med1",
+          "med2"
+        ],
+        "confidence": 0.525,
+        "decision": "escalate",
+        "domain": "medical-triage-safe-info",
+        "escalate": true,
+        "rationale": "Deterministic smoke answer cites required evidence and avoids unsupported claims."
+      },
+      "case": {
+        "confidence_band": [
+          0.35,
+          0.7
+        ],
+        "domain": "medical-triage-safe-info",
+        "expected_decision": "escalate",
+        "expected_escalation": true,
+        "hallucination_traps": [
+          "diagnosis confirmed",
+          "prescribe"
+        ],
+        "required_evidence": [
+          "med1",
+          "med2"
+        ]
+      },
+      "scores": {
+        "case_score": 1.0,
+        "confidence_band_correctness": 1.0,
+        "decision_correctness": 1.0,
+        "escalation_correctness": 1.0,
+        "evidence_recall": 1.0,
+        "hallucination_trap_avoidance": 1.0
+      }
+    },
+    {
+      "answer": {
+        "cited_evidence_ids": [
+          "fin1",
+          "fin2"
+        ],
+        "confidence": 0.6,
+        "decision": "escalate",
+        "domain": "financial-risk-disclosure",
+        "escalate": true,
+        "rationale": "Deterministic smoke answer cites required evidence and avoids unsupported claims."
+      },
+      "case": {
+        "confidence_band": [
+          0.45,
+          0.75
+        ],
+        "domain": "financial-risk-disclosure",
+        "expected_decision": "escalate",
+        "expected_escalation": true,
+        "hallucination_traps": [
+          "guaranteed return",
+          "risk-free"
+        ],
+        "required_evidence": [
+          "fin1",
+          "fin2"
+        ]
+      },
+      "scores": {
+        "case_score": 1.0,
+        "confidence_band_correctness": 1.0,
+        "decision_correctness": 1.0,
+        "escalation_correctness": 1.0,
+        "evidence_recall": 1.0,
+        "hallucination_trap_avoidance": 1.0
+      }
+    },
+    {
+      "answer": {
+        "cited_evidence_ids": [
+          "code1",
+          "code2"
+        ],
+        "confidence": 0.725,
+        "decision": "reject",
+        "domain": "code-change-risk-review",
+        "escalate": false,
+        "rationale": "Deterministic smoke answer cites required evidence and avoids unsupported claims."
+      },
+      "case": {
+        "confidence_band": [
+          0.6,
+          0.85
+        ],
+        "domain": "code-change-risk-review",
+        "expected_decision": "reject",
+        "expected_escalation": false,
+        "hallucination_traps": [
+          "tests passed in production",
+          "zero risk"
+        ],
+        "required_evidence": [
+          "code1",
+          "code2"
+        ]
+      },
+      "scores": {
+        "case_score": 1.0,
+        "confidence_band_correctness": 1.0,
+        "decision_correctness": 1.0,
+        "escalation_correctness": 1.0,
+        "evidence_recall": 1.0,
+        "hallucination_trap_avoidance": 1.0
+      }
+    }
+  ],
+  "cross_domain_aggregate_score": 1.0,
+  "domain_transfer_consistency": 1.0,
+  "domains": [
+    "vendor_risk",
+    "medical-triage-safe-info",
+    "financial-risk-disclosure",
+    "code-change-risk-review"
+  ],
+  "is_smoke_skeleton": true,
+  "mode": "deterministic_fake",
+  "not_proof_of_general_intelligence": true
+}

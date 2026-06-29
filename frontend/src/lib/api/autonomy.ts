@@ -5,7 +5,8 @@
  * Provides methods to fetch and manage autonomy runs, tasks, candidates, and evals.
  */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const API_ROOT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = `${API_ROOT.replace(/\/$/, '')}/api`;
 
 export interface AutonomyRun {
   id: string;

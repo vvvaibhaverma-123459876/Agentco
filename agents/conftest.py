@@ -20,7 +20,7 @@ def llm_test_env(monkeypatch):
     that do not patch the client — tests that call act() must mock client_for.
     """
     monkeypatch.setenv("LLM_PROVIDER", "openai")
-    monkeypatch.setenv("LLM_API_KEY", "sk-test-placeholder-not-real")
+    monkeypatch.setenv("LLM_API_KEY", "test-placeholder-not-real")
     monkeypatch.setenv("LLM_BASE_URL", "https://api.openai.com/v1")
     monkeypatch.setenv("LLM_MODEL_DEFAULT", "gpt-4o-mini")
     # Clear cached clients so each test starts fresh

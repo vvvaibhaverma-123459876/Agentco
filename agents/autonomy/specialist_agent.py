@@ -5,7 +5,8 @@ Foundation for all specialist agents.
 Handles HTTP server, budget tracking, and action execution.
 """
 
-from agents.base_agent import BaseAgent
+from agents.core.base_agent import BaseAgent
+from agents.core.types import AgentOutput, RiskLevel
 from flask import Flask, request, jsonify
 import threading
 import json
@@ -17,6 +18,7 @@ import os
 import hmac
 import time
 from collections import defaultdict
+from urllib.parse import parse_qs, unquote, urlparse
 
 # Database connection pooling (optional - only if env vars present)
 try:
@@ -180,8 +182,16 @@ def verify_request_signature(payload_bytes: bytes, signature: str, timestamp: st
     Returns:
         True if signature is valid and timestamp is recent
     """
-    # Get shared secret from environment
-    secret = os.environ.get('SPECIALIST_SHARED_SECRET', 'default-insecure-secret')
+    # Get shared secret from environment. Development/test keeps a local-only
+    # default so existing isolated tests can run; staging/production must fail
+    # closed instead of accepting a public shared secret.
+    secret = os.environ.get('SPECIALIST_SHARED_SECRET')
+    runtime_env = (os.environ.get('AGENTCO_ENV') or os.environ.get('NODE_ENV') or '').lower()
+    if not secret or secret == 'default-insecure-secret':
+        if runtime_env in {'staging', 'production'}:
+            print('[Auth] SPECIALIST_SHARED_SECRET is required in staging/production')
+            return False
+        secret = 'development-only-specialist-secret'
 
     # Check timestamp is recent (within 30 seconds to prevent replay attacks)
     try:
@@ -226,7 +236,11 @@ class SpecialistAgent(BaseAgent):
             role: Specialist role (researcher, fetcher, etc.)
             budget: {"tokens": int, "iterations": int, "seconds": int}
         """
-        super().__init__(name=f"{role}_specialist_{specialist_id}")
+        # Set AGENT_ID as required by BaseAgent
+        self.AGENT_ID = f"{role}_specialist_{specialist_id}"
+        self.MODEL = "mistral:7b"  # Default local model
+
+        super().__init__()
         self.specialist_id = specialist_id
         self.role = role
         self.budget = budget  # {tokens, iterations, seconds}
@@ -242,6 +256,22 @@ class SpecialistAgent(BaseAgent):
         # Flask app for HTTP communication
         self.app = Flask(f"specialist_{specialist_id}")
         self.setup_routes()
+
+    def get_system_prompt(self) -> str:
+        return f"You are a bounded AgentCo autonomy specialist with role {self.role}."
+
+    def get_tools(self) -> list:
+        return []
+
+    async def execute_task(self, task: Dict[str, Any]) -> AgentOutput:
+        result = self.handle_action(task)
+        return AgentOutput(
+            content=json.dumps(result),
+            confidence_score=0.7,
+            risk_level=RiskLevel.LOW,
+            rationale=f"Executed bounded specialist action for role {self.role}.",
+            requires_human_approval=False,
+        )
 
     def setup_routes(self):
         """Register HTTP endpoints for orchestrator communication"""
@@ -483,9 +513,112 @@ class SpecialistAgent(BaseAgent):
         self.iterations_used += 1
         self.check_budget()
 
+    def real_fetch_page(self, url: str) -> Dict[str, Any]:
+        """Fetch a real HTTP/HTTPS page or return a structured failure."""
+        valid, error = validate_url(url)
+        if not valid:
+            return {'status': 'blocked', 'reason': error, 'url': url}
+
+        try:
+            import requests
+            response = requests.get(
+                url,
+                headers={'User-Agent': 'AgentCo-Specialist/1.0 (+https://agentco.local)'},
+                timeout=12,
+                allow_redirects=True,
+            )
+            final_url = response.url
+            valid_final, final_error = validate_url(final_url)
+            if not valid_final:
+                return {'status': 'blocked', 'reason': f'Redirect rejected: {final_error}', 'url': url, 'final_url': final_url}
+            response.raise_for_status()
+            content_type = response.headers.get('content-type', '')
+            text = response.text
+            title = final_url
+            try:
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(text, 'html.parser')
+                if soup.title and soup.title.string:
+                    title = soup.title.string.strip()[:300]
+                body_text = soup.get_text(separator=' ', strip=True)
+                if body_text:
+                    text = body_text
+            except Exception:
+                pass
+            if not text.strip():
+                return {'status': 'failed', 'reason': 'Fetched page had empty text content', 'url': final_url}
+            return {
+                'status': 'fetch_completed',
+                'url': final_url,
+                'title': title,
+                'content': text[:20000],
+                'content_type': content_type,
+                'content_length': len(text),
+            }
+        except Exception as exc:
+            return {'status': 'failed', 'reason': str(exc), 'url': url}
+
+    def real_web_search(self, query: str, max_results: int = 5) -> Dict[str, Any]:
+        """Run a real web search through DuckDuckGo HTML, or fail closed."""
+        valid, error = validate_search_query(query)
+        if not valid:
+            return {'status': 'blocked', 'reason': error, 'query': query, 'results': []}
+
+        try:
+            import requests
+            from bs4 import BeautifulSoup
+            response = requests.get(
+                'https://html.duckduckgo.com/html/',
+                params={'q': query},
+                headers={'User-Agent': 'AgentCo-Specialist/1.0 (+https://agentco.local)'},
+                timeout=12,
+            )
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, 'html.parser')
+            results = []
+            for anchor in soup.select('a.result__a'):
+                href = anchor.get('href') or ''
+                parsed = urlparse(href)
+                if parsed.netloc.endswith('duckduckgo.com') and parsed.path.startswith('/l/'):
+                    href = unquote(parse_qs(parsed.query).get('uddg', [''])[0])
+                valid_url, _ = validate_url(href)
+                if not valid_url:
+                    continue
+                snippet_node = anchor.find_parent('div', class_='result')
+                snippet = ''
+                if snippet_node:
+                    body = snippet_node.select_one('.result__snippet')
+                    snippet = body.get_text(' ', strip=True) if body else ''
+                results.append({
+                    'url': href,
+                    'title': anchor.get_text(' ', strip=True)[:300],
+                    'snippet': snippet[:500],
+                })
+                if len(results) >= max_results:
+                    break
+            if not results:
+                return {'status': 'failed', 'reason': 'No search results returned by real search provider', 'query': query, 'results': []}
+            return {'status': 'search_completed', 'query': query, 'results': results}
+        except Exception as exc:
+            return {'status': 'failed', 'reason': str(exc), 'query': query, 'results': []}
+
+    def select_server_backend(self) -> str:
+        """Return the configured specialist HTTP backend, or fail closed."""
+        server_mode = os.environ.get('AGENTCO_SPECIALIST_SERVER', 'waitress').strip().lower()
+        production = os.environ.get('AGENTCO_ENV') == 'production'
+        if server_mode == 'flask-dev' and production:
+            raise RuntimeError('Refusing to run Flask development server in production')
+        if server_mode not in {'waitress', 'flask-dev'}:
+            raise RuntimeError(f'Unsupported specialist server backend: {server_mode}')
+        return server_mode
+
     def run_server(self, port: int):
         """
-        Run Flask server in background thread
+        Run specialist HTTP server in a background thread.
+
+        Production and default local runs use Waitress, a real WSGI server.
+        Flask's development server is allowed only when explicitly requested
+        with AGENTCO_SPECIALIST_SERVER=flask-dev outside production.
 
         Args:
             port: Port number to listen on
@@ -493,8 +626,33 @@ class SpecialistAgent(BaseAgent):
         Returns:
             Thread reference
         """
+        server_mode = self.select_server_backend()
+
         def run():
-            self.app.run(host='127.0.0.1', port=port, debug=False, threaded=True)
+            if server_mode == 'flask-dev':
+                print(
+                    f"[{self.role}] Starting explicit flask-dev specialist server on 127.0.0.1:{port}; "
+                    "not production."
+                )
+                self.app.run(host='127.0.0.1', port=port, debug=False, threaded=True, use_reloader=False)
+                return
+
+            try:
+                from waitress import serve
+            except ImportError as exc:
+                raise RuntimeError(
+                    'waitress is required for specialist HTTP serving. '
+                    'Install requirements-runtime.txt or agents/requirements.txt.'
+                ) from exc
+
+            print(f"[{self.role}] Starting waitress specialist server on 127.0.0.1:{port}")
+            serve(
+                self.app,
+                host='127.0.0.1',
+                port=port,
+                threads=int(os.environ.get('AGENTCO_SPECIALIST_THREADS', '4')),
+                ident=f'agentco-specialist-{self.role}',
+            )
 
         thread = threading.Thread(target=run, daemon=True)
         thread.start()
@@ -537,14 +695,13 @@ class SpecialistAgent(BaseAgent):
                         print(f"[Evidence] No connection available, retrying in {wait_time}s (attempt {attempt + 1}/3)")
                         time.sleep(wait_time)
                         continue
-                    print(f"[Evidence] DB unavailable after 3 attempts, returning stub ID: {evidence_id}")
-                    return evidence_id
+                    raise RuntimeError("Database unavailable after 3 attempts; evidence was not persisted")
 
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT INTO autonomy_evidence
-                    (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
+                    (id, source_id, url, title, snippet, content_hash, source_type, is_public_access, retrieved_at, content_text)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), %s)
                 """, (
                     evidence_id,
                     str(uuid.uuid4()),  # source_id
@@ -553,7 +710,8 @@ class SpecialistAgent(BaseAgent):
                     snippet,
                     content_hash,
                     source_type,
-                    True  # is_public_access
+                    True,  # is_public_access
+                    content[:20000] if content else None,
                 ))
                 conn.commit()
                 print(f"[Evidence] Persisted: {evidence_id}")
@@ -600,6 +758,37 @@ class SpecialistAgent(BaseAgent):
         # Should never reach here
         raise RuntimeError(f"Evidence persistence failed unexpectedly")
 
+    def load_evidence_text(self, evidence_id: str) -> Optional[Dict[str, str]]:
+        """Load persisted evidence text for extraction."""
+        conn = None
+        try:
+            conn = get_db_connection()
+            if not conn:
+                return None
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id, url, title, snippet, COALESCE(content_text, snippet, title, '') AS content_text
+                FROM autonomy_evidence
+                WHERE id = %s OR source_id = %s
+                LIMIT 1
+                """,
+                (evidence_id, evidence_id),
+            )
+            row = cursor.fetchone()
+            if not row:
+                return None
+            return {
+                'id': str(row[0]),
+                'url': row[1] or '',
+                'title': row[2] or '',
+                'snippet': row[3] or '',
+                'content_text': row[4] or '',
+            }
+        finally:
+            if conn:
+                return_db_connection(conn)
+
     def persist_claim(
         self,
         claim_text: str,
@@ -613,8 +802,7 @@ class SpecialistAgent(BaseAgent):
         claim_id = str(uuid.uuid4())
 
         if not support_source_ids:
-            print(f"[Claim] No sources provided, returning stub ID: {claim_id}")
-            return claim_id
+            raise RuntimeError("Cannot persist supported claim without support_source_ids")
 
         # Retry logic with exponential backoff
         for attempt in range(3):
@@ -627,8 +815,7 @@ class SpecialistAgent(BaseAgent):
                         print(f"[Claim] No connection available, retrying in {wait_time}s (attempt {attempt + 1}/3)")
                         time.sleep(wait_time)
                         continue
-                    print(f"[Claim] DB unavailable after 3 attempts, returning stub ID: {claim_id}")
-                    return claim_id
+                    raise RuntimeError("Database unavailable after 3 attempts; claim was not persisted")
 
                 cursor = conn.cursor()
                 cursor.execute("""

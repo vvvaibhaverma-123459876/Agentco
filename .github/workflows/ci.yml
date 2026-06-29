@@ -7,6 +7,25 @@ on:
     branches: [main, 'claude/**']
 
 jobs:
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan for committed secrets
+        run: |
+          set -euo pipefail
+          openai_prefix='s''k-'
+          private_key='BEGIN (RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY'
+          bad_jwt='JWT_SECRET=(change-me|[A-Za-z0-9]{16,})'
+          bad_api_key='AGENTCO_API_KEY=dev''-api-key'
+          pattern="${openai_prefix}[A-Za-z0-9_-]{20,}|${private_key}|${bad_jwt}|${bad_api_key}"
+          if git grep -n -E "$pattern" -- ':!*.md' ':!docs/**' ':!reports/**' ':!**/tests/**' ':!node_modules/**'; then
+            echo "Potential committed secret or production-dangerous default found"
+            exit 1
+          fi
+
   test-agents:
     name: Python Agent Tests
     runs-on: ubuntu-latest
@@ -34,6 +53,20 @@ jobs:
   test-backend:
     name: TypeScript Backend Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: agentco
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: agentco
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agentco -d agentco"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -52,9 +85,17 @@ jobs:
         working-directory: backend
         run: npx tsc --noEmit
 
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+        run: npm run db:migrate
+
       - name: Run tests
         working-directory: backend
-        run: npm test
+        env:
+          DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+        run: npm run test:all -- --forceExit
 
   test-frontend:
     name: Next.js Frontend
