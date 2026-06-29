@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T06:55:12Z'
+  last_updated: '2026-06-29T07:00:08Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -175,15 +175,25 @@ layers:
       artifacts: []
       tests: []
   L2_resources_budgets:
-    status: not_started
+    status: in_progress
     items:
     - id: L2.ResourceLedger
-      status: not_started
+      status: verified
       depends_on:
       - L1.ActorRegistry
       - L3.EventLog
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/services/resource-ledger.service.ts
+      - backend/src/routes/resource-ledger.routes.ts
+      tests:
+      - backend/tests/resource-ledger.test.ts
+      gates_passed:
+      - db_migration
+      - integration
+      - typescript
+      notes: Canonical L2 ledger uses civilization_resource_accounts/transactions to avoid legacy table collision, prevents
+        overdraft under row lock, enforces idempotency keys, and writes event_log plus decision_log audit in the same transaction.
     - id: L2.ReservationService
       status: not_started
       depends_on:
@@ -625,11 +635,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 5
+  verified: 6
   in_progress: 35
-  not_started: 27
+  not_started: 26
   blocked: 0
-  percent_verified: 7.46
+  percent_verified: 8.96
 gates:
   no_stub: red
   no_simulation: green
