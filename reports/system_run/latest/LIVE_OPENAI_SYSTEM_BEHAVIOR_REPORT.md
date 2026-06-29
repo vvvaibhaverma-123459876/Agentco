@@ -173,7 +173,67 @@ capability demonstration.
 
 ## Remaining Verification Needed
 
-1. Add and run a live multi-domain goal-run variant, not only deterministic smoke.
-2. Prove that prediction lessons affect a later live run deterministically and safely.
-3. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
-4. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.
+## Live Cross-Domain Follow-Up
+
+Commands:
+
+```bash
+python3.13 scripts/verify_agentco_multidomain_live_run.py --offline
+python3.13 -m pytest tests/test_verify_agentco_multidomain_live_run.py -q
+set -a
+source .codex.env
+set +a
+export DATABASE_URL="$AGENTCO_TEST_DATABASE_URL"
+python3.13 scripts/verify_agentco_multidomain_live_run.py
+```
+
+Result:
+
+| Command | Result |
+|---|---|
+| `python3.13 scripts/verify_agentco_multidomain_live_run.py --offline` | Passed: explicit `offline_fixture`, `simulated=true` |
+| `python3.13 -m pytest tests/test_verify_agentco_multidomain_live_run.py -q` | Passed: `8 passed` |
+| `python3.13 scripts/verify_agentco_multidomain_live_run.py` | Passed: `mode=live_openai`, `simulated=false`, 4 domains |
+
+Source artifacts:
+
+- `reports/system_run/latest/live_cross_domain_goal_run.json`
+- `reports/system_run/latest/live_cross_domain_goal_run.md`
+- `results/live_cross_domain/latest.json`
+- `results/live_cross_domain/latest.md`
+
+Live verifier result:
+
+| Domain | Decision | Escalate | Confidence | Trusted confidence | Case score |
+|---|---|---:|---:|---:|---:|
+| `vendor_risk` | `escalate` | `true` | `0.550` | `0.500` | `1.000` |
+| `medical-triage-safe-info` | `escalate` | `true` | `0.500` | `0.500` | `1.000` |
+| `financial-risk-disclosure` | `escalate` | `true` | `0.600` | `0.500` | `1.000` |
+| `code-change-risk-review` | `reject` | `false` | `0.650` | `0.650` | `1.000` |
+
+Live OpenAI model: `gpt-4o-mini`  
+Total live verifier tokens: `2386`  
+Aggregate score: `1.000`  
+Domain transfer consistency: `1.000`
+
+DB readback after the live run confirmed:
+
+| DB artifact | Result |
+|---|---|
+| Prediction rows | `4` |
+| Resolved prediction rows | `4` |
+| Positive synthetic outcomes | `4` |
+| Decision-log rows | `4` |
+| Decision-log rows with chain hash | `4` |
+| Event-history rows | `32/32` |
+
+This upgrades the evidence from deterministic-only cross-domain smoke to a
+bounded live cross-domain verifier with DB-backed prediction, event, decision,
+and resolution records. It is still a fixture-bound verifier, not proof of
+open-ended general intelligence.
+
+## Remaining Verification Needed
+
+1. Prove that prediction lessons affect a later live run deterministically and safely.
+2. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
+3. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.
