@@ -53,12 +53,25 @@ That run passed the current vendor-risk goal verifier with `mode=live_openai`,
 It proves the narrow live verifier path works; it does not prove full production
 readiness, durable cross-domain transfer, or the complete civilization goal.
 
+The latest live cross-domain verifier is documented in
+`reports/system_run/latest/live_cross_domain_goal_run.md`. It ran four bounded
+synthetic domains with OpenAI and native Postgres persistence:
+
+- `vendor_risk`
+- `medical-triage-safe-info`
+- `financial-risk-disclosure`
+- `code-change-risk-review`
+
+That verifier proves bounded live cross-domain routing/evidence/calibration
+checks for the current fixtures. It does not prove open-ended general
+intelligence or durable transfer beyond those fixtures.
+
 ## Partial Or In Progress
 
 - Full L0-L14 architecture: `18/67` verified, many layers remain in progress.
 - Source independence scoring and Python independence tests need reconciliation with current actor model.
 - Production observability stack, Vault posture, Kafka/Redis real-service path, and Docker production smoke are not recently re-proven.
-- Cross-domain transfer remains a deterministic smoke benchmark, not a demonstrated general-intelligence metric.
+- Cross-domain transfer has a bounded live verifier and deterministic smoke benchmark, but it is not a demonstrated general-intelligence metric.
 - Some older services are implemented but not yet proven through the current canonical coordinator path.
 
 ## Unsupported Or Future
