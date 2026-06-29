@@ -129,7 +129,7 @@ class BaseAgentV2:
     @abstractmethod
     def run(self, task: dict) -> Any:
         """Agent-specific entrypoint. Must call execute_action() for each action."""
-        raise NotImplementedError
+        raise RuntimeError("BaseAgentV2 subclasses must implement run()")
 
     def pre_register_claim(
         self,

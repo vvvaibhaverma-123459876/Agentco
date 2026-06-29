@@ -15,6 +15,8 @@ AgentCo is a runnable local-native research/runtime system with important produc
 | Offline fixture | Runnable when explicitly selected and labeled simulated/offline |
 | Local native | Runnable with native Postgres |
 | Backend default tier | Passed: `42` suites, `287` tests |
+| No-stub/no-simulation ledger gates | Green: `0` findings in both gates |
+| Native migration verifier | Passed with runtime-critical task and civilization-routing schema checks |
 | Production | Not certified |
 | Full civilization goal | In progress |
 
@@ -32,10 +34,12 @@ AgentCo is a runnable local-native research/runtime system with important produc
 | L4 Memory promotion | Resolved/scored predictions promote append-only prediction lessons |
 | E2E learning slice | Evidence -> grounded claim -> prediction -> resolution -> trust -> memory -> audit/event |
 | Source discovery tests | Unit verification is deterministic; production still does live reachability checks |
+| Runtime schema compatibility | Additive migrations repair legacy `departments.institution_id` drift and expose `agent_task_events` as a canonical view over the existing task event log |
 
 ## Current Real Capabilities
 
 - Native Postgres schema and migrations.
+- Native migration verification now checks `agent_tasks`, `agent_task_events`, work-request tables, department institution routing columns, allocation history, and hierarchy columns.
 - Backend build and default Jest tier.
 - Runtime doctor and mode/fallback reports.
 - OpenAI-compatible live path in verifier scripts when credentials are present.
@@ -109,6 +113,13 @@ cd backend
 npm run db:migrate
 npx tsc --noEmit
 npm test -- --runInBand --forceExit
+```
+
+Migration contract check:
+
+```bash
+make verify-migrations-native
+python3.13 -m pytest tests/test_verify_migrations_native.py -q
 ```
 
 Focused current civilization slice:

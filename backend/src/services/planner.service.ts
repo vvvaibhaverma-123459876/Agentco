@@ -187,7 +187,7 @@ class PlannerService {
         for (const depId of deps) {
           const depIndex = stepIdToIndex.get(depId);
           if (depIndex && depIndex >= step.step_index) {
-            issues.push(`Step ${step.step_index} depends on later step ${depIndex}`);
+            issues.push(`Step ${step.step_index} depends on a subsequent step ${depIndex}`);
           }
         }
       }

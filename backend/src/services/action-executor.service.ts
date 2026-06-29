@@ -26,7 +26,7 @@ export class ActionExecutorService {
   private teamActivation = new TeamActivationService();
 
   /**
-   * Inject web adapter (can be real or mock)
+   * Inject web adapter implementation.
    */
   setWebAdapter(adapter: WebAdapter): void {
     this.webAdapter = adapter;

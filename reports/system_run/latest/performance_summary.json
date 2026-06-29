@@ -1,11 +1,11 @@
 {
-  "audit_event_records": 11,
-  "db_decision_log_records": 1,
-  "db_event_records": 11,
-  "db_prediction_resolved": true,
+  "audit_event_records": 10,
+  "db_decision_log_records": 0,
+  "db_event_records": 0,
+  "db_prediction_resolved": false,
   "failures": 0,
-  "goal_run_total_latency_ms": 2178,
-  "openai_call_latency_ms": 2177,
+  "goal_run_total_latency_ms": 0,
+  "openai_call_latency_ms": 0,
   "predictions_registered": 1,
-  "tokens_used": 350
+  "tokens_used": null
 }

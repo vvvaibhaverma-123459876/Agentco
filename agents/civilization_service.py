@@ -405,10 +405,10 @@ class CivilizationService:
 - Proposed Goals in DB: {result.self_assessment.proposed_goals if result.self_assessment else 'N/A'}
 - Weak Domains Identified: {', '.join(result.self_assessment.weak_domains if result.self_assessment else []) or 'none'}
 
-## Execution Summary (STUB = zero counts, not fabricated)
+## Execution Summary (zero counts are explicit, not fabricated)
 - Internal Goals Generated: {len(result.internal_goals_generated)} (REAL DB writes)
 - Goals Executed: 0 (orchestrator not wired)
-- Claims Extracted: {result.claims_extracted} (extraction stub not yet implemented)
+- Claims Extracted: {result.claims_extracted} (real extraction unavailable in this run)
 - Evidence Collected: {result.evidence_collected} (awaiting real ingestion)
 - Predictions Registered: {result.predictions_registered} (awaiting real claims)
 

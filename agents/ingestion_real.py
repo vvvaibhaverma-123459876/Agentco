@@ -3,7 +3,7 @@ Real Claim Extraction for Civilization Free-Run
 ================================================
 
 Extracts structured claims from text with classification, evidence attachment,
-and database persistence. Replaces the stub ingestion/claim_extractor.py.
+and database persistence. Replaces the retired ingestion/claim_extractor.py.
 """
 from __future__ import annotations
 

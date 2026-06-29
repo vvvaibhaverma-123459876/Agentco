@@ -60,13 +60,19 @@ export class HashChainAnchorService {
       );
       const auditHead = await client.query<{ log_id: string; chain_hash: string; count: string }>(
         `SELECT head.log_id, head.chain_hash, totals.count
-           FROM (SELECT COUNT(*)::text AS count FROM decision_log WHERE chain_hash <> '') totals
+           FROM (
+             SELECT COUNT(*)::text AS count
+               FROM decision_log
+              WHERE chain_hash ~ '^[0-9a-f]{64}$'
+                AND prev_hash ~ '^[0-9a-f]{64}$'
+           ) totals
            LEFT JOIN LATERAL (
              SELECT log_id, chain_hash
-               FROM decision_log
-              WHERE chain_hash <> ''
-              ORDER BY timestamp DESC, log_id DESC
-              LIMIT 1
+             FROM decision_log
+             WHERE chain_hash ~ '^[0-9a-f]{64}$'
+               AND prev_hash ~ '^[0-9a-f]{64}$'
+             ORDER BY timestamp DESC, log_id DESC
+             LIMIT 1
            ) head ON true`
       );
       const eventHeadHash = eventHead.rows[0]?.event_hash ?? '0'.repeat(64);
@@ -127,7 +133,12 @@ export class HashChainAnchorService {
       `SELECT event_hash FROM event_log ORDER BY occurred_at DESC, id DESC LIMIT 1`
     );
     const currentDecision = await db.query<{ chain_hash: string }>(
-      `SELECT chain_hash FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp DESC, log_id DESC LIMIT 1`
+      `SELECT chain_hash
+         FROM decision_log
+        WHERE chain_hash ~ '^[0-9a-f]{64}$'
+          AND prev_hash ~ '^[0-9a-f]{64}$'
+        ORDER BY timestamp DESC, log_id DESC
+        LIMIT 1`
     );
     const currentEventHeadHash = currentEvent.rows[0]?.event_hash ?? '0'.repeat(64);
     const currentDecisionHeadHash = currentDecision.rows[0]?.chain_hash ?? '0'.repeat(64);

@@ -15,12 +15,12 @@ def llm_test_env(monkeypatch):
     """
     Inject test-safe LLM env vars for every runtime test.
 
-    Uses OpenAI provider with a placeholder key so the OpenAI SDK constructor
+    Uses OpenAI provider with a synthetic key so the OpenAI SDK constructor
     does not raise "Missing credentials".  No real API calls are made by tests
-    that do not patch the client — tests that call act() must mock client_for.
+    that do not patch the client; tests that call act() must inject client_for.
     """
     monkeypatch.setenv("LLM_PROVIDER", "openai")
-    monkeypatch.setenv("LLM_API_KEY", "test-placeholder-not-real")
+    monkeypatch.setenv("LLM_API_KEY", "test-synthetic-key-not-real")
     monkeypatch.setenv("LLM_BASE_URL", "https://api.openai.com/v1")
     monkeypatch.setenv("LLM_MODEL_DEFAULT", "gpt-4o-mini")
     # Clear cached clients so each test starts fresh

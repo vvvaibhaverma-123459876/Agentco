@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T09:45:50Z'
+  last_updated: '2026-06-29T14:21:43Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -774,108 +774,15 @@ rollups:
   blocked: 0
   percent_verified: 26.87
 gates:
-  no_stub: red
+  no_stub: green
   no_simulation: green
   reachability: unknown
   firewall: unknown
   sandbox_breach: unknown
   credential_key_independence: unknown
   e2e_civilization_slice: green
-  _no_stub_hit_count: '23'
+  _no_stub_hit_count: '0'
   _no_simulation_hit_count: '0'
 gate_findings:
-  no_stub:
-  - path: backend/src/runtime-mode.ts
-    line: 74
-    marker: mock
-    excerpt: '''mock'','
-  - path: backend/src/runtime-mode.ts
-    line: 80
-    marker: mock
-    excerpt: '`Refusing to use ${providerName}=${providerValue} in staging/production; deterministic, fake, mock, and fixture
-      providers are test-only`'
-  - path: backend/src/adapters/web-adapter.ts
-    line: 5
-    marker: mock
-    excerpt: '* Allows swapping between real web API calls and deterministic mock data for testing.'
-  - path: backend/src/db/run_migrations.py
-    line: 44
-    marker: placeholder
-    excerpt: The placeholder is already inside quotes in the SQL, so we replace just the placeholder.
-  - path: backend/src/db/run_migrations.py
-    line: 60
-    marker: placeholder
-    excerpt: '# Replace placeholder (which is already surrounded by single quotes in SQL)'
-  - path: backend/src/services/action-executor.service.ts
-    line: 29
-    marker: mock
-    excerpt: '* Inject web adapter (can be real or mock)'
-  - path: backend/src/services/planner.service.ts
-    line: 190
-    marker: later
-    excerpt: issues.push(`Step ${step.step_index} depends on later step ${depIndex}`);
-  - path: backend/src/services/reputation-learning.service.ts
-    line: 418
-    marker: placeholder
-    excerpt: '* initializeEntity(), so callers do not need to invent placeholder agents.'
-  - path: backend/src/services/crash-recovery.service.ts
-    line: 53
-    marker: later
-    excerpt: '* Save checkpoint at current step for later resumption'
-  - path: runtime/orchestration/modes.py
-    line: 45
-    marker: fake_
-    excerpt: ("fake_llm", "file_ledger", "in_memory_db", "auth_bypass", "env_secrets"),
-  - path: runtime/orchestration/modes.py
-    line: 64
-    marker: fake_
-    excerpt: ("fake_llm", "in_memory_db"),
-  - path: runtime/orchestration/modes.py
-    line: 84
-    marker: fake_
-    excerpt: ("fake_llm", "in_memory_db"),
-  - path: runtime/base_agent/base_agent_v2.py
-    line: 132
-    marker: raise NotImplemented
-    excerpt: raise NotImplementedError
-  - path: agents/conftest.py
-    line: 18
-    marker: placeholder
-    excerpt: Uses OpenAI provider with a placeholder key so the OpenAI SDK constructor
-  - path: agents/conftest.py
-    line: 20
-    marker: mock
-    excerpt: "that do not patch the client \u2014 tests that call act() must mock client_for."
-  - path: agents/conftest.py
-    line: 23
-    marker: placeholder
-    excerpt: monkeypatch.setenv("LLM_API_KEY", "test-placeholder-not-real")
-  - path: agents/ingestion_real.py
-    line: 6
-    marker: stub
-    excerpt: and database persistence. Replaces the stub ingestion/claim_extractor.py.
-  - path: agents/civilization_service.py
-    line: 408
-    marker: STUB
-    excerpt: '## Execution Summary (STUB = zero counts, not fabricated)'
-  - path: agents/civilization_service.py
-    line: 411
-    marker: stub
-    excerpt: '- Claims Extracted: {result.claims_extracted} (extraction stub not yet implemented)'
-  - path: agents/autonomy/specialist_agent.py
-    line: 485
-    marker: raise NotImplemented
-    excerpt: raise NotImplementedError(f"handle_action not implemented for {self.role}")
-  - path: reserve/oracle/oracle_layer.py
-    line: 20
-    marker: later
-    excerpt: are later overridden by stronger downstream sources suffer reputational cost.
-  - path: reserve/credentials/proof_of_calibration.py
-    line: 230
-    marker: placeholder
-    excerpt: 'hmac_sha256="",       # placeholder; filled below (legacy)'
-  - path: reserve/credentials/proof_of_calibration.py
-    line: 231
-    marker: placeholder
-    excerpt: 'ed25519_signature="", # placeholder; filled below'
+  no_stub: []
   no_simulation: []

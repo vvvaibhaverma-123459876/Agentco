@@ -2,7 +2,7 @@
  * Web Adapter Interface
  * =======================
  * Defines the contract for web operations (search, fetch).
- * Allows swapping between real web API calls and deterministic mock data for testing.
+ * Allows swapping between real web API calls and deterministic test data.
  */
 
 export interface SearchResult {

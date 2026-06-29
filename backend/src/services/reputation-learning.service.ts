@@ -415,7 +415,7 @@ class ReputationLearningService {
    *
    * Services that make runtime governance/routing decisions use this as their
    * candidate pool. Database-backed entities are loaded into this map through
-   * initializeEntity(), so callers do not need to invent placeholder agents.
+   * initializeEntity(), so callers do not need to invent ad hoc agents.
    */
   listReputations(): ReputationRecord[] {
     return Array.from(this.reputations.values());

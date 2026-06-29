@@ -1,18 +1,69 @@
 {
   "core_schema_status": "real",
   "core_tables_found": [
+    "agent_task_events",
+    "agent_tasks",
+    "autonomy_goals",
     "decision_log",
+    "departments",
+    "institution_specialist_assignments",
+    "institution_work_requests",
     "override_queue",
-    "prediction_ledger"
+    "prediction_ledger",
+    "specialist_allocation_history"
   ],
-  "detail": "existing schema accepted if required tables are present",
+  "detail": "existing schema accepted if required tables and columns are present",
   "migration_dependency_status": "real",
   "migration_runner": "ts-node src/db/migrate.ts",
+  "missing_columns": {},
+  "missing_tables": [],
   "postgres_connectivity": "real",
+  "required_columns": {
+    "autonomy_goals": [
+      "goal_depth",
+      "goal_path",
+      "id",
+      "institution_id",
+      "rollup_status"
+    ],
+    "departments": [
+      "authority_scope",
+      "entity_type",
+      "id",
+      "institution_id",
+      "metadata",
+      "parent_id"
+    ],
+    "institution_specialist_assignments": [
+      "department_id",
+      "id",
+      "institution_id",
+      "specialist_role"
+    ],
+    "institution_work_requests": [
+      "department_id",
+      "id",
+      "institution_id",
+      "status"
+    ],
+    "specialist_allocation_history": [
+      "department_id",
+      "id",
+      "specialist_role",
+      "work_request_id"
+    ]
+  },
   "required_tables": [
+    "agent_task_events",
+    "agent_tasks",
+    "autonomy_goals",
     "decision_log",
+    "departments",
+    "institution_specialist_assignments",
+    "institution_work_requests",
     "override_queue",
-    "prediction_ledger"
+    "prediction_ledger",
+    "specialist_allocation_history"
   ],
   "success": true
 }

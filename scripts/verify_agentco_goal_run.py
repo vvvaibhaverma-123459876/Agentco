@@ -10,6 +10,7 @@ import sys
 import time
 import urllib.request
 import uuid
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote, urlparse
 
@@ -17,6 +18,7 @@ from urllib.parse import quote, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 REPORT_DIR = ROOT / "reports" / "system_run" / "latest"
 DEFAULT_DB_URL = "postgresql://agentco:password@localhost:5432/agentco"
+_AUDIT_TIMESTAMP_COUNTER = 0
 
 
 SYNTHETIC_VENDOR_TASK = {
@@ -99,6 +101,13 @@ def canonical_audit_content(fields: dict) -> str:
     return json.dumps({key: fields[key] for key in order}, separators=(",", ":"))
 
 
+def next_audit_timestamp() -> str:
+    global _AUDIT_TIMESTAMP_COUNTER
+    _AUDIT_TIMESTAMP_COUNTER += 1
+    timestamp = datetime.now(timezone.utc) + timedelta(milliseconds=_AUDIT_TIMESTAMP_COUNTER)
+    return timestamp.isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
 def append_decision_log(cur, *, session_id: str, event_ids: list[str], report: dict) -> str:
     cur.execute(
         "select chain_hash from decision_log where chain_hash <> '' order by timestamp desc, log_id desc limit 1"
@@ -106,7 +115,7 @@ def append_decision_log(cur, *, session_id: str, event_ids: list[str], report: d
     row = cur.fetchone()
     prev_hash = row[0] if row else "0" * 64
     log_id = str(uuid.uuid4())
-    timestamp = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime())
+    timestamp = next_audit_timestamp()
     result = report["result"]
     fields = {
         "log_id": log_id,
