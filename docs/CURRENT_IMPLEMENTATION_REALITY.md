@@ -43,6 +43,16 @@ AgentCo is a runnable local-native research/runtime system with important produc
 - DB-enforced prediction-ledger resolution firewall.
 - Append-only memory promotion for resolved prediction lessons.
 
+## Latest Live OpenAI Evidence
+
+The latest live OpenAI + native Postgres verifier is documented in
+`reports/system_run/latest/LIVE_OPENAI_SYSTEM_BEHAVIOR_REPORT.md`.
+
+That run passed the current vendor-risk goal verifier with `mode=live_openai`,
+`simulated=false`, DB-backed prediction/audit/event writes, and resolution/scoring.
+It proves the narrow live verifier path works; it does not prove full production
+readiness, durable cross-domain transfer, or the complete civilization goal.
+
 ## Partial Or In Progress
 
 - Full L0-L14 architecture: `18/67` verified, many layers remain in progress.
