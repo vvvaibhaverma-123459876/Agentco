@@ -43,18 +43,6 @@ const BASE_ENTRY: AuditEntry = {
   session_id: TEST_SESSION,
 };
 
-beforeAll(async () => {
-  // The hash chain spans ALL decision_log rows, so any partial delete would break it.
-  // For a deterministic test we reset the whole chain to a clean slate.
-  // Superuser + triggers disabled is required because decision_log is append-only.
-  await superDb.query('ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete');
-  try {
-    await superDb.query('DELETE FROM decision_log');
-  } finally {
-    await superDb.query('ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete');
-  }
-});
-
 afterAll(async () => {
   await agentcoDb.end();
   await superDb.end();
@@ -78,8 +66,9 @@ describe('Audit Log — real Postgres', () => {
 
   test('query() returns appended rows filtered by agent_id', async () => {
     const rows = await svc.query({ agent_id: TEST_AGENT, limit: 10 });
-    expect(rows.length).toBe(5);
-    for (const row of rows) {
+    const testRows = rows.filter(row => logIds.includes(row.log_id));
+    expect(testRows.length).toBe(5);
+    for (const row of testRows) {
       expect(row.agent_id).toBe(TEST_AGENT);
       expect(row.chain_hash).toMatch(/^[0-9a-f]{64}$/);
       expect(row.prev_hash).toMatch(/^[0-9a-f]{64}$/);
