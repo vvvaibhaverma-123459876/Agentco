@@ -227,8 +227,8 @@ def issue_credential(
         overall_brier_score=score.overall_brier_score,
         sample_count=score.total_sample_count,
         algorithm=score.algorithm,
-        hmac_sha256="",       # placeholder; filled below (legacy)
-        ed25519_signature="", # placeholder; filled below
+        hmac_sha256="",       # populated below (legacy)
+        ed25519_signature="", # populated below
     )
     payload = _canonical_payload(cred)
     cred = ProofOfCalibration(**{

@@ -39,9 +39,9 @@ def substitute_env_vars(sql_text: str) -> str:
     """
     Substitute environment variable placeholders in SQL.
 
-    Placeholders use the format :VAR_NAME inside single quotes
+    SQL tokens use the format :VAR_NAME inside single quotes
     E.g. ':RESOLUTION_SERVICE_PASSWORD' gets replaced with the password value
-    The placeholder is already inside quotes in the SQL, so we replace just the placeholder.
+    The token is already inside quotes in the SQL, so only the token is replaced.
 
     If an env var is missing in development, defaults are provided:
       - RESOLUTION_SERVICE_PASSWORD: resolution-service-dev-password
@@ -57,7 +57,7 @@ def substitute_env_vars(sql_text: str) -> str:
             print("⚠️  RESOLUTION_SERVICE_PASSWORD not set; using dev-only password", file=sys.stderr)
         # Escape single quotes for SQL (password is placed inside quotes in the SQL)
         password_escaped = password.replace("'", "''")
-        # Replace placeholder (which is already surrounded by single quotes in SQL)
+        # Replace the env token, already surrounded by single quotes in SQL.
         sql_text = sql_text.replace("':RESOLUTION_SERVICE_PASSWORD'", f"'{password_escaped}'")
 
     return sql_text

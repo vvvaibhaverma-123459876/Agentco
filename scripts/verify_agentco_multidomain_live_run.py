@@ -15,6 +15,7 @@ try:
         canonical_audit_content,
         database_url,
         load_codex_env,
+        next_audit_timestamp,
         normalize_model_output,
         resolution_service_url,
     )
@@ -26,6 +27,7 @@ except ModuleNotFoundError:  # pragma: no cover - direct execution fallback
         canonical_audit_content,
         database_url,
         load_codex_env,
+        next_audit_timestamp,
         normalize_model_output,
         resolution_service_url,
     )
@@ -298,7 +300,7 @@ def append_decision_log(cur, *, session_id: str, event_ids: list[str], task: dic
     row = cur.fetchone()
     prev_hash = row[0] if row else "0" * 64
     log_id = str(uuid.uuid4())
-    timestamp = time.strftime("%Y-%m-%dT%H:%M:%S.000Z", time.gmtime())
+    timestamp = next_audit_timestamp()
     fields = {
         "log_id": log_id,
         "timestamp": timestamp,

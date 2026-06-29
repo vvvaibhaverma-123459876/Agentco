@@ -50,7 +50,7 @@ export class CrashRecoveryService {
   private readonly MAX_RETRY_DELAY_MS = 32000; // 32 seconds
 
   /**
-   * Save checkpoint at current step for later resumption
+   * Save checkpoint at current step for future resumption
    */
   async saveCheckpoint(
     taskId: string,

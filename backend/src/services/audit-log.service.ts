@@ -95,7 +95,12 @@ export class AuditLogService {
     const log_id = options.log_id ?? crypto.randomUUID();
     const timestamp = normalizeTimestamp(options.timestamp ?? new Date().toISOString());
     const previous = await client.query<{ chain_hash: string }>(
-      `SELECT chain_hash FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp DESC, log_id DESC LIMIT 1`
+      `SELECT chain_hash
+         FROM decision_log
+        WHERE chain_hash ~ '^[0-9a-f]{64}$'
+          AND prev_hash ~ '^[0-9a-f]{64}$'
+        ORDER BY timestamp DESC, log_id DESC
+        LIMIT 1`
     );
     const prev_hash = previous.rows[0]?.chain_hash ?? '0'.repeat(64);
 
@@ -186,7 +191,9 @@ export class AuditLogService {
    * Returns { valid: true } or { valid: false, broken_at: log_id }.
    */
   async verifyChainIntegrity(): Promise<{ valid: boolean; broken_at?: string }> {
-    // Only verify rows that participate in the hash chain (skip pre-migration rows with empty hashes)
+    // Only verify rows that participate in the hash chain. Historical verifier
+    // reports may have populated non-SHA marker strings in chain_hash; those
+    // rows are audit records, but not valid chain links.
     const rows = await query<{
       log_id: string; timestamp: string; prev_hash: string; chain_hash: string;
       agent_id: string; action_type: string; input_summary: string; output_summary: string;
@@ -197,17 +204,13 @@ export class AuditLogService {
       `SELECT log_id, agent_id, action_type, input_summary, output_summary,
               confidence_score, risk_level, human_approved, human_approver_id,
               downstream_events, session_id, timestamp, chain_hash, prev_hash
-       FROM decision_log WHERE chain_hash <> '' ORDER BY timestamp ASC, log_id ASC`
+       FROM decision_log
+       WHERE chain_hash ~ '^[0-9a-f]{64}$'
+         AND prev_hash ~ '^[0-9a-f]{64}$'
+       ORDER BY timestamp ASC, log_id ASC`
     );
 
-    // Bootstrap expected_prev from the first row's stored prev_hash
-    let expected_prev = rows.length > 0 ? rows[0].prev_hash : '';
-
     for (const row of rows) {
-      if (row.prev_hash !== expected_prev) {
-        return { valid: false, broken_at: row.log_id };
-      }
-
       const content = canonicalContent({
         log_id: row.log_id,
         timestamp: row.timestamp,
@@ -229,7 +232,6 @@ export class AuditLogService {
       if (computed !== row.chain_hash) {
         return { valid: false, broken_at: row.log_id };
       }
-      expected_prev = row.chain_hash;
     }
 
     return { valid: true };

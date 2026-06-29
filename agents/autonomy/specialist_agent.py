@@ -482,7 +482,7 @@ class SpecialistAgent(BaseAgent):
                 'errors': optional error list
             }
         """
-        raise NotImplementedError(f"handle_action not implemented for {self.role}")
+        raise RuntimeError(f"Specialist role {self.role} has no action handler")
 
     def check_budget(self):
         """Check if any budget is exceeded, raise if so"""

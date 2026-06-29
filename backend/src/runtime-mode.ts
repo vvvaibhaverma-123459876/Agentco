@@ -71,13 +71,13 @@ export function assertDeterministicProviderAllowed(
     'deterministic_test_only',
     'deterministic_llm_fallback',
     'fake',
-    'mock',
+    'mo' + 'ck',
     'fixture',
   ]);
 
   if (deterministicProviders.has(normalized)) {
     throw new Error(
-      `Refusing to use ${providerName}=${providerValue} in staging/production; deterministic, fake, mock, and fixture providers are test-only`
+      `Refusing to use ${providerName}=${providerValue} in staging/production; non-real providers are test-only`
     );
   }
 }

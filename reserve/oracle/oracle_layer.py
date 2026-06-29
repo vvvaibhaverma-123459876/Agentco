@@ -17,7 +17,7 @@ SELF-CORRECTION INVARIANT:
         standing_delta = -CONTRADICTION_PENALTY * A2
 
     This creates a self-correcting pressure: oracles who make resolutions that
-    are later overridden by stronger downstream sources suffer reputational cost.
+    are subsequently overridden by stronger downstream sources suffer reputational cost.
     An oracle cannot improve their standing by making resolutions that get
     contradicted — they can only hold or lose standing through oracle activity.
 
