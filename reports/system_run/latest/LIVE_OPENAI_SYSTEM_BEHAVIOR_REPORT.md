@@ -234,6 +234,52 @@ open-ended general intelligence.
 
 ## Remaining Verification Needed
 
-1. Prove that prediction lessons affect a later live run deterministically and safely.
-2. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
-3. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.
+## Memory Influence Follow-Up
+
+Commands:
+
+```bash
+python3.13 -m pytest tests/test_verify_memory_influence_live.py -q
+set -a
+source .codex.env
+set +a
+export DATABASE_URL="$AGENTCO_TEST_DATABASE_URL"
+python3.13 scripts/verify_memory_influence_live.py
+```
+
+Result:
+
+| Command | Result |
+|---|---|
+| `python3.13 -m pytest tests/test_verify_memory_influence_live.py -q` | Passed: `4 passed` |
+| `python3.13 scripts/verify_memory_influence_live.py` | Passed: `mode=live_openai`, `simulated=false`, score `1.0` |
+
+Source artifacts:
+
+- `reports/system_run/latest/memory_influence_verification.json`
+- `reports/system_run/latest/memory_influence_verification.md`
+
+Live memory-influence result:
+
+| Field | Value |
+|---|---|
+| Model | `gpt-4o-mini` |
+| Tokens | `453` |
+| Memory type | `prediction_lesson` |
+| Memories retrieved | `1` |
+| Memory access count | `1` |
+| Decision | `escalate` |
+| Confidence | `0.62` |
+
+Validation confirmed the memory context contained the generated lesson marker,
+the live model copied that marker, reported memory use, escalated, applied the
+confidence cap, and requested SOC 2 Type II, signed DPA, and subprocessor
+information.
+
+This proves bounded lesson reuse for one later live run. It still does not prove
+open-ended autonomous self-improvement or long-horizon capability growth.
+
+## Remaining Verification Needed
+
+1. Re-run Docker/Kafka/Redis/Vault/observability production smoke when those services are available.
+2. Continue closing `BUILD_LEDGER.yaml` items with real tests, not documentation claims.
