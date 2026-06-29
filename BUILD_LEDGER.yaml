@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-29T07:11:38Z'
+  last_updated: '2026-06-29T07:27:37Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -184,6 +184,7 @@ layers:
       - L3.EventLog
       artifacts:
       - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/db/migrations/082_resource_reservations.sql
       - backend/src/services/resource-ledger.service.ts
       - backend/src/routes/resource-ledger.routes.ts
       tests:
@@ -211,12 +212,23 @@ layers:
       notes: Reservations use two-phase reserve/settle/release with expiring holds, idempotent creation, row locks, and event_log
         plus decision_log audit for every state transition.
     - id: L2.SpendGuardrailIntegration
-      status: in_progress
+      status: verified
       depends_on:
       - L2.ResourceLedger
       artifacts:
       - runtime/base_agent/spend_guardrail.py
-      tests: []
+      - runtime/base_agent/spend_ledger.py
+      - runtime/base_agent/structured_output.py
+      - runtime/base_agent/base_agent_v2.py
+      tests:
+      - runtime/tests/test_spend_guardrail_ledger.py
+      - runtime/tests/test_config_driven_tiers.py
+      gates_passed:
+      - db_migration
+      - integration
+      - python
+      notes: SpendGuardrail can optionally enforce real L2 llm_tokens budget through Postgres-backed reservations when AGENTCO_SPEND_LEDGER_ENABLED=1.
+        Ledger mode fails closed on missing budget and releases holds on provider failure.
   L3_events_audit:
     status: in_progress
     items:
@@ -645,11 +657,11 @@ layers:
       tests: []
 rollups:
   total_items: 67
-  verified: 7
-  in_progress: 35
+  verified: 8
+  in_progress: 34
   not_started: 25
   blocked: 0
-  percent_verified: 10.45
+  percent_verified: 11.94
 gates:
   no_stub: red
   no_simulation: green

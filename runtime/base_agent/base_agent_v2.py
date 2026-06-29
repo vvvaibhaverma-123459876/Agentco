@@ -108,7 +108,7 @@ class BaseAgentV2:
         self.output_schema: dict = {}   # subclasses set this to enforce structured output shape
 
         # Spend guardrail — halts LLM calls if token/rate cap exceeded
-        self._spend = SpendGuardrail(agent_id=agent_id, escalation=self._gate)
+        self._spend = SpendGuardrail(agent_id=agent_id, model_name=self._model, escalation=self._gate)
 
         # Experiential memory is optional and non-blocking. It enriches prompts
         # only when the append-only memory schema is available.
