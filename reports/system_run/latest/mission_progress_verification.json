@@ -1,0 +1,89 @@
+{
+  "claims": [
+    {
+      "evidence": [
+        "build ledger verified=67/67",
+        "termination_predicate_met=True",
+        "non_green_gates=[]"
+      ],
+      "name": "evidence_governed_calibration_civilization",
+      "required_next_evidence": [],
+      "status": "verified",
+      "summary": "Build-ledger architecture is complete with green safety gates."
+    },
+    {
+      "evidence": [
+        "successful_longitudinal_runs=0",
+        "timespan_days=0",
+        "improving_trend=False"
+      ],
+      "name": "progressively_more_general_intelligence_over_long_horizons",
+      "required_next_evidence": [
+        "Persist a longitudinal mission-run registry with at least 10 successful real runs.",
+        "Cover at least 30 calendar days.",
+        "Show statistically meaningful improvement across held-out domains without lowering safety gates."
+      ],
+      "status": "unproven",
+      "summary": "No sufficient longitudinal evidence yet for progressive general intelligence."
+    },
+    {
+      "evidence": [
+        "memory_influence_live_success=True",
+        "vca_promotion_mechanism_verified=True",
+        "repeated_real_world_runs=0"
+      ],
+      "name": "durable_autonomous_improvement_from_repeated_real_world_operation",
+      "required_next_evidence": [
+        "Run at least 3 real-world improvement cycles where a prior lesson/skill measurably improves later performance.",
+        "Persist before/after scores, promotion proof, rollback/canary result, and event-log lineage for each cycle."
+      ],
+      "status": "partial",
+      "summary": "Mechanisms exist, but repeated real-world autonomous improvement is not yet proven."
+    },
+    {
+      "evidence": [
+        "live_cross_domain_success=True",
+        "simulated=False",
+        "domain_count=4",
+        "bounded_not_gi_flag=True"
+      ],
+      "name": "broad_open_domain_transfer_beyond_bounded_verifiers",
+      "required_next_evidence": [
+        "Run live held-out domains selected after the verifier is written.",
+        "Use at least 12 domains with unseen task schemas and independent evidence sources.",
+        "Remove the bounded-verifier limitation only after independent adjudication."
+      ],
+      "status": "partial",
+      "summary": "Current cross-domain evidence is bounded and should not be read as open-domain transfer."
+    },
+    {
+      "evidence": [
+        "local_production_posture_can_continue=True",
+        "release_gates_green=True",
+        "hosted_production_certification=False"
+      ],
+      "name": "hosted_production_operations_certification",
+      "required_next_evidence": [
+        "Record hosted deployment environment identity and release artifact.",
+        "Verify SLO dashboards, alert routing, backup/restore, DR runbook, and incident response.",
+        "Run production smoke/load/security gates against hosted production or staging with production-equivalent controls."
+      ],
+      "status": "partial",
+      "summary": "Local production posture is not the same as hosted production operations certification."
+    }
+  ],
+  "generated_at": "2026-06-30T15:33:22Z",
+  "mission": "AgentCo exists to evolve into progressively more general intelligence by operating as an evidence-governed, calibration-driven AI civilization that learns continuously, improves itself safely, and expands its capability across domains over time.",
+  "summary": {
+    "mission_fully_proven": false,
+    "statuses": {
+      "broad_open_domain_transfer_beyond_bounded_verifiers": "partial",
+      "durable_autonomous_improvement_from_repeated_real_world_operation": "partial",
+      "evidence_governed_calibration_civilization": "verified",
+      "hosted_production_operations_certification": "partial",
+      "progressively_more_general_intelligence_over_long_horizons": "unproven"
+    },
+    "total_claims": 5,
+    "verified_claims": 1
+  }
+}

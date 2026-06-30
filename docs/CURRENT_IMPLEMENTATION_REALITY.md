@@ -64,6 +64,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 | L6 proof of competence | Passed threshold-gated proof minting for registered skill regressions with canonical proof hashes |
 | L13 capability expansion gate | Passed active-domain/current-skill/proof-required expansion approval with generality metric updates |
 | VCA promotion loop | Passed protected-surface scan, competence proof, capability expansion approval, and idempotent promotion persistence |
+| Mission progress evidence gate | Passed current evidence aggregation while preserving unproven/partial status for long-horizon generality, repeated real-world improvement, broad open-domain transfer, and hosted production certification |
 | Production | Not certified |
 | Full civilization goal | Build-ledger complete; production run still depends on live infrastructure and deployment operations |
 
@@ -167,6 +168,13 @@ a later live OpenAI prompt, and validates that the model copies the lesson
 marker, escalates, and applies the confidence cap. This proves bounded lesson
 reuse for one fixture, not open-ended autonomous self-improvement.
 
+The latest mission progress verifier is documented in
+`reports/system_run/latest/mission_progress_verification.md`. It ties the project
+mission to explicit evidence claims and intentionally keeps long-horizon
+generality, repeated real-world autonomous improvement, broad open-domain
+transfer, and hosted production operations as partial/unproven until the required
+longitudinal or hosted evidence exists.
+
 The latest Docker production-infrastructure smoke is documented in
 `reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`. On 2026-06-30,
 Docker Desktop was started, `.env.production.local` was loaded, production
@@ -220,6 +228,13 @@ Release gate check:
 ```bash
 make release-gates
 python3.13 -m pytest tests/test_verify_release_gates.py reserve/tests/test_key_independence_safe.py -q
+```
+
+Mission progress evidence check:
+
+```bash
+make mission-progress
+python3.13 -m pytest tests/test_verify_mission_progress.py -q
 ```
 
 Focused current civilization slice:
