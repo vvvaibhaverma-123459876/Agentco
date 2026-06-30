@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-30  
 **Branch:** `main`  
-**Commit before this report:** `bea00fbf7040fccea80120f3a866d78a6f7f88a9`
+**Commit before this report:** `48899c54011ae35513641b6ccefde7551ae5948d`
 
 ## Command
 
@@ -10,22 +10,24 @@
 make docker-production-smoke
 ```
 
-Exit code: `2`
+Exit code: `0`
 
 ## Result
 
-The smoke could not start or reuse Docker/Compose infrastructure because the
-Docker daemon socket was not reachable:
+Docker Desktop was started, then the smoke was run with `.env.production.local`
+loaded. Docker/Compose infrastructure started or was already running, and the
+production posture gate returned `can_continue=true`.
 
-```text
-unable to get image 'postgres:16-alpine': failed to connect to the docker API
-at unix:///Users/Zet/.docker/run/docker.sock: connect: no such file or directory
-```
-
-After loading `.env.production.local`, `scripts/verify_production_posture.py`
-was rerun directly. Production secrets were present and suppressed, but the
-runtime infrastructure probes failed because Docker/Compose services were not
-running.
+| Service | Status |
+|---|---|
+| Postgres | running, healthy |
+| Redis | running, healthy |
+| Zookeeper | running, healthy |
+| Kafka | running, TCP reachable |
+| Vault | running, healthy |
+| Prometheus | running, healthy |
+| Grafana | running, healthy |
+| OTel collector | running |
 
 ## Production Posture Blockers
 
@@ -42,18 +44,19 @@ Source artifact: `reports/system_run/latest/production_posture_verification.json
 | `VAULT_TOKEN` | real | present; value suppressed |
 | `SPECIALIST_SHARED_SECRET` | real | present; value suppressed |
 | `postgres` | real | tcp reachable at localhost:5432 |
-| `redis` | blocked | tcp unavailable at localhost:6379 |
-| `kafka` | blocked | tcp unavailable at localhost:9092 |
-| `vault` | blocked | tcp unavailable at localhost:8200 |
-| `prometheus` | blocked | tcp unavailable at localhost:9090 |
-| `grafana` | blocked | tcp unavailable at localhost:3005 |
-| `docker_compose` | blocked | docker compose is unavailable or project is not running |
+| `redis` | real | tcp reachable at localhost:6379 |
+| `kafka` | real | tcp reachable at localhost:9092 |
+| `vault` | real | tcp reachable at localhost:8200 |
+| `prometheus` | real | tcp reachable at localhost:9090 |
+| `grafana` | real | tcp reachable at localhost:3005 |
+| `docker_compose` | real | docker compose responded |
 
 ## Verdict
 
-AgentCo is not currently runnable as a real-world production smoke in this local
-environment because Docker/Compose infrastructure is down. This is an external
-runtime-state blocker, not a missing-secret blocker and not a code-path success.
+AgentCo currently passes the local Docker production-infrastructure smoke with
+real local services reachable and production secrets present outside git.
 
-The desired safety behavior held: the production posture gate failed closed and
-did not print secret values.
+This is a local production-posture smoke, not a certification of hosted
+production operations. The desired safety behavior held: the verifier did not
+print secret values and would fail closed if required services or secrets were
+missing.

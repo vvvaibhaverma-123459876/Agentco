@@ -21,7 +21,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 | Local observability compose | Compose config validates; Prometheus, Grafana, and OTel bind sources exist |
 | Durable standalone smoke | Shared runtime shutdown closes Kafka producer state and DB pool; smoke exits after attested task |
 | Validation connector evidence | Live endpoint success is `EXTERNAL-VALIDATED`; configured failures are `LIVE-UNAVAILABLE`; unconfigured CI remains `FIXTURE` |
-| Full Docker startup | Previously passed locally via `make docker-startup-verify`; current Docker daemon is not reachable in the latest production smoke |
+| Full Docker startup | Passed locally via `make docker-production-smoke`; Postgres, Redis, Kafka, Vault, Prometheus, Grafana, and Docker Compose probes passed |
 | Native migration verifier | Passed with runtime-critical task and civilization-routing schema checks |
 | Civilization vertical slice | Passed live local slice with Postgres, Kafka, OpenAI chat/embeddings, `resolution_service`, Reserve recomputation, memory promotion, learner candidate, and coordinator tick |
 | Backend L14 runtime tick | Passed focused backend route/service tests; coordinator exposes graph/tick API routes and persists a core service-graph tick to Postgres |
@@ -169,16 +169,16 @@ reuse for one fixture, not open-ended autonomous self-improvement.
 
 The latest Docker production-infrastructure smoke is documented in
 `reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`. On 2026-06-30,
-real production secrets were present in the local production env, but the Docker
-daemon was not reachable and Redis/Kafka/Vault/Prometheus/Grafana TCP probes were
-down. The production posture gate correctly failed closed with
-`can_continue=false`.
+Docker Desktop was started, `.env.production.local` was loaded, production
+secrets were present with values suppressed, and Postgres, Redis, Kafka, Vault,
+Prometheus, Grafana, and Docker Compose probes passed. The posture gate returned
+`can_continue=true`.
 
 ## Partial Or In Progress
 
 - Full L0-L14 build ledger: `67/67` verified; current work shifts from build completion to production operation hardening.
 - Source independence scoring and Python independence tests are verified in the current ledger through deterministic source discovery and Gate 2 evidence-kernel tests, but broader live-source diversity remains an operational measurement target.
-- Production observability stack, Vault, Kafka, Redis, and Docker services have passed prior local startup verification, but the latest production posture report is blocked because Docker/compose services are not currently running.
+- Production observability stack, Vault, Kafka, Redis, and Docker services pass the latest local production posture smoke; hosted production operations still require deployment-specific SLO, backup, DR, and monitoring evidence.
 - Cross-domain transfer has a bounded live verifier and deterministic smoke benchmark, but it is not a demonstrated general-intelligence metric.
 - Continuous learning has bounded live lesson-reuse verification, but not long-horizon autonomous improvement measurement.
 - Some older services are implemented but not yet proven through the current canonical coordinator path.

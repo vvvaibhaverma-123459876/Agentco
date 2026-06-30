@@ -1,6 +1,6 @@
 {
   "mode": "production_posture",
-  "can_continue": false,
+  "can_continue": true,
   "checks": [
     {
       "name": "AGENTCO_API_KEY",
@@ -49,73 +49,35 @@
     },
     {
       "name": "redis",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:6379: ConnectionRefusedError"
+      "status": "real",
+      "detail": "tcp reachable at localhost:6379"
     },
     {
       "name": "kafka",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:9092: ConnectionRefusedError"
+      "status": "real",
+      "detail": "tcp reachable at localhost:9092"
     },
     {
       "name": "vault",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:8200: ConnectionRefusedError"
+      "status": "real",
+      "detail": "tcp reachable at localhost:8200"
     },
     {
       "name": "prometheus",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:9090: ConnectionRefusedError"
+      "status": "real",
+      "detail": "tcp reachable at localhost:9090"
     },
     {
       "name": "grafana",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:3005: ConnectionRefusedError"
+      "status": "real",
+      "detail": "tcp reachable at localhost:3005"
     },
     {
       "name": "docker_compose",
-      "status": "blocked",
-      "detail": "docker compose is unavailable or project is not running"
+      "status": "real",
+      "detail": "docker compose responded"
     }
   ],
-  "blocked": [
-    {
-      "name": "redis",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:6379: ConnectionRefusedError"
-    },
-    {
-      "name": "kafka",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:9092: ConnectionRefusedError"
-    },
-    {
-      "name": "vault",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:8200: ConnectionRefusedError"
-    },
-    {
-      "name": "prometheus",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:9090: ConnectionRefusedError"
-    },
-    {
-      "name": "grafana",
-      "status": "blocked",
-      "detail": "tcp unavailable at localhost:3005: ConnectionRefusedError"
-    },
-    {
-      "name": "docker_compose",
-      "status": "blocked",
-      "detail": "docker compose is unavailable or project is not running"
-    }
-  ],
-  "required_fixes": [
-    "redis: tcp unavailable at localhost:6379: ConnectionRefusedError",
-    "kafka: tcp unavailable at localhost:9092: ConnectionRefusedError",
-    "vault: tcp unavailable at localhost:8200: ConnectionRefusedError",
-    "prometheus: tcp unavailable at localhost:9090: ConnectionRefusedError",
-    "grafana: tcp unavailable at localhost:3005: ConnectionRefusedError",
-    "docker_compose: docker compose is unavailable or project is not running"
-  ]
+  "blocked": [],
+  "required_fixes": []
 }
