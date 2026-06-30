@@ -1,14 +1,14 @@
 # Current Implementation Reality
 
 **Date:** 2026-06-30  
-**Branch:** `fix/runtime-integrity-and-production-honesty`  
-**Current build-ledger status:** `58/67 verified (86.57%)`
+**Branch:** `main`  
+**Current build-ledger status:** `67/67 verified (100.0%)`
 
 This document supersedes older completion/prod-readiness claims when they conflict with current tests, `BUILD_LEDGER.yaml`, or reports under `reports/system_run/latest/`.
 
 ## Verdict
 
-AgentCo is a runnable local-native research/runtime system with important production guards, not a certified production deployment.
+AgentCo is a runnable local-native research/runtime system with all current build-ledger items verified. It is not a certified production deployment until a real production environment is continuously available and the production posture gate is green at run time.
 
 | Verdict area | Status |
 |---|---|
@@ -16,12 +16,12 @@ AgentCo is a runnable local-native research/runtime system with important produc
 | Local native | Runnable with native Postgres |
 | Backend default tier | Passed: `42` suites, `287` tests |
 | No-stub/no-simulation ledger gates | Green: `0` findings in both gates |
-| Release safety gates | Firewall, sandbox breach, and credential key-independence green; reachability is partial |
+| Release safety gates | Firewall, sandbox breach, credential key-independence, and reachability green |
 | Dependency audit | Backend and frontend npm audits report `0 vulnerabilities` |
 | Local observability compose | Compose config validates; Prometheus, Grafana, and OTel bind sources exist |
 | Durable standalone smoke | Shared runtime shutdown closes Kafka producer state and DB pool; smoke exits after attested task |
 | Validation connector evidence | Live endpoint success is `EXTERNAL-VALIDATED`; configured failures are `LIVE-UNAVAILABLE`; unconfigured CI remains `FIXTURE` |
-| Full Docker startup | Passed locally via `make docker-startup-verify`; Postgres, Redis, Kafka, Vault TCP, Prometheus, Grafana, and OTel collector probes passed |
+| Full Docker startup | Previously passed locally via `make docker-startup-verify`; current Docker daemon is not reachable in the latest production smoke |
 | Native migration verifier | Passed with runtime-critical task and civilization-routing schema checks |
 | Civilization vertical slice | Passed live local slice with Postgres, Kafka, OpenAI chat/embeddings, `resolution_service`, Reserve recomputation, memory promotion, learner candidate, and coordinator tick |
 | Backend L14 runtime tick | Passed focused backend route/service tests; coordinator exposes graph/tick API routes and persists a core service-graph tick to Postgres |
@@ -59,8 +59,13 @@ AgentCo is a runnable local-native research/runtime system with important produc
 | L6 commitment chain | Passed append-only prediction-chain log, chain-head recomputation, and tamper-divergence checks |
 | L7 citizen runtime | Passed BaseAgentV2 contract, trusted-confidence, human-approval, DB resource-ledger spend, Reserve credential, and dispatch E2E checks |
 | L7 role separation | Passed role-derived authority-chain decisions, protected RBAC/policy surface blocks, ConfigAgent self-modification blocks, and tool-denial audit checks |
+| L11 conflict judiciary | Passed contradiction dispute opening, ruling issuance, duplicate-ruling blocking, precedent storage/lookup, and event-log/outbox provenance |
+| L12 skill library | Passed versioned skill registration from simulation-trained learner candidates with generated regression coverage |
+| L6 proof of competence | Passed threshold-gated proof minting for registered skill regressions with canonical proof hashes |
+| L13 capability expansion gate | Passed active-domain/current-skill/proof-required expansion approval with generality metric updates |
+| VCA promotion loop | Passed protected-surface scan, competence proof, capability expansion approval, and idempotent promotion persistence |
 | Production | Not certified |
-| Full civilization goal | In progress |
+| Full civilization goal | Build-ledger complete; production run still depends on live infrastructure and deployment operations |
 
 ## Verified Since Runtime-Integrity Work
 
@@ -163,21 +168,22 @@ marker, escalates, and applies the confidence cap. This proves bounded lesson
 reuse for one fixture, not open-ended autonomous self-improvement.
 
 The latest Docker production-infrastructure smoke is documented in
-`reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`. Docker, Postgres,
-Redis, Kafka, Vault, Prometheus, and Grafana were reachable/healthy, but the
-production posture gate correctly failed closed because production secrets were
-not configured.
+`reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`. On 2026-06-30,
+real production secrets were present in the local production env, but the Docker
+daemon was not reachable and Redis/Kafka/Vault/Prometheus/Grafana TCP probes were
+down. The production posture gate correctly failed closed with
+`can_continue=false`.
 
 ## Partial Or In Progress
 
-- Full L0-L14 architecture: `45/67` verified, many layers remain in progress.
-- Source independence scoring and Python independence tests need reconciliation with current actor model.
-- Production observability stack, Vault, Kafka, Redis, and Docker services are locally startup-verified, but production posture is still blocked by missing deployment secrets.
+- Full L0-L14 build ledger: `67/67` verified; current work shifts from build completion to production operation hardening.
+- Source independence scoring and Python independence tests are verified in the current ledger through deterministic source discovery and Gate 2 evidence-kernel tests, but broader live-source diversity remains an operational measurement target.
+- Production observability stack, Vault, Kafka, Redis, and Docker services have passed prior local startup verification, but the latest production posture report is blocked because Docker/compose services are not currently running.
 - Cross-domain transfer has a bounded live verifier and deterministic smoke benchmark, but it is not a demonstrated general-intelligence metric.
 - Continuous learning has bounded live lesson-reuse verification, but not long-horizon autonomous improvement measurement.
 - Some older services are implemented but not yet proven through the current canonical coordinator path.
-- Reachability is still partial at the release-gate level: the expanded L14 graph verifies required tables and route declarations across the core L0-L14 runtime graph, but it does not prove every internal service behavior or every disabled/legacy route.
-- The canonical civilization vertical slice and L14 reachability graph are verified, but full L0-L14 civilization integration is not complete: the repo still lacks durable multi-society runtime traces and full behavior-level proof across every implemented layer.
+- Release-gate reachability is green for required backend route clusters and L14 runtime reachability endpoints; it still does not prove every disabled/legacy route or every internal behavior path.
+- The canonical civilization vertical slice and L14 reachability graph are verified, but long-running production behavior still needs durable multi-society runtime traces and repeated operational evidence.
 
 ## Unsupported Or Future
 

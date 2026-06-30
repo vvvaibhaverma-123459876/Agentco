@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-30T15:09:01Z'
+  last_updated: '2026-06-30T15:24:55Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -52,8 +52,9 @@ layers:
       gates_passed:
       - unit
       - production_posture
-      notes: Production posture verifier fails closed for missing/dev secrets and now passes against the local production-run
-        environment with real service sockets, minted Vault token, and suppressed secret values.
+      notes: Production posture verifier fails closed for missing/dev secrets, suppresses secret values in reports, and checks
+        live service sockets plus Docker Compose availability so transient local infrastructure outages block real-world runs
+        instead of being treated as code success.
     - id: L0.BuildLedgerTooling
       status: verified
       depends_on: []

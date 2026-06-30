@@ -1,8 +1,8 @@
 # Production Infrastructure Smoke Report
 
-**Date:** 2026-06-29  
-**Branch:** `fix/runtime-integrity-and-production-honesty`  
-**Commit before this report:** `1e21ce4d132a7fc6c0e761464621ade922490045`
+**Date:** 2026-06-30  
+**Branch:** `main`  
+**Commit before this report:** `bea00fbf7040fccea80120f3a866d78a6f7f88a9`
 
 ## Command
 
@@ -14,21 +14,18 @@ Exit code: `2`
 
 ## Result
 
-The Docker/Compose infrastructure services started or were already running and
-reported healthy:
+The smoke could not start or reuse Docker/Compose infrastructure because the
+Docker daemon socket was not reachable:
 
-| Service | Status |
-|---|---|
-| Postgres | healthy |
-| Redis | healthy |
-| Zookeeper | healthy |
-| Kafka | healthy |
-| Vault | healthy |
-| Prometheus | healthy |
-| Grafana | healthy |
+```text
+unable to get image 'postgres:16-alpine': failed to connect to the docker API
+at unix:///Users/Zet/.docker/run/docker.sock: connect: no such file or directory
+```
 
-The target still failed because `scripts/verify_production_posture.py` correctly
-returned `can_continue=false`.
+After loading `.env.production.local`, `scripts/verify_production_posture.py`
+was rerun directly. Production secrets were present and suppressed, but the
+runtime infrastructure probes failed because Docker/Compose services were not
+running.
 
 ## Production Posture Blockers
 
@@ -36,20 +33,27 @@ Source artifact: `reports/system_run/latest/production_posture_verification.json
 
 | Check | Status | Detail |
 |---|---|---|
-| `AGENTCO_API_KEY` | blocked | missing required production secret |
-| `JWT_SECRET` | blocked | missing required production secret |
-| `EVENT_BUS_SIGNING_KEY` | blocked | missing required production secret |
-| `EVENT_BUS_HMAC_KEY` | blocked | missing required production secret |
-| `DATABASE_URL` | blocked | missing required production secret |
-| `VAULT_ADDR` | blocked | missing required production secret |
-| `VAULT_TOKEN` | blocked | missing required production secret |
-| `SPECIALIST_SHARED_SECRET` | blocked | missing required production secret |
+| `AGENTCO_API_KEY` | real | present; value suppressed |
+| `JWT_SECRET` | real | present; value suppressed |
+| `EVENT_BUS_SIGNING_KEY` | real | present; value suppressed |
+| `EVENT_BUS_HMAC_KEY` | real | present; value suppressed |
+| `DATABASE_URL` | real | present; value suppressed |
+| `VAULT_ADDR` | real | present; value suppressed |
+| `VAULT_TOKEN` | real | present; value suppressed |
+| `SPECIALIST_SHARED_SECRET` | real | present; value suppressed |
+| `postgres` | real | tcp reachable at localhost:5432 |
+| `redis` | blocked | tcp unavailable at localhost:6379 |
+| `kafka` | blocked | tcp unavailable at localhost:9092 |
+| `vault` | blocked | tcp unavailable at localhost:8200 |
+| `prometheus` | blocked | tcp unavailable at localhost:9090 |
+| `grafana` | blocked | tcp unavailable at localhost:3005 |
+| `docker_compose` | blocked | docker compose is unavailable or project is not running |
 
 ## Verdict
 
-Docker/Kafka/Redis/Vault/Prometheus/Grafana are locally reachable as real
-services in this run. AgentCo is still not production-runnable because the
-production posture gate fails closed on missing production secrets.
+AgentCo is not currently runnable as a real-world production smoke in this local
+environment because Docker/Compose infrastructure is down. This is an external
+runtime-state blocker, not a missing-secret blocker and not a code-path success.
 
-This is the desired safety behavior. It is not a runtime bug and should not be
-worked around with fake or default production secrets.
+The desired safety behavior held: the production posture gate failed closed and
+did not print secret values.
