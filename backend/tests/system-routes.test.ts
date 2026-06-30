@@ -11,6 +11,24 @@ describe('system routes', () => {
     expect(runtime.json()).toHaveProperty('runtime_mode');
     expect(capabilities.statusCode).toBe(200);
     expect(capabilities.json()).toHaveProperty('providers');
+    expect(capabilities.json()).toHaveProperty('production_contract');
+    expect(capabilities.json()).toHaveProperty('feature_gates');
+    await app.close();
+  });
+
+  test('reports feature gate decisions', async () => {
+    const app = await build();
+
+    const response = await app.inject({ method: 'GET', url: '/system/feature-gates' });
+    const body = response.json();
+
+    expect(response.statusCode).toBe(200);
+    expect(body.runtime_mode).toBeDefined();
+    expect(body.production_contract).toBeDefined();
+    expect(body.feature_gates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'live_llm' }),
+      expect.objectContaining({ name: 'civilization_scheduler' }),
+    ]));
     await app.close();
   });
 
@@ -41,6 +59,10 @@ describe('system routes', () => {
     expect(body.termination_predicate_met).toBe(false);
     expect(body.honesty.status).toBe('not_fully_verified');
     expect(body.build_ledger.total_items).toBeGreaterThan(0);
+    expect(body.production_contract.satisfied).toBe(false);
+    expect(body.feature_gates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'simulated_data' }),
+    ]));
     await app.close();
   });
 });

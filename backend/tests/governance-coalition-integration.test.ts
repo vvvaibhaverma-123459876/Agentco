@@ -6,6 +6,7 @@
 import { ReputationLearningService } from '../src/services/reputation-learning.service';
 import { GovernanceReputationIntegrationService } from '../src/services/governance-reputation-integration.service';
 import { CoalitionFormationService } from '../src/services/coalition-formation.service';
+import { db } from '../src/db/client';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('Governance-Reputation & Coalition Formation Integration', () => {
@@ -97,6 +98,54 @@ describe('Governance-Reputation & Coalition Formation Integration', () => {
       expect(['approved', 'rejected', 'deferred']).toContain(decision.decision);
       expect(decision.weighted_score).toBeGreaterThanOrEqual(0);
       expect(decision.weighted_score).toBeLessThanOrEqual(1);
+
+      const persistedVotes = await db.query(
+        `SELECT vote, COUNT(*)::int AS count
+           FROM governance_reputation_votes
+          WHERE proposal_id = $1
+          GROUP BY vote`,
+        [testProposalId]
+      );
+      expect(persistedVotes.rows.reduce((sum, row) => sum + row.count, 0)).toBe(3);
+
+      const governanceAudit = await db.query(
+        `SELECT action, new_vote
+           FROM governance_reputation_audit
+          WHERE proposal_id = $1`,
+        [testProposalId]
+      );
+      expect(governanceAudit.rows).toHaveLength(3);
+      expect(governanceAudit.rows.map((row) => row.action)).toEqual(expect.arrayContaining(['vote_cast']));
+
+      const persistedDecision = await db.query(
+        `SELECT decision_id, decision, vote_count, weighted_score
+           FROM governance_reputation_decisions
+          WHERE decision_id = $1`,
+        [decision.decision_id]
+      );
+      expect(persistedDecision.rows).toEqual([
+        expect.objectContaining({
+          decision_id: decision.decision_id,
+          decision: decision.decision,
+          vote_count: 3,
+        }),
+      ]);
+
+      const auditLogRows = await db.query(
+        `SELECT action_type, session_id, output_summary
+           FROM decision_log
+          WHERE session_id = $1
+          ORDER BY timestamp ASC`,
+        [testProposalId]
+      );
+      expect(auditLogRows.rows.length).toBeGreaterThanOrEqual(4);
+      expect(auditLogRows.rows).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          action_type: 'decision',
+          session_id: testProposalId,
+          output_summary: expect.stringContaining('approval'),
+        }),
+      ]));
     });
 
     it('should check proposal authority based on innovation score', async () => {

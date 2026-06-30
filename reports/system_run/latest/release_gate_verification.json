@@ -1,0 +1,164 @@
+{
+  "checks": {
+    "credential_key_independence": {
+      "command": "/Users/Zet/anaconda3/bin/python3.13 -m pytest reserve/tests/test_ed25519_signing.py reserve/tests/test_key_independence_safe.py -q",
+      "exit_code": 0,
+      "output_tail": "......                                                                   [100%]\n6 passed in 0.08s\n/Users/Zet/anaconda3/lib/python3.13/site-packages/pytest_asyncio/plugin.py:299: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))",
+      "status": "passed"
+    },
+    "firewall": {
+      "command": "/Users/Zet/anaconda3/bin/python3.13 -m pytest calibration/tests/test_ledger_immutability.py::TestFirewall -q",
+      "exit_code": 0,
+      "output_tail": "..........                                                               [100%]\n10 passed in 0.06s\n/Users/Zet/anaconda3/lib/python3.13/site-packages/pytest_asyncio/plugin.py:299: PytestDeprecationWarning: The configuration option \"asyncio_default_fixture_loop_scope\" is unset.\nThe event loop scope for asynchronous fixtures will default to the \"fixture\" caching scope. Future versions of pytest-asyncio will default the loop scope for asynchronous fixtures to \"function\" scope. Set the default fixture loop scope explicitly in order to avoid unexpected behavior in the future. Valid fixture loop scopes are: \"function\", \"class\", \"module\", \"package\", \"session\"\n\n  warnings.warn(PytestDeprecationWarning(_DEFAULT_FIXTURE_LOOP_SCOPE_UNSET))",
+      "status": "passed"
+    },
+    "sandbox_breach": {
+      "command": "/Users/Zet/anaconda3/bin/python3.13 selfcoding/tests/test_wall_holds.py",
+      "exit_code": 0,
+      "output_tail": "================================================================================\nADVERSARIAL BREACH TEST SUITE\n================================================================================\n\nAll breach attempts MUST fail. Any success = wall is broken.\n\n\n\u2713 PASS: Data Breach: Overwrite frozen data\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: NameError\n       Error: name 'open' is not defined\n\n\u2713 PASS: Data Breach: Append to frozen data\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: NameError\n       Error: name 'open' is not defined\n\n\u2713 PASS: Data Breach: Create files in frozen data dir\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: NameError\n       Error: name 'open' is not defined\n\n\u2713 PASS: Resolver Breach: Import SealedResolver class\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: ImportError\n       Error: __import__ not found\n\n\u2713 PASS: Resolver Breach: Introspect score_prediction source\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: ImportError\n       Error: __import__ not found\n\n\u2713 PASS: Escape Breach: Use subprocess\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: ImportError\n       Error: __import__ not found\n\n\u2713 PASS: Escape Breach: Use os module\n       (Expected: breach blocked or ineffective)\n       Breach: False, Blocked by: ImportError\n       Error: __import__ not found\n\n\u2713 PASS: Answer Breach: Reverse-engineer resolver logic\n       (Expected: should succeed)\n       Result: {'reverse_engineered': False}\n\n\u2713 PASS: Answer Breach: Smuggle precomputed answers\n       (Expected: should succeed)\n       Breach: False, Blocked by: ValueError\n       Error: predicted_direction must be 'up' or 'down', got: precomputed_answer\n\n\u2713 PASS: Answer Breach: Modify resolver behavior\n       (Expected: should succeed)\n       Breach: False, Blocked by: N/A\n\n\u2713 PASS: Valid Usage: Call score_prediction normally\n       (Expected: should succeed)\n       Result: {'prediction_date': '2024-10-21', 'resolution_date': '2024-10-22', 'instrument': 'NIFTY 50', 'predicted_direction': 'down', 'confidence': 0.75, 'actual_open': 24956.150390625, 'actual_close': 24472.099609375, 'actual_direction': 'down', 'hit': True, 'score': 0.75, 'timestamp': '2026-06-30T09:07:48.033510+00:00'}\n\n\u2713 PASS: Valid Usage: Read data via resolver\n       (Expected: should succeed)\n       Result: {'predictions_scored': 6, 'sample': {'prediction_date': '2024-10-21', 'resolution_date': '2024-10-22', 'instrument': 'NIFTY 50', 'predicted_direction': 'up', 'confidence': 0.5, 'actual_open': 24956.150390625, 'actual_close': 24472.099609375, 'actual_direction': 'down', 'hit': False, 'score': -0.5, 'timestamp': '2026-06-30T09:07:48.034599+00:00'}}\n\n================================================================================\nRESULTS: 12/12 tests passed\n================================================================================\n\u2713 WALL HOLDS: All breach attempts failed as expected",
+      "status": "passed"
+    }
+  },
+  "gates": {
+    "credential_key_independence": "green",
+    "firewall": "green",
+    "reachability": "partial",
+    "sandbox_breach": "green"
+  },
+  "generated_at": "2026-06-30T09:07:48Z",
+  "reachability": {
+    "honesty_note": "This proves enabled backend route clusters and the core L14 runtime reachability endpoints are registered. It does not prove full L14 coordinator reachability for every internal service.",
+    "missing_from_server": [],
+    "missing_runtime_endpoints": [],
+    "passed": true,
+    "registered_route_files": [
+      "agents.routes.ts",
+      "audit.routes.ts",
+      "autonomy-dashboard.routes.ts",
+      "autonomy-orchestrator.routes.ts",
+      "autonomy-tasks.routes.ts",
+      "civilization-governance.routes.ts",
+      "credential.routes.ts",
+      "goal-hierarchy.routes.ts",
+      "identity.routes.ts",
+      "institution-work-assignment.routes.ts",
+      "override.routes.ts",
+      "phase3-hardening.routes.ts",
+      "resource-ledger.routes.ts",
+      "system.routes.ts"
+    ],
+    "required_runtime_endpoints": [
+      "/health/runtime",
+      "/system/readiness",
+      "/system/build-status",
+      "/system/feature-gates",
+      "/api/civilization/runtime/graph",
+      "/api/civilization/runtime/reachability-tick",
+      "/api/civilization/runtime/scheduler",
+      "/api/civilization/runtime/scheduler/run-once"
+    ],
+    "route_registrations": {
+      "agents.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "agentRoutes"
+        ]
+      },
+      "audit.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "auditRoutes"
+        ]
+      },
+      "autonomy-dashboard.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "autonomyDashboardRoutes"
+        ]
+      },
+      "autonomy-orchestrator.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "autonomyOrchestratorRoutes"
+        ]
+      },
+      "autonomy-tasks.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "autonomyTaskRoutes"
+        ]
+      },
+      "civilization-governance.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "civilizationGovernanceRoutes"
+        ]
+      },
+      "credential.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "credentialRoutes"
+        ]
+      },
+      "goal-hierarchy.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "goalHierarchyRoutes"
+        ]
+      },
+      "identity.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "identityRoutes"
+        ]
+      },
+      "institution-work-assignment.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "institutionWorkAssignmentRoutes"
+        ]
+      },
+      "override.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "overrideRoutes"
+        ]
+      },
+      "phase3-hardening.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "phase3HardeningRoutes"
+        ]
+      },
+      "resource-ledger.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "resourceLedgerRoutes"
+        ]
+      },
+      "system.routes.ts": {
+        "imported": true,
+        "registered": true,
+        "symbols": [
+          "systemRoutes"
+        ]
+      }
+    },
+    "scope": "backend_http_route_clusters",
+    "status": "partial"
+  },
+  "success": true
+}

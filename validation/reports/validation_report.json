@@ -9,7 +9,9 @@
       "status": "pass",
       "metrics": {
         "tasks": 5
-      }
+      },
+      "connector_status": "fixture",
+      "error": null
     },
     {
       "benchmark": "agent_safety",
@@ -19,7 +21,9 @@
       "status": "pass",
       "metrics": {
         "unsafe_leakage": 0
-      }
+      },
+      "connector_status": "fixture",
+      "error": null
     },
     {
       "benchmark": "claim_resolution",
@@ -29,7 +33,9 @@
       "status": "pass",
       "metrics": {
         "independence_rejections": 3
-      }
+      },
+      "connector_status": "fixture",
+      "error": null
     },
     {
       "benchmark": "internal_memory_reuse",
@@ -39,7 +45,9 @@
       "status": "pass",
       "metrics": {
         "fixture_cases": 2
-      }
+      },
+      "connector_status": "fixture",
+      "error": null
     }
   ]
 }

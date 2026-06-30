@@ -14,12 +14,12 @@ scrape_configs:
   # OpenTelemetry Collector
   - job_name: 'otel-collector'
     static_configs:
-      - targets: ['localhost:8888']
+      - targets: ['otel-collector:8888']
 
   # Backend API server metrics
   - job_name: 'backend-api'
     static_configs:
-      - targets: ['localhost:3001']
+      - targets: ['host.docker.internal:3001']
     metrics_path: '/metrics'
     scrape_interval: 10s
     scrape_timeout: 5s
@@ -27,7 +27,7 @@ scrape_configs:
   # Frontend (if exposing metrics)
   - job_name: 'frontend'
     static_configs:
-      - targets: ['localhost:3000']
+      - targets: ['host.docker.internal:3000']
     metrics_path: '/metrics'
     scrape_interval: 30s
 

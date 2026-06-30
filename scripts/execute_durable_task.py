@@ -243,9 +243,18 @@ def load_task(conn, task_id: str) -> Task:
     with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
         cur.execute(
             """
-            SELECT task_id, agent_id, task_type, payload
+            SELECT agent_tasks.task_id,
+                   agent_tasks.agent_id,
+                   agent_tasks.task_type,
+                   agent_tasks.payload
             FROM agent_tasks
-            WHERE task_id = %s AND status IN ('queued', 'running', 'failed')
+            JOIN agent_identities ON agent_identities.agent_key = agent_tasks.agent_id
+            JOIN actors ON actors.id = agent_identities.actor_id
+            WHERE task_id = %s
+              AND agent_tasks.status IN ('queued', 'running', 'failed')
+              AND agent_identities.status = 'active'
+              AND actors.actor_type = 'agent'
+              AND actors.status = 'active'
             """,
             (task_id,),
         )

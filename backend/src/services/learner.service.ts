@@ -1,6 +1,8 @@
 import { pool } from '../db/client';
 import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
+import { eventLog } from './event-log.service';
+import { ledgerResolutionService } from './resolution-service.service';
 
 /**
  * PHASE 9: Learner, Replay, and Offline Training Loop
@@ -37,7 +39,32 @@ export interface LearnerConfig {
   createdBy?: string;
 }
 
+function isUuid(value: string | undefined): value is string {
+  return !!value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 export class LearnerService {
+  private async appendLearnerEvent(input: {
+    eventType: string;
+    objectType: string;
+    objectId: string;
+    payload: Record<string, unknown>;
+    correlationId?: string;
+  }): Promise<string> {
+    const actorId = await ledgerResolutionService.ensureServiceActor('agentco-learner-service', [
+      'learning.candidate.create',
+    ]);
+    const event = await eventLog.append({
+      event_type: input.eventType,
+      actor_id: actorId,
+      object_type: input.objectType,
+      object_id: input.objectId,
+      correlation_id: isUuid(input.correlationId) ? input.correlationId : undefined,
+      payload: input.payload,
+    });
+    return event.id;
+  }
+
   /**
    * Create a replay batch from trajectory IDs
    *
@@ -95,19 +122,33 @@ export class LearnerService {
       await client.query(
         `INSERT INTO replay_batches
          (id, source_filter_json, trajectory_ids, batch_hash, batch_label, 
-          simulation_derived, created_by, trace_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          batch_size, simulation_derived, created_by, trace_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
         [
           batchId,
           JSON.stringify(input.sourceFilter || {}),
           input.trajectoryIds,
           batchHash,
           input.batchLabel || null,
+          input.trajectoryIds.length,
           isSimulation,
           input.createdBy,
           input.traceId || null,
         ]
       );
+
+      await this.appendLearnerEvent({
+        eventType: 'learner.replay_batch_created',
+        objectType: 'replay_batch',
+        objectId: batchId,
+        correlationId: input.traceId,
+        payload: {
+          batch_hash: batchHash,
+          batch_size: input.trajectoryIds.length,
+          simulation_derived: isSimulation,
+          created_by: input.createdBy,
+        },
+      });
 
       return { replayBatchId: batchId, batchHash };
     } finally {
@@ -183,6 +224,17 @@ export class LearnerService {
           'in_progress'
         ]
       );
+      await this.appendLearnerEvent({
+        eventType: 'learner.run_started',
+        objectType: 'learner_run',
+        objectId: learnerRunId,
+        correlationId: config.traceId,
+        payload: {
+          replay_batch_id: config.replayBatchId,
+          learner_type: config.learnerType,
+          policy_version_before: config.baselinePolicyVersion || 'v1',
+        },
+      });
 
       // Compute baseline metrics from trajectories
       const metrics = await this.computeBaselineMetrics(config.replayBatchId, trajectory_ids);
@@ -356,6 +408,29 @@ export class LearnerService {
           candidateContext.traceId || null,
         ]
       );
+      await client.query(
+        `UPDATE learner_runs
+            SET candidate_count = candidate_count + 1,
+                best_candidate_id = COALESCE(best_candidate_id, $1)
+          WHERE id = $2`,
+        [candidateId, learnerRunId]
+      );
+
+      await this.appendLearnerEvent({
+        eventType: 'learner.candidate_generated',
+        objectType: 'learner_candidate',
+        objectId: candidateId,
+        correlationId: candidateContext.traceId,
+        payload: {
+          learner_run_id: learnerRunId,
+          candidate_type: candidateType,
+          artifact_id: artifactId,
+          artifact_hash: artifactHash,
+          expected_improvement: improvement.expectedImprovement,
+          risk_level: improvement.riskLevel,
+          simulation_trained: candidateContext.simulationTrained || false,
+        },
+      });
 
       return { candidateId, id: candidateId };
     } finally {
@@ -435,6 +510,12 @@ export class LearnerService {
         `UPDATE learner_candidates SET status = $1 WHERE id = $2`,
         ['ready_for_eval', candidateId]
       );
+      await this.appendLearnerEvent({
+        eventType: 'learner.candidate_ready_for_eval',
+        objectType: 'learner_candidate',
+        objectId: candidateId,
+        payload: { status: 'ready_for_eval' },
+      });
     } finally {
       client.release();
     }
@@ -463,6 +544,12 @@ export class LearnerService {
         `UPDATE learner_runs SET status = $1, completed_at = NOW() WHERE id = $2`,
         ['completed', learnerRunId]
       );
+      await this.appendLearnerEvent({
+        eventType: 'learner.run_completed',
+        objectType: 'learner_run',
+        objectId: learnerRunId,
+        payload: { status: 'completed' },
+      });
     } finally {
       client.release();
     }

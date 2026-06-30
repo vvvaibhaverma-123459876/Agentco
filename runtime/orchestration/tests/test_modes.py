@@ -4,6 +4,7 @@ from runtime.orchestration.modes import (
     choose_runtime_mode,
     classify_mode,
     fixture_fallback_allowed,
+    production_capability_contract,
 )
 
 
@@ -49,6 +50,41 @@ def test_production_requires_real_infrastructure_no_fallbacks():
     assert result["can_continue"] is False
     assert "redis:required_unavailable" in result["disabled_capabilities"]
     assert not result["fallbacks_used"]
+
+
+def test_production_capability_contract_requires_every_real_service():
+    status = {
+        "python": "real",
+        "node": "real",
+        "npm": "real",
+        "backend_build": "real",
+        "frontend_build": "real",
+        "postgres": "real",
+        "migrations": "real",
+        "core_db_schema": "real",
+        "redis": "real",
+        "kafka": "real",
+        "vault": "real",
+        "prometheus": "real",
+        "grafana": "real",
+        "resolution_service": "real",
+        "sensitive_route_auth": "real",
+        "production_secret_posture": "real",
+        "filesystem_reports": "real",
+    }
+    contract = production_capability_contract(status)
+
+    assert contract["satisfied"] is True
+    assert contract["missing_or_non_real"] == []
+    assert contract["fallbacks_allowed"] == {}
+
+
+def test_production_capability_contract_reports_missing_services():
+    contract = production_capability_contract({"python": "real", "postgres": "missing"})
+
+    assert contract["satisfied"] is False
+    assert {"service": "postgres", "status": "missing"} in contract["missing_or_non_real"]
+    assert {"service": "kafka", "status": "missing"} in contract["missing_or_non_real"]
 
 
 def test_production_secret_posture_rejects_dev_defaults(monkeypatch):

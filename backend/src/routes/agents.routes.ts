@@ -7,66 +7,28 @@ import { durableExecution } from '../services/durable-execution.service';
 import { query } from '../db/client';
 import { requireApiKey } from '../security';
 import crypto from 'crypto';
-import { assertAgentCanRunTask, listAgentRegistry } from '../agent-registry';
-
-// Model resolved from local model-tier map (matches runtime/base_agent/model_tiers.py).
-// No cloud model ids here.
-const AGENT_MODEL: Record<string, string> = {
-  'ceo-agent':    'phi4',
-  'cfo-agent':    'phi4',
-  'coo-agent':    'phi4',
-  'synthesis-agent':   'phi4',
-  'calibration-reasoner': 'phi4',
-  'coder-agent':   'qwen2.5-coder:7b',
-  'reviewer-agent':'qwen2.5-coder:7b',
-  // all others resolve to standard tier
-};
-function modelFor(agentId: string): string {
-  return AGENT_MODEL[agentId] ?? 'qwen2.5:7b';
-}
-
-const ALL_AGENTS = [
-  { id: 'ceo-agent',         department: 'executive' },
-  { id: 'cfo-agent',         department: 'executive' },
-  { id: 'coo-agent',         department: 'executive' },
-  { id: 'pm-agent',          department: 'product' },
-  { id: 'research-agent',    department: 'product' },
-  { id: 'prioritizer-agent', department: 'product' },
-  { id: 'architect-agent',   department: 'engineering' },
-  { id: 'coder-agent',       department: 'engineering' },
-  { id: 'reviewer-agent',    department: 'engineering' },
-  { id: 'devops-agent',      department: 'engineering' },
-  { id: 'ux-agent',          department: 'design' },
-  { id: 'brand-agent',       department: 'design' },
-  { id: 'ab-agent',          department: 'design' },
-  { id: 'sdr-agent',         department: 'sales' },
-  { id: 'ae-agent',          department: 'sales' },
-  { id: 'revops-agent',      department: 'sales' },
-  { id: 'content-agent',     department: 'marketing' },
-  { id: 'seo-agent',         department: 'marketing' },
-  { id: 'ads-agent',         department: 'marketing' },
-  { id: 'analytics-agent',   department: 'marketing' },
-  { id: 'support-agent',     department: 'customer_experience' },
-  { id: 'success-agent',     department: 'customer_experience' },
-  { id: 'voice-agent',       department: 'customer_experience' },
-  { id: 'performance-agent', department: 'people_ops' },
-  { id: 'recruiter-agent',   department: 'people_ops' },
-  { id: 'config-agent',      department: 'people_ops' },
-  { id: 'contract-agent',    department: 'legal' },
-  { id: 'risk-agent',        department: 'legal' },
-  { id: 'privacy-agent',     department: 'legal' },
-];
+import { assertAgentCanRunTask, listAgentRegistryWithIdentities } from '../agent-registry';
 
 export async function agentRoutes(fastify: FastifyInstance) {
   // ── GET /api/agents ──────────────────────────────────────────────────
   fastify.get('/api/agents', async (_req, reply) => {
-    const registry = new Map(listAgentRegistry().map(entry => [entry.agentId, entry]));
+    const registry = await listAgentRegistryWithIdentities();
     const agents = await Promise.all(
-      ALL_AGENTS.map(async (a) => ({
-        ...a,
-        runtime: registry.get(a.id) ?? { runtimeStatus: 'library_only', allowedTaskTypes: [] },
-        model: modelFor(a.id),
-        state: await memoryStore.getAgentState(a.id) ?? {
+      registry.map(async (agent) => ({
+        id: agent.agentId,
+        actor_id: agent.actorId,
+        actor_status: agent.actorStatus,
+        identity_status: agent.identityStatus,
+        department: agent.department,
+        runtime: {
+          runtimeStatus: agent.runtimeStatus,
+          allowedTaskTypes: agent.allowedTaskTypes,
+          modelTier: agent.modelTier,
+          capabilityTags: agent.capabilityTags,
+        },
+        model: agent.modelName,
+        version: agent.version,
+        state: await memoryStore.getAgentState(agent.agentId) ?? {
           status: 'idle', lifecycle_state: 'production',
         },
       }))
@@ -77,10 +39,25 @@ export async function agentRoutes(fastify: FastifyInstance) {
   // ── GET /api/agents/:id ──────────────────────────────────────────────
   fastify.get<{ Params: { id: string } }>('/api/agents/:id', async (req, reply) => {
     const { id } = req.params;
-    const agent = ALL_AGENTS.find(a => a.id === id);
+    const agent = (await listAgentRegistryWithIdentities()).find(a => a.agentId === id);
     if (!agent) return reply.status(404).send({ error: 'Agent not found' });
     const state = await memoryStore.getAgentState(id);
-    return reply.send({ ...agent, model: modelFor(id), state });
+    return reply.send({
+      id: agent.agentId,
+      actor_id: agent.actorId,
+      actor_status: agent.actorStatus,
+      identity_status: agent.identityStatus,
+      department: agent.department,
+      runtime: {
+        runtimeStatus: agent.runtimeStatus,
+        allowedTaskTypes: agent.allowedTaskTypes,
+        modelTier: agent.modelTier,
+        capabilityTags: agent.capabilityTags,
+      },
+      model: agent.modelName,
+      version: agent.version,
+      state,
+    });
   });
 
   // ── GET /api/agents/:id/heartbeat ────────────────────────────────────
@@ -97,7 +74,7 @@ export async function agentRoutes(fastify: FastifyInstance) {
     Body: { task_type: string; payload?: Record<string, unknown> };
   }>('/api/agents/:id/dispatch', { preHandler: requireApiKey }, async (req, reply) => {
     const { id } = req.params;
-    const agent = ALL_AGENTS.find(a => a.id === id);
+    const agent = (await listAgentRegistryWithIdentities()).find(a => a.agentId === id);
     if (!agent) return reply.status(404).send({ error: 'Agent not found' });
 
     const { task_type, payload = {} } = req.body ?? {};

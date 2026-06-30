@@ -13,7 +13,7 @@ import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
-from .modes import RUNTIME_MODES, choose_runtime_mode, classify_mode
+from .modes import RUNTIME_MODES, choose_runtime_mode, classify_mode, production_capability_contract
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -236,6 +236,7 @@ def build_report(requested_mode: str, checks: list[Check]) -> dict:
         "requested_mode": requested_mode,
         "selected_runtime_mode": selected,
         "can_continue": classified["can_continue"],
+        "production_contract": production_capability_contract(status),
         "services": [c.to_dict() for c in checks],
         "fallbacks_used": classified["fallbacks_used"],
         "disabled_capabilities": classified["disabled_capabilities"],

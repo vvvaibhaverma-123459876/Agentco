@@ -46,6 +46,11 @@
       "institution_id",
       "status"
     ],
+    "prediction_ledger": [
+      "consequence",
+      "hardness",
+      "prediction_id"
+    ],
     "specialist_allocation_history": [
       "department_id",
       "id",

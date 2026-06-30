@@ -3,6 +3,7 @@ import {
   assertDeterministicProviderAllowed,
   assertNoProductionFallbackProviders,
   configuredProviders,
+  productionCapabilityContract,
 } from '../src/runtime-mode';
 
 describe('runtime provider classification', () => {
@@ -35,6 +36,46 @@ describe('runtime provider classification', () => {
       VAULT_ADDR: 'https://vault.example',
       VAULT_TOKEN: 'real-token',
     } as NodeJS.ProcessEnv)).toThrow(/non-real providers/);
+  });
+
+  test('production contract is satisfied only by real providers', () => {
+    const contract = productionCapabilityContract({
+      AGENTCO_ENV: 'production',
+      AGENTCO_WEB_ADAPTER: 'real_web_adapter',
+      LLM_PROVIDER: 'openai_compatible',
+      LLM_API_KEY: 'real-key',
+      VAULT_ADDR: 'https://vault.example',
+      VAULT_TOKEN: 'real-token',
+    } as NodeJS.ProcessEnv);
+
+    expect(contract).toEqual({
+      requiredProviders: ['web_adapter', 'llm', 'secrets'],
+      missingProviders: [],
+      nonRealProviders: [],
+      satisfied: true,
+    });
+    expect(() => assertNoProductionFallbackProviders({
+      AGENTCO_ENV: 'production',
+      AGENTCO_WEB_ADAPTER: 'real_web_adapter',
+      LLM_PROVIDER: 'openai_compatible',
+      LLM_API_KEY: 'real-key',
+      VAULT_ADDR: 'https://vault.example',
+      VAULT_TOKEN: 'real-token',
+    } as NodeJS.ProcessEnv)).not.toThrow();
+  });
+
+  test('production contract reports every non-real required provider', () => {
+    const contract = productionCapabilityContract({
+      AGENTCO_ENV: 'production',
+      AGENTCO_WEB_ADAPTER: 'mock_web_adapter',
+    } as NodeJS.ProcessEnv);
+
+    expect(contract.satisfied).toBe(false);
+    expect(contract.nonRealProviders).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'web_adapter', status: 'simulated' }),
+      expect.objectContaining({ name: 'llm', status: 'unsupported' }),
+      expect.objectContaining({ name: 'secrets', status: 'fallback' }),
+    ]));
   });
 
   test('production rejects deterministic llm fallback', () => {

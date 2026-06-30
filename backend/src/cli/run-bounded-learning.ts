@@ -19,6 +19,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { BoundedCivilizationLearningRun } from '../services/bounded-learning-run.service';
+import { assertDeterministicProviderAllowed } from '../runtime-mode';
 
 // Load .codex.env if available
 const codexEnvPath = path.join(__dirname, '../../.codex.env');
@@ -50,8 +51,8 @@ interface CliArgs {
   realWebEnabled?: boolean;
 }
 
-function parseArgs(): CliArgs {
-  const args = process.argv.slice(2);
+export function parseArgs(argv: string[] = process.argv.slice(2)): CliArgs {
+  const args = argv;
   const parsed: any = {
     goal: '',
     sourcePack: 'technical',
@@ -185,8 +186,8 @@ NOTES:
   `);
 }
 
-async function main(): Promise<void> {
-  const args = parseArgs();
+export async function main(argv: string[] = process.argv.slice(2)): Promise<void> {
+  const args = parseArgs(argv);
 
   console.log(`\nLoading configuration...`);
   console.log(`  LLM Provider: ${process.env.LLM_PROVIDER}`);
@@ -194,9 +195,9 @@ async function main(): Promise<void> {
   console.log(`  OpenAI API Key: ${process.env.OPENAI_API_KEY ? '(set)' : '(not set)'}`);
   console.log(`  LLM API Key: ${process.env.LLM_API_KEY ? '(set)' : '(not set)'}`);
 
-  const orchestrator = new BoundedCivilizationLearningRun();
-
   try {
+    assertDeterministicProviderAllowed('bounded_learning.provider', args.provider);
+    const orchestrator = new BoundedCivilizationLearningRun();
     const result = await orchestrator.execute({
       goal: args.goal,
       sourcePack: args.sourcePack,
@@ -222,4 +223,6 @@ async function main(): Promise<void> {
   }
 }
 
-main();
+if (require.main === module) {
+  main();
+}

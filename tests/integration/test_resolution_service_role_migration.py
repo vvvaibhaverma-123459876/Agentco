@@ -25,7 +25,11 @@ from psycopg2 import sql
 
 DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL")
 pytestmark = pytest.mark.skipif(
-    not DSN, reason="AGENTCO_TEST_DATABASE_URL not set — real Postgres required"
+    not DSN or os.environ.get("AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS") != "1",
+    reason=(
+        "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 "
+        "are required because this rebuilds the target schema"
+    ),
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -145,24 +149,22 @@ def test_resolution_service_permissions_prediction_ledger(fresh_db):
     Minimum required to read and resolve predictions; no more.
     """
     with fresh_db.cursor() as cur:
-        # Check grants on prediction_ledger table
         cur.execute("""
-            SELECT privilege_type
-            FROM information_schema.table_privileges
-            WHERE table_name='prediction_ledger'
-              AND grantee='resolution_service'
-            ORDER BY privilege_type
+            SELECT
+              has_table_privilege('resolution_service', 'prediction_ledger', 'SELECT'),
+              has_table_privilege('resolution_service', 'prediction_ledger', 'UPDATE'),
+              has_table_privilege('resolution_service', 'prediction_ledger', 'INSERT'),
+              has_table_privilege('resolution_service', 'prediction_ledger', 'DELETE'),
+              has_table_privilege('resolution_service', 'prediction_ledger', 'TRUNCATE')
         """)
-        privileges = {row[0] for row in cur.fetchall()}
+        can_select, can_update, can_insert, can_delete, can_truncate = cur.fetchone()
 
-        # Should have: SELECT, UPDATE
-        assert "SELECT" in privileges, "Missing SELECT on prediction_ledger"
-        assert "UPDATE" in privileges, "Missing UPDATE on prediction_ledger"
+        assert can_select, "Missing SELECT on prediction_ledger"
+        assert can_update, "Missing UPDATE on prediction_ledger"
 
-        # Should NOT have: INSERT, DELETE, TRUNCATE
-        assert "INSERT" not in privileges, "ERROR: resolution_service should not have INSERT"
-        assert "DELETE" not in privileges, "ERROR: resolution_service should not have DELETE"
-        assert "TRUNCATE" not in privileges, "ERROR: resolution_service should not have TRUNCATE"
+        assert not can_insert, "ERROR: resolution_service should not have INSERT"
+        assert not can_delete, "ERROR: resolution_service should not have DELETE"
+        assert not can_truncate, "ERROR: resolution_service should not have TRUNCATE"
 
     print("[✓] resolution_service has correct permissions on prediction_ledger (SELECT, UPDATE)")
 
@@ -178,23 +180,20 @@ def test_resolution_service_permissions_beliefs(fresh_db):
     Minimum required to promote beliefs to reality_validated; no more.
     """
     with fresh_db.cursor() as cur:
-        # Check grants on beliefs table
         cur.execute("""
-            SELECT privilege_type
-            FROM information_schema.table_privileges
-            WHERE table_name='beliefs'
-              AND grantee='resolution_service'
-            ORDER BY privilege_type
+            SELECT
+              has_table_privilege('resolution_service', 'beliefs', 'SELECT'),
+              has_table_privilege('resolution_service', 'beliefs', 'UPDATE'),
+              has_table_privilege('resolution_service', 'beliefs', 'INSERT'),
+              has_table_privilege('resolution_service', 'beliefs', 'DELETE')
         """)
-        privileges = {row[0] for row in cur.fetchall()}
+        can_select, can_update, can_insert, can_delete = cur.fetchone()
 
-        # Should have: SELECT, UPDATE
-        assert "SELECT" in privileges, "Missing SELECT on beliefs"
-        assert "UPDATE" in privileges, "Missing UPDATE on beliefs"
+        assert can_select, "Missing SELECT on beliefs"
+        assert can_update, "Missing UPDATE on beliefs"
 
-        # Should NOT have: INSERT, DELETE, TRUNCATE
-        assert "INSERT" not in privileges, "ERROR: resolution_service should not have INSERT on beliefs"
-        assert "DELETE" not in privileges, "ERROR: resolution_service should not have DELETE on beliefs"
+        assert not can_insert, "ERROR: resolution_service should not have INSERT on beliefs"
+        assert not can_delete, "ERROR: resolution_service should not have DELETE on beliefs"
 
     print("[✓] resolution_service has correct permissions on beliefs (SELECT, UPDATE)")
 
@@ -209,8 +208,10 @@ def test_resolution_service_can_connect(fresh_db):
     PROOF: resolution_service role is usable (can connect and perform operations).
     This tests that the password is set correctly and permissions are enforceable.
     """
-    # Extract the password used in migrations
-    password = os.environ.get("RESOLUTION_SERVICE_PASSWORD", str(uuid.uuid4()))
+    password = os.environ.get(
+        "RESOLUTION_SERVICE_PASSWORD",
+        "resolution-service-dev-password",
+    )
 
     # Try to connect as resolution_service (this would fail if role doesn't exist or password is wrong)
     # For now, just verify the role exists and can be tested via the main connection
@@ -228,6 +229,24 @@ def test_resolution_service_can_connect(fresh_db):
         assert can_login is True, "resolution_service should have LOGIN capability"
 
     print("[✓] resolution_service is a valid LOGIN role")
+
+    from urllib.parse import quote, urlparse, urlunparse
+
+    parsed = urlparse(DSN)
+    host = parsed.hostname or "localhost"
+    port = parsed.port or 5432
+    service_url = urlunparse(
+        parsed._replace(
+            netloc=f"resolution_service:{quote(password, safe='')}@{host}:{port}"
+        )
+    )
+    with psycopg2.connect(service_url) as service_conn:
+        with service_conn.cursor() as cur:
+            cur.execute("SELECT current_user, COUNT(*) FROM prediction_ledger")
+            current_user, _ = cur.fetchone()
+            assert current_user == "resolution_service"
+
+    print("[✓] resolution_service can connect and read prediction_ledger")
 
 
 # ════════════════════════════════════════════════════════════════════════════════

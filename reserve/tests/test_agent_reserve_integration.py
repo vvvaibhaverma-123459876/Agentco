@@ -46,6 +46,10 @@ def _apply_migrations(cur):
     )
     cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
     cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+    cur.execute(
+        "DO $$ BEGIN GRANT resolution_service TO agentco; "
+        "EXCEPTION WHEN insufficient_privilege THEN NULL; END $$;"
+    )
 
 
 @pytest.fixture(scope="module")
@@ -63,12 +67,18 @@ def db():
     conn.close()
 
 
-def test_agent_earns_reserve_credential_from_real_predictions(db):
+def test_agent_earns_reserve_credential_from_real_predictions(db, monkeypatch):
     """
     Full path: BaseAgentV2 → pre_register_claim → resolve → refresh_reserve_credential.
     Proves hardness is written on INSERT and credential is independently verifiable.
     """
     from runtime.base_agent.base_agent_v2 import BaseAgentV2
+    from runtime.base_agent.llm_client import clear_client_cache
+
+    monkeypatch.setenv("LLM_PROVIDER", "ollama")
+    monkeypatch.setenv("LLM_BASE_URL", "http://localhost:11434/v1")
+    monkeypatch.setenv("LLM_API_KEY", "ollama")
+    clear_client_cache()
 
     cal = create_calibration_engine(db=db)
 

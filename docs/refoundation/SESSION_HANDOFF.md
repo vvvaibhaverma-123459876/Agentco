@@ -130,14 +130,13 @@ Result: passed. It ran smoke tests, validation report generation, backend build,
 
 ## Known Risks
 
-- `npm ci` reported dependency vulnerabilities: backend 25 total, frontend 8 total including one critical. These were not remediated in this pass.
-- `docker compose --profile dev up -d` failed on a Prometheus bind mount for missing/mis-typed `infrastructure/prometheus/prometheus.yml`, although Postgres was already running and was usable for tests.
-- Durable execution Kafka publish currently catches Kafka failures, but the KafkaJS producer can keep a standalone smoke process open after output.
-- Gate 15 uses deterministic external-harness adapters, not live third-party benchmark infrastructure.
+- Backend and frontend `npm audit --audit-level=moderate` currently report `0 vulnerabilities` after dependency updates.
+- Docker Compose config now validates, local bind sources are covered by `tests/test_compose_bind_sources.py`, Prometheus/Grafana/OTel local config files exist, and `make docker-startup-verify` passed once Docker was running.
+- The canonical civilization vertical slice now passes after `resolution_service` grant repair and `prediction_ledger` Reserve-field compatibility fixes. A backend L14 runtime service now exposes graph/tick API routes, persists a core coordinator reachability tick, and has a bounded scheduler with run-once/start/stop controls. Full civilization is still not fully integrated: the remaining gap is the complete always-on L14 coordinator service graph, durable multi-society runtime trace, and reachability proof across every implemented service.
+- Durable execution standalone smoke now uses shared runtime shutdown and exits after local Postgres verification even when Kafka is unavailable.
+- Gate 15 has optional live endpoint connectors and now labels configured-but-unavailable connectors as `LIVE-UNAVAILABLE` instead of fixture evidence. No real third-party endpoint credentials are configured in this workspace.
 
 ## Exact Next Steps
 
-1. Replace deterministic external-harness adapters with live third-party benchmark connectors where available.
-2. Triage npm vulnerability reports.
-3. Fix Prometheus compose mount issue.
-4. Continue hardening durable execution cleanup for standalone smoke scripts.
+1. Complete full L14 civilization coordinator integration beyond the verified vertical slice.
+2. Configure real third-party benchmark endpoint credentials and run `python3.13 scripts/run_real_world_validation.py` with `WORKFLOW_API_URL`, `SAFETY_API_URL`, and/or `EVIDENCE_API_URL`.

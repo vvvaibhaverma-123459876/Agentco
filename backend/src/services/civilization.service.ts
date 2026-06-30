@@ -16,7 +16,9 @@
 import { symbolicService } from './symbolic.service';
 import { ensembleService } from './ensemble.service';
 import { ragService } from './rag.service';
+import { durableExecution } from './durable-execution.service';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 interface KnowledgeEntry {
   id: string;
@@ -292,10 +294,13 @@ export class CivilizationService {
   }
 
   private async callServiceSolver(service: string, question: string): Promise<any> {
+    const routeTask = await this.recordDurableReasoningRoute(service, question);
+
     if (service === 'symbolic') {
       const result = await symbolicService.solve(question);
       return {
         service,
+        route_task_id: routeTask.task_id,
         answer: result.solved ? result.answer : 'Unable to solve symbolically',
         confidence: result.solved ? result.confidence : 0.1,
         reasoning: result.reasoning,
@@ -307,6 +312,7 @@ export class CivilizationService {
       const result = await ensembleService.ensembleVote(question);
       return {
         service,
+        route_task_id: routeTask.task_id,
         answer: result.final_answer,
         confidence: result.confidence,
         reasoning: result.reasoning,
@@ -318,6 +324,7 @@ export class CivilizationService {
       const result = await ragService.augmentAnswer(question, '', 0.2);
       return {
         service,
+        route_task_id: routeTask.task_id,
         answer: result.final_answer || 'No retrieved evidence answer',
         confidence: result.final_confidence,
         reasoning: result.reasoning,
@@ -326,6 +333,33 @@ export class CivilizationService {
     }
 
     throw new Error(`Unknown civilization solver service: ${service}`);
+  }
+
+  private async recordDurableReasoningRoute(service: string, question: string): Promise<{ task_id: string }> {
+    const agentByService: Record<string, string> = {
+      symbolic: 'calibration-reasoner',
+      ensemble: 'reviewer-agent',
+      rag: 'research-agent',
+    };
+    const agentId = agentByService[service];
+    if (!agentId) throw new Error(`No durable agent route for civilization service: ${service}`);
+
+    const task = await durableExecution.enqueue(agentId, 'record_observation', {
+      observation: {
+        kind: 'civilization_reasoning_route',
+        service,
+        question_hash: this.questionHash(question),
+      },
+    });
+    const completed = await durableExecution.run(task.task_id);
+    if (completed.status !== 'done') {
+      throw new Error(`durable reasoning route failed for ${service}: ${completed.error ?? completed.status}`);
+    }
+    return { task_id: completed.task_id };
+  }
+
+  private questionHash(question: string): string {
+    return crypto.createHash('sha256').update(question).digest('hex');
   }
 
   private async validateWithService(service: string, question: string, primaryResult: any): Promise<any> {

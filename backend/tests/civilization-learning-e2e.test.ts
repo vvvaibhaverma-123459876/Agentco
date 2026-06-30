@@ -13,7 +13,7 @@ function serviceDatabaseUrl(): string {
   if (process.env.RESOLUTION_SERVICE_DATABASE_URL) return process.env.RESOLUTION_SERVICE_DATABASE_URL;
   const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://agentco:password@localhost:5432/agentco');
   base.username = 'resolution_service';
-  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'local_dev_only_not_secret';
+  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
   return base.toString();
 }
 

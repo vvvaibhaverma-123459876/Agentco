@@ -5,23 +5,32 @@
 import { Kafka, Producer, Consumer, CompressionTypes, logLevel } from 'kafkajs';
 
 const brokers = (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(',');
+const retries = Number(process.env.KAFKA_RETRIES ?? 5);
+const initialRetryTime = Number(process.env.KAFKA_INITIAL_RETRY_MS ?? 300);
+const factor = Number(process.env.KAFKA_RETRY_FACTOR ?? 2);
 
 export const kafka = new Kafka({
   clientId: 'agentco-backend',
   brokers,
   logLevel: logLevel.WARN,
-  retry: { retries: 5, initialRetryTime: 300, factor: 2 },
+  retry: { retries, initialRetryTime, factor },
 });
 
 let _producer: Producer | null = null;
 
 export async function getProducer(): Promise<Producer> {
   if (!_producer) {
-    _producer = kafka.producer({
+    const producer = kafka.producer({
       allowAutoTopicCreation: true,
       transactionTimeout: 30000,
     });
-    await _producer.connect();
+    try {
+      await producer.connect();
+      _producer = producer;
+    } catch (error) {
+      await producer.disconnect().catch(() => undefined);
+      throw error;
+    }
   }
   return _producer;
 }

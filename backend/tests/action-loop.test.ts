@@ -162,6 +162,50 @@ describe('Action Loop Integration', () => {
       expect(result.status).toBe(ActionStatus.COMPLETED);
       expect(result.observations.claimId).toBeDefined();
       expect(result.createdArtifacts).toContain(result.observations.claimId);
+
+      const actionRows = await db.query(
+        `SELECT id, action_type, tool_name
+           FROM autonomy_actions
+          WHERE id = $1`,
+        [fetchSpec.actionId]
+      );
+      expect(actionRows.rows).toEqual([
+        expect.objectContaining({
+          id: fetchSpec.actionId,
+          action_type: 'tool_call',
+          tool_name: ActionType.FETCH_PAGE,
+        }),
+      ]);
+
+      const evidenceRows = await db.query(
+        `SELECT source_id, action_id, event_log_id, registered_by_actor_id
+           FROM autonomy_evidence
+          WHERE source_id = $1`,
+        [sourceId]
+      );
+      expect(evidenceRows.rows).toEqual([
+        expect.objectContaining({
+          source_id: sourceId,
+          action_id: fetchSpec.actionId,
+          event_log_id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+          registered_by_actor_id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        }),
+      ]);
+
+      const claimRows = await db.query(
+        `SELECT claim_id, action_id, status, support_source_ids
+           FROM autonomy_claims
+          WHERE claim_id = $1`,
+        [result.observations.claimId]
+      );
+      expect(claimRows.rows).toEqual([
+        expect.objectContaining({
+          claim_id: result.observations.claimId,
+          action_id: spec.actionId,
+          status: 'supported',
+          support_source_ids: [sourceId],
+        }),
+      ]);
     });
 
     it('should BLOCK claim generation when support source ids are not registered evidence', async () => {

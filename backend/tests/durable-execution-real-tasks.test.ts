@@ -1,4 +1,5 @@
 import { DurableExecutionService, WorkflowTask } from '../src/services/durable-execution.service';
+import { db } from '../src/db/client';
 
 function task(task_type: string, payload: Record<string, unknown>): WorkflowTask {
   return {
@@ -92,5 +93,46 @@ describe('DurableExecutionService real review/decision handlers', () => {
       options: ['approve', 'reject'],
       criteria: ['security'],
     }))).rejects.toThrow(/LLM_API_KEY/);
+  });
+
+  test('enqueue rejects agents that are not in the canonical registry', async () => {
+    const service = new DurableExecutionService();
+
+    await expect(
+      service.enqueue('unregistered-agent', 'health_check', {})
+    ).rejects.toThrow(/not registered/);
+  });
+
+  test('runs a registered durable task and records provenance pointers', async () => {
+    const service = new DurableExecutionService();
+    const queued = await service.enqueue('reviewer-agent', 'health_check', {
+      probe: 'durable-execution-registry-test',
+    });
+
+    const completed = await service.run(queued.task_id);
+
+    expect(completed.status).toBe('done');
+    expect(completed.audit_log_id).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
+    expect(completed.action_attestation_id).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
+    expect(completed.result).toEqual(expect.objectContaining({
+      kind: 'health_check_result',
+      agent_id: 'reviewer-agent',
+      executed_by: 'durable-execution-service',
+    }));
+
+    const stored = await db.query(
+      `SELECT status, claimed_by, audit_log_id, action_attestation_id
+         FROM workflow_tasks
+        WHERE task_id = $1`,
+      [queued.task_id]
+    );
+    expect(stored.rows).toEqual([
+      expect.objectContaining({
+        status: 'done',
+        claimed_by: 'backend-dispatcher',
+        audit_log_id: completed.audit_log_id,
+        action_attestation_id: completed.action_attestation_id,
+      }),
+    ]);
   });
 });

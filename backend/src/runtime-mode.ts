@@ -10,6 +10,15 @@ export interface RuntimeProvider {
   reason?: string;
 }
 
+export interface ProductionCapabilityContract {
+  requiredProviders: string[];
+  missingProviders: string[];
+  nonRealProviders: Array<Pick<RuntimeProvider, 'name' | 'status' | 'reason'>>;
+  satisfied: boolean;
+}
+
+const PRODUCTION_REQUIRED_PROVIDERS = ['web_adapter', 'llm', 'secrets'];
+
 export function activeRuntimeMode(env: NodeJS.ProcessEnv = process.env): 'test' | 'development' | 'staging' | 'production' {
   const agentcoEnv = (env.AGENTCO_ENV || '').toLowerCase();
   const nodeEnv = (env.NODE_ENV || '').toLowerCase();
@@ -33,6 +42,28 @@ export function configuredProviders(env: NodeJS.ProcessEnv = process.env): Runti
   return providers;
 }
 
+export function productionCapabilityContract(env: NodeJS.ProcessEnv = process.env): ProductionCapabilityContract {
+  const providers = configuredProviders(env);
+  const byName = new Map(providers.map(runtimeProvider => [runtimeProvider.name, runtimeProvider]));
+  const missingProviders = PRODUCTION_REQUIRED_PROVIDERS.filter(name => !byName.has(name));
+  const nonRealProviders = PRODUCTION_REQUIRED_PROVIDERS
+    .map(name => byName.get(name))
+    .filter((runtimeProvider): runtimeProvider is RuntimeProvider => Boolean(runtimeProvider))
+    .filter(runtimeProvider => runtimeProvider.status !== 'real')
+    .map(runtimeProvider => ({
+      name: runtimeProvider.name,
+      status: runtimeProvider.status,
+      reason: runtimeProvider.reason,
+    }));
+
+  return {
+    requiredProviders: [...PRODUCTION_REQUIRED_PROVIDERS],
+    missingProviders,
+    nonRealProviders,
+    satisfied: missingProviders.length === 0 && nonRealProviders.length === 0,
+  };
+}
+
 function provider(name: string, implementation: string, status: RuntimeProviderStatus): RuntimeProvider {
   const classification = status === 'real' ? 'production' : status === 'simulated' ? 'test' : 'development';
   return {
@@ -46,12 +77,10 @@ function provider(name: string, implementation: string, status: RuntimeProviderS
 
 export function assertNoProductionFallbackProviders(env: NodeJS.ProcessEnv = process.env): void {
   if (!isProductionEnv(env)) return;
-  const unsafe = configuredProviders(env).filter(provider =>
-    provider.status === 'fallback' || provider.status === 'simulated' || provider.status === 'unsupported'
-  );
-  if (unsafe.length > 0) {
+  const contract = productionCapabilityContract(env);
+  if (!contract.satisfied) {
     throw new Error(
-      `Refusing to start in staging/production with non-real providers: ${unsafe
+      `Refusing to start in staging/production with non-real providers: ${contract.nonRealProviders
         .map(provider => `${provider.name}=${provider.reason}`)
         .join(', ')}`
     );

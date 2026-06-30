@@ -1,0 +1,89 @@
+{
+  "checks": [
+    {
+      "host": "localhost",
+      "name": "postgres",
+      "port": 5432,
+      "status": "passed"
+    },
+    {
+      "host": "localhost",
+      "name": "redis",
+      "port": 6379,
+      "status": "passed"
+    },
+    {
+      "host": "localhost",
+      "name": "kafka",
+      "port": 9092,
+      "status": "passed"
+    },
+    {
+      "host": "localhost",
+      "name": "vault",
+      "port": 8200,
+      "status": "passed"
+    },
+    {
+      "http_status": 200,
+      "name": "prometheus",
+      "status": "passed",
+      "url": "http://localhost:9090/-/healthy"
+    },
+    {
+      "http_status": 200,
+      "name": "grafana",
+      "status": "passed",
+      "url": "http://localhost:3005/api/health"
+    },
+    {
+      "host": "localhost",
+      "name": "otel_grpc",
+      "port": 4317,
+      "status": "passed"
+    },
+    {
+      "host": "localhost",
+      "name": "otel_http",
+      "port": 4318,
+      "status": "passed"
+    }
+  ],
+  "compose_config": {
+    "command": "docker compose config",
+    "exit_code": 0,
+    "output_tail": "5s\n      interval: 10s\n      retries: 5\n      start_period: 20s\n    image: postgres:16-alpine\n    networks:\n      agentco-net: null\n    ports:\n      - mode: ingress\n        target: 5432\n        published: \"5432\"\n        protocol: tcp\n    restart: unless-stopped\n    volumes:\n      - type: volume\n        source: postgres-data\n        target: /var/lib/postgresql/data\n        volume: {}\n  prometheus:\n    command:\n      - --config.file=/etc/prometheus/prometheus.yml\n      - --storage.tsdb.path=/prometheus\n      - --storage.tsdb.retention.time=15d\n      - --web.enable-lifecycle\n    container_name: agentco-prometheus\n    healthcheck:\n      test:\n        - CMD-SHELL\n        - wget -qO- http://localhost:9090/-/healthy | grep -q Healthy\n      timeout: 5s\n      interval: 15s\n      retries: 5\n      start_period: 15s\n    image: prom/prometheus:v2.52.0\n    networks:\n      agentco-net: null\n    ports:\n      - mode: ingress\n        target: 9090\n        published: \"9090\"\n        protocol: tcp\n    restart: unless-stopped\n    volumes:\n      - type: bind\n        source: /Users/Zet/Agentco/infrastructure/prometheus/prometheus.yml\n        target: /etc/prometheus/prometheus.yml\n        read_only: true\n        bind: {}\n      - type: volume\n        source: prometheus-data\n        target: /prometheus\n        volume: {}\n  redis:\n    command:\n      - redis-server\n      - --save\n      - \"60\"\n      - \"1\"\n      - --loglevel\n      - warning\n    container_name: agentco-redis\n    healthcheck:\n      test:\n        - CMD\n        - redis-cli\n        - ping\n      timeout: 5s\n      interval: 10s\n      retries: 5\n      start_period: 10s\n    image: redis:7-alpine\n    networks:\n      agentco-net: null\n    ports:\n      - mode: ingress\n        target: 6379\n        published: \"6379\"\n        protocol: tcp\n    restart: unless-stopped\n    volumes:\n      - type: volume\n        source: redis-data\n        target: /data\n        volume: {}\n  vault:\n    cap_add:\n      - IPC_LOCK\n    command:\n      - server\n      - -dev\n    container_name: agentco-vault\n    environment:\n      VAULT_ADDR: http://0.0.0.0:8200\n      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200\n      VAULT_DEV_ROOT_TOKEN_ID: root\n    healthcheck:\n      test:\n        - CMD-SHELL\n        - vault status -address=http://localhost:8200\n      timeout: 5s\n      interval: 10s\n      retries: 5\n      start_period: 10s\n    image: hashicorp/vault:1.16\n    networks:\n      agentco-net: null\n    ports:\n      - mode: ingress\n        target: 8200\n        published: \"8200\"\n        protocol: tcp\n    restart: unless-stopped\n    volumes:\n      - type: volume\n        source: vault-data\n        target: /vault/data\n        volume: {}\n      - type: bind\n        source: /Users/Zet/Agentco/infrastructure/vault/policies.hcl\n        target: /vault/config/policies.hcl\n        read_only: true\n        bind: {}\n  zookeeper:\n    container_name: agentco-zookeeper\n    environment:\n      ZOOKEEPER_4LW_COMMANDS_WHITELIST: ruok,stat,mntr,conf\n      ZOOKEEPER_CLIENT_PORT: \"2181\"\n      ZOOKEEPER_SYNC_LIMIT: \"2\"\n      ZOOKEEPER_TICK_TIME: \"2000\"\n    healthcheck:\n      test:\n        - CMD-SHELL\n        - bash -ec 'cat < /dev/null > /dev/tcp/localhost/2181'\n      timeout: 5s\n      interval: 10s\n      retries: 10\n      start_period: 30s\n    image: confluentinc/cp-zookeeper:7.6.1\n    networks:\n      agentco-net: null\n    ports:\n      - mode: ingress\n        target: 2181\n        published: \"2181\"\n        protocol: tcp\n    restart: unless-stopped\n    volumes:\n      - type: volume\n        source: zookeeper-data\n        target: /var/lib/zookeeper/data\n        volume: {}\nnetworks:\n  agentco-net:\n    name: agentco_agentco-net\n    driver: bridge\nvolumes:\n  grafana-data:\n    name: agentco_grafana-data\n  kafka-data:\n    name: agentco_kafka-data\n  postgres-data:\n    name: agentco_postgres-data\n  prometheus-data:\n    name: agentco_prometheus-data\n  redis-data:\n    name: agentco_redis-data\n  vault-data:\n    name: agentco_vault-data\n  zookeeper-data:\n    name: agentco_zookeeper-data",
+    "status": "passed"
+  },
+  "compose_ps": {
+    "command": "docker compose ps",
+    "exit_code": 0,
+    "output_tail": "NAME                     IMAGE                                          COMMAND                  SERVICE          CREATED        STATUS                  PORTS\nagentco-grafana          grafana/grafana:10.4.3                         \"/run.sh\"                grafana          14 hours ago   Up 14 hours (healthy)   0.0.0.0:3005->3005/tcp, [::]:3005->3005/tcp\nagentco-kafka            confluentinc/cp-kafka:7.6.1                    \"/etc/confluent/dock\u2026\"   kafka            4 days ago     Up 14 hours (healthy)   0.0.0.0:9092->9092/tcp, [::]:9092->9092/tcp\nagentco-otel-collector   otel/opentelemetry-collector-contrib:0.100.0   \"/otelcol-contrib --\u2026\"   otel-collector   14 hours ago   Up 14 hours             0.0.0.0:4317-4318->4317-4318/tcp, [::]:4317-4318->4317-4318/tcp, 0.0.0.0:8888->8888/tcp, [::]:8888->8888/tcp\nagentco-postgres         postgres:16-alpine                             \"docker-entrypoint.s\u2026\"   postgres         7 days ago     Up 14 hours (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp\nagentco-prometheus       prom/prometheus:v2.52.0                        \"/bin/prometheus --c\u2026\"   prometheus       14 hours ago   Up 14 hours (healthy)   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp\nagentco-redis            redis:7-alpine                                 \"docker-entrypoint.s\u2026\"   redis            4 days ago     Up 14 hours (healthy)   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp\nagentco-vault            hashicorp/vault:1.16                           \"docker-entrypoint.s\u2026\"   vault            14 hours ago   Up 14 hours (healthy)   0.0.0.0:8200->8200/tcp, [::]:8200->8200/tcp\nagentco-zookeeper        confluentinc/cp-zookeeper:7.6.1                \"/etc/confluent/dock\u2026\"   zookeeper        4 days ago     Up 14 hours (healthy)   0.0.0.0:2181->2181/tcp, [::]:2181->2181/tcp",
+    "status": "passed"
+  },
+  "compose_up": {
+    "command": "docker compose up -d postgres redis zookeeper kafka vault prometheus otel-collector grafana",
+    "exit_code": 0,
+    "output_tail": "time=\"2026-06-30T14:37:47+05:30\" level=warning msg=\"Found orphan containers ([agentco-kafka-staging agentco-grafana-staging agentco-otel-staging agentco-redis-staging agentco-prometheus-staging agentco-zookeeper-staging agentco-postgres-staging]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.\"\n Container agentco-postgres Running \n Container agentco-redis Running \n Container agentco-zookeeper Running \n Container agentco-vault Running \n Container agentco-prometheus Running \n Container agentco-kafka Running \n Container agentco-otel-collector Running \n Container agentco-grafana Running \n Container agentco-zookeeper Waiting \n Container agentco-prometheus Waiting \n Container agentco-prometheus Healthy \n Container agentco-zookeeper Healthy",
+    "status": "passed"
+  },
+  "docker_info": {
+    "command": "docker info --format {{.ServerVersion}}",
+    "exit_code": 0,
+    "output_tail": "29.5.3",
+    "status": "passed"
+  },
+  "generated_at": "2026-06-30T09:07:45Z",
+  "services": [
+    "postgres",
+    "redis",
+    "zookeeper",
+    "kafka",
+    "vault",
+    "prometheus",
+    "otel-collector",
+    "grafana"
+  ],
+  "status": "passed",
+  "success": true
+}

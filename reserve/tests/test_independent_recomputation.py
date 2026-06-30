@@ -23,8 +23,13 @@ import pytest
 psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
 
 DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL")
+ALLOW_DESTRUCTIVE = os.environ.get("AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS") == "1"
 pytestmark = pytest.mark.skipif(
-    not DSN, reason="AGENTCO_TEST_DATABASE_URL not set — real Postgres required"
+    not DSN or not ALLOW_DESTRUCTIVE,
+    reason=(
+        "requires AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS=1; "
+        "this legacy test rebuilds public reserve tables"
+    ),
 )
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +40,8 @@ ROOT = Path(__file__).resolve().parents[2]
 # ---------------------------------------------------------------------------
 @pytest.fixture(scope="module")
 def db():
+    if "reserve_test" not in DSN:
+        pytest.skip("destructive reserve recomputation test requires an isolated reserve_test database")
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
     with conn.cursor() as cur:
@@ -50,6 +57,10 @@ def db():
         )
         cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+        cur.execute(
+            "DO $$ BEGIN GRANT resolution_service TO agentco; "
+            "EXCEPTION WHEN insufficient_privilege THEN NULL; END $$;"
+        )
     yield conn
     with conn.cursor() as cur:
         cur.execute("DROP TABLE IF EXISTS calibration_credentials CASCADE")

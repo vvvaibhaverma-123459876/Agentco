@@ -149,15 +149,19 @@ async function logViolation(
 ): Promise<void> {
   try {
     await db.query(
-      `INSERT INTO autonomy_task_events (
-        event_type, previous_status, new_status, actor_type, reason
-      ) VALUES ($1, $2, $3, $4, $5)`,
+      `INSERT INTO audit_events (
+        id, event_type, entity_type, entity_id, status, details_json, severity
+      ) VALUES (gen_random_uuid(), $1, $2, $3, $4, $5::jsonb, $6)`,
       [
-        'escalated',
-        'evaluating',
+        'protected_surface_violation',
+        'candidate',
+        candidateId,
         'blocked',
-        'system',
-        `Protected surface violation: ${touchedSurfaces.join(', ')}`,
+        JSON.stringify({
+          touched_surfaces: touchedSurfaces,
+          violations,
+        }),
+        'high',
       ]
     );
   } catch (error) {

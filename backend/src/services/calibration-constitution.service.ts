@@ -42,6 +42,19 @@ export interface VerificationResult {
   requires_override: boolean;
 }
 
+function stable(value: unknown): unknown {
+  if (value instanceof Date) return value.toISOString();
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([key, nested]) => [key, stable(nested)])
+    );
+  }
+  return value;
+}
+
 export class CalibrationConstitutionService {
   /**
    * Create a new constitution version
@@ -98,19 +111,9 @@ export class CalibrationConstitutionService {
    * Retire a constitution version
    */
   async retireVersion(versionId: string, traceId?: string): Promise<ConstitutionVersion> {
-    const result = await db.query(
-      `UPDATE calibration_constitution_versions
-       SET retired_at = NOW()
-       WHERE id = $1 AND is_active = false
-       RETURNING *`,
-      [versionId]
+    throw new Error(
+      `Constitution versions are immutable append-only records; create and activate a replacement instead of retiring ${versionId}`
     );
-
-    if (result.rows.length === 0) {
-      throw new Error(`Cannot retire active constitution version`);
-    }
-
-    return result.rows[0];
   }
 
   /**
@@ -654,7 +657,7 @@ export class CalibrationConstitutionService {
    * Hash content for integrity verification
    */
   private hashContent(content: Record<string, any>): string {
-    const jsonString = JSON.stringify(content);
+    const jsonString = JSON.stringify(stable(content));
     return createHash('sha256').update(jsonString).digest('hex');
   }
 

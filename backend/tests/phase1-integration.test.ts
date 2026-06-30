@@ -2,8 +2,10 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
 import { institutionWorkAssignmentService } from '../src/services/institution-work-assignment.service';
 import { autonomyCivilizationBridgeService } from '../src/services/autonomy-civilization-bridge.service';
+import { institutionsService } from '../src/services/institutions.service';
 describe('Phase 1: Autonomy-Civilization Integration', () => {
   let institutionId: string;
+  let institutionActorId: string;
   let departmentIds: { [key: string]: string } = {};
   let workRequestId: string;
 
@@ -65,32 +67,33 @@ describe('Phase 1: Autonomy-Civilization Integration', () => {
   });
 
   it('creates institution with 5 mandatory departments', async () => {
-    institutionId = `phase1_test_inst_${Date.now()}`;
-    await db.query(
-      `INSERT INTO institutions (id, name, entity_type, parent_id, status, purpose, authority_scope, metadata, created_at, updated_at)
-       VALUES ($1, $2, 'institution', NULL, 'active', $3, $4, $5, NOW(), NOW())`,
-      [
-        institutionId,
-        `phase1_test_${Date.now()}`,
-        'Phase 1 integration institution',
-        JSON.stringify(['research_request']),
-        JSON.stringify({ verification_required: true }),
-      ]
-    );
+    const created = await institutionsService.createCanonicalInstitution({
+      name: `phase1_test_${Date.now()}`,
+      domain: 'ai_safety_governance',
+      purpose: 'Phase 1 integration institution',
+      authorityScope: ['research_request'],
+      metadata: { verification_required: true },
+    });
+    institutionId = created.institutionId;
+    institutionActorId = created.actorId;
+    departmentIds = Object.fromEntries(created.departments.map((department) => [department.name, department.id]));
 
-    const deptNames = ['Production', 'Verification', 'Audit', 'Adversarial', 'Improvement'];
-    for (const name of deptNames) {
-      const departmentId = `phase1_${name.toLowerCase()}_${Date.now()}`;
-      await db.query(
-        `INSERT INTO departments
-           (id, institution_id, name, entity_type, parent_id, status, purpose, authority_scope, metadata, created_at, updated_at)
-         VALUES ($1, $2, $3, 'department', $2, 'active', $4, '[]', '{}', NOW(), NOW())`,
-        [departmentId, institutionId, name, `${name} department`]
-      );
-      departmentIds[name] = departmentId;
-    }
+    const actor = await db.query(
+      `SELECT a.actor_type, a.name, a.status, i.metadata
+         FROM actors a
+         JOIN institutions i ON i.metadata->>'actor_id' = a.id::text
+        WHERE a.id = $1 AND i.id = $2`,
+      [institutionActorId, institutionId]
+    );
+    expect(actor.rows).toEqual([
+      expect.objectContaining({
+        actor_type: 'institution',
+        status: 'active',
+      }),
+    ]);
 
     console.log(`✅ Institution created: ${institutionId}`);
+    console.log(`✅ Institution actor: ${institutionActorId}`);
     console.log(`✅ Departments: ${Object.keys(departmentIds).join(', ')}`);
   });
 

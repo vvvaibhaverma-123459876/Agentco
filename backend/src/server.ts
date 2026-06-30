@@ -24,6 +24,7 @@ import { systemRoutes } from './routes/system.routes';
 import { identityRoutes } from './routes/identity.routes';
 import { resourceLedgerRoutes } from './routes/resource-ledger.routes';
 import { metricsService } from './services/autonomy-metrics.service';
+import { shutdownRuntimeResources } from './runtime/shutdown';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -192,6 +193,7 @@ async function main() {
     console.log(`Received ${signal}, shutting down gracefully...`);
     try {
       await app.close();
+      await shutdownRuntimeResources({ closeDb: true });
       console.log('Server closed gracefully');
       process.exit(0);
     } catch (err) {
