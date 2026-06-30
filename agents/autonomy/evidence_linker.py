@@ -21,7 +21,7 @@ class EvidenceLinkerAgent(SpecialistAgent):
             'EVALUATE_PROGRESS',
         }
 
-        def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
+    def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         self.record_iteration()
         action_type = action_spec.get('actionType', '').lower()
 

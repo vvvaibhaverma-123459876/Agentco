@@ -410,8 +410,8 @@ export class ActionExecutorService {
 
   private async handleSpawnSpecialist(spec: ActionSpec, result: ActionResult): Promise<void> {
     const role = spec.args.role;
-    const objective = spec.args.objective;
-    const parentGoalId = spec.goalId;
+    const objective = spec.args.objective || spec.objective;
+    const parentGoalId = spec.goalId || spec.args.goalId;
     const customBudget = spec.args.budget;
 
     if (!role || !objective || !parentGoalId) {
@@ -435,36 +435,79 @@ export class ActionExecutorService {
     }
 
     try {
-      // Wait for specialist to complete (with timeout)
-      const specialistResults = await this.waitForSpecialistCompletion(specialist);
+      // Choose the right action type based on the specialist role's allowed actions
+      const searchRoles = new Set([
+        'researcher', 'background_researcher', 'data_analyst',
+        'comparative_analyst', 'temporal_analyst', 'sentiment_analyzer', 'fetcher',
+      ]);
+      const primaryActionType = searchRoles.has(role) ? 'WEB_SEARCH' : 'EXTRACT_EVIDENCE';
+      const primaryArgs = primaryActionType === 'WEB_SEARCH'
+        ? { query: objective }
+        : { content: objective, source: parentGoalId };
 
-      if (specialistResults) {
-        // Persist specialist results to database
-        await this.persistSpecialistResults(parentGoalId, specialistResults);
+      // Send the task directly to the specialist's HTTP /execute endpoint
+      const taskPayload = {
+        actionType: primaryActionType,
+        objective,
+        args: primaryArgs,
+        goalId: parentGoalId,
+        specialistId: specialist.specialistId,
+      };
 
+      const execResponse = await fetch(`${specialist.httpEndpoint}/execute`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(taskPayload),
+        signal: AbortSignal.timeout(25000),
+      });
+
+      if (!execResponse.ok) {
+        const errBody = await execResponse.text();
+        throw new Error(`Specialist /execute returned ${execResponse.status}: ${errBody}`);
+      }
+
+      const execResult = await execResponse.json() as {
+        status: string;
+        observations?: Record<string, any>;
+        artifacts?: string[];
+        errors?: string[];
+      };
+
+      // Kill the specialist subprocess after it responds
+      await this.teamActivation.terminateSpecialist(specialist.specialistId, {
+        artifacts: execResult.artifacts || [],
+        evidence: [],
+        claims: [],
+      }).catch(() => {/* ignore cleanup errors */});
+
+      if (execResult.status === 'completed') {
         result.observations = {
           ...result.observations,
           specialistId: specialist.specialistId,
           role: specialist.role,
           status: 'specialist_completed',
-          artifactsCreated: specialistResults.artifacts?.length || 0,
-          claimsGenerated: specialistResults.claims?.length || 0,
-          evidenceCollected: specialistResults.evidence?.length || 0,
+          ...execResult.observations,
+          artifactsCreated: execResult.artifacts?.length || 0,
         };
-        result.createdArtifacts.push(...(specialistResults.artifacts || []));
+        result.createdArtifacts.push(...(execResult.artifacts || []));
         result.status = ActionStatus.COMPLETED;
       } else {
-        result.observations.status = 'specialist_timeout';
-        result.observations.specialistId = specialist.specialistId;
         result.status = ActionStatus.FAILED;
         if (!result.errors) result.errors = [];
-        result.errors.push('Specialist timed out before completion');
+        result.errors.push(...(execResult.errors || [`Specialist returned status: ${execResult.status}`]));
       }
     } catch (error: any) {
       result.status = ActionStatus.FAILED;
       result.observations.specialistId = specialist.specialistId;
       if (!result.errors) result.errors = [];
       result.errors.push(`Specialist execution failed: ${error.message}`);
+      // Attempt cleanup
+      await this.teamActivation.terminateSpecialist(specialist.specialistId, {
+        artifacts: [],
+        evidence: [],
+        claims: [],
+        error: error.message,
+      }).catch(() => {/* ignore */});
     }
   }
 

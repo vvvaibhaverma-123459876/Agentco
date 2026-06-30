@@ -21,7 +21,7 @@ class SourceValidatorAgent(SpecialistAgent):
             'EVALUATE_PROGRESS',
         }
 
-        def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
+    def handle_action(self, action_spec: Dict[str, Any]) -> Dict[str, Any]:
         """Handle source validation actions"""
         self.record_iteration()
 

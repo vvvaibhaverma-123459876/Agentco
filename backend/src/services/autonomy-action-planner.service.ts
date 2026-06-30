@@ -288,8 +288,8 @@ Available action types with REQUIRED parameters:
 3. extract_evidence [REQUIRED: content, source]
    Example: {"action_type": "extract_evidence", "objective": "Extract key points", "args": {"content": "text...", "source": "url"}}
 
-4. generate_claim [REQUIRED: claimText, supportSourceIds]
-   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"claimText": "claim text", "supportSourceIds": ["source1", "source2"]}}
+4. generate_claim [REQUIRED: claimText, supportSourceIds, supportSnippets]
+   Example: {"action_type": "generate_claim", "objective": "Create supported claim", "args": {"claimText": "claim text", "supportSourceIds": ["source1", "source2"], "supportSnippets": ["exact quote from the source evidence"]}}
 
 5. update_memory [REQUIRED: content]
    Example: {"action_type": "update_memory", "objective": "Store learning", "args": {"content": {"type": "learning", "text": "..."}}}
@@ -457,12 +457,22 @@ Decide now:
   ): ActionSpec {
     const actionType = this.normalizeActionType(decision.actionType);
 
+    // For spawn_specialist, ensure args has real goalId and objective
+    let args = decision.args;
+    if (actionType === ActionType.SPAWN_SPECIALIST) {
+      args = {
+        ...args,
+        goalId,
+        objective: args.objective || decision.objective,
+      };
+    }
+
     return {
       actionId: uuidv4(),
       actionType,
       goalId,
       objective: decision.objective,
-      args: decision.args,
+      args,
       successCriteria: this.getSuccessCriteria(actionType),
       riskLevel: RiskLevel.LOW,
       decidedBy: 'autonomy_planner',
