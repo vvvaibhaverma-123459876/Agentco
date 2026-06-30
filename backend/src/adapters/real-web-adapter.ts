@@ -5,11 +5,12 @@
  * Implements real search using multiple strategies - NO synthetic fallback.
  *
  * Priority:
- * 1. Google Custom Search API (if SEARCH_ENGINE_API_KEY set)
- * 2. Brave Search API (free, no key needed for limited requests)
- * 3. Bing Search API (if BING_SEARCH_API_KEY set)
- * 4. DuckDuckGo with retry logic
- * 5. If all fail: BLOCKED (not synthetic results)
+ * 1. SearXNG self-hosted (if SEARXNG_URL set) — no rate limits, no key needed
+ * 2. Google Custom Search API (if SEARCH_ENGINE_API_KEY set)
+ * 3. Brave Search API (free, no key needed for limited requests)
+ * 4. Bing Search API (if BING_SEARCH_API_KEY set)
+ * 5. DuckDuckGo with retry logic
+ * 6. If all fail: BLOCKED (not synthetic results)
  */
 
 import fetch from 'node-fetch';
@@ -45,6 +46,7 @@ export class RealWebAdapter implements WebAdapter {
 
     // Try each search method in priority order
     const methods = [
+      () => this.trySearXNG(query),
       () => this.tryGoogleCustomSearch(query),
       () => this.tryBraveSearch(query),
       () => this.tryBingSearch(query),
@@ -68,6 +70,40 @@ export class RealWebAdapter implements WebAdapter {
     const errorMsg = `[RealWebAdapter] ❌ ALL search methods failed for: "${query}". No fallback to synthetic.`;
     console.error(errorMsg);
     throw new Error(errorMsg);
+  }
+
+  private async trySearXNG(query: string): Promise<SearchResult[]> {
+    const baseUrl = process.env.SEARXNG_URL;
+    if (!baseUrl) {
+      return [];
+    }
+
+    try {
+      const url = `${baseUrl.replace(/\/$/, '')}/search?q=${encodeURIComponent(query)}&format=json&language=en`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': USER_AGENT, 'Accept': 'application/json' },
+        timeout: FETCH_TIMEOUT_MS,
+      });
+
+      if (!response.ok) {
+        throw new Error(`SearXNG returned ${response.status}`);
+      }
+
+      const data = await response.json() as { results?: Array<{ url: string; title: string; content?: string }> };
+      if (!data.results || data.results.length === 0) {
+        throw new Error('No results from SearXNG');
+      }
+
+      return data.results.slice(0, 10).map((item, idx) => ({
+        url: item.url,
+        title: item.title,
+        snippet: item.content || '',
+        rank: idx + 1,
+      }));
+    } catch (error) {
+      console.warn(`SearXNG failed: ${error}`);
+      return [];
+    }
   }
 
   private async tryGoogleCustomSearch(query: string): Promise<SearchResult[]> {
