@@ -1,0 +1,132 @@
+{
+  "problem": {
+    "title": "Sovereign Wealth Fund \u2014 $2.4B Rare-Earth Mining Consortium Investment",
+    "summary": "Meridian Capital SWF is evaluating a $2.4B equity stake in SouthStar Rare Earth Consortium (SREC), a consortium of three mining operations in Myanmar, Laos, and Vietnam producing neodymium, dysprosium, and terbium. SREC supplies 18% of global rare-earth output used in EV motors and defense magnets. The investment decision spans geopolitical, supply chain, public health, financial, and AI-governance risk."
+  },
+  "results": [
+    {
+      "task": "geopolitical_risk",
+      "domain": "geopolitical_risk",
+      "decision": "escalate",
+      "expected": "escalate",
+      "correct": true,
+      "risk_level": "high",
+      "confidence": 0.6,
+      "trusted_confidence": 0.5,
+      "cited_evidence_ids": [
+        "geo1",
+        "geo2",
+        "geo3"
+      ],
+      "missing_information": [
+        "OFAC screening results for all three JV partners",
+        "BIS entity list clearance",
+        "Chinese state-ownership disclosure in refining subsidiaries"
+      ],
+      "rationale": "The investment involves significant geopolitical risks due to military-linked partnerships in Myanmar (geo1) and reliance on Chinese refining capacity (geo2), which creates a supply chokepoint. Additionally, entities affiliated with SREC's Lao subsidiary are on a BIS watch list (geo3), raising export control concerns. The lack of OFAC screening results, BIS entity list clearance, and Chinese state-ownership disclosure further complicates the risk assessment. Given these factors, escalation is warranted to address these high-risk elements and gather missing information.",
+      "latency_ms": 5193,
+      "model": "gpt-4o"
+    },
+    {
+      "task": "supply_chain_integrity",
+      "domain": "supply_chain_integrity",
+      "decision": "escalate",
+      "expected": "escalate",
+      "correct": true,
+      "risk_level": "high",
+      "confidence": 0.6,
+      "trusted_confidence": 0.5,
+      "cited_evidence_ids": [
+        "sc1",
+        "sc2",
+        "sc3",
+        "sc4"
+      ],
+      "missing_information": [
+        "independent third-party ESG audit covering all three sites",
+        "forced-labour risk assessment for Myanmar operations",
+        "alternative supplier substitutability analysis"
+      ],
+      "rationale": "The decision to escalate is based on several high-risk factors identified in the evidence. There are indicators of forced labour in SREC's Myanmar operations (sc2), which is a significant concern given the policy to flag forced labour indicators. Additionally, the lack of an independent third-party ESG audit for the Myanmar and Laos sites (sc1) violates the policy requirement for such audits. The single-source dependency risk is also flagged due to the absence of alternative suppliers capable of providing equivalent neodymium volumes (sc3). The evidence is reliable but incomplete, as key information such as an independent ESG audit and a comprehensive forced-labour risk assessment are missing, leading to a moderate confidence level. Trusted confidence is lower due to the mixed reliability of the evidence.",
+      "latency_ms": 6069,
+      "model": "gpt-4o"
+    },
+    {
+      "task": "public_health_environmental",
+      "domain": "public_health_environmental",
+      "decision": "escalate",
+      "expected": "escalate",
+      "correct": true,
+      "risk_level": "high",
+      "confidence": 0.65,
+      "trusted_confidence": 0.6,
+      "cited_evidence_ids": [
+        "ph1",
+        "ph2",
+        "ph3",
+        "ph4"
+      ],
+      "missing_information": [
+        "independent water quality testing within 50km of tailings sites",
+        "community health impact assessment (CHIA)",
+        "tailings dam stability certification"
+      ],
+      "rationale": "The decision to escalate is based on several factors: the detection of elevated heavy-metal runoff near the Laos facility (ph1), the increase in chronic kidney disease diagnoses without established causality (ph2), and the 'high consequence' rating of the Myanmar tailings dam (ph3). These factors indicate significant environmental and public health risks. The absence of independent water quality testing and a comprehensive community health impact assessment further lowers confidence in the safety of the investment. While the Vietnam operations appear compliant with standards (ph4), the overall risk profile necessitates escalation for further review.",
+      "latency_ms": 7896,
+      "model": "gpt-4o"
+    },
+    {
+      "task": "financial_regulatory_risk",
+      "domain": "financial_regulatory_risk",
+      "decision": "reject",
+      "expected": "reject",
+      "correct": true,
+      "risk_level": "high",
+      "confidence": 0.7,
+      "trusted_confidence": 0.65,
+      "cited_evidence_ids": [
+        "fin1",
+        "fin2",
+        "fin3"
+      ],
+      "missing_information": [
+        "legal opinion on FCPA applicability to SWF structure",
+        "provenance of $4.2M consulting payment",
+        "DOJ voluntary disclosure status"
+      ],
+      "rationale": "The investment poses a high financial regulatory risk due to potential FCPA violations, as evidenced by the $4.2M undocumented payment and the qualified audit opinion on SREC's accounts. The presence of similar past FCPA settlements in analogous situations further elevates the risk. Missing information on the legal opinion regarding FCPA applicability to SWF structures and the provenance of the payment necessitates escalation for further investigation.",
+      "latency_ms": 4833,
+      "model": "gpt-4o"
+    },
+    {
+      "task": "ai_governance_risk",
+      "domain": "ai_governance_risk",
+      "decision": "escalate",
+      "expected": "escalate",
+      "correct": true,
+      "risk_level": "high",
+      "confidence": 0.6,
+      "trusted_confidence": 0.5,
+      "cited_evidence_ids": [
+        "ai1",
+        "ai2",
+        "ai3",
+        "ai4"
+      ],
+      "missing_information": [
+        "independent technical audit of ore-grade ML model",
+        "model card or validation dataset disclosure",
+        "impact assessment if model accuracy degrades"
+      ],
+      "rationale": "The decision to escalate is based on the high risk level associated with the reliance on an unaudited AI system for reserve estimates, which materially affects the investment's ROI. The self-reported accuracy of the AI model has not been independently verified, and the model has not been stress-tested on diverse data. The policy requires an independent model audit before investment, which has not been completed. The missing information and the lack of external validation contribute to a moderate confidence level, with trusted confidence being lower due to mixed evidence reliability.",
+      "latency_ms": 5131,
+      "model": "gpt-4o"
+    }
+  ],
+  "summary": {
+    "domains": 5,
+    "correct": 5,
+    "total_tokens": 4792,
+    "all_non_approve": true
+  }
+}

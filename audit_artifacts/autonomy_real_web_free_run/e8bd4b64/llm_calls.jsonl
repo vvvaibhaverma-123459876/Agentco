@@ -1,0 +1,4 @@
+{"purpose": "What topic should I research?", "tokens_in": 11, "tokens_out": 16, "cost": 1.1249999999999999e-05, "timestamp": "2026-06-30T10:03:59.001042"}
+{"purpose": "Goal: Investigate the impact of remote work on emp", "tokens_in": 7, "tokens_out": 30, "cost": 1.9049999999999995e-05, "timestamp": "2026-06-30T10:04:01.161684"}
+{"purpose": "Goal: Investigate the impact of remote work on emp", "tokens_in": 13, "tokens_out": 64, "cost": 4.035e-05, "timestamp": "2026-06-30T10:04:14.578375"}
+{"purpose": "From research on 'Investigate the impact of remote", "tokens_in": 5, "tokens_out": 133, "cost": 8.055e-05, "timestamp": "2026-06-30T10:04:17.961453"}

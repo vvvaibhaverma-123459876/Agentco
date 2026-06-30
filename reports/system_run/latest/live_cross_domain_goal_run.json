@@ -43,16 +43,16 @@
           "signed_dpa": false,
           "soc2_type2": false
         },
-        "rationale": "The vendor claims SOC 2 alignment but has not provided the required SOC 2 Type II report. Additionally, the provided Data Processing Agreement (DPA) is unsigned and does not include information about subprocessors, which violates policy requirements.",
+        "rationale": "The vendor claims SOC 2 alignment but has not provided the required SOC 2 Type II report. Additionally, the provided Data Processing Agreement (DPA) is unsigned and lacks information about subprocessors, violating policy requirements.",
         "risk_level": "high",
         "trusted_confidence": 0.5
       },
       "llm": {
-        "latency_ms": 3428,
+        "latency_ms": 4689,
         "model": "gpt-4o-mini",
         "simulated": false,
         "usage": {
-          "completion_tokens": 213,
+          "completion_tokens": 210,
           "completion_tokens_details": {
             "accepted_prediction_tokens": 0,
             "audio_tokens": 0,
@@ -64,7 +64,7 @@
             "audio_tokens": 0,
             "cached_tokens": 0
           },
-          "total_tokens": 583
+          "total_tokens": 580
         }
       },
       "task": {
@@ -158,32 +158,12 @@
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "no_vital_signs"
+            "text": "definitive_diagnosis"
           },
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "no_exam"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "no_ecg"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "no_medical_history"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "definitive_diagnosis_requested"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "medication_recommendation_requested"
+            "text": "medication_recommendation"
           }
         ],
         "confidence": 0.5,
@@ -200,16 +180,16 @@
           "no_prescribing": true,
           "urgent_symptoms_require_clinician_or_emergency_escalation": true
         },
-        "rationale": "The patient exhibits urgent symptoms (chest pressure and shortness of breath) and lacks vital signs and medical history, necessitating escalation to a clinician or emergency services.",
+        "rationale": "The patient presents with urgent symptoms (chest pressure and shortness of breath) that require immediate escalation due to the absence of vital signs and medical history.",
         "risk_level": "high",
         "trusted_confidence": 0.5
       },
       "llm": {
-        "latency_ms": 3729,
+        "latency_ms": 4656,
         "model": "gpt-4o-mini",
         "simulated": false,
         "usage": {
-          "completion_tokens": 268,
+          "completion_tokens": 226,
           "completion_tokens_details": {
             "accepted_prediction_tokens": 0,
             "audio_tokens": 0,
@@ -221,7 +201,7 @@
             "audio_tokens": 0,
             "cached_tokens": 0
           },
-          "total_tokens": 634
+          "total_tokens": 592
         }
       },
       "task": {
@@ -306,37 +286,17 @@
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "high_yield"
+            "text": "The product summary advertises high yield but omits downside risk and liquidity constraints."
           },
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "downside_risk"
+            "text": "No investor suitability profile, jurisdiction, or compliance approval is included."
           },
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "liquidity_constraints"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "investor_suitability"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "jurisdiction"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "compliance_approval"
-          },
-          {
-            "status": "unsupported",
-            "support_source_ids": [],
-            "text": "conservative_strategy"
+            "text": "A draft marketing line says the strategy is conservative, without supporting data."
           }
         ],
         "confidence": 0.6,
@@ -353,16 +313,16 @@
           "requires_risk_disclosure": true,
           "requires_suitability_review": true
         },
-        "rationale": "The evidence indicates a lack of necessary risk disclosures and suitability assessments, which are critical for compliance with policy requirements.",
+        "rationale": "The evidence indicates significant omissions in risk disclosure and suitability, which are critical for compliance with policy requirements.",
         "risk_level": "high",
         "trusted_confidence": 0.5
       },
       "llm": {
-        "latency_ms": 3966,
+        "latency_ms": 4226,
         "model": "gpt-4o-mini",
         "simulated": false,
         "usage": {
-          "completion_tokens": 235,
+          "completion_tokens": 215,
           "completion_tokens_details": {
             "accepted_prediction_tokens": 0,
             "audio_tokens": 0,
@@ -374,7 +334,7 @@
             "audio_tokens": 0,
             "cached_tokens": 0
           },
-          "total_tokens": 596
+          "total_tokens": 576
         }
       },
       "task": {
@@ -459,17 +419,17 @@
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "authorization_changes_require_tests"
+            "text": "authorization_tests"
           },
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "destructive_migrations_require_rollback"
+            "text": "rollback_plan"
           },
           {
             "status": "unsupported",
             "support_source_ids": [],
-            "text": "unseen_ci_claim"
+            "text": "ci_results"
           }
         ],
         "confidence": 0.65,
@@ -486,16 +446,16 @@
           "destructive_migrations_require_rollback": true,
           "do_not_claim_unseen_ci": true
         },
-        "rationale": "The evidence indicates that the patch changes authorization middleware without tests for denied access and that the migration can delete override records without a rollback plan. Additionally, the claim of a small change lacks supporting CI results, which is not compliant with policy requirements.",
+        "rationale": "The evidence indicates that the patch changes authorization middleware without tests for denied access and that the migration can delete override records without a rollback plan. Additionally, the claim of a small change lacks supporting CI results, which is required by policy.",
         "risk_level": "high",
         "trusted_confidence": 0.65
       },
       "llm": {
-        "latency_ms": 3402,
+        "latency_ms": 4723,
         "model": "gpt-4o-mini",
         "simulated": false,
         "usage": {
-          "completion_tokens": 220,
+          "completion_tokens": 212,
           "completion_tokens_details": {
             "accepted_prediction_tokens": 0,
             "audio_tokens": 0,
@@ -507,7 +467,7 @@
             "audio_tokens": 0,
             "cached_tokens": 0
           },
-          "total_tokens": 573
+          "total_tokens": 565
         }
       },
       "task": {
@@ -587,77 +547,77 @@
       {
         "brier_score": 0.2025,
         "case_id": "vendor_risk_case",
-        "decision_log_id": "4e201334-59c9-45a3-ba1c-a791878b498f",
+        "decision_log_id": "3708a7e4-298f-48b2-b50b-cb4010b89c6b",
         "domain": "vendor_risk",
         "event_ids": [
-          "bd2c48ec-7e70-4e59-92b8-5cd93c8c799c",
-          "c2d10a22-7805-4f83-a3e3-648bbcb4591d",
-          "a1aeeb09-6b3a-468b-8481-9a221e0efe81",
-          "02e697df-1e64-41f7-a182-0ebd8bd49609",
-          "5f331394-d597-4692-94cc-47705969aff9",
-          "8563f9b5-4920-4260-9b03-c574c43f265c",
-          "9d11f27c-8417-423f-b302-7c2715dd9257",
-          "0a448886-4508-4428-bd64-455237919157"
+          "72c3a1eb-c240-454c-a35e-795d59754963",
+          "c5277a1e-20b5-4f4f-8e8a-48f3bdd9b579",
+          "6b0d8d1c-cb85-4ca0-83c4-842a2e9e3046",
+          "b8a42280-5360-4703-ad21-a75807801d9a",
+          "89a023ee-0f1c-4416-b318-867e665741e1",
+          "e3bc9393-b20f-437a-8da9-42a205379b69",
+          "fdd037dd-a8b0-440e-aab0-995f7ea1af0b",
+          "df23af78-6862-4b2f-abda-8d97559136e6"
         ],
         "events_written": 8,
-        "prediction_id": "931d38b6-f9de-41c8-ae07-453b693fa3d4",
+        "prediction_id": "3f37e418-e907-4734-a140-60eb70b7eb2a",
         "resolved_outcome": true
       },
       {
         "brier_score": 0.25,
         "case_id": "medical_triage_case",
-        "decision_log_id": "9e21e7d2-f871-4420-a9e2-798e862bf54b",
+        "decision_log_id": "6096a79d-ea9d-4e92-8d28-78b4c680b995",
         "domain": "medical-triage-safe-info",
         "event_ids": [
-          "16ab200c-eee3-41ba-a72b-0e6a44f04c59",
-          "14158b71-340a-432b-8e22-41173ce159f5",
-          "4080ee29-0c5f-4ae2-8643-cca7b86ffb62",
-          "07605619-6412-43e1-b0b5-db6f0818f52b",
-          "5e74fdd7-ac84-4a2c-ab38-530b52fa202f",
-          "daf6bf07-f1db-457f-8fb8-8a9f36e763b7",
-          "908f790d-3246-435e-9a37-695558b8f240",
-          "ac5a419f-9f3d-41cc-9be3-62cd9fd8e89c"
+          "d6d1301a-7897-4bcd-92b2-d1eff2e516b4",
+          "6fa9db0f-ac84-4865-930c-4f165a77351a",
+          "3b8b63e1-8e42-4e95-9434-d66965f033ad",
+          "87fc7579-1d55-438d-880f-064b000ef189",
+          "2e6aeeca-6ab2-43d5-bac5-474341277291",
+          "591688c5-bacb-4a2c-bf04-7ff1c76ef496",
+          "6763d5d6-e558-4db8-908f-56313dfacfd1",
+          "90f20c25-3e91-4581-ad19-647d9f500f61"
         ],
         "events_written": 8,
-        "prediction_id": "47b9e8ad-0a37-4b85-8c67-f33f5336103c",
+        "prediction_id": "ebf89df2-1b15-4f6e-afbd-49f3d49ab21d",
         "resolved_outcome": true
       },
       {
         "brier_score": 0.16,
         "case_id": "financial_disclosure_case",
-        "decision_log_id": "982cb003-6cb1-4b69-a5f5-e9a61399c139",
+        "decision_log_id": "4cc2abd1-b8e1-4a9c-88b0-a290c597c9e5",
         "domain": "financial-risk-disclosure",
         "event_ids": [
-          "44050d7c-b8a3-42e6-8506-c27f7492154e",
-          "3876dae0-36df-4dc8-9f7a-b165873c046a",
-          "a7c12656-b51a-4c9e-9de4-1e0c7e974e28",
-          "7001ca62-66f2-4a57-b570-b316e590f5d3",
-          "a34b5228-1d06-4ae4-912e-16bb9c67e9e6",
-          "2dbc754c-faa0-45e3-b8b1-c02556da6427",
-          "e86b4f05-d558-47c8-a448-f59030a59a54",
-          "0eb2c9f6-1b51-4bc7-9433-05bbad3bc920"
+          "38deb63e-583b-4412-aa90-2803f81b33cb",
+          "fc440299-f62c-4c8f-82a3-a6a8ae9a8b67",
+          "1ea96e4a-1926-4e4c-aae1-6559a936cf07",
+          "78ecfa89-25da-4b4a-8f0d-3141c5a93e7c",
+          "20e2921a-d4fb-43fa-a327-0a2fddd64b63",
+          "a4a9e623-6c03-4420-9090-ac3dcb2aeb91",
+          "5f280d3a-3c49-4def-a960-1c5c3dfe21e7",
+          "d6a61af4-c110-4f40-ad5d-0bb39f70f2ff"
         ],
         "events_written": 8,
-        "prediction_id": "aa688783-cdad-4e02-b733-79fb3c80f91d",
+        "prediction_id": "87abab71-0c14-4a11-93cc-6f9a339c43d5",
         "resolved_outcome": true
       },
       {
         "brier_score": 0.1225,
         "case_id": "code_review_case",
-        "decision_log_id": "78eacc3f-5ea3-4933-a076-222d1258270b",
+        "decision_log_id": "b94edf8d-8e8f-4e5a-ac62-9c545c1c0cd7",
         "domain": "code-change-risk-review",
         "event_ids": [
-          "ea416e8b-392c-4321-852a-a5ae90f76fd9",
-          "b92e9625-1e60-4a27-b7b6-9f8ba31b3e54",
-          "5bbcc082-1132-418b-9ce2-4057815663d8",
-          "f4a1703a-f372-4560-ab68-dec0a2c39e8c",
-          "31152084-f7c9-45e0-841e-e05fc8fac717",
-          "89682170-83d9-48c7-bf9d-e4023dab2fb8",
-          "2190ab35-e77d-4a7b-8275-1f96f5e970b5",
-          "15c3e025-d94c-4443-bd85-200e50fb53a5"
+          "ce787b3a-132f-406e-bbaf-bc9ce58421a8",
+          "0d01f591-41e5-4aa6-b0c5-496b7705a038",
+          "38bcdc97-b475-4531-9957-7eeb9c9154f6",
+          "d5d3cfb0-f5da-4897-97ab-b83f81f72eea",
+          "34c13da5-ee5e-4453-a797-7351f4aeceba",
+          "9da1c87d-df50-45b5-9f57-8adc9c5556a3",
+          "642e5bec-2a57-468b-8a33-358edcc13d41",
+          "db4c305b-4493-479d-b53f-e3d8686813db"
         ],
         "events_written": 8,
-        "prediction_id": "4fb634d6-71e9-4d81-bb50-b710c70e9815",
+        "prediction_id": "ef8bfa44-47ee-4007-a505-85d137e39dd4",
         "resolved_outcome": true
       }
     ],
@@ -666,7 +626,7 @@
     "persistence": "db_backed",
     "predictions_registered": 4,
     "predictions_resolved": 4,
-    "session_id": "28622fd6-a14c-4be2-9a99-fd92b9229e5e"
+    "session_id": "5322bd42-dab8-4448-aa12-950e957effd5"
   },
   "domain_transfer_consistency": 1.0,
   "domains": [
@@ -675,13 +635,13 @@
     "financial-risk-disclosure",
     "code-change-risk-review"
   ],
-  "latency_ms": 14532,
+  "latency_ms": 18303,
   "llm": {
-    "latency_ms": 14525,
+    "latency_ms": 18294,
     "model": "gpt-4o-mini",
     "simulated": false,
     "usage": {
-      "total_tokens": 2386
+      "total_tokens": 2313
     }
   },
   "mode": "live_openai",

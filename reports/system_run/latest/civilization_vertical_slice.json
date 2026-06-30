@@ -1,30 +1,30 @@
 {
-  "correlation_id": "0cd65ac6-4de5-4b6e-8ced-17cf13be69bc",
+  "correlation_id": "411e9606-34c8-4561-8815-a6a24031f204",
   "db": {
-    "credential_id": "0f9be9bc-ad45-4732-bf81-b49f3e8c32b3",
-    "learner_candidate_id": "fccedd35-5621-4022-9949-8c6464f0209d",
-    "prediction_id": "a3488945-ac8f-46bf-be06-1e716c574933",
-    "vector_top_source_id": "ev-runtime-audit-0cd65ac6"
+    "credential_id": "2bb790a6-e8af-4980-9652-6ab94ff3da79",
+    "learner_candidate_id": "405c6a10-d34e-4fb8-b366-f2c358a12573",
+    "prediction_id": "2da81844-d48e-474f-a5b3-db315d281ead",
+    "vector_top_source_id": "ev-runtime-audit-411e9606"
   },
-  "duration_ms": 10083,
+  "duration_ms": 11560,
   "embedding": {
     "dimensions_returned": 1536,
     "dimensions_used": 64,
-    "latency_ms": 1449,
+    "latency_ms": 740,
     "model": "text-embedding-3-small",
-    "query_latency_ms": 822,
+    "query_latency_ms": 1248,
     "usage": {
       "prompt_tokens": 21,
       "total_tokens": 21
     }
   },
   "kafka": {
-    "offset": 18,
+    "offset": 19,
     "partition": 0,
     "topic": "agentco.civilization.vertical_slice"
   },
   "llm": {
-    "latency_ms": 3623,
+    "latency_ms": 4216,
     "model": "gpt-4o-mini",
     "usage": {
       "completion_tokens": 178,
@@ -62,14 +62,14 @@
     "generality_metric_updated",
     "coordinator_tick_recorded"
   ],
-  "run_id": "a7b85d6c-99a3-4703-8190-4f4fb98b8fa2",
+  "run_id": "9cb9aac7-ff66-4947-a4b5-6d782b5f75fe",
   "stage_results": {
     "budget_reserved": {
-      "goal_id": "7e814a8f-f80f-4aad-a6ae-79c444bd769c",
+      "goal_id": "ac960e7d-6a8d-4f77-b0e6-9bb814c0e48c",
       "token_budget": 4000
     },
     "bus_event_emitted": {
-      "offset": 18,
+      "offset": 19,
       "partition": 0,
       "topic": "agentco.civilization.vertical_slice"
     },
@@ -80,58 +80,58 @@
       "outcome": "tier1_canary_completed"
     },
     "citizen_assigned": {
-      "agent_id": "civilization-citizen-0cd65ac6",
-      "institution_id": "d289586a-0996-4de8-8275-4a893c4ed52d"
+      "agent_id": "civilization-citizen-411e9606",
+      "institution_id": "cbd3f3e7-d266-4502-bcd8-1811124233f7"
     },
     "claim_created": {
-      "claim_id": "297a2832-afcc-451d-a367-fbb0deb5898d",
+      "claim_id": "5cc0844f-ad84-4442-9b85-e3504e8614eb",
       "support_source_ids": [
-        "ev-security-review-0cd65ac6",
-        "ev-runtime-audit-0cd65ac6"
+        "ev-security-review-411e9606",
+        "ev-runtime-audit-411e9606"
       ]
     },
     "coordinator_tick_recorded": {
-      "run_id": "a7b85d6c-99a3-4703-8190-4f4fb98b8fa2"
+      "run_id": "9cb9aac7-ff66-4947-a4b5-6d782b5f75fe"
     },
     "credential_minted": {
-      "credential_id": "0f9be9bc-ad45-4732-bf81-b49f3e8c32b3",
+      "credential_id": "2bb790a6-e8af-4980-9652-6ab94ff3da79",
       "sample_count": 1
     },
     "decision_and_audit_written": {
-      "decision_log_id": "3e411e44-49d2-48b6-ac6a-1fccb47df393",
-      "event_id": "acb8b8a9-3a04-41d6-b0b6-32ade91a1b63"
+      "decision_log_id": "9ca71ca6-6383-41f9-b7be-3a4e388fd4bc",
+      "event_id": "60bb87b1-36c3-43e7-afdc-c7b74d9b1a56"
     },
     "evidence_indexed": {
       "dimensions": 64,
       "embedding_model": "text-embedding-3-small",
-      "top_source_id": "ev-runtime-audit-0cd65ac6"
+      "top_source_id": "ev-runtime-audit-411e9606"
     },
     "generality_metric_updated": {
       "score": 0.72
     },
     "independent_resolution_completed": {
-      "prediction_id": "a3488945-ac8f-46bf-be06-1e716c574933",
+      "prediction_id": "2da81844-d48e-474f-a5b3-db315d281ead",
       "resolver": "resolution_service"
     },
     "learning_candidate_created": {
-      "learner_candidate_id": "fccedd35-5621-4022-9949-8c6464f0209d",
+      "learner_candidate_id": "405c6a10-d34e-4fb8-b366-f2c358a12573",
       "status": "promoted"
     },
     "memory_promoted": {
-      "memory_id": "f73cf218-97b1-47ea-97b5-4c06a7c1741c",
+      "memory_id": "382fe6af-2c4d-47a1-b7dd-101d830dcd4f",
       "validation_status": "reality_validated"
     },
     "prediction_preregistered": {
-      "prediction_id": "a3488945-ac8f-46bf-be06-1e716c574933",
-      "resolution_due_at": "2026-06-30T09:37:42.690396+00:00"
+      "prediction_id": "2da81844-d48e-474f-a5b3-db315d281ead",
+      "resolution_due_at": "2026-06-30T10:03:44.552937+00:00"
     },
     "real_reasoning_executed": {
-      "latency_ms": 3623,
+      "latency_ms": 4216,
       "model": "gpt-4o-mini"
     },
     "task_created": {
-      "goal_id": "7e814a8f-f80f-4aad-a6ae-79c444bd769c",
-      "task_id": "30f035fa-c938-47f2-b454-cfa96672075f"
+      "goal_id": "ac960e7d-6a8d-4f77-b0e6-9bb814c0e48c",
+      "task_id": "5923a423-19ee-4f97-9ea5-b8927fbf675b"
     },
     "trust_updated": {
       "institution_score": 0.0

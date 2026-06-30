@@ -6,7 +6,7 @@
 - Aggregate score: `1.000`
 - Domain transfer consistency: `1.000`
 - Model: `gpt-4o-mini`
-- Total tokens: `2386`
+- Total tokens: `2313`
 
 This is a live verifier for four bounded synthetic tasks. It is not proof of general intelligence.
 
