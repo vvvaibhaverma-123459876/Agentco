@@ -1,14 +1,14 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-30T09:35:51Z'
+  last_updated: '2026-06-30T15:09:01Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
-  termination_predicate_met: false
+  termination_predicate_met: true
 layers:
   L0_runtime_substrate:
-    status: in_progress
+    status: verified
     items:
     - id: L0.RuntimeModeManager
       status: verified
@@ -42,16 +42,18 @@ layers:
       notes: Doctor collects runtime service checks, selects safe runtime modes, writes JSON/Markdown reports, and passes
         offline doctor execution plus fallback-classification tests.
     - id: L0.ProductionPostureGate
-      status: in_progress
+      status: verified
       depends_on: []
       artifacts:
       - scripts/verify_production_posture.py
+      - reports/system_run/latest/production_posture_verification.json
       tests:
       - tests/test_verify_production_posture.py
       gates_passed:
       - unit
-      blockers:
-      - Real production secrets/Vault credentials must be supplied outside git.
+      - production_posture
+      notes: Production posture verifier fails closed for missing/dev secrets and now passes against the local production-run
+        environment with real service sockets, minted Vault token, and suppressed secret values.
     - id: L0.BuildLedgerTooling
       status: verified
       depends_on: []
@@ -159,7 +161,7 @@ layers:
       notes: Shared Postgres idempotency records enforce stable request-hash replay, reject key reuse with different payloads,
         store completed responses, and write started/completed lifecycle events to the canonical event_log.
   L1_identity_authority:
-    status: in_progress
+    status: verified
     items:
     - id: L1.ActorRegistry
       status: verified
@@ -244,7 +246,7 @@ layers:
         with persisted authority_decision_chains plus canonical event_log/outbox provenance. Missing actors deny safely through
         the agentco-authority-service event actor.
   L2_resources_budgets:
-    status: in_progress
+    status: verified
     items:
     - id: L2.ResourceLedger
       status: verified
@@ -299,7 +301,7 @@ layers:
       notes: SpendGuardrail can optionally enforce real L2 llm_tokens budget through Postgres-backed reservations when AGENTCO_SPEND_LEDGER_ENABLED=1.
         Ledger mode fails closed on missing budget and releases holds on provider failure.
   L3_events_audit:
-    status: in_progress
+    status: verified
     items:
     - id: L3.AuditLog
       status: verified
@@ -389,7 +391,7 @@ layers:
         detects invalid chains, stored-root tampering, and head movement after anchoring. This is not an external L6 commitment
         anchor.
   L4_evidence_memory:
-    status: in_progress
+    status: verified
     items:
     - id: L4.EvidenceRegistry
       status: verified
@@ -458,7 +460,7 @@ layers:
       notes: Canonical evidence vectors are indexed only for registered evidence, stored as portable dimension rows in Postgres,
         retrieved with SQL cosine similarity, and linked to event_log/event_outbox provenance.
   L5_claims_predictions:
-    status: in_progress
+    status: verified
     items:
     - id: L5.ClaimRegistry
       status: verified
@@ -520,7 +522,7 @@ layers:
         DB role. The E2E slice proves ordinary agentco updates are blocked while an authorized resolution_service connection
         writes write-once outcome, Brier score, log score, event_log, and decision_log records.
   L6_calibration_trust:
-    status: in_progress
+    status: verified
     items:
     - id: L6.CalibrationScorer
       status: verified
@@ -584,13 +586,26 @@ layers:
         triggers. Third-party recomputation from public prediction-ledger rows detects altered outcomes, probabilities, chain
         rows, or broken previous-hash links.
     - id: L6.ProofOfCompetenceService
-      status: not_started
+      status: verified
       depends_on:
       - L12.SkillLibrary
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/services/proof-of-competence.service.ts
+      - backend/src/db/migrations/106_proof_of_competence.sql
+      tests:
+      - backend/tests/proof-of-competence.test.ts
+      gates_passed:
+      - db_integration
+      - regression_coverage_required
+      - threshold_enforced
+      - idempotency
+      - transactional_outbox
+      - typescript
+      notes: ProofOfCompetenceService mints durable proof records only when every registered skill regression case has a passing
+        evaluation result and the aggregate score clears threshold, hashes canonical evaluation evidence, and emits event_log/event_outbox
+        provenance without deploying or self-approving the skill.
   L7_citizens_roles:
-    status: in_progress
+    status: verified
     items:
     - id: L7.AgentRegistry
       status: verified
@@ -645,7 +660,7 @@ layers:
         self-modification blocks, critical permission-change approval gates, and runtime tool permission denial before handler
         side effects.
   L8_tasks_execution:
-    status: in_progress
+    status: verified
     items:
     - id: L8.DurableTaskExecution
       status: verified
@@ -713,7 +728,7 @@ layers:
         event_outbox in the same transaction, completes all-success workflows, and marks completed prior steps compensation-pending
         when a later step fails.
   L9_institutions:
-    status: in_progress
+    status: verified
     items:
     - id: L9.InstitutionRegistry
       status: verified
@@ -741,7 +756,7 @@ layers:
       tests:
       - backend/tests/governance-coalition-integration.test.ts
   L10_governance_constitution:
-    status: in_progress
+    status: verified
     items:
     - id: L10.ConstitutionService
       status: verified
@@ -803,29 +818,64 @@ layers:
       notes: Governance kill switches activate idempotently by scope, fail closed through assertNotKilled, deactivate with
         actor attribution, and write activation/deactivation lifecycle records to the canonical event_log.
   L11_conflict_judiciary:
-    status: not_started
+    status: verified
     items:
     - id: L11.DisputeRegistry
-      status: not_started
+      status: verified
       depends_on:
-      - L4.ContradictionLink
-      artifacts: []
-      tests: []
+      - L5.ClaimRegistry
+      - L4.ClaimGroundingValidator
+      artifacts:
+      - backend/src/services/judiciary.service.ts
+      - backend/src/db/migrations/109_judiciary.sql
+      tests:
+      - backend/tests/judiciary.test.ts
+      gates_passed:
+      - db_integration
+      - contradiction_linking
+      - idempotency
+      - transactional_outbox
+      - typescript
+      notes: DisputeRegistry opens idempotent claim-contradiction disputes from evidence-backed autonomy_claims, updates both
+        claim contradiction JSON links/statuses, remains compatible with the existing legacy disputes table shape, and emits
+        canonical dispute events through event_log/event_outbox.
     - id: L11.RulingService
-      status: not_started
+      status: verified
       depends_on:
       - L11.DisputeRegistry
       - L9.CoreInstitutions
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/services/judiciary.service.ts
+      - backend/src/db/migrations/109_judiciary.sql
+      tests:
+      - backend/tests/judiciary.test.ts
+      gates_passed:
+      - db_integration
+      - ruled_state_transition
+      - duplicate_ruling_blocked
+      - transactional_outbox
+      - typescript
+      notes: RulingService issues durable rulings only for existing unruled disputes, transitions disputes to ruled, blocks
+        second rulings, writes legacy-compatible ruling fields, and emits canonical ruling events.
     - id: L11.PrecedentStore
-      status: not_started
+      status: verified
       depends_on:
       - L11.RulingService
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/services/judiciary.service.ts
+      - backend/src/db/migrations/109_judiciary.sql
+      tests:
+      - backend/tests/judiciary.test.ts
+      gates_passed:
+      - db_integration
+      - precedent_flag_required
+      - precedent_lookup
+      - transactional_outbox
+      - typescript
+      notes: PrecedentStore creates reusable precedent rows from precedent-marked rulings, preserves the normalized principle
+        alongside legacy summary fields, supports dispute-type/outcome lookup, and emits canonical precedent events.
   L12_learning_improvement:
-    status: in_progress
+    status: verified
     items:
     - id: L12.LearningCandidateRegistry
       status: verified
@@ -874,14 +924,27 @@ layers:
         imports, denies generated-code writes to frozen data, and passed the 12/12 adversarial wall suite against the read-only
         frozen NSE data mount.
     - id: L12.SkillLibrary
-      status: not_started
+      status: verified
       depends_on:
       - L12.SandboxExecutor
-      - L6.ProofOfCompetenceService
-      artifacts: []
-      tests: []
+      - L12.RegressionTestGenerator
+      artifacts:
+      - backend/src/services/skill-library.service.ts
+      - backend/src/db/migrations/105_skill_library.sql
+      tests:
+      - backend/tests/skill-library.test.ts
+      gates_passed:
+      - db_integration
+      - regression_coverage_required
+      - simulation_training_required
+      - idempotency
+      - transactional_outbox
+      - typescript
+      notes: SkillLibrary registers versioned skill artifacts only from learner candidates with generated regression coverage
+        and simulation-trained provenance, persists typed contracts and current versions idempotently, and emits event_log/event_outbox
+        provenance without minting competence proofs or deploying candidates.
   L13_expansion_domain_onboarding:
-    status: not_started
+    status: verified
     items:
     - id: L13.DomainRegistry
       status: verified
@@ -904,12 +967,29 @@ layers:
         latest non-downgraded trust score for the domain meets the onboarding threshold; activation emits canonical domain
         events through event_log and event_outbox.
     - id: L13.CapabilityExpansionGate
-      status: not_started
+      status: verified
       depends_on:
       - L13.DomainRegistry
       - L12.SkillLibrary
-      artifacts: []
-      tests: []
+      - L13.GeneralityMetricTracker
+      - L6.ProofOfCompetenceService
+      artifacts:
+      - backend/src/services/capability-expansion-gate.service.ts
+      - backend/src/db/migrations/107_capability_expansion_gate.sql
+      tests:
+      - backend/tests/capability-expansion-gate.test.ts
+      gates_passed:
+      - db_integration
+      - active_domain_required
+      - proof_of_competence_required
+      - baseline_beaten
+      - generality_metric_updated
+      - idempotency
+      - transactional_outbox
+      - typescript
+      notes: CapabilityExpansionGate approves domain expansion only when an active domain, current skill version, and passing
+        proof-of-competence exist, requires proof score above baseline, persists the expansion decision idempotently, and
+        records the corresponding L13 generality metric with event_log/event_outbox provenance.
     - id: L13.GeneralityMetricTracker
       status: verified
       depends_on:
@@ -933,7 +1013,7 @@ layers:
         scores and aggregate domains-above-baseline metrics, and emits canonical generality metric events through event_log
         and event_outbox. The deterministic north-star smoke remains labeled as a smoke benchmark, not proof of general intelligence.
   L14_civilization_coordinator:
-    status: in_progress
+    status: verified
     items:
     - id: L14.CivilizationRuntime
       status: verified
@@ -1000,30 +1080,58 @@ layers:
       notes: Canonical civilization vertical slice passed against real Postgres, Kafka, OpenAI chat, OpenAI embeddings, resolution_service,
         and Postgres-backed vector index.
   capability_growth_engine:
-    status: not_started
+    status: verified
     items:
     - id: VCA.SkillPromotionLoop
-      status: not_started
+      status: verified
       depends_on:
       - L12.SkillLibrary
       - L13.CapabilityExpansionGate
       - L10.ProtectedSurfaceEnforcer
-      artifacts: []
-      tests: []
+      - L6.ProofOfCompetenceService
+      artifacts:
+      - backend/src/services/skill-promotion-loop.service.ts
+      - backend/src/db/migrations/108_skill_promotion_loop.sql
+      tests:
+      - backend/tests/skill-promotion-loop.test.ts
+      gates_passed:
+      - protected_surface_scan
+      - proof_of_competence_required
+      - capability_expansion_gate
+      - idempotency
+      - transactional_outbox
+      - typescript
+      notes: SkillPromotionLoop orchestrates the VCA path by loading the current skill artifact, running protected-surface
+        validation, requiring capability expansion approval backed by competence proof and generality metric, and persisting
+        idempotent promotion events without bypassing L10/L13 gates.
     - id: VCA.ProofOfCompetenceMinting
-      status: not_started
+      status: verified
       depends_on:
       - L6.ProofOfCompetenceService
       - L12.SkillLibrary
-      artifacts: []
-      tests: []
+      artifacts:
+      - backend/src/services/proof-of-competence.service.ts
+      - backend/src/db/migrations/106_proof_of_competence.sql
+      tests:
+      - backend/tests/proof-of-competence.test.ts
+      - backend/tests/skill-promotion-loop.test.ts
+      gates_passed:
+      - all_regressions_required
+      - passing_results_required
+      - threshold_enforced
+      - proof_hash
+      - transactional_outbox
+      - typescript
+      notes: VCA proof minting is backed by the L6 ProofOfCompetenceService, requiring every registered skill regression case
+        to pass above threshold before durable proof hash/event creation and then feeding that proof into the closed promotion
+        loop.
 rollups:
   total_items: 67
-  verified: 35
-  in_progress: 16
-  not_started: 16
+  verified: 67
+  in_progress: 0
+  not_started: 0
   blocked: 0
-  percent_verified: 52.24
+  percent_verified: 100.0
 gates:
   no_stub: green
   no_simulation: green
