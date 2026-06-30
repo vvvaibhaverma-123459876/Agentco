@@ -1,0 +1,236 @@
+{
+  "meta": {
+    "schema_version": 1,
+    "generated_by": "codex",
+    "last_updated": "2026-06-30T09:03:43Z",
+    "source_docs": [
+      "docs/CIVILIZATION_ARCHITECTURE.md",
+      "docs/CODEX_BUILD_PLAN.md"
+    ],
+    "termination_predicate_met": false
+  },
+  "rollups": {
+    "total_items": 67,
+    "verified": 58,
+    "in_progress": 1,
+    "not_started": 8,
+    "blocked": 0,
+    "percent_verified": 86.57
+  },
+  "gates": {
+    "no_stub": "green",
+    "no_simulation": "green",
+    "reachability": "partial",
+    "firewall": "green",
+    "sandbox_breach": "green",
+    "credential_key_independence": "green",
+    "e2e_civilization_slice": "green",
+    "_no_stub_hit_count": "0",
+    "_no_simulation_hit_count": "0"
+  },
+  "layers": [
+    {
+      "layer": "L0_runtime_substrate",
+      "status": "in_progress",
+      "total_items": 10,
+      "verified": 9,
+      "in_progress": 1,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 90.0,
+      "ready_items": [
+        "L0.ProductionPostureGate"
+      ]
+    },
+    {
+      "layer": "L1_identity_authority",
+      "status": "in_progress",
+      "total_items": 5,
+      "verified": 5,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L2_resources_budgets",
+      "status": "in_progress",
+      "total_items": 3,
+      "verified": 3,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L3_events_audit",
+      "status": "in_progress",
+      "total_items": 5,
+      "verified": 5,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L4_evidence_memory",
+      "status": "in_progress",
+      "total_items": 4,
+      "verified": 4,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L5_claims_predictions",
+      "status": "in_progress",
+      "total_items": 4,
+      "verified": 4,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L6_calibration_trust",
+      "status": "in_progress",
+      "total_items": 5,
+      "verified": 4,
+      "in_progress": 0,
+      "not_started": 1,
+      "blocked": 0,
+      "percent_verified": 80.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L7_citizens_roles",
+      "status": "in_progress",
+      "total_items": 3,
+      "verified": 3,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L8_tasks_execution",
+      "status": "in_progress",
+      "total_items": 5,
+      "verified": 5,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L9_institutions",
+      "status": "in_progress",
+      "total_items": 3,
+      "verified": 3,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L10_governance_constitution",
+      "status": "in_progress",
+      "total_items": 4,
+      "verified": 4,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L11_conflict_judiciary",
+      "status": "not_started",
+      "total_items": 3,
+      "verified": 0,
+      "in_progress": 0,
+      "not_started": 3,
+      "blocked": 0,
+      "percent_verified": 0.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L12_learning_improvement",
+      "status": "in_progress",
+      "total_items": 4,
+      "verified": 3,
+      "in_progress": 0,
+      "not_started": 1,
+      "blocked": 0,
+      "percent_verified": 75.0,
+      "ready_items": []
+    },
+    {
+      "layer": "L13_expansion_domain_onboarding",
+      "status": "not_started",
+      "total_items": 3,
+      "verified": 2,
+      "in_progress": 0,
+      "not_started": 1,
+      "blocked": 0,
+      "percent_verified": 66.67,
+      "ready_items": []
+    },
+    {
+      "layer": "L14_civilization_coordinator",
+      "status": "in_progress",
+      "total_items": 4,
+      "verified": 4,
+      "in_progress": 0,
+      "not_started": 0,
+      "blocked": 0,
+      "percent_verified": 100.0,
+      "ready_items": []
+    },
+    {
+      "layer": "capability_growth_engine",
+      "status": "not_started",
+      "total_items": 2,
+      "verified": 0,
+      "in_progress": 0,
+      "not_started": 2,
+      "blocked": 0,
+      "percent_verified": 0.0,
+      "ready_items": []
+    }
+  ],
+  "ready_frontier": [
+    {
+      "id": "L0.ProductionPostureGate",
+      "status": "in_progress",
+      "depends_on": [],
+      "artifacts": [
+        "scripts/verify_production_posture.py"
+      ],
+      "tests": [
+        "tests/test_verify_production_posture.py"
+      ],
+      "gates_passed": [
+        "unit"
+      ],
+      "blockers": [
+        "Real production secrets/Vault credentials must be supplied outside git."
+      ],
+      "_layer": "L0_runtime_substrate",
+      "_order": 2
+    }
+  ],
+  "gate_findings": {
+    "no_stub": [],
+    "no_simulation": []
+  }
+}

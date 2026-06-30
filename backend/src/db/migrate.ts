@@ -22,6 +22,20 @@ const MIGRATIONS_DIR = __dirname.endsWith('dist/db')
   ? path.join(__dirname, '../../src/db/migrations')
   : path.join(__dirname, 'migrations');
 
+function substituteEnvVars(sql: string): string {
+  const token = "':RESOLUTION_SERVICE_PASSWORD'";
+  if (!sql.includes(token)) return sql;
+  const password =
+    process.env.RESOLUTION_SERVICE_PASSWORD ??
+    (process.env.AGENTCO_ENV === 'production'
+      ? undefined
+      : 'resolution-service-dev-password');
+  if (!password) {
+    throw new Error('RESOLUTION_SERVICE_PASSWORD must be set in production');
+  }
+  return sql.replaceAll(token, `'${password.replaceAll("'", "''")}'`);
+}
+
 async function run(): Promise<void> {
   const pool = new Pool({ connectionString: DSN });
 
@@ -47,7 +61,7 @@ async function run(): Promise<void> {
       console.log(`[skip]  ${filename} (already applied)`);
       continue;
     }
-    const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, filename), 'utf8');
+    const sql = substituteEnvVars(fs.readFileSync(path.join(MIGRATIONS_DIR, filename), 'utf8'));
     const client = await pool.connect();
     try {
       await client.query('BEGIN');

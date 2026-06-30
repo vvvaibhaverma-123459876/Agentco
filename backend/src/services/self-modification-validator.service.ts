@@ -239,7 +239,9 @@ export class SelfModificationValidator {
     }
 
     const candidate = candResult.rows[0];
-    const artifact = JSON.parse(candidate.artifact_json);
+    const artifact = typeof candidate.artifact_json === 'string'
+      ? JSON.parse(candidate.artifact_json)
+      : candidate.artifact_json;
 
     // Get protected surfaces
     const protectedSurfaces = this.getProtectedSurfaces();
@@ -403,8 +405,12 @@ export class SelfModificationValidator {
       candidateId: row.candidate_id,
       status: row.status,
       blocked: row.status === 'blocked',
-      blockedReasons: JSON.parse(row.blocked_reasons_json || '[]'),
-      touchedSurfaces: JSON.parse(row.touched_surfaces_json || '[]'),
+      blockedReasons: typeof row.blocked_reasons_json === 'string'
+        ? JSON.parse(row.blocked_reasons_json || '[]')
+        : row.blocked_reasons_json || [],
+      touchedSurfaces: typeof row.touched_surfaces_json === 'string'
+        ? JSON.parse(row.touched_surfaces_json || '[]')
+        : row.touched_surfaces_json || [],
       createdAt: row.created_at,
     };
   }

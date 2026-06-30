@@ -1,33 +1,33 @@
 {
-  "correlation_id": "1e15bc3b-dd1e-47c2-8b2e-f27ca02d886c",
+  "correlation_id": "a2f98790-441f-4caf-8eaa-f0c6e7b67174",
   "db": {
-    "credential_id": "62267f03-1cc0-4dca-bae9-719e55f17eab",
-    "learner_candidate_id": "f0158c3b-f735-4513-b50e-e6a2a9f93627",
-    "prediction_id": "f6e8b6e1-7cae-4336-b095-9fcae686f220",
-    "vector_top_source_id": "ev-runtime-audit-1e15bc3b"
+    "credential_id": "9b5538e3-660d-4699-8fac-e1efd7313c94",
+    "learner_candidate_id": "223a95d1-adf8-45b8-92c1-de973dced1bf",
+    "prediction_id": "61625c2a-175d-4da1-b35e-f8a6a06a9079",
+    "vector_top_source_id": "ev-runtime-audit-a2f98790"
   },
-  "duration_ms": 7944,
+  "duration_ms": 7977,
   "embedding": {
     "dimensions_returned": 1536,
     "dimensions_used": 64,
-    "latency_ms": 608,
+    "latency_ms": 532,
     "model": "text-embedding-3-small",
-    "query_latency_ms": 659,
+    "query_latency_ms": 541,
     "usage": {
       "prompt_tokens": 21,
       "total_tokens": 21
     }
   },
   "kafka": {
-    "offset": 11,
+    "offset": 17,
     "partition": 0,
     "topic": "agentco.civilization.vertical_slice"
   },
   "llm": {
-    "latency_ms": 3592,
+    "latency_ms": 2822,
     "model": "gpt-4o-mini",
     "usage": {
-      "completion_tokens": 170,
+      "completion_tokens": 175,
       "completion_tokens_details": {
         "accepted_prediction_tokens": 0,
         "audio_tokens": 0,
@@ -39,7 +39,7 @@
         "audio_tokens": 0,
         "cached_tokens": 0
       },
-      "total_tokens": 448
+      "total_tokens": 453
     }
   },
   "required_stages": [
@@ -62,14 +62,14 @@
     "generality_metric_updated",
     "coordinator_tick_recorded"
   ],
-  "run_id": "e36f6186-d57a-4423-8c07-26851d3c6ee4",
+  "run_id": "69a9de3a-8ebd-442d-bda4-3bc7c48725af",
   "stage_results": {
     "budget_reserved": {
-      "goal_id": "805c12ea-a29e-474d-a3f0-39a851879a3d",
+      "goal_id": "d91105b8-8407-4ae1-9a86-2cdbc59ad402",
       "token_budget": 4000
     },
     "bus_event_emitted": {
-      "offset": 11,
+      "offset": 17,
       "partition": 0,
       "topic": "agentco.civilization.vertical_slice"
     },
@@ -80,58 +80,58 @@
       "outcome": "tier1_canary_completed"
     },
     "citizen_assigned": {
-      "agent_id": "civilization-citizen-1e15bc3b",
-      "institution_id": "b337dd1f-f995-44ec-b3fc-b6839e5ef09f"
+      "agent_id": "civilization-citizen-a2f98790",
+      "institution_id": "08db1106-ac89-4bf1-847d-1d8526655e8e"
     },
     "claim_created": {
-      "claim_id": "673e8625-8615-4c19-8269-4913f8beb86c",
+      "claim_id": "46fd0b30-8e48-4b0b-8b1d-0b4e90ba2530",
       "support_source_ids": [
-        "ev-security-review-1e15bc3b",
-        "ev-runtime-audit-1e15bc3b"
+        "ev-security-review-a2f98790",
+        "ev-runtime-audit-a2f98790"
       ]
     },
     "coordinator_tick_recorded": {
-      "run_id": "e36f6186-d57a-4423-8c07-26851d3c6ee4"
+      "run_id": "69a9de3a-8ebd-442d-bda4-3bc7c48725af"
     },
     "credential_minted": {
-      "credential_id": "62267f03-1cc0-4dca-bae9-719e55f17eab",
+      "credential_id": "9b5538e3-660d-4699-8fac-e1efd7313c94",
       "sample_count": 1
     },
     "decision_and_audit_written": {
-      "decision_log_id": "8594c17f-77aa-4872-b291-99e8df06f7cc",
-      "event_id": "7bfd39a9-86e3-4db8-b58b-a577d0263e30"
+      "decision_log_id": "c3982153-5300-465e-9ac9-c277a0542e11",
+      "event_id": "e59089d4-5434-440c-ab71-decc09db514e"
     },
     "evidence_indexed": {
       "dimensions": 64,
       "embedding_model": "text-embedding-3-small",
-      "top_source_id": "ev-runtime-audit-1e15bc3b"
+      "top_source_id": "ev-runtime-audit-a2f98790"
     },
     "generality_metric_updated": {
       "score": 0.72
     },
     "independent_resolution_completed": {
-      "prediction_id": "f6e8b6e1-7cae-4336-b095-9fcae686f220",
+      "prediction_id": "61625c2a-175d-4da1-b35e-f8a6a06a9079",
       "resolver": "resolution_service"
     },
     "learning_candidate_created": {
-      "learner_candidate_id": "f0158c3b-f735-4513-b50e-e6a2a9f93627",
+      "learner_candidate_id": "223a95d1-adf8-45b8-92c1-de973dced1bf",
       "status": "promoted"
     },
     "memory_promoted": {
-      "memory_id": "c9fcbf7d-872b-473e-b1e0-f476873c6a89",
+      "memory_id": "6e1ea251-b837-4b0d-887f-f4f328239326",
       "validation_status": "reality_validated"
     },
     "prediction_preregistered": {
-      "prediction_id": "f6e8b6e1-7cae-4336-b095-9fcae686f220",
-      "resolution_due_at": "2026-06-26T10:23:02.668989+00:00"
+      "prediction_id": "61625c2a-175d-4da1-b35e-f8a6a06a9079",
+      "resolution_due_at": "2026-06-30T09:14:26.661302+00:00"
     },
     "real_reasoning_executed": {
-      "latency_ms": 3592,
+      "latency_ms": 2822,
       "model": "gpt-4o-mini"
     },
     "task_created": {
-      "goal_id": "805c12ea-a29e-474d-a3f0-39a851879a3d",
-      "task_id": "3160ac26-6482-4484-b7e0-cb002683f882"
+      "goal_id": "d91105b8-8407-4ae1-9a86-2cdbc59ad402",
+      "task_id": "70a0318c-7cc9-4fe2-bf2e-7897d1bac588"
     },
     "trust_updated": {
       "institution_score": 0.0

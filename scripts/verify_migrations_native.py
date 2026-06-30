@@ -24,6 +24,7 @@ REQUIRED_TABLES = {
     "autonomy_goals",
 }
 REQUIRED_COLUMNS = {
+    "prediction_ledger": {"prediction_id", "hardness", "consequence"},
     "departments": {"id", "institution_id", "parent_id", "entity_type", "authority_scope", "metadata"},
     "institution_work_requests": {"id", "institution_id", "department_id", "status"},
     "institution_specialist_assignments": {"id", "institution_id", "department_id", "specialist_role"},

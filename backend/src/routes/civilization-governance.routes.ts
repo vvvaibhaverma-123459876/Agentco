@@ -6,6 +6,8 @@ import { trustImpactAssessmentService } from '../services/trust-impact-assessmen
 import { trustReputationService } from '../services/trust-reputation.service';
 import { calibrationDriftMonitorService } from '../services/calibration-drift-monitor.service';
 import { trustPolicyCanaryService } from '../services/trust-policy-canary.service';
+import { civilizationRuntimeService } from '../services/civilization-runtime.service';
+import { civilizationSchedulerService } from '../services/civilization-scheduler.service';
 
 export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
@@ -479,6 +481,59 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // GET /api/civilization/health - Health check
   fastify.get('/api/civilization/health', async (_req: FastifyRequest, reply: FastifyReply) => {
     return reply.send({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // GET /api/civilization/runtime/graph - L14 runtime graph
+  fastify.get('/api/civilization/runtime/graph', async (_req: FastifyRequest, reply: FastifyReply) => {
+    return reply.send({
+      graph: civilizationRuntimeService.runtimeGraph(),
+      scope: 'core_l14_runtime_graph',
+    });
+  });
+
+  // POST /api/civilization/runtime/reachability-tick - Persist L14 coordinator reachability tick
+  fastify.post('/api/civilization/runtime/reachability-tick', async (req: FastifyRequest, reply: FastifyReply) => {
+    const { runtimeMode } = (req.body as { runtimeMode?: string } | undefined) ?? {};
+    try {
+      const tick = await civilizationRuntimeService.runReachabilityTick(runtimeMode ?? 'api_l14_runtime');
+      return reply.status(tick.status === 'passed' ? 201 : 503).send(tick);
+    } catch (e) {
+      return reply.status(400).send({ error: String(e) });
+    }
+  });
+
+  // GET /api/civilization/runtime/scheduler - L14 scheduler status
+  fastify.get('/api/civilization/runtime/scheduler', async (_req: FastifyRequest, reply: FastifyReply) => {
+    return reply.send(civilizationSchedulerService.status());
+  });
+
+  // POST /api/civilization/runtime/scheduler/run-once - Execute one bounded scheduler tick
+  fastify.post('/api/civilization/runtime/scheduler/run-once', async (req: FastifyRequest, reply: FastifyReply) => {
+    const { runtimeMode } = (req.body as { runtimeMode?: string } | undefined) ?? {};
+    try {
+      const tick = await civilizationSchedulerService.runOnce(runtimeMode ?? 'api_scheduler_l14_runtime');
+      return reply.status(tick.status === 'passed' ? 201 : 503).send({
+        scheduler: civilizationSchedulerService.status(),
+        tick,
+      });
+    } catch (e) {
+      return reply.status(400).send({ error: String(e), scheduler: civilizationSchedulerService.status() });
+    }
+  });
+
+  // POST /api/civilization/runtime/scheduler/start - Start bounded periodic L14 ticks
+  fastify.post('/api/civilization/runtime/scheduler/start', async (req: FastifyRequest, reply: FastifyReply) => {
+    const { intervalMs } = (req.body as { intervalMs?: number } | undefined) ?? {};
+    try {
+      return reply.send(civilizationSchedulerService.start(intervalMs ?? 60_000));
+    } catch (e) {
+      return reply.status(400).send({ error: String(e), scheduler: civilizationSchedulerService.status() });
+    }
+  });
+
+  // POST /api/civilization/runtime/scheduler/stop - Stop periodic L14 ticks
+  fastify.post('/api/civilization/runtime/scheduler/stop', async (_req: FastifyRequest, reply: FastifyReply) => {
+    return reply.send(civilizationSchedulerService.stop());
   });
 
   // GET /api/civilization/governance/summary - Governance summary

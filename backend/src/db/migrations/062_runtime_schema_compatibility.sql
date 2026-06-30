@@ -20,6 +20,7 @@ WHERE objective IS NULL OR institution_id IS NULL OR updated_at IS NULL;
 
 ALTER TABLE departments ADD COLUMN IF NOT EXISTS entity_type VARCHAR(50) DEFAULT 'department';
 ALTER TABLE departments ADD COLUMN IF NOT EXISTS parent_id VARCHAR(255);
+ALTER TABLE departments ADD COLUMN IF NOT EXISTS description TEXT;
 ALTER TABLE departments ADD COLUMN IF NOT EXISTS purpose TEXT;
 ALTER TABLE departments ADD COLUMN IF NOT EXISTS authority_scope JSONB DEFAULT '[]';
 ALTER TABLE departments ADD COLUMN IF NOT EXISTS metadata JSONB DEFAULT '{}';
@@ -96,7 +97,7 @@ ALTER TABLE cross_institutional_evidence_access DROP CONSTRAINT IF EXISTS fk_sou
 ALTER TABLE cross_institutional_evidence_access DROP CONSTRAINT IF EXISTS fk_requesting_inst;
 ALTER TABLE cross_institutional_evidence_access
   ADD CONSTRAINT fk_source_inst
-  FOREIGN KEY (source_institution_id) REFERENCES institutions(id) ON DELETE CASCADE;
+  FOREIGN KEY (source_institution_id) REFERENCES institutions(id) ON DELETE CASCADE NOT VALID;
 ALTER TABLE cross_institutional_evidence_access
   ADD CONSTRAINT fk_requesting_inst
-  FOREIGN KEY (requesting_institution_id) REFERENCES institutions(id) ON DELETE CASCADE;
+  FOREIGN KEY (requesting_institution_id) REFERENCES institutions(id) ON DELETE CASCADE NOT VALID;

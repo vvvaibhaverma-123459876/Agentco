@@ -193,16 +193,43 @@ def emit_kafka_event(payload: dict) -> dict:
 
 
 def canonical_audit(fields: dict) -> str:
-    return json.dumps(fields, sort_keys=True, separators=(",", ":"))
+    order = [
+        "log_id",
+        "timestamp",
+        "prev_hash",
+        "agent_id",
+        "action_type",
+        "input_summary",
+        "output_summary",
+        "confidence_score",
+        "risk_level",
+        "human_approved",
+        "human_approver_id",
+        "downstream_events",
+        "session_id",
+    ]
+    return json.dumps({key: fields[key] for key in order}, separators=(",", ":"))
 
 
 def append_decision_log(cur, *, correlation_id: str, event_ids: list[str], decision: dict) -> str:
-    cur.execute("SELECT chain_hash FROM decision_log ORDER BY timestamp DESC LIMIT 1")
+    cur.execute(
+        """
+        SELECT chain_hash
+          FROM decision_log
+         WHERE chain_hash ~ '^[0-9a-f]{64}$'
+           AND prev_hash ~ '^[0-9a-f]{64}$'
+         ORDER BY timestamp DESC, log_id DESC
+         LIMIT 1
+        """
+    )
     prev = cur.fetchone()
     prev_hash = prev[0] if prev else "0" * 64
     log_id = str(uuid.uuid4())
+    timestamp = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
     fields = {
         "log_id": log_id,
+        "timestamp": timestamp,
+        "prev_hash": prev_hash,
         "agent_id": "civilization_coordinator",
         "action_type": "decision",
         "input_summary": "external security review and runtime audit evidence",
@@ -210,18 +237,18 @@ def append_decision_log(cur, *, correlation_id: str, event_ids: list[str], decis
         "confidence_score": float(decision["confidence"]),
         "risk_level": "medium",
         "human_approved": False,
+        "human_approver_id": None,
         "downstream_events": event_ids,
         "session_id": correlation_id,
-        "prev_hash": prev_hash,
     }
     chain_hash = hashlib.sha256((prev_hash + canonical_audit(fields)).encode()).hexdigest()
     cur.execute(
         """
         INSERT INTO decision_log
           (log_id, agent_id, action_type, input_summary, output_summary,
-           confidence_score, risk_level, human_approved, downstream_events,
+           confidence_score, risk_level, human_approved, human_approver_id, downstream_events,
            session_id, timestamp, chain_hash, prev_hash)
-        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::uuid[],%s::uuid,now(),%s,%s)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::uuid[],%s::uuid,%s,%s,%s)
         """,
         [
             log_id,
@@ -232,8 +259,10 @@ def append_decision_log(cur, *, correlation_id: str, event_ids: list[str], decis
             fields["confidence_score"],
             fields["risk_level"],
             fields["human_approved"],
+            fields["human_approver_id"],
             event_ids,
             correlation_id,
+            timestamp,
             chain_hash,
             prev_hash,
         ],

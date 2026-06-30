@@ -85,6 +85,10 @@ def _apply_migrations(cur):
     )
     cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
     cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+    cur.execute(
+        "DO $$ BEGIN GRANT resolution_service TO agentco; "
+        "EXCEPTION WHEN insufficient_privilege THEN NULL; END $$;"
+    )
 
 
 @pytest.fixture(scope="module")

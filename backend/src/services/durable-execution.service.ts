@@ -3,6 +3,7 @@ import { query, withClient } from '../db/client';
 import { auditLog } from './audit-log.service';
 import { eventBus } from './event-bus.service';
 import { provenance } from './provenance.service';
+import { assertAgentCanRunTask, ensureAgentRegistryActors } from '../agent-registry';
 
 export type TaskStatus = 'queued' | 'running' | 'done' | 'failed' | 'blocked';
 
@@ -24,6 +25,8 @@ export interface WorkflowTask {
 
 export class DurableExecutionService {
   async enqueue(agent_id: string, task_type: string, payload: Record<string, unknown>): Promise<WorkflowTask> {
+    await ensureAgentRegistryActors();
+    assertAgentCanRunTask(agent_id, task_type);
     const rows = await query<WorkflowTask>(
       `INSERT INTO workflow_tasks (agent_id, task_type, payload, status)
        VALUES ($1,$2,$3,'queued') RETURNING *`,
@@ -45,6 +48,8 @@ export class DurableExecutionService {
     const task = await this.claim(task_id);
     if (!task) throw new Error(`task not found or not runnable: ${task_id}`);
     try {
+      await ensureAgentRegistryActors();
+      assertAgentCanRunTask(task.agent_id, task.task_type);
       const result = await this.dispatch(task);
       const confidence_score = 0.8;
       const risk_level = 'low' as const;

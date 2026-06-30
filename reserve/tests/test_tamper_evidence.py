@@ -50,6 +50,10 @@ def db():
         )
         cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
+        cur.execute(
+            "DO $$ BEGIN GRANT resolution_service TO agentco; "
+            "EXCEPTION WHEN insufficient_privilege THEN NULL; END $$;"
+        )
     yield conn
     with conn.cursor() as cur:
         for tbl in ("prediction_chain_log", "calibration_credentials",

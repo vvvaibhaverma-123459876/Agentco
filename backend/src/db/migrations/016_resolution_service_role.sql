@@ -17,7 +17,7 @@
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'resolution_service') THEN
-        CREATE ROLE resolution_service WITH LOGIN PASSWORD 'local_dev_only_not_secret';
+        CREATE ROLE resolution_service WITH LOGIN PASSWORD ':RESOLUTION_SERVICE_PASSWORD';
     END IF;
 END
 $$;
@@ -36,16 +36,18 @@ $$;
 -- ============================================================================
 -- GRANTS: Minimal privilege set for prediction_ledger and beliefs
 -- ============================================================================
--- Grants are conditional and wrapped to handle permission errors gracefully.
--- In development, these may fail if the current user lacks CREATEROLE attribute.
--- In production, they will succeed if run by a database admin.
+-- Grants are conditional but not silently swallowed. A migration that records
+-- success without these grants leaves the resolution firewall unusable.
 
--- Try to grant USAGE on public schema
+DO $$
+BEGIN
+    EXECUTE 'GRANT CONNECT ON DATABASE ' || quote_ident(current_database()) || ' TO resolution_service';
+END
+$$;
+
 DO $$
 BEGIN
     EXECUTE 'GRANT USAGE ON SCHEMA public TO resolution_service';
-EXCEPTION WHEN OTHERS THEN
-    NULL;  -- Ignore if user lacks permission
 END
 $$;
 
@@ -57,8 +59,6 @@ BEGIN
         EXECUTE 'GRANT SELECT ON prediction_ledger TO resolution_service';
         EXECUTE 'GRANT UPDATE ON prediction_ledger TO resolution_service';
     END IF;
-EXCEPTION WHEN OTHERS THEN
-    NULL;  -- Ignore grant errors
 END
 $$;
 
@@ -70,8 +70,6 @@ BEGIN
         EXECUTE 'GRANT SELECT ON beliefs TO resolution_service';
         EXECUTE 'GRANT UPDATE ON beliefs TO resolution_service';
     END IF;
-EXCEPTION WHEN OTHERS THEN
-    NULL;  -- Ignore grant errors
 END
 $$;
 

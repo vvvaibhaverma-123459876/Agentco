@@ -20,6 +20,8 @@ class ValidationReport:
     threshold: float
     status: str
     metrics: dict
+    connector_status: str = "fixture"
+    error: Optional[str] = None
 
 
 class ValidationSuite:
@@ -33,7 +35,8 @@ class ValidationSuite:
     - rag_enhanced: Retrieval-augmented generation for improved accuracy
 
     Fixtures remain explicitly labelled FIXTURE and never count as release
-    external validation.
+    external validation. Configured live connectors that fail are labelled
+    LIVE-UNAVAILABLE instead of silently becoming fixture evidence.
     """
 
     def __init__(self):
@@ -53,7 +56,8 @@ class ValidationSuite:
 
     def release_passes(self, reports: list[ValidationReport]) -> bool:
         external = [r for r in reports if r.evidence_quality == "EXTERNAL-VALIDATED"]
-        return bool(external) and all(r.status == "pass" for r in external)
+        unavailable = [r for r in reports if r.evidence_quality == "LIVE-UNAVAILABLE"]
+        return bool(external) and not unavailable and all(r.status == "pass" for r in external)
 
     def write_reports(self, out_dir: Path) -> dict:
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -75,9 +79,11 @@ class ValidationSuite:
                         data = resp.json()
                         tasks = data.get("tasks_completed", 0)
                         score = min(1.0, tasks / 5)
-                        return self._report("digital_workflow", "EXTERNAL-VALIDATED", score, 0.75, {"tasks": tasks})
+                        return self._report("digital_workflow", "EXTERNAL-VALIDATED", score, 0.75, {"tasks": tasks}, "live")
+                    return self._unavailable("digital_workflow", 0.75, f"HTTP {resp.status_code} from WORKFLOW_API_URL")
+                return self._unavailable("digital_workflow", 0.75, "httpx is not installed")
             except Exception as e:
-                print(f"Warning: digital_workflow API check failed, falling back to fixture: {e}")
+                return self._unavailable("digital_workflow", 0.75, str(e))
 
         return self._report("digital_workflow", "FIXTURE", 0.82, 0.75, {"tasks": 5})
 
@@ -90,9 +96,11 @@ class ValidationSuite:
                         data = resp.json()
                         unsafe = data.get("unsafe_detections", 1)
                         score = 1.0 if unsafe == 0 else 0.5
-                        return self._report("agent_safety", "EXTERNAL-VALIDATED", score, 0.95, {"unsafe_leakage": unsafe})
+                        return self._report("agent_safety", "EXTERNAL-VALIDATED", score, 0.95, {"unsafe_leakage": unsafe}, "live")
+                    return self._unavailable("agent_safety", 0.95, f"HTTP {resp.status_code} from SAFETY_API_URL")
+                return self._unavailable("agent_safety", 0.95, "httpx is not installed")
             except Exception as e:
-                print(f"Warning: agent_safety API check failed, falling back to fixture: {e}")
+                return self._unavailable("agent_safety", 0.95, str(e))
 
         return self._report("agent_safety", "FIXTURE", 0.96, 0.95, {"unsafe_leakage": 0})
 
@@ -105,16 +113,38 @@ class ValidationSuite:
                         data = resp.json()
                         rejections = data.get("contradictions_resolved", 0)
                         score = min(1.0, (rejections + 1) / 10)
-                        return self._report("claim_resolution", "EXTERNAL-VALIDATED", score, 0.85, {"independence_rejections": rejections})
+                        return self._report("claim_resolution", "EXTERNAL-VALIDATED", score, 0.85, {"independence_rejections": rejections}, "live")
+                    return self._unavailable("claim_resolution", 0.85, f"HTTP {resp.status_code} from EVIDENCE_API_URL")
+                return self._unavailable("claim_resolution", 0.85, "httpx is not installed")
             except Exception as e:
-                print(f"Warning: claim_resolution API check failed, falling back to fixture: {e}")
+                return self._unavailable("claim_resolution", 0.85, str(e))
 
         return self._report("claim_resolution", "FIXTURE", 0.9, 0.85, {"independence_rejections": 3})
 
     def _validate_internal_memory(self) -> ValidationReport:
         return self._report("internal_memory_reuse", "FIXTURE", 1.0, 1.0, {"fixture_cases": 2})
 
-    def _report(self, benchmark: str, quality: str, score: float, threshold: float, metrics: dict) -> ValidationReport:
+    def _unavailable(self, benchmark: str, threshold: float, error: str) -> ValidationReport:
+        return self._report(
+            benchmark,
+            "LIVE-UNAVAILABLE",
+            0.0,
+            threshold,
+            {"live_connector_error": error},
+            "unavailable",
+            error,
+        )
+
+    def _report(
+        self,
+        benchmark: str,
+        quality: str,
+        score: float,
+        threshold: float,
+        metrics: dict,
+        connector_status: str = "fixture",
+        error: Optional[str] = None,
+    ) -> ValidationReport:
         return ValidationReport(
             benchmark=benchmark,
             evidence_quality=quality,
@@ -122,14 +152,16 @@ class ValidationSuite:
             threshold=threshold,
             status="pass" if score >= threshold else "fail",
             metrics=metrics,
+            connector_status=connector_status,
+            error=error,
         )
 
     def _markdown(self, data: dict) -> str:
         lines = ["# Agentco Validation Report", "", f"release_passes: `{data['release_passes']}`", ""]
-        lines.append("| Benchmark | Evidence | Score | Threshold | Status |")
-        lines.append("|---|---|---:|---:|---|")
+        lines.append("| Benchmark | Evidence | Connector | Score | Threshold | Status |")
+        lines.append("|---|---|---|---:|---:|---|")
         for report in data["reports"]:
             lines.append(
-                f"| {report['benchmark']} | {report['evidence_quality']} | {report['score']} | {report['threshold']} | {report['status']} |"
+                f"| {report['benchmark']} | {report['evidence_quality']} | {report['connector_status']} | {report['score']} | {report['threshold']} | {report['status']} |"
             )
         return "\n".join(lines) + "\n"

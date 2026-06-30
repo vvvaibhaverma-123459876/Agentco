@@ -127,6 +127,45 @@ def recompute_gate_findings() -> dict[str, list[dict[str, Any]]]:
     }
 
 
+def layer_summaries(ledger: dict[str, Any]) -> list[dict[str, Any]]:
+    summaries: list[dict[str, Any]] = []
+    for layer_name, layer in ledger.get("layers", {}).items():
+        items = list(layer.get("items", []))
+        counts = Counter(item.get("status", "unknown") for item in items)
+        total = len(items)
+        verified = counts.get("verified", 0)
+        summaries.append(
+            {
+                "layer": layer_name,
+                "status": layer.get("status", "unknown"),
+                "total_items": total,
+                "verified": verified,
+                "in_progress": counts.get("in_progress", 0),
+                "not_started": counts.get("not_started", 0),
+                "blocked": counts.get("blocked", 0),
+                "percent_verified": round((verified / total) * 100, 2) if total else 0.0,
+                "ready_items": [
+                    item["id"]
+                    for item in ready_frontier(ledger)
+                    if item.get("_layer") == layer_name
+                ],
+            }
+        )
+    return summaries
+
+
+def architecture_report(ledger: dict[str, Any]) -> dict[str, Any]:
+    computed = apply_computed_fields(ledger)
+    return {
+        "meta": computed["meta"],
+        "rollups": computed["rollups"],
+        "gates": computed["gates"],
+        "layers": layer_summaries(computed),
+        "ready_frontier": ready_frontier(computed),
+        "gate_findings": computed["gate_findings"],
+    }
+
+
 def ready_frontier(ledger: dict[str, Any]) -> list[dict[str, Any]]:
     items = iter_items(ledger)
     by_id = {item["id"]: item for item in items}
@@ -183,6 +222,16 @@ def cmd_remaining(args: argparse.Namespace) -> int:
     else:
         for item in frontier:
             print(f"{item['id']} [{item.get('status')}] layer={item['_layer']}")
+    return 0
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    report = architecture_report(load_ledger())
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report, indent=2))
     return 0
 
 
@@ -248,6 +297,9 @@ def main() -> int:
     remaining = sub.add_parser("remaining")
     remaining.add_argument("--json", action="store_true")
     remaining.set_defaults(func=cmd_remaining)
+    report = sub.add_parser("report")
+    report.add_argument("--output")
+    report.set_defaults(func=cmd_report)
     sync_db = sub.add_parser("sync-db")
     sync_db.set_defaults(func=cmd_sync_db)
     args = parser.parse_args()

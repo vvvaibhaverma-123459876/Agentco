@@ -14,6 +14,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/client';
 import { ReputationLearningService } from './reputation-learning.service';
+import { auditLog } from './audit-log.service';
 
 export interface GovernanceDecision {
   decision_id: string;
@@ -110,27 +111,38 @@ class GovernanceReputationIntegrationService {
       }
       this.voting_cache.get(proposal_id)!.push(weighted_vote);
 
-      // Persist vote (non-blocking)
-      try {
-        await db.query(
-          `INSERT INTO governance_reputation_votes
-           (vote_id, voter_id, proposal_id, vote, weight, voter_reputation, voter_reliability, voter_innovation, reasoning)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-          [
-            uuidv4(),
-            voter_id,
-            proposal_id,
-            vote,
-            weight,
-            record.current_score,
-            record.reliability,
-            record.innovation,
-            reasoning || null,
-          ]
-        );
-      } catch (dbErr: any) {
-        console.warn(`[GovernanceReputation] Vote persist failed: ${dbErr.message}`);
-      }
+      const voteId = uuidv4();
+      await db.query(
+        `INSERT INTO governance_reputation_votes
+         (vote_id, voter_id, proposal_id, vote, weight, voter_reputation, voter_reliability, voter_innovation, reasoning)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          voteId,
+          voter_id,
+          proposal_id,
+          vote,
+          weight,
+          record.current_score,
+          record.reliability,
+          record.innovation,
+          reasoning || null,
+        ]
+      );
+      await db.query(
+        `INSERT INTO governance_reputation_audit
+           (audit_id, voter_id, proposal_id, action, previous_vote, new_vote, weight_change, reason)
+         VALUES ($1,$2,$3,'vote_cast',NULL,$4,$5,$6)`,
+        [uuidv4(), voter_id, proposal_id, vote, weight, reasoning ?? null]
+      );
+      await auditLog.append({
+        agent_id: voter_id,
+        action_type: 'decision',
+        input_summary: `governance vote proposal=${proposal_id}`,
+        output_summary: `vote=${vote} weight=${weight.toFixed(3)}`,
+        confidence_score: Math.max(0, Math.min(1, weight)),
+        risk_level: 'medium',
+        session_id: proposal_id,
+      });
 
       // Record governance_voted event in reputation system
       await this.reputation.recordEvent(voter_id, 'governance_voted', vote === 'approve' ? 1.0 : vote === 'reject' ? -0.5 : 0, [], {
@@ -199,26 +211,30 @@ class GovernanceReputationIntegrationService {
         reasoning: `${decision.toUpperCase()}: ${approve_normalized.toFixed(2)} approval vs ${reject_normalized.toFixed(2)} rejection`,
       };
 
-      // Persist decision (non-blocking)
-      try {
-        await db.query(
-          `INSERT INTO governance_reputation_decisions
-           (decision_id, proposal_id, proposal_type, proposed_by, decision, vote_count, weighted_score, reasoning)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-          [
-            governance_decision.decision_id,
-            proposal_id,
-            proposal_type,
-            proposed_by,
-            decision,
-            votes.length,
-            approve_normalized,
-            governance_decision.reasoning,
-          ]
-        );
-      } catch (dbErr: any) {
-        console.warn(`[GovernanceReputation] Decision persist failed: ${dbErr.message}`);
-      }
+      await db.query(
+        `INSERT INTO governance_reputation_decisions
+         (decision_id, proposal_id, proposal_type, proposed_by, decision, vote_count, weighted_score, reasoning)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          governance_decision.decision_id,
+          proposal_id,
+          proposal_type,
+          proposed_by,
+          decision,
+          votes.length,
+          approve_normalized,
+          governance_decision.reasoning,
+        ]
+      );
+      await auditLog.append({
+        agent_id: proposed_by,
+        action_type: 'decision',
+        input_summary: `governance decision proposal=${proposal_id} type=${proposal_type}`,
+        output_summary: governance_decision.reasoning,
+        confidence_score: Math.max(0, Math.min(1, approve_normalized)),
+        risk_level: proposal_type === 'coalition_formation' ? 'medium' : 'low',
+        session_id: proposal_id,
+      });
 
       // Record decision in audit
       console.log(

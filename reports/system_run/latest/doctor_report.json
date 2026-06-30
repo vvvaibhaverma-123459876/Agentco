@@ -4,6 +4,43 @@
     "production_secret_posture"
   ],
   "fallbacks_used": [],
+  "production_contract": {
+    "fallbacks_allowed": {},
+    "missing_or_non_real": [
+      {
+        "service": "backend_build",
+        "status": "not_required"
+      },
+      {
+        "service": "frontend_build",
+        "status": "not_required"
+      },
+      {
+        "service": "production_secret_posture",
+        "status": "blocked"
+      }
+    ],
+    "required_services": [
+      "python",
+      "node",
+      "npm",
+      "backend_build",
+      "frontend_build",
+      "postgres",
+      "migrations",
+      "core_db_schema",
+      "redis",
+      "kafka",
+      "vault",
+      "prometheus",
+      "grafana",
+      "resolution_service",
+      "sensitive_route_auth",
+      "production_secret_posture",
+      "filesystem_reports"
+    ],
+    "satisfied": false
+  },
   "requested_mode": "offline_fixture",
   "required_fixes": [],
   "run_best_effort": {

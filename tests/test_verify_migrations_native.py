@@ -1,7 +1,7 @@
 from scripts.verify_migrations_native import build_report
 
 
-def test_migration_report_fails_when_department_institution_column_missing():
+def test_migration_report_fails_when_required_runtime_columns_missing():
     table_out = "\n".join(
         [
             "agent_task_events",
@@ -40,6 +40,8 @@ def test_migration_report_fails_when_department_institution_column_missing():
             "autonomy_goals|id",
             "autonomy_goals|institution_id",
             "autonomy_goals|rollup_status",
+            "prediction_ledger|consequence",
+            "prediction_ledger|prediction_id",
         ]
     )
 
@@ -55,7 +57,10 @@ def test_migration_report_fails_when_department_institution_column_missing():
 
     assert report["success"] is False
     assert report["core_schema_status"] == "missing"
-    assert report["missing_columns"] == {"departments": ["institution_id"]}
+    assert report["missing_columns"] == {
+        "departments": ["institution_id"],
+        "prediction_ledger": ["hardness"],
+    }
 
 
 def test_migration_report_accepts_runtime_required_schema():
@@ -98,6 +103,9 @@ def test_migration_report_accepts_runtime_required_schema():
             "autonomy_goals|id",
             "autonomy_goals|institution_id",
             "autonomy_goals|rollup_status",
+            "prediction_ledger|consequence",
+            "prediction_ledger|hardness",
+            "prediction_ledger|prediction_id",
         ]
     )
 

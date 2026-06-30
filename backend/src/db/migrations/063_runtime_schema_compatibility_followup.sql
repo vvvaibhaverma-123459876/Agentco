@@ -25,7 +25,7 @@ ALTER TABLE cross_institutional_evidence_access DROP CONSTRAINT IF EXISTS fk_sou
 ALTER TABLE cross_institutional_evidence_access DROP CONSTRAINT IF EXISTS fk_requesting_inst;
 ALTER TABLE cross_institutional_evidence_access
   ADD CONSTRAINT fk_source_inst
-  FOREIGN KEY (source_institution_id) REFERENCES institutions(id) ON DELETE CASCADE;
+  FOREIGN KEY (source_institution_id) REFERENCES institutions(id) ON DELETE CASCADE NOT VALID;
 ALTER TABLE cross_institutional_evidence_access
   ADD CONSTRAINT fk_requesting_inst
-  FOREIGN KEY (requesting_institution_id) REFERENCES institutions(id) ON DELETE CASCADE;
+  FOREIGN KEY (requesting_institution_id) REFERENCES institutions(id) ON DELETE CASCADE NOT VALID;

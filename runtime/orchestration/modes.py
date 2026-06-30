@@ -147,6 +147,8 @@ RUNTIME_MODES: dict[str, RuntimeMode] = {
     ),
 }
 
+PRODUCTION_REQUIRED_SERVICES: tuple[str, ...] = RUNTIME_MODES["production"].required_services
+
 
 def service_ok(status: str | None) -> bool:
     return status == "real"
@@ -211,4 +213,18 @@ def classify_mode(mode_name: str, service_status: Mapping[str, str]) -> dict:
         "missing_required": missing_required,
         "fallbacks_used": fallbacks,
         "disabled_capabilities": disabled,
+    }
+
+
+def production_capability_contract(service_status: Mapping[str, str]) -> dict:
+    missing_or_non_real = [
+        {"service": service, "status": service_status.get(service, "missing")}
+        for service in PRODUCTION_REQUIRED_SERVICES
+        if not service_ok(service_status.get(service))
+    ]
+    return {
+        "required_services": list(PRODUCTION_REQUIRED_SERVICES),
+        "missing_or_non_real": missing_or_non_real,
+        "fallbacks_allowed": {},
+        "satisfied": not missing_or_non_real,
     }

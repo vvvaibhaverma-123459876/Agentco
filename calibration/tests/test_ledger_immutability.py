@@ -155,6 +155,39 @@ class TestLedgerImmutability:
         assert record.brier_score == pytest.approx((0.8 - 1.0) ** 2)
         assert record.log_score == pytest.approx(math.log(0.8))
 
+    def test_calibration_report_excludes_unresolved_and_post_hoc_records(self):
+        import math
+
+        scorer = ScoringModule()
+        records = [
+            _make_resolved_prediction(True, agent_id="cal-agent"),
+            _make_resolved_prediction(False, agent_id="cal-agent"),
+            _make_resolved_prediction(False, agent_id="cal-agent"),
+            _make_resolved_prediction(True, post_hoc=True, agent_id="cal-agent"),
+            _make_unresolved_prediction(),
+        ]
+        records[0].horizon_class = "short"
+        records[1].horizon_class = "medium"
+        records[2].horizon_class = "long"
+        for record in records[:4]:
+            outcome = bool(record.resolved_outcome)
+            record.brier_score = scorer.brier_score(record.probability, outcome)
+            record.log_score = scorer.log_score(record.probability, outcome)
+
+        report = scorer.calibration_report(records, "cal-agent", "market_dynamics")
+
+        assert report.sample_count == 3
+        assert report.mean_brier == pytest.approx((0.04 + 0.64 + 0.64) / 3)
+        assert report.mean_log == pytest.approx((math.log(0.8) + math.log(0.2) + math.log(0.2)) / 3)
+        assert report.ece == pytest.approx(abs(0.8 - (1 / 3)))
+        assert report.overconfidence == pytest.approx(abs(0.8 - (1 / 3)))
+        assert report.underconfidence == pytest.approx(0.0)
+        assert report.horizon_breakdown == {
+            "short": pytest.approx(0.04),
+            "medium": pytest.approx(0.64),
+            "long": pytest.approx(0.64),
+        }
+
 
 # ─────────────────────────────────────────────────────────────
 # FIREWALL TESTS — the central invariant

@@ -2,8 +2,9 @@ import { FastifyInstance } from 'fastify';
 import fs from 'fs';
 import path from 'path';
 import YAML from 'yaml';
-import { RuntimeProvider, activeRuntimeMode, configuredProviders } from '../runtime-mode';
+import { RuntimeProvider, activeRuntimeMode, configuredProviders, productionCapabilityContract } from '../runtime-mode';
 import { db } from '../db/client';
+import { evaluateFeatureGates } from '../feature-gates';
 
 function repoRoot(): string {
   return path.resolve(__dirname, '../../../');
@@ -74,18 +75,27 @@ export async function systemRoutes(fastify: FastifyInstance) {
 
   fastify.get('/system/capabilities', async () => {
     const providers = configuredProviders();
+    const productionContract = productionCapabilityContract();
     return {
       runtime_mode: activeRuntimeMode(),
       providers,
       can_continue: !providers.some(provider => provider.status === 'unsupported'),
       fallback_active: fallbackProviders(providers).length > 0,
       disabled_capabilities: disabledCapabilities(providers),
+      production_contract: productionContract,
+      feature_gates: evaluateFeatureGates(),
     };
   });
 
   fastify.get('/system/fallbacks', async () => ({
     runtime_mode: activeRuntimeMode(),
     fallbacks: configuredProviders().filter(provider => provider.status === 'fallback' || provider.status === 'simulated'),
+  }));
+
+  fastify.get('/system/feature-gates', async () => ({
+    runtime_mode: activeRuntimeMode(),
+    production_contract: productionCapabilityContract(),
+    feature_gates: evaluateFeatureGates(),
   }));
 
   fastify.get('/system/version', async () => {
@@ -120,6 +130,7 @@ export async function systemRoutes(fastify: FastifyInstance) {
   fastify.get('/system/readiness', async () => {
     const providers = configuredProviders();
     const ledger = summarizeLedger(loadBuildLedger());
+    const productionContract = productionCapabilityContract();
     const fallbacks = fallbackProviders(providers);
     const disabled = disabledCapabilities(providers);
     return {
@@ -130,6 +141,8 @@ export async function systemRoutes(fastify: FastifyInstance) {
       fallback_active: fallbacks.length > 0,
       fallbacks,
       disabled_capabilities: disabled,
+      production_contract: productionContract,
+      feature_gates: evaluateFeatureGates(),
       build_ledger: ledger.rollups,
       termination_predicate_met: ledger.meta?.termination_predicate_met === true,
       honesty: {

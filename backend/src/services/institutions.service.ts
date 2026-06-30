@@ -12,6 +12,10 @@
  * Civilization → Institutions (specialized) → Domain Expertise
  */
 
+import crypto from 'crypto';
+import { db } from '../db/client';
+import { identityAuthorityService } from './identity-authority.service';
+
 interface ResearchPaper {
   id: string;
   title: string;
@@ -58,6 +62,25 @@ interface InstitutionMetrics {
   specialties: InstitutionSpecialty[];
   created_at: number;
   last_activity: number;
+}
+
+interface CanonicalInstitutionInput {
+  name: string;
+  domain: string;
+  purpose?: string;
+  authorityScope?: string[];
+  metadata?: Record<string, unknown>;
+}
+
+interface CanonicalDepartmentRecord {
+  id: string;
+  name: string;
+}
+
+interface CanonicalInstitutionRecord {
+  institutionId: string;
+  actorId: string;
+  departments: CanonicalDepartmentRecord[];
 }
 
 export class Institution {
@@ -370,6 +393,56 @@ export class InstitutionsService {
     console.log(`   ID: ${id}\n`);
 
     return institution;
+  }
+
+  async createCanonicalInstitution(input: CanonicalInstitutionInput): Promise<CanonicalInstitutionRecord> {
+    const actor = await identityAuthorityService.registerActor({
+      actor_type: 'institution',
+      name: input.name,
+      metadata: {
+        domain: input.domain,
+        ...(input.metadata ?? {}),
+      },
+    });
+    const institutionId = crypto.randomUUID();
+    const authorityScope = input.authorityScope ?? ['research_request'];
+    await db.query(
+      `INSERT INTO institutions
+         (id, name, entity_type, parent_id, status, purpose, authority_scope, metadata, created_at, updated_at)
+       VALUES ($1,$2,'institution',NULL,'active',$3,$4::jsonb,$5::jsonb,NOW(),NOW())`,
+      [
+        institutionId,
+        input.name,
+        input.purpose ?? `${input.domain} institution`,
+        JSON.stringify(authorityScope),
+        JSON.stringify({
+          actor_id: actor.id,
+          domain: input.domain,
+          ...(input.metadata ?? {}),
+        }),
+      ]
+    );
+
+    const departmentNames = ['Production', 'Verification', 'Audit', 'Adversarial', 'Improvement'];
+    const departments: CanonicalDepartmentRecord[] = [];
+    for (const name of departmentNames) {
+      const departmentId = crypto.randomUUID();
+      await db.query(
+        `INSERT INTO departments
+           (id, institution_id, name, entity_type, parent_id, status, purpose, authority_scope, metadata, created_at, updated_at)
+         VALUES ($1,$2,$3,'department',$2,'active',$4,'[]'::jsonb,$5::jsonb,NOW(),NOW())`,
+        [
+          departmentId,
+          institutionId,
+          name,
+          `${name} department`,
+          JSON.stringify({ institution_actor_id: actor.id }),
+        ]
+      );
+      departments.push({ id: departmentId, name });
+    }
+
+    return { institutionId, actorId: actor.id, departments };
   }
 
   /**

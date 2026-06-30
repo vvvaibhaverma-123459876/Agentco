@@ -4,7 +4,7 @@
  */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 
 interface BenchmarkRun {
@@ -31,17 +31,7 @@ export default function EvalsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedRun, setSelectedRun] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchRuns();
-  }, []);
-
-  useEffect(() => {
-    if (selectedRun) {
-      fetchLeaderboard(selectedRun);
-    }
-  }, [selectedRun]);
-
-  async function fetchRuns() {
+  const fetchRuns = useCallback(async () => {
     try {
       const res = await fetch('/api/evals/runs?limit=50');
       const data = await res.json();
@@ -54,9 +44,9 @@ export default function EvalsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchLeaderboard(run_id: string) {
+  const fetchLeaderboard = useCallback(async (run_id: string) => {
     try {
       const res = await fetch(`/api/evals/runs/${run_id}`);
       const data = await res.json();
@@ -78,7 +68,17 @@ export default function EvalsPage() {
     } catch (err) {
       console.error('Failed to fetch leaderboard:', err);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    fetchRuns();
+  }, [fetchRuns]);
+
+  useEffect(() => {
+    if (selectedRun) {
+      fetchLeaderboard(selectedRun);
+    }
+  }, [fetchLeaderboard, selectedRun]);
 
   function getStatusBadge(status: string) {
     const colors: Record<string, string> = {

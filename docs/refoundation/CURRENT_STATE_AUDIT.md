@@ -1,10 +1,10 @@
 # Current State Audit
 
-Audit date: 2026-06-21.
+Audit date: 2026-06-30.
 
 ## Summary
 
-Agentco contains valuable calibration, trust, reserve, memory, audit, override, and early civilization code. Gates 0-17 are complete for the implemented repo scope; remaining work is hardening, live third-party benchmark connectors, dependency/security triage, and infrastructure cleanup.
+Agentco contains valuable calibration, trust, reserve, memory, audit, override, and early civilization code. Gates 0-17 are complete for the implemented repo scope; dependency/security triage, local observability compose cleanup, durable execution standalone cleanup, live connector evidence separation, Docker startup verification, and the canonical civilization vertical slice are current. Remaining work is full L14 civilization coordinator integration beyond the verified vertical slice and operator configuration of real third-party benchmark endpoints.
 
 ## Status-Labeled Findings
 
@@ -30,4 +30,12 @@ Agentco contains valuable calibration, trust, reserve, memory, audit, override, 
 - **REAL after escalation/local Postgres**: Postgres ledger tests passed with `AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco`.
 - **REAL** migration path through Gate 1: backend TypeScript runner applied migrations 001-018 to local Postgres; Python check-only path points to the same migration directory; duplicate `015` numbering is resolved.
 - **REAL** dispatch path: API dispatch now enqueues `workflow_tasks` and runs measured supported tasks via durable execution service. Unsupported task types fail closed.
-- **BROKEN dependency hygiene**: `npm ci` reports 25 backend vulnerabilities and 8 frontend vulnerabilities; not remediated in Phase 0 pass.
+- **REAL dependency hygiene**: backend and frontend `npm audit --audit-level=moderate` report `0 vulnerabilities` after dependency updates.
+- **REAL local observability config**: Docker Compose config validates, Prometheus/Grafana/OTel bind sources exist, and `tests/test_compose_bind_sources.py` guards local bind-source regressions.
+- **REAL durable standalone cleanup**: `backend/src/runtime/shutdown.ts` closes Kafka producer state and optionally the DB pool; `npm run smoke:durable` completed with local Postgres while Kafka was unavailable.
+- **REAL validation connector separation**: configured live validation endpoints produce `EXTERNAL-VALIDATED` on success and `LIVE-UNAVAILABLE` on failure; unconfigured CI mode remains explicitly `FIXTURE`.
+- **REAL Docker startup verification**: `make docker-startup-verify` passed after Docker was started, including Postgres, Redis, Kafka, Vault TCP, Prometheus, Grafana, and OTel collector probes.
+- **REAL civilization vertical slice**: `scripts/verify_civilization_vertical_slice.py --update-ledger` passed with all required stages after repairing `resolution_service` grants and `prediction_ledger` Reserve columns.
+- **REAL backend L14 runtime tick**: `backend/tests/civilization-runtime-reachability.test.ts` persists a coordinator reachability tick for the core L14 runtime graph; `backend/tests/civilization-runtime-routes.test.ts` proves the graph/tick API routes are registered through Fastify.
+- **REAL backend L14 bounded scheduler**: `backend/tests/civilization-scheduler.test.ts` proves run-once and start/stop controls without leaving background timers active.
+- **INCOMPLETE full civilization integration**: the vertical slice is verified, but the repo still lacks a complete always-on L14 coordinator service graph, durable multi-society runtime trace, and reachability proof across every implemented layer.

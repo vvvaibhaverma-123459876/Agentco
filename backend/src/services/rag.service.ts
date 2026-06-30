@@ -10,12 +10,15 @@
  * 5. Return best answer with confidence
  */
 
+import { evidenceVectorIndex } from './evidence-vector-index.service';
+
 interface SearchResult {
   source: string;
   title: string;
   snippet: string;
   relevance: number;
   url: string;
+  source_id?: string;
 }
 
 interface EvidenceConsensus {
@@ -34,7 +37,14 @@ interface RAGResult {
   reasoning: string;
 }
 
+interface RAGServiceOptions {
+  embedQuestion?: (question: string) => Promise<{ embedding: number[]; embedding_model: string }>;
+  canonicalEvidenceTopK?: number;
+}
+
 export class RAGService {
+  constructor(private readonly options: RAGServiceOptions = {}) {}
+
   /**
    * Main RAG pipeline:
    * Compare model answer with retrieved evidence to improve accuracy
@@ -76,12 +86,36 @@ export class RAGService {
   }
 
   private async retrieveEvidence(question: string): Promise<SearchResult[]> {
-    const [wikipedia, arxiv] = await Promise.all([
+    const [canonical, wikipedia, arxiv] = await Promise.all([
+      this.searchCanonicalEvidence(question),
       this.searchWikipedia(question),
       this.searchArXiv(question),
     ]);
 
-    return [...wikipedia, ...arxiv];
+    return [...canonical, ...wikipedia, ...arxiv];
+  }
+
+  private async searchCanonicalEvidence(question: string): Promise<SearchResult[]> {
+    if (!this.options.embedQuestion) return [];
+    try {
+      const query = await this.options.embedQuestion(question);
+      const results = await evidenceVectorIndex.search({
+        embedding: query.embedding,
+        embedding_model: query.embedding_model,
+        top_k: this.options.canonicalEvidenceTopK ?? 3,
+      });
+      return results.map((result) => ({
+        source: 'EvidenceVectorIndex',
+        title: result.evidence_title ?? result.source_id,
+        snippet: result.content_text,
+        relevance: Math.max(0, Math.min(1, result.similarity)),
+        url: result.evidence_url,
+        source_id: result.source_id,
+      }));
+    } catch (err: any) {
+      console.warn(`[RAG] canonical evidence retrieval failed: ${err.message}`);
+      return [];
+    }
   }
 
   private async searchWikipedia(question: string): Promise<SearchResult[]> {
