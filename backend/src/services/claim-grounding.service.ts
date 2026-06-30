@@ -59,18 +59,14 @@ export class ClaimGroundingService {
       .join(' ');
     const evidenceTokens = normalizeTokens(evidenceText);
 
-    // Use real evidence snippets — prefer LLM-provided ones that actually appear in evidence,
-    // fall back to auto-extracted snippets so claims always pass grounding.
-    const verifiedSnippets = supportSnippets.filter(s => {
-      const tokens = normalizeTokens(s);
-      return tokens.length > 0 && isTokenSubsequence(tokens, evidenceTokens);
-    });
-
-    const effectiveSnippets = verifiedSnippets.length > 0
-      ? verifiedSnippets
-      : evidenceRows.map(row => row.snippet || row.title || '').filter(Boolean).slice(0, 3);
-
-    if (effectiveSnippets.length === 0) {
+    if (supportSnippets.length > 0) {
+      for (const snippet of supportSnippets) {
+        const snippetTokens = normalizeTokens(snippet);
+        if (!isTokenSubsequence(snippetTokens, evidenceTokens)) {
+          errors.push(`support snippet is not a token-subsequence of registered evidence: ${snippet}`);
+        }
+      }
+    } else if (!evidenceRows.some(row => row.snippet || row.title)) {
       errors.push('supported claims require at least one grounded support snippet');
     }
 
