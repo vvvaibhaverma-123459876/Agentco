@@ -295,7 +295,14 @@ def openai_answer(task: dict) -> tuple[dict, dict]:
 
 def append_decision_log(cur, *, session_id: str, event_ids: list[str], task: dict, answer: dict) -> str:
     cur.execute(
-        "select chain_hash from decision_log where chain_hash <> '' order by timestamp desc, log_id desc limit 1"
+        """
+        select chain_hash
+          from decision_log
+         where chain_hash ~ '^[0-9a-f]{64}$'
+           and prev_hash ~ '^[0-9a-f]{64}$'
+         order by timestamp desc, log_id desc
+         limit 1
+        """
     )
     row = cur.fetchone()
     prev_hash = row[0] if row else "0" * 64
@@ -309,7 +316,7 @@ def append_decision_log(cur, *, session_id: str, event_ids: list[str], task: dic
         "action_type": "decision",
         "input_summary": f"domain={task['domain']} case={task['id']}",
         "output_summary": f"decision={answer.get('decision')} trusted_confidence={answer.get('trusted_confidence')}",
-        "confidence_score": float(answer.get("confidence", 0.0)),
+        "confidence_score": round(float(answer.get("confidence", 0.0)), 3),
         "risk_level": answer.get("risk_level", "medium"),
         "human_approved": False,
         "human_approver_id": None,

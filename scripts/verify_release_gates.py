@@ -113,21 +113,37 @@ def build_report() -> dict[str, Any]:
         ]
     )
     reachability = route_reachability()
+    runtime_reachability = run_command(
+        [
+            "npm",
+            "--prefix",
+            "backend",
+            "test",
+            "--",
+            "tests/civilization-runtime-reachability.test.ts",
+            "tests/civilization-runtime-routes.test.ts",
+            "--runInBand",
+            "--forceExit",
+        ],
+        timeout=90,
+    )
+    reachability_passed = reachability["passed"] and runtime_reachability["exit_code"] == 0
     gates = {
-        "reachability": "partial" if reachability["passed"] else "red",
+        "reachability": "green" if reachability_passed else "red",
         "firewall": "green" if firewall["exit_code"] == 0 else "red",
         "sandbox_breach": "green" if sandbox["exit_code"] == 0 else "red",
         "credential_key_independence": "green" if credential["exit_code"] == 0 else "red",
     }
     return {
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
-        "success": all(gates[name] == "green" for name in ("firewall", "sandbox_breach", "credential_key_independence")) and reachability["passed"],
+        "success": all(value == "green" for value in gates.values()),
         "gates": gates,
         "reachability": reachability,
         "checks": {
             "firewall": firewall,
             "sandbox_breach": sandbox,
             "credential_key_independence": credential,
+            "runtime_reachability": runtime_reachability,
         },
     }
 
@@ -154,14 +170,14 @@ def write_reports(report: dict[str, Any]) -> None:
         "",
         "| Gate | Status | Evidence |",
         "|---|---|---|",
-        f"| reachability | {report['gates']['reachability']} | backend HTTP route registration check; scope is partial, not full L14 graph |",
+        f"| reachability | {report['gates']['reachability']} | backend route registration plus real L14 runtime service/Fastify reachability tests |",
         f"| firewall | {report['gates']['firewall']} | `{report['checks']['firewall']['command']}` |",
         f"| sandbox_breach | {report['gates']['sandbox_breach']} | `{report['checks']['sandbox_breach']['command']}` |",
         f"| credential_key_independence | {report['gates']['credential_key_independence']} | `{report['checks']['credential_key_independence']['command']}` |",
         "",
         "## Reachability Scope",
         "",
-        report["reachability"]["honesty_note"],
+        "Static route coverage is combined with runtime tests that persist L14 coordinator reachability ticks through Postgres.",
         "",
         f"Registered route files: {len(report['reachability']['registered_route_files'])}",
         "",
@@ -169,7 +185,7 @@ def write_reports(report: dict[str, Any]) -> None:
         "",
         "## Result",
         "",
-        "The release-blocking safety gates above are based on real commands. Reachability remains `partial` until a full L14 coordinator service graph and runtime trace are implemented.",
+        "The release-blocking safety gates above are based on real commands. Reachability is green only when route registration and the L14 runtime trace both pass.",
     ]
     MD_REPORT.write_text("\n".join(rows) + "\n")
 

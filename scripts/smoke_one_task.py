@@ -174,26 +174,72 @@ def main():
         conn = psycopg2.connect(db_url)
         conn.autocommit = True
         log_id = str(uuid.uuid4())
-        ts = datetime.now(timezone.utc).isoformat()
+        ts = datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT chain_hash FROM decision_log ORDER BY timestamp DESC LIMIT 1"
+                """
+                SELECT chain_hash
+                  FROM decision_log
+                 WHERE chain_hash ~ '^[0-9a-f]{64}$'
+                   AND prev_hash ~ '^[0-9a-f]{64}$'
+                 ORDER BY timestamp DESC, log_id DESC
+                 LIMIT 1
+                """
             )
             row = cur.fetchone()
             prev_hash = row[0] if row else "0" * 64
-            content = json.dumps({"log_id": log_id, "timestamp": ts, "prev_hash": prev_hash})
+            audit_fields = {
+                "log_id": log_id,
+                "timestamp": ts,
+                "prev_hash": prev_hash,
+                "agent_id": agent_id,
+                "action_type": "decision",
+                "input_summary": "smoke: quarterly financial report review",
+                "output_summary": json.dumps(llm_result or {"smoke": True}),
+                "confidence_score": round(float(trusted_conf or 0.78), 3),
+                "risk_level": "low",
+                "human_approved": False,
+                "human_approver_id": None,
+                "downstream_events": [],
+                "session_id": None,
+            }
+            canonical_order = [
+                "log_id",
+                "timestamp",
+                "prev_hash",
+                "agent_id",
+                "action_type",
+                "input_summary",
+                "output_summary",
+                "confidence_score",
+                "risk_level",
+                "human_approved",
+                "human_approver_id",
+                "downstream_events",
+                "session_id",
+            ]
+            canonical_fields = {key: audit_fields[key] for key in canonical_order}
+            score = canonical_fields.get("confidence_score")
+            if isinstance(score, float):
+                score = round(score, 3)
+                canonical_fields["confidence_score"] = score
+            if isinstance(score, float) and score.is_integer():
+                canonical_fields["confidence_score"] = int(score)
+            content = json.dumps(canonical_fields, separators=(",", ":"))
             chain_hash = hashlib.sha256((prev_hash + content).encode()).hexdigest()
             cur.execute(
                 """INSERT INTO decision_log
                    (log_id, agent_id, action_type, input_summary, output_summary,
-                    confidence_score, risk_level, human_approved, timestamp,
+                    confidence_score, risk_level, human_approved, human_approver_id,
+                    downstream_events, session_id, timestamp,
                     chain_hash, prev_hash)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 (
                     log_id, agent_id, "decision",
-                    "smoke: quarterly financial report review",
-                    json.dumps(llm_result or {"smoke": True}),
-                    float(trusted_conf or 0.78), "low", False, ts, chain_hash, prev_hash,
+                    audit_fields["input_summary"],
+                    audit_fields["output_summary"],
+                    audit_fields["confidence_score"], "low", False, None,
+                    [], None, ts, chain_hash, prev_hash,
                 )
             )
             cur.execute(

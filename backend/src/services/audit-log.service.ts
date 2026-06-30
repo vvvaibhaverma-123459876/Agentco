@@ -60,6 +60,10 @@ function normalizeTimestamp(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 }
 
+function normalizeConfidenceScore(value: number): number {
+  return Math.round(value * 1000) / 1000;
+}
+
 export class AuditLogService {
   /**
    * Append an immutable audit entry. Returns the log_id.
@@ -116,7 +120,7 @@ export class AuditLogService {
       action_type: entry.action_type,
       input_summary: entry.input_summary,
       output_summary: entry.output_summary,
-      confidence_score: entry.confidence_score,
+      confidence_score: normalizeConfidenceScore(entry.confidence_score),
       risk_level: entry.risk_level,
       human_approved,
       human_approver_id,
@@ -140,7 +144,7 @@ export class AuditLogService {
         entry.action_type,
         entry.input_summary,
         entry.output_summary,
-        entry.confidence_score,
+        normalizeConfidenceScore(entry.confidence_score),
         entry.risk_level,
         human_approved,
         human_approver_id,

@@ -64,7 +64,7 @@
   "compose_up": {
     "command": "docker compose up -d postgres redis zookeeper kafka vault prometheus otel-collector grafana",
     "exit_code": 0,
-    "output_tail": "time=\"2026-06-30T14:37:47+05:30\" level=warning msg=\"Found orphan containers ([agentco-kafka-staging agentco-grafana-staging agentco-otel-staging agentco-redis-staging agentco-prometheus-staging agentco-zookeeper-staging agentco-postgres-staging]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.\"\n Container agentco-postgres Running \n Container agentco-redis Running \n Container agentco-zookeeper Running \n Container agentco-vault Running \n Container agentco-prometheus Running \n Container agentco-kafka Running \n Container agentco-otel-collector Running \n Container agentco-grafana Running \n Container agentco-zookeeper Waiting \n Container agentco-prometheus Waiting \n Container agentco-prometheus Healthy \n Container agentco-zookeeper Healthy",
+    "output_tail": "time=\"2026-06-30T15:06:05+05:30\" level=warning msg=\"Found orphan containers ([agentco-kafka-staging agentco-grafana-staging agentco-otel-staging agentco-redis-staging agentco-prometheus-staging agentco-zookeeper-staging agentco-postgres-staging]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.\"\n Container agentco-postgres Running \n Container agentco-redis Running \n Container agentco-prometheus Running \n Container agentco-vault Running \n Container agentco-zookeeper Running \n Container agentco-grafana Running \n Container agentco-otel-collector Running \n Container agentco-kafka Running \n Container agentco-zookeeper Waiting \n Container agentco-prometheus Waiting \n Container agentco-prometheus Healthy \n Container agentco-zookeeper Healthy",
     "status": "passed"
   },
   "docker_info": {
@@ -73,7 +73,7 @@
     "output_tail": "29.5.3",
     "status": "passed"
   },
-  "generated_at": "2026-06-30T09:07:45Z",
+  "generated_at": "2026-06-30T09:36:04Z",
   "services": [
     "postgres",
     "redis",
