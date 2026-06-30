@@ -98,7 +98,14 @@ def canonical_audit_content(fields: dict) -> str:
         "downstream_events",
         "session_id",
     ]
-    return json.dumps({key: fields[key] for key in order}, separators=(",", ":"))
+    canonical = {key: fields[key] for key in order}
+    score = canonical.get("confidence_score")
+    if isinstance(score, float):
+        score = round(score, 3)
+        canonical["confidence_score"] = score
+    if isinstance(score, float) and score.is_integer():
+        canonical["confidence_score"] = int(score)
+    return json.dumps(canonical, separators=(",", ":"))
 
 
 def next_audit_timestamp() -> str:
@@ -110,7 +117,14 @@ def next_audit_timestamp() -> str:
 
 def append_decision_log(cur, *, session_id: str, event_ids: list[str], report: dict) -> str:
     cur.execute(
-        "select chain_hash from decision_log where chain_hash <> '' order by timestamp desc, log_id desc limit 1"
+        """
+        select chain_hash
+          from decision_log
+         where chain_hash ~ '^[0-9a-f]{64}$'
+           and prev_hash ~ '^[0-9a-f]{64}$'
+         order by timestamp desc, log_id desc
+         limit 1
+        """
     )
     row = cur.fetchone()
     prev_hash = row[0] if row else "0" * 64
@@ -125,7 +139,7 @@ def append_decision_log(cur, *, session_id: str, event_ids: list[str], report: d
         "action_type": "escalation",
         "input_summary": f"vendor={report['task']['vendor']} domain={report['task']['domain']}",
         "output_summary": f"decision={result.get('decision')} trusted_confidence={result.get('trusted_confidence')}",
-        "confidence_score": float(result.get("confidence", 0.0)),
+        "confidence_score": round(float(result.get("confidence", 0.0)), 3),
         "risk_level": result.get("risk_level", "medium") if result.get("risk_level") in {"low", "medium", "high", "critical"} else "medium",
         "human_approved": False,
         "human_approver_id": None,

@@ -1,7 +1,7 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-30T09:07:48Z'
+  last_updated: '2026-06-30T09:35:51Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
@@ -1027,7 +1027,7 @@ rollups:
 gates:
   no_stub: green
   no_simulation: green
-  reachability: partial
+  reachability: green
   firewall: green
   sandbox_breach: green
   credential_key_independence: green

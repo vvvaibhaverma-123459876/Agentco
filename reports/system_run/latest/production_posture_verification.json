@@ -1,46 +1,46 @@
 {
   "mode": "production_posture",
-  "can_continue": false,
+  "can_continue": true,
   "checks": [
     {
       "name": "AGENTCO_API_KEY",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "JWT_SECRET",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "EVENT_BUS_SIGNING_KEY",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "EVENT_BUS_HMAC_KEY",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "DATABASE_URL",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "VAULT_ADDR",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "VAULT_TOKEN",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "SPECIALIST_SHARED_SECRET",
-      "status": "blocked",
-      "detail": "missing required production secret"
+      "status": "real",
+      "detail": "present; value suppressed"
     },
     {
       "name": "postgres",
@@ -78,56 +78,6 @@
       "detail": "docker compose responded"
     }
   ],
-  "blocked": [
-    {
-      "name": "AGENTCO_API_KEY",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "JWT_SECRET",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "EVENT_BUS_SIGNING_KEY",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "EVENT_BUS_HMAC_KEY",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "DATABASE_URL",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "VAULT_ADDR",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "VAULT_TOKEN",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    },
-    {
-      "name": "SPECIALIST_SHARED_SECRET",
-      "status": "blocked",
-      "detail": "missing required production secret"
-    }
-  ],
-  "required_fixes": [
-    "AGENTCO_API_KEY: missing required production secret",
-    "JWT_SECRET: missing required production secret",
-    "EVENT_BUS_SIGNING_KEY: missing required production secret",
-    "EVENT_BUS_HMAC_KEY: missing required production secret",
-    "DATABASE_URL: missing required production secret",
-    "VAULT_ADDR: missing required production secret",
-    "VAULT_TOKEN: missing required production secret",
-    "SPECIALIST_SHARED_SECRET: missing required production secret"
-  ]
+  "blocked": [],
+  "required_fixes": []
 }

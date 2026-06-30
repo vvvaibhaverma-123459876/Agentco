@@ -208,7 +208,14 @@ def canonical_audit(fields: dict) -> str:
         "downstream_events",
         "session_id",
     ]
-    return json.dumps({key: fields[key] for key in order}, separators=(",", ":"))
+    canonical = {key: fields[key] for key in order}
+    score = canonical.get("confidence_score")
+    if isinstance(score, float):
+        score = round(score, 3)
+        canonical["confidence_score"] = score
+    if isinstance(score, float) and score.is_integer():
+        canonical["confidence_score"] = int(score)
+    return json.dumps(canonical, separators=(",", ":"))
 
 
 def append_decision_log(cur, *, correlation_id: str, event_ids: list[str], decision: dict) -> str:
@@ -234,7 +241,7 @@ def append_decision_log(cur, *, correlation_id: str, event_ids: list[str], decis
         "action_type": "decision",
         "input_summary": "external security review and runtime audit evidence",
         "output_summary": f"decision={decision['decision']} confidence={decision['confidence']}",
-        "confidence_score": float(decision["confidence"]),
+        "confidence_score": round(float(decision["confidence"]), 3),
         "risk_level": "medium",
         "human_approved": False,
         "human_approver_id": None,
@@ -271,6 +278,8 @@ def append_decision_log(cur, *, correlation_id: str, event_ids: list[str], decis
 
 
 def ensure_slice_schema(conn) -> None:
+    if os.getenv("AGENTCO_SKIP_SLICE_SCHEMA_ENSURE") == "1":
+        return
     with conn.cursor() as cur:
         for name in (
             "077_civilization_vertical_slice.sql",
