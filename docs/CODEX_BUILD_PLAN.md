@@ -1,6 +1,6 @@
 # PART B — CODEX END-TO-END PRODUCTION BUILD PLAN
 
-> **Current build status (2026-06-29):** this plan remains the target process. It is not complete. The durable ledger currently reports `18/67 verified (26.87%)`; see `BUILD_LEDGER.yaml` and `docs/CURRENT_IMPLEMENTATION_REALITY.md`.
+> **Current build status (2026-07-01):** this plan remains the target process and historical build contract. The durable ledger currently reports `67/67 verified (100%)` with the termination predicate met; see `BUILD_LEDGER.yaml`, `docs/CURRENT_IMPLEMENTATION_REALITY.md`, and `reports/system_run/latest/mission_progress_verification.md`. Mission-level claims still distinguish verified evidence-governed operation from partial or unproven long-horizon generality, repeated real-world self-improvement, broad open-domain transfer, and hosted production operations.
 
 ## B.0 Codex operating contract (read first, obey always)
 

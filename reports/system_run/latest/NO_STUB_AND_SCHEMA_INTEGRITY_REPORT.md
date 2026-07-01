@@ -1,5 +1,7 @@
 # No-Stub And Schema Integrity Report
 
+> **Historical/superseded status notice:** This report is retained for audit history. Do not treat old ledger-count, branch, or production-readiness language below as current truth. Current implementation status is tracked in `BUILD_LEDGER.yaml`, `docs/CURRENT_IMPLEMENTATION_REALITY.md`, and `reports/system_run/latest/mission_progress_verification.md`.
+
 Date: 2026-06-29
 Branch: `fix/runtime-integrity-and-production-honesty`
 

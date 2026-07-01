@@ -2,24 +2,26 @@
 
 AgentCo is being built as an evidence-governed, calibration-driven AI civilization: a runtime where agents act as bounded citizens, claims require evidence, predictions are pre-registered and independently resolved, trust changes only from scored outcomes, and learning is promoted through audited memory.
 
-This repository is **not production certified**. The verified state is local-native and testable, with explicit production fail-closed guards.
+This repository is a local production-posture runnable research/runtime system. It is **not a certified hosted production operation** until a real deployment has continuous SLOs, incident response, disaster recovery, backups, monitoring response, and long-running operational evidence.
 
 ## Current Verdict
 
 | Area | Current state |
 |---|---|
-| Build ledger | `18/67 verified (26.87%)` |
-| Local backend | Runnable against native Postgres |
-| Backend tests | Full default tier passed: `42` suites, `287` tests |
-| OpenAI path | Live connectivity and goal-run verifier have passed in prior reports |
-| Production | Not certified; real Vault/secrets and full production infrastructure smoke remain required |
-| Docker/Kafka/Redis/Vault/observability | Local fallbacks exist where safe; production must use real services or fail closed |
+| Build ledger | `67/67 verified (100%)`; termination predicate true |
+| Local backend | Runnable against native Postgres with default backend tier passed |
+| Release gates | Firewall, sandbox, credential key-independence, reachability, no-stub, no-simulation, and dependency-audit gates passed |
+| OpenAI path | Live connectivity, goal-run verifier, and civilization vertical slice have passed when credentials are present |
+| Docker/Kafka/Redis/Vault/observability | Local production smoke passed for Postgres, Redis, Kafka, Vault, Prometheus, Grafana, and Docker Compose probes |
+| Mission progress | Evidence-governed civilization path verified; long-horizon generality, durable real-world self-improvement, broad open-domain transfer, and hosted production operations remain partial or unproven |
+| Production | Local production posture passes; hosted production certification remains unproven |
 
 The source of truth for implementation status is:
 
 - [BUILD_LEDGER.yaml](BUILD_LEDGER.yaml)
 - [docs/CURRENT_IMPLEMENTATION_REALITY.md](docs/CURRENT_IMPLEMENTATION_REALITY.md)
-- [reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md](reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md)
+- [reports/system_run/latest/mission_progress_verification.md](reports/system_run/latest/mission_progress_verification.md)
+- [reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md](reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md)
 
 Older phase reports are historical artifacts. If they conflict with the build ledger or current implementation reality, treat them as superseded.
 
@@ -38,14 +40,18 @@ Older phase reports are historical artifacts. If they conflict with the build le
 - Memory promotion from resolved/scored predictions into append-only `agent_memories`.
 - A focused civilization learning E2E slice: evidence -> grounded claim -> prediction -> authorized resolution -> trust score -> memory promotion -> event log -> audit log.
 - Deterministic source-discovery unit verification without depending on public internet reachability; production source discovery still probes live URLs.
+- L11 conflict judiciary, L12 skill library, L6 proof of competence, L13 capability expansion gate, and VCA promotion loop verified through focused tests.
+- L14 coordinator graph/tick API routes, bounded scheduler controls, and reachability checks across the current core service graph.
+- Mission progress evidence gate that separates verified claims from partial or unproven long-horizon claims.
+- Docker production smoke for local infrastructure services when Docker and configured secrets are available.
 
 ## What Is Partial
 
-- The full L0-L14 civilization architecture is incomplete: 18 of 67 ledger items are verified.
-- Some services are implemented but not yet fully reachable from the L14 coordinator path.
-- Kafka, Redis, Vault, Prometheus/Grafana, and Docker production smoke are not proven in the current local-native path.
-- Cross-domain transfer is still a smoke benchmark, not proof of general intelligence.
-- Source independence scoring remains in progress; Python release-blocking independence tests still need reconciliation with the current actor model.
+- AgentCo has not proven progressively more general intelligence over long time horizons.
+- It has not proven durable autonomous improvement from repeated real-world operation.
+- Broad open-domain transfer remains partial; current evidence is bounded verifier and smoke-benchmark evidence, not proof of general intelligence.
+- Hosted production operations are not certified: SLOs, disaster recovery, backups, monitoring response, incident response, and long-running operations evidence remain required.
+- Real-world production source discovery still depends on live URL reachability and configured external services.
 - Disabled migrations under `backend/src/db/unsupported_migrations/` remain unsupported/future.
 
 ## What Is Test-Only Or Simulated
