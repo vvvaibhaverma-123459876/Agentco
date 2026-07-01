@@ -10,6 +10,7 @@ open-domain transfer, or hosted production certification.
 
 from __future__ import annotations
 
+import argparse
 import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -21,6 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 REPORT_DIR = ROOT / "reports" / "system_run" / "latest"
 MISSION_JSON = REPORT_DIR / "mission_progress_verification.json"
 MISSION_MD = REPORT_DIR / "mission_progress_verification.md"
+MISSION_HISTORY_JSON = REPORT_DIR / "mission_run_registry.json"
 
 
 @dataclass(frozen=True)
@@ -45,6 +47,17 @@ def load_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {"_missing": True, "_path": str(path)}
     return json.loads(path.read_text())
+
+
+def load_longitudinal_history(path: Path = MISSION_HISTORY_JSON) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text())
+    if not isinstance(data, list):
+        raise ValueError(f"{path} must contain a JSON array")
+    if not all(isinstance(row, dict) for row in data):
+        raise ValueError(f"{path} must contain only JSON objects")
+    return data
 
 
 def build_ledger_claim(report: dict[str, Any]) -> Claim:
@@ -77,7 +90,10 @@ def build_ledger_claim(report: dict[str, Any]) -> Claim:
 def long_horizon_claim(history: list[dict[str, Any]]) -> Claim:
     # Current repo has latest reports, not a longitudinal run registry. Require a
     # minimum time span and trend before allowing a stronger claim.
-    successful = [row for row in history if row.get("success") is True]
+    successful = [
+        row for row in history
+        if row.get("success") is True and row.get("real_world") is True
+    ]
     timestamps = [parse_time(row.get("generated_at")) for row in successful if row.get("generated_at")]
     timestamps = [ts for ts in timestamps if ts is not None]
     spans_days = 0
@@ -92,7 +108,7 @@ def long_horizon_claim(history: list[dict[str, Any]]) -> Claim:
             if proven else "No sufficient longitudinal evidence yet for progressive general intelligence."
         ),
         evidence=[
-            f"successful_longitudinal_runs={len(successful)}",
+            f"successful_real_world_longitudinal_runs={len(successful)}",
             f"timespan_days={spans_days}",
             f"improving_trend={trend_improves(successful)}",
         ],
@@ -199,7 +215,34 @@ def trend_improves(rows: list[dict[str, Any]]) -> bool:
     return len(scores) >= 2 and scores[-1] > scores[0]
 
 
-def build_report() -> dict[str, Any]:
+def mission_run_registry_entry(report: dict[str, Any], *, real_world: bool) -> dict[str, Any]:
+    statuses = report["summary"]["statuses"]
+    blocked = any(status == "blocked" for status in statuses.values())
+    verified = report["summary"]["verified_claims"]
+    total = report["summary"]["total_claims"]
+    return {
+        "generated_at": report["generated_at"],
+        "success": not blocked and verified >= 1,
+        "real_world": real_world,
+        "aggregate_score": round(verified / total, 4) if total else 0.0,
+        "verified_claims": verified,
+        "total_claims": total,
+        "statuses": statuses,
+    }
+
+
+def append_mission_run(
+    entry: dict[str, Any],
+    path: Path = MISSION_HISTORY_JSON,
+) -> list[dict[str, Any]]:
+    history = load_longitudinal_history(path)
+    history.append(entry)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(history, indent=2, sort_keys=True) + "\n")
+    return history
+
+
+def build_report(history: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     build_ledger = load_json(REPORT_DIR / "build_ledger_report.json")
     memory = load_json(REPORT_DIR / "memory_influence_verification.json")
     cross_domain = load_json(REPORT_DIR / "live_cross_domain_goal_run.json")
@@ -209,7 +252,7 @@ def build_report() -> dict[str, Any]:
         "verified": build_ledger.get("rollups", {}).get("verified") == build_ledger.get("rollups", {}).get("total_items"),
         "repeated_real_world_runs": 0,
     }
-    history: list[dict[str, Any]] = []
+    history = history if history is not None else load_longitudinal_history()
 
     claims = [
         build_ledger_claim(build_ledger),
@@ -261,9 +304,32 @@ def write_markdown(report: dict[str, Any]) -> None:
     MISSION_MD.write_text("\n".join(lines).rstrip() + "\n")
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Verify AgentCo mission progress without overclaiming."
+    )
+    parser.add_argument(
+        "--record-run",
+        action="store_true",
+        help="Append this verifier run to the longitudinal mission-run registry.",
+    )
+    parser.add_argument(
+        "--real-world-run",
+        action="store_true",
+        help="Mark a recorded run as real-world evidence. Ignored unless --record-run is set.",
+    )
+    return parser.parse_args()
+
+
 def main() -> int:
+    args = parse_args()
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    report = build_report()
+    history = load_longitudinal_history()
+    report = build_report(history)
+    if args.record_run:
+        entry = mission_run_registry_entry(report, real_world=args.real_world_run)
+        history = append_mission_run(entry)
+        report = build_report(history)
     MISSION_JSON.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     write_markdown(report)
     print(json.dumps(report["summary"], sort_keys=True))

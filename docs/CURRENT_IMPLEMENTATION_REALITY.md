@@ -237,6 +237,17 @@ make mission-progress
 python3.13 -m pytest tests/test_verify_mission_progress.py -q
 ```
 
+Longitudinal mission evidence is persisted only when explicitly recorded:
+
+```bash
+make mission-progress-record
+make mission-progress-record-real-world
+```
+
+Only `mission-progress-record-real-world` can count toward the long-horizon
+real-world run threshold, and the verifier still requires at least 10 successful
+real-world runs over at least 30 calendar days with an improving aggregate trend.
+
 Focused current civilization slice:
 
 ```bash

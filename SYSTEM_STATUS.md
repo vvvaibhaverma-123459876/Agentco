@@ -46,6 +46,8 @@ native Postgres
 ```bash
 python3.13 scripts/build_ledger.py status
 make mission-progress
+make mission-progress-record
+make mission-progress-record-real-world
 
 set -a
 source .codex.env
