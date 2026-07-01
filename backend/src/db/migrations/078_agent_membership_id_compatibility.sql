@@ -5,6 +5,18 @@
 -- (agent_id, department_id) as the primary key. Add a stable surrogate id
 -- without weakening the existing composite primary key.
 
+CREATE TABLE IF NOT EXISTS agent_membership_edges (
+  agent_id UUID NOT NULL,
+  department_id VARCHAR(255) NOT NULL,
+  role_name TEXT NOT NULL,
+  active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (agent_id, department_id),
+  CONSTRAINT fk_agent_membership_edges_department
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT
+);
+
 ALTER TABLE agent_membership_edges
   ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
 
