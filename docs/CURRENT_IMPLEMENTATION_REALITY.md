@@ -46,7 +46,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 | L9 institution registry | Passed canonical institution actor creation, mandatory department creation, and full work-request/autonomy feedback cycle |
 | L9 institution decisions | Passed reputation-weighted voting, governance audit rows, immutable decision-log records, and coalition decision integration |
 | L9 core institutions | Passed canonical creation of Production, Verification, Audit, Adversarial, and Improvement departments for each institution |
-| L13 domain registry | Passed trust-threshold-gated domain activation, mandatory core-institution checks, event-log/outbox provenance, and TypeScript checks |
+| L13 domain registry | Passed trust-threshold-gated domain activation, mandatory core-institution checks, event-log/outbox provenance, and exact/subtype institution-routing lookup |
 | L13 generality metric tracker | Passed active-domain-only metric recording, cross-domain smoke scoring, domains-above-baseline aggregation, event-log/outbox provenance, and TypeScript checks |
 | L12 sandbox executor | Passed 12/12 adversarial wall tests for frozen-data writes, resolver import/introspection, escape imports, answer smuggling, and valid resolver usage |
 | L12 regression test generator | Passed deterministic learner-candidate regression case generation, idempotency, event-log/outbox provenance, and TypeScript checks |
@@ -124,7 +124,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 - Institution registry creates active institution actors before institution rows, provisions mandatory departments, and supports the existing work assignment/autonomy feedback loop.
 - Institution decisions persist reputation-weighted votes, governance audit rows, final decisions, and immutable decision-log entries while feeding coalition/reputation workflows.
 - Core institutions now have verified mandatory department provisioning through the canonical institution creation path.
-- Domain registry activates new domains only when a core institution with all mandatory departments exists and the latest non-downgraded trust score for the domain meets the onboarding threshold.
+- Domain registry activates new domains only when a core institution with all mandatory departments exists and the latest non-downgraded trust score for the domain meets the onboarding threshold. It now also acts as the coordination-spine routing substrate: exact domain keys route first, subtype keys can fall back to their nearest active parent domain, suspended domains are excluded, and qualified institutions are ordered by trust.
 - Generality metric tracking persists cross-domain benchmark runs only for active registered domains, records per-domain scores, computes domains-above-baseline, and keeps deterministic smoke results labeled as smoke rather than proof of general intelligence.
 - Sandbox execution exposes only the sealed resolver scoring API to generated code, blocks forbidden imports and resolver internals, and passed the adversarial wall suite against the read-only frozen NSE data mount.
 - Regression test generation derives metric-floor, artifact-integrity, and simulation-guard cases from learner candidate metrics/artifact hashes, persists them idempotently, and emits canonical event/outbox provenance without promoting candidates.

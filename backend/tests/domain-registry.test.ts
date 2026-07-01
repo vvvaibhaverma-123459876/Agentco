@@ -106,4 +106,80 @@ describe('domain registry', () => {
       })
     ).rejects.toThrow(/force-downgraded/);
   });
+
+  test('resolves qualifying institution routes with subtype fallback and trust ordering', async () => {
+    const suffix = Date.now();
+    const parentDomain = `oncology_${suffix}`;
+    const subtypeDomain = `${parentDomain}.cell_lineage`;
+    const parentProof = `parent-proof-${suffix}`;
+    const subtypeProof = `subtype-proof-${suffix}`;
+
+    const parentInstitution = await institutionsService.createCanonicalInstitution({
+      name: `oncology_parent_${suffix}`,
+      domain: parentDomain,
+      purpose: 'Parent oncology society',
+      authorityScope: ['domain_routing'],
+    });
+    const subtypeInstitution = await institutionsService.createCanonicalInstitution({
+      name: `oncology_cell_lineage_${suffix}`,
+      domain: subtypeDomain,
+      purpose: 'Cell lineage specialist society',
+      authorityScope: ['domain_routing'],
+    });
+
+    await insertTrust(parentProof, parentDomain, 0.81);
+    await insertTrust(subtypeProof, subtypeDomain, 0.93);
+    const parentRecord = await domainRegistry.registerDomain({
+      domain_key: parentDomain,
+      institution_id: parentInstitution.institutionId,
+      proof_subject_id: parentProof,
+    });
+    const subtypeRecord = await domainRegistry.registerDomain({
+      domain_key: subtypeDomain,
+      institution_id: subtypeInstitution.institutionId,
+      proof_subject_id: subtypeProof,
+    });
+
+    const exact = await domainRegistry.bestInstitutionForDomain(subtypeDomain);
+    expect(exact?.id).toBe(subtypeRecord.id);
+    expect(exact?.match_type).toBe('exact');
+    expect(exact?.institution_id).toBe(subtypeInstitution.institutionId);
+
+    const fallback = await domainRegistry.bestInstitutionForDomain(`${parentDomain}.trial_design`);
+    expect(fallback?.id).toBe(parentRecord.id);
+    expect(fallback?.match_type).toBe('parent');
+    expect(fallback?.institution_id).toBe(parentInstitution.institutionId);
+
+    const noParentFallback = await domainRegistry.bestInstitutionForDomain(
+      `${parentDomain}.trial_design`,
+      { includeParentDomains: false }
+    );
+    expect(noParentFallback).toBeNull();
+
+    const tooStrict = await domainRegistry.qualifiedInstitutionsForDomain(subtypeDomain, { minimumTrust: 0.95 });
+    expect(tooStrict).toHaveLength(0);
+  });
+
+  test('excludes suspended domains from routing results', async () => {
+    const suffix = Date.now();
+    const domainKey = `suspended_domain_${suffix}`;
+    const proofSubject = `suspended-proof-${suffix}`;
+    const institution = await institutionsService.createCanonicalInstitution({
+      name: `suspended_domain_${suffix}`,
+      domain: domainKey,
+      purpose: 'Suspended domain routing institution',
+      authorityScope: ['domain_routing'],
+    });
+
+    await insertTrust(proofSubject, domainKey, 0.91);
+    const record = await domainRegistry.registerDomain({
+      domain_key: domainKey,
+      institution_id: institution.institutionId,
+      proof_subject_id: proofSubject,
+    });
+    await db.query(`UPDATE domain_registry SET status = 'suspended' WHERE id = $1`, [record.id]);
+
+    await expect(domainRegistry.getDomain(domainKey)).resolves.toMatchObject({ id: record.id, status: 'suspended' });
+    await expect(domainRegistry.bestInstitutionForDomain(domainKey)).resolves.toBeNull();
+  });
 });

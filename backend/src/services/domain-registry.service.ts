@@ -28,10 +28,15 @@ export interface DomainRegistryRecord {
   event_log_id: string | null;
 }
 
+export interface QualifiedInstitutionRoute extends DomainRegistryRecord {
+  match_type: 'exact' | 'parent';
+  matched_domain_key: string;
+}
+
 function normalizeDomainKey(value: string): string {
   const normalized = value.trim().toLowerCase().replace(/\s+/g, '_');
-  if (!/^[a-z0-9][a-z0-9_-]{2,80}$/.test(normalized)) {
-    throw new Error('domain_key must be 3-81 chars of lowercase letters, numbers, underscores, or hyphens');
+  if (!/^[a-z0-9][a-z0-9_.-]{2,80}$/.test(normalized) || normalized.includes('..')) {
+    throw new Error('domain_key must be 3-81 chars of lowercase letters, numbers, dots, underscores, or hyphens');
   }
   return normalized;
 }
@@ -138,6 +143,47 @@ export class DomainRegistryService {
     return result.rows[0] ?? null;
   }
 
+  async qualifiedInstitutionsForDomain(
+    domainKey: string,
+    options: { minimumTrust?: number; includeParentDomains?: boolean; limit?: number } = {}
+  ): Promise<QualifiedInstitutionRoute[]> {
+    const normalized = normalizeDomainKey(domainKey);
+    const candidates = options.includeParentDomains === false
+      ? [normalized]
+      : this.domainKeyLineage(normalized);
+    const minimumTrust = options.minimumTrust ?? 0.7;
+    validateThreshold(minimumTrust);
+    const limit = Math.max(1, Math.min(options.limit ?? candidates.length, 50));
+
+    const result = await db.query<QualifiedInstitutionRoute>(
+      `SELECT id, domain_key, display_name, status, institution_id, institution_actor_id,
+              proof_subject_id, required_trust_threshold, latest_trust_id, latest_trust_factor,
+              proof_json, event_log_id,
+              CASE WHEN domain_key = $1 THEN 'exact' ELSE 'parent' END AS match_type,
+              domain_key AS matched_domain_key
+         FROM domain_registry
+        WHERE status = 'active'
+          AND domain_key = ANY($2::text[])
+          AND latest_trust_factor >= required_trust_threshold
+          AND latest_trust_factor >= $3
+        ORDER BY CASE WHEN domain_key = $1 THEN 0 ELSE 1 END,
+                 length(domain_key) DESC,
+                 latest_trust_factor DESC,
+                 created_at ASC
+        LIMIT $4`,
+      [normalized, candidates, minimumTrust, limit]
+    );
+    return result.rows;
+  }
+
+  async bestInstitutionForDomain(
+    domainKey: string,
+    options: { minimumTrust?: number; includeParentDomains?: boolean } = {}
+  ): Promise<QualifiedInstitutionRoute | null> {
+    const routes = await this.qualifiedInstitutionsForDomain(domainKey, { ...options, limit: 1 });
+    return routes[0] ?? null;
+  }
+
   private async requireCoreInstitution(client: PoolClient, institutionId: string): Promise<{ actor_id: string | null }> {
     const institution = await client.query<{ actor_id: string | null }>(
       `SELECT metadata->>'actor_id' AS actor_id
@@ -164,6 +210,16 @@ export class DomainRegistryService {
       throw new Error('domain onboarding requires all five core institution departments');
     }
     return institution.rows[0];
+  }
+
+  private domainKeyLineage(domainKey: string): string[] {
+    const parts = domainKey.split('.');
+    const lineage: string[] = [];
+    while (parts.length > 0) {
+      lineage.push(parts.join('.'));
+      parts.pop();
+    }
+    return lineage;
   }
 
   private async requireDomainTrust(
