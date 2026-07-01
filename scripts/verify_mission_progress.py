@@ -88,18 +88,24 @@ def build_ledger_claim(report: dict[str, Any]) -> Claim:
 
 
 def long_horizon_claim(history: list[dict[str, Any]]) -> Claim:
-    # Current repo has latest reports, not a longitudinal run registry. Require a
-    # minimum time span and trend before allowing a stronger claim.
     successful = [
         row for row in history
-        if row.get("success") is True and row.get("real_world") is True
+        if row.get("success") is True
+        and row.get("real_world") is True
+        and row.get("safety_gates_green") is True
     ]
     timestamps = [parse_time(row.get("generated_at")) for row in successful if row.get("generated_at")]
     timestamps = [ts for ts in timestamps if ts is not None]
     spans_days = 0
     if len(timestamps) >= 2:
         spans_days = (max(timestamps) - min(timestamps)).days
-    proven = len(successful) >= 10 and spans_days >= 30 and trend_improves(successful)
+    max_held_out_domains = max([domain_count(row) for row in successful] or [0])
+    proven = (
+        len(successful) >= 10
+        and spans_days >= 30
+        and max_held_out_domains >= 12
+        and trend_improves(successful)
+    )
     return Claim(
         name="progressively_more_general_intelligence_over_long_horizons",
         status="verified" if proven else "unproven",
@@ -110,20 +116,29 @@ def long_horizon_claim(history: list[dict[str, Any]]) -> Claim:
         evidence=[
             f"successful_real_world_longitudinal_runs={len(successful)}",
             f"timespan_days={spans_days}",
+            f"max_held_out_domains={max_held_out_domains}",
             f"improving_trend={trend_improves(successful)}",
+            "safety_gates_required=True",
         ],
         required_next_evidence=[] if proven else [
-            "Persist a longitudinal mission-run registry with at least 10 successful real runs.",
+            "Persist a longitudinal mission-run registry with at least 10 successful real runs whose safety gates stayed green.",
             "Cover at least 30 calendar days.",
-            "Show statistically meaningful improvement across held-out domains without lowering safety gates.",
+            "Cover at least 12 held-out domains.",
+            "Show statistically meaningful improvement across held-out domains without lowering or bypassing safety gates.",
         ],
     )
 
 
-def durable_improvement_claim(memory_report: dict[str, Any], promotion_evidence: dict[str, Any]) -> Claim:
+def durable_improvement_claim(
+    memory_report: dict[str, Any],
+    promotion_evidence: dict[str, Any],
+    history: list[dict[str, Any]] | None = None,
+) -> Claim:
     memory_ok = memory_report.get("success") is True and memory_report.get("mode") == "live_openai"
     promotion_ok = promotion_evidence.get("verified") is True
-    proven = memory_ok and promotion_ok and promotion_evidence.get("repeated_real_world_runs", 0) >= 3
+    cycles = verified_improvement_cycles(history or [])
+    repeated_runs = max(int(promotion_evidence.get("repeated_real_world_runs", 0)), len(cycles))
+    proven = memory_ok and promotion_ok and repeated_runs >= 3
     return Claim(
         name="durable_autonomous_improvement_from_repeated_real_world_operation",
         status="verified" if proven else ("partial" if memory_ok and promotion_ok else "unproven"),
@@ -134,7 +149,8 @@ def durable_improvement_claim(memory_report: dict[str, Any], promotion_evidence:
         evidence=[
             f"memory_influence_live_success={memory_ok}",
             f"vca_promotion_mechanism_verified={promotion_ok}",
-            f"repeated_real_world_runs={promotion_evidence.get('repeated_real_world_runs', 0)}",
+            f"repeated_real_world_runs={repeated_runs}",
+            f"verified_improvement_cycles={len(cycles)}",
         ],
         required_next_evidence=[] if proven else [
             "Run at least 3 real-world improvement cycles where a prior lesson/skill measurably improves later performance.",
@@ -148,7 +164,9 @@ def open_domain_transfer_claim(cross_domain_report: dict[str, Any]) -> Claim:
     simulated = cross_domain_report.get("simulated") is True
     domains = cross_domain_report.get("domains") or []
     bounded_flag = cross_domain_report.get("not_proof_of_general_intelligence") is True
-    broad_enough = success and not simulated and len(domains) >= 12 and not bounded_flag
+    independent = cross_domain_report.get("independent_adjudication") is True
+    held_out = cross_domain_report.get("held_out_task_schemas") is True
+    broad_enough = success and not simulated and len(domains) >= 12 and not bounded_flag and independent and held_out
     return Claim(
         name="broad_open_domain_transfer_beyond_bounded_verifiers",
         status="verified" if broad_enough else ("partial" if success and not simulated else "unproven"),
@@ -161,6 +179,8 @@ def open_domain_transfer_claim(cross_domain_report: dict[str, Any]) -> Claim:
             f"simulated={simulated}",
             f"domain_count={len(domains)}",
             f"bounded_not_gi_flag={bounded_flag}",
+            f"independent_adjudication={independent}",
+            f"held_out_task_schemas={held_out}",
         ],
         required_next_evidence=[] if broad_enough else [
             "Run live held-out domains selected after the verifier is written.",
@@ -176,7 +196,16 @@ def hosted_ops_claim(posture: dict[str, Any], release: dict[str, Any]) -> Claim:
         status == "green" for status in (release.get("gates") or {}).values()
     )
     hosted_evidence = posture.get("hosted_production_certification") is True
-    verified = local_posture_ok and release_ok and hosted_evidence
+    ops = posture.get("hosted_ops_evidence") if isinstance(posture.get("hosted_ops_evidence"), dict) else {}
+    ops_checks = {
+        "slo_dashboard": ops.get("slo_dashboard_verified") is True,
+        "alert_routing": ops.get("alert_routing_verified") is True,
+        "backup_restore": ops.get("backup_restore_verified") is True,
+        "dr_runbook": ops.get("dr_runbook_verified") is True,
+        "incident_response": ops.get("incident_response_verified") is True,
+        "production_equivalent_gates": ops.get("production_equivalent_gates_passed") is True,
+    }
+    verified = local_posture_ok and release_ok and hosted_evidence and all(ops_checks.values())
     return Claim(
         name="hosted_production_operations_certification",
         status="verified" if verified else ("partial" if local_posture_ok and release_ok else "blocked"),
@@ -188,6 +217,7 @@ def hosted_ops_claim(posture: dict[str, Any], release: dict[str, Any]) -> Claim:
             f"local_production_posture_can_continue={local_posture_ok}",
             f"release_gates_green={release_ok}",
             f"hosted_production_certification={hosted_evidence}",
+            f"hosted_ops_checks={ops_checks}",
         ],
         required_next_evidence=[] if verified else [
             "Record hosted deployment environment identity and release artifact.",
@@ -212,7 +242,45 @@ def trend_improves(rows: list[dict[str, Any]]) -> bool:
         return False
     scores = [row.get("aggregate_score") for row in rows]
     scores = [float(score) for score in scores if isinstance(score, int | float)]
-    return len(scores) >= 2 and scores[-1] > scores[0]
+    if len(scores) < 2:
+        return False
+    if len(scores) < 6:
+        return scores[-1] > scores[0]
+    window = min(3, len(scores) // 2)
+    first_avg = sum(scores[:window]) / window
+    last_avg = sum(scores[-window:]) / window
+    return last_avg > first_avg
+
+
+def domain_count(row: dict[str, Any]) -> int:
+    value = row.get("held_out_domain_count", row.get("domain_count", 0))
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    domains = row.get("domains")
+    if isinstance(domains, list):
+        return len(domains)
+    return 0
+
+
+def verified_improvement_cycles(history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    cycles = []
+    for row in history:
+        delta = row.get("before_after_delta")
+        if (
+            row.get("real_world") is True
+            and row.get("success") is True
+            and row.get("improvement_cycle") is True
+            and isinstance(delta, int | float)
+            and delta > 0
+            and row.get("promotion_proof") is True
+            and row.get("canary_or_rollback_passed") is True
+            and row.get("event_log_lineage") is True
+            and row.get("safety_gates_green") is True
+        ):
+            cycles.append(row)
+    return cycles
 
 
 def mission_run_registry_entry(report: dict[str, Any], *, real_world: bool) -> dict[str, Any]:
@@ -224,6 +292,7 @@ def mission_run_registry_entry(report: dict[str, Any], *, real_world: bool) -> d
         "generated_at": report["generated_at"],
         "success": not blocked and verified >= 1,
         "real_world": real_world,
+        "safety_gates_green": statuses.get("evidence_governed_calibration_civilization") == "verified",
         "aggregate_score": round(verified / total, 4) if total else 0.0,
         "verified_claims": verified,
         "total_claims": total,
@@ -257,7 +326,7 @@ def build_report(history: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     claims = [
         build_ledger_claim(build_ledger),
         long_horizon_claim(history),
-        durable_improvement_claim(memory, promotion_evidence),
+        durable_improvement_claim(memory, promotion_evidence, history),
         open_domain_transfer_claim(cross_domain),
         hosted_ops_claim(posture, release),
     ]

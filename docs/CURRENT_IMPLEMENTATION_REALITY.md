@@ -181,6 +181,12 @@ generality, repeated real-world autonomous improvement, broad open-domain
 transfer, and hosted production operations as partial/unproven until the required
 longitudinal or hosted evidence exists.
 
+The operational path for graduating those claims is tracked in
+`docs/REAL_WORLD_PROOF_PLAN.md`. The mission verifier now requires green safety
+gates, held-out domain breadth, audited improvement cycles, independent
+open-domain adjudication, and hosted SLO/backup/DR/incident-response evidence
+before upgrading the remaining claims.
+
 The latest Docker production-infrastructure smoke is documented in
 `reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md`. On 2026-06-30,
 Docker Desktop was started, `.env.production.local` was loaded, production

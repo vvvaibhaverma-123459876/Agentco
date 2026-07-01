@@ -15,13 +15,16 @@
       "evidence": [
         "successful_real_world_longitudinal_runs=0",
         "timespan_days=0",
-        "improving_trend=False"
+        "max_held_out_domains=0",
+        "improving_trend=False",
+        "safety_gates_required=True"
       ],
       "name": "progressively_more_general_intelligence_over_long_horizons",
       "required_next_evidence": [
-        "Persist a longitudinal mission-run registry with at least 10 successful real runs.",
+        "Persist a longitudinal mission-run registry with at least 10 successful real runs whose safety gates stayed green.",
         "Cover at least 30 calendar days.",
-        "Show statistically meaningful improvement across held-out domains without lowering safety gates."
+        "Cover at least 12 held-out domains.",
+        "Show statistically meaningful improvement across held-out domains without lowering or bypassing safety gates."
       ],
       "status": "unproven",
       "summary": "No sufficient longitudinal evidence yet for progressive general intelligence."
@@ -30,7 +33,8 @@
       "evidence": [
         "memory_influence_live_success=True",
         "vca_promotion_mechanism_verified=True",
-        "repeated_real_world_runs=0"
+        "repeated_real_world_runs=0",
+        "verified_improvement_cycles=0"
       ],
       "name": "durable_autonomous_improvement_from_repeated_real_world_operation",
       "required_next_evidence": [
@@ -45,7 +49,9 @@
         "live_cross_domain_success=True",
         "simulated=False",
         "domain_count=4",
-        "bounded_not_gi_flag=True"
+        "bounded_not_gi_flag=True",
+        "independent_adjudication=False",
+        "held_out_task_schemas=False"
       ],
       "name": "broad_open_domain_transfer_beyond_bounded_verifiers",
       "required_next_evidence": [
@@ -60,7 +66,8 @@
       "evidence": [
         "local_production_posture_can_continue=True",
         "release_gates_green=True",
-        "hosted_production_certification=False"
+        "hosted_production_certification=False",
+        "hosted_ops_checks={'slo_dashboard': False, 'alert_routing': False, 'backup_restore': False, 'dr_runbook': False, 'incident_response': False, 'production_equivalent_gates': False}"
       ],
       "name": "hosted_production_operations_certification",
       "required_next_evidence": [
@@ -72,7 +79,7 @@
       "summary": "Local production posture is not the same as hosted production operations certification."
     }
   ],
-  "generated_at": "2026-07-01T04:27:46Z",
+  "generated_at": "2026-07-01T08:58:01Z",
   "mission": "AgentCo exists to evolve into progressively more general intelligence by operating as an evidence-governed, calibration-driven AI civilization that learns continuously, improves itself safely, and expands its capability across domains over time.",
   "summary": {
     "mission_fully_proven": false,

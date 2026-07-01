@@ -1,6 +1,6 @@
 # Mission Progress Verification
 
-Generated: 2026-07-01T04:27:46Z
+Generated: 2026-07-01T08:58:01Z
 
 AgentCo exists to evolve into progressively more general intelligence by operating as an evidence-governed, calibration-driven AI civilization that learns continuously, improves itself safely, and expands its capability across domains over time.
 
@@ -17,9 +17,10 @@ Mission fully proven: `False`
 ## Required Next Evidence
 
 ### progressively_more_general_intelligence_over_long_horizons
-- Persist a longitudinal mission-run registry with at least 10 successful real runs.
+- Persist a longitudinal mission-run registry with at least 10 successful real runs whose safety gates stayed green.
 - Cover at least 30 calendar days.
-- Show statistically meaningful improvement across held-out domains without lowering safety gates.
+- Cover at least 12 held-out domains.
+- Show statistically meaningful improvement across held-out domains without lowering or bypassing safety gates.
 
 ### durable_autonomous_improvement_from_repeated_real_world_operation
 - Run at least 3 real-world improvement cycles where a prior lesson/skill measurably improves later performance.
