@@ -16,15 +16,6 @@ import { ActionSpec, ActionType, RiskLevel } from '../types/action.types';
 import { LoopDetectionResult } from './loop-detector.service';
 
 export class AutonomyActionPlannerService {
-  private apiKey: string;
-
-  constructor() {
-    this.apiKey = process.env.LLM_API_KEY || '';
-    if (!this.apiKey) {
-      throw new Error('LLM_API_KEY environment variable not set');
-    }
-  }
-
   /**
    * Validate required parameters for each action type
    */
@@ -65,6 +56,10 @@ export class AutonomyActionPlannerService {
     // Use configured LLM provider, default to OpenAI
     const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
     const apiUrl = `${baseUrl}/chat/completions`;
+    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for autonomy action planning');
+    }
 
     // Add error feedback to messages on retry
     let messagesWithFeedback = [...messages];
@@ -87,7 +82,7 @@ export class AutonomyActionPlannerService {
         const response = await fetch(apiUrl, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
+            'Authorization': `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
