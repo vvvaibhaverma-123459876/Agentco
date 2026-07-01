@@ -24,7 +24,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 | Full Docker startup | Passed locally via `make docker-production-smoke`; Postgres, Redis, Kafka, Vault, Prometheus, Grafana, and Docker Compose probes passed |
 | Native migration verifier | Passed with runtime-critical task and civilization-routing schema checks |
 | Civilization vertical slice | Passed live local slice with Postgres, Kafka, OpenAI chat/embeddings, `resolution_service`, Reserve recomputation, memory promotion, learner candidate, and coordinator tick |
-| Backend L14 runtime tick | Passed focused backend route/service tests; coordinator exposes graph/tick API routes and persists a core service-graph tick to Postgres |
+| Backend L14 runtime tick | Passed focused backend route/service tests; coordinator exposes graph, reachability-tick, and dispatch-tick API routes, persists core service-graph ticks, and routes registered-domain goals into institution work requests |
 | Backend L14 scheduler | Passed bounded scheduler tests; run-once/start/stop and scheduler API routes are verified |
 | Build-ledger tooling | Passed architecture report, frontier, DB sync projection, and backend build-status/readiness tests |
 | Runtime mode manager | Passed explicit production capability contract, fallback rejection, doctor reporting, and /system capability/readiness tests |
@@ -104,6 +104,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 - Validation suite live connector separation for configured external endpoints.
 - Canonical civilization vertical-slice verifier across reasoning, evidence indexing, prediction, resolution, trust, credential, memory, learning, canary, and coordinator stages.
 - Backend L14 runtime graph/tick API routes and reachability tick across core durable-task, institution, constitution, evidence, resolution, trust, memory, learning, and runtime-trace tables.
+- Backend L14 dispatch tick routes goals through the active `domain_registry`, fails closed when a requested domain lacks a qualifying institution, creates queued Production department work requests for qualifying institutions, and records multi-institution goals as coalition dispatch traces in `civilization_coordinator_ticks`.
 - Backend L14 bounded scheduler with run-once/start/stop controls and API route coverage.
 - Build-ledger architecture report generation with layer rollups, ready frontier, gate findings, DB sync projection, and backend build-status/readiness surfaces.
 - Runtime mode classification with explicit production capability contracts for backend providers and Python doctor service checks.

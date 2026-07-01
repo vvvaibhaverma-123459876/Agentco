@@ -502,6 +502,33 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // POST /api/civilization/runtime/dispatch-tick - Route a goal through L14 coordinator to institutions
+  fastify.post('/api/civilization/runtime/dispatch-tick', async (req: FastifyRequest, reply: FastifyReply) => {
+    const body = (req.body as {
+      goalId?: string;
+      objective?: string;
+      domains?: string[];
+      rigorTier?: 'lite' | 'full';
+      riskLevel?: 'low' | 'medium' | 'high';
+      budget?: { tokens?: number; iterations?: number; seconds?: number };
+      runtimeMode?: string;
+    } | undefined) ?? {};
+    try {
+      const tick = await civilizationRuntimeService.runDispatchTick({
+        goalId: body.goalId,
+        objective: body.objective ?? '',
+        domains: body.domains ?? [],
+        rigorTier: body.rigorTier,
+        riskLevel: body.riskLevel,
+        budget: body.budget,
+        runtimeMode: body.runtimeMode ?? 'api_l14_dispatch',
+      });
+      return reply.status(tick.status === 'dispatched' ? 201 : 409).send(tick);
+    } catch (e) {
+      return reply.status(400).send({ error: String(e) });
+    }
+  });
+
   // GET /api/civilization/runtime/scheduler - L14 scheduler status
   fastify.get('/api/civilization/runtime/scheduler', async (_req: FastifyRequest, reply: FastifyReply) => {
     return reply.send(civilizationSchedulerService.status());

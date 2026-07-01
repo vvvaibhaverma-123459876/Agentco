@@ -25,6 +25,7 @@ describe('Civilization runtime API routes', () => {
       ]));
       const graphRoutes = graphBody.graph.flatMap((node: { requiredRoutes: string[] }) => node.requiredRoutes);
       expect(graphRoutes).toContain('/api/civilization/runtime/reachability-tick');
+      expect(graphRoutes).toContain('/api/civilization/runtime/dispatch-tick');
       expect(graphRoutes).toContain('/api/civilization/runtime/scheduler/run-once');
 
       const tick = await app.inject({
