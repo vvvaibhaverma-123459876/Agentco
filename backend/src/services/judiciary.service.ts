@@ -40,6 +40,27 @@ export interface RulingRecord {
   event_log_id: string | null;
 }
 
+export interface CalibrationWeightedRulingInput {
+  dispute_id: string;
+  domain: string;
+  claim_type?: string;
+  subject_evidence_independence?: number;
+  counter_evidence_independence?: number;
+  minimum_margin?: number;
+  minimum_weight?: number;
+  correlation_id?: string;
+}
+
+export interface CalibrationWeightedRulingResult {
+  status: 'ruled' | 'escalated';
+  outcome: IssueRulingInput['outcome'] | 'escalate';
+  subject_weight: number | null;
+  counter_weight: number | null;
+  rationale: string;
+  ruling: RulingRecord | null;
+  precedent: PrecedentRecord | null;
+}
+
 export interface PrecedentRecord {
   id: string;
   ruling_id: string;
@@ -265,6 +286,144 @@ export class RulingService {
     }
 
     return { ruling: ruling.rows[0], precedent };
+  }
+
+  async issueCalibrationWeightedRuling(
+    input: CalibrationWeightedRulingInput
+  ): Promise<CalibrationWeightedRulingResult> {
+    requireUuid(input.dispute_id, 'dispute_id');
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const dispute = await client.query<{
+        id: string;
+        status: string;
+        subject_claim_id: string;
+        counter_claim_id: string;
+      }>(
+        `SELECT id, status, subject_claim_id, counter_claim_id
+           FROM disputes
+          WHERE id = $1
+          LIMIT 1`,
+        [input.dispute_id]
+      );
+      if ((dispute.rowCount ?? 0) !== 1) throw new Error(`dispute not found: ${input.dispute_id}`);
+      if (['ruled', 'closed'].includes(dispute.rows[0].status)) {
+        throw new Error('dispute already ruled or closed');
+      }
+
+      const claims = await client.query<{ claim_id: string; generated_by: string | null }>(
+        `SELECT claim_id, generated_by
+           FROM autonomy_claims
+          WHERE claim_id = ANY($1::varchar[])`,
+        [[dispute.rows[0].subject_claim_id, dispute.rows[0].counter_claim_id]]
+      );
+      const claimById = new Map(claims.rows.map(row => [row.claim_id, row]));
+      const subject = claimById.get(dispute.rows[0].subject_claim_id);
+      const counter = claimById.get(dispute.rows[0].counter_claim_id);
+      if (!subject?.generated_by || !counter?.generated_by) {
+        await client.query('COMMIT');
+        return this.escalateResult(null, null, 'claim producer identity missing; judiciary cannot weight by calibration');
+      }
+
+      const claimType = input.claim_type ?? 'general';
+      const subjectTrust = await this.latestTrust(client, subject.generated_by, input.domain, claimType);
+      const counterTrust = await this.latestTrust(client, counter.generated_by, input.domain, claimType);
+      const subjectWeight = subjectTrust == null ? null : subjectTrust * this.independence(input.subject_evidence_independence);
+      const counterWeight = counterTrust == null ? null : counterTrust * this.independence(input.counter_evidence_independence);
+      const minimumMargin = input.minimum_margin ?? 0.1;
+      const minimumWeight = input.minimum_weight ?? 0.5;
+
+      if (subjectWeight == null || counterWeight == null) {
+        await client.query('COMMIT');
+        return this.escalateResult(subjectWeight, counterWeight, 'missing calibration trust score for one or both claim producers');
+      }
+      const margin = Math.abs(subjectWeight - counterWeight);
+      const winnerWeight = Math.max(subjectWeight, counterWeight);
+      if (margin < minimumMargin || winnerWeight < minimumWeight) {
+        await client.query('COMMIT');
+        return this.escalateResult(
+          subjectWeight,
+          counterWeight,
+          `calibration weights too close or weak: margin=${margin.toFixed(4)}, winner_weight=${winnerWeight.toFixed(4)}`
+        );
+      }
+
+      const outcome: IssueRulingInput['outcome'] = subjectWeight > counterWeight ? 'subject_upheld' : 'counter_upheld';
+      const rationale = [
+        `Calibration-weighted judiciary ruling for domain=${input.domain} claim_type=${claimType}.`,
+        `subject_weight=${subjectWeight.toFixed(4)} counter_weight=${counterWeight.toFixed(4)}.`,
+        'Weights use producer domain trust and evidence independence; stated confidence is not used.',
+        'Dissent is retained in the dispute and precedent rationale for later calibration reversal.',
+      ].join(' ');
+      const issued = await this.issueRulingWithClient(client, {
+        dispute_id: input.dispute_id,
+        outcome,
+        rationale,
+        precedent_flag: true,
+        principle: rationale,
+        correlation_id: input.correlation_id,
+      });
+      await client.query('COMMIT');
+      return {
+        status: 'ruled',
+        outcome,
+        subject_weight: subjectWeight,
+        counter_weight: counterWeight,
+        rationale,
+        ruling: issued.ruling,
+        precedent: issued.precedent,
+      };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  private async latestTrust(
+    client: PoolClient,
+    subjectId: string,
+    domain: string,
+    claimType: string
+  ): Promise<number | null> {
+    const result = await client.query<{ trust_factor: string | number; force_downgrade: boolean }>(
+      `SELECT trust_factor, force_downgrade
+         FROM trust_scores
+        WHERE subject_id = $1
+          AND domain = $2
+          AND claim_type = $3
+        ORDER BY window_end DESC, created_at DESC
+        LIMIT 1`,
+      [subjectId, domain, claimType]
+    );
+    if ((result.rowCount ?? 0) !== 1 || result.rows[0].force_downgrade) return null;
+    return Number(result.rows[0].trust_factor);
+  }
+
+  private independence(value: number | undefined): number {
+    if (value == null) return 1;
+    if (!Number.isFinite(value) || value < 0 || value > 1) {
+      throw new Error('evidence independence must be between 0 and 1');
+    }
+    return value;
+  }
+
+  private escalateResult(
+    subjectWeight: number | null,
+    counterWeight: number | null,
+    rationale: string
+  ): CalibrationWeightedRulingResult {
+    return {
+      status: 'escalated',
+      outcome: 'escalate',
+      subject_weight: subjectWeight,
+      counter_weight: counterWeight,
+      rationale,
+      ruling: null,
+      precedent: null,
+    };
   }
 
   private async ensureServiceActor(): Promise<string> {
