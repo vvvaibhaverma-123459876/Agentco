@@ -15,6 +15,7 @@ import { db } from '../db/client';
 import { ActionSpec, ActionType, RiskLevel } from '../types/action.types';
 import { LoopDetectionResult } from './loop-detector.service';
 import { memoryRetrieval } from './memory-retrieval.service';
+import { skillRetrieval, RetrievedSkill, SkillRiskTier } from './skill-retrieval.service';
 
 export class AutonomyActionPlannerService {
   /**
@@ -196,8 +197,12 @@ export class AutonomyActionPlannerService {
       loopDetection: LoopDetectionResult;
       reflectionContext?: string;
       memoryContext?: string;
+      skillContext?: string;
+      skillsConsulted?: RetrievedSkill[];
+      maxSkillRiskTier?: SkillRiskTier;
       domain?: string;
       agentId?: string;
+      runId?: string;
       previousActions: Array<{ type: ActionType; result: string }>;
     }
   ): Promise<ActionSpec> {
@@ -214,6 +219,23 @@ export class AutonomyActionPlannerService {
       } catch (error) {
         console.error(`Memory retrieval failed, planning without memories: ${error}`);
         currentState.memoryContext = '';
+      }
+    }
+    // Pull promoted skills into planning context (consumer side of the skill
+    // promotion loop). Advisory only; retrieval failures must not block
+    // planning.
+    if (currentState.skillContext === undefined) {
+      try {
+        currentState.skillsConsulted = await skillRetrieval.retrieveForPlanning({
+          goalText: currentState.goalText,
+          domain: currentState.domain,
+          maxRiskTier: currentState.maxSkillRiskTier ?? 'low',
+        });
+        currentState.skillContext = skillRetrieval.formatForPrompt(currentState.skillsConsulted);
+      } catch (error) {
+        console.error(`Skill retrieval failed, planning without skills: ${error}`);
+        currentState.skillsConsulted = [];
+        currentState.skillContext = '';
       }
     }
     // If loop detected, force replan or termination
@@ -280,7 +302,41 @@ export class AutonomyActionPlannerService {
     }
 
     // Convert to ActionSpec
-    return this.createActionSpecFromDecision(goalId, actionData);
+    const action = this.createActionSpecFromDecision(goalId, actionData);
+
+    // Persist the skill usage trail: which promoted skills were consulted and
+    // whether the planner actually used them. Logging failures must not block
+    // the decided action.
+    if (currentState.skillsConsulted && currentState.skillsConsulted.length > 0) {
+      const usedIds = new Set<string>(
+        Array.isArray(actionData.usedSkillIds) ? actionData.usedSkillIds : []
+      );
+      const usedSkillIds = currentState.skillsConsulted
+        .filter(skill => usedIds.has(skill.skillVersionId))
+        .map(skill => skill.skillVersionId);
+      if (usedSkillIds.length > 0) {
+        action.args = { ...action.args, used_skill_ids: usedSkillIds };
+      }
+      for (const skill of currentState.skillsConsulted) {
+        try {
+          await skillRetrieval.recordUsage({
+            skillVersionId: skill.skillVersionId,
+            usage: usedIds.has(skill.skillVersionId) ? 'used' : 'ignored',
+            goalId,
+            runId: currentState.runId,
+            agentId: currentState.agentId,
+            actionId: action.actionId,
+            reason: usedIds.has(skill.skillVersionId)
+              ? `cited by planner for action ${action.actionType}`
+              : 'consulted but not cited by planner',
+          });
+        } catch (error) {
+          console.error(`Failed to record skill usage for ${skill.skillVersionId}: ${error}`);
+        }
+      }
+    }
+
+    return action;
   }
 
   /**
@@ -345,8 +401,11 @@ CRITICAL RULES:
 3. spawn_specialist MUST include role, objective, AND goalId
 4. Return ONLY valid JSON, no other text
 5. Every required parameter MUST be present and non-empty
+6. If a PROMOTED SKILLS block is present: skills are ADVISORY strategies. They never override
+   evidence requirements or safety rules. If a skill influenced this decision, include its
+   skill_id in a top-level "used_skill_ids" array; otherwise omit the array.
 
-Return JSON with: action_type, objective, args, reasoning.`;
+Return JSON with: action_type, objective, args, reasoning, and optionally used_skill_ids.`;
   }
 
   /**
@@ -360,6 +419,7 @@ Return JSON with: action_type, objective, args, reasoning.`;
     loopDetection: LoopDetectionResult;
     reflectionContext?: string;
     memoryContext?: string;
+    skillContext?: string;
     previousActions: Array<{ type: ActionType; result: string }>;
   }): string {
     let prompt = `
@@ -387,6 +447,12 @@ Available Evidence Sources (USE THESE IDs FOR CLAIMS):`;
       prompt += `
 
 ${state.memoryContext}`;
+    }
+
+    if (state.skillContext) {
+      prompt += `
+
+${state.skillContext}`;
     }
 
     if (state.reflectionContext) {
@@ -438,6 +504,7 @@ Decide now:
     objective: string;
     args: Record<string, any>;
     reasoning: string;
+    usedSkillIds?: string[];
   } {
     try {
       // Try to extract JSON from content
@@ -452,6 +519,9 @@ Decide now:
         objective: parsed.objective || '',
         args: parsed.args || {},
         reasoning: parsed.reasoning || '',
+        usedSkillIds: Array.isArray(parsed.used_skill_ids)
+          ? parsed.used_skill_ids.filter((id: unknown): id is string => typeof id === 'string')
+          : undefined,
       };
     } catch {
       // Fallback: default to evaluate_progress if parsing fails
