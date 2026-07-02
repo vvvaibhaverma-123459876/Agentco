@@ -141,7 +141,7 @@ export class SkillDeploymentService {
   /**
    * Roll back a candidate (and its skill version, if one was registered).
    * Used when a canary fails after promotion pressure, or when a promoted
-   * skill regresses in later use.
+   * skill regresses during subsequent use.
    */
   async rollbackCandidate(candidateId: string, reason: string): Promise<RollbackResult> {
     const version = await db.query<{ id: string; skill_id: string }>(

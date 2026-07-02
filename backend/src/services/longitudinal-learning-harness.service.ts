@@ -10,7 +10,7 @@
  *         -> evaluate (regression cases + measured benchmark delta)
  *         -> canary (bounded fresh-seed run)
  *         -> promote OR rollback
- *         -> reuse (promoted skill retrievable for later planning)
+ *         -> reuse (promoted skill retrievable for subsequent planning)
  *
  * Default mode is fully deterministic (no LLM, no web). The three standard
  * cycles cover different task families and domains; the third cycle
@@ -144,7 +144,7 @@ export class LongitudinalLearningHarness {
       description: `Longitudinal cycle ${cycleLabel}: measured ${family} strategy improvement.`,
     });
 
-    // Reuse: the promoted skill must be retrievable for later planning.
+    // Reuse: the promoted skill must be retrievable for subsequent planning.
     const retrieved = await skillRetrieval.retrieveForPlanning({
       goalText: `Apply learned ${family.replace('_', ' ')} strategy`,
       domain,

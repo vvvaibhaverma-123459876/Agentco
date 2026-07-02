@@ -158,7 +158,7 @@ export class GoalFormationService {
 
   /**
    * List previously formed goals that are still open (not executed,
-   * rejected, or retired) so a later free run can pick them up.
+   * rejected, or retired) so a subsequent free run can pick them up.
    */
   async listOpenFormationGoals(limit = 10): Promise<GoalProposal[]> {
     const rows = await db.query<{
@@ -244,7 +244,7 @@ export class GoalFormationService {
           approved.push(goalId);
         } catch (error) {
           // Conflicts (e.g. another active goal in the same domain) hold the
-          // goal for later instead of crashing the whole governance pass.
+          // goal for review instead of crashing the whole governance pass.
           console.warn(`goal ${goalId} held: ${error}`);
           held.push(goalId);
         }

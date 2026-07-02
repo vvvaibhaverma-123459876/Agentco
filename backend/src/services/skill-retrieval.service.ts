@@ -4,7 +4,7 @@
  * Consumer side of the skill promotion pipeline. Promotion writes
  * `skill_library_entries` / `skill_library_versions` rows and records a
  * `skill_promotion_loop_runs` row; retrieval surfaces only skills that
- * cleared the full promotion path so they can influence later planning.
+ * cleared the full promotion path so they can influence subsequent planning.
  *
  * A skill is retrievable only when ALL of the following hold:
  *   - the library entry is `active` (not suspended/retired)
