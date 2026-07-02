@@ -16,6 +16,7 @@ import { ActionSpec, ActionType, RiskLevel } from '../types/action.types';
 import { LoopDetectionResult } from './loop-detector.service';
 import { memoryRetrieval } from './memory-retrieval.service';
 import { skillRetrieval, RetrievedSkill, SkillRiskTier } from './skill-retrieval.service';
+import { calibrationAwareRouting, RankedAgents } from './calibration-aware-routing.service';
 
 export class AutonomyActionPlannerService {
   /**
@@ -200,6 +201,9 @@ export class AutonomyActionPlannerService {
       skillContext?: string;
       skillsConsulted?: RetrievedSkill[];
       maxSkillRiskTier?: SkillRiskTier;
+      calibrationContext?: string;
+      calibrationRanking?: RankedAgents;
+      candidateAgentIds?: string[];
       domain?: string;
       agentId?: string;
       runId?: string;
@@ -238,6 +242,29 @@ export class AutonomyActionPlannerService {
         currentState.skillContext = '';
       }
     }
+    // Rank candidate agents by calibration history so routing preferences
+    // come from resolved-prediction evidence, not stated confidence.
+    // Ranking failures must not block planning.
+    if (
+      currentState.calibrationContext === undefined &&
+      currentState.domain &&
+      currentState.candidateAgentIds &&
+      currentState.candidateAgentIds.length > 0
+    ) {
+      try {
+        currentState.calibrationRanking = await calibrationAwareRouting.rankAgents({
+          domain: currentState.domain,
+          candidateAgentIds: currentState.candidateAgentIds,
+        });
+        currentState.calibrationContext = calibrationAwareRouting.formatForPrompt(
+          currentState.calibrationRanking
+        );
+      } catch (error) {
+        console.error(`Calibration ranking failed, planning without it: ${error}`);
+        currentState.calibrationContext = '';
+      }
+    }
+
     // If loop detected, force replan or termination
     if (currentState.loopDetection.isLooping) {
       if (currentState.loopDetection.recommendation === 'terminate') {
@@ -303,6 +330,49 @@ export class AutonomyActionPlannerService {
 
     // Convert to ActionSpec
     const action = this.createActionSpecFromDecision(goalId, actionData);
+
+    // Calibration is enforcement, not decoration: record the ranking inputs
+    // in the decided action and hard-block delegation to demoted agents even
+    // if the model ignored the prompt rules.
+    if (currentState.calibrationRanking) {
+      const ranking = currentState.calibrationRanking;
+      action.args = {
+        ...action.args,
+        calibration_context: {
+          domain: ranking.domain,
+          ranked: ranking.ranked.map(profile => ({
+            agent_id: profile.agentId,
+            routing_score: Number(profile.routingScore.toFixed(4)),
+            reason_codes: profile.reasonCodes,
+            requires_verification: profile.requiresVerification,
+          })),
+          demoted: ranking.demoted.map(profile => profile.agentId),
+        },
+      };
+      const assigned = action.args.assigned_agent_id ?? action.args.agent_id;
+      if (
+        action.actionType === ActionType.SPAWN_SPECIALIST &&
+        typeof assigned === 'string' &&
+        ranking.demoted.some(profile => profile.agentId === assigned)
+      ) {
+        const replacement = ranking.ranked[0]?.agentId;
+        if (replacement) {
+          action.args.assigned_agent_id = replacement;
+          action.args.calibration_override_reason = `agent ${assigned} is calibration-demoted; routed to ${replacement}`;
+        } else {
+          return this.createFallbackAction(
+            goalId,
+            `delegation blocked: agent ${assigned} is calibration-demoted and no calibrated replacement exists`
+          );
+        }
+      }
+      if (
+        action.actionType === ActionType.GENERATE_CLAIM &&
+        ranking.ranked[0]?.requiresVerification !== false
+      ) {
+        action.args.requires_independent_verification = true;
+      }
+    }
 
     // Persist the skill usage trail: which promoted skills were consulted and
     // whether the planner actually used them. Logging failures must not block
@@ -420,6 +490,7 @@ Return JSON with: action_type, objective, args, reasoning, and optionally used_s
     reflectionContext?: string;
     memoryContext?: string;
     skillContext?: string;
+    calibrationContext?: string;
     previousActions: Array<{ type: ActionType; result: string }>;
   }): string {
     let prompt = `
@@ -453,6 +524,12 @@ ${state.memoryContext}`;
       prompt += `
 
 ${state.skillContext}`;
+    }
+
+    if (state.calibrationContext) {
+      prompt += `
+
+${state.calibrationContext}`;
     }
 
     if (state.reflectionContext) {
