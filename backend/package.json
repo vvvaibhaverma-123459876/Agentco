@@ -1,7 +1,7 @@
 {
   "name": "@agentco/backend",
   "version": "1.0.0",
-  "description": "AgentCo API Layer — Node.js + Fastify",
+  "description": "AgentCo API Layer \u2014 Node.js + Fastify",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn src/server.ts",
@@ -14,7 +14,9 @@
     "test:all": "jest --runInBand",
     "smoke:durable": "npm run build && KAFKA_RETRIES=0 KAFKAJS_NO_PARTITIONER_WARNING=1 node dist/cli/smoke-durable-execution.js",
     "db:migrate": "ts-node src/db/migrate.ts",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src --ext .ts",
+    "agentco:supervised-free-run": "ts-node src/cli/supervised-free-run.ts",
+    "agentco:longitudinal-learning": "ts-node src/cli/run-longitudinal-learning.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",

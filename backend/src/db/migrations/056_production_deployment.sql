@@ -160,7 +160,7 @@ RETURNS VARCHAR(36) AS $$
 DECLARE
   v_metric_id VARCHAR(36);
 BEGIN
-  v_metric_id := uuid_generate_v4()::VARCHAR(36);
+  v_metric_id := gen_random_uuid()::VARCHAR(36);
 
   INSERT INTO production_metrics
     (id, metric_type, metric_name, metric_value, institution_id, measured_at)
