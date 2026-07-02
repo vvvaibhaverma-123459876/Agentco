@@ -427,3 +427,8 @@ verify-clean-room:
 		cd backend && ./node_modules/.bin/ts-node src/cli/score-validation.ts || exit 1; \
 	else echo "score validation CLI not present yet"; fi
 	@echo "verify-clean-room: ALL GREEN"
+
+.PHONY: longitudinal-learning
+longitudinal-learning:
+	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL must point at a local Postgres database"; exit 1; fi
+	cd backend && ./node_modules/.bin/ts-node src/cli/run-longitudinal-learning.ts

@@ -119,17 +119,36 @@ export class DeterministicBenchmarkService {
           { text: groundedSnippet, grounded: true },
           { text: `${groundedSnippet} extra invented words`, grounded: false },
         ];
+        // Deterministic shuffle: the baseline (first snippet) is sometimes
+        // right by luck, so the comparison against the strategy is fair
+        // rather than a rigged always-zero baseline.
+        for (let j = snippets.length - 1; j > 0; j--) {
+          const k = Math.floor(rng.next() * (j + 1));
+          [snippets[j], snippets[k]] = [snippets[k], snippets[j]];
+        }
         tasks.push({ taskIndex: i, family, evidenceText, snippets });
       } else {
         const trustA = 0.3 + rng.next() * 0.6;
         const trustB = 0.3 + rng.next() * 0.6;
+        // Half the producers are honest (confidence tracks calibration);
+        // half are overconfident (confidence anti-correlates). The baseline
+        // "believe the loudest" policy is right whenever the honest producer
+        // is also the better-calibrated one, so it scores mid-range instead
+        // of a rigged zero.
+        const honestA = rng.next() > 0.5;
+        const honestB = rng.next() > 0.5;
         tasks.push({
           taskIndex: i,
           family,
           contradiction: {
-            // Poorly calibrated producers state HIGH confidence; that is the trap.
-            claimA: { producerTrust: trustA, statedConfidence: 1 - trustA + 0.2 },
-            claimB: { producerTrust: trustB, statedConfidence: 1 - trustB + 0.2 },
+            claimA: {
+              producerTrust: trustA,
+              statedConfidence: honestA ? trustA : 1 - trustA + 0.2,
+            },
+            claimB: {
+              producerTrust: trustB,
+              statedConfidence: honestB ? trustB : 1 - trustB + 0.2,
+            },
             correct: trustA >= trustB ? 'A' : 'B',
           },
         });

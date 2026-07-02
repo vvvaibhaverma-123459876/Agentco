@@ -1,0 +1,65 @@
+{
+  "runLabel": "longrun_1783004171466",
+  "generatedAt": "2026-07-02T14:56:11.718Z",
+  "cycles": [
+    {
+      "cycle_label": "longrun_1783004171466-c1",
+      "task_family": "source_selection",
+      "domain": "longlearn_src_1783004171467",
+      "candidate_id": "09922ce1-4b5b-4157-9d87-2fa6037446c3",
+      "skill_version_id": "88018cb6-e850-432e-aeb5-cd6c479688bc",
+      "baseline_score": 0.06666666666666667,
+      "improved_score": 1,
+      "score_delta": 0.9333333333333333,
+      "outcome": "improved",
+      "lineage_json": {
+        "reused": true,
+        "skill_key": "source_selection_longrun_1783004171466-c1",
+        "evaluation_delta": 0.8583333333333333,
+        "canary_improvement": 0.9333333333333333
+      },
+      "event_log_id": "82c7672c-e6c0-40a1-ae89-4a880462c24a",
+      "created_at": "2026-07-02T14:56:11.644Z"
+    },
+    {
+      "cycle_label": "longrun_1783004171466-c2",
+      "task_family": "evidence_grounding",
+      "domain": "longlearn_ground_1783004171645",
+      "candidate_id": "581eca7e-046f-41ae-8e2d-35c48dc6f2ec",
+      "skill_version_id": "8e6adabb-3ed8-4883-9ce3-1dc63dc7384f",
+      "baseline_score": 0.45,
+      "improved_score": 1,
+      "score_delta": 0.55,
+      "outcome": "improved",
+      "lineage_json": {
+        "reused": true,
+        "skill_key": "evidence_grounding_longrun_1783004171466-c2",
+        "evaluation_delta": 0.725,
+        "canary_improvement": 0.55
+      },
+      "event_log_id": "b78f034b-33bd-4989-951a-dad051462323",
+      "created_at": "2026-07-02T14:56:11.695Z"
+    },
+    {
+      "cycle_label": "longrun_1783004171466-c3",
+      "task_family": "contradiction_handling",
+      "domain": "longlearn_demote_1783004171695",
+      "candidate_id": "18bb3fb5-7b5b-4653-81aa-c91fc9d74272",
+      "skill_version_id": null,
+      "baseline_score": 0.6333333333333333,
+      "improved_score": null,
+      "score_delta": null,
+      "outcome": "rolled_back",
+      "lineage_json": {
+        "reused": false,
+        "demotion": true,
+        "failure_reason": "candidate carries no executable strategy; projected improvements alone do not pass"
+      },
+      "event_log_id": "13940cd5-0072-44d4-96cd-416913015caf",
+      "created_at": "2026-07-02T14:56:11.716Z"
+    }
+  ],
+  "improvedCycles": 2,
+  "rolledBackCycles": 1,
+  "durableImprovement": true
+}
