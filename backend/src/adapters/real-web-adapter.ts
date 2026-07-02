@@ -13,13 +13,16 @@
  * 6. If all fail: BLOCKED (not synthetic results)
  */
 
+import crypto from 'crypto';
 import fetch from 'node-fetch';
 import { WebAdapter, SearchResult, FetchResult } from './web-adapter';
+import { assertPublicHttpUrl } from './url-safety';
 
 const USER_AGENT = 'AgentCo-Research/1.0 (autonomous research agent)';
 const FETCH_TIMEOUT_MS = 8000;
 const MAX_CONTENT_SIZE = 500000; // 500KB
 const MAX_RETRIES = 3;
+const MAX_REDIRECTS = 3;
 
 export class RealWebAdapter implements WebAdapter {
   getName(): string {
@@ -291,23 +294,35 @@ export class RealWebAdapter implements WebAdapter {
 
   async fetch(url: string): Promise<FetchResult | null> {
     try {
-      // Validate URL to prevent SSRF
-      const parsed = new URL(url);
-      if (!['http:', 'https:'].includes(parsed.protocol)) {
-        console.warn(`Invalid protocol for fetch: ${parsed.protocol}`);
-        return null;
-      }
+      // SSRF guard: only public HTTP(S) endpoints; hostnames that resolve to
+      // private/reserved addresses are rejected. Loopback is only permitted
+      // when a test fixture explicitly opts in.
+      const allowLoopback = process.env.AGENTCO_ALLOW_LOOPBACK_FETCH === '1';
+      let currentUrl = (await assertPublicHttpUrl(url, { allowLoopback })).toString();
 
-      const response = await Promise.race([
-        fetch(url, {
+      // Bounded redirects, each hop re-validated so a public page cannot
+      // bounce the fetch into an internal service.
+      let response: import('node-fetch').Response | null = null;
+      for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+        response = await fetch(currentUrl, {
           headers: { 'User-Agent': USER_AGENT },
           timeout: FETCH_TIMEOUT_MS,
-          redirect: 'follow',
-        }),
-        new Promise<Response | null>((_, reject) =>
-          setTimeout(() => reject(new Error('Fetch timeout')), FETCH_TIMEOUT_MS)
-        ),
-      ]);
+          redirect: 'manual',
+          size: MAX_CONTENT_SIZE,
+        });
+        if (response.status >= 300 && response.status < 400) {
+          const location = response.headers.get('location');
+          if (!location) break;
+          if (hop === MAX_REDIRECTS) {
+            console.warn(`Fetch aborted: exceeded ${MAX_REDIRECTS} redirects for ${url}`);
+            return null;
+          }
+          const nextUrl = new URL(location, currentUrl).toString();
+          currentUrl = (await assertPublicHttpUrl(nextUrl, { allowLoopback })).toString();
+          continue;
+        }
+        break;
+      }
 
       if (!response || !response.ok) {
         console.warn(`Fetch failed: ${response?.status || 'timeout'}`);
@@ -330,11 +345,11 @@ export class RealWebAdapter implements WebAdapter {
       const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
       const title = titleMatch ? titleMatch[1].trim() : undefined;
 
-      // Compute content hash for deduplication
+      // Cryptographic content hash for provenance/deduplication
       const contentHash = this.computeHash(content);
 
       return {
-        url,
+        url: currentUrl,
         status: response.status,
         title,
         content: content.substring(0, MAX_CONTENT_SIZE),
@@ -348,13 +363,6 @@ export class RealWebAdapter implements WebAdapter {
   }
 
   private computeHash(content: string): string {
-    // Simple hash for content deduplication
-    let hash = 0;
-    for (let i = 0; i < content.length; i++) {
-      const char = content.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return `hash_${Math.abs(hash)}`;
+    return `sha256:${crypto.createHash('sha256').update(content).digest('hex')}`;
   }
 }

@@ -16,7 +16,9 @@
     "db:migrate": "ts-node src/db/migrate.ts",
     "lint": "eslint src --ext .ts",
     "agentco:supervised-free-run": "ts-node src/cli/supervised-free-run.ts",
-    "agentco:longitudinal-learning": "ts-node src/cli/run-longitudinal-learning.ts"
+    "agentco:longitudinal-learning": "ts-node src/cli/run-longitudinal-learning.ts",
+    "agentco:score-validation": "ts-node src/cli/score-validation.ts",
+    "agentco:db-table-usage": "ts-node src/cli/db-table-usage.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
