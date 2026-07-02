@@ -186,3 +186,10 @@ kubeconfig
 
 # Test runs regenerate free-run artifacts; committed ones are historical records
 audit_artifacts/civilization_free_run/
+
+# Generated run outputs (never commit; regenerate via make targets)
+learning_run_*.json
+/latest.json
+/latest.md
+reports/system_run/*/
+!reports/system_run/latest/

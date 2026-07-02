@@ -23,7 +23,13 @@ The source of truth for implementation status is:
 - [reports/system_run/latest/mission_progress_verification.md](reports/system_run/latest/mission_progress_verification.md)
 - [reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md](reports/system_run/latest/PRODUCTION_INFRA_SMOKE_REPORT.md)
 
-Older phase reports are historical artifacts. If they conflict with the build ledger or current implementation reality, treat them as superseded.
+Older phase reports have been moved to [docs/history/](docs/history/) and are historical artifacts only. If they conflict with the build ledger or current implementation reality, treat them as superseded.
+
+To verify the current state reproducibly from a clean clone (no LLM/web keys required):
+
+```bash
+make verify-clean-room
+```
 
 ## What Is Real Now
 

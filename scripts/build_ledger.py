@@ -17,6 +17,10 @@ import yaml
 
 
 LEDGER_PATH = Path("BUILD_LEDGER.yaml")
+# The no-stub / no-simulation gate must cover the FULL runtime surface. Only
+# tests, fixtures, generated artifacts, archived code, and docs/history are
+# excluded. Do not narrow this list to make the gate green; fix or archive
+# the offending code instead.
 RUNTIME_DIRS = [
     Path("backend/src"),
     Path("runtime"),
@@ -26,8 +30,33 @@ RUNTIME_DIRS = [
     Path("synthesis"),
     Path("selfcoding"),
     Path("reserve"),
+    Path("autonomy"),
+    Path("civilization"),
+    Path("ingestion"),
+    Path("institutions"),
+    Path("governance"),
+    Path("memory_kernel"),
+    Path("provenance"),
+    Path("self_modification"),
+    Path("simulation"),
+    Path("foundry"),
+    Path("agentco_security"),
+    Path("validation"),
+    Path("frontend/src"),
 ]
-EXCLUDED_PARTS = {"tests", "__tests__", "fixtures", "__pycache__", "unsupported_migrations"}
+EXCLUDED_PARTS = {
+    "tests",
+    "__tests__",
+    "fixtures",
+    "__pycache__",
+    "unsupported_migrations",
+    "node_modules",
+    "archive",
+}
+# Explicitly allowed line patterns that the banned-marker regex would
+# otherwise flag. Each entry must be justified: JSX/HTML `placeholder=` is a
+# standard input attribute, not a stub marker.
+ALLOWED_LINE_PATTERNS = re.compile(r"placeholder\s*=\s*[\"'{]")
 BANNED_MARKER = re.compile(
     r"\bTODO\b|\bFIXME\b|\bXXX\b|\bHACK\b|NotImplementedError|raise NotImplemented|"
     r"\bplaceholder\b|\bstub\b|\bmock(?!ito)\b|\bfake_|\bdummy\b|to ?be ?done|\blater\b",
@@ -97,6 +126,8 @@ def scan_runtime(pattern: re.Pattern[str], limit: int | None = None) -> list[Sca
                 continue
             for line_no, line in enumerate(text.splitlines(), start=1):
                 match = pattern.search(line)
+                if match and ALLOWED_LINE_PATTERNS.search(line) and match.group(0).lower() == "placeholder":
+                    continue
                 if match:
                     hits.append(ScanHit(str(path), line_no, match.group(0), line.strip()[:160]))
                     if limit is not None and len(hits) >= limit:

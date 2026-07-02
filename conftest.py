@@ -42,3 +42,51 @@ if "AGENTCO_TEST_DATABASE_URL" not in os.environ:
             os.environ["DATABASE_URL"] = _sandbox_url
         except Exception:
             pass  # leave DATABASE_URL as-is; tests will skip or fail with a clear error
+
+
+# ---------------------------------------------------------------------------
+# Live-LLM test gating (clean-room integrity).
+#
+# Tests that require a live LLM provider must be marked with
+# @pytest.mark.live_llm. They are skipped unless RUN_REAL_LLM_TESTS=1 AND a
+# provider credential is configured. This mirrors the backend Jest convention
+# so `make test` / `make master-gate` pass on machines without keys, while
+# live suites remain runnable explicitly.
+# ---------------------------------------------------------------------------
+import pytest as _pytest
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers",
+        "live_llm: test requires a live LLM provider; opt in with "
+        "RUN_REAL_LLM_TESTS=1 and provider credentials",
+    )
+    config.addinivalue_line(
+        "markers",
+        "live_web: test requires live internet access; opt in with RUN_REAL_WEB_TESTS=1",
+    )
+
+
+def _live_llm_enabled() -> bool:
+    if os.environ.get("RUN_REAL_LLM_TESTS") != "1":
+        return False
+    return bool(
+        os.environ.get("OPENAI_API_KEY")
+        or os.environ.get("LLM_API_KEY")
+        or os.environ.get("ANTHROPIC_API_KEY")
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    skip_llm = _pytest.mark.skip(
+        reason="live LLM test skipped: set RUN_REAL_LLM_TESTS=1 with provider credentials"
+    )
+    skip_web = _pytest.mark.skip(
+        reason="live web test skipped: set RUN_REAL_WEB_TESTS=1"
+    )
+    for item in items:
+        if "live_llm" in item.keywords and not _live_llm_enabled():
+            item.add_marker(skip_llm)
+        if "live_web" in item.keywords and os.environ.get("RUN_REAL_WEB_TESTS") != "1":
+            item.add_marker(skip_web)

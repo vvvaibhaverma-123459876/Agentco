@@ -14,6 +14,7 @@ Process:
 7. Compare prediction vs actual (meta-learning)
 """
 
+import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Optional
 from enum import Enum
@@ -59,6 +60,7 @@ class DecisionRecord:
     actual_outcomes: Dict[str, float] = field(default_factory=dict)
     actual_utility_change: float = 0.0
     prediction_error: float = 0.0  # Actual - predicted
+    utility_at_decision: float = 0.0  # Utility baseline captured when decision was made
 
 
 class DecisionEngine:
@@ -106,7 +108,26 @@ class DecisionEngine:
         if decision_type in self.action_library:
             relevant.extend(self.action_library[decision_type])
 
-        # TODO: Add better filtering based on situation context
+        # Context filtering: drop actions whose cost exceeds an explicit
+        # situation budget, then prefer actions whose name/description share
+        # vocabulary with the stated problem. If keyword filtering would
+        # eliminate every candidate, keep the type-matched set so the engine
+        # still has options to evaluate.
+        constraints = situation.get('constraints')
+        if isinstance(constraints, dict) and constraints.get('max_cost') is not None:
+            relevant = [a for a in relevant if a.estimated_cost <= constraints['max_cost']]
+
+        problem_words = {w for w in re.findall(r"[a-z]+", problem.lower()) if len(w) > 3}
+        if problem_words:
+            matched = [
+                a for a in relevant
+                if problem_words & {
+                    w for w in re.findall(r"[a-z]+", f"{a.name} {a.description}".lower())
+                    if len(w) > 3
+                }
+            ]
+            if matched:
+                relevant = matched
         return relevant
 
     def _predict_outcomes(self, action: Action) -> Dict[str, float]:
@@ -178,7 +199,8 @@ class DecisionEngine:
             predicted_utility_change=best['expected_utility_change'],
             predicted_outcomes=best['action'].predicted_outcomes,
             timestamp=datetime.now(),
-            executed=False
+            executed=False,
+            utility_at_decision=self.objective.calculate_utility()
         )
 
         self.decisions[decision_id] = decision_record
@@ -232,11 +254,10 @@ class DecisionEngine:
         record = self.decisions[decision_id]
         record.actual_outcomes = actual_outcomes
 
-        # Calculate actual utility change
-        # (In real system, recalculate from updated component values)
-        actual_utility_before = 0.5  # TODO: get before value
+        # Calculate actual utility change against the baseline captured when
+        # the decision was made, not a fixed constant.
         actual_utility_after = self.objective.calculate_utility()
-        record.actual_utility_change = actual_utility_after - actual_utility_before
+        record.actual_utility_change = actual_utility_after - record.utility_at_decision
 
         # Calculate prediction error
         total_predicted = sum(record.predicted_outcomes.values())

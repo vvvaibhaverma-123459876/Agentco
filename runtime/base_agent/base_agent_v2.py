@@ -102,8 +102,12 @@ class BaseAgentV2:
         self._confidence = ConfidenceV2(trust_controller=self._trust)
         self._gate = EscalationGate()
 
-        # LLM client — tier-specific; provider+model resolved from env config
-        self._llm_client = client_for(agent_id)
+        # LLM client — tier-specific; provider+model resolved from env config.
+        # Constructed lazily on first use so agents whose logic paths never
+        # reach the LLM (calibration analysis, memory writes, offline tests)
+        # do not require live credentials at __init__ time. A missing key
+        # still fails honestly at the first act() call.
+        self._llm_client_instance: Optional[Any] = None
         self._model = model_for(agent_id)
         self.output_schema: dict = {}   # subclasses set this to enforce structured output shape
 
@@ -203,6 +207,18 @@ class BaseAgentV2:
         )
         return cred
 
+    @property
+    def _llm_client(self) -> Any:
+        """Tier-specific LLM client, built on first access (see __init__ note)."""
+        if self._llm_client_instance is None:
+            self._llm_client_instance = client_for(self.agent_id)
+        return self._llm_client_instance
+
+    @_llm_client.setter
+    def _llm_client(self, client: Any) -> None:
+        """Allow explicit client injection (deterministic providers, tests)."""
+        self._llm_client_instance = client
+
     def act(self, messages: list[dict], schema: Optional[dict] = None) -> dict:
         """
         Call the local LLM with validate-and-retry.  Subclasses use this instead of
@@ -212,7 +228,7 @@ class BaseAgentV2:
         """
         messages = self._inject_memory_context(messages)
         return get_validated_output(
-            client=self._llm_client,
+            client=self._llm_client,  # lazy property — resolves credentials on first call
             model=self._model,
             messages=messages,
             schema=schema if schema is not None else self.output_schema,

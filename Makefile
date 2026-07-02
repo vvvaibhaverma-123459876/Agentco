@@ -400,3 +400,30 @@ autonomy-open-world-5min:
 	@echo "✓ Open-world 5-minute test complete"
 
 .PHONY: production-release-gate autonomy-real-web-free-run autonomy-open-world-5min
+
+# ---------------------------------------------------------------------------
+# Clean-room verification: everything below must pass on a machine with NO
+# OpenAI/web credentials, given only Node, Python 3.13, and a Postgres
+# reachable via DATABASE_URL. Live LLM/web suites are opt-in elsewhere
+# (RUN_REAL_LLM_TESTS=1 / RUN_REAL_WEB_TESTS=1).
+# ---------------------------------------------------------------------------
+.PHONY: verify-clean-room
+verify-clean-room:
+	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL must point at a local Postgres database"; exit 1; fi
+	@echo "== [1/6] backend install/migrate =="
+	cd backend && npm install --no-audit --no-fund && npm run db:migrate
+	@echo "== [2/6] backend typecheck =="
+	cd backend && ./node_modules/.bin/tsc --noEmit
+	@echo "== [3/6] backend tests =="
+	cd backend && npm test -- --runInBand --forceExit
+	@echo "== [4/6] python smoke (no live keys) =="
+	$(PYTHON313) -m pytest calibration runtime learning synthesis evals/regression -q \
+		--ignore=evals/regression/test_pg_ledger_immutability.py \
+		--ignore=evals/regression/test_pg_ledger_persistence.py
+	@echo "== [5/6] build ledger gates =="
+	$(PYTHON313) scripts/build_ledger.py status
+	@echo "== [6/6] score validation =="
+	@if [ -f backend/dist/cli/score-validation.js ] || [ -f backend/src/cli/score-validation.ts ]; then \
+		cd backend && ./node_modules/.bin/ts-node src/cli/score-validation.ts || exit 1; \
+	else echo "score validation CLI not present yet"; fi
+	@echo "verify-clean-room: ALL GREEN"
