@@ -40,6 +40,9 @@ CREATE TABLE IF NOT EXISTS departments (
 
 -- ── agent_membership_edges ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS agent_membership_edges (
+    -- Surrogate id kept in sync with backend migration 078; the institution
+    -- service reads it when re-activating an existing membership.
+    id              UUID NOT NULL DEFAULT gen_random_uuid(),
     agent_id        TEXT NOT NULL,
     department_id   TEXT NOT NULL REFERENCES departments(id) ON DELETE RESTRICT,
     role_name       TEXT NOT NULL,
@@ -47,6 +50,9 @@ CREATE TABLE IF NOT EXISTS agent_membership_edges (
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY (agent_id, department_id)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_agent_membership_edges_id
+    ON agent_membership_edges(id);
 
 -- ── institution_contracts ─────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS institution_contracts (

@@ -18,11 +18,54 @@ interface AuditEvent {
   created_at: string;
 }
 
+interface ActionAttestation {
+  action_id: string;
+  principal_id: string | null;
+  policy_id: string | null;
+  trusted_confidence: number | null;
+  risk_level: string | null;
+  created_at: string;
+}
+
+interface AttestationLookup {
+  action: ActionAttestation;
+  explanation: {
+    status: string;
+    why_allowed: string;
+    evidence_quality: string;
+  };
+}
+
 export default function GovernancePage() {
   const [status, setStatus] = useState<GovernanceStatus | null>(null);
   const [recentEvents, setRecentEvents] = useState<AuditEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [attestationActionId, setAttestationActionId] = useState('');
+  const [attestation, setAttestation] = useState<AttestationLookup | null>(null);
+  const [attestationError, setAttestationError] = useState<string | null>(null);
+
+  const lookupAttestation = async () => {
+    if (!attestationActionId.trim()) return;
+    try {
+      setAttestation(null);
+      setAttestationError(null);
+      const response = await fetch(
+        `/api/governance/why/${encodeURIComponent(attestationActionId.trim())}`,
+        { headers: { 'x-actor-id': 'dashboard' } }
+      );
+      if (!response.ok) {
+        throw new Error(
+          response.status === 404
+            ? 'No attestation found for that action id'
+            : 'Failed to fetch attestation'
+        );
+      }
+      setAttestation(await response.json());
+    } catch (err) {
+      setAttestationError(err instanceof Error ? err.message : 'Unknown error');
+    }
+  };
 
   useEffect(() => {
     const fetchGovernanceStatus = async () => {
@@ -199,6 +242,55 @@ export default function GovernancePage() {
                 No recent events
               </div>
             )}
+          </div>
+
+          {/* Action Attestations */}
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Action Attestations</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Look up why an action was allowed: attestation record, risk level, trusted
+                confidence, and policy/evidence references.
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={attestationActionId}
+                  onChange={(e) => setAttestationActionId(e.target.value)}
+                  placeholder="Action ID"
+                  className="flex-1 border border-gray-300 rounded px-3 py-2 text-sm font-mono"
+                />
+                <button
+                  onClick={lookupAttestation}
+                  className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold hover:bg-blue-700"
+                >
+                  Explain
+                </button>
+              </div>
+              {attestationError && (
+                <p className="text-sm text-red-700">{attestationError}</p>
+              )}
+              {attestation && (
+                <div className="bg-gray-50 rounded p-4 text-sm space-y-2">
+                  <p>
+                    <span className="font-semibold">Why allowed:</span>{' '}
+                    {attestation.explanation.why_allowed}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Evidence quality:</span>{' '}
+                    {attestation.explanation.evidence_quality}
+                  </p>
+                  <p className="font-mono text-gray-700">
+                    principal={attestation.action.principal_id ?? 'n/a'} policy=
+                    {attestation.action.policy_id ?? 'n/a'} risk=
+                    {attestation.action.risk_level ?? 'n/a'} confidence=
+                    {attestation.action.trusted_confidence ?? 'n/a'}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* System Information */}

@@ -858,6 +858,12 @@ export class AutonomyOrchestratorService {
         );
       }
 
+      const goalDomainRow = await db.query<{ domain: string }>(
+        `SELECT domain FROM autonomy_goals WHERE id = $1`,
+        [goalId]
+      );
+      const goalDomain = goalDomainRow.rows[0]?.domain ?? 'research';
+
       // Initialize reputation for goal (society-level entity)
       try {
         await this.reputation.initializeEntity(goalId, 'society', ['research', 'autonomy', goalText.split(' ')[0]]);
@@ -956,6 +962,7 @@ export class AutonomyOrchestratorService {
           evidenceSources,
           loopDetection,
           reflectionContext,
+          domain: goalDomain,
           previousActions: actionHistory.map(h => ({
             type: h.actionType,
             result: h.resultStatus,

@@ -32,6 +32,19 @@ import pytest
 psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
 
 DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL")
+if DSN:
+    try:
+        import sys as _sys
+        from pathlib import Path as _Path
+
+        _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
+        from pg_test_isolation import isolated_dsn
+
+        # Destructive fixture: run in an isolated sibling database so the
+        # shared prediction_ledger is never dropped out from under other suites.
+        DSN = isolated_dsn(DSN)
+    except Exception:
+        DSN = None  # Postgres unreachable; the skip guard below handles it
 
 pytestmark = pytest.mark.skipif(
     not DSN, reason="AGENTCO_TEST_DATABASE_URL not set — real Postgres required"

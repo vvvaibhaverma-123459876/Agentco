@@ -761,186 +761,186 @@ See the call ledger above and `pawdent_agent_decisions.jsonl` for every structur
 ## Pre-Registered Claims and Calibration
 | Month | Prediction id | Agent | Claim | Outcome | Trust change |
 |---:|---|---|---|---|---|
-| 1 | `d3a4da45-9560-42b5-8ebd-c1fca18a8e0b` | Growth Marketer | Month 1 CAC will be <= 38.68. | False | 0.4960->0.4712 |
-| 1 | `71bcdf70-fcea-464e-acb6-30721c8d3472` | Product Manager | Month 1 conversion rate will be >= 0.0401. | True | 0.4640->0.4408 |
-| 1 | `c9e81b51-e7cf-47cf-9c7f-f8943b729b22` | Finance Controller | Month 1 gross revenue will be >= 500.00. | True | 0.4800->0.4560 |
-| 1 | `b873a83c-eb2c-4586-b28f-bc3a71c425ee` | Operations Manager | Month 1 stockout risk will be <= 0.1000. | True | 0.5120->0.4864 |
-| 1 | `f5ce0bad-3c72-4048-b5dc-bd3f26ca8b3b` | Founder CEO | Month 1 strategy will improve business health score. | True | 0.4480->0.4256 |
-| 2 | `7164d16a-77e5-4d04-8145-522f6a37553a` | Growth Marketer | Month 2 CAC will be <= 36.38. | False | 0.4712->0.4464 |
-| 2 | `22d4491b-23db-433d-bb8b-474f339f9330` | Product Manager | Month 2 conversion rate will be >= 0.0420. | True | 0.4408->0.4176 |
-| 2 | `4f6c821f-eb63-47ae-a1cb-966bd5457747` | Finance Controller | Month 2 gross revenue will be >= 699.60. | True | 0.4560->0.4320 |
-| 2 | `d4be9418-c098-4e2d-9861-7853159e7c00` | Operations Manager | Month 2 stockout risk will be <= 0.1000. | False | 0.4864->0.4608 |
-| 2 | `c4521f72-3731-4af1-9eb2-02e19e9363f3` | Founder CEO | Month 2 strategy will improve business health score. | False | 0.4256->0.4032 |
-| 3 | `2e0d2f2b-9a7a-4948-818d-88ba69109c7c` | Growth Marketer | Month 3 CAC will be <= 38.61. | False | 0.4464->0.4216 |
-| 3 | `fc480a63-6fbf-49c3-8081-c4412064a8cc` | Product Manager | Month 3 conversion rate will be >= 0.0377. | True | 0.4176->0.3944 |
-| 3 | `8321b6a5-33d6-4a7c-8851-d640eb8a089c` | Finance Controller | Month 3 gross revenue will be >= 1570.80. | True | 0.4320->0.4080 |
-| 3 | `11ced137-1d6a-460d-bacf-7bceba9b3487` | Operations Manager | Month 3 stockout risk will be <= 0.1000. | True | 0.4608->0.4352 |
-| 3 | `fc7f66fc-3357-4cdd-85af-d3c5737eb35d` | Founder CEO | Month 3 strategy will improve business health score. | True | 0.4032->0.3808 |
-| 4 | `9b72df9c-91b8-466d-b3c8-b33334cfa1c9` | Growth Marketer | Month 4 CAC will be <= 39.83. | False | 0.4216->0.3968 |
-| 4 | `f78316d4-a166-41da-92a7-21358021c13b` | Product Manager | Month 4 conversion rate will be >= 0.0416. | True | 0.3944->0.3712 |
-| 4 | `854c9ba4-4ba5-496e-b7b4-5b91104a0a69` | Finance Controller | Month 4 gross revenue will be >= 3578.85. | True | 0.4080->0.3840 |
-| 4 | `d55bca7f-61b2-451e-aecb-19e7c13b9153` | Operations Manager | Month 4 stockout risk will be <= 0.1000. | True | 0.4352->0.4096 |
-| 4 | `30c811bd-97b1-4464-8ee7-d8ce3b9ec927` | Founder CEO | Month 4 strategy will improve business health score. | False | 0.3808->0.3584 |
-| 5 | `e31d6a9d-7c70-487b-b320-a1914ae87e54` | Growth Marketer | Month 5 CAC will be <= 39.72. | False | 0.3968->0.0000 |
-| 5 | `23051dcc-abe2-4316-a551-4f3af40e427e` | Product Manager | Month 5 conversion rate will be >= 0.0407. | True | 0.3712->0.0900 |
-| 5 | `0447628a-62bf-49bc-9c72-c22fe57b02c9` | Finance Controller | Month 5 gross revenue will be >= 6088.50. | True | 0.3840->0.0900 |
-| 5 | `0db23b16-d251-4ccf-9ebc-94707a9aa03e` | Operations Manager | Month 5 stockout risk will be <= 0.1600. | True | 0.4096->0.2800 |
-| 5 | `b9a722f2-073a-4485-be85-e5029dce1b3c` | Founder CEO | Month 5 strategy will improve business health score. | False | 0.3584->0.3584 |
-| 6 | `264d0e66-0de6-44ca-b400-f8a3edcf550b` | Growth Marketer | Month 6 CAC will be <= 42.34. | True | 0.0000->0.0150 |
-| 6 | `7cb54c06-6b18-4423-8766-03d76afec6df` | Product Manager | Month 6 conversion rate will be >= 0.0411. | True | 0.0900->0.0900 |
-| 6 | `b165e4c4-320c-4e3e-a236-9e36dd950483` | Finance Controller | Month 6 gross revenue will be >= 8835.75. | True | 0.0900->0.0900 |
-| 6 | `75b5485b-77c0-4ef7-925c-01f30cb90300` | Operations Manager | Month 6 stockout risk will be <= 0.1600. | True | 0.2800->0.1667 |
-| 6 | `3d9a17dd-dcad-4926-a986-706d8d4e73b4` | Founder CEO | Month 6 strategy will improve business health score. | False | 0.3584->0.1778 |
-| 7 | `5c519d6e-1c7d-4ca2-996a-6401c798f524` | Growth Marketer | Month 7 CAC will be <= 43.15. | True | 0.0150->0.0306 |
-| 7 | `8cc13573-f2d8-4763-9860-002719bca78d` | Product Manager | Month 7 conversion rate will be >= 0.0407. | True | 0.0900->0.0900 |
-| 7 | `2a828f02-97e0-4225-860b-e81c6d3259a8` | Finance Controller | Month 7 gross revenue will be >= 13691.70. | True | 0.0900->0.0900 |
-| 7 | `de2b7121-ca72-45ce-bdc4-2b83eceb5c4a` | Operations Manager | Month 7 stockout risk will be <= 0.1000. | True | 0.1667->0.1359 |
-| 7 | `8fa30760-2774-43f2-a675-3da58e7ed382` | Founder CEO | Month 7 strategy will improve business health score. | False | 0.1778->0.0805 |
-| 8 | `031dacad-7c44-4fe1-a565-d17bf4097d68` | Growth Marketer | Month 8 CAC will be <= 35.72. | False | 0.0306->0.0225 |
-| 8 | `26084f2a-3a2c-4662-ae13-d0fed46a2e9b` | Product Manager | Month 8 conversion rate will be >= 0.0435. | True | 0.0900->0.0900 |
-| 8 | `2f8245f4-1f2d-4444-8961-5c722eb4c749` | Finance Controller | Month 8 gross revenue will be >= 18376.88. | True | 0.0900->0.0900 |
-| 8 | `682712bc-618e-4d02-b83b-d99ad695a10c` | Operations Manager | Month 8 stockout risk will be <= 0.1600. | True | 0.1359->0.1247 |
-| 8 | `7f747ff3-2b68-4c45-b6a9-12c718ee5218` | Founder CEO | Month 8 strategy will improve business health score. | False | 0.0805->0.0413 |
-| 9 | `229d7fed-a255-4146-abef-2434817073ec` | Growth Marketer | Month 9 CAC will be <= 42.97. | False | 0.0225->0.0200 |
-| 9 | `99e4749e-cbe0-4bee-ae3d-d101e9b08fb4` | Product Manager | Month 9 conversion rate will be >= 0.0443. | True | 0.0900->0.0900 |
-| 9 | `ecc07285-7ba6-4d9b-b4b2-3ca74fb8f35b` | Finance Controller | Month 9 gross revenue will be >= 22854.15. | True | 0.0900->0.0900 |
-| 9 | `565a2186-11d2-4470-9286-2186de4423b2` | Operations Manager | Month 9 stockout risk will be <= 0.1600. | True | 0.1247->0.1156 |
-| 9 | `bfcfb142-574f-409a-b46e-9811ec7c3a2a` | Founder CEO | Month 9 strategy will improve business health score. | False | 0.0413->0.0311 |
-| 10 | `6303d732-2ab9-4079-93c1-a62e0a78350a` | Growth Marketer | Month 10 CAC will be <= 42.69. | True | 0.0200->0.0360 |
-| 10 | `16f91a38-3283-4a87-b3af-6bf8942ceb63` | Product Manager | Month 10 conversion rate will be >= 0.0464. | True | 0.0900->0.0900 |
-| 10 | `0ed388b5-7bdb-47cd-b32a-8d83b860d519` | Finance Controller | Month 10 gross revenue will be >= 27286.88. | True | 0.0900->0.0900 |
-| 10 | `d125f5a5-2ecb-4032-a9cf-cbc05886f763` | Operations Manager | Month 10 stockout risk will be <= 0.1600. | True | 0.1156->0.1080 |
-| 10 | `2773e58c-727b-4c5a-80aa-33ebae15c36c` | Founder CEO | Month 10 strategy will improve business health score. | False | 0.0311->0.0240 |
-| 11 | `a934b51c-97a6-4ff5-bf32-d79ba14a538d` | Growth Marketer | Month 11 CAC will be <= 35.97. | True | 0.0360->0.0684 |
-| 11 | `58f5ead1-8f1f-4b2a-91b9-4dd30e482d63` | Product Manager | Month 11 conversion rate will be >= 0.0487. | True | 0.0900->0.0900 |
-| 11 | `8576898d-5d2f-47fa-8bf8-ce1545e5b80e` | Finance Controller | Month 11 gross revenue will be >= 26819.10. | True | 0.0900->0.0900 |
-| 11 | `671f5d85-db32-4836-8c25-6c9e482568ab` | Operations Manager | Month 11 stockout risk will be <= 0.1600. | True | 0.1080->0.1017 |
-| 11 | `148a1555-fea6-4ec7-8046-c1c56d5806c8` | Founder CEO | Month 11 strategy will improve business health score. | False | 0.0240->0.0188 |
-| 12 | `f6c7dc02-37d8-40d2-806d-b73450a68647` | Growth Marketer | Month 12 CAC will be <= 40.82. | True | 0.0684->0.1823 |
-| 12 | `f97ac02d-5148-4b28-b8c7-d20dac5e6bd0` | Product Manager | Month 12 conversion rate will be >= 0.0439. | True | 0.0900->0.0900 |
-| 12 | `fea35187-5ef6-4fa8-a3d6-5df641da1bf5` | Finance Controller | Month 12 gross revenue will be >= 26722.58. | True | 0.0900->0.0900 |
-| 12 | `ce5fdd01-562c-4c36-83b8-8330ea10d374` | Operations Manager | Month 12 stockout risk will be <= 0.1600. | True | 0.1017->0.0963 |
-| 12 | `ae8504f2-c2b2-4211-a630-12741dd7104d` | Founder CEO | Month 12 strategy will improve business health score. | False | 0.0188->0.0150 |
-| 13 | `c0fc360e-8845-4b49-a860-a73f8012630f` | Growth Marketer | Month 13 CAC will be <= 41.48. | True | 0.1823->0.3298 |
-| 13 | `70ac8072-57fb-4560-9998-01ecdca62d18` | Product Manager | Month 13 conversion rate will be >= 0.0495. | True | 0.0900->0.0900 |
-| 13 | `cfa076ca-9d33-4e5f-9975-01351171372a` | Finance Controller | Month 13 gross revenue will be >= 25022.25. | True | 0.0900->0.0900 |
-| 13 | `4070f13b-a20f-41cd-8fb5-1ca5ad2d450b` | Operations Manager | Month 13 stockout risk will be <= 0.1600. | True | 0.0963->0.0916 |
-| 13 | `288bfcff-f7c9-4a2f-b77b-c25958c04761` | Founder CEO | Month 13 strategy will improve business health score. | False | 0.0150->0.0138 |
-| 14 | `c1368392-446d-44c9-a288-6c5cf798b398` | Growth Marketer | Month 14 CAC will be <= 43.28. | True | 0.3298->0.5000 |
-| 14 | `e6ef0054-715a-4930-8f1e-c7dd36c9e1f7` | Product Manager | Month 14 conversion rate will be >= 0.0486. | True | 0.0900->0.0900 |
-| 14 | `72ad85f8-52ad-4b8e-96b9-df856a5728b8` | Finance Controller | Month 14 gross revenue will be >= 27591.30. | True | 0.0900->0.0900 |
-| 14 | `19db6e1d-abba-4e55-bd1c-5108fd91d426` | Operations Manager | Month 14 stockout risk will be <= 0.1600. | True | 0.0916->0.0876 |
-| 14 | `19ca5f21-5709-4a48-b155-447382f36d47` | Founder CEO | Month 14 strategy will improve business health score. | False | 0.0138->0.0129 |
-| 15 | `f0c10583-2be8-4230-b121-b68472043442` | Growth Marketer | Month 15 CAC will be <= 37.24. | False | 0.5000->0.3500 |
-| 15 | `6d980e9e-9d57-41ff-9555-6341d2691c15` | Product Manager | Month 15 conversion rate will be >= 0.0454. | True | 0.0900->0.0900 |
-| 15 | `6b799513-f782-4227-b98a-83f989e692f8` | Finance Controller | Month 15 gross revenue will be >= 30390.53. | True | 0.0900->0.0900 |
-| 15 | `b5e696a3-710a-48c6-8977-4f372429474f` | Operations Manager | Month 15 stockout risk will be <= 0.1600. | True | 0.0876->0.0840 |
-| 15 | `579267cb-6358-49a9-b7fc-ac80d66d8734` | Founder CEO | Month 15 strategy will improve business health score. | False | 0.0129->0.0120 |
-| 16 | `75506a16-d885-411d-b11c-10b52b587eac` | Growth Marketer | Month 16 CAC will be <= 43.05. | True | 0.3500->0.5000 |
-| 16 | `0311dc60-438f-412c-84b2-80e701f7717f` | Product Manager | Month 16 conversion rate will be >= 0.0464. | True | 0.0900->0.0900 |
-| 16 | `de5766ac-52c3-4c51-aa45-a14bca40d71d` | Finance Controller | Month 16 gross revenue will be >= 33546.15. | True | 0.0900->0.0900 |
-| 16 | `1d64c5b6-cea9-4b80-8755-56a97ea49289` | Operations Manager | Month 16 stockout risk will be <= 0.1600. | True | 0.0840->0.0844 |
-| 16 | `c6e53ecb-1523-4317-a438-c6fcf2bdd4fa` | Founder CEO | Month 16 strategy will improve business health score. | False | 0.0120->0.0112 |
-| 17 | `dd6e03e6-6d60-4bf0-8df9-f5dddb1d0f2f` | Growth Marketer | Month 17 CAC will be <= 42.95. | True | 0.5000->0.5294 |
-| 17 | `9f686515-b234-4828-b819-f68423bc64d6` | Product Manager | Month 17 conversion rate will be >= 0.0471. | True | 0.0900->0.0900 |
-| 17 | `6ae93221-16b4-4a79-b963-b6176c3a6a5e` | Finance Controller | Month 17 gross revenue will be >= 36516.15. | True | 0.0900->0.0900 |
-| 17 | `5b9696e4-3e0c-44a3-9d64-d61487ae5885` | Operations Manager | Month 17 stockout risk will be <= 0.1600. | True | 0.0844->0.0847 |
-| 17 | `38709da3-039d-438e-a31d-3990b7855503` | Founder CEO | Month 17 strategy will improve business health score. | False | 0.0112->0.0106 |
-| 18 | `33e5c0db-6b6a-4bf6-8613-c89fe2110aff` | Growth Marketer | Month 18 CAC will be <= 38.07. | False | 0.5294->0.5000 |
-| 18 | `58bdffbe-9615-40a3-859b-25b431990d96` | Product Manager | Month 18 conversion rate will be >= 0.0477. | True | 0.0900->0.0900 |
-| 18 | `7b53a0c7-3140-459f-ab9c-2b1670b902ca` | Finance Controller | Month 18 gross revenue will be >= 39040.65. | True | 0.0900->0.0900 |
-| 18 | `2a61d478-2dad-46d7-96f2-2474ce2b9b42` | Operations Manager | Month 18 stockout risk will be <= 0.1600. | True | 0.0847->0.0850 |
-| 18 | `9b4375e4-c535-4157-9db2-fe4848afe286` | Founder CEO | Month 18 strategy will improve business health score. | False | 0.0106->0.0100 |
-| 19 | `3636e387-d641-4b23-8e76-6a8b96a62b50` | Growth Marketer | Month 19 CAC will be <= 42.04. | False | 0.5000->0.3789 |
-| 19 | `9863fb31-02ca-41aa-94c5-08bc6d8723b4` | Product Manager | Month 19 conversion rate will be >= 0.0459. | True | 0.0900->0.0900 |
-| 19 | `1dbfe97f-7db3-4231-9de8-e08b1d9bcac9` | Finance Controller | Month 19 gross revenue will be >= 40154.40. | True | 0.0900->0.0900 |
-| 19 | `b720adf5-1763-4f42-bb9a-827fcf53d0f3` | Operations Manager | Month 19 stockout risk will be <= 0.1600. | True | 0.0850->0.0853 |
-| 19 | `d91882e0-9c12-495b-9f39-b306948966bb` | Founder CEO | Month 19 strategy will improve business health score. | False | 0.0100->0.0095 |
-| 20 | `df2047f7-bc81-424f-b3c4-5629136354ab` | Growth Marketer | Month 20 CAC will be <= 40.82. | True | 0.3789->0.5000 |
-| 20 | `e2231da2-cc7e-49b7-b41d-83aa3284e758` | Product Manager | Month 20 conversion rate will be >= 0.0505. | True | 0.0900->0.0900 |
-| 20 | `ec6c4c70-c680-4bed-8fb0-5ec2d6919e8d` | Finance Controller | Month 20 gross revenue will be >= 41839.88. | True | 0.0900->0.0900 |
-| 20 | `18b7abb9-d7d9-4179-8edb-01c76d94eceb` | Operations Manager | Month 20 stockout risk will be <= 0.1600. | True | 0.0853->0.0855 |
-| 20 | `58e6a3ee-7dfd-4601-9805-068b219bfc4c` | Founder CEO | Month 20 strategy will improve business health score. | False | 0.0095->0.0090 |
-| 21 | `403ba72a-2704-443c-8fe8-acb29d1caa14` | Growth Marketer | Month 21 CAC will be <= 41.78. | True | 0.5000->0.5238 |
-| 21 | `576a16ef-770b-4a31-b1b5-05750f95bd3f` | Product Manager | Month 21 conversion rate will be >= 0.0497. | True | 0.0900->0.0900 |
-| 21 | `baf83323-956e-4609-a2d7-42f72eba9bca` | Finance Controller | Month 21 gross revenue will be >= 45017.78. | True | 0.0900->0.0900 |
-| 21 | `4494fbe9-1b82-4b84-a6a4-b04c0d17217e` | Operations Manager | Month 21 stockout risk will be <= 0.1600. | True | 0.0855->0.0857 |
-| 21 | `5c790032-1fb9-4ae5-9f90-601b806bccc4` | Founder CEO | Month 21 strategy will improve business health score. | False | 0.0090->0.0086 |
-| 22 | `31e22fb1-cd79-462e-b0c0-52146a69db50` | Growth Marketer | Month 22 CAC will be <= 46.73. | True | 0.5238->0.5455 |
-| 22 | `c638a88e-6ce2-414b-8e18-03f4d7aed861` | Product Manager | Month 22 conversion rate will be >= 0.0514. | True | 0.0900->0.0900 |
-| 22 | `e5835aaf-3b1e-4b20-bb5f-d9d0ece235e7` | Finance Controller | Month 22 gross revenue will be >= 47163.60. | True | 0.0900->0.0900 |
-| 22 | `1bf92166-1609-4c7f-b49f-83b361bfc449` | Operations Manager | Month 22 stockout risk will be <= 0.1600. | True | 0.0857->0.0859 |
-| 22 | `8c02699d-2187-4f2e-ac6b-6dd37dd911de` | Founder CEO | Month 22 strategy will improve business health score. | False | 0.0086->0.0082 |
-| 23 | `ea6d2862-b98f-4030-bbaa-691b2e809781` | Growth Marketer | Month 23 CAC will be <= 41.83. | False | 0.5455->0.5217 |
-| 23 | `3dc3905b-cee4-4e24-9171-6e200872c9fd` | Product Manager | Month 23 conversion rate will be >= 0.0502. | True | 0.0900->0.0900 |
-| 23 | `478c6dc5-0c8b-4103-bfb2-897211c9a31c` | Finance Controller | Month 23 gross revenue will be >= 49160.93. | True | 0.0900->0.0900 |
-| 23 | `e47cdac5-311a-4e8e-98b7-6561f0ed89b1` | Operations Manager | Month 23 stockout risk will be <= 0.1600. | True | 0.0859->0.0861 |
-| 23 | `77073447-b1c4-44bf-b152-ca53e93bd0d1` | Founder CEO | Month 23 strategy will improve business health score. | False | 0.0082->0.0078 |
-| 24 | `11063e67-539d-4529-9231-ed2c73a12fbd` | Growth Marketer | Month 24 CAC will be <= 45.06. | True | 0.5217->0.5417 |
-| 24 | `0c4816b4-b716-45cf-a931-01893822a5ea` | Product Manager | Month 24 conversion rate will be >= 0.0530. | True | 0.0900->0.0900 |
-| 24 | `d2268763-609c-4863-a74a-13d1bbe00574` | Finance Controller | Month 24 gross revenue will be >= 51247.35. | True | 0.0900->0.0900 |
-| 24 | `d241374f-00cb-4fe9-a0c4-10c14dc6225d` | Operations Manager | Month 24 stockout risk will be <= 0.1600. | True | 0.0861->0.0862 |
-| 24 | `f272099d-0090-4a11-8677-7660ad7c6331` | Founder CEO | Month 24 strategy will improve business health score. | False | 0.0078->0.0075 |
-| 25 | `d62c565f-641e-4eff-8ce3-396c03afdf20` | Growth Marketer | Month 25 CAC will be <= 46.38. | True | 0.5417->0.5600 |
-| 25 | `8c0c6f3b-0eb3-4404-b150-35a1ae547195` | Product Manager | Month 25 conversion rate will be >= 0.0514. | True | 0.0900->0.0900 |
-| 25 | `452d101c-0cdf-449d-81b5-23a49a9cb6af` | Finance Controller | Month 25 gross revenue will be >= 53081.33. | True | 0.0900->0.0900 |
-| 25 | `b124dfd3-3f62-4997-870f-db54e9ce6f0c` | Operations Manager | Month 25 stockout risk will be <= 0.1600. | True | 0.0862->0.0864 |
-| 25 | `76f9ceae-9073-4eda-a9ba-e7ed6d85c54f` | Founder CEO | Month 25 strategy will improve business health score. | False | 0.0075->0.0072 |
-| 26 | `cebcb450-40f3-4304-9be9-9b93ccf426ef` | Growth Marketer | Month 26 CAC will be <= 45.89. | True | 0.5600->0.5769 |
-| 26 | `610a1d6b-9625-4278-8c6b-2dcfa402d181` | Product Manager | Month 26 conversion rate will be >= 0.0506. | True | 0.0900->0.0900 |
-| 26 | `2feb045c-8c2b-4ded-91cb-93890d9b5706` | Finance Controller | Month 26 gross revenue will be >= 55709.78. | True | 0.0900->0.0900 |
-| 26 | `c4f8dcb2-fef4-49ec-9edf-7ab0378e38fd` | Operations Manager | Month 26 stockout risk will be <= 0.1600. | True | 0.0864->0.0865 |
-| 26 | `4dfaf18e-913a-4e32-b59e-0bd6d4939dd3` | Founder CEO | Month 26 strategy will improve business health score. | False | 0.0072->0.0069 |
-| 27 | `ecbc859d-ee49-45a4-bd8e-db1c08bb0011` | Growth Marketer | Month 27 CAC will be <= 41.00. | True | 0.5769->0.5926 |
-| 27 | `1f72fc9f-7dcc-4287-84bb-6829d6eb5b48` | Product Manager | Month 27 conversion rate will be >= 0.0528. | True | 0.0900->0.0900 |
-| 27 | `3cf2740c-c7eb-4b26-8e68-a0b60d71a405` | Finance Controller | Month 27 gross revenue will be >= 58880.25. | True | 0.0900->0.0900 |
-| 27 | `6ccbf9c0-a7b1-4910-a79a-aef1c2e34159` | Operations Manager | Month 27 stockout risk will be <= 0.1600. | True | 0.0865->0.0867 |
-| 27 | `cc3ebc1c-db6c-4b55-80a1-17be480b6e5c` | Founder CEO | Month 27 strategy will improve business health score. | False | 0.0069->0.0067 |
-| 28 | `b8fc3766-3b99-48df-b985-a0cbce64b7fd` | Growth Marketer | Month 28 CAC will be <= 47.19. | True | 0.5926->0.6071 |
-| 28 | `0ae8801a-1ba6-4dc0-8c5a-2a0c76c0a9c2` | Product Manager | Month 28 conversion rate will be >= 0.0471. | True | 0.0900->0.0900 |
-| 28 | `5b18a6fd-5cb4-49e3-b24d-38fe7a36a233` | Finance Controller | Month 28 gross revenue will be >= 61315.65. | True | 0.0900->0.0900 |
-| 28 | `84ae59fe-70f4-4da4-943e-a1231b322596` | Operations Manager | Month 28 stockout risk will be <= 0.1600. | True | 0.0867->0.0868 |
-| 28 | `8e0f38f6-4280-482a-a56a-bf2b97ca5ac4` | Founder CEO | Month 28 strategy will improve business health score. | False | 0.0067->0.0064 |
-| 29 | `2d70404f-4144-42db-8483-2be0670d8371` | Growth Marketer | Month 29 CAC will be <= 47.29. | True | 0.6071->0.6207 |
-| 29 | `cf52945c-7b1f-483a-baf6-c0654cebcf40` | Product Manager | Month 29 conversion rate will be >= 0.0473. | True | 0.0900->0.0900 |
-| 29 | `34c12bd0-6e1e-40a7-9b6a-9485b7312538` | Finance Controller | Month 29 gross revenue will be >= 64627.20. | True | 0.0900->0.0900 |
-| 29 | `cd63d296-222c-409b-8ff5-48fcc440d1c1` | Operations Manager | Month 29 stockout risk will be <= 0.1600. | True | 0.0868->0.0869 |
-| 29 | `696399c2-8e8b-4d6f-bbe4-3e3c58b456de` | Founder CEO | Month 29 strategy will improve business health score. | False | 0.0064->0.0062 |
-| 30 | `8082e55a-5787-4921-8c1b-eeb2c60318df` | Growth Marketer | Month 30 CAC will be <= 46.84. | True | 0.6207->0.6333 |
-| 30 | `e4ab9f9d-9fdf-4e41-90c2-155d24993a50` | Product Manager | Month 30 conversion rate will be >= 0.0509. | True | 0.0900->0.0900 |
-| 30 | `988a2000-bc59-4769-bc5f-2a7dbad69eab` | Finance Controller | Month 30 gross revenue will be >= 66513.15. | True | 0.0900->0.0900 |
-| 30 | `4a0497e2-d82a-4b01-9b3f-f5b6ea8bedce` | Operations Manager | Month 30 stockout risk will be <= 0.1600. | True | 0.0869->0.0870 |
-| 30 | `888bef01-9521-4ca6-8ee9-cf1114978841` | Founder CEO | Month 30 strategy will improve business health score. | False | 0.0062->0.0060 |
-| 31 | `0d274b62-dd22-4c71-82f4-bc25af48674f` | Growth Marketer | Month 31 CAC will be <= 49.10. | True | 0.6333->0.6452 |
-| 31 | `4ea4b5d9-ad73-431d-9507-fcad1cf6d785` | Product Manager | Month 31 conversion rate will be >= 0.0482. | True | 0.0900->0.0900 |
-| 31 | `b923a1fb-58ce-4f1f-9095-3874fcc42ce3` | Finance Controller | Month 31 gross revenue will be >= 69364.35. | True | 0.0900->0.0900 |
-| 31 | `ded8bc32-9299-4cb6-9da9-8ba0be09a0ad` | Operations Manager | Month 31 stockout risk will be <= 0.1600. | True | 0.0870->0.0871 |
-| 31 | `9dcbda9c-94ed-4a08-89d0-3a2a254e8366` | Founder CEO | Month 31 strategy will improve business health score. | False | 0.0060->0.0058 |
-| 32 | `700db71e-6290-402a-8d46-6256755f65af` | Growth Marketer | Month 32 CAC will be <= 49.07. | True | 0.6452->0.6562 |
-| 32 | `e878c75a-d30d-4075-bac9-d12467ed9883` | Product Manager | Month 32 conversion rate will be >= 0.0459. | True | 0.0900->0.0900 |
-| 32 | `6165dc89-720e-4c29-ae4e-d9360b039b54` | Finance Controller | Month 32 gross revenue will be >= 72007.65. | True | 0.0900->0.0900 |
-| 32 | `23ac4ec3-6ef4-4257-854d-b97c7b3f4c2a` | Operations Manager | Month 32 stockout risk will be <= 0.1600. | True | 0.0871->0.0872 |
-| 32 | `322cd802-e698-4841-aa57-fca8806aabb4` | Founder CEO | Month 32 strategy will improve business health score. | False | 0.0058->0.0056 |
-| 33 | `072e81aa-c04a-4f8a-9918-46787d377583` | Growth Marketer | Month 33 CAC will be <= 46.55. | True | 0.6562->0.6667 |
-| 33 | `02d2d786-ec6d-40e8-86bc-c62e8587ec28` | Product Manager | Month 33 conversion rate will be >= 0.0469. | True | 0.0900->0.0900 |
-| 33 | `8e054b82-908c-414e-9e3b-59414f69bb5b` | Finance Controller | Month 33 gross revenue will be >= 74873.70. | True | 0.0900->0.0900 |
-| 33 | `88fc712c-dff2-4e8e-afdc-6f808a3be2f1` | Operations Manager | Month 33 stockout risk will be <= 0.1600. | True | 0.0872->0.0873 |
-| 33 | `a0f27807-9590-46fd-8648-efdc63b42c48` | Founder CEO | Month 33 strategy will improve business health score. | False | 0.0056->0.0055 |
-| 34 | `2f9a6560-2a4c-43b9-9f77-37689cab9d1c` | Growth Marketer | Month 34 CAC will be <= 46.10. | True | 0.6667->0.6765 |
-| 34 | `2dbf2970-bb98-4b20-9e10-df7cfb344b83` | Product Manager | Month 34 conversion rate will be >= 0.0510. | True | 0.0900->0.0900 |
-| 34 | `4488c134-c752-4612-98a5-299fbe99f3da` | Finance Controller | Month 34 gross revenue will be >= 77531.85. | True | 0.0900->0.0900 |
-| 34 | `5b25810e-4e23-4ca7-b52e-688d56e57fcf` | Operations Manager | Month 34 stockout risk will be <= 0.1600. | True | 0.0873->0.0874 |
-| 34 | `e6b05e77-a313-4019-aecc-36d93cf3dfd6` | Founder CEO | Month 34 strategy will improve business health score. | False | 0.0055->0.0053 |
-| 35 | `84604f92-ecc8-4de7-adf2-ba2cb114240b` | Growth Marketer | Month 35 CAC will be <= 45.16. | True | 0.6765->0.6857 |
-| 35 | `5f6c1749-a3dc-4ecb-9e1d-c34462a8c4a6` | Product Manager | Month 35 conversion rate will be >= 0.0486. | True | 0.0900->0.0900 |
-| 35 | `b008940e-c1ad-421b-bb0d-1ddbee8f5e96` | Finance Controller | Month 35 gross revenue will be >= 80071.20. | True | 0.0900->0.0900 |
-| 35 | `edde0939-cdbb-4a20-baee-576de02c1e21` | Operations Manager | Month 35 stockout risk will be <= 0.1600. | True | 0.0874->0.0874 |
-| 35 | `14ed802c-e46f-412b-8c99-6f49f8812857` | Founder CEO | Month 35 strategy will improve business health score. | False | 0.0053->0.0051 |
-| 36 | `3b3cf4df-1587-480c-a309-0d6326bb5b19` | Growth Marketer | Month 36 CAC will be <= 44.95. | True | 0.6857->0.6944 |
-| 36 | `c1f04387-59c7-4d11-b426-80166207a90f` | Product Manager | Month 36 conversion rate will be >= 0.0521. | True | 0.0900->0.0900 |
-| 36 | `6e63e5f2-e1a5-4478-9f92-e97f3b0ba457` | Finance Controller | Month 36 gross revenue will be >= 81905.18. | True | 0.0900->0.0900 |
-| 36 | `b66bf3de-2ae1-48d6-9e68-4769ac29c2ef` | Operations Manager | Month 36 stockout risk will be <= 0.1600. | True | 0.0874->0.0875 |
-| 36 | `af67eb07-f618-4e64-af40-6479bf463bea` | Founder CEO | Month 36 strategy will improve business health score. | False | 0.0051->0.0050 |
+| 1 | `241cd765-0ef1-49e9-a364-06a42a39746c` | Growth Marketer | Month 1 CAC will be <= 38.68. | False | 0.4960->0.4712 |
+| 1 | `b6b8a9fe-a783-4c13-99be-9ab5cb7a4bd5` | Product Manager | Month 1 conversion rate will be >= 0.0401. | True | 0.4640->0.4408 |
+| 1 | `162fcd0e-cd41-4bff-86a3-10d88bf2c518` | Finance Controller | Month 1 gross revenue will be >= 500.00. | True | 0.4800->0.4560 |
+| 1 | `dd0c7c14-9302-4c34-9959-755bcb847d9f` | Operations Manager | Month 1 stockout risk will be <= 0.1000. | True | 0.5120->0.4864 |
+| 1 | `c23dc630-c09e-4fc0-903b-03c99e7ef16b` | Founder CEO | Month 1 strategy will improve business health score. | True | 0.4480->0.4256 |
+| 2 | `bf0ed614-636b-41d0-9719-cf9f216fdf41` | Growth Marketer | Month 2 CAC will be <= 36.38. | False | 0.4712->0.4464 |
+| 2 | `f9dd9ab6-85fe-44c9-ac51-cea91feb80f5` | Product Manager | Month 2 conversion rate will be >= 0.0420. | True | 0.4408->0.4176 |
+| 2 | `ca9763f2-feef-456f-8147-08728c8b9f5b` | Finance Controller | Month 2 gross revenue will be >= 699.60. | True | 0.4560->0.4320 |
+| 2 | `d342b944-e38e-4a5c-a57e-a24df524c9d3` | Operations Manager | Month 2 stockout risk will be <= 0.1000. | False | 0.4864->0.4608 |
+| 2 | `09584332-03a1-437e-b1e5-731c04a935d2` | Founder CEO | Month 2 strategy will improve business health score. | False | 0.4256->0.4032 |
+| 3 | `76b5c942-691e-4ef2-9ffd-365a6d531c81` | Growth Marketer | Month 3 CAC will be <= 38.61. | False | 0.4464->0.4216 |
+| 3 | `af1de8fb-ba5d-44dc-9127-89a9fc8249c4` | Product Manager | Month 3 conversion rate will be >= 0.0377. | True | 0.4176->0.3944 |
+| 3 | `418d3a7c-6711-4c71-962d-0ffd1dc07b53` | Finance Controller | Month 3 gross revenue will be >= 1570.80. | True | 0.4320->0.4080 |
+| 3 | `7fad3a40-2848-45bf-8db0-d5f9215d5cd5` | Operations Manager | Month 3 stockout risk will be <= 0.1000. | True | 0.4608->0.4352 |
+| 3 | `ded4eccb-3d6c-4ab9-922a-01b19d321041` | Founder CEO | Month 3 strategy will improve business health score. | True | 0.4032->0.3808 |
+| 4 | `b67d3a93-3db5-42ac-b589-b4b0fcdd02cb` | Growth Marketer | Month 4 CAC will be <= 39.83. | False | 0.4216->0.3968 |
+| 4 | `938b5403-e647-4f3b-8b33-614bd0c2653a` | Product Manager | Month 4 conversion rate will be >= 0.0416. | True | 0.3944->0.3712 |
+| 4 | `b7e59120-dfea-428f-83e9-381f7b3b698e` | Finance Controller | Month 4 gross revenue will be >= 3578.85. | True | 0.4080->0.3840 |
+| 4 | `db83aa13-8e98-4d23-8976-c4cedfa9e2e0` | Operations Manager | Month 4 stockout risk will be <= 0.1000. | True | 0.4352->0.4096 |
+| 4 | `8a5cdcbe-4bf5-4b95-88d9-ecd658658c3c` | Founder CEO | Month 4 strategy will improve business health score. | False | 0.3808->0.3584 |
+| 5 | `e48409df-7057-44d2-9bac-d8fdc8dbb0e2` | Growth Marketer | Month 5 CAC will be <= 39.72. | False | 0.3968->0.0000 |
+| 5 | `b85c68e1-9d4f-403e-8432-159cada11569` | Product Manager | Month 5 conversion rate will be >= 0.0407. | True | 0.3712->0.0900 |
+| 5 | `23db4b36-0106-429b-b43b-518ee3382e9f` | Finance Controller | Month 5 gross revenue will be >= 6088.50. | True | 0.3840->0.0900 |
+| 5 | `65379f94-3d8b-4859-babe-829f9dc8baed` | Operations Manager | Month 5 stockout risk will be <= 0.1600. | True | 0.4096->0.2800 |
+| 5 | `3ace9666-7c3a-49c6-884c-2531ed11cbc7` | Founder CEO | Month 5 strategy will improve business health score. | False | 0.3584->0.3584 |
+| 6 | `c10ba9bd-533c-4842-97a6-0965c5139866` | Growth Marketer | Month 6 CAC will be <= 42.34. | True | 0.0000->0.0150 |
+| 6 | `2039fd69-aa2b-4f5c-b622-726e9950fe4a` | Product Manager | Month 6 conversion rate will be >= 0.0411. | True | 0.0900->0.0900 |
+| 6 | `47afd7e0-6bcc-4db4-8b75-b5afd2c0337c` | Finance Controller | Month 6 gross revenue will be >= 8835.75. | True | 0.0900->0.0900 |
+| 6 | `96189c3b-baf2-4256-9503-b1911cdf69fe` | Operations Manager | Month 6 stockout risk will be <= 0.1600. | True | 0.2800->0.1667 |
+| 6 | `402f04f3-affc-4844-88a1-bf754027f8bd` | Founder CEO | Month 6 strategy will improve business health score. | False | 0.3584->0.1778 |
+| 7 | `9a181f9c-f813-4d51-a27f-2be5643f1dd8` | Growth Marketer | Month 7 CAC will be <= 43.15. | True | 0.0150->0.0306 |
+| 7 | `d771f9fc-6da6-41f6-8ffc-3b229bdc10f5` | Product Manager | Month 7 conversion rate will be >= 0.0407. | True | 0.0900->0.0900 |
+| 7 | `aebb2f1b-2343-4b2d-a99c-a6d9f99c3567` | Finance Controller | Month 7 gross revenue will be >= 13691.70. | True | 0.0900->0.0900 |
+| 7 | `37e96bc6-a7ca-49ea-b2bc-d9ba79dc5f6b` | Operations Manager | Month 7 stockout risk will be <= 0.1000. | True | 0.1667->0.1359 |
+| 7 | `23215334-ba7c-4c53-9282-926b84c573e8` | Founder CEO | Month 7 strategy will improve business health score. | False | 0.1778->0.0805 |
+| 8 | `b0bb6cac-2a58-4a45-9be7-9e6f382ec5a6` | Growth Marketer | Month 8 CAC will be <= 35.72. | False | 0.0306->0.0225 |
+| 8 | `e4449879-0d0e-4065-a510-9c19e91cace4` | Product Manager | Month 8 conversion rate will be >= 0.0435. | True | 0.0900->0.0900 |
+| 8 | `859ce7e2-3700-40ab-bacf-bf9b68b1d731` | Finance Controller | Month 8 gross revenue will be >= 18376.88. | True | 0.0900->0.0900 |
+| 8 | `1b73ec78-f733-45d3-8aaf-1844464c2ac6` | Operations Manager | Month 8 stockout risk will be <= 0.1600. | True | 0.1359->0.1247 |
+| 8 | `7329dc84-8668-404b-a0d1-ae58408ce4b4` | Founder CEO | Month 8 strategy will improve business health score. | False | 0.0805->0.0413 |
+| 9 | `c893d95a-cc14-4080-9650-cfee6b472dc4` | Growth Marketer | Month 9 CAC will be <= 42.97. | False | 0.0225->0.0200 |
+| 9 | `6718db3e-64e8-4f8f-ac51-b193dd036398` | Product Manager | Month 9 conversion rate will be >= 0.0443. | True | 0.0900->0.0900 |
+| 9 | `f1dd8506-3bd1-4a5b-80ea-52a44d202a06` | Finance Controller | Month 9 gross revenue will be >= 22854.15. | True | 0.0900->0.0900 |
+| 9 | `e9a30e53-e538-46de-9a06-3850081df39d` | Operations Manager | Month 9 stockout risk will be <= 0.1600. | True | 0.1247->0.1156 |
+| 9 | `1506d510-731f-472a-bd7e-0d472e15b877` | Founder CEO | Month 9 strategy will improve business health score. | False | 0.0413->0.0311 |
+| 10 | `7342cb51-1e62-428c-b773-418c7425dfe6` | Growth Marketer | Month 10 CAC will be <= 42.69. | True | 0.0200->0.0360 |
+| 10 | `510c5f03-d16c-4909-8536-6ca5d3fc1be0` | Product Manager | Month 10 conversion rate will be >= 0.0464. | True | 0.0900->0.0900 |
+| 10 | `eb6419b1-d8c2-41f6-870f-31973964bffc` | Finance Controller | Month 10 gross revenue will be >= 27286.88. | True | 0.0900->0.0900 |
+| 10 | `ded64f5b-e828-4357-b203-dcaef62e714a` | Operations Manager | Month 10 stockout risk will be <= 0.1600. | True | 0.1156->0.1080 |
+| 10 | `8464cd0a-54a3-4af4-9c43-cbd901e1a6ce` | Founder CEO | Month 10 strategy will improve business health score. | False | 0.0311->0.0240 |
+| 11 | `c4df92f7-cc4f-4daa-a105-51c31bd76eda` | Growth Marketer | Month 11 CAC will be <= 35.97. | True | 0.0360->0.0684 |
+| 11 | `63431bd7-d236-4f8c-89d8-1512e95d68c6` | Product Manager | Month 11 conversion rate will be >= 0.0487. | True | 0.0900->0.0900 |
+| 11 | `f373de96-6ef0-4f95-9371-a5946784b385` | Finance Controller | Month 11 gross revenue will be >= 26819.10. | True | 0.0900->0.0900 |
+| 11 | `52f3c063-ba06-4b88-9197-c72e733afcba` | Operations Manager | Month 11 stockout risk will be <= 0.1600. | True | 0.1080->0.1017 |
+| 11 | `ebb569db-3c6d-48ff-b2ce-c36460700856` | Founder CEO | Month 11 strategy will improve business health score. | False | 0.0240->0.0188 |
+| 12 | `b021ef50-acd7-4022-9979-9fc12c30dc40` | Growth Marketer | Month 12 CAC will be <= 40.82. | True | 0.0684->0.1823 |
+| 12 | `f9811ba4-da2a-4cd5-8e7e-91f2fff1ce1d` | Product Manager | Month 12 conversion rate will be >= 0.0439. | True | 0.0900->0.0900 |
+| 12 | `bec39f4b-a845-432c-93ed-921e7aa1abb0` | Finance Controller | Month 12 gross revenue will be >= 26722.58. | True | 0.0900->0.0900 |
+| 12 | `f7d36074-af61-401d-b92d-4906bccb7f10` | Operations Manager | Month 12 stockout risk will be <= 0.1600. | True | 0.1017->0.0963 |
+| 12 | `23d2a603-4a7b-44ed-a3e8-d62a36d58be1` | Founder CEO | Month 12 strategy will improve business health score. | False | 0.0188->0.0150 |
+| 13 | `b24ee37b-52b1-446f-9257-f09c2c8f4b33` | Growth Marketer | Month 13 CAC will be <= 41.48. | True | 0.1823->0.3298 |
+| 13 | `6b621ae0-fca5-4352-9b5a-0647b5903a15` | Product Manager | Month 13 conversion rate will be >= 0.0495. | True | 0.0900->0.0900 |
+| 13 | `2542192a-8575-47df-a7d1-0e9a27998c94` | Finance Controller | Month 13 gross revenue will be >= 25022.25. | True | 0.0900->0.0900 |
+| 13 | `4a622978-9c04-4375-bfee-69bbdb52ed7d` | Operations Manager | Month 13 stockout risk will be <= 0.1600. | True | 0.0963->0.0916 |
+| 13 | `8a177764-ec43-49a7-9da1-cc93df3d9c9b` | Founder CEO | Month 13 strategy will improve business health score. | False | 0.0150->0.0138 |
+| 14 | `7e0c4f07-8715-4354-9d11-16fdce47daf8` | Growth Marketer | Month 14 CAC will be <= 43.28. | True | 0.3298->0.5000 |
+| 14 | `7db9ae4c-28cc-4924-9b7a-cce9b2516bd8` | Product Manager | Month 14 conversion rate will be >= 0.0486. | True | 0.0900->0.0900 |
+| 14 | `33450051-fc38-4e0d-8b35-a1f4652f322b` | Finance Controller | Month 14 gross revenue will be >= 27591.30. | True | 0.0900->0.0900 |
+| 14 | `b754559c-883f-401e-94ac-fbaafde94cf7` | Operations Manager | Month 14 stockout risk will be <= 0.1600. | True | 0.0916->0.0876 |
+| 14 | `f7ecb384-a0fb-4c41-b090-dae5f5ea244d` | Founder CEO | Month 14 strategy will improve business health score. | False | 0.0138->0.0129 |
+| 15 | `51133026-717e-4152-8e4d-aff5323cde9c` | Growth Marketer | Month 15 CAC will be <= 37.24. | False | 0.5000->0.3500 |
+| 15 | `e3acdeb2-08fe-459c-940a-25f4b9d7768a` | Product Manager | Month 15 conversion rate will be >= 0.0454. | True | 0.0900->0.0900 |
+| 15 | `0bcb8c5d-5fa0-4d13-865e-9ffb0ad2cae2` | Finance Controller | Month 15 gross revenue will be >= 30390.53. | True | 0.0900->0.0900 |
+| 15 | `187b42af-a209-4c91-b43b-9cd29153a865` | Operations Manager | Month 15 stockout risk will be <= 0.1600. | True | 0.0876->0.0840 |
+| 15 | `23330ffc-f554-4372-8062-e012e85f5add` | Founder CEO | Month 15 strategy will improve business health score. | False | 0.0129->0.0120 |
+| 16 | `6e8a48d3-9ef1-4bb3-b620-49d6b403ad52` | Growth Marketer | Month 16 CAC will be <= 43.05. | True | 0.3500->0.5000 |
+| 16 | `d82225d0-817e-42e5-a685-a7e99384a023` | Product Manager | Month 16 conversion rate will be >= 0.0464. | True | 0.0900->0.0900 |
+| 16 | `03b958fd-e422-48d6-a137-a275203a49c2` | Finance Controller | Month 16 gross revenue will be >= 33546.15. | True | 0.0900->0.0900 |
+| 16 | `4c242839-bddb-4c69-bff8-d899cdd0d4bf` | Operations Manager | Month 16 stockout risk will be <= 0.1600. | True | 0.0840->0.0844 |
+| 16 | `b2b42796-0f77-462a-88e9-bd30a6514edb` | Founder CEO | Month 16 strategy will improve business health score. | False | 0.0120->0.0112 |
+| 17 | `13d9b190-4246-4520-8563-cfea339c806c` | Growth Marketer | Month 17 CAC will be <= 42.95. | True | 0.5000->0.5294 |
+| 17 | `82161929-b3a5-4ce3-a57f-5849106c4b5b` | Product Manager | Month 17 conversion rate will be >= 0.0471. | True | 0.0900->0.0900 |
+| 17 | `9bfc188c-dc72-4b5e-9f8f-2f3450e032b4` | Finance Controller | Month 17 gross revenue will be >= 36516.15. | True | 0.0900->0.0900 |
+| 17 | `ba59b4e2-5111-4437-8fe5-31e0fa1371c4` | Operations Manager | Month 17 stockout risk will be <= 0.1600. | True | 0.0844->0.0847 |
+| 17 | `a19398ec-2664-4665-8d00-e87110150a36` | Founder CEO | Month 17 strategy will improve business health score. | False | 0.0112->0.0106 |
+| 18 | `1e8a83b6-75d0-4a6d-acdf-9dbf8c1e7fd8` | Growth Marketer | Month 18 CAC will be <= 38.07. | False | 0.5294->0.5000 |
+| 18 | `7bc97304-d57d-4b7f-afa5-c22a76de6b0d` | Product Manager | Month 18 conversion rate will be >= 0.0477. | True | 0.0900->0.0900 |
+| 18 | `27913a0b-4763-42a7-b295-6755a9a7473a` | Finance Controller | Month 18 gross revenue will be >= 39040.65. | True | 0.0900->0.0900 |
+| 18 | `a0ac40b5-07f3-4e92-bd9e-62fdc383ccec` | Operations Manager | Month 18 stockout risk will be <= 0.1600. | True | 0.0847->0.0850 |
+| 18 | `898f56d8-fa78-49f0-8a8b-de046479e7f7` | Founder CEO | Month 18 strategy will improve business health score. | False | 0.0106->0.0100 |
+| 19 | `1afd0293-aca1-4f30-9a28-a888b714d885` | Growth Marketer | Month 19 CAC will be <= 42.04. | False | 0.5000->0.3789 |
+| 19 | `841947b7-f5b8-4581-8d99-aad6c2967787` | Product Manager | Month 19 conversion rate will be >= 0.0459. | True | 0.0900->0.0900 |
+| 19 | `049821fb-1c39-4149-b090-8f024f2e742a` | Finance Controller | Month 19 gross revenue will be >= 40154.40. | True | 0.0900->0.0900 |
+| 19 | `8f80f141-dbf2-450d-9d65-5a41eba712fe` | Operations Manager | Month 19 stockout risk will be <= 0.1600. | True | 0.0850->0.0853 |
+| 19 | `43876e38-9a2f-4875-82ec-1a0314963f99` | Founder CEO | Month 19 strategy will improve business health score. | False | 0.0100->0.0095 |
+| 20 | `43cbd26b-3fae-4362-9740-00d83bc9014f` | Growth Marketer | Month 20 CAC will be <= 40.82. | True | 0.3789->0.5000 |
+| 20 | `f5f89604-8cc5-466f-b953-e1abf5aef94d` | Product Manager | Month 20 conversion rate will be >= 0.0505. | True | 0.0900->0.0900 |
+| 20 | `ee172130-e2aa-49df-a79a-2f65fce6ce40` | Finance Controller | Month 20 gross revenue will be >= 41839.88. | True | 0.0900->0.0900 |
+| 20 | `6130377c-66a4-4f28-9d5f-de8ac1de3548` | Operations Manager | Month 20 stockout risk will be <= 0.1600. | True | 0.0853->0.0855 |
+| 20 | `fada2e9e-b1ec-454e-9fd5-8959ece6779d` | Founder CEO | Month 20 strategy will improve business health score. | False | 0.0095->0.0090 |
+| 21 | `9cc58bc2-9d5c-42c7-96fa-f44a977fc855` | Growth Marketer | Month 21 CAC will be <= 41.78. | True | 0.5000->0.5238 |
+| 21 | `03df5615-320f-4006-a606-d6488884a340` | Product Manager | Month 21 conversion rate will be >= 0.0497. | True | 0.0900->0.0900 |
+| 21 | `2e3409e2-cc98-4a4f-8859-926cf00d27f7` | Finance Controller | Month 21 gross revenue will be >= 45017.78. | True | 0.0900->0.0900 |
+| 21 | `ca136d3e-0e27-4abc-9b71-1a5028c059af` | Operations Manager | Month 21 stockout risk will be <= 0.1600. | True | 0.0855->0.0857 |
+| 21 | `2da4ec82-6720-43f7-81d5-9b6ca2dd817f` | Founder CEO | Month 21 strategy will improve business health score. | False | 0.0090->0.0086 |
+| 22 | `1a9f448c-ff70-4758-9693-15db9a0bbe60` | Growth Marketer | Month 22 CAC will be <= 46.73. | True | 0.5238->0.5455 |
+| 22 | `71900ca9-4ad0-4770-bbbc-dffefe5cbcff` | Product Manager | Month 22 conversion rate will be >= 0.0514. | True | 0.0900->0.0900 |
+| 22 | `f1be422c-c62d-4962-b901-af29cacdf30e` | Finance Controller | Month 22 gross revenue will be >= 47163.60. | True | 0.0900->0.0900 |
+| 22 | `d7b1dcb3-e428-463a-8668-402659a3907d` | Operations Manager | Month 22 stockout risk will be <= 0.1600. | True | 0.0857->0.0859 |
+| 22 | `7f0ec989-c66b-40d6-b08f-ecec4881ffc4` | Founder CEO | Month 22 strategy will improve business health score. | False | 0.0086->0.0082 |
+| 23 | `b3812729-4b5d-4f03-890b-6109b501cf21` | Growth Marketer | Month 23 CAC will be <= 41.83. | False | 0.5455->0.5217 |
+| 23 | `e961e1df-d7ae-4462-84f4-09271befd27d` | Product Manager | Month 23 conversion rate will be >= 0.0502. | True | 0.0900->0.0900 |
+| 23 | `9fe02699-168f-45d9-b512-1bf1e71935f2` | Finance Controller | Month 23 gross revenue will be >= 49160.93. | True | 0.0900->0.0900 |
+| 23 | `2e1b0e25-12a7-4a81-affa-7943b492d0ca` | Operations Manager | Month 23 stockout risk will be <= 0.1600. | True | 0.0859->0.0861 |
+| 23 | `98a0d80c-8590-49db-a5ea-0d475622754b` | Founder CEO | Month 23 strategy will improve business health score. | False | 0.0082->0.0078 |
+| 24 | `8bdd4cdb-aa60-45b4-86c2-09933bf956ac` | Growth Marketer | Month 24 CAC will be <= 45.06. | True | 0.5217->0.5417 |
+| 24 | `08ed21f0-2cfa-4484-af29-9edc4a04a4e8` | Product Manager | Month 24 conversion rate will be >= 0.0530. | True | 0.0900->0.0900 |
+| 24 | `b8a2ae92-38c4-43b3-b478-5f3ad1a1bcd2` | Finance Controller | Month 24 gross revenue will be >= 51247.35. | True | 0.0900->0.0900 |
+| 24 | `513e1929-946c-4bf7-a78e-37d5573506a7` | Operations Manager | Month 24 stockout risk will be <= 0.1600. | True | 0.0861->0.0862 |
+| 24 | `87344b6e-ce93-4ee6-8308-c91dcf015430` | Founder CEO | Month 24 strategy will improve business health score. | False | 0.0078->0.0075 |
+| 25 | `8e8a92b3-494e-4fdd-9524-0ec0dcdb3d85` | Growth Marketer | Month 25 CAC will be <= 46.38. | True | 0.5417->0.5600 |
+| 25 | `d730f1c5-0ab7-4690-b308-36b5cab915b9` | Product Manager | Month 25 conversion rate will be >= 0.0514. | True | 0.0900->0.0900 |
+| 25 | `e834cd84-e6ff-4633-8d66-f7ccba44a0c7` | Finance Controller | Month 25 gross revenue will be >= 53081.33. | True | 0.0900->0.0900 |
+| 25 | `49d14fd6-c688-496e-af51-5a8d67aa226e` | Operations Manager | Month 25 stockout risk will be <= 0.1600. | True | 0.0862->0.0864 |
+| 25 | `3cce486d-4be3-4caa-a224-44a5a078503c` | Founder CEO | Month 25 strategy will improve business health score. | False | 0.0075->0.0072 |
+| 26 | `5a0fd72b-1b0b-4725-80f8-05ad1424d48f` | Growth Marketer | Month 26 CAC will be <= 45.89. | True | 0.5600->0.5769 |
+| 26 | `1b3b7c06-040b-4aa5-a3b0-e12bd67cd334` | Product Manager | Month 26 conversion rate will be >= 0.0506. | True | 0.0900->0.0900 |
+| 26 | `fd9b50e2-ba10-488e-b4e3-8a7897862f92` | Finance Controller | Month 26 gross revenue will be >= 55709.78. | True | 0.0900->0.0900 |
+| 26 | `6a2981d1-7cf5-4ec6-911b-de50e779407c` | Operations Manager | Month 26 stockout risk will be <= 0.1600. | True | 0.0864->0.0865 |
+| 26 | `c37d1228-75ad-41b3-87b9-ed4c234396f1` | Founder CEO | Month 26 strategy will improve business health score. | False | 0.0072->0.0069 |
+| 27 | `3d10badc-a14d-4eb9-941b-bc472810fa75` | Growth Marketer | Month 27 CAC will be <= 41.00. | True | 0.5769->0.5926 |
+| 27 | `6b0be219-6500-428c-9e2c-71e43f2f2161` | Product Manager | Month 27 conversion rate will be >= 0.0528. | True | 0.0900->0.0900 |
+| 27 | `e2de7e22-3be9-4828-babe-820dfb99245c` | Finance Controller | Month 27 gross revenue will be >= 58880.25. | True | 0.0900->0.0900 |
+| 27 | `b473f31a-ecf2-4fdc-b41d-ccae260a0d1f` | Operations Manager | Month 27 stockout risk will be <= 0.1600. | True | 0.0865->0.0867 |
+| 27 | `beef5117-3712-43c4-94a1-89fc0e94b2a2` | Founder CEO | Month 27 strategy will improve business health score. | False | 0.0069->0.0067 |
+| 28 | `e60a053b-5aaf-4724-982a-08de51f4b703` | Growth Marketer | Month 28 CAC will be <= 47.19. | True | 0.5926->0.6071 |
+| 28 | `0e1b3367-1074-4631-bbd9-d8871a3d1723` | Product Manager | Month 28 conversion rate will be >= 0.0471. | True | 0.0900->0.0900 |
+| 28 | `da3cb82c-a789-456b-aa20-c5a9f813a7cd` | Finance Controller | Month 28 gross revenue will be >= 61315.65. | True | 0.0900->0.0900 |
+| 28 | `dc545fd2-274e-4c92-abbc-b1a8f80ff525` | Operations Manager | Month 28 stockout risk will be <= 0.1600. | True | 0.0867->0.0868 |
+| 28 | `0ea62413-ab15-47c0-8139-190c8e16e409` | Founder CEO | Month 28 strategy will improve business health score. | False | 0.0067->0.0064 |
+| 29 | `121e3b19-bb49-4ed3-b38e-46696dcf281d` | Growth Marketer | Month 29 CAC will be <= 47.29. | True | 0.6071->0.6207 |
+| 29 | `8898fdc8-5a1f-4a63-bd25-f1ff8db28d60` | Product Manager | Month 29 conversion rate will be >= 0.0473. | True | 0.0900->0.0900 |
+| 29 | `825bd5fe-a116-47ce-8cb6-5d421a470366` | Finance Controller | Month 29 gross revenue will be >= 64627.20. | True | 0.0900->0.0900 |
+| 29 | `03784f32-8272-4d4d-8a77-3ba86540c79a` | Operations Manager | Month 29 stockout risk will be <= 0.1600. | True | 0.0868->0.0869 |
+| 29 | `4b615dbe-7542-49b9-b74b-11c4bad77def` | Founder CEO | Month 29 strategy will improve business health score. | False | 0.0064->0.0062 |
+| 30 | `c7b38e12-b9a7-4f33-b8b6-fbb80230bf87` | Growth Marketer | Month 30 CAC will be <= 46.84. | True | 0.6207->0.6333 |
+| 30 | `a95d06d9-d5e5-43bd-8915-49c02c4ecbcf` | Product Manager | Month 30 conversion rate will be >= 0.0509. | True | 0.0900->0.0900 |
+| 30 | `019708a2-d95a-443a-a65c-5e99e42fedd2` | Finance Controller | Month 30 gross revenue will be >= 66513.15. | True | 0.0900->0.0900 |
+| 30 | `c8430cad-d974-4ff4-ae7e-51e961235c12` | Operations Manager | Month 30 stockout risk will be <= 0.1600. | True | 0.0869->0.0870 |
+| 30 | `9a77accb-fa5b-4891-a825-52b6b6dc30d3` | Founder CEO | Month 30 strategy will improve business health score. | False | 0.0062->0.0060 |
+| 31 | `88e70a6e-b1a5-408e-abc9-2a3132d42eb0` | Growth Marketer | Month 31 CAC will be <= 49.10. | True | 0.6333->0.6452 |
+| 31 | `b4e8644e-461d-4a3d-a215-ea96e9b5d6ff` | Product Manager | Month 31 conversion rate will be >= 0.0482. | True | 0.0900->0.0900 |
+| 31 | `d891dad9-0021-47bc-8e4b-54612bf4b4bc` | Finance Controller | Month 31 gross revenue will be >= 69364.35. | True | 0.0900->0.0900 |
+| 31 | `855dd716-f6bb-4968-88d1-4103e9dc7876` | Operations Manager | Month 31 stockout risk will be <= 0.1600. | True | 0.0870->0.0871 |
+| 31 | `c8cdfd03-0085-4d14-aad9-df590e50c713` | Founder CEO | Month 31 strategy will improve business health score. | False | 0.0060->0.0058 |
+| 32 | `20964cbb-74fb-455c-a856-2c7fb1ceb1d9` | Growth Marketer | Month 32 CAC will be <= 49.07. | True | 0.6452->0.6562 |
+| 32 | `8a57cdd9-2e18-479a-98e2-9ad8e37d6ae1` | Product Manager | Month 32 conversion rate will be >= 0.0459. | True | 0.0900->0.0900 |
+| 32 | `adcd2e7e-81b2-49e5-8c62-2e2b3988a001` | Finance Controller | Month 32 gross revenue will be >= 72007.65. | True | 0.0900->0.0900 |
+| 32 | `f77d2fa9-3ae1-4f67-9278-5111edf4f3a6` | Operations Manager | Month 32 stockout risk will be <= 0.1600. | True | 0.0871->0.0872 |
+| 32 | `0c329186-51e3-42ea-9165-ecc13f2eacf3` | Founder CEO | Month 32 strategy will improve business health score. | False | 0.0058->0.0056 |
+| 33 | `7aabaa7d-916c-4743-aefa-5625a68938be` | Growth Marketer | Month 33 CAC will be <= 46.55. | True | 0.6562->0.6667 |
+| 33 | `dab33504-3dad-4e16-aa53-cc40f6305b23` | Product Manager | Month 33 conversion rate will be >= 0.0469. | True | 0.0900->0.0900 |
+| 33 | `90f7dc89-c969-498a-90a2-020e74415746` | Finance Controller | Month 33 gross revenue will be >= 74873.70. | True | 0.0900->0.0900 |
+| 33 | `ef8ec6c3-def5-4756-b65b-052fcceab6de` | Operations Manager | Month 33 stockout risk will be <= 0.1600. | True | 0.0872->0.0873 |
+| 33 | `4c336178-efe3-44b4-ae36-024b8c8bf803` | Founder CEO | Month 33 strategy will improve business health score. | False | 0.0056->0.0055 |
+| 34 | `a7a89b4b-453d-410a-9f0d-be47a900fc2a` | Growth Marketer | Month 34 CAC will be <= 46.10. | True | 0.6667->0.6765 |
+| 34 | `079f6406-42f6-4651-81db-da7a0d663cf7` | Product Manager | Month 34 conversion rate will be >= 0.0510. | True | 0.0900->0.0900 |
+| 34 | `3839481b-414c-4a58-8a4c-15e6ca03b20c` | Finance Controller | Month 34 gross revenue will be >= 77531.85. | True | 0.0900->0.0900 |
+| 34 | `13302027-7b0f-4354-afa2-b7ae0acb4efc` | Operations Manager | Month 34 stockout risk will be <= 0.1600. | True | 0.0873->0.0874 |
+| 34 | `4268d22c-9a37-447a-89d2-4271e284c3b9` | Founder CEO | Month 34 strategy will improve business health score. | False | 0.0055->0.0053 |
+| 35 | `b653f1e9-38b3-4648-8271-648a25475c46` | Growth Marketer | Month 35 CAC will be <= 45.16. | True | 0.6765->0.6857 |
+| 35 | `c4480afd-c29f-4377-8fd5-59b4c5d4e19b` | Product Manager | Month 35 conversion rate will be >= 0.0486. | True | 0.0900->0.0900 |
+| 35 | `2da66598-1626-4dfa-a9d1-feb499ef5457` | Finance Controller | Month 35 gross revenue will be >= 80071.20. | True | 0.0900->0.0900 |
+| 35 | `2b5f1a32-4a95-438f-a28b-44afd7a6e3a9` | Operations Manager | Month 35 stockout risk will be <= 0.1600. | True | 0.0874->0.0874 |
+| 35 | `9b3b9c05-7a1f-4539-a4c7-b1a2fc8e5e3b` | Founder CEO | Month 35 strategy will improve business health score. | False | 0.0053->0.0051 |
+| 36 | `de4b559a-770c-42d3-9ca6-5ed0da4aa881` | Growth Marketer | Month 36 CAC will be <= 44.95. | True | 0.6857->0.6944 |
+| 36 | `970bcdb0-f9c9-4cd0-9bb9-e26709892d43` | Product Manager | Month 36 conversion rate will be >= 0.0521. | True | 0.0900->0.0900 |
+| 36 | `17c8c045-24ee-49aa-b1e0-30b6d8b0457d` | Finance Controller | Month 36 gross revenue will be >= 81905.18. | True | 0.0900->0.0900 |
+| 36 | `eb9bd592-3d09-4d13-acbf-9985a27e880a` | Operations Manager | Month 36 stockout risk will be <= 0.1600. | True | 0.0874->0.0875 |
+| 36 | `d13efe58-e4fa-4f12-9603-ac3486fd54ee` | Founder CEO | Month 36 strategy will improve business health score. | False | 0.0051->0.0050 |
 
 ## Actual Market Outcomes
 Actuals came only from `market_oracle_monthly_actual` rows in `pawdent_monthly_financials.csv`.
@@ -1044,10 +1044,10 @@ Finance decisions are recorded as `cash_and_unit_economics` events and shaped fi
 | 36 | 5520 | 287 | 141 | 41.81 | 294.95 | 26.44 |
 
 ## Biggest Correct Call
-{"agent": "Growth Marketer", "calibration_delta": 0.1702, "claim": "Month 14 CAC will be <= 43.28.", "claim_source": "market_oracle_pre_decision_signal:seed=7319:month=14", "confidence": 0.62, "explanation": "CAC actual 41.38 <= 43.28", "month": 14, "outcome": true, "prediction_id": "c1368392-446d-44c9-a288-6c5cf798b398", "resolution_source": "market_oracle_monthly_actual:seed=7319:month=14", "run_id": "pawdent-bd40112b-810c-4361-8d4a-c347efd2c8cd", "seed": 7319, "simulated_date": "2028-02-01", "trust_after": 0.5, "trust_before": 0.3298}
+{"agent": "Growth Marketer", "calibration_delta": 0.1702, "claim": "Month 14 CAC will be <= 43.28.", "claim_source": "market_oracle_pre_decision_signal:seed=7319:month=14", "confidence": 0.62, "explanation": "CAC actual 41.38 <= 43.28", "month": 14, "outcome": true, "prediction_id": "7e0c4f07-8715-4354-9d11-16fdce47daf8", "resolution_source": "market_oracle_monthly_actual:seed=7319:month=14", "run_id": "pawdent-c74782ee-9211-4d3a-bc65-e8fa8eee54f5", "seed": 7319, "simulated_date": "2028-02-01", "trust_after": 0.5, "trust_before": 0.3298}
 
 ## Biggest Wrong Call
-{"agent": "Growth Marketer", "calibration_delta": -0.3968, "claim": "Month 5 CAC will be <= 39.72.", "claim_source": "market_oracle_pre_decision_signal:seed=7319:month=5", "confidence": 0.62, "explanation": "CAC actual 40.72 > 39.72", "month": 5, "outcome": false, "prediction_id": "e31d6a9d-7c70-487b-b320-a1914ae87e54", "resolution_source": "market_oracle_monthly_actual:seed=7319:month=5", "run_id": "pawdent-bd40112b-810c-4361-8d4a-c347efd2c8cd", "seed": 7319, "simulated_date": "2027-05-01", "trust_after": 0.0, "trust_before": 0.3968}
+{"agent": "Growth Marketer", "calibration_delta": -0.3968, "claim": "Month 5 CAC will be <= 39.72.", "claim_source": "market_oracle_pre_decision_signal:seed=7319:month=5", "confidence": 0.62, "explanation": "CAC actual 40.72 > 39.72", "month": 5, "outcome": false, "prediction_id": "e48409df-7057-44d2-9bac-d8fdc8dbb0e2", "resolution_source": "market_oracle_monthly_actual:seed=7319:month=5", "run_id": "pawdent-c74782ee-9211-4d3a-bc65-e8fa8eee54f5", "seed": 7319, "simulated_date": "2027-05-01", "trust_after": 0.0, "trust_before": 0.3968}
 
 ## Agent Trust Leaderboard
 | Agent | Last trust | Resolved claims |

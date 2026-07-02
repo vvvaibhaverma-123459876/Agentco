@@ -21,6 +21,15 @@ import pytest
 psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
 
 DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL")
+if DSN:
+    try:
+        from pg_test_isolation import isolated_dsn
+
+        # Destructive fixture: run in an isolated sibling database so shared
+        # backend-migrated tables are never replaced with this suite's schema.
+        DSN = isolated_dsn(DSN)
+    except Exception:
+        DSN = None  # Postgres unreachable; the skip guard below handles it
 pytestmark = pytest.mark.skipif(
     not DSN, reason="AGENTCO_TEST_DATABASE_URL not set"
 )
@@ -56,10 +65,9 @@ def db():
         cur.execute("GRANT USAGE ON SCHEMA public TO resolution_service;")
         cur.execute("GRANT INSERT, SELECT, UPDATE ON prediction_ledger TO resolution_service;")
     yield conn
-    with conn.cursor() as cur:
-        for tbl in CIVI_TABLES + ["prediction_chain_log", "calibration_credentials",
-                                   "credential_domains", "prediction_ledger"]:
-            cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
+    # Teardown intentionally leaves the schema in place: each fixture's setup
+    # is self-cleaning, and dropping shared tables here left the database
+    # inconsistent with schema_migrations for every suite that ran afterwards.
     conn.close()
 
 

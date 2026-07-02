@@ -12,9 +12,18 @@ import requests
 from datetime import datetime
 from openai import OpenAI
 
-# Load environment
+# Load environment. This is a live integration script that needs credentials
+# and a running backend; under pytest it must skip instead of killing the
+# whole collection with sys.exit.
 api_key = os.environ.get('LLM_API_KEY')
 if not api_key:
+    if "pytest" in sys.modules:
+        import pytest
+
+        pytest.skip(
+            "LLM_API_KEY not set; live OpenAI integration requires credentials and a running backend",
+            allow_module_level=True,
+        )
     print("❌ LLM_API_KEY not set")
     sys.exit(1)
 

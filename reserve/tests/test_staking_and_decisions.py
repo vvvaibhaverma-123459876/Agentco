@@ -53,6 +53,20 @@ DSN = os.environ.get(
     "AGENTCO_TEST_DATABASE_URL",
     "postgresql://agentco:password@localhost:5433/agentco?host=/tmp",
 )
+if DSN:
+    try:
+        import sys as _sys
+        from pathlib import Path as _Path
+
+        _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
+        from pg_test_isolation import isolated_dsn
+
+        # Destructive fixture: run in an isolated sibling database so shared
+        # tables (prediction_ledger and friends) are never dropped out from
+        # under other suites.
+        DSN = isolated_dsn(DSN)
+    except Exception:
+        DSN = None  # Postgres unreachable; skip guards below handle it
 
 MIGRATION_ROOT = Path(__file__).resolve().parents[2]
 

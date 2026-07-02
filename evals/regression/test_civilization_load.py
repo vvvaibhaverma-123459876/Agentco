@@ -20,27 +20,23 @@ from pathlib import Path
 # Add parent directories to path
 sys.path.insert(0, str(Path(__file__).parents[2]))
 
-from civilization.services.governance_service import create_decision, propose_decision, approve_decision
+from civilization.services.governance_service import propose_decision, approve_decision
 from civilization.services.institution_service import create_institution
 from civilization.services.reputation_service import propagate_institution
 from unittest.mock import MagicMock
 
 
 def get_db_connection():
-    """Create a database connection for testing."""
+    """Create a database connection for testing, skipping when Postgres is unreachable."""
+    import pytest
+
+    dsn = os.environ.get("DATABASE_URL")
     try:
-        conn = psycopg2.connect(
-            dbname=os.environ.get('DB_NAME', 'agentco'),
-            user=os.environ.get('DB_USER', 'postgres'),
-            password=os.environ.get('DB_PASSWORD', 'postgres'),
-            host=os.environ.get('DB_HOST', 'localhost'),
-            port=int(os.environ.get('DB_PORT', 5432)),
-        )
+        conn = psycopg2.connect(dsn)
         conn.autocommit = False  # Ensure explicit commit control
         return conn
     except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-        sys.exit(1)
+        pytest.skip(f"Postgres unreachable via DATABASE_URL for civilization load test: {e}")
 
 
 def create_test_contract(name: str) -> dict:

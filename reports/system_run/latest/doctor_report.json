@@ -101,7 +101,7 @@
       "status": "real"
     },
     {
-      "detail": "agentco|agentco",
+      "detail": "agentco_audit_test|Zet",
       "remediation": "Start native Postgres or use offline_fixture",
       "service": "postgres",
       "status": "real"
@@ -173,13 +173,13 @@
       "status": "real"
     },
     {
-      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
+      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
       "remediation": "Set non-default production secrets through Vault or the deployment secret manager",
       "service": "production_secret_posture",
       "status": "blocked"
     },
     {
-      "detail": "/Users/Zet/Agentco/reports/system_run/latest",
+      "detail": "/private/tmp/claude-502/-Users-Zet/e3a2113e-4a96-4328-b13d-f2b1a4f1673f/scratchpad/Agentco/reports/system_run/latest",
       "remediation": "",
       "service": "filesystem_reports",
       "status": "real"

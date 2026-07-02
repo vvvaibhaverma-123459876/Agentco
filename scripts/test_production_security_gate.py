@@ -12,6 +12,21 @@ import json
 import subprocess
 from typing import Tuple, List
 
+import os
+import sys
+
+# This gate verifies a *production-configured* deployment (env, secrets, and a
+# running hardened API). Under pytest in any other environment it must skip,
+# not fail.
+if "pytest" in sys.modules and os.environ.get("AGENTCO_ENV") != "production":
+    import pytest
+
+    pytest.skip(
+        "AGENTCO_ENV != production; the production security gate verifies a live production deployment",
+        allow_module_level=True,
+    )
+
+
 # Colors for output
 RED = '\033[91m'
 GREEN = '\033[92m'

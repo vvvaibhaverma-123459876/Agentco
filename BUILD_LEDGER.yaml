@@ -1,11 +1,11 @@
 meta:
   schema_version: 1
   generated_by: codex
-  last_updated: '2026-06-30T15:33:37Z'
+  last_updated: '2026-07-02T07:47:26Z'
   source_docs:
   - docs/CIVILIZATION_ARCHITECTURE.md
   - docs/CODEX_BUILD_PLAN.md
-  termination_predicate_met: true
+  termination_predicate_met: false
 layers:
   L0_runtime_substrate:
     status: verified
@@ -1126,13 +1126,61 @@ layers:
       notes: VCA proof minting is backed by the L6 ProofOfCompetenceService, requiring every registered skill regression case
         to pass above threshold before durable proof hash/event creation and then feeding that proof into the closed promotion
         loop.
+  L15_mission_long_horizon:
+    status: in_progress
+    items:
+    - id: L15.MemoryRetrievalInPlanning
+      status: verified
+      depends_on:
+      - L14.VerticalSlice
+      artifacts:
+      - backend/src/services/memory-retrieval.service.ts
+      - backend/src/services/autonomy-action-planner.service.ts
+      - backend/src/services/autonomy-orchestrator.service.ts
+      tests:
+      - backend/tests/memory-retrieval.test.ts
+      gates_passed:
+      - unit
+      - real_db
+      notes: Promoted agent_memories rows are now retrieved (domain/full-text ranked, superseded and expired rows excluded,
+        access counters updated) and injected into the autonomy action planner prompt, closing the promotion-to-reuse learning
+        loop that was previously write-only.
+    - id: L15.LongHorizonGenerality
+      status: not_started
+      depends_on:
+      - L14.VerticalSlice
+      artifacts: []
+      tests: []
+      gates_passed: []
+      notes: Progressively more general intelligence over long time horizons is unproven. Current evidence is bounded verifier
+        and smoke-benchmark evidence only; no long-horizon benchmark track record exists.
+    - id: L15.DurableRealWorldSelfImprovement
+      status: in_progress
+      depends_on:
+      - L12.SkillLibrary
+      artifacts:
+      - self_modification/kernel.py
+      - selfcoding/sandbox/run_generated.py
+      tests: []
+      gates_passed: []
+      notes: Self-modification exists only as a proposal gate; there is no closed observe-diagnose-implement-test-promote/rollback
+        loop and no durable improvement evidence from repeated real-world operation.
+    - id: L15.HostedProductionOperations
+      status: not_started
+      depends_on:
+      - L0.ProductionPostureGate
+      artifacts: []
+      tests: []
+      gates_passed: []
+      notes: Hosted production certification (SLOs, disaster recovery, backups, monitoring response, incident response, long-running
+        operational evidence) has not been attempted.
 rollups:
-  total_items: 67
-  verified: 67
-  in_progress: 0
-  not_started: 0
+  total_items: 71
+  verified: 68
+  in_progress: 1
+  not_started: 2
   blocked: 0
-  percent_verified: 100.0
+  percent_verified: 95.77
 gates:
   no_stub: green
   no_simulation: green

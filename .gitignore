@@ -183,3 +183,6 @@ kubeconfig
 .stylelintcache
 *.tsbuildinfo
 /backend/.env
+
+# Test runs regenerate free-run artifacts; committed ones are historical records
+audit_artifacts/civilization_free_run/

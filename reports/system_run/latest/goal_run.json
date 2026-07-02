@@ -26,7 +26,7 @@
   "prediction": {
     "brier_score": 0.0,
     "confidence": 0.68,
-    "id": "56a5503c-3716-499f-b57f-cfa65773ad46",
+    "id": "cf04d711-160c-48cb-87b1-007fa6a1b0c7",
     "resolution": "escalate",
     "statement": "Northstar DataWorks onboarding should be escalated.",
     "trusted_confidence": 0.61

@@ -24,7 +24,7 @@ def test_canonical_schema_declares_required_tables():
         "action_attestations",
         "override_cases",
         "memory_events",
-        "eval_runs",
+        "benchmark_eval_runs",
     ]:
         assert f"CREATE TABLE IF NOT EXISTS {table}" in sql
 
@@ -32,7 +32,7 @@ def test_canonical_schema_declares_required_tables():
 def test_canonical_schema_has_down_migration_contract():
     rollback = ROLLBACK.read_text()
     for table in [
-        "eval_runs",
+        "benchmark_eval_runs",
         "memory_events",
         "override_cases",
         "action_attestations",

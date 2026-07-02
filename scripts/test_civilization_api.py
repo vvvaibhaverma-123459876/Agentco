@@ -23,6 +23,17 @@ from contextlib import contextmanager
 BASE_URL = os.environ.get('API_URL', 'http://localhost:3001')
 API_KEY = os.environ.get('AGENTCO_API_KEY', 'test-key')
 
+# These checks exercise a live backend built from the current tree. Under
+# pytest they are opt-in: a process answering /health on the port proves
+# nothing about which build it is, so require an explicit flag.
+if "pytest" in sys.modules and os.environ.get("RUN_LIVE_API_TESTS") != "1":
+    import pytest
+
+    pytest.skip(
+        f"live API endpoint checks are opt-in; set RUN_LIVE_API_TESTS=1 with a current backend running at {BASE_URL}",
+        allow_module_level=True,
+    )
+
 def make_request(method, path, data=None):
     """Make HTTP request to API"""
     url = f"{BASE_URL}{path}"

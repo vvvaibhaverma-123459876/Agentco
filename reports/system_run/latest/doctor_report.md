@@ -15,7 +15,7 @@
 | `frontend_build` | `not_required` | build not run in this mode |
 | `docker_cli` | `real` | /usr/local/bin/docker |
 | `docker_daemon` | `real` | docker daemon reachable |
-| `postgres` | `real` | agentco|agentco |
+| `postgres` | `real` | agentco_audit_test|Zet |
 | `migrations` | `real` | ts-node src/db/migrate.ts |
 | `core_db_schema` | `real` | prediction_ledger|decision_log|override_queue |
 | `redis` | `real` | localhost:6379 |
@@ -27,8 +27,8 @@
 | `openai_connectivity` | `not_required` | live check not requested |
 | `resolution_service` | `real` | resolution_service |
 | `sensitive_route_auth` | `real` | override read route protected |
-| `production_secret_posture` | `blocked` | dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN |
-| `filesystem_reports` | `real` | /Users/Zet/Agentco/reports/system_run/latest |
+| `production_secret_posture` | `blocked` | dev-default or missing production secrets: AGENTCO_API_KEY, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN |
+| `filesystem_reports` | `real` | /private/tmp/claude-502/-Users-Zet/e3a2113e-4a96-4328-b13d-f2b1a4f1673f/scratchpad/Agentco/reports/system_run/latest |
 
 ## Fallbacks Used
 - None

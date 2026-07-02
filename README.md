@@ -8,7 +8,7 @@ This repository is a local production-posture runnable research/runtime system. 
 
 | Area | Current state |
 |---|---|
-| Build ledger | `67/67 verified (100%)`; termination predicate true |
+| Build ledger | `68/71 verified`; mission-level long-horizon items (generality, durable self-improvement, hosted operations) tracked as open frontier; termination predicate false |
 | Local backend | Runnable against native Postgres with default backend tier passed |
 | Release gates | Firewall, sandbox, credential key-independence, reachability, no-stub, no-simulation, and dependency-audit gates passed |
 | OpenAI path | Live connectivity, goal-run verifier, and civilization vertical slice have passed when credentials are present |
@@ -38,6 +38,7 @@ Older phase reports are historical artifacts. If they conflict with the build le
 - Prediction registration and authorized resolution-service path with ordinary-user resolution blocked by DB trigger.
 - Persistent trust scoring from resolved predictions into immutable `trust_scores` and reputation events.
 - Memory promotion from resolved/scored predictions into append-only `agent_memories`.
+- Memory retrieval: promoted memories are ranked against the active goal (domain + full-text), access-tracked, and injected into the autonomy action planner's prompt, so resolved-prediction lessons influence subsequent planning.
 - A focused civilization learning E2E slice: evidence -> grounded claim -> prediction -> authorized resolution -> trust score -> memory promotion -> event log -> audit log.
 - Deterministic source-discovery unit verification without depending on public internet reachability; production source discovery still probes live URLs.
 - L11 conflict judiciary, L12 skill library, L6 proof of competence, L13 capability expansion gate, and VCA promotion loop verified through focused tests.
@@ -73,10 +74,10 @@ Prerequisites:
 - Optional OpenAI-compatible key in `.codex.env` for live LLM verification
 
 ```bash
-set -a
-source .codex.env
-set +a
-export DATABASE_URL="$AGENTCO_TEST_DATABASE_URL"
+# Point DATABASE_URL at any empty local Postgres database.
+# (.codex.env is an optional, uncommitted local secrets file; if you have one,
+# `source` it first to pick up AGENTCO_TEST_DATABASE_URL and LLM keys.)
+export DATABASE_URL="postgresql://localhost/agentco"
 
 cd backend
 npm install
@@ -85,14 +86,11 @@ npx tsc --noEmit
 npm test -- --runInBand --forceExit
 ```
 
-Recent verified backend default result:
-
-```text
-42 test suites passed
-287 tests passed
-1 suite skipped
-5 todos
-```
+The backend suite is expected to pass from a clean clone against an empty
+database. Live-web/live-LLM suites (source discovery, real-web smoke, live
+adapters) skip unless `RUN_REAL_WEB_TESTS=1` / `RUN_REAL_LLM_TESTS=1` and
+provider credentials are configured. CI (`.github/workflows/ci.yml`) runs the
+same clean-room path, including the Refoundation Master Gate job.
 
 ## Runtime Doctor
 

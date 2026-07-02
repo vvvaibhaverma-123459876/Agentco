@@ -1,7 +1,7 @@
 -- Rollback for 018_refoundation_canonical_schema.sql.
 -- Drops only additive refoundation tables, in dependency order.
 
-DROP TABLE IF EXISTS eval_runs;
+DROP TABLE IF EXISTS benchmark_eval_runs;
 DROP TABLE IF EXISTS memory_events;
 DROP TABLE IF EXISTS override_cases;
 DROP TABLE IF EXISTS action_attestations;

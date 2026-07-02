@@ -2,20 +2,20 @@
   "meta": {
     "schema_version": 1,
     "generated_by": "codex",
-    "last_updated": "2026-06-30T15:33:37Z",
+    "last_updated": "2026-07-02T09:50:24Z",
     "source_docs": [
       "docs/CIVILIZATION_ARCHITECTURE.md",
       "docs/CODEX_BUILD_PLAN.md"
     ],
-    "termination_predicate_met": true
+    "termination_predicate_met": false
   },
   "rollups": {
-    "total_items": 67,
-    "verified": 67,
-    "in_progress": 0,
-    "not_started": 0,
+    "total_items": 71,
+    "verified": 68,
+    "in_progress": 1,
+    "not_started": 2,
     "blocked": 0,
-    "percent_verified": 100.0
+    "percent_verified": 95.77
   },
   "gates": {
     "no_stub": "green",
@@ -204,9 +204,67 @@
       "blocked": 0,
       "percent_verified": 100.0,
       "ready_items": []
+    },
+    {
+      "layer": "L15_mission_long_horizon",
+      "status": "in_progress",
+      "total_items": 4,
+      "verified": 1,
+      "in_progress": 1,
+      "not_started": 2,
+      "blocked": 0,
+      "percent_verified": 25.0,
+      "ready_items": [
+        "L15.LongHorizonGenerality",
+        "L15.DurableRealWorldSelfImprovement",
+        "L15.HostedProductionOperations"
+      ]
     }
   ],
-  "ready_frontier": [],
+  "ready_frontier": [
+    {
+      "id": "L15.LongHorizonGenerality",
+      "status": "not_started",
+      "depends_on": [
+        "L14.VerticalSlice"
+      ],
+      "artifacts": [],
+      "tests": [],
+      "gates_passed": [],
+      "notes": "Progressively more general intelligence over long time horizons is unproven. Current evidence is bounded verifier and smoke-benchmark evidence only; no long-horizon benchmark track record exists.",
+      "_layer": "L15_mission_long_horizon",
+      "_order": 1
+    },
+    {
+      "id": "L15.DurableRealWorldSelfImprovement",
+      "status": "in_progress",
+      "depends_on": [
+        "L12.SkillLibrary"
+      ],
+      "artifacts": [
+        "self_modification/kernel.py",
+        "selfcoding/sandbox/run_generated.py"
+      ],
+      "tests": [],
+      "gates_passed": [],
+      "notes": "Self-modification exists only as a proposal gate; there is no closed observe-diagnose-implement-test-promote/rollback loop and no durable improvement evidence from repeated real-world operation.",
+      "_layer": "L15_mission_long_horizon",
+      "_order": 2
+    },
+    {
+      "id": "L15.HostedProductionOperations",
+      "status": "not_started",
+      "depends_on": [
+        "L0.ProductionPostureGate"
+      ],
+      "artifacts": [],
+      "tests": [],
+      "gates_passed": [],
+      "notes": "Hosted production certification (SLOs, disaster recovery, backups, monitoring response, incident response, long-running operational evidence) has not been attempted.",
+      "_layer": "L15_mission_long_horizon",
+      "_order": 3
+    }
+  ],
   "gate_findings": {
     "no_stub": [],
     "no_simulation": []

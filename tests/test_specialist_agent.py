@@ -50,9 +50,9 @@ class TestSpecialistAgentBase:
         agent.record_token_usage(100)
         agent.check_budget()  # Should not raise
 
-        # Exceed budget
-        agent.record_token_usage(50)
+        # Exceeding the budget raises as soon as usage is recorded
         with pytest.raises(RuntimeError, match='Token budget exceeded'):
+            agent.record_token_usage(50)
             agent.check_budget()
 
     def test_iteration_budget_exceeded(self):
@@ -205,18 +205,46 @@ class TestEvidenceSummarizerAgent:
     """Test EvidenceSummarizerAgent"""
 
     def test_extract_evidence(self):
-        """Test evidence extraction"""
+        """Test evidence extraction against a real seeded evidence row"""
+        import os
+        import uuid
+
+        if not os.environ.get('DATABASE_URL'):
+            pytest.skip('DATABASE_URL not set; extraction reads real autonomy_evidence rows')
+
+        from agents.db.connection import get_db
+
+        source_id = f'src-{uuid.uuid4().hex[:12]}'
+        db = get_db()
+        try:
+            db.execute_query(
+                """INSERT INTO autonomy_evidence (source_id, url, title, snippet, retrieved_at)
+                   VALUES (%s, %s, %s, %s, NOW())""",
+                [source_id, 'https://example.org/specialist-evidence',
+                 'Specialist evidence fixture', 'A short snippet used to verify real extraction.'],
+            )
+        except Exception as exc:
+            pytest.skip(f'Postgres unavailable for evidence extraction test: {exc}')
+
         budget = {'tokens': 3000, 'iterations': 15, 'seconds': 180}
         agent = EvidenceSummarizerAgent('summarizer-1', 'evidence_summarizer', budget)
 
         action_spec = {
             'actionType': 'extract_evidence',
-            'args': {'sourceId': 'source-1'},
+            'args': {'sourceId': source_id},
             'objective': 'Extract'
         }
 
         result = agent.handle_action(action_spec)
         assert result['observations']['status'] == 'extraction_completed'
+
+        # Unknown sources must block honestly rather than fabricate output
+        missing = agent.handle_action({
+            'actionType': 'extract_evidence',
+            'args': {'sourceId': f'missing-{uuid.uuid4().hex[:8]}'},
+            'objective': 'Extract'
+        })
+        assert missing['observations']['status'] == 'blocked'
 
     def test_claim_generation_blocked(self):
         """Test that summarizer cannot generate claims"""

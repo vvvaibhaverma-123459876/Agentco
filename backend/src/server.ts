@@ -17,6 +17,7 @@ import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
 import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
 import { civilizationGovernanceRoutes } from './routes/civilization-governance.routes';
+import { governanceRoutes } from './routes/governance.routes';
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
 import { phase3HardeningRoutes } from './routes/phase3-hardening.routes';
@@ -104,6 +105,7 @@ export async function build() {
   await app.register(autonomyOrchestratorRoutes);
   await app.register(autonomyDashboardRoutes);
   await app.register(civilizationGovernanceRoutes);
+  await app.register(governanceRoutes);
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);
   await app.register(phase3HardeningRoutes);

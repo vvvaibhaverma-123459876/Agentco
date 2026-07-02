@@ -62,7 +62,7 @@ def header(text):
     log(text)
     log("=" * 70)
 
-def test_header(num, total, text):
+def print_test_header(num, total, text):
     """Print test header"""
     log("")
     log("-" * 70)
@@ -127,7 +127,7 @@ def make_request(method, endpoint, data=None, headers=None):
 
 def scenario_1_baseline():
     """Scenario 1: Baseline steady state load"""
-    test_header(1, 7, "Baseline steady state (100 sequential requests)")
+    print_test_header(1, 7, "Baseline steady state (100 sequential requests)")
 
     scenario_metrics = {
         "requests": 100,
@@ -168,7 +168,7 @@ def scenario_1_baseline():
 
 def scenario_2_concurrent():
     """Scenario 2: Concurrent load test"""
-    test_header(2, 7, "Concurrent load (50 workers, 300 total requests)")
+    print_test_header(2, 7, "Concurrent load (50 workers, 300 total requests)")
 
     scenario_metrics = {
         "workers": 50,
@@ -215,7 +215,7 @@ def scenario_2_concurrent():
 
 def scenario_3_burst():
     """Scenario 3: Burst traffic test"""
-    test_header(3, 7, "Burst traffic (200 concurrent workers, 1 second)")
+    print_test_header(3, 7, "Burst traffic (200 concurrent workers, 1 second)")
 
     scenario_metrics = {
         "workers": 200,
@@ -269,7 +269,7 @@ def scenario_3_burst():
 
 def scenario_4_sustained():
     """Scenario 4: Sustained load test"""
-    test_header(4, 7, "Sustained load (100 req/s for 30 seconds)")
+    print_test_header(4, 7, "Sustained load (100 req/s for 30 seconds)")
 
     scenario_metrics = {
         "target_rps": 100,
@@ -348,7 +348,7 @@ def scenario_4_sustained():
 
 def scenario_5_mixed():
     """Scenario 5: Mixed workload test"""
-    test_header(5, 7, "Mixed workload (GET, POST, error conditions)")
+    print_test_header(5, 7, "Mixed workload (GET, POST, error conditions)")
 
     scenario_metrics = {
         "health_checks": 0,
@@ -406,7 +406,7 @@ def scenario_5_mixed():
 
 def scenario_6_db_pool():
     """Scenario 6: Database connection pool stress"""
-    test_header(6, 7, "Database connection pool stress (100 concurrent DB queries)")
+    print_test_header(6, 7, "Database connection pool stress (100 concurrent DB queries)")
 
     scenario_metrics = {
         "db_queries": 0,
@@ -443,7 +443,7 @@ def scenario_6_db_pool():
 
 def scenario_7_safety():
     """Scenario 7: Governance gate enforcement under load"""
-    test_header(7, 7, "Safety and governance under load")
+    print_test_header(7, 7, "Safety and governance under load")
 
     scenario_metrics = {
         "unauthorized_requests": 0,

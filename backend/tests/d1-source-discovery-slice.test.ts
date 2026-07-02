@@ -18,6 +18,13 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
 import { AutonomyOrchestratorService } from '../src/services/autonomy-orchestrator.service';
 
+// This slice needs live web access plus a configured LLM key; gate it the same
+// way as the other real-web smoke tests so clean-room CI skips it honestly
+// instead of failing.
+const SKIP_LIVE =
+  !process.env.RUN_REAL_WEB_TESTS || !(process.env.LLM_API_KEY || process.env.OPENAI_API_KEY);
+const liveIt = SKIP_LIVE ? it.skip : it;
+
 describe('D1 Source Discovery Slice (End-to-End)', () => {
   let orchestrator: AutonomyOrchestratorService;
   let testGoalId: string;
@@ -44,7 +51,7 @@ describe('D1 Source Discovery Slice (End-to-End)', () => {
     }
   });
 
-  it('should execute source discovery bootstrap and fetch real URLs', async () => {
+  liveIt('should execute source discovery bootstrap and fetch real URLs', async () => {
     // The core D1 test: verify that source discovery bootstrap works
     // The test will fail when planner is called (no real LLM), but by then
     // the D1 bootstrap phase will have already created evidence
@@ -71,7 +78,7 @@ describe('D1 Source Discovery Slice (End-to-End)', () => {
     }
   });
 
-  it('should have created real evidence from discovered sources', async () => {
+  liveIt('should have created real evidence from discovered sources', async () => {
     // Query autonomy_evidence created by source discovery bootstrap
     const evidenceResult = await db.query(
       `SELECT id, source_id, url, title, content_hash, source_type
@@ -108,7 +115,7 @@ describe('D1 Source Discovery Slice (End-to-End)', () => {
     }
   });
 
-  it('should have created claims backed by discovered evidence', async () => {
+  liveIt('should have created claims backed by discovered evidence', async () => {
     // Query claims created from evidence
     const claimsResult = await db.query(
       `SELECT id, claim_id, text, status, support_source_ids
@@ -156,7 +163,7 @@ describe('D1 Source Discovery Slice (End-to-End)', () => {
     }
   });
 
-  it('should prove NO synthetic data was used', async () => {
+  liveIt('should prove NO synthetic data was used', async () => {
     // Verify that discovered sources are from real seed registry, not mocked
     const evidenceResult = await db.query(
       `SELECT url, action_id FROM autonomy_evidence
@@ -198,7 +205,7 @@ describe('D1 Source Discovery Slice (End-to-End)', () => {
     console.log(`   ✅ All evidence originated from real seed registries`);
   });
 
-  it('should prove the D1 slice is production-ready', async () => {
+  liveIt('should prove the D1 slice is production-ready', async () => {
     // This is the final verification: the slice works end-to-end
     const summaryResult = await db.query(
       `SELECT

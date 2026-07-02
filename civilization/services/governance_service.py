@@ -44,7 +44,15 @@ class GovernanceError(ValueError):
 
 
 def _load_controls() -> dict:
-    """Load controls from cache (auto-reloads on file change)."""
+    """Load controls from cache (auto-reloads on file change).
+
+    Rebinds the cache when CONTROLS_FILE has been repointed (tests patch the
+    module-level path), so overrides take effect instead of being masked by
+    the cache created at import time.
+    """
+    global _controls_cache
+    if _controls_cache.controls_file != CONTROLS_FILE:
+        _controls_cache = ControlsCache(CONTROLS_FILE)
     return _controls_cache.get()
 
 

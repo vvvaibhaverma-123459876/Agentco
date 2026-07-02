@@ -103,6 +103,20 @@ export class ActionExecutorService {
     }
 
     if (this.isUuid(spec.goalId)) {
+      // autonomy_goal_actions.goal_id carries an FK to autonomy_goals; callers
+      // may execute actions under a goal id that was minted outside the goal
+      // manager, so guarantee the referenced goal row exists first.
+      await db.query(
+        `INSERT INTO autonomy_goals (id, title, source, proposed_by, domain, risk_level, status)
+         VALUES ($1, $2, 'agent_proposed', $3, 'action_loop', COALESCE($4, 'medium')::risk_level, 'active')
+         ON CONFLICT (id) DO NOTHING`,
+        [
+          spec.goalId,
+          spec.objective || spec.actionType,
+          spec.decidedBy || 'action_executor',
+          spec.riskLevel || null,
+        ]
+      );
       await db.query(
         `INSERT INTO autonomy_goal_actions (
           action_id, goal_id, action_type, objective, args, success_criteria,

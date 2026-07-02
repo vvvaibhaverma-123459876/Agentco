@@ -97,6 +97,58 @@ jobs:
           DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
         run: npm run test:all -- --forceExit
 
+  master-gate:
+    name: Refoundation Master Gate
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: agentco
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: agentco
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U agentco -d agentco"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package.json
+
+      - name: Install Python dependencies
+        run: pip install -r requirements-dev.txt -r requirements-runtime.txt psycopg2-binary pyyaml requests
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+        run: npm run db:migrate
+
+      - name: Run Refoundation Master Gate
+        env:
+          DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+          AGENTCO_TEST_DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+        run: make master-gate
+
   test-frontend:
     name: Next.js Frontend
     runs-on: ubuntu-latest

@@ -1,11 +1,11 @@
 {
   "mode": "production_posture",
-  "can_continue": true,
+  "can_continue": false,
   "checks": [
     {
       "name": "AGENTCO_API_KEY",
-      "status": "real",
-      "detail": "present; value suppressed"
+      "status": "blocked",
+      "detail": "dev/default value is not allowed"
     },
     {
       "name": "JWT_SECRET",
@@ -78,6 +78,14 @@
       "detail": "docker compose responded"
     }
   ],
-  "blocked": [],
-  "required_fixes": []
+  "blocked": [
+    {
+      "name": "AGENTCO_API_KEY",
+      "status": "blocked",
+      "detail": "dev/default value is not allowed"
+    }
+  ],
+  "required_fixes": [
+    "AGENTCO_API_KEY: dev/default value is not allowed"
+  ]
 }

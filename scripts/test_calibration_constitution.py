@@ -354,6 +354,15 @@ def initialize_default_constitution():
 
         conn.commit()
 
+import pytest
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _seed_default_constitution():
+    """Pytest entrypoint parity with main(): seed the default constitution once."""
+    initialize_default_constitution()
+
+
 def main():
     """Run all tests"""
     print("=" * 70)

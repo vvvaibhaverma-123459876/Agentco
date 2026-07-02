@@ -86,7 +86,6 @@ const RUNTIME_GRAPH: Array<Omit<CivilizationRuntimeNode, 'status' | 'missingTabl
     id: 'resource_budgeting',
     layer: 'L2',
     requiredTables: [
-      'resource_accounts',
       'civilization_resource_accounts',
       'civilization_resource_transactions',
       'civilization_resource_reservations',

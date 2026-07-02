@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db/client';
 import { ActionSpec, ActionType, RiskLevel } from '../types/action.types';
 import { LoopDetectionResult } from './loop-detector.service';
+import { memoryRetrieval } from './memory-retrieval.service';
 
 export class AutonomyActionPlannerService {
   /**
@@ -194,9 +195,27 @@ export class AutonomyActionPlannerService {
       evidenceSources?: Array<{ sourceId: string; url: string; snippet: string }>;
       loopDetection: LoopDetectionResult;
       reflectionContext?: string;
+      memoryContext?: string;
+      domain?: string;
+      agentId?: string;
       previousActions: Array<{ type: ActionType; result: string }>;
     }
   ): Promise<ActionSpec> {
+    // Pull promoted memories into planning context unless the caller
+    // already resolved them; retrieval failures must not block planning.
+    if (currentState.memoryContext === undefined) {
+      try {
+        const memories = await memoryRetrieval.retrieveForPlanning({
+          goalText: currentState.goalText,
+          domain: currentState.domain,
+          agentId: currentState.agentId,
+        });
+        currentState.memoryContext = memoryRetrieval.formatForPrompt(memories);
+      } catch (error) {
+        console.error(`Memory retrieval failed, planning without memories: ${error}`);
+        currentState.memoryContext = '';
+      }
+    }
     // If loop detected, force replan or termination
     if (currentState.loopDetection.isLooping) {
       if (currentState.loopDetection.recommendation === 'terminate') {
@@ -333,13 +352,14 @@ Return JSON with: action_type, objective, args, reasoning.`;
   /**
    * Build decision prompt from current state
    */
-  private buildDecisionPrompt(state: {
+  buildDecisionPrompt(state: {
     goalText: string;
     claimsGenerated: number;
     evidenceCount: number;
     evidenceSources?: Array<{ sourceId: string; url: string; snippet: string }>;
     loopDetection: LoopDetectionResult;
     reflectionContext?: string;
+    memoryContext?: string;
     previousActions: Array<{ type: ActionType; result: string }>;
   }): string {
     let prompt = `
@@ -361,6 +381,12 @@ Available Evidence Sources (USE THESE IDs FOR CLAIMS):`;
         prompt += `\n${i + 1}. [${src.sourceId}] ${src.url}\n   Snippet: ${src.snippet?.substring(0, 100) || 'N/A'}`;
       });
       prompt += `\n\nYou can now generate claims using these source IDs in supportSourceIds parameter.`;
+    }
+
+    if (state.memoryContext) {
+      prompt += `
+
+${state.memoryContext}`;
     }
 
     if (state.reflectionContext) {

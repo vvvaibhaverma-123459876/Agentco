@@ -53,6 +53,15 @@ def ensure_test_data():
 
         conn.commit()
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _seed_active_constitution():
+    """These tests read active_constitution; seed one when the DB is fresh."""
+    ensure_test_data()
+
+
 def test_change_request_creation():
     """Test: Change request creation"""
     print("\n✓ TEST: Change Request Creation")

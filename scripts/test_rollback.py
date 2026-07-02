@@ -38,7 +38,7 @@ def connect_db():
         print(f"❌ Failed to connect to database: {e}", file=sys.stderr)
         return None
 
-def test_snapshot_creation() -> bool:
+def check_snapshot_creation() -> bool:
     """Test Case 1: Create deployment snapshot before canary"""
     print("\n" + "="*80)
     print("TEST CASE 1: Deployment Snapshot Creation")
@@ -94,7 +94,7 @@ def test_snapshot_creation() -> bool:
         print(f"❌ Test failed: {e}")
         return False
 
-def test_atomic_rollback() -> bool:
+def check_atomic_rollback() -> bool:
     """Test Case 2: Verify rollback changes active artifact atomically"""
     print("\n" + "="*80)
     print("TEST CASE 2: Atomic Rollback")
@@ -188,7 +188,7 @@ def test_atomic_rollback() -> bool:
         print(f"❌ Test failed: {e}")
         return False
 
-def test_immutable_audit_trail() -> bool:
+def check_immutable_audit_trail() -> bool:
     """Test Case 3: Verify rollback events are immutably recorded"""
     print("\n" + "="*80)
     print("TEST CASE 3: Immutable Rollback Audit Trail")
@@ -236,7 +236,7 @@ def test_immutable_audit_trail() -> bool:
         print(f"❌ Test failed: {e}")
         return False
 
-def test_previous_good_tracking() -> bool:
+def check_previous_good_tracking() -> bool:
     """Test Case 4: Verify previous_good artifact is maintained"""
     print("\n" + "="*80)
     print("TEST CASE 4: Previous-Good Artifact Tracking")
@@ -285,6 +285,57 @@ def test_previous_good_tracking() -> bool:
         print(f"❌ Test failed: {e}")
         return False
 
+# ---------------------------------------------------------------------------
+# Pytest wrappers: the check_* functions return booleans for the script runner
+# in main(); under pytest a bare return value passes silently, so assert here.
+# ---------------------------------------------------------------------------
+
+def _require_db():
+    import pytest
+    if not os.environ.get("DATABASE_URL"):
+        pytest.skip("DATABASE_URL not set; rollback checks need real Postgres")
+    # Rollback infrastructure ships in
+    # backend/src/db/unsupported_migrations/029_rollback_infrastructure.sql.disabled
+    # and is explicitly unsupported until that migration is promoted. Skip with
+    # that reason instead of failing (or, worse, silently passing).
+    import psycopg2
+
+    try:
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    except Exception as exc:
+        pytest.skip(f"Postgres unreachable: {exc}")
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT to_regclass('public.active_artifacts')")
+            if cur.fetchone()[0] is None:
+                pytest.skip(
+                    "rollback infrastructure tables absent: migration 029_rollback_infrastructure "
+                    "is disabled under backend/src/db/unsupported_migrations/"
+                )
+    finally:
+        conn.close()
+
+
+def test_snapshot_creation():
+    _require_db()
+    assert check_snapshot_creation()
+
+
+def test_atomic_rollback():
+    _require_db()
+    assert check_atomic_rollback()
+
+
+def test_immutable_audit_trail():
+    _require_db()
+    assert check_immutable_audit_trail()
+
+
+def test_previous_good_tracking():
+    _require_db()
+    assert check_previous_good_tracking()
+
+
 def main():
     print("\n" + "="*80)
     print("🎯 LEVEL_4 Area 5: Rollback Hardening Test Suite")
@@ -293,10 +344,10 @@ def main():
     results = []
 
     # Run test cases
-    results.append(("Test Case 1: Snapshot Creation", test_snapshot_creation()))
-    results.append(("Test Case 2: Atomic Rollback", test_atomic_rollback()))
-    results.append(("Test Case 3: Immutable Audit Trail", test_immutable_audit_trail()))
-    results.append(("Test Case 4: Previous-Good Tracking", test_previous_good_tracking()))
+    results.append(("Test Case 1: Snapshot Creation", check_snapshot_creation()))
+    results.append(("Test Case 2: Atomic Rollback", check_atomic_rollback()))
+    results.append(("Test Case 3: Immutable Audit Trail", check_immutable_audit_trail()))
+    results.append(("Test Case 4: Previous-Good Tracking", check_previous_good_tracking()))
 
     # Summary
     print("\n" + "="*80)

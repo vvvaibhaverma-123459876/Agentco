@@ -16,6 +16,7 @@ Verifies:
 import os
 import sys
 import json
+import uuid
 import psycopg2
 from datetime import datetime
 from contextlib import contextmanager
@@ -138,7 +139,7 @@ def test_correction_events():
         cur = conn.cursor()
 
         # Use unique entity ID for this test
-        entity_id = 'agent-correction-test'
+        entity_id = f'agent-correction-test-{uuid.uuid4().hex[:8]}'
 
         # Record original event
         cur.execute("""
@@ -204,6 +205,7 @@ def test_event_type_weights():
 
 def test_reputation_computation():
     """Test: Reputation computed from events"""
+    agent5_id = f'agent-5-{uuid.uuid4().hex[:8]}'
     print("\n✓ TEST: Reputation Computation")
 
     with get_db_connection() as conn:
@@ -222,14 +224,14 @@ def test_reputation_computation():
                 INSERT INTO trust_reputation_ledger (
                     entity_type, entity_id, event_type, context,
                     impact_value, impact_confidence, evidence_json
-                ) VALUES ('agent', 'agent-5', %s, 'real_world', %s, %s, '{}')
-            """, [event_type, impact, abs(impact)])
+                ) VALUES ('agent', %s, %s, 'real_world', %s, %s, '{}')
+            """, [agent5_id, event_type, impact, abs(impact)])
 
         # Count events
         cur.execute("""
             SELECT COUNT(*) FROM trust_reputation_ledger
-            WHERE entity_type = 'agent' AND entity_id = 'agent-5'
-        """)
+            WHERE entity_type = 'agent' AND entity_id = %s
+        """, [agent5_id])
 
         event_count = cur.fetchone()[0]
         assert event_count == len(events), f"Should have {len(events)} events"
@@ -277,6 +279,7 @@ def test_reputation_snapshots():
 
 def test_event_querying():
     """Test: Events queryable by entity and context"""
+    team_id = f'team-1-{uuid.uuid4().hex[:8]}'
     print("\n✓ TEST: Event Querying")
 
     with get_db_connection() as conn:
@@ -288,17 +291,17 @@ def test_event_querying():
                 entity_type, entity_id, event_type, context,
                 impact_value, impact_confidence, evidence_json
             ) VALUES
-                ('team', 'team-1', 'dispute_resolution_quality', 'real_world', 0.2, 0.9, '{}'),
-                ('team', 'team-1', 'governance_review_quality', 'real_world', 0.15, 0.85, '{}'),
-                ('team', 'team-1', 'calibration_improvement', 'simulation', 0.25, 0.95, '{}')
-        """)
+                ('team', %(team)s, 'dispute_resolution_quality', 'real_world', 0.2, 0.9, '{}'),
+                ('team', %(team)s, 'governance_review_quality', 'real_world', 0.15, 0.85, '{}'),
+                ('team', %(team)s, 'calibration_improvement', 'simulation', 0.25, 0.95, '{}')
+        """, {'team': team_id})
 
         # Query real-world events
         cur.execute("""
             SELECT COUNT(*) FROM trust_reputation_ledger
-            WHERE entity_type = 'team' AND entity_id = 'team-1'
+            WHERE entity_type = 'team' AND entity_id = %(team)s
             AND context = 'real_world'
-        """)
+        """, {'team': team_id})
 
         real_count = cur.fetchone()[0]
         assert real_count == 2, "Should have 2 real-world events"
@@ -307,9 +310,9 @@ def test_event_querying():
         # Query simulation events
         cur.execute("""
             SELECT COUNT(*) FROM trust_reputation_ledger
-            WHERE entity_type = 'team' AND entity_id = 'team-1'
+            WHERE entity_type = 'team' AND entity_id = %(team)s
             AND context = 'simulation'
-        """)
+        """, {'team': team_id})
 
         sim_count = cur.fetchone()[0]
         assert sim_count == 1, "Should have 1 simulation event"

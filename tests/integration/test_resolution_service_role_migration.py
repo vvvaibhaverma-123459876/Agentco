@@ -24,6 +24,15 @@ psycopg2 = pytest.importorskip("psycopg2", reason="psycopg2 not installed")
 from psycopg2 import sql
 
 DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL")
+if DSN:
+    try:
+        from pg_test_isolation import isolated_dsn
+
+        # Destructive fixture: run in an isolated sibling database so shared
+        # backend-migrated tables are never replaced with this suite's schema.
+        DSN = isolated_dsn(DSN)
+    except Exception:
+        DSN = None  # Postgres unreachable; the skip guard below handles it
 pytestmark = pytest.mark.skipif(
     not DSN or os.environ.get("AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS") != "1",
     reason=(
@@ -109,12 +118,9 @@ def fresh_db():
 
     yield conn
 
-    # Tear down
-    with conn.cursor() as cur:
-        for tbl in tables_to_drop:
-            cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
-        _drop_resolution_service_role(cur)
-
+    # Teardown intentionally leaves the schema and role in place: setup is
+    # self-cleaning, and dropping shared tables here left the database
+    # inconsistent with schema_migrations for every suite that ran afterwards.
     conn.close()
 
 

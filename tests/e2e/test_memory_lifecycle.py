@@ -22,7 +22,25 @@ from calibration.ledger.prediction_ledger import PredictionLedger, PredictionReg
 
 ROOT = Path(__file__).resolve().parents[2]
 DSN = os.environ.get("AGENTCO_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
+if DSN:
+    try:
+        from pg_test_isolation import isolated_dsn
+
+        # Destructive fixture: run in an isolated sibling database so shared
+        # backend-migrated tables are never replaced with this suite's schema.
+        DSN = isolated_dsn(DSN)
+    except Exception:
+        DSN = None  # Postgres unreachable; the skip guard below handles it
 pytestmark = pytest.mark.skipif(not DSN, reason="real Postgres required")
+
+# Lesson extraction/consolidation call a live LLM (chat + embeddings). Those
+# tests are opt-in so a clean environment without working provider credentials
+# skips them honestly instead of failing on provider 404s.
+RUN_REAL_LLM = os.environ.get("RUN_REAL_LLM_TESTS") == "1"
+requires_llm = pytest.mark.skipif(
+    not RUN_REAL_LLM,
+    reason="requires a live LLM provider; set RUN_REAL_LLM_TESTS=1 with working credentials",
+)
 
 _MIGRATION_015 = ROOT / "backend/src/db/migrations/015_agent_memories.sql"
 _MIGRATION_011 = ROOT / "backend/src/db/migrations/011_prediction_ledger.sql"
@@ -275,6 +293,7 @@ def test_reader_track_record_and_format(memory_db):
 # T6 — Learning loop
 # ─────────────────────────────────────────────────────────────────────────────
 
+@requires_llm
 def test_learning_loop_extracts_lessons(memory_db):
     """T6.1: extract_lessons_from_recent produces at least one semantic memory."""
     writer = MemoryWriter(DSN)
@@ -289,6 +308,7 @@ def test_learning_loop_extracts_lessons(memory_db):
     assert len(extracted) >= 1, f"Expected >=1 semantic memories, got {extracted}"
 
 
+@requires_llm
 def test_learning_loop_consolidates_semantics(memory_db):
     """T6.2: consolidate_semantic_memories collapses 5 memories to 1."""
     writer = MemoryWriter(DSN)
@@ -336,6 +356,7 @@ def test_learning_loop_cross_agent_sharing(memory_db):
 # T7 — Full lifecycle (Step 7)
 # ─────────────────────────────────────────────────────────────────────────────
 
+@requires_llm
 def test_full_memory_lifecycle_trace(memory_db):
     """
     End-to-end proof:

@@ -75,14 +75,24 @@ def _ensure_prediction_ledger(c):
             cur.execute(reserve_ext.read_text())
             cur.execute((root / "reserve" / "migrations" / "004_ed25519_signature.sql").read_text())
         else:
-            # Table exists but may be missing hardness column (e.g. created by an older fixture).
+            # Table exists but may be missing the reserve extension entirely
+            # (calibration_credentials) or just the hardness column.
+            reserve_ext = root / "reserve" / "migrations" / "001_reserve_extension.sql"
             cur.execute(
                 "SELECT 1 FROM information_schema.columns "
                 "WHERE table_name='prediction_ledger' AND column_name='hardness'"
             )
             if cur.fetchone() is None:
-                reserve_ext = root / "reserve" / "migrations" / "001_reserve_extension.sql"
                 cur.execute(reserve_ext.read_text())
+            else:
+                cur.execute("SELECT to_regclass('public.calibration_credentials')")
+                if cur.fetchone()[0] is None:
+                    # Ledger columns are already extended; re-running the full
+                    # extension would UPDATE ledger rows and trip the
+                    # immutability trigger, so apply only the credential DDL.
+                    sql_text = reserve_ext.read_text()
+                    credentials_ddl = sql_text[sql_text.index("CREATE TABLE IF NOT EXISTS credential_domains") :]
+                    cur.execute(credentials_ddl)
             # Apply migration 004 if ed25519_signature column is missing.
             cur.execute(
                 "SELECT 1 FROM information_schema.columns "
@@ -99,9 +109,23 @@ def db():
     yield c
     # Cleanup: remove this test's rows (triggers disabled where append-only).
     with c.cursor() as cur:
-        cur.execute("ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete")
+        cur.execute(
+            """DO $$ BEGIN
+                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
+                   ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete;
+                 END IF;
+               END $$;"""
+        )
         cur.execute("DELETE FROM decision_log WHERE agent_id=%s AND input_summary LIKE 'E2E%%'", (E2E_AGENT,))
-        cur.execute("ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete")
+        cur.execute(
+            """DO $$ BEGIN
+                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
+                   ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete;
+                 END IF;
+               END $$;"""
+        )
         cur.execute("ALTER TABLE prediction_ledger DISABLE TRIGGER ALL")
         cur.execute("DELETE FROM prediction_ledger WHERE producing_agent_id=%s", ("e2e-dispatch-agent",))
         cur.execute("ALTER TABLE prediction_ledger ENABLE TRIGGER ALL")

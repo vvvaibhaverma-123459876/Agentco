@@ -60,6 +60,15 @@ def ensure_active_constitution():
 
         conn.commit()
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _seed_active_constitution():
+    """These tests read active_constitution; seed one when the DB is fresh."""
+    ensure_active_constitution()
+
+
 def test_policy_creation():
     """Test: Policy creation as draft"""
     print("\n✓ TEST: Policy Creation")

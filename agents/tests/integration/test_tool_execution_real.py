@@ -43,9 +43,23 @@ def _setup():
     conn = _conn()
     conn.autocommit = True
     with conn.cursor() as cur:
-        cur.execute("ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete")
+        cur.execute(
+            """DO $$ BEGIN
+                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
+                   ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete;
+                 END IF;
+               END $$;"""
+        )
         cur.execute("DELETE FROM decision_log WHERE agent_id LIKE 'test-tool-%'")
-        cur.execute("ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete")
+        cur.execute(
+            """DO $$ BEGIN
+                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
+                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
+                   ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete;
+                 END IF;
+               END $$;"""
+        )
     conn.close()
 
 

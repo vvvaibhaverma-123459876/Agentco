@@ -354,7 +354,7 @@ export class RulingService {
         `Calibration-weighted judiciary ruling for domain=${input.domain} claim_type=${claimType}.`,
         `subject_weight=${subjectWeight.toFixed(4)} counter_weight=${counterWeight.toFixed(4)}.`,
         'Weights use producer domain trust and evidence independence; stated confidence is not used.',
-        'Dissent is retained in the dispute and precedent rationale for later calibration reversal.',
+        'Dissent is retained in the dispute and precedent rationale so calibration reversal remains possible.',
       ].join(' ');
       const issued = await this.issueRulingWithClient(client, {
         dispute_id: input.dispute_id,
