@@ -1,0 +1,245 @@
+{
+  "generatedAt": "2026-07-02T15:29:04.352Z",
+  "commit": "680f5d17c22bb81e845a27598cfcc8bc38d7ede6",
+  "note": "Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.",
+  "acceptanceChecks": [
+    {
+      "id": "A1_clean_room_target",
+      "description": "make verify-clean-room target exists",
+      "pass": true,
+      "evidence": "Makefile:verify-clean-room"
+    },
+    {
+      "id": "A2_py_live_gating",
+      "description": "Python live-LLM tests are opt-in (conftest gating)",
+      "pass": true,
+      "evidence": "conftest.py live_llm marker"
+    },
+    {
+      "id": "A3_ledger_scan_expanded",
+      "description": "build ledger scans autonomy/civilization/frontend",
+      "pass": true,
+      "evidence": "scripts/build_ledger.py RUNTIME_DIRS"
+    },
+    {
+      "id": "A4_docs_archived",
+      "description": "legacy status docs archived under docs/history",
+      "pass": true,
+      "evidence": "docs/history/README.md"
+    },
+    {
+      "id": "B1_skill_retrieval",
+      "description": "SkillRetrievalService exists and planner consumes it",
+      "pass": true,
+      "evidence": "skill-retrieval.service.ts + planner import"
+    },
+    {
+      "id": "B2_skill_usage_events",
+      "description": "skill_usage_events migration + skill-consumption E2E present",
+      "pass": true,
+      "evidence": "migration 110 + skill-consumption-e2e.test.ts"
+    },
+    {
+      "id": "C1_eval_canary_deploy",
+      "description": "candidate evaluation, canary, deployment services exist",
+      "pass": true,
+      "evidence": "candidate-evaluation/skill-canary/skill-deployment services"
+    },
+    {
+      "id": "C2_closed_loop_e2e",
+      "description": "self-improvement closed-loop E2E present",
+      "pass": true,
+      "evidence": "self-improvement-closed-loop-e2e.test.ts"
+    },
+    {
+      "id": "D1_longitudinal_harness",
+      "description": "longitudinal learning harness + 3-cycle test present",
+      "pass": true,
+      "evidence": "longitudinal-learning-harness service + test"
+    },
+    {
+      "id": "D2_longitudinal_cli",
+      "description": "longitudinal learning CLI generates a DB-derived report",
+      "pass": true,
+      "evidence": "run-longitudinal-learning.ts"
+    },
+    {
+      "id": "E1_calibration_routing",
+      "description": "calibration-aware routing service + planner integration",
+      "pass": true,
+      "evidence": "calibration-aware-routing.service.ts + planner import"
+    },
+    {
+      "id": "E2_calibration_test",
+      "description": "calibration-driven planning test present",
+      "pass": true,
+      "evidence": "calibration-driven-planning.test.ts"
+    },
+    {
+      "id": "F1_civilization_live_flow",
+      "description": "civilization live flow service + E2E present",
+      "pass": true,
+      "evidence": "civilization-live-flow service + e2e"
+    },
+    {
+      "id": "G1_goal_formation_free_run",
+      "description": "goal formation + supervised free-run services + test",
+      "pass": true,
+      "evidence": "goal-formation + supervised-free-run + test"
+    },
+    {
+      "id": "G2_free_run_cli",
+      "description": "supervised free-run CLI present",
+      "pass": true,
+      "evidence": "supervised-free-run.ts"
+    },
+    {
+      "id": "H1_ssrf_guard",
+      "description": "URL safety (SSRF) guard wired into the web adapter",
+      "pass": true,
+      "evidence": "url-safety.ts + real-web-adapter import"
+    },
+    {
+      "id": "H2_prompt_injection",
+      "description": "untrusted-content wrapping wired into the planner",
+      "pass": true,
+      "evidence": "planner wrapUntrustedContent"
+    },
+    {
+      "id": "H3_rbac_and_safety_test",
+      "description": "safety hardening test + RBAC middleware decision doc",
+      "pass": true,
+      "evidence": "safety-hardening.test.ts + RBAC_AND_WEB_SAFETY.md"
+    },
+    {
+      "id": "I1_canonical_doc",
+      "description": "canonical runtime doc present",
+      "pass": true,
+      "evidence": "docs/CURRENT_RUNTIME_CANONICAL.md"
+    },
+    {
+      "id": "I2_db_usage_manifest",
+      "description": "DB table usage manifest present",
+      "pass": true,
+      "evidence": "docs/DB_TABLE_USAGE.md"
+    }
+  ],
+  "acceptanceAllPass": true,
+  "dimensions": [
+    {
+      "name": "Clean-room runnability",
+      "score": 9,
+      "baseline": 7,
+      "target": 9,
+      "gatePassed": true
+    },
+    {
+      "name": "Documentation accuracy",
+      "score": 8,
+      "baseline": 6,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Architecture coherence",
+      "score": 8,
+      "baseline": 6,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Code completeness",
+      "score": 8,
+      "baseline": 6,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Integration completeness",
+      "score": 8,
+      "baseline": 5,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Test quality",
+      "score": 8,
+      "baseline": 7,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Evidence governance",
+      "score": 8,
+      "baseline": 7,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Calibration loop",
+      "score": 8,
+      "baseline": 6,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Learning loop",
+      "score": 8,
+      "baseline": 5,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Autonomy",
+      "score": 6,
+      "baseline": 3,
+      "target": 6,
+      "gatePassed": true
+    },
+    {
+      "name": "Civilization implementation",
+      "score": 7,
+      "baseline": 4,
+      "target": 7,
+      "gatePassed": true
+    },
+    {
+      "name": "Self-improvement",
+      "score": 7,
+      "baseline": 3,
+      "target": 7,
+      "gatePassed": true
+    },
+    {
+      "name": "Safety",
+      "score": 8,
+      "baseline": 7,
+      "target": 8,
+      "gatePassed": true
+    },
+    {
+      "name": "Production readiness",
+      "score": 6,
+      "baseline": 4,
+      "target": 6,
+      "gatePassed": true
+    },
+    {
+      "name": "Real-world usefulness",
+      "score": 6,
+      "baseline": 3,
+      "target": 6,
+      "gatePassed": true
+    },
+    {
+      "name": "Alignment with stated goal",
+      "score": 8,
+      "baseline": 5,
+      "target": 8,
+      "gatePassed": true
+    }
+  ],
+  "totalOutOf160": 121,
+  "scoreOutOf100": 75.6,
+  "claims80Plus": false
+}

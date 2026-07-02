@@ -48,26 +48,26 @@ function check(id: string, description: string, pass: boolean, evidence: string)
 check(
   'A1_clean_room_target',
   'make verify-clean-room target exists',
-  fileContains('../Makefile', 'verify-clean-room', repoRoot),
+  fileContains('Makefile', 'verify-clean-room', repoRoot),
   'Makefile:verify-clean-room'
 );
 check(
   'A2_py_live_gating',
   'Python live-LLM tests are opt-in (conftest gating)',
-  fileContains('../conftest.py', 'live_llm', repoRoot),
+  fileContains('conftest.py', 'live_llm', repoRoot),
   'conftest.py live_llm marker'
 );
 check(
   'A3_ledger_scan_expanded',
   'build ledger scans autonomy/civilization/frontend',
-  fileContains('../scripts/build_ledger.py', 'Path("autonomy")', repoRoot) &&
-    fileContains('../scripts/build_ledger.py', 'Path("civilization")', repoRoot),
+  fileContains('scripts/build_ledger.py', 'Path("autonomy")', repoRoot) &&
+    fileContains('scripts/build_ledger.py', 'Path("civilization")', repoRoot),
   'scripts/build_ledger.py RUNTIME_DIRS'
 );
 check(
   'A4_docs_archived',
   'legacy status docs archived under docs/history',
-  fileExists('../docs/history/README.md', repoRoot),
+  fileExists('docs/history/README.md', repoRoot),
   'docs/history/README.md'
 );
 
@@ -169,20 +169,20 @@ check(
   'H3_rbac_and_safety_test',
   'safety hardening test + RBAC middleware decision doc',
   fileExists('tests/safety-hardening.test.ts') &&
-    fileExists('../docs/RBAC_AND_WEB_SAFETY.md', repoRoot),
+    fileExists('docs/RBAC_AND_WEB_SAFETY.md', repoRoot),
   'safety-hardening.test.ts + RBAC_AND_WEB_SAFETY.md'
 );
 
 check(
   'I1_canonical_doc',
   'canonical runtime doc present',
-  fileExists('../docs/CURRENT_RUNTIME_CANONICAL.md', repoRoot),
+  fileExists('docs/CURRENT_RUNTIME_CANONICAL.md', repoRoot),
   'docs/CURRENT_RUNTIME_CANONICAL.md'
 );
 check(
   'I2_db_usage_manifest',
   'DB table usage manifest present',
-  fileExists('../docs/DB_TABLE_USAGE.md', repoRoot),
+  fileExists('docs/DB_TABLE_USAGE.md', repoRoot),
   'docs/DB_TABLE_USAGE.md'
 );
 
