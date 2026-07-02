@@ -348,8 +348,13 @@ export class LearnerService {
         candidateContext.metrics = runResult.rows[0]?.baseline_metrics_json ?? {};
       }
 
-      // Generate improvement based on learner type
-      const improvement = this.computeImprovement(candidateType, candidateContext.metrics);
+      // Derive the dominant observed weakness from the run's trajectories so
+      // the proposed strategy is grounded in what actually failed rather than
+      // a generic guess. Trajectories label failures via info_json.weakness.
+      const weakness = await this.dominantWeakness(client, learnerRunId);
+
+      // Generate improvement based on learner type and observed weakness
+      const improvement = this.computeImprovement(candidateType, candidateContext.metrics, weakness);
 
       // Create artifact ref and hash
       const artifactContent = JSON.stringify(improvement);
@@ -564,13 +569,57 @@ export class LearnerService {
    * 
    * Real improvement logic, not hardcoded success
    */
+  /**
+   * Find the most common failure label across the run's trajectories.
+   * Returns null when trajectories carry no weakness labels.
+   */
+  private async dominantWeakness(client: any, learnerRunId: string): Promise<string | null> {
+    const result = await client.query(
+      `SELECT t.info_json->>'weakness' AS weakness, COUNT(*) AS n
+         FROM learner_runs r
+         JOIN replay_batches b ON b.id = r.replay_batch_id
+         JOIN trajectory_store t ON t.id = ANY(b.trajectory_ids)
+        WHERE r.id = $1
+          AND t.info_json ? 'weakness'
+        GROUP BY 1
+        ORDER BY COUNT(*) DESC
+        LIMIT 1`,
+      [learnerRunId]
+    );
+    return result.rows[0]?.weakness ?? null;
+  }
+
+  /**
+   * Map an observed weakness to an executable strategy + benchmark family.
+   * Strategies are real decision policies executed by the deterministic
+   * benchmark and, after promotion, surfaced to the planner as skills.
+   */
+  private strategyForWeakness(
+    weakness: string | null
+  ): { strategy: string; taskFamily: string } | null {
+    switch (weakness) {
+      case 'non_independent_sources':
+        return { strategy: 'prefer_independent_sources', taskFamily: 'source_selection' };
+      case 'ungrounded_snippets':
+        return { strategy: 'require_token_subsequence', taskFamily: 'evidence_grounding' };
+      case 'overconfident_claims':
+        return { strategy: 'calibration_weighted_adjudication', taskFamily: 'contradiction_handling' };
+      default:
+        return null;
+    }
+  }
+
   private computeImprovement(
     learnerType: string,
-    metrics: Record<string, number>
+    metrics: Record<string, number>,
+    weakness: string | null = null
   ): {
     expectedImprovement: number;
     riskLevel: string;
     rationale: string;
+    strategy?: string;
+    taskFamily?: string;
+    observedWeakness?: string;
   } {
     const baselineScore = metrics.baseline_score || 50;
     const successRate = metrics.success_rate || 0.5;
@@ -631,6 +680,17 @@ export class LearnerService {
     // Never guarantee more than realistic improvement
     expectedImprovement = Math.min(expectedImprovement, 20);
 
+    const mapped = this.strategyForWeakness(weakness);
+    if (mapped) {
+      return {
+        expectedImprovement,
+        riskLevel,
+        rationale: `${rationale} (observed weakness: ${weakness})`,
+        strategy: mapped.strategy,
+        taskFamily: mapped.taskFamily,
+        observedWeakness: weakness ?? undefined,
+      };
+    }
     return { expectedImprovement, riskLevel, rationale };
   }
 }
