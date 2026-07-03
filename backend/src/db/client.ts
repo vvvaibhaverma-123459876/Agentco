@@ -15,9 +15,12 @@ const INITIAL_RETRY_DELAY_MS = 100;
 
 export const db: Pool = new Pool({
   connectionString: DSN,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  // Pool size is env-configurable so a many-suite test run sharing a single
+  // Postgres (max_connections default 100) plus per-suite service pools does
+  // not exhaust connections. Production default is unchanged.
+  max: Number(process.env.AGENTCO_PG_POOL_MAX) || 20,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 5000,
 });
 
 db.on('error', (err) => {

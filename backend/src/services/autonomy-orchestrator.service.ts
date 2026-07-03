@@ -22,6 +22,7 @@ import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '.
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { WebAdapter } from '../adapters/web-adapter';
 import { SourceDiscoveryEngine } from './source-discovery.service';
+import { autonomousPromotion } from './autonomous-promotion.service';
 import { isProductionEnv } from '../security';
 
 export interface AutonomyRun {
@@ -1130,6 +1131,24 @@ export class AutonomyOrchestratorService {
       console.log(`   Claims generated: ${claimsGenerated}`);
       console.log(`   Actions executed: ${actionsExecuted}`);
       console.log(`   Reason: ${terminationReason}`);
+
+      // Autonomous promotion hook (GA4): the run's OWN resolved outcomes
+      // trigger the existing promotion pipeline without a human. Gated by the
+      // existing thresholds — a run with no resolved/scored predictions
+      // promotes nothing. Failures here must not fail the run.
+      try {
+        const promotion = await autonomousPromotion.promoteResolvedForRun({
+          runId,
+          agentId: 'autonomy_action_planner',
+        });
+        if (promotion.considered > 0) {
+          console.log(
+            `[AutonomousPromotion] considered=${promotion.considered} promoted=${promotion.promoted} rejected=${promotion.rejected}`
+          );
+        }
+      } catch (error: any) {
+        console.warn(`[AutonomousPromotion] hook failed (non-fatal): ${error.message}`);
+      }
 
       return {
         goalId,

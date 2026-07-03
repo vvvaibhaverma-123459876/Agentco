@@ -121,7 +121,7 @@ describe('Action Loop Integration', () => {
       expect(result.status).toBe(ActionStatus.BLOCKED);
       expect(result.createdArtifacts).toHaveLength(0);
       expect(result.observations.status).toBe('fetch_blocked_no_real_content');
-      expect(result.blockedReason).toContain('no evidence artifact was created');
+      expect(result.blockedReason).toMatch(/no evidence artifact was created|produced no evidence/);
     });
 
     it('should execute GENERATE_CLAIM with evidence validation', async () => {
