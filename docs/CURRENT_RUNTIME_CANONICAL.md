@@ -33,6 +33,7 @@ make verify-clean-room
 | Longitudinal improvement across runs | `longitudinal-learning-harness.service.ts` | `longitudinal_learning_cycles` | yes | `longitudinal-learning-harness.test.ts` |
 | Calibration → planner routing/authority | `calibration-aware-routing.service.ts` | `trust_scores`, `event_log` | yes | `calibration-driven-planning.test.ts` |
 | Institution acts on live events | `civilization-live-flow.service.ts` | `institution_work_requests`, `event_log` | yes | `civilization-live-flow-e2e.test.ts` |
+| **Civilization produces learning** | `institutional-knowledge-bridge.service.ts` | `institutional_knowledge_promotions`, `agent_memories` | yes | `civilization-learning-backbone-e2e.test.ts` + `-live.test.ts` |
 | Self-generated goals + bounded free-run | `goal-formation`, `supervised-free-run` | `autonomy_goals`, `goal_evidence`, `event_log` | yes | `goal-formation-supervised-free-run.test.ts` |
 
 ## Python modules: tooling / research / deprecated

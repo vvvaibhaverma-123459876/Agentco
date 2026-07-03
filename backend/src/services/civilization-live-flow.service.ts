@@ -27,6 +27,11 @@ import { institutionWorkAssignmentService as institutionWorkAssignment } from '.
 import { candidateEvaluation } from './candidate-evaluation.service';
 import { skillCanary } from './skill-canary.service';
 import { skillDeployment } from './skill-deployment.service';
+import { institutionalSynthesisService } from './institutional-synthesis.service';
+import {
+  institutionalKnowledgeBridge,
+  InstitutionalPromotionResult,
+} from './institutional-knowledge-bridge.service';
 import crypto from 'crypto';
 
 export interface CivilizationEvent {
@@ -96,6 +101,41 @@ export class CivilizationLiveFlowService {
     }
 
     return events.slice(0, limit);
+  }
+
+  /**
+   * Civilization-produces-learning: synthesize completed institutional
+   * findings into a composite claim and promote it into durable memory the
+   * planner will reuse. This is the seam that makes the civilization a
+   * PRODUCER of learning, not only a governor of it. Returns the synthesis
+   * ids and the promotion decision (which fails closed on weak/ungrounded
+   * composites).
+   */
+  async synthesizeAndPromoteKnowledge(input: {
+    sourceWorkRequestIds: string[];
+    synthesisText: string;
+    domain: string;
+    outputInstitutionId?: string;
+  }): Promise<{
+    synthesisClaimId: string;
+    contributingInstitutionIds: string[];
+    promotion: InstitutionalPromotionResult;
+  }> {
+    const synthesis = await institutionalSynthesisService.synthesize({
+      sourceWorkRequestIds: input.sourceWorkRequestIds,
+      synthesisText: input.synthesisText,
+      outputInstitutionId: input.outputInstitutionId,
+    });
+    const promotion = await institutionalKnowledgeBridge.promoteFromSynthesis({
+      synthesis_claim_id: synthesis.synthesis_claim_id,
+      contributing_institution_ids: synthesis.contributing_institution_ids,
+      domain: input.domain,
+    });
+    return {
+      synthesisClaimId: synthesis.synthesis_claim_id,
+      contributingInstitutionIds: synthesis.contributing_institution_ids,
+      promotion,
+    };
   }
 
   /**

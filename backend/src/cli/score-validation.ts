@@ -136,6 +136,15 @@ check(
     fileExists('tests/civilization-live-flow-e2e.test.ts'),
   'civilization-live-flow service + e2e'
 );
+check(
+  'F2_civilization_learning_backbone',
+  'civilization produces learning: knowledge bridge + E2E (clean-room & live)',
+  fileExists('src/services/institutional-knowledge-bridge.service.ts') &&
+    fileExists('src/db/migrations/113_institutional_knowledge_promotions.sql') &&
+    fileExists('tests/civilization-learning-backbone-e2e.test.ts') &&
+    fileExists('tests/civilization-learning-backbone-live.test.ts'),
+  'institutional-knowledge-bridge + migration 113 + backbone e2e + live test'
+);
 
 check(
   'G1_goal_formation_free_run',
@@ -206,7 +215,7 @@ const dimensions: Array<{ name: string; baseline: number; target: number; gated:
   { name: 'Calibration loop', baseline: 6, target: 8, gated: passed('E') },
   { name: 'Learning loop', baseline: 5, target: 8, gated: passed('C') && passed('D') },
   { name: 'Autonomy', baseline: 3, target: 6, gated: passed('G') },
-  { name: 'Civilization implementation', baseline: 4, target: 7, gated: passed('F') },
+  { name: 'Civilization implementation', baseline: 4, target: 8, gated: passed('F') },
   { name: 'Self-improvement', baseline: 3, target: 7, gated: passed('C') && passed('D') },
   { name: 'Safety', baseline: 7, target: 8, gated: passed('H') },
   { name: 'Production readiness', baseline: 4, target: 6, gated: passed('H') && passed('A') },

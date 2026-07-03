@@ -1,11 +1,11 @@
 # Score Validation (signal-gated)
 
-Generated 2026-07-02T15:31:54.159Z at commit `230a4cabfdee55e3a13ece3c9fa2b78e799933e8`.
+Generated 2026-07-03T05:48:03.091Z at commit `d41bbb2b08b0b3bd1095614dfe60659732cbb200`.
 
 Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.
 
-**Acceptance checks:** 20/20 pass.
-**Estimated score:** 75.6/100 (121/160).
+**Acceptance checks:** 21/21 pass.
+**Estimated score:** 76.3/100 (122/160).
 **Claims 80+ :** false
 
 ## Acceptance checks
@@ -25,6 +25,7 @@ Scores are estimates gated on structural signals (presence of the required servi
 | E1_calibration_routing | calibration-aware routing service + planner integration | ✅ | calibration-aware-routing.service.ts + planner import |
 | E2_calibration_test | calibration-driven planning test present | ✅ | calibration-driven-planning.test.ts |
 | F1_civilization_live_flow | civilization live flow service + E2E present | ✅ | civilization-live-flow service + e2e |
+| F2_civilization_learning_backbone | civilization produces learning: knowledge bridge + E2E (clean-room & live) | ✅ | institutional-knowledge-bridge + migration 113 + backbone e2e + live test |
 | G1_goal_formation_free_run | goal formation + supervised free-run services + test | ✅ | goal-formation + supervised-free-run + test |
 | G2_free_run_cli | supervised free-run CLI present | ✅ | supervised-free-run.ts |
 | H1_ssrf_guard | URL safety (SSRF) guard wired into the web adapter | ✅ | url-safety.ts + real-web-adapter import |
@@ -47,7 +48,7 @@ Scores are estimates gated on structural signals (presence of the required servi
 | Calibration loop | 6 | 8 | ✅ | 8 |
 | Learning loop | 5 | 8 | ✅ | 8 |
 | Autonomy | 3 | 6 | ✅ | 6 |
-| Civilization implementation | 4 | 7 | ✅ | 7 |
+| Civilization implementation | 4 | 8 | ✅ | 8 |
 | Self-improvement | 3 | 7 | ✅ | 7 |
 | Safety | 7 | 8 | ✅ | 8 |
 | Production readiness | 4 | 6 | ✅ | 6 |

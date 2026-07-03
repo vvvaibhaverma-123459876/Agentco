@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-02T15:31:54.159Z",
-  "commit": "230a4cabfdee55e3a13ece3c9fa2b78e799933e8",
+  "generatedAt": "2026-07-03T05:48:03.091Z",
+  "commit": "d41bbb2b08b0b3bd1095614dfe60659732cbb200",
   "note": "Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.",
   "acceptanceChecks": [
     {
@@ -80,6 +80,12 @@
       "description": "civilization live flow service + E2E present",
       "pass": true,
       "evidence": "civilization-live-flow service + e2e"
+    },
+    {
+      "id": "F2_civilization_learning_backbone",
+      "description": "civilization produces learning: knowledge bridge + E2E (clean-room & live)",
+      "pass": true,
+      "evidence": "institutional-knowledge-bridge + migration 113 + backbone e2e + live test"
     },
     {
       "id": "G1_goal_formation_free_run",
@@ -198,9 +204,9 @@
     },
     {
       "name": "Civilization implementation",
-      "score": 7,
+      "score": 8,
       "baseline": 4,
-      "target": 7,
+      "target": 8,
       "gatePassed": true
     },
     {
@@ -239,7 +245,7 @@
       "gatePassed": true
     }
   ],
-  "totalOutOf160": 121,
-  "scoreOutOf100": 75.6,
+  "totalOutOf160": 122,
+  "scoreOutOf100": 76.3,
   "claims80Plus": false
 }

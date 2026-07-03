@@ -2,8 +2,8 @@
 
 Generated from migrations + service/test references + live row counts.
 
-- Total tables declared in migrations: 219
-- Referenced by a runtime service: 175
+- Total tables declared in migrations: 220
+- Referenced by a runtime service: 176
 - Speculative (no service reference, no rows): 37
 
 Classification:
@@ -19,12 +19,12 @@ Classification:
 | active_trust_policies | 028_trust_policy_versions.sql | autonomy-orchestrator.service.ts, trust-policy-canary.service.ts, trust-policy.service.ts | 0 | runtime |
 | actor_key_ring | 086_key_ring.sql | identity-authority.service.ts | 3 | runtime |
 | actor_permissions | 079_identity_authority.sql | identity-authority.service.ts | 2 | runtime |
-| actors | 079_identity_authority.sql | civilization-runtime.service.ts, domain-registry.service.ts, event-log.service.ts | 114 | runtime |
+| actors | 079_identity_authority.sql | civilization-runtime.service.ts, domain-registry.service.ts, event-log.service.ts | 117 | runtime |
 | adaptive_strategies | 058_adaptive_strategy.sql | adaptive-strategy.service.ts | 28 | runtime |
 | agent_identities | 079_identity_authority.sql | identity-authority.service.ts | 31 | runtime |
 | agent_membership_edges | 078_agent_membership_id_compatibility.sql | — | 0 | speculative |
-| agent_memories | 015_agent_memories.sql | memory-promotion-pipeline.service.ts, memory-retrieval.service.ts | 5 | runtime |
-| agent_memory | 002_agent_memory.sql | memory-promotion-pipeline.service.ts, memory-store.service.ts | 3 | runtime |
+| agent_memories | 015_agent_memories.sql | institutional-knowledge-bridge.service.ts, memory-promotion-pipeline.service.ts, memory-retrieval.service.ts | 7 | runtime |
+| agent_memory | 002_agent_memory.sql | institutional-knowledge-bridge.service.ts, memory-promotion-pipeline.service.ts, memory-store.service.ts | 3 | runtime |
 | agent_state | 001_agent_state.sql | memory-store.service.ts | 29 | runtime |
 | allowed_change_types | 027_calibration_constitution.sql | calibration-constitution.service.ts, civilization-runtime.service.ts, trust-policy.service.ts | 3 | runtime |
 | artifacts | 033_artifacts.sql | action-executor.service.ts, autonomy-orchestrator.service.ts, candidate-evaluation.service.ts | 5 | runtime |
@@ -36,12 +36,12 @@ Classification:
 | autonomy_calibration_events | 059_calibration_framework.sql | claim-accuracy-tracker.service.ts | 5 | runtime |
 | autonomy_calibration_reports | 059_calibration_framework.sql | claim-accuracy-tracker.service.ts | 1 | runtime |
 | autonomy_claim_validations | 059_calibration_framework.sql | claim-accuracy-tracker.service.ts | 3 | runtime |
-| autonomy_claims | 050_autonomy_action_loop.sql | action-executor.service.ts, autonomy-orchestrator.service.ts, bounded-learning-run.service.ts | 19 | runtime |
+| autonomy_claims | 050_autonomy_action_loop.sql | action-executor.service.ts, autonomy-orchestrator.service.ts, bounded-learning-run.service.ts | 27 | runtime |
 | autonomy_dead_letters | 022_autonomy_tasks.sql | crash-recovery.service.ts, task-engine.service.ts | 0 | runtime |
 | autonomy_episodes | 023_autonomy_episodes.sql | action-executor.service.ts, calibration-change-governance.service.ts, longitudinal-learning-harness.service.ts | 80 | runtime |
 | autonomy_evidence | 050_autonomy_action_loop.sql | action-executor.service.ts, autonomy-orchestrator.service.ts, bounded-learning-run.service.ts | 6 | runtime |
 | autonomy_goal_actions | 050_autonomy_action_loop.sql | action-executor.service.ts, autonomy-orchestrator.service.ts | 22 | runtime |
-| autonomy_goals | 025_goal_management_clean.sql | action-executor.service.ts, autonomy-orchestrator.service.ts, deadlock-detector.service.ts | 27 | runtime |
+| autonomy_goals | 025_goal_management_clean.sql | action-executor.service.ts, autonomy-orchestrator.service.ts, deadlock-detector.service.ts | 28 | runtime |
 | autonomy_interventions | 023_autonomy_episodes.sql | observability.service.ts, trajectory-store.service.ts | 0 | runtime |
 | autonomy_loop_detection | 050_autonomy_action_loop.sql | action-executor.service.ts | 2 | runtime |
 | autonomy_memory | 050_autonomy_action_loop.sql | action-executor.service.ts, reflection.service.ts | 0 | runtime |
@@ -56,7 +56,7 @@ Classification:
 | autonomy_source_trustworthiness | 059_calibration_framework.sql | claim-accuracy-tracker.service.ts | 0 | runtime |
 | autonomy_task_events | 022_autonomy_tasks.sql | — | 0 | speculative |
 | autonomy_tasks | 022_autonomy_tasks.sql | autonomy-orchestrator.service.ts, crash-recovery.service.ts, observability.service.ts | 2 | runtime |
-| autonomy_team_activations | 051_team_activations.sql | action-executor.service.ts, team-activation.service.ts | 6 | runtime |
+| autonomy_team_activations | 051_team_activations.sql | action-executor.service.ts, team-activation.service.ts | 9 | runtime |
 | autonomy_workflow_checkpoints | 022_autonomy_tasks.sql | autonomy-orchestrator.service.ts, crash-recovery.service.ts, task-engine.service.ts | 2 | runtime |
 | backup_recovery_log | 056_production_deployment.sql | — | 1 | test-only |
 | baseline_metrics | 030_trust_impact_assessment.sql | trust-impact-assessment.service.ts | 0 | runtime |
@@ -99,8 +99,8 @@ Classification:
 | customer_data | 008_customer_data.sql | — | 0 | speculative |
 | cutover_checklist | 056_production_deployment.sql | — | 5 | test-only |
 | deadlock_incidents | 055_deadlock_prevention.sql | deadlock-detector.service.ts, load-test-harness.service.ts | 0 | runtime |
-| decision_log | 004_decision_log.sql | audit-log.service.ts, civilization-runtime.service.ts, hash-chain-anchor.service.ts | 249 | runtime |
-| departments | 052b_institutions.sql | civilization-live-flow.service.ts, civilization-runtime.service.ts, deadlock-detector.service.ts | 145 | runtime |
+| decision_log | 004_decision_log.sql | audit-log.service.ts, civilization-runtime.service.ts, hash-chain-anchor.service.ts | 251 | runtime |
+| departments | 052b_institutions.sql | civilization-live-flow.service.ts, civilization-runtime.service.ts, deadlock-detector.service.ts | 155 | runtime |
 | deployment_events | 056_production_deployment.sql | — | 4 | test-only |
 | disaster_recovery_snapshots | 056_production_deployment.sql | — | 2 | test-only |
 | disputes | 109_judiciary.sql | calibration-constitution.service.ts, judiciary.service.ts | 4 | runtime |
@@ -117,9 +117,9 @@ Classification:
 | eval_scorecards | 025_goal_management_clean.sql | autonomy-orchestrator.service.ts, eval-harness.service.ts, observability.service.ts | 2 | runtime |
 | eval_suites | 025_goal_management_clean.sql | autonomy-orchestrator.service.ts, eval-harness.service.ts | 1 | runtime |
 | event_dead_letters | 083_transactional_outbox.sql | transactional-outbox.service.ts | 1 | runtime |
-| event_history | 005_event_history.sql | event-bus.service.ts, identity-authority.service.ts, protected-surface-validator.service.ts | 80 | runtime |
-| event_log | 080_event_log.sql | civilization-live-flow.service.ts, civilization-runtime.service.ts, event-log.service.ts | 446 | runtime |
-| event_outbox | 083_transactional_outbox.sql | civilization-runtime.service.ts, transactional-outbox.service.ts | 446 | runtime |
+| event_history | 005_event_history.sql | event-bus.service.ts, identity-authority.service.ts, protected-surface-validator.service.ts | 82 | runtime |
+| event_log | 080_event_log.sql | civilization-live-flow.service.ts, civilization-runtime.service.ts, event-log.service.ts | 448 | runtime |
+| event_outbox | 083_transactional_outbox.sql | civilization-runtime.service.ts, transactional-outbox.service.ts | 448 | runtime |
 | evidence_artifacts | 018_refoundation_canonical_schema.sql | — | 0 | speculative |
 | evidence_deduplication_map | 054_goal_hierarchies.sql | goal-hierarchy.service.ts | 1 | runtime |
 | evidence_vector_documents | 101_evidence_vector_index.sql | evidence-vector-index.service.ts | 3 | runtime |
@@ -127,14 +127,14 @@ Classification:
 | failure_recovery_incidents | 056_production_deployment.sql | — | 0 | test-only |
 | generality_domain_scores | 103_generality_metric_tracker.sql | generality-metric-tracker.service.ts | 13 | runtime |
 | generality_metric_runs | 103_generality_metric_tracker.sql | generality-metric-tracker.service.ts | 12 | runtime |
-| goal_budgets | 025_goal_management_clean.sql | goal-manager.service.ts | 6 | runtime |
+| goal_budgets | 025_goal_management_clean.sql | goal-manager.service.ts | 3 | runtime |
 | goal_conflicts | 025_goal_management_clean.sql | — | 0 | speculative |
 | goal_dependency_graph | 055_deadlock_prevention.sql | deadlock-detector.service.ts | 0 | runtime |
-| goal_evidence | 025_goal_management_clean.sql | goal-formation.service.ts, goal-manager.service.ts | 6 | runtime |
+| goal_evidence | 025_goal_management_clean.sql | goal-formation.service.ts, goal-manager.service.ts | 3 | runtime |
 | goal_execution_locks | 055_deadlock_prevention.sql | deadlock-detector.service.ts | 0 | runtime |
-| goal_reviews | 025_goal_management_clean.sql | goal-manager.service.ts | 3 | runtime |
+| goal_reviews | 025_goal_management_clean.sql | goal-manager.service.ts | 1 | runtime |
 | goal_rollup_results | 054_goal_hierarchies.sql | goal-hierarchy.service.ts | 0 | runtime |
-| goal_status_events | 025_goal_management_clean.sql | goal-manager.service.ts | 19 | runtime |
+| goal_status_events | 025_goal_management_clean.sql | goal-manager.service.ts | 9 | runtime |
 | governance_coalition_formations | 074_governance_coalition_formations.sql | governance-reputation-integration.service.ts | 2 | runtime |
 | governance_constraint_violations | 055_deadlock_prevention.sql | deadlock-detector.service.ts | 0 | runtime |
 | governance_entity_roles | 040_governance_rbac.sql | governance-rbac.service.ts | 5 | runtime |
@@ -150,10 +150,11 @@ Classification:
 | idempotency_records | 096_idempotency_store.sql | civilization-runtime.service.ts, idempotency-store.service.ts | 3 | runtime |
 | if | 062_runtime_schema_compatibility.sql | action-executor.service.ts, adaptive-strategy.service.ts, audit-log.service.ts | 0 | runtime |
 | institution_consistency_audit | 052b_institutions.sql | — | 0 | speculative |
-| institution_specialist_assignments | 053_work_assignment_schema.sql | institution-work-assignment.service.ts, reputation-scale.service.ts | 5 | runtime |
-| institution_work_requests | 053_work_assignment_schema.sql | civilization-runtime.service.ts, goal-hierarchy.service.ts, institution-claim-vetting.service.ts | 18 | runtime |
+| institution_specialist_assignments | 053_work_assignment_schema.sql | institution-work-assignment.service.ts, reputation-scale.service.ts | 4 | runtime |
+| institution_work_requests | 053_work_assignment_schema.sql | civilization-runtime.service.ts, goal-hierarchy.service.ts, institution-claim-vetting.service.ts | 20 | runtime |
 | institutional_knowledge_items | 026_civilization_learning_entities.sql | — | 0 | speculative |
-| institutions | 052b_institutions.sql | civilization-live-flow.service.ts, civilization-runtime.service.ts, deadlock-detector.service.ts | 30 | runtime |
+| institutional_knowledge_promotions | 113_institutional_knowledge_promotions.sql | institutional-knowledge-bridge.service.ts | 4 | runtime |
+| institutions | 052b_institutions.sql | civilization-live-flow.service.ts, civilization-runtime.service.ts, deadlock-detector.service.ts | 32 | runtime |
 | learner_candidates | 034_learner_infrastructure.sql | candidate-evaluation.service.ts, civilization-live-flow.service.ts, civilization-runtime.service.ts | 29 | runtime |
 | learner_runs | 034_learner_infrastructure.sql | civilization-live-flow.service.ts, learner.service.ts | 27 | runtime |
 | load_test_results | 056_production_deployment.sql | load-test-harness.service.ts | 2 | runtime |
@@ -180,7 +181,7 @@ Classification:
 | precedents | 109_judiciary.sql | judiciary.service.ts | 2 | runtime |
 | prediction_ledger | 011_prediction_ledger.sql | calibration-change-governance.service.ts, civilization-runtime.service.ts, credential.service.ts | 1 | runtime |
 | principals | 018_refoundation_canonical_schema.sql | provenance.service.ts | 3 | runtime |
-| production_metrics | 056_production_deployment.sql | — | 2 | test-only |
+| production_metrics | 056_production_deployment.sql | — | 1 | test-only |
 | prohibited_change_types | 027_calibration_constitution.sql | calibration-constitution.service.ts, civilization-runtime.service.ts, trust-policy.service.ts | 2 | runtime |
 | prompt_registry | 006_prompt_registry.sql | — | 0 | speculative |
 | proof_of_competence | 106_proof_of_competence.sql | capability-expansion-gate.service.ts, proof-of-competence.service.ts, skill-retrieval.service.ts | 13 | runtime |
@@ -204,7 +205,7 @@ Classification:
 | saga_steps | 100_saga_coordinator.sql | saga-coordinator.service.ts | 4 | runtime |
 | search_query_history | 058_adaptive_strategy.sql | — | 0 | speculative |
 | self_modification_validations | 097_self_modification_validation_compatibility.sql | civilization-runtime.service.ts, self-modification-validator.service.ts | 4 | runtime |
-| service_identities | 079_identity_authority.sql | domain-registry.service.ts, evidence-registry.service.ts, evidence-vector-index.service.ts | 45 | runtime |
+| service_identities | 079_identity_authority.sql | domain-registry.service.ts, evidence-registry.service.ts, evidence-vector-index.service.ts | 46 | runtime |
 | shared_knowledge | 003_shared_knowledge.sql | civilization-runtime.service.ts, memory-store.service.ts | 2 | runtime |
 | skill_canary_runs | 111_self_improvement_loop.sql | skill-canary.service.ts, skill-deployment.service.ts | 6 | runtime |
 | skill_library_entries | 105_skill_library.sql | capability-expansion-gate.service.ts, proof-of-competence.service.ts, skill-deployment.service.ts | 15 | runtime |
@@ -229,7 +230,7 @@ Classification:
 | trust_policy_versions | 028_trust_policy_versions.sql | autonomy-orchestrator.service.ts, civilization-runtime.service.ts, trust-policy-canary.service.ts | 0 | runtime |
 | trust_reputation_ledger | 031_trust_reputation_ledger.sql | persistent-trust-scorer.service.ts, trust-impact-assessment.service.ts, trust-reputation.service.ts | 3 | runtime |
 | trust_scores | 009_trust_scores.sql | calibration-aware-routing.service.ts, civilization-runtime.service.ts, domain-registry.service.ts | 37 | runtime |
-| work_cycle_events | 053_work_assignment_schema.sql | civilization-runtime.service.ts, institution-claim-vetting.service.ts, institution-work-assignment.service.ts | 34 | runtime |
+| work_cycle_events | 053_work_assignment_schema.sql | civilization-runtime.service.ts, institution-claim-vetting.service.ts, institution-work-assignment.service.ts | 32 | runtime |
 | worker_leases | 022_autonomy_tasks.sql | crash-recovery.service.ts, task-engine.service.ts, worker-coordinator.service.ts | 2 | runtime |
 | workflow_intents | 018_refoundation_canonical_schema.sql | — | 0 | speculative |
 | workflow_tasks | 019_durable_execution.sql | civilization-runtime.service.ts, durable-execution.service.ts | 4 | runtime |
