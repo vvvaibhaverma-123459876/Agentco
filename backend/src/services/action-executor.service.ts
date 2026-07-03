@@ -391,14 +391,69 @@ export class ActionExecutorService {
     }
 
     const memoryId = uuidv4();
+    // Preserve the autonomy_memory write (reflection/metrics read this table).
     await db.query(
       `INSERT INTO autonomy_memory (id, action_id, content, timestamp)
        VALUES ($1, $2, $3, NOW())`,
       [memoryId, spec.actionId, JSON.stringify(memoryContent)]
     );
 
+    // Dual-write into agent_memories so the planner's retrieval path can reuse
+    // this self-generated memory in a later run (GA1). It enters as a
+    // self-derived HYPOTHESIS, not verified knowledge: episodic type,
+    // 'autonomous_self' namespace, explicit provenance, and a low importance
+    // so promoted/verified knowledge always outranks it. task_id links back to
+    // the autonomy_memory row for idempotency/traceability.
+    try {
+      const summary = this.summarizeMemoryContent(memoryContent);
+      if (summary) {
+        const domain = await this.goalDomain(spec.goalId);
+        await db.query(
+          `INSERT INTO agent_memories
+             (agent_id, memory_type, namespace, task_id, domain, summary, content, importance)
+           VALUES ('autonomy-loop','episodic','autonomous_self',$1,$2,$3,$4::jsonb,0.4)`,
+          [
+            memoryId,
+            domain,
+            summary,
+            JSON.stringify({
+              source: 'autonomous_update_memory',
+              action_id: spec.actionId,
+              goal_id: spec.goalId ?? null,
+              autonomy_memory_id: memoryId,
+              original: memoryContent,
+            }),
+          ]
+        );
+      }
+    } catch (error) {
+      // Retrieval mirroring is best-effort; the canonical autonomy_memory row
+      // is already written. Log loudly so a broken mirror is never silent.
+      console.error(`[handleUpdateMemory] agent_memories mirror failed (self-memory not retrievable): ${error}`);
+    }
+
     result.observations.memoryId = memoryId;
     result.createdArtifacts.push(memoryId);
+  }
+
+  private summarizeMemoryContent(content: unknown): string | null {
+    if (typeof content === 'string') return content.slice(0, 2000) || null;
+    if (content && typeof content === 'object') {
+      const text = (content as Record<string, unknown>).text;
+      if (typeof text === 'string' && text.trim()) return text.slice(0, 2000);
+      try {
+        return JSON.stringify(content).slice(0, 2000);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  private async goalDomain(goalId?: string): Promise<string | null> {
+    if (!goalId) return null;
+    const row = await db.query<{ domain: string }>(`SELECT domain FROM autonomy_goals WHERE id = $1`, [goalId]);
+    return row.rows[0]?.domain ?? null;
   }
 
   private async handleEvaluateProgress(spec: ActionSpec, result: ActionResult): Promise<void> {
