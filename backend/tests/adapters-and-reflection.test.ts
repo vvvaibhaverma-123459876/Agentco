@@ -99,7 +99,7 @@ describe('Web Adapters', () => {
     });
 
     it('should gracefully handle missing API key', async () => {
-      await expect(adapter.search('test query')).rejects.toThrow(/No fallback to synthetic/);
+      await expect(adapter.search('test query')).rejects.toThrow(/no working search backend|SEARXNG_URL/);
     });
 
     it('should handle fetch timeout gracefully', async () => {
@@ -133,7 +133,7 @@ describe('Web Adapters', () => {
 
         it('should implement search() method returning array', async () => {
           if (adapter instanceof RealWebAdapter && !process.env.RUN_REAL_WEB_TESTS) {
-            await expect(adapter.search('test')).rejects.toThrow(/No fallback to synthetic/);
+            await expect(adapter.search('test')).rejects.toThrow(/no working search backend|SEARXNG_URL/);
             return;
           }
           const results = await adapter.search('test');

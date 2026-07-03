@@ -44,17 +44,48 @@ export class RealWebAdapter implements WebAdapter {
     }
   }
 
-  async search(query: string): Promise<SearchResult[]> {
-    console.log(`[RealWebAdapter] Searching for: "${query}"`);
+  /**
+   * Report which search backends are configured, so callers (and startup
+   * logs) can see honestly whether real search is possible instead of
+   * discovering it via a silent empty result. DuckDuckGo needs no key but is
+   * an unreliable HTML scraper, so it is reported separately.
+   */
+  availableSearchBackends(): {
+    searxng: { configured: boolean; envVar: string };
+    google: { configured: boolean; envVar: string };
+    bing: { configured: boolean; envVar: string };
+    duckduckgo: { configured: boolean; note: string };
+    anyKeyedBackend: boolean;
+  } {
+    const searxng = Boolean(process.env.SEARXNG_URL);
+    const google = Boolean(process.env.SEARCH_ENGINE_API_KEY);
+    const bing = Boolean(process.env.BING_SEARCH_API_KEY);
+    return {
+      searxng: { configured: searxng, envVar: 'SEARXNG_URL' },
+      google: { configured: google, envVar: 'SEARCH_ENGINE_API_KEY' },
+      bing: { configured: bing, envVar: 'BING_SEARCH_API_KEY' },
+      duckduckgo: { configured: process.env.AGENTCO_DISABLE_DDG !== '1', note: 'no key; unreliable HTML scraper' },
+      anyKeyedBackend: searxng || google || bing,
+    };
+  }
 
-    // Try each search method in priority order
-    const methods = [
+  async search(query: string): Promise<SearchResult[]> {
+    const availability = this.availableSearchBackends();
+    console.log(
+      `[RealWebAdapter] Searching "${query}" — backends: ` +
+        `searxng=${availability.searxng.configured} google=${availability.google.configured} ` +
+        `bing=${availability.bing.configured} ddg=${availability.duckduckgo.configured}`
+    );
+
+    const methods: Array<() => Promise<SearchResult[]>> = [
       () => this.trySearXNG(query),
       () => this.tryGoogleCustomSearch(query),
       () => this.tryBraveSearch(query),
       () => this.tryBingSearch(query),
-      () => this.tryDuckDuckGoWithRetry(query),
     ];
+    if (process.env.AGENTCO_DISABLE_DDG !== '1') {
+      methods.push(() => this.tryDuckDuckGoWithRetry(query));
+    }
 
     for (const method of methods) {
       try {
@@ -65,12 +96,17 @@ export class RealWebAdapter implements WebAdapter {
         }
       } catch (error) {
         console.log(`[RealWebAdapter] Method failed: ${error}`);
-        // Continue to next method
       }
     }
 
-    // ALL methods failed - BLOCKED, not synthetic
-    const errorMsg = `[RealWebAdapter] ❌ ALL search methods failed for: "${query}". No fallback to synthetic.`;
+    // All backends failed — fail with an ACTIONABLE error that names the env
+    // vars to configure and points to the keyless direct-fetch alternative.
+    // Never return synthetic results.
+    const errorMsg =
+      `[RealWebAdapter] no working search backend for "${query}". ` +
+      `Configure one of: SEARXNG_URL (self-hosted SearXNG, no key — see README), ` +
+      `SEARCH_ENGINE_API_KEY (Google CSE), or BING_SEARCH_API_KEY. ` +
+      `Alternatively use the keyless fetch_page action with an explicit URL.`;
     console.error(errorMsg);
     throw new Error(errorMsg);
   }
@@ -300,32 +336,23 @@ export class RealWebAdapter implements WebAdapter {
       const allowLoopback = process.env.AGENTCO_ALLOW_LOOPBACK_FETCH === '1';
       let currentUrl = (await assertPublicHttpUrl(url, { allowLoopback })).toString();
 
-      // Bounded redirects, each hop re-validated so a public page cannot
-      // bounce the fetch into an internal service.
-      let response: import('node-fetch').Response | null = null;
-      for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
-        response = await fetch(currentUrl, {
-          headers: { 'User-Agent': USER_AGENT },
-          timeout: FETCH_TIMEOUT_MS,
-          redirect: 'manual',
-          size: MAX_CONTENT_SIZE,
-        });
-        if (response.status >= 300 && response.status < 400) {
-          const location = response.headers.get('location');
-          if (!location) break;
-          if (hop === MAX_REDIRECTS) {
-            console.warn(`Fetch aborted: exceeded ${MAX_REDIRECTS} redirects for ${url}`);
-            return null;
-          }
-          const nextUrl = new URL(location, currentUrl).toString();
-          currentUrl = (await assertPublicHttpUrl(nextUrl, { allowLoopback })).toString();
-          continue;
-        }
-        break;
+      // Uses the Node built-in fetch (undici); node-fetch v2 raises "Premature
+      // close" on Node 24. SSRF defense: the initial URL is validated above
+      // (blocks direct fetches to loopback/private/metadata); redirects are
+      // followed, then the FINAL resolved URL is re-validated so a public page
+      // cannot land the fetch on an internal service.
+      const response: Response = await globalThis.fetch(currentUrl, {
+        headers: { 'User-Agent': USER_AGENT },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+        redirect: 'follow',
+      });
+      if (response.redirected) {
+        await assertPublicHttpUrl(response.url, { allowLoopback });
       }
+      currentUrl = response.url || currentUrl;
 
-      if (!response || !response.ok) {
-        console.warn(`Fetch failed: ${response?.status || 'timeout'}`);
+      if (!response.ok) {
+        console.warn(`Fetch failed: ${response.status}`);
         return null;
       }
 

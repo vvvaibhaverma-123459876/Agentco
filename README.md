@@ -98,6 +98,24 @@ adapters) skip unless `RUN_REAL_WEB_TESTS=1` / `RUN_REAL_LLM_TESTS=1` and
 provider credentials are configured. CI (`.github/workflows/ci.yml`) runs the
 same clean-room path, including the Refoundation Master Gate job.
 
+## Web Evidence Intake
+
+AgentCo acquires external evidence two ways:
+
+- **Direct fetch (keyless, always available):** the `fetch_page` action takes an
+  explicit URL, passes the SSRF guard (`backend/src/adapters/url-safety.ts`),
+  fetches with Node's built-in fetch, records `sha256`-hashed evidence, and
+  feeds the claim-grounding gate. No search backend required.
+- **Search (optional):** enable one backend, else `search` fails with an
+  actionable error naming these env vars:
+  - `SEARXNG_URL` — self-hosted SearXNG (no key). One-liner:
+    `docker run -d -p 8080:8080 searxng/searxng`, then
+    `export SEARXNG_URL=http://localhost:8080`.
+  - `SEARCH_ENGINE_API_KEY` — Google Custom Search.
+  - `BING_SEARCH_API_KEY` — Bing.
+  DuckDuckGo's keyless HTML scraper is a last-resort best-effort path
+  (disable with `AGENTCO_DISABLE_DDG=1`). No public SearXNG is hard-coded.
+
 ## Runtime Doctor
 
 ```bash

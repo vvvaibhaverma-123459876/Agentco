@@ -17,12 +17,16 @@ import {
   Claim,
 } from '../types/action.types';
 import { WebAdapter } from '../adapters/web-adapter';
+import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { TeamActivationService } from './team-activation.service';
 import { evidenceRegistry } from './evidence-registry.service';
 import { claimGrounding } from './claim-grounding.service';
 
 export class ActionExecutorService {
-  private webAdapter: WebAdapter | null = null;
+  // Default to a real web adapter so the direct-fetch (fetch_page) evidence
+  // path works with zero configuration (GA2). Tests override via
+  // setWebAdapter(new MockWebAdapter()). All fetches pass the SSRF guard.
+  private webAdapter: WebAdapter | null = new RealWebAdapter();
   private teamActivation = new TeamActivationService();
 
   /**
@@ -288,9 +292,14 @@ export class ActionExecutorService {
           result.observations.status = 'fetch_completed';
           return;
         } else {
+          // A null fetch means the SSRF guard rejected the target or the HTTP
+          // fetch failed. Either way no evidence was created, so the action is
+          // BLOCKED (honest) rather than silently "completed".
+          result.status = ActionStatus.BLOCKED;
+          result.blockedReason = `Fetch produced no evidence for URL "${url}" (SSRF-blocked or HTTP failure)`;
           result.observations.url = url;
-          result.observations.status = 'fetch_failed_http_error';
-          result.errors = ['HTTP fetch failed'];
+          result.observations.status = 'fetch_blocked_no_real_content';
+          result.errors = [result.blockedReason];
           return;
         }
       } catch (error: any) {
