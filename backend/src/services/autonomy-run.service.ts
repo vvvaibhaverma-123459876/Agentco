@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import { db } from '../db/client';
+import { resolutionServiceDatabaseUrl } from '../db/dsn';
 import { AutonomyOrchestratorService } from './autonomy-orchestrator.service';
 import { ledgerResolutionService } from './resolution-service.service';
 import { groundedResolver } from './grounded-resolver.service';
@@ -41,13 +42,9 @@ export interface AutonomyRunResult {
   evidenceUrls: string[];
 }
 
-function serviceDatabaseUrl(): string {
-  if (process.env.RESOLUTION_SERVICE_DATABASE_URL) return process.env.RESOLUTION_SERVICE_DATABASE_URL;
-  const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://localhost/agentco');
-  base.username = 'resolution_service';
-  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
-  return base.toString();
-}
+// Firewall DSN comes from the shared resolver so prediction writes and
+// resolutions can never target different databases (G1).
+const serviceDatabaseUrl = resolutionServiceDatabaseUrl;
 
 export class AutonomyRunService {
   private orchestrator = new AutonomyOrchestratorService();

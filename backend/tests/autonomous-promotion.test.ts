@@ -14,6 +14,7 @@
 
 import { describe, expect, test, afterAll } from '@jest/globals';
 import { Pool } from 'pg';
+import { resolutionServiceDatabaseUrl } from '../src/db/dsn';
 import { db } from '../src/db/client';
 import { ledgerResolutionService } from '../src/services/resolution-service.service';
 import { persistentTrustScorer } from '../src/services/persistent-trust-scorer.service';
@@ -22,11 +23,7 @@ import { memoryRetrieval } from '../src/services/memory-retrieval.service';
 import { v4 as uuidv4 } from 'uuid';
 
 function serviceDatabaseUrl(): string {
-  if (process.env.RESOLUTION_SERVICE_DATABASE_URL) return process.env.RESOLUTION_SERVICE_DATABASE_URL;
-  const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://agentco:password@localhost:5432/agentco');
-  base.username = 'resolution_service';
-  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
-  return base.toString();
+  return resolutionServiceDatabaseUrl();
 }
 
 async function registerPrediction(agentId: string, domain: string, claim: string, resolveIt: boolean): Promise<string> {

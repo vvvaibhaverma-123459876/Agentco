@@ -5,9 +5,9 @@
  */
 import { Pool, PoolClient } from 'pg';
 import { metricsService } from '../services/metrics.service';
+import { appDatabaseUrl } from './dsn';
 
-const DSN = process.env.DATABASE_URL ??
-  'postgresql://agentco:password@localhost:5432/agentco';
+const DSN = appDatabaseUrl();
 
 const QUERY_TIMEOUT_MS = 10000; // 10 second timeout per query
 const MAX_RETRIES = 3;

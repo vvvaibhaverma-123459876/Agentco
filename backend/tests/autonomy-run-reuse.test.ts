@@ -13,6 +13,7 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import { describe, expect, test, afterAll } from '@jest/globals';
+import { resolutionServiceDatabaseUrl } from '../src/db/dsn';
 import { db } from '../src/db/client';
 import { ledgerResolutionService } from '../src/services/resolution-service.service';
 import { persistentTrustScorer } from '../src/services/persistent-trust-scorer.service';
@@ -23,10 +24,7 @@ import { AutonomyActionPlannerService } from '../src/services/autonomy-action-pl
 let servicePool: Pool | null = null;
 function svc(): Pool {
   if (!servicePool) {
-    const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://localhost/agentco');
-    base.username = 'resolution_service';
-    base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
-    servicePool = new Pool({ connectionString: base.toString(), max: 2 });
+    servicePool = new Pool({ connectionString: resolutionServiceDatabaseUrl(), max: 2 });
   }
   return servicePool;
 }

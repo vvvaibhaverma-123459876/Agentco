@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import { Pool, PoolClient } from 'pg';
 import { db } from '../db/client';
+import { resolutionServiceDatabaseUrl } from '../db/dsn';
 import { auditLog } from './audit-log.service';
 import { eventLog } from './event-log.service';
 
@@ -97,10 +98,8 @@ export class LedgerResolutionService {
   }
 
   async resolvePrediction(input: ResolvePredictionInput): Promise<PredictionResolutionRecord> {
-    const serviceUrl = process.env.RESOLUTION_SERVICE_DATABASE_URL;
-    if (!serviceUrl) {
-      throw new Error('RESOLUTION_SERVICE_DATABASE_URL is required for ledger resolution');
-    }
+    // Same-database guarantee: derived from the shared DSN resolver (G1).
+    const serviceUrl = resolutionServiceDatabaseUrl();
     if (!this.servicePool) {
       this.servicePool = new Pool({ connectionString: serviceUrl, max: 2, connectionTimeoutMillis: 2000 });
     }

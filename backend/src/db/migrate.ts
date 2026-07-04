@@ -11,10 +11,9 @@
 import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
+import { appDatabaseUrl, resolutionServicePassword } from './dsn';
 
-const DSN =
-  process.env.DATABASE_URL ??
-  'postgresql://agentco:password@localhost:5432/agentco';
+const DSN = appDatabaseUrl();
 
 // __dirname is dist/db/ when compiled, src/db/ when run via ts-node.
 // Migrations always live next to the source file.
@@ -25,14 +24,8 @@ const MIGRATIONS_DIR = __dirname.endsWith('dist/db')
 function substituteEnvVars(sql: string): string {
   const token = "':RESOLUTION_SERVICE_PASSWORD'";
   if (!sql.includes(token)) return sql;
-  const password =
-    process.env.RESOLUTION_SERVICE_PASSWORD ??
-    (process.env.AGENTCO_ENV === 'production'
-      ? undefined
-      : 'resolution-service-dev-password');
-  if (!password) {
-    throw new Error('RESOLUTION_SERVICE_PASSWORD must be set in production');
-  }
+  // Shared policy (src/db/dsn.ts): dev default only outside production/staging.
+  const password = resolutionServicePassword();
   return sql.replaceAll(token, `'${password.replaceAll("'", "''")}'`);
 }
 

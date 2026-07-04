@@ -13,6 +13,7 @@ import http from 'http';
 import path from 'path';
 import { Pool } from 'pg';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
+import { resolutionServiceDatabaseUrl } from '../src/db/dsn';
 import { db } from '../src/db/client';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { ledgerResolutionService } from '../src/services/resolution-service.service';
@@ -23,10 +24,7 @@ import { ActionType, RiskLevel } from '../src/types/action.types';
 const PORT = 18955;
 
 function serviceDatabaseUrl(): string {
-  const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://agentco:password@localhost:5432/agentco');
-  base.username = 'resolution_service';
-  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
-  return base.toString();
+  return resolutionServiceDatabaseUrl();
 }
 
 let servicePool: Pool;
