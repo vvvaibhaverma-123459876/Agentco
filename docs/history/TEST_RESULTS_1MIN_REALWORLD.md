@@ -18,7 +18,7 @@ npx ts-node backend/scripts/autonomy-1min-realworld-test.ts
 ```
 
 **Environment**:
-- Real OpenAI API Key: sk-proj-jZX4TcrC8roQ...CtvekdmG8A
+- Real OpenAI API Key: [REDACTED-KEY-PREFIX]...CtvekdmG8A
 - Database: PostgreSQL agentco (53 migrations applied)
 - Node.js: v24.17.0
 

@@ -384,7 +384,7 @@ Return BoundedLearningRunResult:
 LLM_PROVIDER=openai
 LLM_BASE_URL=https://api.openai.com/v1
 LLM_MODEL_DEFAULT=gpt-4o-mini
-LLM_API_KEY=sk-proj-... (real API key)
+LLM_API_KEY=[REDACTED-KEY-PREFIX]... (real API key)
 ```
 
 ### Database

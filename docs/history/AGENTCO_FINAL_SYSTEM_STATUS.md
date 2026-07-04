@@ -236,7 +236,7 @@ Error Handling:         Graceful throughout
 ### To Run in Real World
 Requires:
 1. PostgreSQL database running
-2. OpenAI API key (sk-proj-...)
+2. OpenAI API key ([REDACTED-KEY-PREFIX]...)
 3. Environment variables configured
 4. Backend compiled (`npm run build`)
 

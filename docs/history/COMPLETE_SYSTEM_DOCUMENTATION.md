@@ -1382,8 +1382,8 @@ try {
 
 ```bash
 # OpenAI API
-OPENAI_API_KEY=sk-proj-...
-LLM_API_KEY=sk-proj-...
+OPENAI_API_KEY=[REDACTED-KEY-PREFIX]...
+LLM_API_KEY=[REDACTED-KEY-PREFIX]...
 LLM_PROVIDER=openai
 LLM_BASE_URL=https://api.openai.com/v1
 
@@ -1472,7 +1472,7 @@ npm install
 
 # 3. Configure environment
 export DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco
-export OPENAI_API_KEY=sk-proj-...
+export OPENAI_API_KEY=[REDACTED-KEY-PREFIX]...
 
 # 4. Build
 npm run build
@@ -1629,7 +1629,7 @@ psql -U agentco -d agentco -h localhost
 **Solution**:
 ```bash
 # Set API key
-export OPENAI_API_KEY=sk-proj-...
+export OPENAI_API_KEY=[REDACTED-KEY-PREFIX]...
 
 # Verify key
 echo $OPENAI_API_KEY

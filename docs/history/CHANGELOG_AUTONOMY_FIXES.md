@@ -404,7 +404,7 @@ npm run dev  # or production start command
 ### Environment Variables Required
 
 ```bash
-export LLM_API_KEY=sk-proj-...
+export LLM_API_KEY=[REDACTED-KEY-PREFIX]...
 export AGENTCO_TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/agentco
 export LLM_PROVIDER=openai
 export LLM_BASE_URL=https://api.openai.com/v1

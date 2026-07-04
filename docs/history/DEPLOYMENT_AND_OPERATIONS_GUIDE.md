@@ -99,7 +99,7 @@ psql -l | grep agentco
 # Create .env file in backend directory
 cat > .env << 'EOF'
 DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco
-OPENAI_API_KEY=sk-proj-...
+OPENAI_API_KEY=[REDACTED-KEY-PREFIX]...
 LLM_PROVIDER=openai
 LLM_BASE_URL=https://api.openai.com/v1
 NODE_ENV=development
@@ -200,7 +200,7 @@ npm run build
 # 5. Create .env file
 cat > .env << 'EOF'
 DATABASE_URL=postgresql://agentco:password@production-db:5432/agentco
-OPENAI_API_KEY=sk-proj-...
+OPENAI_API_KEY=[REDACTED-KEY-PREFIX]...
 NODE_ENV=production
 PORT=3000
 EOF
