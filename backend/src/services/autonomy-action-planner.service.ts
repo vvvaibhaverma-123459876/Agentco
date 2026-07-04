@@ -524,19 +524,21 @@ ${wrapUntrustedContent(snippetBlock, 'fetched web evidence', 4000)}
 
 You can now generate claims using these source IDs in supportSourceIds parameter.`;
 
-      // Claim-first bias: once evidence has been fetched but no grounded claim
-      // exists yet, the highest-value next step is to convert that evidence
-      // into a grounded claim — NOT to gather more or delegate. Give the model
-      // a concrete, copyable generate_claim directive citing a real source id.
-      if (state.claimsGenerated === 0) {
-        const firstSourceId = state.evidenceSources[0].sourceId;
+      // Claim-first bias: convert fetched evidence into grounded claims before
+      // gathering more or delegating. Target one grounded claim per fetched
+      // source (capped) so a run produces multiple findings, not just one.
+      const claimTarget = Math.min(state.evidenceSources.length, 3);
+      if (state.claimsGenerated < claimTarget) {
+        // Point at a source that has not obviously been claimed yet.
+        const nextSource = state.evidenceSources[Math.min(state.claimsGenerated, state.evidenceSources.length - 1)];
         prompt += `
 
-PRIORITY: You have fetched evidence but produced NO claims yet. Your next action MUST be
-generate_claim (or extract_evidence first, then generate_claim) — do NOT spawn specialists or
-search again until at least one grounded claim exists. Produce a grounded claim NOW using a
-supportSnippet that is an EXACT quote copied verbatim from one of the source snippets above.
-Example: {"action_type":"generate_claim","objective":"Record a grounded finding","args":{"claimText":"<your finding>","supportSourceIds":["${firstSourceId}"],"supportSnippets":["<exact words copied from that source's snippet>"]}}`;
+PRIORITY: You have ${state.evidenceSources.length} fetched sources and only ${state.claimsGenerated} grounded claim(s).
+Produce at least ${claimTarget} grounded claims total (aim for one distinct claim per source). Your next action
+MUST be generate_claim (or extract_evidence first, then generate_claim) — do NOT spawn specialists or search
+again until you have ${claimTarget} claims. Use a supportSnippet that is an EXACT quote copied verbatim from a
+source snippet above, and prefer a source you have not claimed yet.
+Example: {"action_type":"generate_claim","objective":"Record a grounded finding","args":{"claimText":"<a distinct finding>","supportSourceIds":["${nextSource.sourceId}"],"supportSnippets":["<exact words copied from that source's snippet>"]}}`;
       }
     }
 
@@ -576,10 +578,11 @@ Consider:
 5. When stuck or looping, terminate instead of repeating`;
     }
 
-    // Add specialist recommendation only once at least one grounded claim
-    // exists. Before that, delegation competes with (and was beating) claim
-    // generation, so a run gathered evidence but minted no claims.
-    if (state.evidenceCount > 0 && state.claimsGenerated > 0) {
+    // Add specialist recommendation only once enough grounded claims exist.
+    // Before that, delegation competes with (and was beating) claim
+    // generation, so a run gathered evidence but minted few/no claims.
+    const claimTargetForSpecialist = state.evidenceSources ? Math.min(state.evidenceSources.length, 3) : 1;
+    if (state.evidenceCount > 0 && state.claimsGenerated >= claimTargetForSpecialist) {
       const specialistFit = this.evaluateSpecialistFit(state.goalText, state.evidenceCount, state.claimsGenerated);
       if (specialistFit.shouldConsider) {
         prompt += `

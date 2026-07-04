@@ -198,3 +198,4 @@ reports/system_run/*/
 codex.env
 .codex.env
 *.codex.env
+outputs/

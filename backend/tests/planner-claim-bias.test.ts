@@ -31,7 +31,8 @@ describe('planner claim bias', () => {
     // Strong directive to generate a grounded claim from the available sources.
     expect(prompt).toMatch(/generate_claim/i);
     expect(prompt).toContain('src-arxiv-1'); // a concrete source id it can cite
-    expect(prompt.toLowerCase()).toMatch(/generate.*grounded claim|create a grounded claim|produce.*claim now/);
+    expect(prompt.toLowerCase()).toMatch(/grounded claim|produce at least .* claims/);
+    expect(prompt).toMatch(/PRIORITY/);
 
     // The specialist-opportunity block must NOT appear before any claim exists.
     expect(prompt).not.toContain('SPECIALIST OPPORTUNITY');
