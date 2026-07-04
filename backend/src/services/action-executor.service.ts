@@ -273,16 +273,22 @@ export class ActionExecutorService {
 
         if (fetchResult) {
           // Store evidence in database with real content
+          // Store readable prose (not raw HTML) as the snippet so claim
+          // grounding has quotable text; keep the raw-content hash for
+          // exact-byte provenance.
+          const readable = (fetchResult.textContent && fetchResult.textContent.length > 0
+            ? fetchResult.textContent
+            : fetchResult.content
+          ).substring(0, 2000);
           const evidence = await evidenceRegistry.register({
             action_id: spec.actionId,
             actor_id: this.actorIdFromSpec(spec),
             url,
             title: fetchResult.title || 'Fetched Page',
-            snippet: fetchResult.content.substring(0, 2000),
+            snippet: readable,
             content_hash: fetchResult.contentHash,
             source_type: 'web',
             is_public_access: true,
-            metadata: { content_length: fetchResult.content.length },
           });
 
           result.observations.url = url;
@@ -370,12 +376,13 @@ export class ActionExecutorService {
     // Store claim in database
     await db.query(
       `INSERT INTO autonomy_claims (
-        id, claim_id, action_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        id, claim_id, action_id, goal_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
       [
         uuidv4(),
         claimId,
         spec.actionId,
+        spec.goalId ?? null,
         claim.text,
         claim.status,
         claim.confidence,

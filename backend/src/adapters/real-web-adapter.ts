@@ -372,7 +372,7 @@ export class RealWebAdapter implements WebAdapter {
       const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
       const title = titleMatch ? titleMatch[1].trim() : undefined;
 
-      // Cryptographic content hash for provenance/deduplication
+      // Cryptographic content hash over the RAW bytes (exact-provenance).
       const contentHash = this.computeHash(content);
 
       return {
@@ -380,6 +380,9 @@ export class RealWebAdapter implements WebAdapter {
         status: response.status,
         title,
         content: content.substring(0, MAX_CONTENT_SIZE),
+        // Readable prose so downstream claim-grounding has quotable text
+        // instead of HTML markup.
+        textContent: this.extractReadableText(content),
         contentHash,
         retrievedAt: new Date(),
       };
@@ -391,5 +394,28 @@ export class RealWebAdapter implements WebAdapter {
 
   private computeHash(content: string): string {
     return `sha256:${crypto.createHash('sha256').update(content).digest('hex')}`;
+  }
+
+  /**
+   * Extract readable prose from HTML: drop script/style/head, strip tags,
+   * decode a few common entities, collapse whitespace. Best-effort (no DOM
+   * parser dependency) — enough for claim grounding to have real sentences to
+   * quote instead of markup.
+   */
+  private extractReadableText(html: string): string {
+    return html
+      .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+      .replace(/<head[\s\S]*?<\/head>/gi, ' ')
+      .replace(/<!--[\s\S]*?-->/g, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 }

@@ -17,6 +17,8 @@ export interface FetchResult {
   status: number;
   title?: string;
   content: string;
+  /** Readable prose extracted from HTML (tags/scripts stripped). Groundable. */
+  textContent?: string;
   contentHash: string;
   retrievedAt: Date;
 }

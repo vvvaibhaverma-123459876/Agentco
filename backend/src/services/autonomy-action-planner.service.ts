@@ -514,7 +514,7 @@ Loop status: ${state.loopDetection.isLooping ? `DETECTED: ${state.loopDetection.
       const snippetBlock = state.evidenceSources
         .map(
           (src, i) =>
-            `${i + 1}. [${src.sourceId}] ${src.url}\n   Snippet: ${src.snippet?.substring(0, 100) || 'N/A'}`
+            `${i + 1}. [${src.sourceId}] ${src.url}\n   Snippet: ${src.snippet?.substring(0, 400) || 'N/A'}`
         )
         .join('\n');
       prompt += `
@@ -523,6 +523,21 @@ Available Evidence Sources (USE THESE IDs FOR CLAIMS):
 ${wrapUntrustedContent(snippetBlock, 'fetched web evidence', 4000)}
 
 You can now generate claims using these source IDs in supportSourceIds parameter.`;
+
+      // Claim-first bias: once evidence has been fetched but no grounded claim
+      // exists yet, the highest-value next step is to convert that evidence
+      // into a grounded claim — NOT to gather more or delegate. Give the model
+      // a concrete, copyable generate_claim directive citing a real source id.
+      if (state.claimsGenerated === 0) {
+        const firstSourceId = state.evidenceSources[0].sourceId;
+        prompt += `
+
+PRIORITY: You have fetched evidence but produced NO claims yet. Your next action MUST be
+generate_claim (or extract_evidence first, then generate_claim) — do NOT spawn specialists or
+search again until at least one grounded claim exists. Produce a grounded claim NOW using a
+supportSnippet that is an EXACT quote copied verbatim from one of the source snippets above.
+Example: {"action_type":"generate_claim","objective":"Record a grounded finding","args":{"claimText":"<your finding>","supportSourceIds":["${firstSourceId}"],"supportSnippets":["<exact words copied from that source's snippet>"]}}`;
+      }
     }
 
     if (state.memoryContext) {
@@ -561,8 +576,10 @@ Consider:
 5. When stuck or looping, terminate instead of repeating`;
     }
 
-    // Add specialist recommendation if evidence exists
-    if (state.evidenceCount > 0) {
+    // Add specialist recommendation only once at least one grounded claim
+    // exists. Before that, delegation competes with (and was beating) claim
+    // generation, so a run gathered evidence but minted no claims.
+    if (state.evidenceCount > 0 && state.claimsGenerated > 0) {
       const specialistFit = this.evaluateSpecialistFit(state.goalText, state.evidenceCount, state.claimsGenerated);
       if (specialistFit.shouldConsider) {
         prompt += `
