@@ -3,8 +3,10 @@
  * Autonomy CLI (D10)
  * ==================
  * The single first-class entrypoint for a full autonomous run:
- *   fetch -> grounded claims -> predictions -> grounded resolution ->
- *   auto-promotion -> user-readable deliverable.
+ *   fetch -> grounded claims -> falsifiable predictions (future due time) ->
+ *   independent resolution (true/false/open) -> auto-promotion ->
+ *   user-readable deliverable. Overdue predictions from earlier runs are
+ *   settled (possibly FALSE) at the start of the resolution stage.
  *
  * Usage:
  *   npm run autonomy -- --goal "Research X" --iterations 6 --output-dir outputs
@@ -35,9 +37,10 @@ async function main() {
   const result = await autonomyRun.run({ goal, maxIterations: iterations, outputDir });
 
   console.log(
-    `[autonomy] run=${result.runId}\n` +
+    `[autonomy] run=${result.runId}${result.halted ? ` HALTED: ${result.halted}` : ''}\n` +
       `  claims=${result.claims} predictions=${result.predictionsRegistered} ` +
-      `resolved=${result.predictionsResolved} lessonsPromoted=${result.lessonsPromoted}\n` +
+      `resolved=${result.predictionsResolved} (false=${result.predictionsResolvedFalse}, ` +
+      `open=${result.predictionsOpen}) lessonsPromoted=${result.lessonsPromoted}\n` +
       `  evidence=${result.evidenceUrls.length} sources\n` +
       `  deliverable=${result.deliverablePath ?? '(none)'}`
   );
