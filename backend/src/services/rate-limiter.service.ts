@@ -29,6 +29,9 @@ export class RateLimitService {
     ['data_analyst', { maxRequests: 5, windowMs: 1000 }], // 5 req/sec
     ['code_reviewer', { maxRequests: 3, windowMs: 1000 }], // 3 req/sec
 
+    // API surface: per-client budget for the Fastify preHandler (E4/G11)
+    ['api', { maxRequests: 100, windowMs: 60000 }], // 100 req/min, burst 100
+
     // All other specialists use default (10 req/sec)
   ]);
 

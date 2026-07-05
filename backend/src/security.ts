@@ -32,6 +32,34 @@ export function assertProductionSecrets(env: NodeJS.ProcessEnv = process.env): v
   }
 }
 
+function isLoopbackHost(host: string): boolean {
+  return host === '127.0.0.1' || host === 'localhost' || host === '::1';
+}
+
+/**
+ * Fail-closed write auth (E3/G11): binding beyond loopback, or running in a
+ * production-like env, REQUIRES a real API key at startup. Key-less operation
+ * is a loopback-only development convenience, never a network posture.
+ */
+export function assertAuthPosture(
+  host: string,
+  env: NodeJS.ProcessEnv = process.env
+): void {
+  const key = env.AGENTCO_API_KEY;
+  const hasRealKey = Boolean(key && key !== DEV_API_KEY);
+  if (isProductionEnv(env) && !hasRealKey) {
+    throw new Error(
+      'Refusing to start: AGENTCO_ENV/NODE_ENV is production-like but AGENTCO_API_KEY is missing or the dev default'
+    );
+  }
+  if (!isLoopbackHost(host) && !hasRealKey) {
+    throw new Error(
+      `Refusing to bind ${host} without AGENTCO_API_KEY: non-loopback binds require write auth. ` +
+        'Set AGENTCO_API_KEY, or bind HOST=127.0.0.1 for key-less local development.'
+    );
+  }
+}
+
 export async function requireApiKey(req: FastifyRequest, reply: FastifyReply) {
   const configured = process.env.AGENTCO_API_KEY || DEV_API_KEY;
   const provided = req.headers['x-agentco-api-key'];

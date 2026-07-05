@@ -11,7 +11,8 @@ import { credentialRoutes } from './routes/credential.routes';
 import { learningRoutes } from './services/learning.service';
 import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { civilizationRequestValidator } from './middleware/civilization-request-validator';
-import { assertProductionSecrets } from './security';
+import { assertProductionSecrets, assertAuthPosture } from './security';
+import { rateLimiterService } from './services/rate-limiter.service';
 import { assertNoProductionFallbackProviders, activeRuntimeMode, configuredProviders } from './runtime-mode';
 import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
 import { autonomyOrchestratorRoutes } from './routes/autonomy-orchestrator.routes';
@@ -32,6 +33,10 @@ const HOST = process.env.HOST ?? '0.0.0.0';
 
 export async function build() {
   assertProductionSecrets();
+  // Production-like envs must have a real key even before any bind; the
+  // non-loopback bind check runs at listen() time (main), so in-process
+  // injection tests can build() on the default host without a network bind.
+  assertAuthPosture('127.0.0.1');
   assertNoProductionFallbackProviders();
   const app = Fastify({ logger: true });
 
@@ -44,37 +49,28 @@ export async function build() {
   // Register civilization request validator (body size, rate limiting)
   await civilizationRequestValidator(app);
 
-  // Rate limiting map: track requests per API key
-  const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-  const RATE_LIMIT_WINDOW = 60000; // 1 minute
-  const RATE_LIMIT_MAX_REQUESTS = 100;
-
   app.addHook('preHandler', async (request, reply) => {
     const method = request.method.toUpperCase();
     const apiKey = process.env.AGENTCO_API_KEY;
+    const providedHeader = request.headers['x-api-key'];
+    const provided = Array.isArray(providedHeader) ? providedHeader[0] : providedHeader;
 
-    if (!apiKey || ['GET', 'HEAD', 'OPTIONS'].includes(method)) return;
-
-    const provided = request.headers['x-api-key'];
-    if (provided !== apiKey) {
-      return reply.status(401).send({ error: 'write API key required' });
+    // Rate limiting applies to EVERY request (E4/G11), keyed by API key when
+    // presented, else client IP; shared token-bucket service.
+    const identifier = provided ? `key:${provided}` : `ip:${request.ip}`;
+    if (!rateLimiterService.isAllowed(identifier, 'api')) {
+      return reply.status(429).send({
+        error: 'Rate limit exceeded',
+        remaining: rateLimiterService.getRemainingRequests(identifier),
+      });
     }
 
-    // Rate limiting
-    const now = Date.now();
-    const identifier = provided || 'anonymous';
-    const rateLimit = rateLimitMap.get(identifier);
-
-    if (rateLimit && rateLimit.resetAt > now) {
-      if (rateLimit.count >= RATE_LIMIT_MAX_REQUESTS) {
-        return reply.status(429).send({
-          error: 'Rate limit exceeded',
-          retryAfter: Math.ceil((rateLimit.resetAt - now) / 1000)
-        });
-      }
-      rateLimit.count++;
-    } else {
-      rateLimitMap.set(identifier, { count: 1, resetAt: now + RATE_LIMIT_WINDOW });
+    // Write auth: reads stay public; writes require the key whenever one is
+    // configured. Startup refuses key-less non-loopback binds and key-less
+    // production (assertAuthPosture), so "no key" means loopback dev only.
+    if (!apiKey || ['GET', 'HEAD', 'OPTIONS'].includes(method)) return;
+    if (provided !== apiKey) {
+      return reply.status(401).send({ error: 'write API key required' });
     }
   });
 
@@ -182,6 +178,9 @@ export async function build() {
 }
 
 async function main() {
+  // Fail closed (E3/G11): refuse a key-less non-loopback bind at the point we
+  // actually open a network socket.
+  assertAuthPosture(HOST);
   const app = await build();
   try {
     await app.listen({ port: PORT, host: HOST });

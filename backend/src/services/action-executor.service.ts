@@ -23,6 +23,7 @@ import { evidenceRegistry } from './evidence-registry.service';
 import { claimGrounding } from './claim-grounding.service';
 import { coreAssertionTokens } from './falsifiable-prediction.service';
 import { relevanceScore, CLAIM_RELEVANCE_THRESHOLD } from './goal-source-discovery.service';
+import { inputValidatorService as inputValidator } from './input-validator.service';
 
 export class ActionExecutorService {
   // Default to a real web adapter so the direct-fetch (fetch_page) evidence
@@ -211,6 +212,13 @@ export class ActionExecutorService {
       result.blockedReason = 'Web search requires "query" argument';
       return;
     }
+    // Input validation (E4/G11): length caps + injection patterns.
+    const queryCheck = inputValidator.validateSearchQuery(query);
+    if (!queryCheck.valid) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = `Search query rejected: ${queryCheck.error}`;
+      return;
+    }
 
     // Try to use web adapter if available
     // Skip isReady() - it checks Google which may be unreachable
@@ -265,6 +273,18 @@ export class ActionExecutorService {
       result.status = ActionStatus.BLOCKED;
       result.blockedReason = 'Fetch requires "url" argument';
       return;
+    }
+    // Input validation (E4/G11): scheme/length/shape checks up front; the
+    // DNS-resolving SSRF guard in url-safety.ts still runs inside the fetch.
+    // Loopback is allowed only under the test-fixture flag the SSRF guard
+    // itself honors.
+    if (process.env.AGENTCO_ALLOW_LOOPBACK_FETCH !== '1') {
+      const urlCheck = inputValidator.validateUrl(url);
+      if (!urlCheck.valid) {
+        result.status = ActionStatus.BLOCKED;
+        result.blockedReason = `Fetch URL rejected: ${urlCheck.error}`;
+        return;
+      }
     }
 
     // Try to use web adapter if available
@@ -370,11 +390,14 @@ export class ActionExecutorService {
     let relevanceReason = 'no goal text available for relevance scoring';
     let claimStatus: 'supported' | 'weakly_supported' = 'supported';
     if (spec.goalId) {
-      const goalRow = await db.query<{ description: string }>(
-        `SELECT COALESCE(description, title) AS description FROM autonomy_goals WHERE id = $1`,
+      // Only gate on a genuine goal description. Ad-hoc executor calls create
+      // goals whose title is just the action objective; scoring a claim
+      // against that is meaningless, so those claims are not downgraded.
+      const goalRow = await db.query<{ description: string | null }>(
+        `SELECT description FROM autonomy_goals WHERE id = $1`,
         [spec.goalId]
       );
-      const goalText = goalRow.rows[0]?.description;
+      const goalText = goalRow.rows[0]?.description ?? undefined;
       if (goalText) {
         const goalTokens = coreAssertionTokens(goalText, 12);
         const snippets = (spec.args.supportSnippets || []).join(' ');
