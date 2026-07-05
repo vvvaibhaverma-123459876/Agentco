@@ -83,9 +83,9 @@ class CalibrationUpdater:
             import json
             from datetime import timedelta
 
-            # Register with all required NOT NULL fields
             now = datetime.now(timezone.utc)
             resolution_date = now + timedelta(days=7)  # 7-day resolution window
+            hardness = 2.0 * probability * (1.0 - probability)
 
             self.db.execute_update(
                 """INSERT INTO prediction_ledger
@@ -103,16 +103,16 @@ class CalibrationUpdater:
                     json.dumps({"basis": confidence_basis}),  # confidence_basis is jsonb
                     agent_id,
                     "civilization-service-v1",  # producing_prompt_version
-                    "external",  # resolution_criterion
+                    "independent external evidence must resolve this claim",  # resolution_criterion
                     resolution_date,  # resolution_date
-                    "pending",  # ground_truth_source
+                    "external_resolution_pending",  # ground_truth_source
                     "medium",  # horizon_class (must be 'short', 'medium', or 'long')
                     domain,
                     "factual",  # claim_type
                     False,  # post_hoc
                     False,  # resolved (unresolved initially)
                     False,  # was_surprise
-                    0.5,  # hardness (0-1 scale)
+                    hardness,
                     now,  # created_at
                 ),
             )

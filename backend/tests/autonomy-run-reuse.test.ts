@@ -53,6 +53,7 @@ describe('autonomy run cross-run reuse (D1)', () => {
       domain,
       claim_type: 'grounded_claim_quality',
       correlation_id: cid,
+      historical_registration_reason: 'deterministic autonomy-run-reuse fixture',
     });
     const client = await svc().connect();
     try {

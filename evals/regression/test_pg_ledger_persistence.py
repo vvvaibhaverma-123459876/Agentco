@@ -74,6 +74,11 @@ def fresh_table():
 
 
 def _reg(resolution_date):
+    historical = None
+    created_at = None
+    if resolution_date <= datetime.now(timezone.utc):
+        historical = "deterministic pg persistence fixture"
+        created_at = resolution_date - timedelta(seconds=1)
     return PredictionRegistration(
         claim="revenue will exceed target",
         probability=0.8,
@@ -86,6 +91,8 @@ def _reg(resolution_date):
         horizon_class="short",
         domain="finance",
         claim_type="forecast",
+        historical_registration_reason=historical,
+        created_at=created_at,
     )
 
 

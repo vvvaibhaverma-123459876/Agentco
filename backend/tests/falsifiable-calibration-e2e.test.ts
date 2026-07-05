@@ -225,6 +225,7 @@ describe('the system can be wrong, and it costs trust (G2/G3)', () => {
       domain: DOMAIN,
       runId: 'test-run',
       dueInMs: -1000, // already overdue
+      historicalRegistrationReason: 'deterministic overdue falsifiable-calibration fixture',
     });
 
     const client = await servicePool.connect();

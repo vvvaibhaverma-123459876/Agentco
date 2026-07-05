@@ -88,7 +88,10 @@ class ScoringModule:
             high = (i + 1) * bin_width
             bin_centre = (low + high) / 2
 
-            in_bin = [r for r in records if low <= r.probability < high]
+            if i == self.N_BINS - 1:
+                in_bin = [r for r in records if low <= r.probability <= high]
+            else:
+                in_bin = [r for r in records if low <= r.probability < high]
             if not in_bin:
                 continue
 

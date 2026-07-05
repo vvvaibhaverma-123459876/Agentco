@@ -141,6 +141,7 @@ describe('the civilization lives (Phase F)', () => {
       runId: 'civ-seed',
       dueInMs: -1000,
       predictionType: 'time_delayed_verification',
+      historicalRegistrationReason: 'deterministic civilization-runtime-live fixture',
     });
   });
 

@@ -69,6 +69,7 @@ describe('civilization learning e2e slice', () => {
       domain: 'civilization_e2e',
       claim_type: 'grounded_claim_quality',
       correlation_id: correlationId,
+      historical_registration_reason: 'deterministic civilization-learning fixture',
     });
 
     const unauthorizedBlocked = await ledgerResolutionService.assertOrdinaryUserCannotResolve(predictionId);

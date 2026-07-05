@@ -19,6 +19,13 @@ export interface RegisterPredictionInput {
   domain: string;
   claim_type?: string;
   correlation_id?: string;
+  earliest_knowable_at?: Date;
+  created_at?: Date;
+  /**
+   * Required for test/import backfills whose resolution_date is already past.
+   * Normal runtime registration must be prospective.
+   */
+  historical_registration_reason?: string;
 }
 
 export interface ResolvePredictionInput {
@@ -56,14 +63,40 @@ function clampProbability(value: number): number {
   return value;
 }
 
+const INTERNAL_SOURCE_TOKENS = new Set([
+  'self',
+  'internal',
+  'simulation',
+  'reasoning_system',
+  'agentco_system',
+  'twin',
+  'sandbox',
+]);
+
+function sourceTokens(value: string): Set<string> {
+  return new Set(value.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+}
+
+function validateExternalSource(value: string): void {
+  if (value.toLowerCase().includes('agentco_system')) {
+    throw new Error(`ground_truth_source is internal or disqualified: ${value}`);
+  }
+  const tokens = sourceTokens(value);
+  for (const token of INTERNAL_SOURCE_TOKENS) {
+    if (tokens.has(token)) {
+      throw new Error(`ground_truth_source is internal or disqualified: ${value}`);
+    }
+  }
+}
+
 function brier(probability: number, outcome: boolean): number {
   const actual = outcome ? 1 : 0;
   return Math.pow(probability - actual, 2);
 }
 
 function logScore(probability: number, outcome: boolean): number {
-  const bounded = Math.min(0.999999, Math.max(0.000001, probability));
-  return outcome ? -Math.log(bounded) : -Math.log(1 - bounded);
+  const bounded = Math.min(0.999999999, Math.max(0.000000001, probability));
+  return outcome ? Math.log(bounded) : Math.log(1 - bounded);
 }
 
 export class LedgerResolutionService {
@@ -72,17 +105,28 @@ export class LedgerResolutionService {
   async registerPrediction(input: RegisterPredictionInput): Promise<string> {
     this.validateRegistration(input);
     const predictionId = input.prediction_id ?? crypto.randomUUID();
+    const createdAt = this.registrationCreatedAt(input);
+    const postHoc = input.earliest_knowable_at ? createdAt > input.earliest_knowable_at : false;
+    const confidenceBasis = {
+      ...(input.confidence_basis ?? {}),
+      ...(input.historical_registration_reason
+        ? { historical_registration_reason: input.historical_registration_reason }
+        : {}),
+      ...(input.earliest_knowable_at
+        ? { earliest_knowable_at: input.earliest_knowable_at.toISOString(), post_hoc: postHoc }
+        : {}),
+    };
     await db.query(
       `INSERT INTO prediction_ledger
          (prediction_id, claim, probability, confidence_basis, producing_agent_id,
           producing_prompt_version, resolution_criterion, resolution_date, ground_truth_source,
-          horizon_class, domain, claim_type, correlation_id)
-       VALUES ($1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+          horizon_class, domain, claim_type, correlation_id, created_at, earliest_knowable_at, post_hoc)
+       VALUES ($1,$2,$3,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
       [
         predictionId,
         input.claim,
         input.probability,
-        JSON.stringify(input.confidence_basis ?? {}),
+        JSON.stringify(confidenceBasis),
         input.producing_agent_id,
         input.producing_prompt_version,
         input.resolution_criterion,
@@ -92,6 +136,9 @@ export class LedgerResolutionService {
         input.domain,
         input.claim_type ?? 'general',
         input.correlation_id ?? null,
+        createdAt,
+        input.earliest_knowable_at ?? null,
+        postHoc,
       ]
     );
     return predictionId;
@@ -219,9 +266,42 @@ export class LedgerResolutionService {
     requireText(input.producing_agent_id, 'producing_agent_id');
     requireText(input.producing_prompt_version, 'producing_prompt_version');
     requireText(input.resolution_criterion, 'resolution_criterion');
-    requireText(input.ground_truth_source, 'ground_truth_source');
+    validateExternalSource(requireText(input.ground_truth_source, 'ground_truth_source'));
     requireText(input.domain, 'domain');
     if (!['short', 'medium', 'long'].includes(input.horizon_class)) throw new Error('invalid horizon_class');
+    if (!(input.resolution_date instanceof Date) || Number.isNaN(input.resolution_date.getTime())) {
+      throw new Error('resolution_date must be a valid Date');
+    }
+    if (input.earliest_knowable_at && Number.isNaN(input.earliest_knowable_at.getTime())) {
+      throw new Error('earliest_knowable_at must be a valid Date');
+    }
+    const now = new Date();
+    if (input.resolution_date <= now && !input.historical_registration_reason) {
+      throw new Error('resolution_date must be in the future for live pre-registration');
+    }
+    if (input.historical_registration_reason) {
+      const allowed =
+        process.env.NODE_ENV === 'test' ||
+        process.env.AGENTCO_ALLOW_HISTORICAL_PREDICTIONS === '1';
+      if (!allowed) {
+        throw new Error('historical registration is allowed only in test/import contexts');
+      }
+      requireText(input.historical_registration_reason, 'historical_registration_reason');
+    }
+  }
+
+  private registrationCreatedAt(input: RegisterPredictionInput): Date {
+    if (input.created_at) {
+      if (Number.isNaN(input.created_at.getTime())) throw new Error('created_at must be a valid Date');
+      if (input.created_at >= input.resolution_date) {
+        throw new Error('created_at must be before resolution_date');
+      }
+      return input.created_at;
+    }
+    if (input.historical_registration_reason) {
+      return new Date(input.resolution_date.getTime() - 1000);
+    }
+    return new Date();
   }
 }
 

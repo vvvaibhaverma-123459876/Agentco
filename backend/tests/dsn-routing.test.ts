@@ -122,6 +122,7 @@ describe('same-database round-trip through the resolver (G1)', () => {
       ground_truth_source: 'agentco://tests/dsn-routing',
       horizon_class: 'short',
       domain: 'test_dsn_routing',
+      historical_registration_reason: 'deterministic dsn-routing fixture',
     });
 
     servicePool = new Pool({ connectionString: resolutionServiceDatabaseUrl(), max: 2 });

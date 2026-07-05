@@ -68,6 +68,7 @@ export interface RegisterFalsifiableInput {
   dueInMs?: number;
   failurePhrase?: string;
   correlationId?: string;
+  historicalRegistrationReason?: string;
 }
 
 export const STOPWORDS = new Set([
@@ -216,6 +217,7 @@ export class FalsifiablePredictionService {
       domain: input.domain,
       claim_type: predictionType,
       correlation_id: input.correlationId ?? crypto.randomUUID(),
+      historical_registration_reason: input.historicalRegistrationReason,
     });
 
     return { predictionId, probability, constraints, resolutionDate };

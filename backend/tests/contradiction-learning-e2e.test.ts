@@ -144,6 +144,7 @@ describe('learning from being wrong (Phase D)', () => {
       runId: 'contradiction-run-2',
       dueInMs: -1000, // already mature; no fresh corroboration for THESE tokens
       predictionType: 'time_delayed_verification', // only post-registration evidence counts
+      historicalRegistrationReason: 'deterministic contradiction-learning fixture',
     });
 
     const client = await servicePool.connect();

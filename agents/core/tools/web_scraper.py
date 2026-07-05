@@ -488,6 +488,16 @@ def register_prediction_safe(
     ]
     _validate_prediction_ledger_columns(required_cols)
 
+    now = datetime.now(timezone.utc)
+    if resolution_date <= now:
+        raise ValueError("resolution_date must be in the future for live pre-registration")
+    source_lower = ground_truth_source.lower()
+    if "agentco_system" in source_lower:
+        raise ValueError(f"ground_truth_source is internal/disqualified: {ground_truth_source}")
+    source_tokens = set(filter(None, re.split(r"[^a-z0-9]+", source_lower)))
+    disqualified = {"self", "internal", "simulation", "reasoning_system", "agentco_system", "twin", "sandbox"}
+    if source_tokens & disqualified:
+        raise ValueError(f"ground_truth_source is internal/disqualified: {ground_truth_source}")
     hardness = 2.0 * probability * (1.0 - probability)
 
     try:

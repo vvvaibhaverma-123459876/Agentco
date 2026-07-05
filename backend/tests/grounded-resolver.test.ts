@@ -63,6 +63,7 @@ async function registerPrediction(agentId: string, domain: string, probability: 
     domain,
     claim_type: 'grounded_claim_quality',
     correlation_id: crypto.randomUUID(),
+    historical_registration_reason: 'deterministic grounded-resolver fixture',
   });
 }
 

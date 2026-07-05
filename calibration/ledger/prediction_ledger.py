@@ -11,9 +11,11 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+import re
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -34,6 +36,8 @@ class PredictionRegistration:
     claim_type: str
     correlation_id: Optional[str] = None
     earliest_knowable_at: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    historical_registration_reason: Optional[str] = None
 
 
 @dataclass
@@ -53,6 +57,7 @@ class PredictionRecord:
     created_at: datetime
     post_hoc: bool
     correlation_id: Optional[str] = None
+    earliest_knowable_at: Optional[datetime] = None
     # Resolution fields (None until resolved by Resolution Service)
     resolved: bool = False
     resolved_outcome: Optional[bool] = None
@@ -71,7 +76,7 @@ class PredictionLedger:
     """
 
     INTERNAL_SOURCES = frozenset({
-        "self", "internal", "simulation", "agent", "reasoning_system",
+        "self", "internal", "simulation", "reasoning_system",
         "agentco_system", "twin", "sandbox"
     })
 
@@ -101,7 +106,7 @@ class PredictionLedger:
         """
         self._validate_registration(reg)
 
-        now = datetime.now(timezone.utc)
+        now = self._registration_created_at(reg)
         post_hoc = bool(
             reg.earliest_knowable_at and now > reg.earliest_knowable_at
         )
@@ -128,6 +133,7 @@ class PredictionLedger:
             correlation_id=reg.correlation_id,
             created_at=now,
             post_hoc=post_hoc,
+            earliest_knowable_at=reg.earliest_knowable_at,
         )
 
         self._in_memory[prediction_id] = record
@@ -197,8 +203,8 @@ class PredictionLedger:
                     (prediction_id, claim, probability, confidence_basis,
                      producing_agent_id, producing_prompt_version, resolution_criterion,
                      resolution_date, ground_truth_source, horizon_class, domain,
-                     claim_type, correlation_id, created_at, post_hoc, hardness)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                     claim_type, correlation_id, created_at, earliest_knowable_at, post_hoc, hardness)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
                     record.prediction_id, record.claim, record.probability,
@@ -206,7 +212,7 @@ class PredictionLedger:
                     record.producing_prompt_version, record.resolution_criterion,
                     record.resolution_date, record.ground_truth_source,
                     record.horizon_class, record.domain, record.claim_type,
-                    record.correlation_id, record.created_at, record.post_hoc,
+                    record.correlation_id, record.created_at, record.earliest_knowable_at, record.post_hoc,
                     hardness,
                 ),
             )
@@ -220,7 +226,7 @@ class PredictionLedger:
                 SELECT prediction_id, claim, probability, confidence_basis,
                        producing_agent_id, producing_prompt_version, resolution_criterion,
                        resolution_date, ground_truth_source, horizon_class, domain,
-                       claim_type, correlation_id, created_at, post_hoc,
+                       claim_type, correlation_id, created_at, earliest_knowable_at, post_hoc,
                        resolved, resolved_outcome, resolved_at, brier_score,
                        log_score, was_surprise
                   FROM prediction_ledger
@@ -234,11 +240,11 @@ class PredictionLedger:
                     resolution_date=row[7], ground_truth_source=row[8],
                     horizon_class=row[9], domain=row[10], claim_type=row[11],
                     correlation_id=str(row[12]) if row[12] else None,
-                    created_at=row[13], post_hoc=row[14], resolved=row[15],
-                    resolved_outcome=row[16], resolved_at=row[17],
-                    brier_score=float(row[18]) if row[18] is not None else None,
-                    log_score=float(row[19]) if row[19] is not None else None,
-                    was_surprise=row[20],
+                    created_at=row[13], earliest_knowable_at=row[14], post_hoc=row[15], resolved=row[16],
+                    resolved_outcome=row[17], resolved_at=row[18],
+                    brier_score=float(row[19]) if row[19] is not None else None,
+                    log_score=float(row[20]) if row[20] is not None else None,
+                    was_surprise=row[21],
                 )
                 self._in_memory[rec.prediction_id] = rec
 
@@ -256,21 +262,43 @@ class PredictionLedger:
         if not (0.0 <= reg.probability <= 1.0):
             raise ValueError(f"probability must be in [0,1], got {reg.probability}")
         source_lower = reg.ground_truth_source.lower()
+        if "agentco_system" in source_lower:
+            raise ValueError(
+                f"ground_truth_source '{reg.ground_truth_source}' appears to be internal — "
+                "ground truth must originate outside the reasoning system"
+            )
+        source_tokens = set(filter(None, re.split(r"[^a-z0-9]+", source_lower)))
         for disqualified in self.INTERNAL_SOURCES:
-            if disqualified in source_lower:
+            if disqualified in source_tokens:
                 raise ValueError(
                     f"ground_truth_source '{reg.ground_truth_source}' appears to be internal — "
                     "ground truth must originate outside the reasoning system"
                 )
         now = datetime.now(timezone.utc)
-        if reg.resolution_date <= now:
-            logger.warning(
-                "BACKDATED resolution_date %s for agent=%s — will be flagged post_hoc",
-                reg.resolution_date, reg.producing_agent_id
-            )
+        if reg.resolution_date <= now and not reg.historical_registration_reason:
+            raise ValueError("resolution_date must be in the future for pre-registration")
+        if reg.historical_registration_reason:
+            if not reg.historical_registration_reason.strip():
+                raise ValueError("historical_registration_reason cannot be empty")
+            if not (
+                os.environ.get("PYTEST_CURRENT_TEST")
+                or os.environ.get("AGENTCO_ALLOW_HISTORICAL_PREDICTIONS") == "1"
+            ):
+                raise ValueError("historical registration is allowed only in test/import contexts")
+            created_at = self._registration_created_at(reg)
+            if created_at >= reg.resolution_date:
+                raise ValueError("created_at must be before resolution_date")
         if not reg.claim.strip():
             raise ValueError("claim cannot be empty")
         if not reg.resolution_criterion.strip():
             raise ValueError("resolution_criterion cannot be empty")
         if reg.horizon_class not in ('short', 'medium', 'long'):
             raise ValueError(f"horizon_class must be short/medium/long, got {reg.horizon_class!r}")
+
+    @staticmethod
+    def _registration_created_at(reg: PredictionRegistration) -> datetime:
+        if reg.created_at is not None:
+            return reg.created_at
+        if reg.historical_registration_reason:
+            return reg.resolution_date - timedelta(seconds=1)
+        return datetime.now(timezone.utc)
