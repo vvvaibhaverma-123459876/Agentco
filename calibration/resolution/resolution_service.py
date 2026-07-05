@@ -10,7 +10,7 @@ Rules:
 from __future__ import annotations
 
 import logging
-import math
+import re
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-INTERNAL_SOURCES = frozenset({"self", "internal", "simulation", "agent", "agentco_system", "twin"})
+INTERNAL_SOURCES = frozenset({"self", "internal", "simulation", "agentco_system", "twin", "sandbox"})
 
 
 class ResolutionService:
@@ -95,6 +95,8 @@ class ResolutionService:
         if is_surprise:
             self.surprise_register.register_surprise(record, outcome)
 
+        self.ledger.persist_resolution(record)
+
         return record
 
     def resolve_batch(self, due_by: datetime | None = None) -> list["PredictionRecord"]:
@@ -117,8 +119,14 @@ class ResolutionService:
                 f"(now={now.isoformat()}, resolution_date={record.resolution_date.isoformat()})"
             )
         src_lower = ground_truth_source.lower()
+        if "agentco_system" in src_lower:
+            raise ValueError(
+                f"DISQUALIFIED SOURCE: '{ground_truth_source}' is internal. "
+                "Ground truth must originate outside the reasoning system."
+            )
+        source_tokens = set(filter(None, re.split(r"[^a-z0-9]+", src_lower)))
         for internal in INTERNAL_SOURCES:
-            if internal in src_lower:
+            if internal in source_tokens:
                 raise ValueError(
                     f"DISQUALIFIED SOURCE: '{ground_truth_source}' is internal. "
                     "Ground truth must originate outside the reasoning system."

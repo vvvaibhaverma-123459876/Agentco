@@ -1,10 +1,36 @@
 {
   "can_continue": true,
   "disabled_capabilities": [
-    "openai_env",
+    "docker_daemon",
     "production_secret_posture"
   ],
-  "fallbacks_used": [],
+  "fallbacks_used": [
+    {
+      "fallback": "memory_cache",
+      "service": "redis",
+      "status": "missing"
+    },
+    {
+      "fallback": "file_event_log",
+      "service": "kafka",
+      "status": "missing"
+    },
+    {
+      "fallback": "env_secret_provider",
+      "service": "vault",
+      "status": "missing"
+    },
+    {
+      "fallback": "json_metrics_writer",
+      "service": "prometheus",
+      "status": "missing"
+    },
+    {
+      "fallback": "metrics_json_only",
+      "service": "grafana",
+      "status": "missing"
+    }
+  ],
   "production_contract": {
     "fallbacks_allowed": {},
     "missing_or_non_real": [
@@ -15,6 +41,26 @@
       {
         "service": "frontend_build",
         "status": "not_required"
+      },
+      {
+        "service": "redis",
+        "status": "missing"
+      },
+      {
+        "service": "kafka",
+        "status": "missing"
+      },
+      {
+        "service": "vault",
+        "status": "missing"
+      },
+      {
+        "service": "prometheus",
+        "status": "missing"
+      },
+      {
+        "service": "grafana",
+        "status": "missing"
       },
       {
         "service": "production_secret_posture",
@@ -96,10 +142,10 @@
       "status": "real"
     },
     {
-      "detail": "docker daemon reachable",
+      "detail": "failed to connect to the docker API at unix:///Users/Zet/.docker/run/docker.sock; check if the path is correct and if the daemon is running: dial unix /Users/Zet/.docker/run/docker.sock: connect: no such file or directory",
       "remediation": "Start Docker or use local_native",
       "service": "docker_daemon",
-      "status": "real"
+      "status": "blocked"
     },
     {
       "detail": "agentco|agentco",
@@ -123,37 +169,37 @@
       "detail": "localhost:6379",
       "remediation": "Use memory cache fallback",
       "service": "redis",
-      "status": "real"
+      "status": "missing"
     },
     {
       "detail": "localhost:9092",
       "remediation": "Use in-process event bus fallback",
       "service": "kafka",
-      "status": "real"
+      "status": "missing"
     },
     {
       "detail": "localhost:8200",
       "remediation": "Use env secret provider fallback",
       "service": "vault",
-      "status": "real"
+      "status": "missing"
     },
     {
       "detail": "localhost:9090",
       "remediation": "Use JSON metrics fallback",
       "service": "prometheus",
-      "status": "real"
+      "status": "missing"
     },
     {
       "detail": "localhost:3005",
       "remediation": "Skip dashboard UI",
       "service": "grafana",
-      "status": "real"
+      "status": "missing"
     },
     {
-      "detail": "key_present=False",
+      "detail": "key_present=True",
       "remediation": "Set LLM_API_KEY or use offline",
       "service": "openai_env",
-      "status": "missing"
+      "status": "real"
     },
     {
       "detail": "live check not requested",
@@ -174,13 +220,13 @@
       "status": "real"
     },
     {
-      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
+      "detail": "dev-default or missing production secrets: AGENTCO_API_KEY, AGENTCO_TEST_DATABASE_URL, DATABASE_URL, EVENT_BUS_HMAC_KEY, EVENT_BUS_SIGNING_KEY, JWT_SECRET, VAULT_TOKEN",
       "remediation": "Set non-default production secrets through Vault or the deployment secret manager",
       "service": "production_secret_posture",
       "status": "blocked"
     },
     {
-      "detail": "/private/tmp/claude-502/-Users-Zet/bf00110a-a95d-44c3-905a-d16dc3207c46/scratchpad/Agentco/reports/system_run/latest",
+      "detail": "/Users/Zet/Agentco/reports/system_run/latest",
       "remediation": "",
       "service": "filesystem_reports",
       "status": "real"

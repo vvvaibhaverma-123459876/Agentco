@@ -26,6 +26,7 @@ import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from urllib.parse import quote, urlparse, urlunparse
 
 import pytest
 
@@ -112,29 +113,32 @@ def pg():
 
 
 def _role_conn(role: str):
-    """Open a connection as a specific role via SET ROLE (keeps one DSN)."""
-    conn = psycopg2.connect(DSN)
+    """Open a connection as a specific login role."""
+    parsed = urlparse(DSN)
+    host = parsed.hostname or "localhost"
+    port = parsed.port or 5432
+    role_dsn = urlunparse(parsed._replace(netloc=f"{role}:{quote('test', safe='')}@{host}:{port}"))
+    conn = psycopg2.connect(role_dsn)
     conn.autocommit = True
-    with conn.cursor() as cur:
-        cur.execute(f"SET ROLE {role};")
     return conn
 
 
 def _insert_prediction(conn, *, resolution_date, resolved=False) -> str:
     pid = str(uuid.uuid4())
+    created_at = resolution_date - timedelta(seconds=1)
     with conn.cursor() as cur:
         cur.execute(
             """
             INSERT INTO prediction_ledger
                 (prediction_id, claim, probability, producing_agent_id,
                  producing_prompt_version, resolution_criterion, resolution_date,
-                 ground_truth_source, horizon_class, domain, claim_type, resolved)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                 ground_truth_source, horizon_class, domain, claim_type, created_at, resolved)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """,
             (
                 pid, "test claim", 0.7, "test-agent", "1.0.0",
                 "criterion", resolution_date, "external_api", "short",
-                "testing", "general", resolved,
+                "testing", "general", created_at, resolved,
             ),
         )
     return pid

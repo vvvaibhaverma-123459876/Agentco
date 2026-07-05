@@ -17,6 +17,13 @@ const root = path.resolve(__dirname, '..', '..');
 loadEnvFile(path.join(root, '.codex.env'));
 loadEnvFile(path.join(root, 'codex.env'));
 
+// Tests always run against the test database. If AGENTCO_TEST_DATABASE_URL is
+// set it WINS inside the test process: DATABASE_URL is overwritten so every
+// module sees one database through the shared resolver (src/db/dsn.ts, G1) —
+// a developer's production-ish DATABASE_URL can never leak into a test run.
+if (process.env.AGENTCO_TEST_DATABASE_URL) {
+  process.env.DATABASE_URL = process.env.AGENTCO_TEST_DATABASE_URL;
+}
 process.env.DATABASE_URL ??= 'postgresql://agentco:password@localhost:5432/agentco';
 process.env.AGENTCO_TEST_DATABASE_URL ??= process.env.DATABASE_URL;
 process.env.SUPERUSER_DATABASE_URL ??= process.env.DATABASE_URL;

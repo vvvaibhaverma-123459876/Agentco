@@ -104,7 +104,7 @@ export class CalibrationAwareRoutingService {
       overconfidencePenalty += Math.min(0.3, brierMean - OVERCONFIDENT_BRIER_THRESHOLD);
       reasonCodes.push('high_brier');
     }
-    if (ece !== null && ece > 0.15) {
+    if (row.n_resolved >= 5 && ece !== null && ece > 0.15) {
       overconfidencePenalty += Math.min(0.2, ece - 0.15);
       reasonCodes.push('high_ece');
     }

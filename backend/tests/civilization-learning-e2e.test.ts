@@ -1,5 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 import { Pool } from 'pg';
+import { resolutionServiceDatabaseUrl } from '../src/db/dsn';
 import { db } from '../src/db/client';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { ledgerResolutionService } from '../src/services/resolution-service.service';
@@ -10,11 +11,7 @@ import { MockWebAdapter } from './support/mock-web-adapter';
 import { v4 as uuidv4 } from 'uuid';
 
 function serviceDatabaseUrl(): string {
-  if (process.env.RESOLUTION_SERVICE_DATABASE_URL) return process.env.RESOLUTION_SERVICE_DATABASE_URL;
-  const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://agentco:password@localhost:5432/agentco');
-  base.username = 'resolution_service';
-  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
-  return base.toString();
+  return resolutionServiceDatabaseUrl();
 }
 
 describe('civilization learning e2e slice', () => {
@@ -72,6 +69,7 @@ describe('civilization learning e2e slice', () => {
       domain: 'civilization_e2e',
       claim_type: 'grounded_claim_quality',
       correlation_id: correlationId,
+      historical_registration_reason: 'deterministic civilization-learning fixture',
     });
 
     const unauthorizedBlocked = await ledgerResolutionService.assertOrdinaryUserCannotResolve(predictionId);

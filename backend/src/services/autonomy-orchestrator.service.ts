@@ -18,6 +18,8 @@ import { ReflectionService } from './reflection.service';
 import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
+import { RunGuard, RunBudget } from './run-guard.service';
+import { goalSourceDiscovery } from './goal-source-discovery.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '../types/action.types';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { WebAdapter } from '../adapters/web-adapter';
@@ -99,19 +101,31 @@ export class AutonomyOrchestratorService {
    */
   private async injectDiscoveredSourceActions(
     goalId: string,
-    sourcePack: string = 'technical',
+    goalText: string,
     maxUrls: number = 3
   ): Promise<{ discoveredCount: number; fetchedCount: number; evidenceCreated: number }> {
     let fetchedCount = 0;
     let evidenceCreated = 0;
 
     try {
-      console.log(`\n[D1] Discovering sources from '${sourcePack}' pack...`);
-      const discovered = await this.sourceDiscovery.discoverSourcesFromPack(sourcePack, maxUrls);
+      // Goal-relevant discovery (Phase B/G4): candidates come from search
+      // (or the labeled fixture backend), are relevance-scored BEFORE any
+      // fetch, and the full accept/reject trail is persisted in
+      // autonomy_source_candidates. Seed packs survive only as a
+      // relevance-gated, explicitly-labeled fallback.
+      console.log(`\n[D1] Discovering goal-relevant sources...`);
+      const discovery = await goalSourceDiscovery.discoverForGoal({ goalId, goalText, limit: maxUrls });
+      if (discovery.accepted.length === 0) {
+        console.log(
+          `[D1] No goal-relevant source found (rejected ${discovery.rejected.length}). ` +
+            `${discovery.note || 'Refusing to fetch generic pages.'}`
+        );
+        return { discoveredCount: 0, fetchedCount: 0, evidenceCreated: 0 };
+      }
+      const discovered = discovery.accepted;
+      console.log(`[D1] Accepted ${discovered.length} goal-relevant sources (rejected ${discovery.rejected.length}), fetching...`);
 
-      console.log(`[D1] Discovered ${discovered.length} sources, fetching them...`);
-
-      // Execute FETCH_PAGE for each discovered URL
+      // Execute FETCH_PAGE for each accepted URL
       for (const source of discovered) {
         try {
           // Create action spec for FETCH_PAGE
@@ -119,11 +133,11 @@ export class AutonomyOrchestratorService {
           const action: ActionSpec = {
             actionId,
             actionType: ActionType.FETCH_PAGE,
-            objective: `Fetch page from discovered source: ${source.source_domain}`,
+            objective: `Fetch goal-relevant source (relevance ${(source.relevance * 100).toFixed(0)}%): ${source.url}`,
             args: {
-              url: source.source_url,
-              sourcePackOrigin: source.source_pack,
-              discoveryMethod: source.discovery_method,
+              url: source.url,
+              discoveryMethod: source.discoveryMethod,
+              relevanceScore: source.relevance,
             },
             successCriteria: ['content_extracted', 'url_resolved'],
             riskLevel: RiskLevel.LOW,
@@ -160,12 +174,12 @@ export class AutonomyOrchestratorService {
             evidenceCreated += result.createdArtifacts.length;
 
             console.log(
-              `[D1] ✅ Fetched: ${source.source_domain} - ` +
+              `[D1] ✅ Fetched: ${source.url} - ` +
                 `${result.observations.contentLength || 0} bytes, ` +
                 `${result.createdArtifacts.length} evidence created`
             );
           } else {
-            console.log(`[D1] ⚠️  Fetch failed for: ${source.source_domain} - ${result.blockedReason || result.errors?.[0]}`);
+            console.log(`[D1] ⚠️  Fetch failed for: ${source.url} - ${result.blockedReason || result.errors?.[0]}`);
           }
 
           // Update action with result
@@ -186,7 +200,7 @@ export class AutonomyOrchestratorService {
             );
           }
         } catch (error: any) {
-          console.warn(`[D1] Error fetching ${source.source_url}: ${error.message}`);
+          console.warn(`[D1] Error fetching ${source.url}: ${error.message}`);
         }
       }
 
@@ -824,7 +838,8 @@ export class AutonomyOrchestratorService {
     goalText: string,
     maxIterations: number = 10,
     idempotencyKey?: string,
-    reuseGoalId?: string
+    reuseGoalId?: string,
+    budget?: Partial<RunBudget>
   ): Promise<{ goalId: string; claimsGenerated: number; actionsExecuted: number; status: string; reason?: string; artifacts: string[] }> {
     const runId = `action_loop_${Date.now()}`;
     const traceId = uuidv4();
@@ -832,6 +847,22 @@ export class AutonomyOrchestratorService {
     console.log(`\n🔄 Starting Autonomy Action Loop`);
     console.log(`   Goal: ${goalText}`);
     console.log(`   Max iterations: ${maxIterations}`);
+
+    // Kill switch + budgets are enforced INSIDE the main loop (G6): before
+    // the run, at every iteration boundary, and before external actions.
+    const guard = new RunGuard(runId, { maxIterations, ...budget });
+    const preRun = await guard.checkHalt('run_start');
+    if (preRun.halted) {
+      console.log(`\n🛑 Run refused before start: ${preRun.reason}`);
+      return {
+        goalId: reuseGoalId ?? '',
+        claimsGenerated: 0,
+        actionsExecuted: 0,
+        status: 'halted',
+        reason: preRun.reason,
+        artifacts: [],
+      };
+    }
 
     try {
       // Reuse goal if provided, otherwise create new one
@@ -889,8 +920,20 @@ export class AutonomyOrchestratorService {
       const allCreatedArtifacts: string[] = [];  // Collect artifacts for HTTP response
 
       // Main action loop
+      let haltedByGuard = false;
       for (let iteration = 0; iteration < maxIterations && !terminated; iteration++) {
         console.log(`\n[Iteration ${iteration + 1}/${maxIterations}] Planning next action...`);
+
+        // Iteration boundary: kill switch and budget check (G6).
+        guard.recordIteration();
+        const boundary = await guard.checkHalt('iteration_boundary');
+        if (boundary.halted) {
+          terminated = true;
+          haltedByGuard = true;
+          terminationReason = boundary.reason ?? 'halted by run guard';
+          console.log(`\n🛑 Run halted: ${terminationReason}`);
+          break;
+        }
 
         // Get current state for planning
         const claimsResult = await db.query(
@@ -918,7 +961,7 @@ export class AutonomyOrchestratorService {
         let didBootstrap = false;
         if (iteration === 0 && evidenceCount === 0) {
           console.log(`\n[Iteration 1] Bootstrapping with discovered sources...`);
-          const d1Result = await this.injectDiscoveredSourceActions(goalId, 'technical', 3);
+          const d1Result = await this.injectDiscoveredSourceActions(goalId, goalText, 3);
           console.log(`[Iteration 1] D1 bootstrap: discovered=${d1Result.discoveredCount}, fetched=${d1Result.fetchedCount}, evidence=${d1Result.evidenceCreated}`);
           actionsExecuted += d1Result.fetchedCount;
           didBootstrap = d1Result.evidenceCreated > 0;
@@ -955,7 +998,16 @@ export class AutonomyOrchestratorService {
           reflectionContext = this.reflection.formatForContext(recentReflections);
         }
 
-        // Plan next action
+        // Plan next action (LLM call — counted against budget, guarded).
+        guard.recordLlmCall();
+        const prePlan = await guard.checkHalt('before_planner_llm');
+        if (prePlan.halted) {
+          terminated = true;
+          haltedByGuard = true;
+          terminationReason = prePlan.reason ?? 'halted by run guard';
+          console.log(`\n🛑 Run halted before planner: ${terminationReason}`);
+          break;
+        }
         const action = await this.actionPlanner.planNextAction(goalId, {
           goalText,
           claimsGenerated: currentClaimsCount,
@@ -992,9 +1044,23 @@ export class AutonomyOrchestratorService {
           ]
         );
 
-        // Execute action
+        // Execute action — external side effects happen here, so the guard
+        // runs immediately before (G6), and usage is metered after.
+        const preExec = await guard.checkHalt('before_action_execution');
+        if (preExec.halted) {
+          terminated = true;
+          haltedByGuard = true;
+          terminationReason = preExec.reason ?? 'halted by run guard';
+          console.log(`\n🛑 Run halted before action execution: ${terminationReason}`);
+          break;
+        }
         console.log(`   Action: ${action.actionType} - ${action.objective}`);
         const result = await this.actionExecutor.executeAction(action);
+        if (action.actionType === ActionType.FETCH_PAGE) {
+          guard.recordWebFetch(Number(result.observations?.bytesFetched ?? 0));
+        } else if (action.actionType === ActionType.WEB_SEARCH) {
+          guard.recordSearchCall();
+        }
 
         // Update action with result
         if (result.completedAt) {
@@ -1154,7 +1220,7 @@ export class AutonomyOrchestratorService {
         goalId,
         claimsGenerated,
         actionsExecuted,
-        status: 'completed',
+        status: haltedByGuard ? 'halted' : 'completed',
         reason: terminationReason,
         artifacts: allCreatedArtifacts,  // Return all artifacts created during loop
       };

@@ -78,6 +78,7 @@ export class RealWebAdapter implements WebAdapter {
     );
 
     const methods: Array<() => Promise<SearchResult[]>> = [
+      () => this.tryFixtureSearch(query),
       () => this.trySearXNG(query),
       () => this.tryGoogleCustomSearch(query),
       () => this.tryBraveSearch(query),
@@ -109,6 +110,41 @@ export class RealWebAdapter implements WebAdapter {
       `Alternatively use the keyless fetch_page action with an explicit URL.`;
     console.error(errorMsg);
     throw new Error(errorMsg);
+  }
+
+  /**
+   * Deterministic fixture search backend for offline/CI runs (Phase B/G4).
+   * Enabled ONLY when AGENTCO_SEARCH_FIXTURE_FILE points at a JSON file of
+   * the form [{ "match": ["token", ...], "results": [{title,url,snippet}] }].
+   * Results are returned when every match token appears in the query. This is
+   * an explicitly-labeled test fixture, refused outright in production, and
+   * results are tagged backend='fixture' so discovery can record their origin
+   * honestly.
+   */
+  private async tryFixtureSearch(query: string): Promise<SearchResult[]> {
+    const fixtureFile = process.env.AGENTCO_SEARCH_FIXTURE_FILE;
+    if (!fixtureFile) return [];
+    if (process.env.AGENTCO_ENV === 'production' || process.env.AGENTCO_ENV === 'staging') {
+      throw new Error('fixture search backend is refused in production/staging');
+    }
+    const fs = await import('fs');
+    const entries = JSON.parse(fs.readFileSync(fixtureFile, 'utf8')) as Array<{
+      match: string[];
+      results: Array<{ title: string; url: string; snippet: string }>;
+    }>;
+    const queryTokens = new Set(query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean));
+    const matched: SearchResult[] = [];
+    for (const entry of entries) {
+      if (entry.match.every(token => queryTokens.has(token.toLowerCase()))) {
+        for (const result of entry.results) {
+          matched.push({ ...result, backend: 'fixture' } as SearchResult & { backend: string });
+        }
+      }
+    }
+    if (matched.length > 0) {
+      console.log(`[RealWebAdapter] using FIXTURE search backend (deterministic, offline/CI only): ${matched.length} results`);
+    }
+    return matched;
   }
 
   private async trySearXNG(query: string): Promise<SearchResult[]> {

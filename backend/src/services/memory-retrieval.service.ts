@@ -56,6 +56,12 @@ export class MemoryRetrievalService {
          FROM agent_memories
         WHERE superseded_by IS NULL
           AND (expires_at IS NULL OR expires_at > NOW())
+          -- Demoted beliefs never steer planning by default (Phase D/G3):
+          -- contradicted lessons are excluded, and surfaced separately as
+          -- warnings via demotionWarnings().
+          AND NOT EXISTS (
+                SELECT 1 FROM memory_demotions d WHERE d.memory_id = agent_memories.id
+          )
           AND (
                 ($2::text IS NOT NULL AND domain = $2)
              OR ($3::text IS NOT NULL AND agent_id = $3)
@@ -91,6 +97,31 @@ export class MemoryRetrievalService {
       importance: Number(row.importance),
       createdAt: row.created_at,
     }));
+  }
+
+  /**
+   * Recently contradicted beliefs in this domain, formatted as planner
+   * warnings: the planner must know a related lesson was WRONG, and why,
+   * without the demoted content steering it (Phase D/G3).
+   */
+  async demotionWarnings(domain: string | null, limit = 3): Promise<string> {
+    const rows = await db.query<{ summary: string; reason: string; claim_text: string | null }>(
+      `SELECT m.summary, d.reason, ac.text AS claim_text
+         FROM memory_demotions d
+         JOIN agent_memories m ON m.id = d.memory_id
+         LEFT JOIN contradictions c ON c.id = d.contradiction_id
+         LEFT JOIN autonomy_claims ac ON ac.claim_id = c.claim_id
+        WHERE $1::text IS NULL OR m.domain = $1
+        ORDER BY d.created_at DESC
+        LIMIT $2`,
+      [domain, Math.max(1, Math.min(limit, 10))]
+    );
+    if (rows.rows.length === 0) return '';
+    const lines = rows.rows.map(
+      (row, index) =>
+        `${index + 1}. CONTRADICTED: "${row.claim_text ?? row.summary}" — ${row.reason}`
+    );
+    return `Warnings — the following previously-learned beliefs were contradicted by independent evidence and MUST NOT be relied on:\n${lines.join('\n')}`;
   }
 
   /**

@@ -366,11 +366,15 @@ export class LearnerService {
         projectedScore: candidateContext.metrics.baseline_score + improvement.expectedImprovement,
       };
 
+      // Artifact identity = content hash + lineage class (G8). Deduping on
+      // hash alone let a real-lineage candidate silently adopt an identical
+      // simulation-derived artifact and inherit its lineage flag.
+      const simulationDerived = candidateContext.simulationTrained === true;
       const artifactResult = await client.query(
         `INSERT INTO artifacts (
           id, artifact_type, artifact_hash, artifact_json, lineage_json, is_simulation_derived, status
         ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-        ON CONFLICT (artifact_hash) DO UPDATE
+        ON CONFLICT (artifact_hash, is_simulation_derived) DO UPDATE
           SET artifact_hash = EXCLUDED.artifact_hash
         RETURNING id`,
         [
@@ -379,12 +383,15 @@ export class LearnerService {
           artifactHash,
           artifactContent,
           JSON.stringify({ learnerRunId, candidateType }),
-          candidateContext.simulationTrained || false,
+          simulationDerived,
           'created',
         ]
       );
       const artifactId = artifactResult.rows[0]?.id ?? (
-        await client.query(`SELECT id FROM artifacts WHERE artifact_hash = $1`, [artifactHash])
+        await client.query(
+          `SELECT id FROM artifacts WHERE artifact_hash = $1 AND is_simulation_derived = $2`,
+          [artifactHash, simulationDerived]
+        )
       ).rows[0].id;
 
       // Insert candidate

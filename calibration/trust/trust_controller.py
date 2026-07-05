@@ -39,6 +39,7 @@ class TrustScore:
     claim_type: str
     horizon_class: str
     stated_to_real: dict[str, float] = field(default_factory=dict)  # bin -> realised accuracy
+    bin_counts: dict[str, int] = field(default_factory=dict)
     trusted_multiplier: float = 1.0
     ece: float = 0.0
     n_resolved: int = 0
@@ -76,14 +77,9 @@ class TrustController:
         score = self._scores.get(key)
 
         if score is None or score.n_resolved < self.MIN_SAMPLES_FOR_TRUST:
-            # Insufficient track record — apply a conservative penalty that does
-            # not get more permissive as additional samples arrive. A fresh
-            # false resolution must never increase trust just because the
-            # sample count changed from 0 to 1.
-            if score is None:
-                penalty = 0.8
-            else:
-                penalty = max(0.8 - 0.04 * min(score.n_resolved, 5), 0.6)
+            # Insufficient track record: hold a stable conservative prior until
+            # enough resolved predictions exist for a reliability curve.
+            penalty = 0.7
             trusted = stated * penalty
             logger.debug(
                 "TRUST: %s/%s insufficient track record (n=%d) — applying %.0f%% penalty → trusted=%.3f",
@@ -95,18 +91,12 @@ class TrustController:
         bin_key = f"{min(int(stated * 10) / 10, 0.9):.1f}"
         realised = score.stated_to_real.get(bin_key, stated)
 
-        # Apply ECE penalty if calibration is poor
-        ece_penalty = 1.0
-        if score.ece > ECE_PENALTY_THRESHOLD:
-            excess = score.ece - ECE_PENALTY_THRESHOLD
-            ece_penalty = max(1.0 - (excess / 0.1) * ECE_PENALTY_RATE, 0.3)
-
-        trusted = realised * score.trusted_multiplier * ece_penalty
+        trusted = realised * score.trusted_multiplier
         trusted = round(min(max(trusted, 0.0), 1.0), 4)
 
         logger.debug(
-            "TRUST: %s/%s stated=%.3f realised=%.3f multiplier=%.3f ece_penalty=%.3f → trusted=%.3f",
-            subject_id, domain, stated, realised, score.trusted_multiplier, ece_penalty, trusted
+            "TRUST: %s/%s stated=%.3f realised=%.3f multiplier=%.3f → trusted=%.3f",
+            subject_id, domain, stated, realised, score.trusted_multiplier, trusted
         )
         return trusted
 
@@ -136,10 +126,13 @@ class TrustController:
 
         # Update reliability bin
         bin_key = f"{min(int(record.probability * 10) / 10, 0.9):.1f}"
-        old_realised = score.stated_to_real.get(bin_key, record.probability)
-        n = score.n_resolved
+        old_realised = score.stated_to_real.get(bin_key, 0.0)
+        bin_n = score.bin_counts.get(bin_key, 0)
         # Incremental mean update
-        score.stated_to_real[bin_key] = (old_realised * n + (1.0 if record.resolved_outcome else 0.0)) / (n + 1)
+        score.stated_to_real[bin_key] = (
+            old_realised * bin_n + (1.0 if record.resolved_outcome else 0.0)
+        ) / (bin_n + 1)
+        score.bin_counts[bin_key] = bin_n + 1
         score.n_resolved += 1
         score.last_reality_contact = datetime.now(timezone.utc)
         score.updated_at = datetime.now(timezone.utc)
@@ -185,9 +178,13 @@ class TrustController:
         """Recompute trusted_multiplier from the reliability curve."""
         if not score.stated_to_real:
             return
+        total = sum(score.bin_counts.values())
+        if total == 0:
+            return
         mean_gap = sum(
-            abs(float(k) - v) for k, v in score.stated_to_real.items()
-        ) / len(score.stated_to_real)
+            (score.bin_counts.get(k, 0) / total) * abs(float(k) - v)
+            for k, v in score.stated_to_real.items()
+        )
         score.ece = mean_gap
         # Multiplier decreases as ECE increases above threshold
         if mean_gap <= ECE_PENALTY_THRESHOLD:

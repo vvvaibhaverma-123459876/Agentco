@@ -220,7 +220,11 @@ export class AutonomyActionPlannerService {
           domain: currentState.domain,
           agentId: currentState.agentId,
         });
-        currentState.memoryContext = memoryRetrieval.formatForPrompt(memories);
+        // Demoted beliefs are excluded from retrieval; contradiction warnings
+        // ride along so the planner knows what NOT to rely on (Phase D/G3).
+        const warnings = await memoryRetrieval.demotionWarnings(currentState.domain ?? null);
+        const memoryBlock = memoryRetrieval.formatForPrompt(memories);
+        currentState.memoryContext = [memoryBlock, warnings].filter(Boolean).join('\n\n');
       } catch (error) {
         console.error(`Memory retrieval failed, planning without memories: ${error}`);
         currentState.memoryContext = '';

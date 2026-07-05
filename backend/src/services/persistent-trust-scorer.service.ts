@@ -26,6 +26,49 @@ function trustFromBrier(brierMean: number, nResolved: number): number {
   return Number((0.5 * (1 - sampleConfidence) + base * sampleConfidence).toFixed(6));
 }
 
+async function computeEce(key: {
+  producing_agent_id: string;
+  domain: string;
+  claim_type: string;
+  horizon_class: string;
+}): Promise<number | null> {
+  const result = await db.query<{ ece: string | null; n: string }>(
+    `WITH resolved AS (
+       SELECT probability::float8 AS probability,
+              CASE WHEN resolved_outcome THEN 1.0 ELSE 0.0 END AS actual,
+              LEAST(FLOOR(probability::float8 * 10)::int, 9) AS bin
+         FROM prediction_ledger
+        WHERE producing_agent_id = $1
+          AND domain = $2
+          AND claim_type = $3
+          AND horizon_class = $4
+          AND post_hoc = false
+          AND resolved = true
+          AND resolved_outcome IS NOT NULL
+     ),
+     bins AS (
+       SELECT bin,
+              COUNT(*)::float8 AS bin_count,
+              AVG(probability) AS mean_stated,
+              AVG(actual) AS mean_actual
+         FROM resolved
+        GROUP BY bin
+     ),
+     total AS (
+       SELECT COUNT(*)::float8 AS n FROM resolved
+     )
+     SELECT CASE WHEN total.n = 0 THEN NULL
+                 ELSE SUM((bins.bin_count / total.n) * ABS(bins.mean_stated - bins.mean_actual))
+            END::numeric AS ece,
+            total.n::int::text AS n
+       FROM bins CROSS JOIN total
+      GROUP BY total.n`,
+    [key.producing_agent_id, key.domain, key.claim_type, key.horizon_class]
+  );
+  const value = result.rows[0]?.ece;
+  return value === null || value === undefined ? null : Number(value);
+}
+
 export class PersistentTrustScorerService {
   async computeForPrediction(predictionId: string, correlationId: string = crypto.randomUUID()): Promise<TrustScoreWindow> {
     const prediction = await db.query<{
@@ -65,6 +108,7 @@ export class PersistentTrustScorerService {
     const nResolved = Number(aggregate.rows[0].n_resolved);
     const brierMean = Number(aggregate.rows[0].brier_mean);
     const logMean = Number(aggregate.rows[0].log_mean);
+    const ece = await computeEce(key);
     const trustFactor = trustFromBrier(brierMean, nResolved);
     const forceDowngrade = nResolved < 5 || brierMean > 0.25;
     const downgradeReason = nResolved < 5 ? 'sample_size_below_5' : brierMean > 0.25 ? 'brier_mean_above_0.25' : null;
@@ -73,7 +117,7 @@ export class PersistentTrustScorerService {
       `INSERT INTO trust_scores
          (subject_id, subject_type, domain, claim_type, horizon_class, window_start, window_end,
           n_predictions, n_resolved, brier_mean, log_mean, ece, trust_factor, force_downgrade, downgrade_reason)
-       VALUES ($1,'agent',$2,$3,$4,NOW(),NOW(),$5,$6,$7,$8,NULL,$9,$10,$11)
+       VALUES ($1,'agent',$2,$3,$4,NOW(),NOW(),$5,$6,$7,$8,$9,$10,$11,$12)
        RETURNING trust_id, subject_id, domain, claim_type, horizon_class, n_predictions,
                  n_resolved, brier_mean, log_mean, ece, trust_factor, force_downgrade, downgrade_reason`,
       [
@@ -85,6 +129,7 @@ export class PersistentTrustScorerService {
         nResolved,
         brierMean,
         logMean,
+        ece,
         trustFactor,
         forceDowngrade,
         downgradeReason,
@@ -103,7 +148,7 @@ export class PersistentTrustScorerService {
         brierMean <= 0.25 ? 1 : -1,
         Math.min(1, nResolved / 5),
         predictionId,
-        JSON.stringify({ brier_mean: brierMean, trust_factor: trustFactor }),
+        JSON.stringify({ brier_mean: brierMean, ece, trust_factor: trustFactor }),
         correlationId,
       ]
     );

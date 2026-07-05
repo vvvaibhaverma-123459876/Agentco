@@ -21,6 +21,9 @@ import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { TeamActivationService } from './team-activation.service';
 import { evidenceRegistry } from './evidence-registry.service';
 import { claimGrounding } from './claim-grounding.service';
+import { coreAssertionTokens } from './falsifiable-prediction.service';
+import { relevanceScore, CLAIM_RELEVANCE_THRESHOLD } from './goal-source-discovery.service';
+import { inputValidatorService as inputValidator } from './input-validator.service';
 
 export class ActionExecutorService {
   // Default to a real web adapter so the direct-fetch (fetch_page) evidence
@@ -209,6 +212,13 @@ export class ActionExecutorService {
       result.blockedReason = 'Web search requires "query" argument';
       return;
     }
+    // Input validation (E4/G11): length caps + injection patterns.
+    const queryCheck = inputValidator.validateSearchQuery(query);
+    if (!queryCheck.valid) {
+      result.status = ActionStatus.BLOCKED;
+      result.blockedReason = `Search query rejected: ${queryCheck.error}`;
+      return;
+    }
 
     // Try to use web adapter if available
     // Skip isReady() - it checks Google which may be unreachable
@@ -263,6 +273,18 @@ export class ActionExecutorService {
       result.status = ActionStatus.BLOCKED;
       result.blockedReason = 'Fetch requires "url" argument';
       return;
+    }
+    // Input validation (E4/G11): scheme/length/shape checks up front; the
+    // DNS-resolving SSRF guard in url-safety.ts still runs inside the fetch.
+    // Loopback is allowed only under the test-fixture flag the SSRF guard
+    // itself honors.
+    if (process.env.AGENTCO_ALLOW_LOOPBACK_FETCH !== '1') {
+      const urlCheck = inputValidator.validateUrl(url);
+      if (!urlCheck.valid) {
+        result.status = ActionStatus.BLOCKED;
+        result.blockedReason = `Fetch URL rejected: ${urlCheck.error}`;
+        return;
+      }
     }
 
     // Try to use web adapter if available
@@ -360,11 +382,41 @@ export class ActionExecutorService {
       return;
     }
 
+    // Relevance gate (Phase B/G4): a claim must be about the GOAL, not just
+    // quotable from some fetched page. Grounded-but-off-goal claims are
+    // downgraded to weakly_supported so they never feed predictions or
+    // deliverables as findings.
+    let relevance: number | null = null;
+    let relevanceReason = 'no goal text available for relevance scoring';
+    let claimStatus: 'supported' | 'weakly_supported' = 'supported';
+    if (spec.goalId) {
+      // Only gate on a genuine goal description. Ad-hoc executor calls create
+      // goals whose title is just the action objective; scoring a claim
+      // against that is meaningless, so those claims are not downgraded.
+      const goalRow = await db.query<{ description: string | null }>(
+        `SELECT description FROM autonomy_goals WHERE id = $1`,
+        [spec.goalId]
+      );
+      const goalText = goalRow.rows[0]?.description ?? undefined;
+      if (goalText) {
+        const goalTokens = coreAssertionTokens(goalText, 12);
+        const snippets = (spec.args.supportSnippets || []).join(' ');
+        relevance = relevanceScore(goalTokens, `${claimText} ${snippets}`);
+        if (relevance < CLAIM_RELEVANCE_THRESHOLD) {
+          claimStatus = 'weakly_supported';
+          relevanceReason = `grounded but off-goal: ${(relevance * 100).toFixed(0)}% goal-token overlap (< ${CLAIM_RELEVANCE_THRESHOLD * 100}%)`;
+          result.observations.relevanceDowngrade = relevanceReason;
+        } else {
+          relevanceReason = `${(relevance * 100).toFixed(0)}% goal-token overlap`;
+        }
+      }
+    }
+
     const claimId = uuidv4();
     const claim: Claim = {
       claimId,
       text: claimText,
-      status: 'supported',
+      status: claimStatus,
       confidence: spec.args.confidence || 0.7,
       supportSourceIds,
       supportSnippets: spec.args.supportSnippets || [],
@@ -373,11 +425,12 @@ export class ActionExecutorService {
       generatedBy: spec.decidedBy,
     };
 
-    // Store claim in database
+    // Store claim in database with its goal-relevance decision (Phase B/G4)
     await db.query(
       `INSERT INTO autonomy_claims (
-        id, claim_id, action_id, goal_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        id, claim_id, action_id, goal_id, text, status, confidence, support_source_ids, support_snippets, derived_from_action_ids,
+        relevance_score, relevance_reason
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
       [
         uuidv4(),
         claimId,
@@ -389,6 +442,8 @@ export class ActionExecutorService {
         JSON.stringify(claim.supportSourceIds),
         JSON.stringify(claim.supportSnippets),
         JSON.stringify(claim.derivedFromActionIds),
+        relevance,
+        relevanceReason,
       ]
     );
 

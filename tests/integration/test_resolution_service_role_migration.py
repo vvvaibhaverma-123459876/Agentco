@@ -272,12 +272,13 @@ def test_prediction_ledger_resolution_trigger_enforces_role(fresh_db):
             INSERT INTO prediction_ledger
             (prediction_id, claim, probability, confidence_basis, producing_agent_id,
              producing_prompt_version, resolution_criterion, resolution_date,
-             ground_truth_source, horizon_class, domain, claim_type)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+             ground_truth_source, horizon_class, domain, claim_type, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             pred_id, "Test claim", 0.75, '{"test": true}', "test-agent",
             "v1", "Check if true", "2026-06-20 00:00:00+00",
-            "https://example.com", "short", "technology", "news_fact"
+            "https://example.com", "short", "technology", "news_fact",
+            "2026-06-19 23:59:59+00"
         ))
 
     # Try to resolve as the main user (not resolution_service)

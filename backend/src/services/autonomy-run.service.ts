@@ -21,10 +21,12 @@ import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 import { db } from '../db/client';
+import { resolutionServiceDatabaseUrl } from '../db/dsn';
 import { AutonomyOrchestratorService } from './autonomy-orchestrator.service';
-import { ledgerResolutionService } from './resolution-service.service';
-import { groundedResolver } from './grounded-resolver.service';
 import { autonomousPromotion } from './autonomous-promotion.service';
+import { falsifiablePrediction } from './falsifiable-prediction.service';
+import { independentResolver } from './independent-resolver.service';
+import { RunGuard } from './run-guard.service';
 
 const RUN_AGENT = 'autonomy_action_planner';
 
@@ -36,18 +38,20 @@ export interface AutonomyRunResult {
   claims: number;
   predictionsRegistered: number;
   predictionsResolved: number;
+  /** resolved-false outcomes (deadline missed or failure pattern matched) */
+  predictionsResolvedFalse: number;
+  /** still-open falsifiable predictions awaiting independent evidence */
+  predictionsOpen: number;
   lessonsPromoted: number;
   deliverablePath: string | null;
   evidenceUrls: string[];
+  /** set when a kill switch or budget stop halted the chain (G6) */
+  halted?: string;
 }
 
-function serviceDatabaseUrl(): string {
-  if (process.env.RESOLUTION_SERVICE_DATABASE_URL) return process.env.RESOLUTION_SERVICE_DATABASE_URL;
-  const base = new URL(process.env.AGENTCO_TEST_DATABASE_URL ?? process.env.DATABASE_URL ?? 'postgresql://localhost/agentco');
-  base.username = 'resolution_service';
-  base.password = process.env.RESOLUTION_SERVICE_PASSWORD ?? 'resolution-service-dev-password';
-  return base.toString();
-}
+// Firewall DSN comes from the shared resolver so prediction writes and
+// resolutions can never target different databases (G1).
+const serviceDatabaseUrl = resolutionServiceDatabaseUrl;
 
 export class AutonomyRunService {
   private orchestrator = new AutonomyOrchestratorService();
@@ -60,10 +64,21 @@ export class AutonomyRunService {
   }): Promise<AutonomyRunResult> {
     const maxIterations = Math.max(1, Math.min(options.maxIterations ?? 6, 60));
     const runId = `autorun_${Date.now()}_${crypto.randomUUID().slice(0, 6)}`;
+    const guard = new RunGuard(runId);
 
-    // 1) fetch -> grounded claims
+    // 1) fetch -> grounded claims (the loop enforces its own guard internally)
     const loop = await this.orchestrator.executeAutonomyActionLoop(options.goal, maxIterations);
     const goalId = loop.goalId;
+    if (loop.status === 'halted') {
+      return this.haltedResult(runId, goalId, options.goal, maxIterations, loop.reason ?? 'halted');
+    }
+
+    // Kill switch gates the post-loop chain too: no resolution or promotion
+    // may run once the switch is active (G6).
+    const preChain = await guard.checkHalt('before_resolution_chain');
+    if (preChain.halted) {
+      return this.haltedResult(runId, goalId, options.goal, maxIterations, preChain.reason ?? 'halted');
+    }
 
     const claims = await db.query<{ claim_id: string; text: string; support_source_ids: string[]; support_snippets: unknown[] }>(
       `SELECT claim_id, text, support_source_ids, support_snippets
@@ -73,49 +88,64 @@ export class AutonomyRunService {
       [goalId]
     );
 
-    // 2) register a prediction per grounded claim
+    // 2) register a FALSIFIABLE prediction per grounded claim (G2): a future
+    // due time, a probability derived from context, and a criterion the
+    // claim's own evidence cannot satisfy — independent corroboration.
     const domain = 'autonomy_research';
+    const predictionHorizonMs = Number(process.env.AGENTCO_PREDICTION_HORIZON_MS) || undefined;
     const predictionIds: string[] = [];
     for (const claim of claims.rows) {
       const evidenceIds = Array.isArray(claim.support_source_ids) ? claim.support_source_ids : [];
       if (evidenceIds.length === 0) continue;
-      const predictionId = await ledgerResolutionService.registerPrediction({
-        claim: claim.text,
-        probability: 0.8,
-        confidence_basis: { claim_id: claim.claim_id, evidence_source_ids: evidenceIds },
-        producing_agent_id: RUN_AGENT,
-        producing_prompt_version: 'autonomy-run-v1',
-        resolution_criterion: 'the claim is supported by the fetched evidence it cites',
-        resolution_date: new Date(Date.now() - 1000),
-        ground_truth_source: `agentco://run/${runId}`,
-        horizon_class: 'short',
-        domain,
-        claim_type: 'grounded_claim_quality',
-        correlation_id: crypto.randomUUID(),
-      });
-      predictionIds.push(predictionId);
+      let registered;
+      try {
+        registered = await falsifiablePrediction.registerForClaim({
+          claimId: claim.claim_id,
+          claimText: claim.text,
+          supportSourceIds: evidenceIds,
+          producingAgentId: RUN_AGENT,
+          domain,
+          runId,
+          dueInMs: predictionHorizonMs,
+        });
+      } catch (error) {
+        // A claim with no content-bearing tokens cannot form a falsifiable
+        // criterion; skip it rather than crashing the whole run.
+        console.warn(`[autonomy-run] skipped prediction for claim ${claim.claim_id}: ${error}`);
+        continue;
+      }
+      predictionIds.push(registered.predictionId);
     }
 
-    // 3) resolve predictions from the SAME fetched evidence (firewall path)
+    // 3) attempt INDEPENDENT resolution (G2/G3): a prediction resolves true
+    // only from evidence outside the claim's own sources/hosts; overdue open
+    // predictions from earlier runs resolve FALSE here — this is where the
+    // system gets to be wrong.
     let resolved = 0;
-    if (predictionIds.length > 0) {
+    let resolvedFalse = 0;
+    let openPredictions = 0;
+    {
       const servicePool = new Pool({ connectionString: serviceDatabaseUrl(), max: 2 });
       try {
         const client = await servicePool.connect();
         try {
-          for (let i = 0; i < predictionIds.length; i++) {
-            const claim = claims.rows[i];
-            const snippet = this.firstSnippet(claim.support_snippets);
-            if (!snippet) continue;
-            const result = await groundedResolver.resolveFromEvidence({
-              predictionId: predictionIds[i],
-              evidenceSourceIds: Array.isArray(claim.support_source_ids) ? claim.support_source_ids : [],
-              resolvedOutcome: true, // the claim was grounded in the evidence it cites
-              justification: snippet,
+          for (const predictionId of predictionIds) {
+            const outcome = await independentResolver.attemptResolution({
+              predictionId,
               serviceClient: client,
+              goalId,
             });
-            if (result.resolved) resolved++;
+            if (outcome.status === 'resolved_true') resolved++;
+            else if (outcome.status === 'resolved_false') { resolved++; resolvedFalse++; }
+            else openPredictions++;
           }
+          // Settle past debts left by earlier runs.
+          const sweep = await independentResolver.resolveDuePredictions({
+            serviceClient: client,
+            producingAgentId: RUN_AGENT,
+          });
+          resolved += sweep.resolvedTrue + sweep.resolvedFalse;
+          resolvedFalse += sweep.resolvedFalse;
         } finally {
           client.release();
         }
@@ -124,7 +154,16 @@ export class AutonomyRunService {
       }
     }
 
-    // 4) auto-promote resolved lessons (gated + audited)
+    // 4) auto-promote resolved lessons (gated + audited); kill switch gates
+    // promotion as its own stage (G6).
+    const prePromotion = await guard.checkHalt('before_promotion');
+    if (prePromotion.halted) {
+      return this.haltedResult(runId, goalId, options.goal, maxIterations, prePromotion.reason ?? 'halted', {
+        claims: claims.rowCount ?? 0,
+        predictionsRegistered: predictionIds.length,
+        predictionsResolved: resolved,
+      });
+    }
     const promotion = await autonomousPromotion.promoteResolvedForRun({ runId, agentId: RUN_AGENT });
 
     // 5) deliverable
@@ -142,19 +181,38 @@ export class AutonomyRunService {
       claims: claims.rowCount ?? 0,
       predictionsRegistered: predictionIds.length,
       predictionsResolved: resolved,
+      predictionsResolvedFalse: resolvedFalse,
+      predictionsOpen: openPredictions,
       lessonsPromoted: promotion.promoted,
       deliverablePath,
       evidenceUrls,
     };
   }
 
-  private firstSnippet(snippets: unknown[]): string | null {
-    if (!Array.isArray(snippets)) return null;
-    for (const s of snippets) {
-      if (typeof s === 'string' && s.trim()) return s;
-      if (s && typeof s === 'object' && typeof (s as any).snippet === 'string') return (s as any).snippet;
-    }
-    return null;
+  private haltedResult(
+    runId: string,
+    goalId: string,
+    goalText: string,
+    iterations: number,
+    reason: string,
+    partial: Partial<Pick<AutonomyRunResult, 'claims' | 'predictionsRegistered' | 'predictionsResolved'>> = {}
+  ): AutonomyRunResult {
+    console.log(`[autonomy-run] halted: ${reason}`);
+    return {
+      goalId,
+      runId,
+      goalText,
+      iterations,
+      claims: partial.claims ?? 0,
+      predictionsRegistered: partial.predictionsRegistered ?? 0,
+      predictionsResolved: partial.predictionsResolved ?? 0,
+      predictionsResolvedFalse: 0,
+      predictionsOpen: 0,
+      lessonsPromoted: 0,
+      deliverablePath: null,
+      evidenceUrls: [],
+      halted: reason,
+    };
   }
 
   private async evidenceUrls(goalId: string): Promise<string[]> {

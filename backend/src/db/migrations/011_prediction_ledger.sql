@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS prediction_ledger (
     claim_type               TEXT NOT NULL DEFAULT 'general',
     correlation_id           UUID,
     created_at               TIMESTAMPTZ NOT NULL DEFAULT now(),
+    earliest_knowable_at     TIMESTAMPTZ,
     post_hoc                 BOOLEAN NOT NULL DEFAULT false,
     -- Resolution columns (write-once, NULL until resolved by resolution_service)
     resolved                 BOOLEAN NOT NULL DEFAULT false,
@@ -33,7 +34,23 @@ CREATE TABLE IF NOT EXISTS prediction_ledger (
     resolved_by_service      TEXT,
     brier_score              NUMERIC,
     log_score                NUMERIC,
-    was_surprise             BOOLEAN NOT NULL DEFAULT false
+    was_surprise             BOOLEAN NOT NULL DEFAULT false,
+    CONSTRAINT prediction_ledger_resolution_after_registration
+        CHECK (resolution_date > created_at),
+    CONSTRAINT prediction_ledger_posthoc_consistent
+        CHECK (
+            earliest_knowable_at IS NULL
+            OR post_hoc = (created_at > earliest_knowable_at)
+        ),
+    CONSTRAINT prediction_ledger_ground_truth_external
+        CHECK (
+            NOT (
+                lower(ground_truth_source) LIKE '%agentco_system%'
+                OR
+                regexp_split_to_array(lower(ground_truth_source), '[^a-z0-9]+')
+                && ARRAY['self','internal','simulation','reasoning_system','agentco_system','twin','sandbox']
+            )
+        )
 );
 
 -- No deletes, ever. Append-only ledger.
@@ -58,6 +75,7 @@ BEGIN
        OR NEW.domain                IS DISTINCT FROM OLD.domain
        OR NEW.claim_type            IS DISTINCT FROM OLD.claim_type
        OR NEW.created_at            IS DISTINCT FROM OLD.created_at
+       OR NEW.earliest_knowable_at  IS DISTINCT FROM OLD.earliest_knowable_at
        OR NEW.post_hoc              IS DISTINCT FROM OLD.post_hoc
     THEN
         RAISE EXCEPTION

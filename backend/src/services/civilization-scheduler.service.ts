@@ -2,6 +2,10 @@ import {
   CivilizationReachabilityTick,
   civilizationRuntimeService,
 } from './civilization-runtime.service';
+import { killSwitchService } from './kill-switch.service';
+
+/** Scopes that stop scheduler ticks (G6): global stop, or scheduler-specific. */
+const SCHEDULER_KILL_SCOPES = ['global', 'civilization.scheduler'];
 
 export interface CivilizationSchedulerStatus {
   running: boolean;
@@ -32,6 +36,17 @@ export class CivilizationSchedulerService {
   }
 
   async runOnce(runtimeMode = 'scheduler_l14_runtime'): Promise<CivilizationReachabilityTick> {
+    // Kill switch gates every tick (G6); an active switch also stops the
+    // recurring timer so a killed scheduler stays down until re-started.
+    for (const scope of SCHEDULER_KILL_SCOPES) {
+      const active = await killSwitchService.getActive(scope);
+      if (active) {
+        this.stop();
+        this.lastStatus = 'failed';
+        this.lastError = `kill switch '${scope}' active: ${active.reason}`;
+        throw new Error(`scheduler tick refused: ${this.lastError}`);
+      }
+    }
     try {
       const tick = await civilizationRuntimeService.runReachabilityTick(runtimeMode);
       this.tickCount += 1;

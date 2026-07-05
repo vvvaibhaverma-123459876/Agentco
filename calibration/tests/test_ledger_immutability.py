@@ -50,6 +50,11 @@ def make_reg(**kwargs):
         claim_type="market_share",
     )
     defaults.update(kwargs)
+    if defaults["resolution_date"] <= datetime.now(timezone.utc):
+        defaults.setdefault(
+            "historical_registration_reason",
+            "deterministic calibration test fixture",
+        )
     return PredictionRegistration(**defaults)
 
 def make_resolution_service(ledger):
@@ -112,6 +117,21 @@ class TestLedgerImmutability:
         ))
         assert ledger.get(pid).post_hoc is False
 
+    def test_live_backdated_registration_rejected(self):
+        ledger = make_ledger()
+        with pytest.raises(ValueError, match="resolution_date"):
+            ledger.pre_register(make_reg(
+                resolution_date=past(1),
+                historical_registration_reason=None,
+            ))
+
+    def test_external_user_agent_source_not_false_positive(self):
+        ledger = make_ledger()
+        pid = ledger.pre_register(make_reg(
+            ground_truth_source="Google Analytics user agent logs export"
+        ))
+        assert ledger.get(pid) is not None
+
     def test_cannot_resolve_before_resolution_date(self):
         ledger = make_ledger()
         svc = make_resolution_service(ledger)
@@ -145,6 +165,17 @@ class TestLedgerImmutability:
         assert scorer.brier_score(0.0, False) == pytest.approx(0.0)
         assert scorer.brier_score(0.5, True) == pytest.approx(0.25)
         assert scorer.brier_score(0.8, False) == pytest.approx(0.64)
+
+    def test_ece_includes_probability_one_top_bin(self):
+        scorer = ScoringModule()
+        records = [_make_resolved_prediction(True)]
+        records[0].probability = 1.0
+        records[0].brier_score = scorer.brier_score(1.0, True)
+        records[0].log_score = scorer.log_score(1.0, True)
+        report = scorer.calibration_report(records, "cal-agent", "market_dynamics")
+        assert report.sample_count == 1
+        assert report.ece == pytest.approx(0.0)
+        assert report.reliability_bins[0]["count"] == 1
 
     def test_resolution_stores_brier_and_log(self):
         import math
