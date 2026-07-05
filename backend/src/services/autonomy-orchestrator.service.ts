@@ -18,6 +18,7 @@ import { ReflectionService } from './reflection.service';
 import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
+import { RunGuard, RunBudget } from './run-guard.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '../types/action.types';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { WebAdapter } from '../adapters/web-adapter';
@@ -824,7 +825,8 @@ export class AutonomyOrchestratorService {
     goalText: string,
     maxIterations: number = 10,
     idempotencyKey?: string,
-    reuseGoalId?: string
+    reuseGoalId?: string,
+    budget?: Partial<RunBudget>
   ): Promise<{ goalId: string; claimsGenerated: number; actionsExecuted: number; status: string; reason?: string; artifacts: string[] }> {
     const runId = `action_loop_${Date.now()}`;
     const traceId = uuidv4();
@@ -832,6 +834,22 @@ export class AutonomyOrchestratorService {
     console.log(`\n🔄 Starting Autonomy Action Loop`);
     console.log(`   Goal: ${goalText}`);
     console.log(`   Max iterations: ${maxIterations}`);
+
+    // Kill switch + budgets are enforced INSIDE the main loop (G6): before
+    // the run, at every iteration boundary, and before external actions.
+    const guard = new RunGuard(runId, { maxIterations, ...budget });
+    const preRun = await guard.checkHalt('run_start');
+    if (preRun.halted) {
+      console.log(`\n🛑 Run refused before start: ${preRun.reason}`);
+      return {
+        goalId: reuseGoalId ?? '',
+        claimsGenerated: 0,
+        actionsExecuted: 0,
+        status: 'halted',
+        reason: preRun.reason,
+        artifacts: [],
+      };
+    }
 
     try {
       // Reuse goal if provided, otherwise create new one
@@ -889,8 +907,20 @@ export class AutonomyOrchestratorService {
       const allCreatedArtifacts: string[] = [];  // Collect artifacts for HTTP response
 
       // Main action loop
+      let haltedByGuard = false;
       for (let iteration = 0; iteration < maxIterations && !terminated; iteration++) {
         console.log(`\n[Iteration ${iteration + 1}/${maxIterations}] Planning next action...`);
+
+        // Iteration boundary: kill switch and budget check (G6).
+        guard.recordIteration();
+        const boundary = await guard.checkHalt('iteration_boundary');
+        if (boundary.halted) {
+          terminated = true;
+          haltedByGuard = true;
+          terminationReason = boundary.reason ?? 'halted by run guard';
+          console.log(`\n🛑 Run halted: ${terminationReason}`);
+          break;
+        }
 
         // Get current state for planning
         const claimsResult = await db.query(
@@ -955,7 +985,16 @@ export class AutonomyOrchestratorService {
           reflectionContext = this.reflection.formatForContext(recentReflections);
         }
 
-        // Plan next action
+        // Plan next action (LLM call — counted against budget, guarded).
+        guard.recordLlmCall();
+        const prePlan = await guard.checkHalt('before_planner_llm');
+        if (prePlan.halted) {
+          terminated = true;
+          haltedByGuard = true;
+          terminationReason = prePlan.reason ?? 'halted by run guard';
+          console.log(`\n🛑 Run halted before planner: ${terminationReason}`);
+          break;
+        }
         const action = await this.actionPlanner.planNextAction(goalId, {
           goalText,
           claimsGenerated: currentClaimsCount,
@@ -992,9 +1031,23 @@ export class AutonomyOrchestratorService {
           ]
         );
 
-        // Execute action
+        // Execute action — external side effects happen here, so the guard
+        // runs immediately before (G6), and usage is metered after.
+        const preExec = await guard.checkHalt('before_action_execution');
+        if (preExec.halted) {
+          terminated = true;
+          haltedByGuard = true;
+          terminationReason = preExec.reason ?? 'halted by run guard';
+          console.log(`\n🛑 Run halted before action execution: ${terminationReason}`);
+          break;
+        }
         console.log(`   Action: ${action.actionType} - ${action.objective}`);
         const result = await this.actionExecutor.executeAction(action);
+        if (action.actionType === ActionType.FETCH_PAGE) {
+          guard.recordWebFetch(Number(result.observations?.bytesFetched ?? 0));
+        } else if (action.actionType === ActionType.WEB_SEARCH) {
+          guard.recordSearchCall();
+        }
 
         // Update action with result
         if (result.completedAt) {
@@ -1154,7 +1207,7 @@ export class AutonomyOrchestratorService {
         goalId,
         claimsGenerated,
         actionsExecuted,
-        status: 'completed',
+        status: haltedByGuard ? 'halted' : 'completed',
         reason: terminationReason,
         artifacts: allCreatedArtifacts,  // Return all artifacts created during loop
       };

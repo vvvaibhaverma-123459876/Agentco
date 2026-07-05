@@ -26,6 +26,7 @@ import { AutonomyOrchestratorService } from './autonomy-orchestrator.service';
 import { ledgerResolutionService } from './resolution-service.service';
 import { groundedResolver } from './grounded-resolver.service';
 import { autonomousPromotion } from './autonomous-promotion.service';
+import { RunGuard } from './run-guard.service';
 
 const RUN_AGENT = 'autonomy_action_planner';
 
@@ -40,6 +41,8 @@ export interface AutonomyRunResult {
   lessonsPromoted: number;
   deliverablePath: string | null;
   evidenceUrls: string[];
+  /** set when a kill switch or budget stop halted the chain (G6) */
+  halted?: string;
 }
 
 // Firewall DSN comes from the shared resolver so prediction writes and
@@ -57,10 +60,21 @@ export class AutonomyRunService {
   }): Promise<AutonomyRunResult> {
     const maxIterations = Math.max(1, Math.min(options.maxIterations ?? 6, 60));
     const runId = `autorun_${Date.now()}_${crypto.randomUUID().slice(0, 6)}`;
+    const guard = new RunGuard(runId);
 
-    // 1) fetch -> grounded claims
+    // 1) fetch -> grounded claims (the loop enforces its own guard internally)
     const loop = await this.orchestrator.executeAutonomyActionLoop(options.goal, maxIterations);
     const goalId = loop.goalId;
+    if (loop.status === 'halted') {
+      return this.haltedResult(runId, goalId, options.goal, maxIterations, loop.reason ?? 'halted');
+    }
+
+    // Kill switch gates the post-loop chain too: no resolution or promotion
+    // may run once the switch is active (G6).
+    const preChain = await guard.checkHalt('before_resolution_chain');
+    if (preChain.halted) {
+      return this.haltedResult(runId, goalId, options.goal, maxIterations, preChain.reason ?? 'halted');
+    }
 
     const claims = await db.query<{ claim_id: string; text: string; support_source_ids: string[]; support_snippets: unknown[] }>(
       `SELECT claim_id, text, support_source_ids, support_snippets
@@ -121,7 +135,16 @@ export class AutonomyRunService {
       }
     }
 
-    // 4) auto-promote resolved lessons (gated + audited)
+    // 4) auto-promote resolved lessons (gated + audited); kill switch gates
+    // promotion as its own stage (G6).
+    const prePromotion = await guard.checkHalt('before_promotion');
+    if (prePromotion.halted) {
+      return this.haltedResult(runId, goalId, options.goal, maxIterations, prePromotion.reason ?? 'halted', {
+        claims: claims.rowCount ?? 0,
+        predictionsRegistered: predictionIds.length,
+        predictionsResolved: resolved,
+      });
+    }
     const promotion = await autonomousPromotion.promoteResolvedForRun({ runId, agentId: RUN_AGENT });
 
     // 5) deliverable
@@ -142,6 +165,30 @@ export class AutonomyRunService {
       lessonsPromoted: promotion.promoted,
       deliverablePath,
       evidenceUrls,
+    };
+  }
+
+  private haltedResult(
+    runId: string,
+    goalId: string,
+    goalText: string,
+    iterations: number,
+    reason: string,
+    partial: Partial<Pick<AutonomyRunResult, 'claims' | 'predictionsRegistered' | 'predictionsResolved'>> = {}
+  ): AutonomyRunResult {
+    console.log(`[autonomy-run] halted: ${reason}`);
+    return {
+      goalId,
+      runId,
+      goalText,
+      iterations,
+      claims: partial.claims ?? 0,
+      predictionsRegistered: partial.predictionsRegistered ?? 0,
+      predictionsResolved: partial.predictionsResolved ?? 0,
+      lessonsPromoted: 0,
+      deliverablePath: null,
+      evidenceUrls: [],
+      halted: reason,
     };
   }
 
