@@ -19,6 +19,7 @@ import { TeamActivationService } from './team-activation.service';
 import { ReputationLearningService } from './reputation-learning.service';
 import { AdaptiveStrategyService } from './adaptive-strategy.service';
 import { RunGuard, RunBudget } from './run-guard.service';
+import { goalSourceDiscovery } from './goal-source-discovery.service';
 import { ActionSpec, ActionResult, ActionStatus, ActionType, RiskLevel } from '../types/action.types';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { WebAdapter } from '../adapters/web-adapter';
@@ -100,19 +101,31 @@ export class AutonomyOrchestratorService {
    */
   private async injectDiscoveredSourceActions(
     goalId: string,
-    sourcePack: string = 'technical',
+    goalText: string,
     maxUrls: number = 3
   ): Promise<{ discoveredCount: number; fetchedCount: number; evidenceCreated: number }> {
     let fetchedCount = 0;
     let evidenceCreated = 0;
 
     try {
-      console.log(`\n[D1] Discovering sources from '${sourcePack}' pack...`);
-      const discovered = await this.sourceDiscovery.discoverSourcesFromPack(sourcePack, maxUrls);
+      // Goal-relevant discovery (Phase B/G4): candidates come from search
+      // (or the labeled fixture backend), are relevance-scored BEFORE any
+      // fetch, and the full accept/reject trail is persisted in
+      // autonomy_source_candidates. Seed packs survive only as a
+      // relevance-gated, explicitly-labeled fallback.
+      console.log(`\n[D1] Discovering goal-relevant sources...`);
+      const discovery = await goalSourceDiscovery.discoverForGoal({ goalId, goalText, limit: maxUrls });
+      if (discovery.accepted.length === 0) {
+        console.log(
+          `[D1] No goal-relevant source found (rejected ${discovery.rejected.length}). ` +
+            `${discovery.note || 'Refusing to fetch generic pages.'}`
+        );
+        return { discoveredCount: 0, fetchedCount: 0, evidenceCreated: 0 };
+      }
+      const discovered = discovery.accepted;
+      console.log(`[D1] Accepted ${discovered.length} goal-relevant sources (rejected ${discovery.rejected.length}), fetching...`);
 
-      console.log(`[D1] Discovered ${discovered.length} sources, fetching them...`);
-
-      // Execute FETCH_PAGE for each discovered URL
+      // Execute FETCH_PAGE for each accepted URL
       for (const source of discovered) {
         try {
           // Create action spec for FETCH_PAGE
@@ -120,11 +133,11 @@ export class AutonomyOrchestratorService {
           const action: ActionSpec = {
             actionId,
             actionType: ActionType.FETCH_PAGE,
-            objective: `Fetch page from discovered source: ${source.source_domain}`,
+            objective: `Fetch goal-relevant source (relevance ${(source.relevance * 100).toFixed(0)}%): ${source.url}`,
             args: {
-              url: source.source_url,
-              sourcePackOrigin: source.source_pack,
-              discoveryMethod: source.discovery_method,
+              url: source.url,
+              discoveryMethod: source.discoveryMethod,
+              relevanceScore: source.relevance,
             },
             successCriteria: ['content_extracted', 'url_resolved'],
             riskLevel: RiskLevel.LOW,
@@ -161,12 +174,12 @@ export class AutonomyOrchestratorService {
             evidenceCreated += result.createdArtifacts.length;
 
             console.log(
-              `[D1] ✅ Fetched: ${source.source_domain} - ` +
+              `[D1] ✅ Fetched: ${source.url} - ` +
                 `${result.observations.contentLength || 0} bytes, ` +
                 `${result.createdArtifacts.length} evidence created`
             );
           } else {
-            console.log(`[D1] ⚠️  Fetch failed for: ${source.source_domain} - ${result.blockedReason || result.errors?.[0]}`);
+            console.log(`[D1] ⚠️  Fetch failed for: ${source.url} - ${result.blockedReason || result.errors?.[0]}`);
           }
 
           // Update action with result
@@ -187,7 +200,7 @@ export class AutonomyOrchestratorService {
             );
           }
         } catch (error: any) {
-          console.warn(`[D1] Error fetching ${source.source_url}: ${error.message}`);
+          console.warn(`[D1] Error fetching ${source.url}: ${error.message}`);
         }
       }
 
@@ -948,7 +961,7 @@ export class AutonomyOrchestratorService {
         let didBootstrap = false;
         if (iteration === 0 && evidenceCount === 0) {
           console.log(`\n[Iteration 1] Bootstrapping with discovered sources...`);
-          const d1Result = await this.injectDiscoveredSourceActions(goalId, 'technical', 3);
+          const d1Result = await this.injectDiscoveredSourceActions(goalId, goalText, 3);
           console.log(`[Iteration 1] D1 bootstrap: discovered=${d1Result.discoveredCount}, fetched=${d1Result.fetchedCount}, evidence=${d1Result.evidenceCreated}`);
           actionsExecuted += d1Result.fetchedCount;
           didBootstrap = d1Result.evidenceCreated > 0;

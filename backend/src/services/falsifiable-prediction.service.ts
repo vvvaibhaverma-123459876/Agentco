@@ -74,6 +74,13 @@ export const STOPWORDS = new Set([
   'the', 'a', 'an', 'and', 'or', 'of', 'to', 'in', 'on', 'for', 'with', 'is',
   'are', 'was', 'were', 'be', 'been', 'that', 'this', 'these', 'those', 'it',
   'its', 'as', 'at', 'by', 'from', 'has', 'have', 'had', 'will', 'can', 'not',
+  // question/instruction words — they carry no subject matter, and keeping
+  // them starved queries of salient tail tokens (G4)
+  'what', 'how', 'why', 'when', 'where', 'who', 'whom', 'which', 'does', 'do',
+  'did', 'say', 'says', 'said', 'about', 'into', 'over', 'under', 'their',
+  'there', 'they', 'them', 'you', 'your', 'our', 'summarize', 'describe',
+  'explain', 'research', 'investigate', 'analyze', 'report', 'review', 'find',
+  'list', 'tell',
 ]);
 
 export function normalizeTokens(value: string): string[] {
