@@ -19,7 +19,8 @@
     "agentco:longitudinal-learning": "ts-node src/cli/run-longitudinal-learning.ts",
     "agentco:score-validation": "ts-node src/cli/score-validation.ts",
     "agentco:db-table-usage": "ts-node src/cli/db-table-usage.ts",
-    "autonomy": "ts-node src/cli/autonomy.ts"
+    "autonomy": "ts-node src/cli/autonomy.ts",
+    "agentco:supervised-runtime": "ts-node src/cli/supervised-runtime.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",
