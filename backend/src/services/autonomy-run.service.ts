@@ -97,15 +97,23 @@ export class AutonomyRunService {
     for (const claim of claims.rows) {
       const evidenceIds = Array.isArray(claim.support_source_ids) ? claim.support_source_ids : [];
       if (evidenceIds.length === 0) continue;
-      const registered = await falsifiablePrediction.registerForClaim({
-        claimId: claim.claim_id,
-        claimText: claim.text,
-        supportSourceIds: evidenceIds,
-        producingAgentId: RUN_AGENT,
-        domain,
-        runId,
-        dueInMs: predictionHorizonMs,
-      });
+      let registered;
+      try {
+        registered = await falsifiablePrediction.registerForClaim({
+          claimId: claim.claim_id,
+          claimText: claim.text,
+          supportSourceIds: evidenceIds,
+          producingAgentId: RUN_AGENT,
+          domain,
+          runId,
+          dueInMs: predictionHorizonMs,
+        });
+      } catch (error) {
+        // A claim with no content-bearing tokens cannot form a falsifiable
+        // criterion; skip it rather than crashing the whole run.
+        console.warn(`[autonomy-run] skipped prediction for claim ${claim.claim_id}: ${error}`);
+        continue;
+      }
       predictionIds.push(registered.predictionId);
     }
 
