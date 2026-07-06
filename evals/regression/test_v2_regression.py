@@ -302,3 +302,110 @@ class TestSeededFalseBeliefRegression:
         result = firewall.promote_to_reality_validated(false_belief.belief_id, records)
         assert result is False
         assert firewall._beliefs[false_belief.belief_id].validation_status != "reality_validated"
+
+
+class TestSeededFalseBeliefAdversarialRoutes:
+    """Alternate routes must not move simulation-seeded beliefs across the firewall."""
+
+    def _simulation_supported_belief(self, firewall):
+        from calibration.firewall.firewall import Belief
+        import uuid
+
+        belief = Belief(
+            belief_id=str(uuid.uuid4()),
+            statement="SEEDED FALSE BELIEF: simulation-only claim",
+            origin="test-seeder",
+        )
+        firewall.register_belief(belief)
+        for _ in range(20):
+            firewall.add_simulation_support(belief.belief_id)
+        assert firewall.status(belief.belief_id) == "simulation_supported"
+        return belief
+
+    def test_replay_import_cannot_register_reality_validated_belief(self):
+        from calibration.firewall.firewall import Belief
+        import uuid
+
+        cal = _cal()
+        firewall = cal["firewall"]
+        imported = Belief(
+            belief_id=str(uuid.uuid4()),
+            statement="IMPORTED FALSE BELIEF: already promoted",
+            origin="replay-import",
+            validation_status="reality_validated",
+        )
+
+        with pytest.raises(ValueError, match="must start as provisional"):
+            firewall.register_belief(imported)
+        assert imported.belief_id not in firewall._beliefs
+
+    def test_trust_score_side_effects_do_not_auto_promote_seeded_belief(self):
+        cal = _cal()
+        firewall = cal["firewall"]
+        ledger = cal["ledger"]
+        resolution = cal["resolution"]
+        belief = self._simulation_supported_belief(firewall)
+
+        past = datetime.now(timezone.utc) - timedelta(hours=1)
+        for i in range(5):
+            pid = ledger.pre_register(PredictionRegistration(
+                claim=f"TRUE calibration side-effect probe {i}",
+                probability=0.9,
+                confidence_basis={"method": "trust-side-effect-probe"},
+                producing_agent_id="trusted-but-not-promoter",
+                producing_prompt_version="1.0",
+                resolution_criterion="External source validates a separate claim",
+                resolution_date=past,
+                ground_truth_source="external_market_research",
+                horizon_class="short",
+                domain="market_dynamics",
+                claim_type="market_forecast",
+                historical_registration_reason="adversarial firewall trust side-effect fixture",
+            ))
+            resolution.resolve(
+                pid,
+                outcome=True,
+                ground_truth_source="external_market_research",
+                evidence="truth for trust side-effect probe",
+            )
+
+        assert cal["trust"].get_sample_count(
+            "trusted-but-not-promoter", "market_dynamics", "market_forecast", "short"
+        ) == 5
+        assert firewall.status(belief.belief_id) == "simulation_supported"
+        assert belief not in firewall.get_governing_beliefs()
+
+    def test_principle_promotion_cannot_bypass_unvalidated_belief(self):
+        cal = _cal()
+        firewall = cal["firewall"]
+        belief = self._simulation_supported_belief(firewall)
+        library = PrincipleLibrary(firewall=firewall)
+        principle = library.add_principle(
+            title="simulation-only principle",
+            description="should remain provisional until its belief crosses the firewall",
+            source_domains=["market_dynamics"],
+            confidence=0.9,
+        )
+
+        promoted = library.promote_principle(principle.principle_id, belief.belief_id)
+
+        assert promoted is False
+        assert library.get(principle.principle_id).validation_status == "provisional"
+        assert firewall.status(belief.belief_id) == "simulation_supported"
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason=(
+            "CODE-WRONG: in-memory Belief objects are mutable and direct cache "
+            "writes can bypass RealitySimulationFirewall.promote_to_reality_validated"
+        ),
+    )
+    def test_direct_in_memory_status_write_is_not_gated(self):
+        cal = _cal()
+        firewall = cal["firewall"]
+        belief = self._simulation_supported_belief(firewall)
+
+        firewall._beliefs[belief.belief_id].validation_status = "reality_validated"
+
+        assert firewall.status(belief.belief_id) != "reality_validated"
+        assert belief not in firewall.get_governing_beliefs()
