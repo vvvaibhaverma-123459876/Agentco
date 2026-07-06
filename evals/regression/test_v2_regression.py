@@ -235,6 +235,7 @@ class TestInvariant10_GroundTruthExternal:
             horizon_class="short",
             domain="general",
             claim_type="test",
+            historical_registration_reason="regression fixture for internal resolution source invariant",
         )
         pid = cal["ledger"].pre_register(reg)
         with pytest.raises(ValueError):
