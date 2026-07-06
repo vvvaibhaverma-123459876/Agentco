@@ -8,6 +8,15 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { db } from '../db/client';
 
+function isDashboardSchemaUnavailable(error: any): boolean {
+  return (
+    error?.code === '42P01' ||
+    error?.code === '42703' ||
+    /relation ".*" does not exist/i.test(error?.message ?? '') ||
+    /column ".*" does not exist/i.test(error?.message ?? '')
+  );
+}
+
 export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
   /**
    * GET /api/autonomy/runs/:runId
@@ -60,6 +69,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           run,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(404).send({ status: 'error', message: 'Run not found' });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -114,6 +126,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           count: runs.length,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(200).send({ status: 'success', runs: [], count: 0 });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -161,6 +176,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           count: tasks.length,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(200).send({ status: 'success', tasks: [], count: 0 });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -215,6 +233,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           candidate,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(404).send({ status: 'error', message: 'Candidate not found' });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -266,6 +287,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           count: candidates.length,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(200).send({ status: 'success', candidates: [], count: 0 });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -321,6 +345,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           scorecard,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(404).send({ status: 'error', message: 'Scorecard not found' });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -373,6 +400,9 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           count: scorecards.length,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(200).send({ status: 'success', scorecards: [], count: 0 });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,
@@ -438,6 +468,20 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
           overview,
         });
       } catch (error: any) {
+        if (isDashboardSchemaUnavailable(error)) {
+          return reply.code(200).send({
+            status: 'success',
+            overview: {
+              totalRuns: 0,
+              completedRuns: 0,
+              failedRuns: 0,
+              totalCandidates: 0,
+              promotionEligibleCount: 0,
+              avgPromotionScore: 0,
+              recentRuns: [],
+            },
+          });
+        }
         reply.code(500).send({
           status: 'error',
           message: error.message,

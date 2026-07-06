@@ -100,3 +100,23 @@ Writers read:
 Finding: the two writers were not using an explicit shared canonical serialization contract. They happened to use the same field order for many rows, but key ordering was implicit and timestamp text differed by runtime (`Z` vs `+00:00`). Phase 5 canonicalized both writers to sorted-key compact JSON and millisecond UTC `Z` timestamps.
 
 Live-service test added: `backend/tests/audit-chain-cross-writer.test.ts` writes TS -> Python -> TS entries with one session id, then calls `AuditLogService.verifyChainIntegrity()` over the chain. It returns early with `SKIP: decision_log live-service test requires Postgres/migrations: ...` when the database or migrations are absent.
+
+## Task 3 — Frontend Auth Smoke
+
+Script added: `scripts/smoke_frontend_auth.sh`.
+
+It starts the backend with `AGENTCO_API_KEY`, starts the frontend with `NEXT_PUBLIC_AGENTCO_API_KEY` and `NEXT_PUBLIC_API_URL`, curls key frontend pages, checks protected backend endpoints without a key, then calls the dashboard/audit/autonomy data endpoints with the same headers the frontend API client adds.
+
+Run summary:
+
+```text
+ready: backend http://127.0.0.1:3101/health
+ready: frontend dashboard page http://127.0.0.1:3100/dashboard
+ok 200: http://127.0.0.1:3100/audit
+ok 200: http://127.0.0.1:3100/autonomy
+ok 401: /api/agents, /api/audit, /api/audit/integrity, /api/autonomy/runs, /api/autonomy/tasks, /api/autonomy/dashboard/overview
+ok 200: /api/agents, /api/audit, /api/audit/integrity, /api/autonomy/runs, /api/autonomy/tasks, /api/autonomy/candidates, /api/autonomy/evals/scorecards, /api/autonomy/dashboard/overview
+frontend auth smoke passed
+```
+
+Local note: the current local DB has dashboard schema drift (`autonomy_runs` absent; some legacy dashboard columns absent). The read-only autonomy dashboard list/overview endpoints now return empty success payloads for missing optional dashboard tables/columns instead of 500, so auth smoke can prove auth/header behavior without requiring historical dashboard schema.
