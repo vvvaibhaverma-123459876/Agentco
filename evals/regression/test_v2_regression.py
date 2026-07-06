@@ -63,6 +63,7 @@ class TestInvariant1_ImmutableLedger:
             horizon_class="short",
             domain="general",
             claim_type="test",
+            historical_registration_reason="regression fixture for write-once resolution invariant",
         )
         pid = cal["ledger"].pre_register(reg)
         cal["resolution"].resolve(pid, outcome=True, ground_truth_source="external_auditor", evidence="test")
