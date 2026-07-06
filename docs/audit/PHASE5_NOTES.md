@@ -87,3 +87,16 @@ Search scope: Python and TypeScript production paths, backend routes/services, `
 Do not retire `SpecialistAgent` or the 17 autonomy subclasses without replacing the active `spawn_specialist` path.
 
 Recommended Phase 6 retire/archive list: all DEAD department-style V1 classes in `agents/customer_experience`, `agents/design`, `agents/engineering/*_agent.py` V1 files, `agents/executive/*_agent.py` V1 files, `agents/legal/*_agent.py` V1 files, `agents/marketing`, `agents/people_ops/*_agent.py` V1 files, `agents/product/*_agent.py` V1 files, and `agents/sales`. Keep V2 equivalents where present.
+
+## Task 2 — `decision_log` Chain Continuity Across Writers
+
+Writers read:
+
+| Writer | File | Fields hashed | Serialization | Hash |
+|---|---|---|---|---|
+| TypeScript `AuditLogService` | `backend/src/services/audit-log.service.ts` | `log_id`, `timestamp`, `prev_hash`, `agent_id`, `action_type`, `input_summary`, `output_summary`, `confidence_score`, `risk_level`, `human_approved`, `human_approver_id`, `downstream_events`, `session_id` | Before Phase 5: `JSON.stringify(fields)` insertion order. After Phase 5: sorted-key compact JSON via `canonicalDecisionLogContent()` with normalized timestamp and confidence. Verifier also accepts the old TS insertion-order form for immutable legacy rows. | SHA-256 over `prev_hash + canonicalContent`. |
+| Python `DurableAuditWriter` | `runtime/base_agent/audit_writer.py` | Same field set as TypeScript. | Before Phase 5: compact JSON with insertion order and Python UTC `+00:00` timestamp text. After Phase 5: `json.dumps(..., sort_keys=True, separators=(",", ":"))` and millisecond UTC `Z` timestamp. | SHA-256 over `prev_hash + canonicalContent`. |
+
+Finding: the two writers were not using an explicit shared canonical serialization contract. They happened to use the same field order for many rows, but key ordering was implicit and timestamp text differed by runtime (`Z` vs `+00:00`). Phase 5 canonicalized both writers to sorted-key compact JSON and millisecond UTC `Z` timestamps.
+
+Live-service test added: `backend/tests/audit-chain-cross-writer.test.ts` writes TS -> Python -> TS entries with one session id, then calls `AuditLogService.verifyChainIntegrity()` over the chain. It returns early with `SKIP: decision_log live-service test requires Postgres/migrations: ...` when the database or migrations are absent.

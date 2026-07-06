@@ -6,8 +6,8 @@
  * Hash chain: each row stores SHA-256(prev_hash || canonicalContent(row)).
  * verifyChainIntegrity() re-derives the chain from the DB and detects any tampering.
  *
- * Canonical content: a fixed set of fields with normalised types so that
- * verifyChainIntegrity() can re-derive the same hash from the stored DB values.
+ * Canonical content: sorted-key compact JSON with normalised types so that
+ * Python and TypeScript writers derive the same hash from the stored DB values.
  */
 import crypto from 'crypto';
 import { PoolClient } from 'pg';
@@ -33,12 +33,7 @@ export interface AuditRecord extends AuditEntry {
   prev_hash: string;
 }
 
-/**
- * Build the canonical string that is hashed for a given row.
- * Fields are listed in a fixed order with normalised types.
- * This function is the single source of truth used by both append() and verifyChainIntegrity().
- */
-function canonicalContent(fields: {
+interface CanonicalDecisionLogFields {
   log_id: string;
   timestamp: string;
   prev_hash: string;
@@ -52,7 +47,30 @@ function canonicalContent(fields: {
   human_approver_id: string | null;
   downstream_events: string[];
   session_id: string | null;
-}): string {
+}
+
+function sortCanonical(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(sortCanonical);
+  if (value && typeof value === 'object' && !(value instanceof Date)) {
+    return Object.keys(value as Record<string, unknown>)
+      .sort()
+      .reduce<Record<string, unknown>>((acc, key) => {
+        acc[key] = sortCanonical((value as Record<string, unknown>)[key]);
+        return acc;
+      }, {});
+  }
+  return value;
+}
+
+/**
+ * Build the canonical string that is hashed for a given row.
+ * This is the cross-language contract used by both append() and verifyChainIntegrity().
+ */
+export function canonicalDecisionLogContent(fields: CanonicalDecisionLogFields): string {
+  return JSON.stringify(sortCanonical(fields));
+}
+
+function legacyTsContent(fields: CanonicalDecisionLogFields): string {
   return JSON.stringify(fields);
 }
 
@@ -112,7 +130,7 @@ export class AuditLogService {
     const human_approver_id = entry.human_approver_id ?? null;
     const downstream_events = entry.downstream_events ?? [];
     const session_id = entry.session_id ?? null;
-    const content = canonicalContent({
+    const content = canonicalDecisionLogContent({
       log_id,
       timestamp,
       prev_hash,
@@ -215,9 +233,9 @@ export class AuditLogService {
     );
 
     for (const row of rows) {
-      const content = canonicalContent({
+      const fields = {
         log_id: row.log_id,
-        timestamp: row.timestamp,
+        timestamp: normalizeTimestamp(row.timestamp),
         prev_hash: row.prev_hash,
         agent_id: row.agent_id,
         action_type: row.action_type,
@@ -230,10 +248,11 @@ export class AuditLogService {
         human_approver_id: row.human_approver_id,
         downstream_events: row.downstream_events ?? [],
         session_id: row.session_id,
-      });
+      };
 
-      const computed = crypto.createHash('sha256').update(row.prev_hash + content).digest('hex');
-      if (computed !== row.chain_hash) {
+      const computed = crypto.createHash('sha256').update(row.prev_hash + canonicalDecisionLogContent(fields)).digest('hex');
+      const legacyComputed = crypto.createHash('sha256').update(row.prev_hash + legacyTsContent(fields)).digest('hex');
+      if (computed !== row.chain_hash && legacyComputed !== row.chain_hash) {
         return { valid: false, broken_at: row.log_id };
       }
     }

@@ -12,6 +12,15 @@ from typing import Any, Protocol
 logger = logging.getLogger(__name__)
 
 
+def _utc_timestamp_ms() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
+def canonical_decision_log_content(fields: dict[str, Any]) -> str:
+    """Cross-language canonical JSON for decision_log hash-chain rows."""
+    return json.dumps(fields, sort_keys=True, separators=(",", ":"))
+
+
 class AuditUnavailableError(RuntimeError):
     """Raised when a protected action cannot be durably audited."""
 
@@ -58,7 +67,7 @@ class DurableAuditWriter:
 
         data = asdict(entry) if hasattr(entry, "__dataclass_fields__") else dict(entry)
         log_id = str(uuid.uuid4())
-        timestamp = datetime.now(timezone.utc).isoformat()
+        timestamp = _utc_timestamp_ms()
         prev_hash = "0" * 64
         action_type = data.get("action_type", "decision")
         if action_type not in self.VALID_ACTION_TYPES:
@@ -95,24 +104,23 @@ class DurableAuditWriter:
                     if row:
                         prev_hash = row[0]
 
-                    content = json.dumps(
-                        {
-                            "log_id": log_id,
-                            "timestamp": timestamp,
-                            "prev_hash": prev_hash,
-                            "agent_id": data["agent_id"],
-                            "action_type": action_type,
-                            "input_summary": data["description"],
-                            "output_summary": output_summary,
-                            "confidence_score": round(float(data["trusted_confidence"]), 3),
-                            "risk_level": data["risk_level"],
-                            "human_approved": human_approved,
-                            "human_approver_id": None,
-                            "downstream_events": downstream_events,
-                            "session_id": session_id,
-                        },
-                        separators=(",", ":"),
-                    )
+                    input_summary = data["description"][:500]
+                    output_summary = output_summary[:500]
+                    content = canonical_decision_log_content({
+                        "log_id": log_id,
+                        "timestamp": timestamp,
+                        "prev_hash": prev_hash,
+                        "agent_id": data["agent_id"],
+                        "action_type": action_type,
+                        "input_summary": input_summary,
+                        "output_summary": output_summary,
+                        "confidence_score": round(float(data["trusted_confidence"]), 3),
+                        "risk_level": data["risk_level"],
+                        "human_approved": human_approved,
+                        "human_approver_id": None,
+                        "downstream_events": downstream_events,
+                        "session_id": session_id,
+                    })
                     chain_hash = hashlib.sha256((prev_hash + content).encode()).hexdigest()
                     cur.execute(
                         """
@@ -127,8 +135,8 @@ class DurableAuditWriter:
                             log_id,
                             data["agent_id"],
                             action_type,
-                            data["description"][:500],
-                            output_summary[:500],
+                            input_summary,
+                            output_summary,
                             round(float(data["trusted_confidence"]), 3),
                             data["risk_level"],
                             human_approved,
