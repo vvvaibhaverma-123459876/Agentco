@@ -35,7 +35,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.13'
           cache: 'pip'
 
       - name: Install dependencies
@@ -131,7 +131,10 @@ jobs:
           cache-dependency-path: backend/package.json
 
       - name: Install Python dependencies
-        run: pip install -r requirements-dev.txt -r requirements-runtime.txt psycopg2-binary pyyaml requests
+        run: pip install -r docs/history/requirements-dev.txt -r docs/history/requirements-runtime.txt psycopg2-binary pyyaml requests
+
+      - name: Verify pytest collection
+        run: PYTHONDONTWRITEBYTECODE=1 python3.13 -m pytest --collect-only -q
 
       - name: Install backend dependencies
         working-directory: backend
