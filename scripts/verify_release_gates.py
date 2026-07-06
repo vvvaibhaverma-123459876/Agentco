@@ -101,7 +101,7 @@ def route_reachability() -> dict[str, Any]:
 def build_report() -> dict[str, Any]:
     py = sys.executable
     firewall = run_command([py, "-m", "pytest", "calibration/tests/test_ledger_immutability.py::TestFirewall", "-q"])
-    sandbox = run_command([py, "selfcoding/tests/test_wall_holds.py"])
+    sandbox = run_command([py, "-m", "pytest", "selfcoding/tests/test_wall_holds.py", "-q"])
     credential = run_command(
         [
             py,

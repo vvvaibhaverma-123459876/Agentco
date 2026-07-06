@@ -74,7 +74,7 @@ export class GoalFormationService {
           reason: 'learner candidate is ready_for_eval and has never been evaluated',
           sourceObjects: [{ table: 'learner_candidates', id: row.id }],
           riskLevel: 'low',
-          domain: 'internal_learning',
+          domain: `internal_learning_${row.id.slice(0, 8)}`,
           budget: { maxIterations: 30, maxSeconds: 120 },
           stopCondition: 'candidate reaches evaluated/rejected status or budget exhausted',
           requiresLiveServices: false,
@@ -122,15 +122,18 @@ export class GoalFormationService {
     // 3. Low-confidence unverified claims -> evidence collection goals.
     //    These need live web access, so they are proposed at medium risk and
     //    will NOT auto-approve.
-    const claims = await db.query<{ id: string; claim_text: string }>(
-      `SELECT c.id, c.text AS claim_text
+    const claims = await db.query<{ row_id: string; claim_id: string; claim_text: string }>(
+      `SELECT c.id AS row_id, c.claim_id, c.text AS claim_text
          FROM autonomy_claims c
         WHERE COALESCE(c.confidence, 0) < 0.5
           AND COALESCE(c.status, 'unverified') NOT IN ('verified', 'retired')
           AND NOT EXISTS (
                 SELECT 1 FROM goal_evidence ge
                  JOIN autonomy_goals g ON g.id = ge.goal_id
-                WHERE ge.evidence_ref = 'autonomy_claims:' || c.id::text
+                WHERE ge.evidence_ref IN (
+                        'autonomy_claims:' || c.id::text,
+                        'autonomy_claims:' || c.claim_id::text
+                      )
                   AND g.status NOT IN ('rejected', 'retired', 'completed')
           )
         ORDER BY c.created_at ASC
@@ -140,9 +143,12 @@ export class GoalFormationService {
     for (const row of claims.rows) {
       proposals.push(
         await this.persistProposal({
-          title: `Collect independent evidence for low-confidence claim ${row.id.slice(0, 8)}`,
+          title: `Collect independent evidence for low-confidence claim ${row.claim_id.slice(0, 8)}`,
           reason: `claim confidence below 0.5 and unverified: "${row.claim_text.slice(0, 120)}"`,
-          sourceObjects: [{ table: 'autonomy_claims', id: row.id }],
+          sourceObjects: [
+            { table: 'autonomy_claims', id: row.claim_id },
+            { table: 'autonomy_claims', id: row.row_id },
+          ],
           riskLevel: 'medium',
           domain: 'evidence_verification',
           budget: { maxIterations: 10, maxSeconds: 300 },

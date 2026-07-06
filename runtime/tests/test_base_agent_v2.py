@@ -179,7 +179,7 @@ class TestBaseAgentV2Contract:
             description="Send notification",
             payload={"msg": "hello"},
             risk_level="low",
-            stated_confidence=0.7,
+            stated_confidence=0.8,
         )
         result = agent.execute_action(action)
         envelope = result["envelope"]

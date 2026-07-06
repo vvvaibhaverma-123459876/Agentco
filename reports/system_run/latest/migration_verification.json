@@ -6,10 +6,16 @@
     "autonomy_goals",
     "decision_log",
     "departments",
+    "eval_runs",
+    "eval_scorecards",
+    "eval_suites",
     "institution_specialist_assignments",
     "institution_work_requests",
+    "learner_candidates",
     "override_queue",
     "prediction_ledger",
+    "reward_calculations",
+    "reward_functions",
     "specialist_allocation_history"
   ],
   "detail": "existing schema accepted if required tables and columns are present",
@@ -20,6 +26,7 @@
   "postgres_connectivity": "real",
   "required_columns": {
     "autonomy_goals": [
+      "depth",
       "goal_depth",
       "goal_path",
       "id",
@@ -34,6 +41,35 @@
       "metadata",
       "parent_id"
     ],
+    "eval_runs": [
+      "baseline_ref",
+      "candidate_ref",
+      "completed_at",
+      "id",
+      "run_status",
+      "run_timestamp",
+      "started_at",
+      "status",
+      "suite_id",
+      "target_id",
+      "target_type",
+      "total_cases",
+      "trace_id"
+    ],
+    "eval_scorecards": [
+      "decision_reason",
+      "eval_run_id",
+      "id",
+      "overall_score",
+      "promotion_eligible"
+    ],
+    "eval_suites": [
+      "active",
+      "eval_type",
+      "id",
+      "name",
+      "total_cases"
+    ],
     "institution_specialist_assignments": [
       "department_id",
       "id",
@@ -46,10 +82,39 @@
       "institution_id",
       "status"
     ],
+    "learner_candidates": [
+      "artifact_json",
+      "id",
+      "learner_run_id",
+      "risk_level",
+      "simulation_trained"
+    ],
     "prediction_ledger": [
       "consequence",
       "hardness",
       "prediction_id"
+    ],
+    "reward_calculations": [
+      "calculation_details_json",
+      "components_json",
+      "function_id",
+      "id",
+      "metrics_json",
+      "regret_score",
+      "reward_function_id",
+      "reward_score",
+      "reward_value"
+    ],
+    "reward_functions": [
+      "created_by",
+      "domain",
+      "formula_json",
+      "function_type",
+      "id",
+      "name",
+      "owner",
+      "risk_level",
+      "version"
     ],
     "specialist_allocation_history": [
       "department_id",
@@ -64,10 +129,16 @@
     "autonomy_goals",
     "decision_log",
     "departments",
+    "eval_runs",
+    "eval_scorecards",
+    "eval_suites",
     "institution_specialist_assignments",
     "institution_work_requests",
+    "learner_candidates",
     "override_queue",
     "prediction_ledger",
+    "reward_calculations",
+    "reward_functions",
     "specialist_allocation_history"
   ],
   "success": true
