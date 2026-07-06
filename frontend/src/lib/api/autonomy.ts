@@ -5,8 +5,8 @@
  * Provides methods to fetch and manage autonomy runs, tasks, candidates, and evals.
  */
 
-const API_ROOT = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-const API_BASE = `${API_ROOT.replace(/\/$/, '')}/api`;
+const API_ROOT = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
+const API_BASE = `${API_ROOT}/api`;
 
 export interface AutonomyRun {
   id: string;
@@ -220,7 +220,7 @@ export async function getTraces(runId: string): Promise<Array<{
  */
 export async function healthCheck(): Promise<boolean> {
   try {
-    const response = await fetch(`${API_BASE}/health`, { method: 'GET' });
+    const response = await fetch(`${API_ROOT}/health`, { method: 'GET' });
     return response.ok;
   } catch {
     return false;
