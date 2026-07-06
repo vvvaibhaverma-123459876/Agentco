@@ -52,3 +52,39 @@ in the Python in-memory authority. The correct fix is to make
 `Belief.validation_status` read-only from outside the firewall and expose
 firewall-owned transition methods. No new DB migration is required for this
 specific in-memory hole.
+
+## Task 2 — Durable BaseAgentV2 Audit Writer Investigation
+
+### Existing Audit Infrastructure
+
+Candidate durable audit targets:
+
+| Artifact | Finding |
+|---|---|
+| `backend/src/db/migrations/004_decision_log.sql` | Creates `decision_log` and says: "This is the legal and governance record of every decision in AgentCo." |
+| `backend/src/db/migrations/012_decision_log_chain.sql` | Adds `chain_hash` and `prev_hash`; comment says the table is hash-chained and DB update revocation enforces immutability. |
+| `backend/src/db/migrations/014_decision_log_immutability_triggers.sql` | Adds triggers rejecting `UPDATE` and `DELETE`, including table-owner/superuser bypass protection unless triggers are explicitly disabled. |
+| `backend/src/services/audit-log.service.ts` | Canonical TS writer. It writes to `decision_log`, computes `prev_hash`/`chain_hash`, and rethrows failures. |
+| `agents/core/tools/handlers.py` | Existing Python V1 audit tool also writes to `decision_log`, but with weaker canonical hashing and no writer interface. |
+| `backend/src/db/migrations/080_event_log.sql` + `083_transactional_outbox.sql` | Canonical event stream/outbox, but it is a broader event bus rather than the legal/governance decision audit record. |
+
+Decision: `DurableAuditWriter` should write directly to `decision_log` using the
+same schema as the TS `AuditLogService`. This avoids a second table, keeps Python
+V2 audits visible in the existing governance audit log, and reuses the DB
+append-only/hash-chain controls. `event_log`/`event_outbox` remain eventing
+infrastructure, not the primary decision audit ledger.
+
+### Fail-Closed Semantics
+
+`BaseAgentV2` currently appends `AuditEntryV2` objects to `self._audit_log`, so
+process restart loses audit history. Phase 3 changes this to constructor-injected
+`AuditWriter`:
+
+- `DurableAuditWriter`: selected by default when `AGENTCO_TEST_DATABASE_URL` or
+  `DATABASE_URL` is configured.
+- `InMemoryAuditWriter`: test-only; construction requires an explicit test flag.
+- No configured writer: low/medium actions may execute with visible error
+  accounting; high/critical actions raise `AuditUnavailableError` before action
+  execution.
+- For high/critical actions that clear the human-approval gate, durable audit ack
+  must be written before the signed action envelope is returned.
