@@ -128,7 +128,7 @@ Suites checked with `--detectOpenHandles`:
 - `npm test -- audit-chain-cross-writer.test.ts --runInBand --detectOpenHandles` — passed; no concrete handle reported.
 - `npm test -- task-worker.test.ts --runInBand --detectOpenHandles` — passed; no concrete handle reported.
 
-Observed issue: the normal cross-writer run passed but printed Jest's "did not exit one second after the test run" warning. Root cause was an obvious shared DB helper bug: `backend/src/db/client.ts` created a 10s query timeout with `setTimeout` and did not clear it when the DB query resolved first.
+Observed issue: the normal cross-writer run passed but printed Jest's "did not exit one second after the test run" warning. Root cause for that focused repro was an obvious shared DB helper bug: `backend/src/db/client.ts` created a 10s query timeout with `setTimeout` and did not clear it when the DB query resolved first.
 
 Fix: clear the query timeout in a `finally()` attached to the `Promise.race`. Verification:
 
@@ -138,7 +138,25 @@ PASS tests/audit-chain-cross-writer.test.ts
 No open-handle warning.
 ```
 
-No `--forceExit` change was needed.
+Full-suite follow-up:
+
+```text
+npm test -- --runInBand
+Test Suites: 3 skipped, 96 passed, 96 of 99 total
+Tests:       8 skipped, 5 todo, 598 passed, 611 total
+Jest did not exit one second after the test run has completed.
+```
+
+TODO: the obvious query-timeout leak is fixed, but another full-suite handle remains. Per the Phase 5 timebox, `backend/jest.config.ts` now sets `forceExit: true` with an inline comment pointing back to this TODO. Phase 6 should isolate the remaining handle with narrower `--detectOpenHandles` runs across the integration suites that start servers, subprocesses, Kafka clients, or shared DB pools.
+
+Verification after fallback:
+
+```text
+npm test -- --runInBand
+Test Suites: 3 skipped, 96 passed, 96 of 99 total
+Tests:       8 skipped, 5 todo, 598 passed, 611 total
+Force exiting Jest: Have you considered using `--detectOpenHandles` ...
+```
 
 ## Task 5 — Python Lockfile and Staging Compose Secrets
 
