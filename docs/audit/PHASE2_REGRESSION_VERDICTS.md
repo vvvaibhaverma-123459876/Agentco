@@ -77,6 +77,14 @@ ValueError WRITE-ONCE VIOLATION: prediction ... is already resolved
 
 TEST-WRONG.
 
+EVIDENCE OF INTENT: `backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql`
+added by `4968b74` says: "Close the remaining calibration hole at the database
+insert boundary." It further states: "This migration also makes registration
+itself falsifiable and durable" and requires "resolution_date must be after
+created_at." The same commit added
+`backend/tests/calibration-registration-invariants.test.ts::live registration
+rejects backdated resolution_date before DB insert`.
+
 The write-once invariant remains documented and enforced in app code, and DB
 trigger definitions still contain the `OLD.resolved` write-once rejection. The
 regression is the test fixture: it relies on a backdated registration style that
@@ -163,6 +171,12 @@ ValueError DISQUALIFIED SOURCE: 'self' is internal. Ground truth must originate 
 ### VERDICT
 
 TEST-WRONG.
+
+EVIDENCE OF INTENT: `backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql`
+added by `4968b74` says registration now rejects "disqualified internal source
+tokens" and adds `prediction_ledger_ground_truth_external`. The same commit
+added `backend/tests/calibration-registration-invariants.test.ts::registration
+rejects disqualified internal source tokens without blocking user-agent text`.
 
 The external-ground-truth invariant remains intended and enforced in
 `ResolutionService._validate_resolution()`. The failing test is still built for
@@ -263,6 +277,13 @@ Gate trace:
 ### VERDICT
 
 TEST-WRONG.
+
+EVIDENCE OF INTENT: `backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql`
+added by `4968b74` says: "Close the remaining calibration hole at the database
+insert boundary" and requires "resolution_date must be after created_at." That
+is the exact registration-boundary behavior blocking the old seeded-belief
+fixture before it reaches the firewall. The firewall invariant itself is
+separately stated in `SYSTEM.md`: "No simulation volume crosses this line."
 
 The firewall invariant is still intended and the code blocks the seeded false
 belief once the test reaches the promotion gate. The failure is in the test
@@ -374,6 +395,14 @@ notified [('agent-drop', 0.3)]
 ### VERDICT
 
 TEST-WRONG.
+
+EVIDENCE OF INTENT: `backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql`
+added by `4968b74` says: "Close the remaining calibration hole at the database
+insert boundary" and requires "resolution_date must be after created_at." The
+same commit added `backend/tests/calibration-registration-invariants.test.ts::live
+registration rejects backdated resolution_date before DB insert`, proving the
+old `_resolve_n()` backdated fixture setup is no longer an accepted live
+registration path.
 
 The intended HIGH-1 and HIGH-3 trust fixes are still present in current code:
 `TrustScore` has `n_resolved`, `get_sample_count()` returns it, `ingest_resolution()`
