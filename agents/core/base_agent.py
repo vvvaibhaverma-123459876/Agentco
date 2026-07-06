@@ -9,6 +9,11 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any, Optional
 
+from runtime.base_agent.audit_writer import (
+    AuditUnavailableError,
+    AuditWriter,
+    DurableAuditWriter,
+)
 from runtime.base_agent.llm_client import make_client
 from runtime.base_agent.model_tiers import model_for
 from .tools import register_all_tools
@@ -26,6 +31,10 @@ from .types import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class GovernanceUnavailableError(RuntimeError):
+    """Raised when V1 governance cannot safely allow an action to proceed."""
 
 
 class BaseAgent(ABC):
@@ -49,7 +58,7 @@ class BaseAgent(ABC):
     COMPETENCY_AREAS: list[str] = []
     AUTONOMY_LEVEL: str = "medium"
 
-    def __init__(self):
+    def __init__(self, audit_writer: Optional[AuditWriter] = None):
         if not self.AGENT_ID:
             raise ValueError(f"{self.__class__.__name__} must define AGENT_ID")
 
@@ -67,6 +76,8 @@ class BaseAgent(ABC):
         self._event_bus = None
         self._audit_log = None
         self._override_queue = None
+        self._audit_writer = audit_writer if audit_writer is not None else DurableAuditWriter.from_env()
+        self._audit_failures = 0
 
     # ──────────────────────────────────────────────────────────────
     # Abstract interface — each agent implements these
@@ -102,12 +113,16 @@ class BaseAgent(ABC):
         }
         validate_confidence_attached(output_dict)
 
-        # Audit every decision
-        await self._write_audit(task, output)
-
         # Escalate if needed — hard stop for high/critical
         if output.risk_level in (RiskLevel.HIGH, RiskLevel.CRITICAL) or output.requires_human_approval:
-            await self._request_human_approval(task, output)
+            await self._write_audit(task, output, require_ack=True)
+            request_id = await self._request_human_approval(task, output, require_record=True)
+            raise GovernanceUnavailableError(
+                f"human approval required for {self.AGENT_ID}; override_request_id={request_id}"
+            )
+
+        # Audit low/medium decisions after validation; failures are visible but non-blocking.
+        await self._write_audit(task, output, require_ack=False)
 
         return output
 
@@ -176,25 +191,42 @@ class BaseAgent(ABC):
     # Internal helpers
     # ──────────────────────────────────────────────────────────────
 
-    async def _write_audit(self, task: dict, output: AgentOutput) -> None:
-        from .tools.handlers import handle_audit_log
+    async def _write_audit(self, task: dict, output: AgentOutput, *, require_ack: bool) -> None:
         logger.info("[AUDIT] %s: %s (confidence=%.2f, risk=%s)",
                     self.AGENT_ID, ActionType.DECISION, output.confidence_score, output.risk_level)
+        if self._audit_writer is None:
+            self._audit_failures += 1
+            message = f"No audit writer configured for V1 agent={self.AGENT_ID}"
+            if require_ack:
+                raise GovernanceUnavailableError(message)
+            logger.error("[AUDIT_FAILURE] %s: %s", self.AGENT_ID, message)
+            return
         try:
-            await handle_audit_log({
+            ack = self._audit_writer.write({
                 "agent_id": self.AGENT_ID,
-                "action_type": ActionType.DECISION,
-                "input_summary": json.dumps(task)[:500],
-                "output_summary": str(output.content)[:500],
-                "confidence_score": output.confidence_score,
-                "risk_level": output.risk_level,
-                "human_approved": output.requires_human_approval,
+                "prompt_version": "v1",
+                "action_type": ActionType.DECISION.value,
+                "description": json.dumps(task)[:500],
+                "stated_confidence": float(output.confidence_score),
+                "trusted_confidence": float(output.confidence_score),
+                "risk_level": output.risk_level.value if hasattr(output.risk_level, "value") else str(output.risk_level),
+                "domain": self.DEPARTMENT or "general",
+                "prediction_id": None,
+                "override_id": None,
+                "outcome": "blocked" if require_ack else "executed",
                 "session_id": self.session_id,
             })
+            if not ack or not ack.get("log_id"):
+                raise AuditUnavailableError("audit writer returned no acknowledgement")
         except Exception as e:
+            self._audit_failures += 1
+            if require_ack:
+                if isinstance(e, GovernanceUnavailableError):
+                    raise
+                raise GovernanceUnavailableError(f"audit unavailable for {self.AGENT_ID}: {e}") from e
             logger.error("[AUDIT_FAILURE] %s: %s", self.AGENT_ID, e)
 
-    async def _request_human_approval(self, task: dict, output: AgentOutput) -> None:
+    async def _request_human_approval(self, task: dict, output: AgentOutput, *, require_record: bool) -> str | None:
         from .tools.handlers import handle_human_override
         try:
             result = await handle_human_override({
@@ -210,8 +242,17 @@ class BaseAgent(ABC):
             })
             logger.warning("[OVERRIDE] %s queued request_id=%s — action BLOCKED",
                            self.AGENT_ID, result.get("request_id"))
+            request_id = result.get("request_id")
+            if require_record and not request_id:
+                raise GovernanceUnavailableError("human override handler returned no request_id")
+            return request_id
         except Exception as e:
+            if require_record:
+                if isinstance(e, GovernanceUnavailableError):
+                    raise
+                raise GovernanceUnavailableError(f"human approval unavailable for {self.AGENT_ID}: {e}") from e
             logger.error("[OVERRIDE_FAILURE] %s: %s", self.AGENT_ID, e)
+            return None
 
     async def publish_event(self, event: AgentEvent) -> None:
         validate_confidence_attached({"confidence_score": event.confidence_score})
