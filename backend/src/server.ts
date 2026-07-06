@@ -50,7 +50,6 @@ export async function build() {
   await civilizationRequestValidator(app);
 
   app.addHook('preHandler', async (request, reply) => {
-    const method = request.method.toUpperCase();
     const apiKey = process.env.AGENTCO_API_KEY;
     const provided = getProvidedApiKey(request);
     const routeConfig = request.routeOptions.config as
@@ -71,7 +70,7 @@ export async function build() {
     // API auth: route configs may explicitly mark liveness-only probes public.
     // Every other route defaults protected for reads and writes whenever a key
     // is configured. Key-less operation remains loopback-only development.
-    if (!apiKey || isPublicRoute || method === 'OPTIONS') return;
+    if (!apiKey || isPublicRoute) return;
     if (provided !== apiKey) {
       return reply.status(401).send({ error: 'unauthorized' });
     }
