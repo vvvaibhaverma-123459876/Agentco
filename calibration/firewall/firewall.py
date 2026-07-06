@@ -14,7 +14,7 @@ This is enforced in code at the data layer, not in prompts.
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Optional
 
@@ -27,22 +27,51 @@ logger = logging.getLogger(__name__)
 MIN_REALITY_PREDICTIONS = 3
 
 
-@dataclass
+@dataclass(init=False)
 class Belief:
     belief_id: str
     statement: str
     origin: str                    # principle / theory / agent
-    validation_status: str = "provisional"
     sim_support_count: int = 0
     reality_validated_predictions: list[str] = None  # prediction_ids
     promoted_at: Optional[datetime] = None
     created_at: datetime = None
+    _validation_status: str = field(init=False, repr=False)
 
-    def __post_init__(self):
-        if self.reality_validated_predictions is None:
-            self.reality_validated_predictions = []
-        if self.created_at is None:
-            self.created_at = datetime.now(timezone.utc)
+    def __init__(
+        self,
+        belief_id: str,
+        statement: str,
+        origin: str,
+        validation_status: str = "provisional",
+        sim_support_count: int = 0,
+        reality_validated_predictions: Optional[list[str]] = None,
+        promoted_at: Optional[datetime] = None,
+        created_at: Optional[datetime] = None,
+    ):
+        self.belief_id = belief_id
+        self.statement = statement
+        self.origin = origin
+        self.sim_support_count = sim_support_count
+        self.reality_validated_predictions = reality_validated_predictions or []
+        self.promoted_at = promoted_at
+        self.created_at = created_at or datetime.now(timezone.utc)
+        self._set_validation_status(validation_status)
+
+    @property
+    def validation_status(self) -> str:
+        return self._validation_status
+
+    @validation_status.setter
+    def validation_status(self, _status: str) -> None:
+        raise AttributeError(
+            "Belief.validation_status is read-only; use RealitySimulationFirewall transition methods"
+        )
+
+    def _set_validation_status(self, status: str) -> None:
+        if status not in RealitySimulationFirewall.VALID_STATUSES:
+            raise ValueError(f"invalid validation_status: {status!r}")
+        object.__setattr__(self, "_validation_status", status)
 
 
 class RealitySimulationFirewall:
@@ -82,7 +111,7 @@ class RealitySimulationFirewall:
         belief.sim_support_count += 1
 
         if belief.validation_status == "provisional" and belief.sim_support_count >= 3:
-            belief.validation_status = "simulation_supported"
+            belief._set_validation_status("simulation_supported")
             logger.info(
                 "BELIEF: %s advanced to simulation_supported (sim_count=%d)",
                 belief_id, belief.sim_support_count
@@ -168,7 +197,7 @@ class RealitySimulationFirewall:
         # Simulation volume cannot compensate for missing reality contact.
 
         # ALL GATES PASSED — promote
-        belief.validation_status = "reality_validated"
+        belief._set_validation_status("reality_validated")
         belief.reality_validated_predictions = [p.prediction_id for p in prediction_records]
         belief.promoted_at = datetime.now(timezone.utc)
 
@@ -187,10 +216,17 @@ class RealitySimulationFirewall:
             pass
         return beliefs
 
+    def demote_to_provisional(self, belief_id: str, reason: str) -> None:
+        """Demote an expired or contradicted belief without granting reality authority."""
+        belief = self._get_belief(belief_id)
+        old_status = belief.validation_status
+        belief._set_validation_status("provisional")
+        logger.info("BELIEF DEMOTED: id=%s was=%s reason=%s", belief_id, old_status, reason)
+
     def retire(self, belief_id: str, reason: str) -> None:
         belief = self._get_belief(belief_id)
         old_status = belief.validation_status
-        belief.validation_status = "retired"
+        belief._set_validation_status("retired")
         logger.info("BELIEF RETIRED: id=%s was=%s reason=%s", belief_id, old_status, reason)
 
     def _get_belief(self, belief_id: str) -> Belief:

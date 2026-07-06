@@ -63,7 +63,7 @@ class TheoryEngine:
             origin="synthesis-agent",
             validation_status="provisional",
         )
-        self._firewall._beliefs[belief.belief_id] = belief
+        self._firewall.register_belief(belief)
         logger.info(
             "THEORY ENGINE: created provisional belief %s for principle %s",
             belief.belief_id, principle.principle_id

@@ -393,19 +393,13 @@ class TestSeededFalseBeliefAdversarialRoutes:
         assert library.get(principle.principle_id).validation_status == "provisional"
         assert firewall.status(belief.belief_id) == "simulation_supported"
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "CODE-WRONG: in-memory Belief objects are mutable and direct cache "
-            "writes can bypass RealitySimulationFirewall.promote_to_reality_validated"
-        ),
-    )
-    def test_direct_in_memory_status_write_is_not_gated(self):
+    def test_direct_in_memory_status_write_is_rejected(self):
         cal = _cal()
         firewall = cal["firewall"]
         belief = self._simulation_supported_belief(firewall)
 
-        firewall._beliefs[belief.belief_id].validation_status = "reality_validated"
+        with pytest.raises(AttributeError, match="read-only"):
+            firewall._beliefs[belief.belief_id].validation_status = "reality_validated"
 
         assert firewall.status(belief.belief_id) != "reality_validated"
         assert belief not in firewall.get_governing_beliefs()

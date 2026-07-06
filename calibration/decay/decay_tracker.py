@@ -72,7 +72,10 @@ class DecayTracker:
 
             if now > trusted_until:
                 old_status = belief.validation_status
-                belief.validation_status = "provisional"
+                self._firewall.demote_to_provisional(
+                    belief.belief_id,
+                    reason=f"trusted_until={trusted_until.isoformat()} expired",
+                )
                 demoted.append(belief.belief_id)
                 logger.warning(
                     "DECAY: belief %s demoted %s → provisional (trusted_until=%s, now=%s)",
