@@ -1,102 +1,102 @@
-PYTHON313 ?= python3.13
+PYTHON ?= python3.13
 
 .PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates status remaining build-ledger-sync civilization-slice
 
 python-check:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) --version
-	@$(PYTHON313) -m pytest runtime/tests -q
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) --version
+	@$(PYTHON) -m pytest runtime/tests -q
 
 verify-migrations-native:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_migrations_native.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_migrations_native.py
 
 verify-resolution-service:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_resolution_service.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_resolution_service.py
 
 doctor:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m runtime.orchestration.doctor --mode local_native
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) -m runtime.orchestration.doctor --mode local_native
 
 doctor-offline:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m runtime.orchestration.doctor --mode offline_fixture
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) -m runtime.orchestration.doctor --mode offline_fixture
 
 doctor-production:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m runtime.orchestration.doctor --mode production --live-openai --run-builds
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) -m runtime.orchestration.doctor --mode production --live-openai --run-builds
 
 run-best-effort:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m runtime.orchestration.run_best_effort
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) -m runtime.orchestration.run_best_effort
 
 run-offline-fixture:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m runtime.orchestration.run_best_effort --mode offline_fixture
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) -m runtime.orchestration.run_best_effort --mode offline_fixture
 
 north-star-smoke:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) -m evals.north_star_cross_domain.run_smoke
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) -m evals.north_star_cross_domain.run_smoke
 
 live-cross-domain:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_agentco_multidomain_live_run.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_agentco_multidomain_live_run.py
 
 memory-influence-live:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_memory_influence_live.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_memory_influence_live.py
 
 mission-progress:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_mission_progress.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_mission_progress.py
 
 mission-progress-record:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_mission_progress.py --record-run
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_mission_progress.py --record-run
 
 mission-progress-record-real-world:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_mission_progress.py --record-run --real-world-run
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_mission_progress.py --record-run --real-world-run
 
 verify-system-offline: doctor-offline run-offline-fixture north-star-smoke
-	@$(PYTHON313) -m pytest runtime/orchestration/tests tests/test_verify_agentco_goal_run.py evals/north_star_cross_domain/tests -q
+	@$(PYTHON) -m pytest runtime/orchestration/tests tests/test_verify_agentco_goal_run.py evals/north_star_cross_domain/tests -q
 
 verify-system-native:
-	@$(PYTHON313) -m runtime.orchestration.run_best_effort --mode local_native
+	@$(PYTHON) -m runtime.orchestration.run_best_effort --mode local_native
 
 status:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/generate_status.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/generate_status.py
 
 remaining:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/build_ledger.py remaining
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/build_ledger.py remaining
 
 build-ledger-sync:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/build_ledger.py sync-db
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/build_ledger.py sync-db
 
 civilization-slice:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_civilization_vertical_slice.py --update-ledger
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_civilization_vertical_slice.py --update-ledger
 
 production-posture:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_production_posture.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_production_posture.py
 
 release-gates:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_release_gates.py --update-ledger
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_release_gates.py --update-ledger
 
 docker-production-smoke:
 	@docker compose up -d postgres redis zookeeper kafka vault prometheus grafana
 	@docker compose ps
-	@$(PYTHON313) scripts/verify_production_posture.py
+	@$(PYTHON) scripts/verify_production_posture.py
 
 docker-startup-verify:
-	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/verify_docker_startup.py
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_docker_startup.py
 
 dev:
 	docker compose --profile dev up -d
@@ -109,7 +109,7 @@ migrate:
 smoke: smoke-python smoke-node
 
 smoke-python:
-	python3 -m pytest calibration runtime learning synthesis evals/regression -q \
+	$(PYTHON) -m pytest calibration runtime learning synthesis evals/regression -q \
 		--ignore=evals/regression/test_pg_ledger_immutability.py \
 		--ignore=evals/regression/test_pg_ledger_persistence.py
 
@@ -119,23 +119,23 @@ smoke-node:
 
 db-tests:
 	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set, skipping DB tests"; exit 0; fi
-	python3 -m pytest evals/regression/test_pg_ledger_immutability.py evals/regression/test_pg_ledger_persistence.py -q
+	$(PYTHON) -m pytest evals/regression/test_pg_ledger_immutability.py evals/regression/test_pg_ledger_persistence.py -q
 
 load-test:
-	@if [ -z "$$SKIP_LOAD_TEST" ]; then python3 -m pytest evals/regression/test_load.py -q 2>/dev/null || echo "load test skipped (optional)"; fi
+	@if [ -z "$$SKIP_LOAD_TEST" ]; then $(PYTHON) -m pytest evals/regression/test_load.py -q 2>/dev/null || echo "load test skipped (optional)"; fi
 
 test: smoke db-tests
 
 validation:
-	python3 scripts/run_real_world_validation.py
+	$(PYTHON) scripts/run_real_world_validation.py
 
 vendor-risk-smoke:
 	@echo "Running enterprise vendor risk triage benchmark (smoke test)..."
-	python3 -m evals.enterprise_vendor_risk.run_benchmark \
+	$(PYTHON) -m evals.enterprise_vendor_risk.run_benchmark \
 		--models fake:deterministic \
 		--output results/enterprise_vendor_risk/runs/smoke_$$(date +%s).json
 	@echo "Generating leaderboard..."
-	python3 -m evals.enterprise_vendor_risk.leaderboard \
+	$(PYTHON) -m evals.enterprise_vendor_risk.leaderboard \
 		--input $$(ls -t results/enterprise_vendor_risk/runs/smoke_*.json | head -1) \
 		--output-json results/enterprise_vendor_risk/latest.json \
 		--output-md results/enterprise_vendor_risk/latest.md
@@ -143,11 +143,11 @@ vendor-risk-smoke:
 
 vendor-risk-full:
 	@echo "Running enterprise vendor risk triage benchmark (full)..."
-	python3 -m evals.enterprise_vendor_risk.run_benchmark \
+	$(PYTHON) -m evals.enterprise_vendor_risk.run_benchmark \
 		--models fake:deterministic,agentco \
 		--output results/enterprise_vendor_risk/runs/benchmark_$$(date +%s).json
 	@echo "Generating leaderboard..."
-	python3 -m evals.enterprise_vendor_risk.leaderboard \
+	$(PYTHON) -m evals.enterprise_vendor_risk.leaderboard \
 		--input $$(ls -t results/enterprise_vendor_risk/runs/benchmark_*.json | head -1) \
 		--output-json results/enterprise_vendor_risk/latest.json \
 		--output-md results/enterprise_vendor_risk/latest.md
@@ -167,22 +167,22 @@ autonomy-migrate:
 
 autonomy-smoke:
 	@echo "🔄 Running autonomy smoke test (real end-to-end loop)..."
-	python3 scripts/autonomy_smoke.py
+	$(PYTHON) scripts/autonomy_smoke.py
 	@echo "✓ Autonomy smoke test passed"
 
 autonomy-eval:
 	@echo "📊 Running autonomy evaluation suite..."
-	python3 scripts/run_autonomy_eval.py
+	$(PYTHON) scripts/run_autonomy_eval.py
 	@echo "✓ Autonomy eval suite complete. Check results/ for details."
 
 autonomy-sim:
 	@echo "🎮 Running autonomy simulators..."
-	python3 scripts/run_simulator.py
+	$(PYTHON) scripts/run_simulator.py
 	@echo "✓ Simulator runs complete"
 
 autonomy-learner:
 	@echo "🧠 Running autonomy learner (trajectory → candidate)..."
-	python3 scripts/run_learner.py
+	$(PYTHON) scripts/run_learner.py
 	@echo "✓ Learner run complete"
 
 autonomy-dashboard:
@@ -192,7 +192,7 @@ autonomy-dashboard:
 
 autonomy-security-test:
 	@echo "🔒 Running security tests (RBAC, protected surfaces, etc)..."
-	python3 -m pytest backend/tests/security/ -v
+	$(PYTHON) -m pytest backend/tests/security/ -v
 	@echo "✓ Security tests passed"
 
 autonomy-full-test:
@@ -204,13 +204,13 @@ autonomy-full-test:
 
 autonomy-level3-smoke:
 	@echo "🎯 Running LEVEL_3 Autonomy Smoke Test (real end-to-end loop)..."
-	python3 scripts/run_level3_autonomy_smoke.py
+	$(PYTHON) scripts/run_level3_autonomy_smoke.py
 	@echo "✓ LEVEL_3 smoke test complete"
 
 autonomy-level3-test:
 	@echo "🔬 Running LEVEL_3 integration tests..."
 	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set, skipping"; exit 0; fi
-	python3 -m pytest tests/integration/test_level3_autonomy_loop.py -v
+	$(PYTHON) -m pytest tests/integration/test_level3_autonomy_loop.py -v
 	@echo "✓ LEVEL_3 tests passed"
 
 autonomy-level3-functional:
@@ -219,30 +219,30 @@ autonomy-level3-functional:
 
 autonomy-idempotency-test:
 	@echo "🎯 Running LEVEL_4 Area 1: Idempotency Test..."
-	python3 scripts/test_idempotency.py
+	$(PYTHON) scripts/test_idempotency.py
 
 autonomy-concurrency-test:
 	@echo "🎯 Running LEVEL_4 Area 2: Concurrency Test..."
 	@bash scripts/run_level3_functional_verification.sh 2>&1 | tail -5 & \
 	sleep 15; \
-	python3 scripts/test_concurrency.py; \
+	$(PYTHON) scripts/test_concurrency.py; \
 	pkill -f "run_level3_functional_verification.sh" || true
 
 autonomy-eval-gate-test:
 	@echo "🎯 Running LEVEL_4 Area 4: Eval Gate Hardening Test..."
-	python3 scripts/test_eval_gates.py
+	$(PYTHON) scripts/test_eval_gates.py
 
 autonomy-rollback-test:
 	@echo "🎯 Running LEVEL_4 Area 5: Rollback Hardening Test..."
-	python3 scripts/test_rollback.py
+	$(PYTHON) scripts/test_rollback.py
 
 autonomy-rbac-test:
 	@echo "🎯 Running LEVEL_4 Area 6: RBAC Hardening Test..."
-	python3 scripts/test_rbac.py
+	$(PYTHON) scripts/test_rbac.py
 
 autonomy-protected-surface-test:
 	@echo "🎯 Running LEVEL_4 Area 7: Protected Surface Hardening Test..."
-	python3 scripts/test_protected_surfaces.py
+	$(PYTHON) scripts/test_protected_surfaces.py
 
 autonomy-level4-phase2-test:
 	@echo "🎯 Running LEVEL_4 Phase 2: Safety Hardening Full Suite (Areas 4-7)..."
@@ -258,7 +258,7 @@ autonomy-observability-test:
 
 autonomy-frontend-real-data-test:
 	@echo "🎯 Running LEVEL_4 Area 10: Frontend Real-Data Hardening Test..."
-	python3 scripts/test_frontend_real_data.py
+	$(PYTHON) scripts/test_frontend_real_data.py
 
 autonomy-level4-phase3-test:
 	@echo "🎯 Running LEVEL_4 Phase 3: Observability Hardening Full Suite (Areas 8-10)..."
@@ -274,38 +274,38 @@ autonomy-level4-certification:
 
 autonomy-perception-test:
 	@echo "🎯 Running PHASE_4: Perception Adapter Infrastructure Tests..."
-	python3 scripts/test_perception.py
+	$(PYTHON) scripts/test_perception.py
 
 autonomy-goal-test:
 	@echo "🎯 Running PHASE_5: Goal Management Infrastructure Tests..."
-	python3 scripts/test_goal_management.py
+	$(PYTHON) scripts/test_goal_management.py
 
 autonomy-phases-5-8-smoke:
 	@echo "🎯 Running PHASES 5-8: Integrated Autonomy Loop Smoke Test..."
-	python3 scripts/test_phases_5_8.py
+	$(PYTHON) scripts/test_phases_5_8.py
 	@echo "✅ PHASES 5-8 smoke test complete"
 
 autonomy-phases-5-8-test:
 	@echo "🔬 Running PHASES 5-8: Full Integrated Test Suite..."
 	@echo "  Testing: Goals → Plans → Outcomes → Rewards → Evals → Promotion"
-	python3 scripts/test_phases_5_8.py
+	$(PYTHON) scripts/test_phases_5_8.py
 	@echo "✅ PHASES 5-8 full test complete"
 
 autonomy-learner-test:
 	@echo "🎯 Running PHASE 9: Learner & Replay Tests..."
 	@echo "  Testing: Replay batches, learner runs, candidate generation"
 	@echo "  Verifying: Real trajectories, baseline metrics, artifact hashes"
-	python3 -c "print('✅ PHASE 9 learner tests would verify real logic')"
+	$(PYTHON) -c "print('✅ PHASE 9 learner tests would verify real logic')"
 
 autonomy-simulator-test:
 	@echo "🎯 Running PHASE 10: Simulator Tests..."
 	@echo "  Testing: Deterministic simulators, trajectory persistence"
 	@echo "  Verifying: Same seed = same trajectory, no fake success"
-	python3 -c "print('✅ PHASE 10 simulator tests would verify determinism')"
+	$(PYTHON) -c "print('✅ PHASE 10 simulator tests would verify determinism')"
 
 autonomy-phases-9-13-smoke:
 	@echo "🎯 Running PHASES 9-13: Self-Improvement Loop Smoke Test..."
-	python3 scripts/test_phases_9_13.py
+	$(PYTHON) scripts/test_phases_9_13.py
 	@echo "✅ PHASES 9-13 smoke test complete"
 
 autonomy-phases-9-13-full-test:
@@ -322,7 +322,7 @@ autonomy-civilization-learning-test:
 	@echo "🌍 Running CIVILIZATION-STRUCTURED LEARNING Tests..."
 	@echo "  Testing: Agent → Team → Institution → Society → Civilization"
 	@echo "  Verifying: Promotion gates, dispute resolution, governance review"
-	python3 scripts/test_civilization_learning.py
+	$(PYTHON) scripts/test_civilization_learning.py
 	@echo "✅ Civilization learning test complete"
 
 # ============================================================================
@@ -351,10 +351,10 @@ production-release-gate:
 	@echo "✓ Migration framework verified"
 	@echo ""
 	@echo "Step 5/7: Production Security Gate"
-	python3 scripts/test_production_security_gate.py || (echo "✗ FAILED: Security gate failed"; exit 1)
+	$(PYTHON) scripts/test_production_security_gate.py || (echo "✗ FAILED: Security gate failed"; exit 1)
 	@echo ""
 	@echo "Step 6/7: Production Smoke Test"
-	python3 scripts/test_production_smoke.py || (echo "⚠ WARNING: Backend not running (expected in CI)"; true)
+	$(PYTHON) scripts/test_production_smoke.py || (echo "⚠ WARNING: Backend not running (expected in CI)"; true)
 	@echo ""
 	@echo "Step 7/7: Documentation Check"
 	@test -f docs/PRODUCTION_DEPLOYMENT_GUIDE.md || (echo "✗ FAILED: Missing deployment guide"; exit 1)
@@ -382,7 +382,7 @@ autonomy-real-web-free-run:
 	@echo "Max Web Fetches: $${WEB_MAX_FETCHES:-20}"
 	@echo "=================================================================="
 	@echo ""
-	@python3 scripts/autonomy_real_web_free_run.py
+	@$(PYTHON) scripts/autonomy_real_web_free_run.py
 	@echo ""
 	@echo "✓ Real-web autonomous observation complete"
 
@@ -395,7 +395,7 @@ autonomy-open-world-5min:
 	@echo "LLM Model: $${OPENAI_MODEL:-gpt-4-turbo}"
 	@echo "=================================================================="
 	@echo ""
-	@python3 scripts/autonomy_open_world_5min.py
+	@$(PYTHON) scripts/autonomy_open_world_5min.py
 	@echo ""
 	@echo "✓ Open-world 5-minute test complete"
 
@@ -417,11 +417,11 @@ verify-clean-room:
 	@echo "== [3/6] backend tests =="
 	cd backend && npm test -- --runInBand --forceExit
 	@echo "== [4/6] python smoke (no live keys) =="
-	$(PYTHON313) -m pytest calibration runtime learning synthesis evals/regression -q \
+	$(PYTHON) -m pytest calibration runtime learning synthesis evals/regression -q \
 		--ignore=evals/regression/test_pg_ledger_immutability.py \
 		--ignore=evals/regression/test_pg_ledger_persistence.py
 	@echo "== [5/6] build ledger gates =="
-	$(PYTHON313) scripts/build_ledger.py status
+	$(PYTHON) scripts/build_ledger.py status
 	@echo "== [6/6] score validation =="
 	@if [ -f backend/dist/cli/score-validation.js ] || [ -f backend/src/cli/score-validation.ts ]; then \
 		cd backend && ./node_modules/.bin/ts-node src/cli/score-validation.ts || exit 1; \
