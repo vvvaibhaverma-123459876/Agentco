@@ -1,3 +1,9 @@
+---
+status: HISTORICAL
+status_source: ../BUILD_LEDGER.yaml
+note: This document is retained for historical context. BUILD_LEDGER.yaml is the sole source of truth for current implementation status.
+---
+
 # Current Implementation Reality
 
 **Date:** 2026-06-30  

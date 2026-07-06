@@ -67,7 +67,7 @@ verify-system-native:
 
 status:
 	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
-	@$(PYTHON313) scripts/build_ledger.py status
+	@$(PYTHON313) scripts/generate_status.py
 
 remaining:
 	@command -v $(PYTHON313) >/dev/null || (echo "Python 3.13 is required. Install python3.13 or run with PYTHON313=/path/to/python3.13"; exit 1)
