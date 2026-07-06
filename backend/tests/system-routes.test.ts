@@ -1,11 +1,24 @@
 import { build } from '../src/server';
 
 describe('system routes', () => {
+  const API_KEY = 'system-routes-test-key';
+  const savedKey = process.env.AGENTCO_API_KEY;
+  const authHeaders = { 'x-api-key': API_KEY };
+
+  beforeAll(() => {
+    process.env.AGENTCO_API_KEY = API_KEY;
+  });
+
+  afterAll(() => {
+    if (savedKey === undefined) delete process.env.AGENTCO_API_KEY;
+    else process.env.AGENTCO_API_KEY = savedKey;
+  });
+
   test('reports runtime mode and capabilities', async () => {
     const app = await build();
 
-    const runtime = await app.inject({ method: 'GET', url: '/system/runtime-mode' });
-    const capabilities = await app.inject({ method: 'GET', url: '/system/capabilities' });
+    const runtime = await app.inject({ method: 'GET', url: '/system/runtime-mode', headers: authHeaders });
+    const capabilities = await app.inject({ method: 'GET', url: '/system/capabilities', headers: authHeaders });
 
     expect(runtime.statusCode).toBe(200);
     expect(runtime.json()).toHaveProperty('runtime_mode');
@@ -19,7 +32,7 @@ describe('system routes', () => {
   test('reports feature gate decisions', async () => {
     const app = await build();
 
-    const response = await app.inject({ method: 'GET', url: '/system/feature-gates' });
+    const response = await app.inject({ method: 'GET', url: '/system/feature-gates', headers: authHeaders });
     const body = response.json();
 
     expect(response.statusCode).toBe(200);
@@ -35,7 +48,7 @@ describe('system routes', () => {
   test('reports build ledger rollups without marking complete', async () => {
     const app = await build();
 
-    const response = await app.inject({ method: 'GET', url: '/system/build-status' });
+    const response = await app.inject({ method: 'GET', url: '/system/build-status', headers: authHeaders });
     const body = response.json();
 
     expect(response.statusCode).toBe(200);
@@ -50,7 +63,7 @@ describe('system routes', () => {
   test('reports readiness without overclaiming production status', async () => {
     const app = await build();
 
-    const response = await app.inject({ method: 'GET', url: '/system/readiness' });
+    const response = await app.inject({ method: 'GET', url: '/system/readiness', headers: authHeaders });
     const body = response.json();
 
     expect(response.statusCode).toBe(200);
