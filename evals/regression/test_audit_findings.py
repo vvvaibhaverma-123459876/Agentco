@@ -40,6 +40,7 @@ def _resolve_n(cal, agent_id, domain, n, outcome, probability=0.9):
             horizon_class="short",
             domain=domain,
             claim_type="general",
+            historical_registration_reason="regression fixture for audit finding trust history",
         )
         pid = cal["ledger"].pre_register(reg)
         cal["resolution"].resolve(pid, outcome=outcome, ground_truth_source="external_auditor", evidence="e")
