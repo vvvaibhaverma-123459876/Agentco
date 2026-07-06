@@ -15,15 +15,18 @@ import psycopg2
 import json
 import sys
 
-# Database connection
-conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    database="agentco",
-    user="agentco",
-    password="password"
-)
-cursor = conn.cursor()
+conn = None
+cursor = None
+
+def connect_db():
+    """Create the script's Postgres connection when run directly."""
+    return psycopg2.connect(
+        host="localhost",
+        port=5432,
+        database="agentco",
+        user="agentco",
+        password="password"
+    )
 
 def test_governance_rbac():
     """Verify governance RBAC system"""
@@ -287,6 +290,8 @@ def test_governance_rbac():
         return True  # Still proceed as core RBAC is working
 
 if __name__ == '__main__':
+    conn = connect_db()
+    cursor = conn.cursor()
     try:
         success = test_governance_rbac()
         conn.close()

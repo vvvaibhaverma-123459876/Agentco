@@ -20,15 +20,18 @@ import sys
 import subprocess
 from datetime import datetime
 
-# Database connection
-conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    database="agentco",
-    user="agentco",
-    password="password"
-)
-cursor = conn.cursor()
+conn = None
+cursor = None
+
+def connect_db():
+    """Create the script's Postgres connection when run directly."""
+    return psycopg2.connect(
+        host="localhost",
+        port=5432,
+        database="agentco",
+        user="agentco",
+        password="password"
+    )
 
 def get_table_count(table_name):
     """Get count of rows in a table"""
@@ -323,6 +326,8 @@ def verify_autonomy_governance_integration():
         return True  # Still return True as integration is architecturally correct
 
 if __name__ == '__main__':
+    conn = connect_db()
+    cursor = conn.cursor()
     try:
         success = verify_autonomy_governance_integration()
         conn.close()

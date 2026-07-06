@@ -15,15 +15,18 @@ import json
 import sys
 from datetime import datetime, timedelta
 
-# Database connection
-conn = psycopg2.connect(
-    host="localhost",
-    port=5432,
-    database="agentco",
-    user="agentco",
-    password="password"
-)
-cursor = conn.cursor()
+conn = None
+cursor = None
+
+def connect_db():
+    """Create the script's Postgres connection when run directly."""
+    return psycopg2.connect(
+        host="localhost",
+        port=5432,
+        database="agentco",
+        user="agentco",
+        password="password"
+    )
 
 def check_governance_integration():
     """Verify governance is integrated into autonomy orchestrator"""
@@ -270,6 +273,8 @@ def check_governance_integration():
         return False
 
 if __name__ == '__main__':
+    conn = connect_db()
+    cursor = conn.cursor()
     try:
         success = check_governance_integration()
         conn.close()
