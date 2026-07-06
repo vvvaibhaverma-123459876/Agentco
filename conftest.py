@@ -27,6 +27,7 @@ if "DATABASE_URL" not in os.environ:
     os.environ["DATABASE_URL"] = os.environ.get(
         "AGENTCO_TEST_DATABASE_URL", _DEFAULT_DB_URL
     )
+os.environ.setdefault("AGENTCO_TEST_AUDIT_WRITER", "1")
 # In the sandbox the server listens on port 5433 via Unix socket /tmp.
 # Rewrite the URL so tests connect to the running instance without any
 # manual export.  AGENTCO_TEST_DATABASE_URL always takes precedence if set.

@@ -104,7 +104,10 @@ class BaseAgentV2:
         self._audit_failures = 0
         if audit_writer is not None:
             self._audit_writer = audit_writer
-        elif allow_test_audit_writer:
+        elif allow_test_audit_writer or (
+            os.environ.get("AGENTCO_TEST_AUDIT_WRITER") == "1"
+            and os.environ.get("PYTEST_CURRENT_TEST") is not None
+        ):
             self._audit_writer = InMemoryAuditWriter(allow_test_mode=True)
         else:
             self._audit_writer = DurableAuditWriter.from_env()
