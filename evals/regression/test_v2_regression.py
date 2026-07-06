@@ -17,6 +17,12 @@ from learning import LearningLoop, IntelligenceAgent, ScenarioAgent, TrainerAgen
 
 class ConcreteV2Agent(BaseAgentV2):
     PROMPT_VERSION = "2.0.0-regression"
+    def __init__(self, agent_id: str, calibration_engine=None):
+        super().__init__(
+            agent_id,
+            calibration_engine=calibration_engine,
+            allow_test_audit_writer=True,
+        )
     def run(self, task): pass
 
 

@@ -27,6 +27,12 @@ from typing import Any, Optional
 
 from calibration.ledger.prediction_ledger import PredictionRegistration
 from runtime.base_agent.llm_client import client_for
+from runtime.base_agent.audit_writer import (
+    AuditUnavailableError,
+    AuditWriter,
+    DurableAuditWriter,
+    InMemoryAuditWriter,
+)
 from runtime.base_agent.model_tiers import model_for
 from runtime.base_agent.spend_guardrail import SpendGuardrail
 from runtime.base_agent.structured_output import get_validated_output
@@ -87,13 +93,21 @@ class BaseAgentV2:
         self,
         agent_id: str,
         calibration_engine: Optional[dict] = None,
+        audit_writer: Optional[AuditWriter] = None,
+        allow_test_audit_writer: bool = False,
     ):
         self.agent_id = agent_id
         self._cal = calibration_engine or {}
         self._ledger = self._cal.get("ledger")
         self._trust = self._cal.get("trust")
         self._resolution = self._cal.get("resolution")
-        self._audit_log: list[AuditEntryV2] = []
+        self._audit_failures = 0
+        if audit_writer is not None:
+            self._audit_writer = audit_writer
+        elif allow_test_audit_writer:
+            self._audit_writer = InMemoryAuditWriter(allow_test_mode=True)
+        else:
+            self._audit_writer = DurableAuditWriter.from_env()
         # Reserve engine — wired lazily when a DB-backed ledger is present.
         self._reserve = None
 
@@ -286,8 +300,14 @@ class BaseAgentV2:
         except HumanApprovalRequired as exc:
             override_id = exc.override_id
             outcome = "blocked"
-            self._write_audit(action, trusted_out, prediction_id, override_id, "blocked")
+            self._write_audit(
+                action, trusted_out, prediction_id, override_id, "blocked",
+                require_ack=action.risk_level in {"high", "critical"},
+            )
             raise
+
+        if action.risk_level in {"high", "critical"}:
+            self._write_audit(action, trusted_out, prediction_id, override_id, outcome, require_ack=True)
 
         # Action cleared — emit signed event envelope
         envelope = self._build_envelope(action, trusted_out, prediction_id)
@@ -296,7 +316,8 @@ class BaseAgentV2:
             self.agent_id, action.action_type, trusted_out.trusted_confidence, action.risk_level
         )
 
-        self._write_audit(action, trusted_out, prediction_id, override_id, outcome)
+        if action.risk_level not in {"high", "critical"}:
+            self._write_audit(action, trusted_out, prediction_id, override_id, outcome, require_ack=False)
         return {
             "outcome": outcome,
             "override_id": override_id,
@@ -325,7 +346,16 @@ class BaseAgentV2:
         envelope["hmac_signature"] = _sign_envelope(envelope)
         return envelope
 
-    def _write_audit(self, action: AgentActionV2, trusted_out, prediction_id, override_id, outcome: str):
+    def _write_audit(
+        self,
+        action: AgentActionV2,
+        trusted_out,
+        prediction_id,
+        override_id,
+        outcome: str,
+        *,
+        require_ack: bool,
+    ):
         entry = AuditEntryV2(
             agent_id=self.agent_id,
             prompt_version=self.PROMPT_VERSION,
@@ -339,7 +369,30 @@ class BaseAgentV2:
             override_id=override_id,
             outcome=outcome,
         )
-        self._audit_log.append(entry)
+        if self._audit_writer is None:
+            self._audit_failures += 1
+            message = f"No audit writer configured for agent={self.agent_id}"
+            if require_ack:
+                raise AuditUnavailableError(message)
+            logger.error(message)
+            return None
+        try:
+            ack = self._audit_writer.write(entry)
+        except Exception as exc:
+            self._audit_failures += 1
+            if require_ack:
+                if isinstance(exc, AuditUnavailableError):
+                    raise
+                raise AuditUnavailableError(str(exc)) from exc
+            logger.error("Audit write failed for low/medium action agent=%s", self.agent_id, exc_info=True)
+            return None
+        if not ack or not ack.get("log_id"):
+            self._audit_failures += 1
+            if require_ack:
+                raise AuditUnavailableError("audit writer returned no acknowledgement")
+            logger.error("Audit writer returned no acknowledgement for agent=%s", self.agent_id)
+            return None
+        return ack
 
     def prepare_memory_context(
         self,
@@ -469,7 +522,13 @@ class BaseAgentV2:
         raise RuntimeError("BaseAgentV2 memory sync helpers cannot run inside an active event loop")
 
     def get_audit_log(self) -> list[dict]:
-        return [asdict(e) for e in self._audit_log]
+        if isinstance(self._audit_writer, InMemoryAuditWriter):
+            return [asdict(e) for e in self._audit_writer.entries]
+        return []
+
+    @property
+    def audit_failure_count(self) -> int:
+        return self._audit_failures
 
     def get_pending_approvals(self):
         return self._gate.list_pending()

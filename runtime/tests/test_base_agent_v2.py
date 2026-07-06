@@ -9,15 +9,28 @@ Verifies:
 - Audit log captures full context including trusted_confidence
 """
 import pytest
+import os
 from datetime import datetime, timedelta, timezone
 
 from calibration import create_calibration_engine
 from runtime.base_agent.base_agent_v2 import BaseAgentV2, AgentActionV2
+from runtime.base_agent.audit_writer import (
+    AuditUnavailableError,
+    DurableAuditWriter,
+    InMemoryAuditWriter,
+)
 from runtime.escalation.escalation_gate import HumanApprovalRequired
 
 
 class ConcreteAgentV2(BaseAgentV2):
     PROMPT_VERSION = "2.0.0-test"
+
+    def __init__(self, agent_id: str, calibration_engine=None):
+        super().__init__(
+            agent_id,
+            calibration_engine=calibration_engine,
+            allow_test_audit_writer=True,
+        )
 
     def run(self, task: dict):
         pass
@@ -187,3 +200,67 @@ class TestBaseAgentV2Contract:
         # All required V2 envelope fields must be present
         for required_field in ["producer_prompt_version", "confidence_score", "risk_level", "hmac_signature"]:
             assert required_field in envelope, f"Missing required envelope field: {required_field}"
+
+
+class _FailingAuditWriter:
+    def write(self, entry):
+        raise AuditUnavailableError("audit sink unavailable")
+
+
+class TestBaseAgentV2DurableAudit:
+    def test_high_risk_action_with_failing_audit_writer_is_blocked(self):
+        cal = _make_engine()
+        agent = ConcreteAgentV2("audit-fail-agent", calibration_engine=cal)
+        action = AgentActionV2(
+            action_type="deploy_config",
+            description="Deploy approved config",
+            payload={},
+            risk_level="high",
+            stated_confidence=0.9,
+        )
+        try:
+            agent.execute_action(action)
+        except HumanApprovalRequired as exc:
+            token = agent.approve_action(exc.override_id, approver_id="human-governor-1")
+
+        agent._audit_writer = _FailingAuditWriter()
+        with pytest.raises(AuditUnavailableError, match="audit sink unavailable"):
+            agent.execute_action(action, pre_approved_token=token)
+
+    def test_in_memory_audit_writer_requires_explicit_test_flag(self):
+        with pytest.raises(AuditUnavailableError):
+            InMemoryAuditWriter()
+        writer = InMemoryAuditWriter(allow_test_mode=True)
+        assert writer.write({"trace_id": "t-1"})["backend"] == "memory"
+
+    def test_durable_audit_writer_round_trip_live_postgres(self):
+        dsn = os.environ.get("AGENTCO_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
+        if not dsn:
+            pytest.skip("live-service: no AGENTCO_TEST_DATABASE_URL or DATABASE_URL configured")
+        psycopg2 = pytest.importorskip("psycopg2", reason="live-service: psycopg2 unavailable")
+        try:
+            conn = psycopg2.connect(dsn, connect_timeout=2)
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT 1 FROM decision_log LIMIT 1")
+            conn.close()
+        except Exception as exc:
+            pytest.skip(f"live-service: decision_log unavailable: {exc}")
+
+        agent = ConcreteAgentV2(
+            "durable-audit-agent",
+            calibration_engine=_make_engine(),
+        )
+        agent._audit_writer = DurableAuditWriter(dsn)
+        action = AgentActionV2(
+            action_type="analysis",
+            description="Durable audit round-trip",
+            payload={},
+            risk_level="low",
+            stated_confidence=0.7,
+        )
+
+        result = agent.execute_action(action)
+
+        assert result["outcome"] == "executed"
+        assert agent.audit_failure_count == 0

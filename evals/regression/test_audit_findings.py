@@ -19,6 +19,12 @@ from runtime.base_agent.structured_output import get_validated_output
 
 class _ConcreteAgent(BaseAgentV2):
     PROMPT_VERSION = "audit-regression-1.0"
+    def __init__(self, agent_id: str, calibration_engine=None):
+        super().__init__(
+            agent_id,
+            calibration_engine=calibration_engine,
+            allow_test_audit_writer=True,
+        )
     def run(self, task):  # pragma: no cover - not exercised
         pass
 
