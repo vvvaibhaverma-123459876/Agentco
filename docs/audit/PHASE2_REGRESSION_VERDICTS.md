@@ -279,3 +279,111 @@ promotion gate itself is CODE-WRONG.
 Update the three seeded-false-belief prediction fixtures to include
 `historical_registration_reason`. Do not weaken the assertion that promotion
 returns `False` and the belief remains out of `reality_validated`.
+
+## R4-R6 — `test_audit_findings.py` trust regression tests
+
+### TEST INTENT
+
+R4 invariant: trust sample accounting must use the actual resolved prediction
+count for an agent/domain track record. The test asserts:
+
+```python
+count = cal["trust"].get_sample_count("agent-x", "sales", "general", "short")
+assert count == 3
+```
+
+R5 invariant: an agent with calibration history must not crash when executing a
+low-risk action and must weight decisions through trusted confidence. The test
+asserts:
+
+```python
+result = agent.execute_action(action)
+assert result["trusted_confidence"] <= result["stated_confidence"]
+```
+
+R6 invariant: a real trust downgrade must notify registered downstream
+consumers. The test asserts:
+
+```python
+assert notified, "downgrade callback never fired (propagation was dead code)"
+assert notified[0][0] == "agent-drop"
+assert notified[0][1] < 1.0
+```
+
+Cross-references:
+
+- `evals/audit/audit_report_2026-06-16.md`: HIGH-1 documents the
+  `sample_count`/`n_resolved` crash; HIGH-3 documents the dead downgrade
+  propagation callback.
+- `calibration/trust/trust_controller.py`: the module docstring says decisions
+  must call `trusted_confidence()` and that downgrade propagation must notify
+  all downstream consumers.
+- `runtime/base_agent/base_agent_v2.py`: `execute_action()` is the decision path
+  that consumes `trusted_confidence()`.
+- `BUILD_LEDGER.yaml`: L6 describes sample-size conservative trust scoring and
+  resolved prediction outcomes feeding trust state.
+
+### CURRENT BEHAVIOR
+
+Command:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3.13 -m pytest -q --tb=short \
+  evals/regression/test_audit_findings.py::TestHigh1SampleCount::test_get_sample_count_with_track_record \
+  evals/regression/test_audit_findings.py::TestHigh1SampleCount::test_execute_action_does_not_crash_for_agent_with_history \
+  evals/regression/test_audit_findings.py::TestHigh3DowngradePropagation::test_downgrade_propagates_to_consumers
+```
+
+Actual result:
+
+```text
+E   ValueError: resolution_date must be in the future for pre-registration
+```
+
+All three fail in the shared `_resolve_n()` fixture before reaching trust
+sample-count, action execution, or downgrade propagation assertions.
+
+A manual probe using the same helper shape, but adding
+`historical_registration_reason` under a pytest context, reached the intended
+trust paths:
+
+```text
+count 3
+execute keys 0.7 0.7 None
+notified [('agent-drop', 0.3)]
+```
+
+### GIT ARCHAEOLOGY
+
+- Trust fixes and regression tests introduced:
+  `12a0fa446aa439bfd8dc2b92a6a57967bd3da8b3`
+  (`audit: fix HIGH/MEDIUM/LOW findings from adversarial invariant audit`).
+  The commit message explicitly states:
+  - HIGH-1 renamed `TrustScore.sample_count` to `n_resolved` and fixed
+    `get_sample_count()` plus the decision hot path.
+  - HIGH-3 moved `was = score.trusted_multiplier` before
+    `_recompute_multiplier(score)` so real drops propagate.
+  - `evals/regression/test_audit_findings.py` was added to encode those audit
+    findings as regression tests.
+- Registration invariant changed intentionally:
+  `4968b7448df7f56c096d69421ea0e8496090e605`
+  (`G: harden integrated calibration system`). This commit added
+  `historical_registration_reason` and made backdated registration invalid
+  unless the explicit historical-fixture path is used.
+
+### VERDICT
+
+TEST-WRONG.
+
+The intended HIGH-1 and HIGH-3 trust fixes are still present in current code:
+`TrustScore` has `n_resolved`, `get_sample_count()` returns it, `ingest_resolution()`
+captures the old multiplier before recompute, and `_propagate_downgrade()` is
+called when the multiplier drops. The three tests fail only because their shared
+fixture still uses the old backdated-registration pattern invalidated by
+`4968b74`.
+
+### FIX
+
+Update the shared `_resolve_n()` fixture to include
+`historical_registration_reason`. Do not alter the sample-count, execute-action,
+or downgrade-propagation assertions.
