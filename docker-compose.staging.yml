@@ -8,15 +8,15 @@ services:
     image: postgres:14-alpine
     container_name: agentco-postgres-staging
     environment:
-      POSTGRES_USER: agentco_staging
-      POSTGRES_PASSWORD: staging_password_change_me
-      POSTGRES_DB: agentco_staging
+      POSTGRES_USER: ${STAGING_POSTGRES_USER:?Set STAGING_POSTGRES_USER in .env.staging}
+      POSTGRES_PASSWORD: ${STAGING_POSTGRES_PASSWORD:?Set STAGING_POSTGRES_PASSWORD in .env.staging}
+      POSTGRES_DB: ${STAGING_POSTGRES_DB:?Set STAGING_POSTGRES_DB in .env.staging}
     ports:
       - "5433:5432"
     volumes:
       - postgres_staging_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U agentco_staging -d agentco_staging"]
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -136,7 +136,8 @@ services:
     image: grafana/grafana:9.2.0
     container_name: agentco-grafana-staging
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_USER: ${STAGING_GRAFANA_ADMIN_USER:?Set STAGING_GRAFANA_ADMIN_USER in .env.staging}
+      GF_SECURITY_ADMIN_PASSWORD: ${STAGING_GRAFANA_ADMIN_PASSWORD:?Set STAGING_GRAFANA_ADMIN_PASSWORD in .env.staging}
       GF_INSTALL_PLUGINS: grafana-piechart-panel
     volumes:
       - grafana_staging_data:/var/lib/grafana
@@ -168,24 +169,24 @@ networks:
 # ============================================================================
 #
 # Start staging environment:
-#   docker-compose -f docker-compose.staging.yml up -d
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml up -d
 #
 # Check services are healthy:
-#   docker-compose -f docker-compose.staging.yml ps
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml ps
 #
 # Access services:
-#   - PostgreSQL: localhost:5433 (user: agentco_staging, pass: staging_password_change_me)
+#   - PostgreSQL: localhost:5433 (credentials from .env.staging)
 #   - Redis: localhost:6380
 #   - Kafka: localhost:9092
 #   - Prometheus: http://localhost:9090
-#   - Grafana: http://localhost:3050 (admin/admin)
+#   - Grafana: http://localhost:3050 (credentials from .env.staging)
 #   - OpenTelemetry: http://localhost:4318
 #
 # View logs:
-#   docker-compose -f docker-compose.staging.yml logs -f [service-name]
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml logs -f [service-name]
 #
 # Stop services:
-#   docker-compose -f docker-compose.staging.yml down
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml down
 #
 # Clean up volumes (WARNING: destroys data):
-#   docker-compose -f docker-compose.staging.yml down -v
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml down -v

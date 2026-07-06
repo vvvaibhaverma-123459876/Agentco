@@ -139,3 +139,34 @@ No open-handle warning.
 ```
 
 No `--forceExit` change was needed.
+
+## Task 5 — Python Lockfile and Staging Compose Secrets
+
+Python lockfile:
+
+- Installed `uv` and generated `requirements/requirements.lock.txt`.
+- Inputs: `requirements/requirements-runtime.txt`, `requirements/requirements-dev.txt`, and `agents/requirements.txt`.
+- CI now installs Python dependencies from `requirements/requirements.lock.txt` in both Python jobs.
+- Regeneration command is documented in `requirements/README.md`.
+
+Command run:
+
+```bash
+uv pip compile requirements/requirements-runtime.txt requirements/requirements-dev.txt agents/requirements.txt -o requirements/requirements.lock.txt
+```
+
+Staging compose:
+
+- Replaced Postgres and Grafana default credentials with `${VAR:?err}` required env interpolation.
+- Added `.env.staging.example` with variable names only:
+  `STAGING_POSTGRES_USER`, `STAGING_POSTGRES_PASSWORD`, `STAGING_POSTGRES_DB`, `STAGING_GRAFANA_ADMIN_USER`, `STAGING_GRAFANA_ADMIN_PASSWORD`.
+
+Validation:
+
+```text
+env STAGING_POSTGRES_USER=placeholder STAGING_POSTGRES_PASSWORD=placeholder STAGING_POSTGRES_DB=placeholder STAGING_GRAFANA_ADMIN_USER=placeholder STAGING_GRAFANA_ADMIN_PASSWORD=placeholder docker compose -f docker-compose.staging.yml config
+=> passed
+
+env -u STAGING_POSTGRES_USER -u STAGING_POSTGRES_PASSWORD -u STAGING_POSTGRES_DB -u STAGING_GRAFANA_ADMIN_USER -u STAGING_GRAFANA_ADMIN_PASSWORD docker compose -f docker-compose.staging.yml config
+=> failed loudly: required variable STAGING_GRAFANA_ADMIN_USER is missing a value
+```
