@@ -1,5 +1,11 @@
 # Deep Audit: `agents/` (Department Agent Framework)
 
+> Phase 5 update: this audit captured the pre-`672b76e` V1 fail-open behavior.
+> Current `BaseAgent.run()` blocks V1 high/critical outputs by raising
+> `GovernanceUnavailableError` after audit/override recording. Because V1 has no
+> approval-resume path, this is disablement pending approval infrastructure, not
+> working approval-gated execution. See `PHASE5_NOTES.md`.
+
 **Date:** 2026-07-05
 **Method:** Execute, don't just read. Test suite run; pure core hand-verified with exact
 fixtures; governance guarantees exercised through the real `BaseAgent.run()` loop against a

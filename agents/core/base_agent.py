@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class GovernanceUnavailableError(RuntimeError):
-    """Raised when V1 governance cannot safely allow an action to proceed."""
+    """Raised when V1 high/critical actions are disabled pending approval infrastructure."""
 
 
 class BaseAgent(ABC):
@@ -44,7 +44,7 @@ class BaseAgent(ABC):
     Guarantees:
     - Every output has a confidence_score (enforced, not optional)
     - Every decision is written to the audit log
-    - High/critical risk actions pause for human approval
+    - High/critical risk actions are disabled pending approval-resume infrastructure; use BaseAgentV2 for approval-gated execution
     - Events are published to Kafka via the event bus
     - Agent is stateful via memory_client
     """
@@ -100,7 +100,7 @@ class BaseAgent(ABC):
     # ──────────────────────────────────────────────────────────────
 
     async def run(self, task: dict[str, Any]) -> AgentOutput:
-        """Entry point. Runs the full reasoning loop with audit, confidence, and escalation."""
+        """Entry point. Low/medium actions may execute; high/critical V1 actions always raise after audit/override recording."""
         logger.info("[%s] Starting task: %s", self.AGENT_ID, task.get("type", "unknown"))
 
         output = await self.execute_task(task)

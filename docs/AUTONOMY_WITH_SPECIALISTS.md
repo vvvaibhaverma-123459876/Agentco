@@ -4,7 +4,9 @@
 
 ## Overview
 
-The complete AgentCo autonomy system now includes 17 specialized agents that the orchestrator can spawn to delegate work. This document describes the end-to-end flow.
+The active autonomy delegation path includes 17 registered `agents/autonomy/*` specialist roles that the TypeScript orchestrator can spawn to delegate work. This document describes that narrow end-to-end flow.
+
+Reachability note: this path is separate from the department-style V1/V2 agent classes under `agents/executive`, `agents/legal`, `agents/marketing`, `agents/sales`, and similar directories. Those classes are repository inventory and test targets unless reached through a separate caller; the `spawn_specialist` action does not instantiate them.
 
 ## Architecture
 
@@ -35,14 +37,14 @@ The complete AgentCo autonomy system now includes 17 specialized agents that the
                  │
         ┌────────▼───────────────────────┐
         │ TeamActivationService          │
-        │ - Allocates port               │
+        │ - Allocates loopback port      │
         │ - Spawns Python subprocess     │
         │ - Polls /status endpoint       │
         │ - Terminates on completion     │
         └────────┬───────────────────────┘
                  │
         ┌────────▼───────────────────────────┐
-        │ Python Specialist Agent (Flask)    │
+        │ Python Specialist Agent (HTTP)     │
         │ - /execute - POST action spec      │
         │ - /status - GET current state      │
         │ - handle_action() - Route action   │
@@ -110,13 +112,13 @@ LLM decision: "spawn_specialist with role='code_reviewer'"
 ActionExecutor.handleSpawnSpecialist():
 1. Validates role exists in specialist registry
 2. Calls TeamActivationService.activateSpecialist()
-3. Allocates random port (54321-55000 range)
-4. Spawns Python subprocess: `python3 -m agents.autonomy.{role}`
+3. Asks the OS for an available loopback port
+4. Spawns Python subprocess: `python3.13 -m agents.autonomy.{role}` by default, or `AGENTCO_PYTHON` when configured
 5. Passes arguments: specialist_id, port, role, budget
 
 **Subprocess Start:**
 ```bash
-python3 -m agents.autonomy.code_reviewer \
+python3.13 -m agents.autonomy.code_reviewer \
   --specialist-id abc123 \
   --port 54567 \
   --role code_reviewer \
@@ -261,7 +263,7 @@ This actually:
 2. Inserts into autonomy_evidence table
 3. Computes content_hash from real content
 4. Returns real evidence_id from database
-5. If DB unavailable: logs warning, returns stub (fallback)
+5. If DB connection retry exhaustion occurs: raises and reports structured failure; it does not return an unpersisted/stub ID
 
 Same for claims via `persist_claim()`.
 
@@ -279,10 +281,9 @@ Same for claims via `persist_claim()`.
 - Status: FAILED
 
 ### Database Unavailable
-- Python specialist logs warning
-- Returns stub UUID (graceful fallback)
-- Allows testing without DB
-- Production: logs alert for ops
+- Python specialist retries the database connection path.
+- If persistence still fails, evidence/claim creation raises and the specialist action reports failure without artifacts.
+- Stub UUID fallback is not part of the active persistence path.
 
 ## Testing the Full Loop
 

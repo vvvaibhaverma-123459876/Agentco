@@ -36,3 +36,9 @@ Results:
 ## Remaining Scope
 
 This module removes active placeholder artifact generation in the covered action paths. It does not remove explicitly offline fixture behavior, deterministic eval baselines, or simulation datasets that are intentionally labeled as such.
+
+## Reachability Note
+
+The live specialist activation path covered here is the TypeScript `TeamActivationService` path that starts `python3.13 -m agents.autonomy.<role>` by default, or `AGENTCO_PYTHON` when configured. It reaches the 17 registered `agents/autonomy/*` specialist roles.
+
+The additional department-style Python agent classes under executive, legal, marketing, sales, design, product, people-ops, customer-experience, and engineering directories are repository inventory and targeted test surfaces unless a separate caller instantiates them. They are not activated by the `spawn_specialist` action and should not be counted as production-reachable subprocess specialists for this module.

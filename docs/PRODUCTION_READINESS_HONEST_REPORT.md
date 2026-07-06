@@ -22,13 +22,15 @@ Classification: Internal - Brutal Truth Required
 ## What Actually Works ✅
 
 ### 1. **Specialist Role Architecture** (SOLID)
-- ✅ 17 specialist roles properly defined with budgets
+- ✅ 17 autonomy specialist roles properly defined with budgets
 - ✅ TypeScript role specs compile cleanly
 - ✅ Budget enforcement logic is correct
 - ✅ Tool access restrictions work
 - ✅ Non-overlapping role definitions
 
 **Why it works**: Simple data structure, no external dependencies, well-isolated.
+
+**Current reachability correction**: The live `spawn_specialist` path reaches the `agents/autonomy/*` specialists through `TeamActivationService` spawning `python3.13 -m agents.autonomy.<role>` by default. Department-style V1/V2 classes elsewhere in `agents/` are not activated by this path.
 
 ### 2. **Database Persistence (Core Logic)**
 - ✅ Evidence/claims schema exists
@@ -85,7 +87,7 @@ def get_db_connection():
 - ❌ No connection pooling
 - ❌ No timeout handling
 - ❌ Connection leaks if error occurs mid-operation
-- ❌ No retry logic
+- ⚠️ Retry logic has since been added for the active specialist persistence path, and persistence now fails closed instead of returning stub IDs.
 - ❌ Will fail under load (connection exhaustion)
 
 **Impact**: 

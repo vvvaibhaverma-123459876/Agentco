@@ -112,18 +112,18 @@ Findings:
   BaseAgent callers, but they confirm `agents/core` is not a purely historical
   folder.
 
-Decision: FAIL-CLOSE V1 instead of retiring it in Phase 3. Retiring would require
-moving many live subclasses and a production autonomy specialist path under
-`archive/`, which is larger than this phase and would need product-level routing
-decisions.
+Decision in Phase 3 was to block V1 high/critical outputs instead of retiring the
+classes immediately. Phase 5 follow-up clarified the semantics: because V1 has no
+approval-resume path, this is de facto disablement of high/critical V1 actions,
+not working approval-gated execution. Use V2 for approval-gated action execution.
 
 ### V1 Fail-Closed Design
 
-V1 will reuse Task 2's `AuditWriter` path instead of writing through a separate
-best-effort audit helper. For high/critical outputs, `run()` must durably audit
-and record a human-override request before returning. Because V1 has no approval
-resume token path, high/critical output is not returned after queueing; the run
-raises `GovernanceUnavailableError` to make the block explicit to callers.
+V1 reuses Task 2's `AuditWriter` path instead of writing through a separate
+best-effort audit helper. For high/critical outputs, `run()` durably audits and
+records a human-override request when infrastructure is available, then raises
+`GovernanceUnavailableError` unconditionally. There is no code path where a
+recorded, granted human approval resumes and returns the V1 output.
 
 Low/medium audit failures remain non-blocking but visible via ERROR logging and
 an in-process failure counter, matching Task 2's low/medium semantics.
