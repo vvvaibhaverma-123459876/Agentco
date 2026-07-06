@@ -11,7 +11,7 @@ import { credentialRoutes } from './routes/credential.routes';
 import { learningRoutes } from './services/learning.service';
 import { registerLearningMiddleware } from './middleware/learning.middleware';
 import { civilizationRequestValidator } from './middleware/civilization-request-validator';
-import { assertProductionSecrets, assertAuthPosture } from './security';
+import { assertProductionSecrets, assertAuthPosture, getProvidedApiKey } from './security';
 import { rateLimiterService } from './services/rate-limiter.service';
 import { assertNoProductionFallbackProviders, activeRuntimeMode, configuredProviders } from './runtime-mode';
 import { autonomyTaskRoutes } from './routes/autonomy-tasks.routes';
@@ -52,8 +52,11 @@ export async function build() {
   app.addHook('preHandler', async (request, reply) => {
     const method = request.method.toUpperCase();
     const apiKey = process.env.AGENTCO_API_KEY;
-    const providedHeader = request.headers['x-api-key'];
-    const provided = Array.isArray(providedHeader) ? providedHeader[0] : providedHeader;
+    const provided = getProvidedApiKey(request);
+    const routeConfig = request.routeOptions.config as
+      | { auth?: { public?: boolean } }
+      | undefined;
+    const isPublicRoute = routeConfig?.auth?.public === true;
 
     // Rate limiting applies to EVERY request (E4/G11), keyed by API key when
     // presented, else client IP; shared token-bucket service.
@@ -65,12 +68,12 @@ export async function build() {
       });
     }
 
-    // Write auth: reads stay public; writes require the key whenever one is
-    // configured. Startup refuses key-less non-loopback binds and key-less
-    // production (assertAuthPosture), so "no key" means loopback dev only.
-    if (!apiKey || ['GET', 'HEAD', 'OPTIONS'].includes(method)) return;
+    // API auth: route configs may explicitly mark liveness-only probes public.
+    // Every other route defaults protected for reads and writes whenever a key
+    // is configured. Key-less operation remains loopback-only development.
+    if (!apiKey || isPublicRoute || method === 'OPTIONS') return;
     if (provided !== apiKey) {
-      return reply.status(401).send({ error: 'write API key required' });
+      return reply.status(401).send({ error: 'unauthorized' });
     }
   });
 
@@ -110,7 +113,7 @@ export async function build() {
   await app.register(systemRoutes);
 
   // Basic health check
-  app.get('/health', async () => ({
+  app.get('/health', { config: { auth: { public: true } } }, async () => ({
     status: 'ok',
     timestamp: new Date().toISOString(),
   }));

@@ -60,11 +60,18 @@ export function assertAuthPosture(
   }
 }
 
+export function getProvidedApiKey(req: FastifyRequest): string | undefined {
+  const primary = req.headers['x-api-key'];
+  const legacy = req.headers['x-agentco-api-key'];
+  const provided = Array.isArray(primary) ? primary[0] : primary;
+  if (provided) return provided;
+  return Array.isArray(legacy) ? legacy[0] : legacy;
+}
+
 export async function requireApiKey(req: FastifyRequest, reply: FastifyReply) {
   const configured = process.env.AGENTCO_API_KEY || DEV_API_KEY;
-  const provided = req.headers['x-agentco-api-key'];
-  const key = Array.isArray(provided) ? provided[0] : provided;
+  const key = getProvidedApiKey(req);
   if (key !== configured) {
-    return reply.status(401).send({ error: 'valid x-agentco-api-key required' });
+    return reply.status(401).send({ error: 'unauthorized' });
   }
 }

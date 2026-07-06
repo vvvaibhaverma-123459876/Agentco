@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { agentcoAuthHeaders } from '@/lib/api/auth';
 
 interface GovernanceStatus {
   rbac_operational: boolean;
@@ -52,7 +53,7 @@ export default function GovernancePage() {
       setAttestationError(null);
       const response = await fetch(
         `/api/governance/why/${encodeURIComponent(attestationActionId.trim())}`,
-        { headers: { 'x-actor-id': 'dashboard' } }
+        { headers: agentcoAuthHeaders({ 'x-actor-id': 'dashboard' }) }
       );
       if (!response.ok) {
         throw new Error(
@@ -74,9 +75,7 @@ export default function GovernancePage() {
 
         // Fetch governance status
         const statusResponse = await fetch('/api/governance/status', {
-          headers: {
-            'x-actor-id': 'dashboard',
-          },
+          headers: agentcoAuthHeaders({ 'x-actor-id': 'dashboard' }),
         });
 
         if (!statusResponse.ok) {
@@ -88,9 +87,7 @@ export default function GovernancePage() {
 
         // Fetch recent audit events
         const auditResponse = await fetch('/api/governance/audit-trail?limit=10', {
-          headers: {
-            'x-actor-id': 'dashboard',
-          },
+          headers: agentcoAuthHeaders({ 'x-actor-id': 'dashboard' }),
         });
 
         if (auditResponse.ok) {

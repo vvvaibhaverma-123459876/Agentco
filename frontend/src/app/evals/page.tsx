@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { agentcoAuthHeaders } from '@/lib/api/auth';
 
 interface BenchmarkRun {
   run_id: string;
@@ -33,7 +34,7 @@ export default function EvalsPage() {
 
   const fetchRuns = useCallback(async () => {
     try {
-      const res = await fetch('/api/evals/runs?limit=50');
+      const res = await fetch('/api/evals/runs?limit=50', { headers: agentcoAuthHeaders() });
       const data = await res.json();
       setRuns(data.data?.runs || []);
       if (data.data?.runs?.length > 0) {
@@ -48,7 +49,7 @@ export default function EvalsPage() {
 
   const fetchLeaderboard = useCallback(async (run_id: string) => {
     try {
-      const res = await fetch(`/api/evals/runs/${run_id}`);
+      const res = await fetch(`/api/evals/runs/${run_id}`, { headers: agentcoAuthHeaders() });
       const data = await res.json();
       if (data.data?.models) {
         const sorted = data.data.models.sort(

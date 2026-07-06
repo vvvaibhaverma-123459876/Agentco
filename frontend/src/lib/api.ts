@@ -1,9 +1,9 @@
 import type { Agent, AuditEntry, OverrideRequest } from '@/types';
+import { agentcoAuthHeaders } from './api/auth';
 
 type QueryValue = string | number | boolean | undefined | null;
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
-const API_KEY = process.env.NEXT_PUBLIC_AGENTCO_API_KEY;
 
 function toQuery(params?: Record<string, QueryValue>): string {
   if (!params) return '';
@@ -36,7 +36,7 @@ async function request<T>(
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const headers = new Headers(options.headers);
+      const headers = agentcoAuthHeaders(options.headers);
       headers.set('Accept', 'application/json');
 
       if (options.body && !headers.has('Content-Type')) {
@@ -44,10 +44,6 @@ async function request<T>(
       }
 
       const method = options.method?.toUpperCase() ?? 'GET';
-      if (API_KEY && !['GET', 'HEAD', 'OPTIONS'].includes(method)) {
-        headers.set('x-api-key', API_KEY);
-        headers.set('x-agentco-api-key', API_KEY);
-      }
 
       const response = await fetch(`${API_BASE_URL}${path}${toQuery(params)}`, {
         ...options,
