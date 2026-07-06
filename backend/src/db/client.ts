@@ -55,11 +55,15 @@ export async function query<T = Record<string, unknown>>(
         return result.rows as T[];
       })();
 
+      let timeoutId: NodeJS.Timeout | undefined;
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Query timeout')), QUERY_TIMEOUT_MS)
+        timeoutId = setTimeout(() => reject(new Error('Query timeout')), QUERY_TIMEOUT_MS)
       );
 
-      const result = await Promise.race([queryPromise, timeoutPromise]);
+      const result = await Promise.race([queryPromise, timeoutPromise])
+        .finally(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+        });
       const duration = (Date.now() - startTime) / 1000;
       metricsService.recordDbQuery(sql, duration, false);
       return result;

@@ -120,3 +120,22 @@ frontend auth smoke passed
 ```
 
 Local note: the current local DB has dashboard schema drift (`autonomy_runs` absent; some legacy dashboard columns absent). The read-only autonomy dashboard list/overview endpoints now return empty success payloads for missing optional dashboard tables/columns instead of 500, so auth smoke can prove auth/header behavior without requiring historical dashboard schema.
+
+## Task 4 — Jest Open Handle Timebox
+
+Suites checked with `--detectOpenHandles`:
+
+- `npm test -- audit-chain-cross-writer.test.ts --runInBand --detectOpenHandles` — passed; no concrete handle reported.
+- `npm test -- task-worker.test.ts --runInBand --detectOpenHandles` — passed; no concrete handle reported.
+
+Observed issue: the normal cross-writer run passed but printed Jest's "did not exit one second after the test run" warning. Root cause was an obvious shared DB helper bug: `backend/src/db/client.ts` created a 10s query timeout with `setTimeout` and did not clear it when the DB query resolved first.
+
+Fix: clear the query timeout in a `finally()` attached to the `Promise.race`. Verification:
+
+```text
+npm test -- audit-chain-cross-writer.test.ts --runInBand
+PASS tests/audit-chain-cross-writer.test.ts
+No open-handle warning.
+```
+
+No `--forceExit` change was needed.
