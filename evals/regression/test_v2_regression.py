@@ -285,6 +285,7 @@ class TestSeededFalseBeliefRegression:
                 horizon_class="short",
                 domain="market_dynamics",
                 claim_type="market_forecast",
+                historical_registration_reason="regression fixture for seeded false belief firewall",
             )
             pids.append(ledger.pre_register(reg))
 
