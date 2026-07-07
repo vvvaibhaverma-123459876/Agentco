@@ -257,7 +257,7 @@ class TestBaseAgentV2DurableAudit:
             description="Durable audit round-trip",
             payload={},
             risk_level="low",
-            stated_confidence=0.7,
+            stated_confidence=0.8,
         )
 
         result = agent.execute_action(action)
