@@ -25,6 +25,7 @@ Run:
 """
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -308,7 +309,8 @@ def test_unqualified_agent_cannot_act_as_oracle(db):
 
 
 def test_write_trace(db):
-    trace_path = MIGRATION_ROOT / "evals" / "acceptance" / "oracle_layer_trace.md"
+    acceptance_dir = Path(os.environ.get("AGENTCO_ACCEPTANCE_DIR", MIGRATION_ROOT / "reports" / "acceptance"))
+    trace_path = acceptance_dir / "oracle_layer_trace.md"
     trace_path.parent.mkdir(parents=True, exist_ok=True)
     body = "\n".join(TRACE_LINES)
     from datetime import date

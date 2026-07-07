@@ -99,6 +99,7 @@ def _seed_resolved_predictions(db, agent_id: str, n: int = 3) -> list[str]:
             horizon_class="short",
             domain="tamper_test",
             claim_type="forecast",
+            historical_registration_reason="test fixture seeds already-resolved historical predictions",
         ))
         pids.append(pid)
 

@@ -23,6 +23,7 @@ Run:
 """
 from __future__ import annotations
 
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -112,6 +113,7 @@ def _register_and_resolve(ledger, cal_engine, agent_id, domain, horizon,
             horizon_class=horizon,
             domain=domain,
             claim_type="forecast",
+            historical_registration_reason="test fixture seeds already-resolved historical predictions",
         ))
         pids.append(pid)
 
@@ -277,7 +279,8 @@ def test_fresh_agent_has_neutral_low_standing(db):
 
 def _write_trace():
     """Write the acceptance trace after all tests run."""
-    trace_path = MIGRATION_ROOT / "evals" / "acceptance" / "proof_of_calibration_trace.md"
+    acceptance_dir = Path(os.environ.get("AGENTCO_ACCEPTANCE_DIR", MIGRATION_ROOT / "reports" / "acceptance"))
+    trace_path = acceptance_dir / "proof_of_calibration_trace.md"
     trace_path.parent.mkdir(parents=True, exist_ok=True)
     body = "\n".join(TRACE_LINES)
     trace_path.write_text(f"""# Acceptance Trace — Proof-of-Calibration Credential

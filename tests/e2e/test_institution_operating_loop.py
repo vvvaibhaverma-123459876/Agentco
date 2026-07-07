@@ -154,6 +154,7 @@ def test_institution_operating_loop(db):
         horizon_class="short",
         domain="engineering",
         claim_type="forecast",
+        historical_registration_reason="test fixture seeds already-resolved historical predictions",
     ))
 
     # Resolve via resolution_service role

@@ -110,6 +110,7 @@ def _register_and_resolve(db, agent_id: str, n: int, probability: float, outcome
                 horizon_class="short",
                 domain="testing",
                 claim_type="forecast",
+                historical_registration_reason="test fixture seeds already-resolved historical predictions",
             )
         )
         pids.append(pid)

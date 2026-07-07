@@ -77,6 +77,19 @@ def _create_inst(db, name):
     return create_institution(name, c, db)
 
 
+def _get_or_create_inst(db, name):
+    with db.cursor() as cur:
+        cur.execute("SELECT id FROM institutions WHERE name = %s LIMIT 1", (name,))
+        row = cur.fetchone()
+    if row:
+        institution_id = row[0]
+        return {
+            "institution_id": institution_id,
+            "department_ids": _get_dept_ids(institution_id, db),
+        }
+    return _create_inst(db, name)
+
+
 def _seed_agent(db, agent_id, institution_result, n=3, probability=0.75, outcome=True):
     """Register + resolve n predictions for agent_id; add them to Production dept."""
     from calibration import create_calibration_engine
@@ -96,6 +109,7 @@ def _seed_agent(db, agent_id, institution_result, n=3, probability=0.75, outcome
             producing_prompt_version="1.0.0", resolution_criterion="test",
             resolution_date=past, ground_truth_source="external_test",
             horizon_class="short", domain="testing", claim_type="forecast",
+            historical_registration_reason="test fixture seeds already-resolved historical predictions",
         ))
         pids.append(pid)
 
@@ -144,12 +158,8 @@ def test_t5_2_second_institution_can_challenge(db):
     from civilization.services.review_service import (
         create_review, transition_review, get_review,
     )
-    # Reuse the institutions created in T5.1 (same module fixture)
-    with db.cursor() as cur:
-        cur.execute("SELECT id FROM institutions WHERE name = 'Engineering' LIMIT 1")
-        eng_id = cur.fetchone()[0]
-        cur.execute("SELECT id FROM institutions WHERE name = 'Security' LIMIT 1")
-        sec_id = cur.fetchone()[0]
+    eng_id = _get_or_create_inst(db, "Engineering")["institution_id"]
+    sec_id = _get_or_create_inst(db, "Security")["institution_id"]
 
     review_id = create_review("out-t5-2", eng_id, sec_id, db)
     transition_review(review_id, "under_review", db)
@@ -167,9 +177,7 @@ def test_t5_3_reputation_propagates_from_agent_to_institution(db):
     from calibration import create_calibration_engine
     from civilization.services.reputation_service import propagate_institution
 
-    with db.cursor() as cur:
-        cur.execute("SELECT id FROM institutions WHERE name = 'Engineering' LIMIT 1")
-        eng_id = cur.fetchone()[0]
+    eng_id = _get_or_create_inst(db, "Engineering")["institution_id"]
 
     # Seed a good agent (p=0.75, all TRUE)
     agent_good = f"t5-3-good-{uuid.uuid4().hex[:6]}"
@@ -210,9 +218,7 @@ def test_t5_4_propagation_writes_memory_events_and_direct_update_rejected(db):
     from calibration import create_calibration_engine
     from civilization.services.reputation_service import propagate_institution
 
-    with db.cursor() as cur:
-        cur.execute("SELECT id FROM institutions WHERE name = 'Engineering' LIMIT 1")
-        eng_id = cur.fetchone()[0]
+    eng_id = _get_or_create_inst(db, "Engineering")["institution_id"]
 
     with db.cursor() as cur:
         cur.execute(

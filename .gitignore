@@ -193,6 +193,7 @@ learning_run_*.json
 /latest.md
 reports/system_run/*/
 !reports/system_run/latest/
+reports/acceptance/
 
 # Local secret env files (never commit)
 codex.env
