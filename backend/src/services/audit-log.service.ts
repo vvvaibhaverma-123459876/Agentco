@@ -49,6 +49,24 @@ interface CanonicalDecisionLogFields {
   session_id: string | null;
 }
 
+interface DecisionLogChainRow {
+  log_id: string;
+  timestamp: string | Date;
+  timestamp_text?: string;
+  prev_hash: string;
+  chain_hash: string;
+  agent_id: string;
+  action_type: string;
+  input_summary: string;
+  output_summary: string;
+  confidence_score: string | number;
+  risk_level: string;
+  human_approved: boolean;
+  human_approver_id: string | null;
+  downstream_events: string[];
+  session_id: string | null;
+}
+
 function sortCanonical(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(sortCanonical);
   if (value && typeof value === 'object' && !(value instanceof Date)) {
@@ -74,12 +92,104 @@ function legacyTsContent(fields: CanonicalDecisionLogFields): string {
   return JSON.stringify(fields);
 }
 
+function legacyPythonContent(fields: CanonicalDecisionLogFields): string {
+  return JSON.stringify(fields);
+}
+
 function normalizeTimestamp(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 }
 
+function timestampTextToLegacyPythonUtc(value: string): string | null {
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(\.(\d+))?([+-])(\d{2})(?::?(\d{2}))?$/
+  );
+  if (!match) return null;
+  const [, year, month, day, hour, minute, second, , fractional = '', sign, offsetHour, offsetMinute = '00'] = match;
+  const micros = BigInt((fractional + '000000').slice(0, 6));
+  const offsetMinutes = BigInt(Number(offsetHour) * 60 + Number(offsetMinute)) * (sign === '+' ? 1n : -1n);
+  const localMillis = Date.UTC(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second)
+  );
+  const utcMicros = BigInt(localMillis) * 1000n + micros - offsetMinutes * 60n * 1000000n;
+  const microsRemainder = Number(utcMicros % 1000000n);
+  const baseMillis = (utcMicros - BigInt(microsRemainder)) / 1000n;
+  const base = new Date(Number(baseMillis)).toISOString().replace(/\.\d{3}Z$/, '');
+  return `${base}.${String(microsRemainder).padStart(6, '0')}+00:00`;
+}
+
+function pythonJsonDumps(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(pythonJsonDumps).join(', ')}]`;
+  }
+  if (value && typeof value === 'object' && !(value instanceof Date)) {
+    const sorted = sortCanonical(value) as Record<string, unknown>;
+    return `{${Object.keys(sorted).map(key => `${JSON.stringify(key)}: ${pythonJsonDumps(sorted[key])}`).join(', ')}}`;
+  }
+  return JSON.stringify(value);
+}
+
 function normalizeConfidenceScore(value: number): number {
   return Math.round(value * 1000) / 1000;
+}
+
+function fieldsForRow(row: DecisionLogChainRow, timestamp: string): CanonicalDecisionLogFields {
+  return {
+    log_id: row.log_id,
+    timestamp,
+    prev_hash: row.prev_hash,
+    agent_id: row.agent_id,
+    action_type: row.action_type,
+    input_summary: row.input_summary,
+    output_summary: row.output_summary,
+    // Postgres NUMERIC comes back as a string; normalise to number for canonical form.
+    confidence_score: Number(row.confidence_score),
+    risk_level: row.risk_level,
+    human_approved: row.human_approved,
+    human_approver_id: row.human_approver_id,
+    downstream_events: row.downstream_events ?? [],
+    session_id: row.session_id,
+  };
+}
+
+function hashDecisionLogContent(prevHash: string, content: string): string {
+  return crypto.createHash('sha256').update(prevHash + content).digest('hex');
+}
+
+export function acceptedDecisionLogChainHashes(row: DecisionLogChainRow): Array<{ version: string; hash: string }> {
+  const normalizedFields = fieldsForRow(row, normalizeTimestamp(row.timestamp));
+  const candidates = [
+    {
+      version: 'v2.sorted-json',
+      hash: hashDecisionLogContent(row.prev_hash, canonicalDecisionLogContent(normalizedFields)),
+    },
+    {
+      version: 'v1.ts-insertion-json',
+      hash: hashDecisionLogContent(row.prev_hash, legacyTsContent(normalizedFields)),
+    },
+  ];
+
+  if (row.timestamp_text) {
+    const legacyPythonTimestamp = timestampTextToLegacyPythonUtc(row.timestamp_text);
+    if (legacyPythonTimestamp) {
+      const legacyPythonFields = fieldsForRow(row, legacyPythonTimestamp);
+      candidates.push({
+        version: 'v1.python-insertion-json',
+        hash: hashDecisionLogContent(row.prev_hash, legacyPythonContent(legacyPythonFields)),
+      });
+      candidates.push({
+        version: 'v1.python-sorted-json-spaced',
+        hash: hashDecisionLogContent(row.prev_hash, pythonJsonDumps(legacyPythonFields)),
+      });
+    }
+  }
+
+  return candidates;
 }
 
 export class AuditLogService {
@@ -216,16 +326,11 @@ export class AuditLogService {
     // Only verify rows that participate in the hash chain. Historical verifier
     // reports may have populated non-SHA marker strings in chain_hash; those
     // rows are audit records, but not valid chain links.
-    const rows = await query<{
-      log_id: string; timestamp: string; prev_hash: string; chain_hash: string;
-      agent_id: string; action_type: string; input_summary: string; output_summary: string;
-      confidence_score: string | number; risk_level: string;
-      human_approved: boolean; human_approver_id: string | null;
-      downstream_events: string[]; session_id: string | null;
-    }>(
+    const rows = await query<DecisionLogChainRow>(
       `SELECT log_id, agent_id, action_type, input_summary, output_summary,
               confidence_score, risk_level, human_approved, human_approver_id,
-              downstream_events, session_id, timestamp, chain_hash, prev_hash
+              downstream_events, session_id, timestamp, timestamp::text AS timestamp_text,
+              chain_hash, prev_hash
        FROM decision_log
        WHERE chain_hash ~ '^[0-9a-f]{64}$'
          AND prev_hash ~ '^[0-9a-f]{64}$'
@@ -233,26 +338,8 @@ export class AuditLogService {
     );
 
     for (const row of rows) {
-      const fields = {
-        log_id: row.log_id,
-        timestamp: normalizeTimestamp(row.timestamp),
-        prev_hash: row.prev_hash,
-        agent_id: row.agent_id,
-        action_type: row.action_type,
-        input_summary: row.input_summary,
-        output_summary: row.output_summary,
-        // Postgres NUMERIC comes back as a string; normalise to number for canonical form
-        confidence_score: Number(row.confidence_score),
-        risk_level: row.risk_level,
-        human_approved: row.human_approved,
-        human_approver_id: row.human_approver_id,
-        downstream_events: row.downstream_events ?? [],
-        session_id: row.session_id,
-      };
-
-      const computed = crypto.createHash('sha256').update(row.prev_hash + canonicalDecisionLogContent(fields)).digest('hex');
-      const legacyComputed = crypto.createHash('sha256').update(row.prev_hash + legacyTsContent(fields)).digest('hex');
-      if (computed !== row.chain_hash && legacyComputed !== row.chain_hash) {
+      const accepted = acceptedDecisionLogChainHashes(row);
+      if (!accepted.some(candidate => candidate.hash === row.chain_hash)) {
         return { valid: false, broken_at: row.log_id };
       }
     }

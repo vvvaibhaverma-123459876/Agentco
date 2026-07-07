@@ -1,5 +1,3 @@
-from .ux_agent import UXAgent
-from .brand_agent import BrandAgent
-from .ab_agent import ABAgent
+"""Design V1 agents are archived under archive/agents_v1."""
 
-__all__ = ["UXAgent", "BrandAgent", "ABAgent"]
+__all__: list[str] = []

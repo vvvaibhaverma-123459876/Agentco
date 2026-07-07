@@ -1,5 +1,5 @@
-from .pm_agent import PMAgent
-from .research_agent import ResearchAgent
-from .prioritizer_agent import PrioritizerAgent
+"""Product V1 agents are archived; active replacements use BaseAgentV2 where present."""
 
-__all__ = ["PMAgent", "ResearchAgent", "PrioritizerAgent"]
+from .pm_agent_v2 import PMAgentV2
+
+__all__ = ["PMAgentV2"]

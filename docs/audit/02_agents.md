@@ -5,6 +5,10 @@
 > `GovernanceUnavailableError` after audit/override recording. Because V1 has no
 > approval-resume path, this is disablement pending approval infrastructure, not
 > working approval-gated execution. See `PHASE5_NOTES.md`.
+>
+> Phase 6 update: the 29 dead department-style V1 classes were moved to
+> `archive/agents_v1/`. The remaining live V1 surface is the autonomy
+> `SpecialistAgent` spawn path and its role modules.
 
 **Date:** 2026-07-05
 **Method:** Execute, don't just read. Test suite run; pure core hand-verified with exact
@@ -23,15 +27,16 @@ agents delegate into is a separate subsystem, flagged where it changes the verdi
 `core/tool_registry.py`, `core/base_agent.py`) plus ~38 department agents across 8
 departments. There are **two parallel, overlapping agent hierarchies**:
 
-- **v1** — 29 agents subclassing `agents.core.base_agent.BaseAgent` (all of design, sales,
-  marketing, customer_experience, most of people_ops, and a v1 copy of every executive/eng
-  agent).
+- **v1** — originally 29 department-style agents subclassing
+  `agents.core.base_agent.BaseAgent`; Phase 6 archived those dead classes under
+  `archive/agents_v1/`. The live V1 path is now the autonomy `SpecialistAgent`
+  hierarchy reached by backend specialist spawning.
 - **v2** — 9 agents subclassing `runtime.base_agent.base_agent_v2.BaseAgentV2`
   (`*_agent_v2.py`). **9 departments have both a v1 and a v2 file for the same role.**
 
 The test suite and `conftest.py` exercise the **v2** path. The `agents/core/base_agent.py`
-governance loop audited below is the **v1** path that still backs 29 live agents and 20
-roles that have no v2 replacement.
+governance loop audited below remains relevant for live autonomy specialists, but it no
+longer backs the archived department-style classes.
 
 ---
 
@@ -159,11 +164,10 @@ escalation/audit path has zero test coverage.**
 
 ## 6. Rot scan
 
-- **Duplicate divergent hierarchies:** 29 v1 agents on `agents.core.base_agent.BaseAgent` vs
-  9 v2 agents on `runtime…BaseAgentV2`; 9 roles exist in **both** (`ceo/cfo/coo/coder/devops/
-  reviewer/pm/privacy/config`). Two governance models coexist: v1 (queues, non-blocking,
-  swallowed) and v2 (raises `HumanApprovalRequired` — a real block, but in `runtime/`). Which
-  is "the system" is unresolved; 20 roles have only the weaker v1.
+- **Archived divergent hierarchy:** the 29 department-style v1 agents on
+  `agents.core.base_agent.BaseAgent` were archived in Phase 6. The remaining divergence is
+  narrower: live autonomy specialists still use `SpecialistAgent`/V1, while department V2
+  roles use `runtime…BaseAgentV2`.
 - **Dead code:** `compute_risk_level` imported into `base_agent.py` and never called.
 - **Bypassed core:** `score_output`/`compute_risk_level` are the advertised mandatory path;
   the agents route around both with literals.

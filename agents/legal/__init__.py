@@ -1,5 +1,5 @@
-from .contract_agent import ContractAgent
-from .risk_agent import RiskAgent
-from .privacy_agent import PrivacyAgent
+"""Legal V1 agents are archived; active replacements use BaseAgentV2 where present."""
 
-__all__ = ["ContractAgent", "RiskAgent", "PrivacyAgent"]
+from .privacy_agent_v2 import PrivacyAgentV2
+
+__all__ = ["PrivacyAgentV2"]

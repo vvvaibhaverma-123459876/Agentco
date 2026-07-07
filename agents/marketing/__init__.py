@@ -1,6 +1,3 @@
-from .content_agent import ContentAgent
-from .seo_agent import SEOAgent
-from .ads_agent import AdsAgent
-from .analytics_agent import AnalyticsAgent
+"""Marketing V1 agents are archived under archive/agents_v1."""
 
-__all__ = ["ContentAgent", "SEOAgent", "AdsAgent", "AnalyticsAgent"]
+__all__: list[str] = []

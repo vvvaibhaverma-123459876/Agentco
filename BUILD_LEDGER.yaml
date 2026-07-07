@@ -636,7 +636,9 @@ layers:
       - dispatch_e2e
       notes: BaseAgentV2 pre-registers falsifiable claims, uses trusted confidence, emits signed prompt-versioned envelopes,
         blocks high-risk actions without human approval, reserves/settles LLM token budget through the resource ledger, and
-        participates in Reserve credential issuance through DB-backed prediction rows.
+        participates in Reserve credential issuance through DB-backed prediction rows. Department-style V1 BaseAgent classes
+        were archived in Phase 6 under archive/agents_v1 after reachability analysis found them dead; the remaining live V1
+        surface is the autonomy SpecialistAgent spawn path pending a Phase 7 adapter migration.
     - id: L7.RoleSeparation
       status: verified
       depends_on:
@@ -657,7 +659,7 @@ layers:
       - protected_surface_enforcement
       - tool_permission_denial
       - config_agent_self_mod_block
-      notes: Role separation is enforced through role-derived authority-chain decisions, protected RBAC/policy surfaces, ConfigAgent
+      notes: Role separation is enforced through role-derived authority-chain decisions, protected RBAC/policy surfaces, ConfigAgentV2
         self-modification blocks, critical permission-change approval gates, and runtime tool permission denial before handler
         side effects.
   L8_tasks_execution:

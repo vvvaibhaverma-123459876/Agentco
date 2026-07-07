@@ -66,7 +66,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 | L6 proof of calibration | Passed Reserve signed credential, public verification, key-independent recomputation, tamper-evidence, and agent credential integration tests |
 | L6 commitment chain | Passed append-only prediction-chain log, chain-head recomputation, and tamper-divergence checks |
 | L7 citizen runtime | Passed BaseAgentV2 contract, trusted-confidence, human-approval, DB resource-ledger spend, Reserve credential, and dispatch E2E checks |
-| L7 role separation | Passed role-derived authority-chain decisions, protected RBAC/policy surface blocks, ConfigAgent self-modification blocks, and tool-denial audit checks |
+| L7 role separation | Passed role-derived authority-chain decisions, protected RBAC/policy surface blocks, ConfigAgentV2 self-modification blocks, and tool-denial audit checks |
 | L11 conflict judiciary | Passed contradiction dispute opening, calibration-weighted ruling issuance, fail-closed near-tie escalation, duplicate-ruling blocking, precedent storage/lookup, and event-log/outbox provenance |
 | L12 skill library | Passed versioned skill registration from simulation-trained learner candidates with generated regression coverage |
 | L6 proof of competence | Passed threshold-gated proof minting for registered skill regressions with canonical proof hashes |
@@ -148,7 +148,7 @@ AgentCo is a runnable local-native research/runtime system with all current buil
 - Proof-of-calibration behavior is verified through the full Reserve suite against an isolated `reserve_test` Postgres database, including credential issuance/persistence, Ed25519/HMAC verification, raw-row recomputation without signing keys, commitment-chain tamper detection, and BaseAgentV2 Reserve credential integration.
 - Commitment-chain behavior is verified through Reserve tamper-evidence tests that append resolved predictions into `prediction_chain_log`, recompute the chain head from public ledger rows, block chain-row mutation, and detect altered prediction outcomes or probabilities.
 - Citizen runtime behavior is verified through runtime and agent tests covering claim pre-registration, trusted-confidence execution, signed prompt-versioned envelopes, human-approval blocking, resource-ledger-backed LLM spend reservations, Reserve credential participation, and DB/Kafka-backed dispatch.
-- Role separation behavior is verified through DB-backed identity authority tests, protected-surface enforcement, ConfigAgent self-modification and permission-change approval gates, and real tool permission denial before handler side effects.
+- Role separation behavior is verified through DB-backed identity authority tests, protected-surface enforcement, ConfigAgentV2 self-modification and permission-change approval gates, and real tool permission denial before handler side effects.
 - L11 judiciary behavior now includes calibration-weighted contradiction rulings using each claim producer's domain trust and evidence-independence weight. Stated confidence is not used as the decision weight; weak, missing, or near-tied calibration evidence leaves the dispute open for escalation rather than fabricating a winner.
 
 ## Latest Live OpenAI Evidence

@@ -1,5 +1,7 @@
-from .ceo_agent import CEOAgent
-from .cfo_agent import CFOAgent
-from .coo_agent import COOAgent
+"""Executive V1 agents are archived; active replacements use BaseAgentV2."""
 
-__all__ = ["CEOAgent", "CFOAgent", "COOAgent"]
+from .ceo_agent_v2 import CEOAgentV2
+from .cfo_agent_v2 import CFOAgentV2
+from .coo_agent_v2 import COOAgentV2
+
+__all__ = ["CEOAgentV2", "CFOAgentV2", "COOAgentV2"]

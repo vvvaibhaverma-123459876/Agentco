@@ -1,5 +1,3 @@
-from .sdr_agent import SDRAgent
-from .ae_agent import AEAgent
-from .revops_agent import RevOpsAgent
+"""Sales V1 agents are archived under archive/agents_v1."""
 
-__all__ = ["SDRAgent", "AEAgent", "RevOpsAgent"]
+__all__: list[str] = []
