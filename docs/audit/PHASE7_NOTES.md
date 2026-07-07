@@ -69,3 +69,25 @@ python3.13 -m pytest tests/test_pawdent_business_simulation.py runtime/orchestra
 make status-check
 README.md already up to date
 ```
+
+## Task 3 — Error Contract: No Raw 500s
+
+Verdict before fix: GENUINE. The central Fastify error handler returned `error.message` directly, and several active route catches returned caught exception text in `error` or `message` fields. The raw Postgres UUID case was one manifestation of the same problem: invalid path params were allowed to reach lower layers.
+
+Fixes:
+
+- Added `backend/src/http-errors.ts` with public error messages and correlation-id response shape `{ error, id }`.
+- Added `backend/src/routes/param-validation.ts` and wired shared UUID path-param validation after API-key auth succeeds, so protected routes still return 401 before any path-param detail is exposed.
+- Added a protected not-found handler for trailing-slash and case variants of protected paths: unauthenticated variants return 401; authenticated misses return 404.
+- Replaced active route catch-block pass-throughs with stable public strings. Full exception details remain server-side through logs keyed by request id.
+
+Focused verification:
+
+```text
+cd backend && npm test -- route-auth-contract.test.ts --runInBand
+Test Suites: 1 passed, 1 total
+Tests:       162 passed, 162 total
+
+cd backend && npm run build
+tsc passed
+```

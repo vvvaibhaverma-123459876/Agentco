@@ -68,7 +68,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: error.message });
+      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Request failed' });
     }
   });
 
@@ -90,7 +90,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: error.message });
+      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Request failed' });
     }
   });
 
@@ -114,7 +114,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: error.message });
+      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Request failed' });
     }
   });
 
@@ -143,7 +143,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: error.message });
+      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Request failed' });
     }
   });
 
@@ -164,7 +164,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: error.message });
+      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Request failed' });
     }
   });
 
@@ -187,7 +187,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         },
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: error.message });
+      return reply.status(500).send({ error: 'INTERNAL_ERROR', message: 'Request failed' });
     }
   });
 
@@ -227,7 +227,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(400).send({ error: 'ASSIGNMENT_FAILED', message: error.message });
+      return reply.status(400).send({ error: 'ASSIGNMENT_FAILED', message: 'Request failed' });
     }
   });
 
@@ -259,7 +259,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(400).send({ error: 'REVOCATION_FAILED', message: error.message });
+      return reply.status(400).send({ error: 'REVOCATION_FAILED', message: 'Request failed' });
     }
   });
 
@@ -281,7 +281,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'BOOTSTRAP_FAILED', message: error.message });
+      return reply.status(500).send({ error: 'BOOTSTRAP_FAILED', message: 'Request failed' });
     }
   });
 
@@ -334,7 +334,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'APPROVAL_FAILED', message: error.message });
+      return reply.status(500).send({ error: 'APPROVAL_FAILED', message: 'Request failed' });
     }
   });
 
@@ -381,7 +381,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
         timestamp: new Date().toISOString(),
       });
     } catch (error: any) {
-      return reply.status(500).send({ error: 'FREEZE_FAILED', message: error.message });
+      return reply.status(500).send({ error: 'FREEZE_FAILED', message: 'Request failed' });
     }
   });
 

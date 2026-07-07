@@ -38,7 +38,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -65,7 +65,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(500).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -84,7 +84,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -110,7 +110,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -129,7 +129,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -151,7 +151,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -178,7 +178,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -200,7 +200,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -227,7 +227,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });
@@ -259,7 +259,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
     } catch (error: any) {
       reply.code(400).send({
         status: 'error',
-        error: error.message,
+        error: 'Request failed',
       });
     }
   });

@@ -122,7 +122,7 @@ export async function agentRoutes(fastify: FastifyInstance) {
           task_id: task.task_id,
           task_type,
           outcome: 'failed',
-          error: err.message,
+          error: 'Request failed',
           confidence: 0.8,
         },
         `agent://outcome/${task.task_id}`,

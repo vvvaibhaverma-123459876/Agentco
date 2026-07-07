@@ -42,7 +42,7 @@ export async function phase3HardeningRoutes(
         status: 'acquired',
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -69,7 +69,7 @@ export async function phase3HardeningRoutes(
 
       return reply.send({ status: 'released', lock_id: lockId });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -93,7 +93,7 @@ export async function phase3HardeningRoutes(
           circular_path: result.cycle,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -127,7 +127,7 @@ export async function phase3HardeningRoutes(
         inconsistencies: result.inconsistencies,
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -151,7 +151,7 @@ export async function phase3HardeningRoutes(
           total: incidents.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -172,7 +172,7 @@ export async function phase3HardeningRoutes(
 
         return reply.send(distribution);
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -199,7 +199,7 @@ export async function phase3HardeningRoutes(
           total: underperformers.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -226,7 +226,7 @@ export async function phase3HardeningRoutes(
           total: topPerformers.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -251,7 +251,7 @@ export async function phase3HardeningRoutes(
           total: anomalies.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -287,7 +287,7 @@ export async function phase3HardeningRoutes(
           data_points: trend.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -319,7 +319,7 @@ export async function phase3HardeningRoutes(
           total: updates.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
