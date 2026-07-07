@@ -123,3 +123,21 @@ Tests:       17 passed, 17 total
 ```
 
 Full-suite note: the subsequent full backend run returned to the shell without `forceExit`; it exposed stale shared-DB chain fixtures, which were fixed above.
+
+## Task 5 — Route-Auth Edge Cases
+
+Verdict before fix: already covered by the Task 3 route-auth contract expansion. The contract suite now asserts:
+
+- HEAD has the same auth posture as GET on a protected route.
+- Trailing-slash variants do not bypass auth.
+- Path-case variants do not bypass auth.
+- Unclassified routes registered in the app still default to protected.
+- Invalid UUID path params return sanitized 400s after auth, not raw lower-layer errors.
+
+Verification:
+
+```text
+cd backend && npm test -- route-auth-contract.test.ts --runInBand
+Test Suites: 1 passed, 1 total
+Tests:       162 passed, 162 total
+```
