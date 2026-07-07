@@ -309,9 +309,10 @@ cannot approve deployment.
 
 **Tables.** `agents`, `roles`, `agent_capabilities` (see A.7).
 
-**Maps from existing.** The 29 `agents/` roles, `BaseAgentV2` (pre-register gate, ConfidenceV2,
-EscalationGate, SpendGuardrail, structured_output, llm_client, model tiers) become the **citizen
-runtime**: the per-citizen execution shell that enforces L1/L2/L5/L10 at the point of action.
+**Maps from existing.** Phase 6 archived the dead department-style V1 `agents/` roles under
+`archive/agents_v1`; active citizen runtime work maps to `BaseAgentV2` (pre-register gate,
+ConfidenceV2, EscalationGate, SpendGuardrail, structured_output, llm_client, model tiers) plus
+the still-live autonomy `SpecialistAgent` spawn path pending a V2 adapter.
 
 ---
 
@@ -546,7 +547,7 @@ Trigger (task or self-assessment goal)
 | `claim-grounding.ts`, source-quality, memory, consolidation | L4 | `[HAVE]`; retrieval `[BUILD]` |
 | Prediction ledger, resolution-independence, grounding validator, NSE | L5 | `[HAVE]` |
 | `calibration/` scoring, `trusted_confidence()`, `reserve/` proof + recompute | L6 | `[HAVE]` |
-| `agents/` 29 roles, `BaseAgentV2` | L7 citizens | `[HAVE]`/`[EXTEND]` |
+| archived V1 department roles, live autonomy specialists, `BaseAgentV2` | L7 citizens | `[HAVE]`/`[EXTEND]`; V1 department roles archived in Phase 6 |
 | `planner`, `action-executor`, reasoning services, `civilization.solve` | L8 | `[HAVE]` |
 | `civilization/` institutions, reputation, economy, societies, coalitions, goals | L9 | `[HAVE]`/`[EXTEND]` |
 | `protected-surface-enforcer`, `self-modification-validator`, override queue, Tier-0 kernel | L10 | `[HAVE]` |

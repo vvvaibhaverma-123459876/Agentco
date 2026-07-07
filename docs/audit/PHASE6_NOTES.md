@@ -103,3 +103,73 @@ Verification:
 python3.13 -m pytest reserve/tests/test_agent_reserve_integration.py reserve/tests/test_oracle_layer.py reserve/tests/test_proof_of_calibration.py reserve/tests/test_staking_and_decisions.py -q
 4 skipped in 0.06s
 ```
+
+## Task 3 — V1 Retirement
+
+Archived class count: 29.
+
+Archived `DEAD` V1 classes:
+
+| class | archived path | replacement/status |
+|---|---|---|
+| `SuccessAgent` | `archive/agents_v1/agents/customer_experience/success_agent.py` | no active V2 replacement |
+| `SupportAgent` | `archive/agents_v1/agents/customer_experience/support_agent.py` | no active V2 replacement |
+| `VoiceAgent` | `archive/agents_v1/agents/customer_experience/voice_agent.py` | no active V2 replacement |
+| `ABAgent` | `archive/agents_v1/agents/design/ab_agent.py` | no active V2 replacement |
+| `BrandAgent` | `archive/agents_v1/agents/design/brand_agent.py` | no active V2 replacement |
+| `UXAgent` | `archive/agents_v1/agents/design/ux_agent.py` | no active V2 replacement |
+| `ArchitectAgent` | `archive/agents_v1/agents/engineering/architect_agent.py` | no active V2 replacement |
+| `CoderAgent` | `archive/agents_v1/agents/engineering/coder_agent.py` | `agents/engineering/coder_agent_v2.py` |
+| `DevOpsAgent` | `archive/agents_v1/agents/engineering/devops_agent.py` | `agents/engineering/devops_agent_v2.py` |
+| `ReviewerAgent` (engineering) | `archive/agents_v1/agents/engineering/reviewer_agent.py` | `agents/engineering/reviewer_agent_v2.py` |
+| `CEOAgent` | `archive/agents_v1/agents/executive/ceo_agent.py` | `agents/executive/ceo_agent_v2.py` |
+| `CFOAgent` | `archive/agents_v1/agents/executive/cfo_agent.py` | `agents/executive/cfo_agent_v2.py` |
+| `COOAgent` | `archive/agents_v1/agents/executive/coo_agent.py` | `agents/executive/coo_agent_v2.py` |
+| `ContractAgent` | `archive/agents_v1/agents/legal/contract_agent.py` | no active V2 replacement |
+| `PrivacyAgent` | `archive/agents_v1/agents/legal/privacy_agent.py` | `agents/legal/privacy_agent_v2.py` |
+| `RiskAgent` | `archive/agents_v1/agents/legal/risk_agent.py` | no active V2 replacement |
+| `AdsAgent` | `archive/agents_v1/agents/marketing/ads_agent.py` | no active V2 replacement |
+| `AnalyticsAgent` | `archive/agents_v1/agents/marketing/analytics_agent.py` | no active V2 replacement |
+| `ContentAgent` | `archive/agents_v1/agents/marketing/content_agent.py` | no active V2 replacement |
+| `SEOAgent` | `archive/agents_v1/agents/marketing/seo_agent.py` | no active V2 replacement |
+| `ConfigAgent` | `archive/agents_v1/agents/people_ops/config_agent.py` | `agents/people_ops/config_agent_v2.py` |
+| `PerformanceAgent` | `archive/agents_v1/agents/people_ops/performance_agent.py` | no active V2 replacement |
+| `RecruiterAgent` | `archive/agents_v1/agents/people_ops/recruiter_agent.py` | no active V2 replacement |
+| `PMAgent` | `archive/agents_v1/agents/product/pm_agent.py` | `agents/product/pm_agent_v2.py` |
+| `PrioritizerAgent` | `archive/agents_v1/agents/product/prioritizer_agent.py` | no active V2 replacement |
+| `ResearchAgent` | `archive/agents_v1/agents/product/research_agent.py` | no active V2 replacement |
+| `AEAgent` | `archive/agents_v1/agents/sales/ae_agent.py` | no active V2 replacement |
+| `RevOpsAgent` | `archive/agents_v1/agents/sales/revops_agent.py` | no active V2 replacement |
+| `SDRAgent` | `archive/agents_v1/agents/sales/sdr_agent.py` | no active V2 replacement |
+
+Archived tests excluded from default collection:
+
+- `archive/agents_v1/tests/agents/engineering/test_devops_agent.py::test_deploy_without_reviewer_approval_blocked`
+- `archive/agents_v1/tests/agents/engineering/test_devops_agent.py::test_rollback_triggered_by_error_rate`
+- `archive/agents_v1/tests/agents/engineering/test_devops_agent.py::test_no_rollback_when_metrics_healthy`
+- `archive/agents_v1/tests/agents/executive/test_ceo_agent.py::test_strategic_pivot_requires_human_approval`
+- `archive/agents_v1/tests/agents/executive/test_ceo_agent.py::test_routine_goal_setting_autonomous`
+
+Default collection verification:
+
+```text
+python3.13 -m pytest --collect-only -q
+551 tests collected in 3.77s
+```
+
+Remaining LIVE V1 list:
+
+- `SpecialistAgent` base and the 17 active autonomy role subclasses:
+  `BackgroundResearcherAgent`, `ClaimValidatorAgent`, `CodeReviewerAgent`,
+  `ComparativeAnalystAgent`, `ContradictionHunterAgent`, `DataAnalystAgent`,
+  `DocAnalyzerAgent`, `EvidenceLinkerAgent`, `EvidenceSummarizerAgent`,
+  `FetcherAgent`, `QualityAuditorAgent`, `ResearcherAgent`, `ReviewerAgent`,
+  `SentimentAnalyzerAgent`, `SourceValidatorAgent`, `SynthesizerAgent`, and
+  `TemporalAnalystAgent`.
+
+LIVE migration note:
+
+- Current active entrypoint: `TeamActivationService.spawnSpecialistProcess()` starts `python3.13 -m agents.autonomy.<role>`, and each role module constructs a `SpecialistAgent` subclass with `(specialist_id, role, budget)`.
+- `BaseAgentV2` constructor shape is different: V2 expects `agent_id`, optional calibration engine, escalation gate, audit writer, and runtime governance helpers rather than the autonomy specialist `(id, role, budget)` interface.
+- Migration would require an adapter that maps specialist budget/role into V2 action execution, wires `DurableAuditWriter` for DB-backed `decision_log`, preserves the HTTP specialist server contract, and translates high/critical actions into V2 `EscalationGate` behavior.
+- This is not mechanical under ~100 lines because the live specialist server, action handlers, budget accounting, and backend process lifecycle all assume the existing `SpecialistAgent` interface. Phase 7 should migrate this as an adapter-first change with a compatibility test for `spawn_specialist`.

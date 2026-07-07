@@ -1,5 +1,5 @@
-from .performance_agent import PerformanceAgent
-from .recruiter_agent import RecruiterAgent
-from .config_agent import ConfigAgent
+"""People ops V1 agents are archived; active replacements use BaseAgentV2 where present."""
 
-__all__ = ["PerformanceAgent", "RecruiterAgent", "ConfigAgent"]
+from .config_agent_v2 import ConfigAgentV2
+
+__all__ = ["ConfigAgentV2"]

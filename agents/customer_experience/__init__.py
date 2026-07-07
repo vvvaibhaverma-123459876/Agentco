@@ -1,5 +1,3 @@
-from .support_agent import SupportAgent
-from .success_agent import SuccessAgent
-from .voice_agent import VoiceAgent
+"""Customer experience V1 agents are archived under archive/agents_v1."""
 
-__all__ = ["SupportAgent", "SuccessAgent", "VoiceAgent"]
+__all__: list[str] = []
