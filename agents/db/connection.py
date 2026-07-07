@@ -79,7 +79,8 @@ class DatabaseConnection:
             cur.close()
             return affected
         except Exception as e:
-            conn.rollback()
+            if self.conn and not self.conn.closed:
+                self.conn.rollback()
             logger.error(f"Update failed: {e}")
             raise
 
@@ -96,7 +97,8 @@ class DatabaseConnection:
             cur.close()
             return total
         except Exception as e:
-            conn.rollback()
+            if self.conn and not self.conn.closed:
+                self.conn.rollback()
             logger.error(f"Batch update failed: {e}")
             raise
 

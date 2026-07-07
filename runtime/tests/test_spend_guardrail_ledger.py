@@ -17,8 +17,15 @@ def _dsn():
     return dsn
 
 
+def _connect_or_skip():
+    try:
+        return psycopg2.connect(_dsn())
+    except Exception as exc:
+        pytest.skip(f"Postgres spend ledger integration unavailable: {exc}")
+
+
 def _apply_migrations():
-    conn = psycopg2.connect(_dsn())
+    conn = _connect_or_skip()
     conn.autocommit = True
     try:
         with conn.cursor() as cur:
@@ -34,7 +41,7 @@ def _apply_migrations():
 
 
 def _account_state(account_id: str):
-    conn = psycopg2.connect(_dsn())
+    conn = _connect_or_skip()
     try:
         with conn.cursor() as cur:
             cur.execute(

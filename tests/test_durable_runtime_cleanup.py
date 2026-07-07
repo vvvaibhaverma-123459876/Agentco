@@ -14,7 +14,8 @@ def test_runtime_shutdown_closes_kafka_and_optional_db_pool():
     assert "disconnectProducer" in source
     assert "db.end()" in source
     assert "closeDb" in source
-    assert "shutdownStarted" in source
+    assert "producerDisconnected" in source
+    assert "dbClosed" in source
 
 
 def test_durable_smoke_uses_shared_shutdown_helper():

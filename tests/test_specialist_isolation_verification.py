@@ -25,15 +25,25 @@ import pytest
 from agents.db import get_db
 
 
+def _db_or_skip():
+    db = get_db()
+    try:
+        db.connect()
+    except Exception as exc:
+        pytest.skip(f"Postgres specialist isolation integration unavailable: {exc}")
+    return db
+
+
 class SpecialistIsolationVerifier:
     """Verifies specialist agent execution in isolation."""
 
     def __init__(self):
-        self.db = get_db()
+        self.db = _db_or_skip()
         self.specialist_process = None
         self.specialist_port = None
         self.test_goal_id = str(uuid.uuid4())
         self.test_action_id = str(uuid.uuid4())
+        self.test_evidence_source_id = None
 
     def setup_test_fixtures(self):
         """Create real test evidence in database."""
@@ -96,10 +106,11 @@ class SpecialistIsolationVerifier:
     def cleanup_test_fixtures(self):
         """Remove test data from database."""
         try:
-            self.db.execute_update(
-                "DELETE FROM autonomy_evidence WHERE source_id = %s",
-                [self.test_evidence_source_id]
-            )
+            if self.test_evidence_source_id:
+                self.db.execute_update(
+                    "DELETE FROM autonomy_evidence WHERE source_id = %s",
+                    [self.test_evidence_source_id]
+                )
             self.db.execute_update(
                 "DELETE FROM autonomy_goal_actions WHERE action_id = %s",
                 [self.test_action_id]

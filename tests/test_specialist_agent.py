@@ -102,6 +102,14 @@ class TestResearcherAgent:
         """Test web search action handling"""
         budget = {'tokens': 10000, 'iterations': 100, 'seconds': 60}
         agent = ResearcherAgent('researcher-1', 'researcher', budget)
+        agent.real_web_search = lambda query: {
+            'status': 'search_completed',
+            'query': query,
+            'results': [
+                {'url': 'https://example.com/agents', 'title': 'Agents', 'snippet': 'Autonomous agents fixture'}
+            ],
+        }
+        agent.persist_evidence = lambda **_kwargs: 'artifact-search-1'
 
         action_spec = {
             'actionType': 'web_search',
@@ -144,6 +152,7 @@ class TestResearcherAgent:
         """Test claim generation with evidence"""
         budget = {'tokens': 10000, 'iterations': 100, 'seconds': 60}
         agent = ResearcherAgent('researcher-3', 'researcher', budget)
+        agent.persist_claim = lambda **_kwargs: 'claim-fixture-1'
 
         action_spec = {
             'actionType': 'generate_claim',

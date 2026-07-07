@@ -30,6 +30,9 @@ Focused verification:
 python3.13 -m pytest agents/tests/integration/test_agent_dispatch_e2e.py::test_full_dispatch_path_touches_real_postgres_ledger_audit_and_kafka learning/tests/test_learning_loop.py::TestScenarioAgent::test_generates_hypotheses_for_focus_areas runtime/tests/test_base_agent_v2.py::TestBaseAgentV2DurableAudit::test_durable_audit_writer_round_trip_live_postgres tests/e2e/test_memory_lifecycle.py::test_reader_track_record_and_format tests/test_db_client_runtime_config.py::test_backend_db_client_has_bounded_pool_and_retry_contract -q
 s.... [100%]
 4 passed, 1 skipped
+
+DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco python3.13 -m pytest -q
+494 passed, 62 skipped, 4 warnings in 18.14s
 ```
 
 ## Task 2 — No-Diff Verification
@@ -161,9 +164,15 @@ Fixes:
   Jest `--forceExit` argument.
 - Updated README to document `make release-gate` as the stranger-trust command
   and removed stale `forceExit` examples.
+- Updated stale Python regression assertions for the new release gate and the
+  idempotent shutdown helper names.
+- Added explicit Postgres capability probes to live-service Python tests that
+  open real DB connections during setup, and made specialist handler unit tests
+  stub search/claim persistence instead of using the DB.
 
 Verification:
 
 ```text
-pending final release-gate run
+DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco AGENTCO_TEST_DATABASE_URL=postgresql://agentco:password@localhost:5432/agentco python3.13 -m pytest agents/tests/integration/test_tool_execution_real.py runtime/tests/test_spend_guardrail_ledger.py tests/test_civilization_free_run_positive_path.py tests/test_specialist_isolation_verification.py evals/regression/test_gate17_ci_master.py tests/test_durable_runtime_cleanup.py tests/test_specialist_agent.py -q
+23 passed, 11 skipped in 1.92s
 ```
