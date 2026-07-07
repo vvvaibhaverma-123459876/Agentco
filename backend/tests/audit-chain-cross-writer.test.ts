@@ -2,7 +2,7 @@ import { spawnSync } from 'child_process';
 import crypto from 'crypto';
 import path from 'path';
 import { db } from '../src/db/client';
-import { auditLog } from '../src/services/audit-log.service';
+import { acceptedDecisionLogChainHashes, auditLog } from '../src/services/audit-log.service';
 
 const DSN = process.env.DATABASE_URL || 'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
 
@@ -20,6 +20,35 @@ afterAll(async () => {
 });
 
 describe('decision_log cross-writer hash chain', () => {
+  test('verifier accepts legacy Python insertion-order rows across the canonicalization seam', () => {
+    const prevHash = 'a'.repeat(64);
+    const fields = {
+      log_id: '11111111-1111-4111-8111-111111111111',
+      timestamp: '2026-07-06T12:34:56.123456+00:00',
+      prev_hash: prevHash,
+      agent_id: 'legacy-python-writer',
+      action_type: 'decision',
+      input_summary: 'python legacy input',
+      output_summary: '{"action_type":"decision","outcome":"executed","override_id":null,"prediction_id":null}',
+      confidence_score: 0.843,
+      risk_level: 'medium',
+      human_approved: false,
+      human_approver_id: null,
+      downstream_events: [],
+      session_id: '22222222-2222-4222-8222-222222222222',
+    };
+    const chainHash = crypto.createHash('sha256').update(prevHash + JSON.stringify(fields)).digest('hex');
+
+    const candidates = acceptedDecisionLogChainHashes({
+      ...fields,
+      timestamp: '2026-07-06T12:34:56.123Z',
+      timestamp_text: '2026-07-06 12:34:56.123456+00',
+      chain_hash: chainHash,
+    });
+
+    expect(candidates).toContainEqual({ version: 'v1.python-insertion-json', hash: chainHash });
+  });
+
   test('TS -> Python -> TS entries verify as one chain', async () => {
     const availability = await decisionLogAvailable();
     if (!availability.available) {
