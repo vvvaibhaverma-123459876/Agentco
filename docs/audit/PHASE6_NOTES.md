@@ -15,11 +15,12 @@ Phase 5 already accepted two serialization buckets:
 - `v2.sorted-json`: sorted-key compact JSON, the current TypeScript/Python writer contract.
 - `v1.ts-insertion-json`: TypeScript `JSON.stringify(fields)` insertion order, the pre-Phase-5 TypeScript writer contract.
 
-Phase 6 added the missing legacy Python bucket:
+Phase 6 added the missing legacy Python buckets:
 
-- `v1.python-insertion-json`: Python insertion-order compact JSON with the original `datetime.now(timezone.utc).isoformat()` timestamp shape.
+- `v1.python-insertion-json`: Python insertion-order compact JSON with the original `datetime.now(timezone.utc).isoformat()` timestamp shape. This matched the historical seam row that broke full-suite verification.
+- `v1.python-sorted-json-spaced`: defensive support for Python `json.dumps(sort_keys=True)` with default separators.
 
-Implementation note: the verifier now selects `timestamp::text AS timestamp_text`. That preserves Postgres microseconds, which JavaScript `Date` would otherwise truncate to milliseconds. The Python legacy timestamp is reconstructed from Postgres text before hashing.
+Implementation note: the verifier now selects `timestamp::text AS timestamp_text`. That preserves Postgres microseconds and the stored timezone offset, which JavaScript `Date` would otherwise truncate to milliseconds. The Python legacy timestamp is reconstructed as UTC `+00:00` before hashing.
 
 Verification:
 
@@ -27,6 +28,7 @@ Verification:
 npm test -- audit-chain-cross-writer.test.ts --runInBand
 PASS tests/audit-chain-cross-writer.test.ts
   ✓ verifier accepts legacy Python insertion-order rows across the canonicalization seam
+  ✓ verifier preserves legacy Python local timestamptz microseconds
   ✓ TS -> Python -> TS entries verify as one chain
 ```
 

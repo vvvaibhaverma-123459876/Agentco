@@ -101,10 +101,37 @@ function normalizeTimestamp(value: string | Date): string {
 }
 
 function timestampTextToLegacyPythonUtc(value: string): string | null {
-  const match = value.match(/^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})(\.\d+)?\+00$/);
+  const match = value.match(
+    /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(\.(\d+))?([+-])(\d{2})(?::?(\d{2}))?$/
+  );
   if (!match) return null;
-  const [, date, time, fractional = ''] = match;
-  return `${date}T${time}${fractional}+00:00`;
+  const [, year, month, day, hour, minute, second, , fractional = '', sign, offsetHour, offsetMinute = '00'] = match;
+  const micros = BigInt((fractional + '000000').slice(0, 6));
+  const offsetMinutes = BigInt(Number(offsetHour) * 60 + Number(offsetMinute)) * (sign === '+' ? 1n : -1n);
+  const localMillis = Date.UTC(
+    Number(year),
+    Number(month) - 1,
+    Number(day),
+    Number(hour),
+    Number(minute),
+    Number(second)
+  );
+  const utcMicros = BigInt(localMillis) * 1000n + micros - offsetMinutes * 60n * 1000000n;
+  const microsRemainder = Number(utcMicros % 1000000n);
+  const baseMillis = (utcMicros - BigInt(microsRemainder)) / 1000n;
+  const base = new Date(Number(baseMillis)).toISOString().replace(/\.\d{3}Z$/, '');
+  return `${base}.${String(microsRemainder).padStart(6, '0')}+00:00`;
+}
+
+function pythonJsonDumps(value: unknown): string {
+  if (Array.isArray(value)) {
+    return `[${value.map(pythonJsonDumps).join(', ')}]`;
+  }
+  if (value && typeof value === 'object' && !(value instanceof Date)) {
+    const sorted = sortCanonical(value) as Record<string, unknown>;
+    return `{${Object.keys(sorted).map(key => `${JSON.stringify(key)}: ${pythonJsonDumps(sorted[key])}`).join(', ')}}`;
+  }
+  return JSON.stringify(value);
 }
 
 function normalizeConfidenceScore(value: number): number {
@@ -154,6 +181,10 @@ export function acceptedDecisionLogChainHashes(row: DecisionLogChainRow): Array<
       candidates.push({
         version: 'v1.python-insertion-json',
         hash: hashDecisionLogContent(row.prev_hash, legacyPythonContent(legacyPythonFields)),
+      });
+      candidates.push({
+        version: 'v1.python-sorted-json-spaced',
+        hash: hashDecisionLogContent(row.prev_hash, pythonJsonDumps(legacyPythonFields)),
       });
     }
   }
