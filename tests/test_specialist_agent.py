@@ -119,6 +119,15 @@ class TestResearcherAgent:
         """Test fetch page action handling"""
         budget = {'tokens': 10000, 'iterations': 100, 'seconds': 60}
         agent = ResearcherAgent('researcher-2', 'researcher', budget)
+        agent.real_fetch_page = lambda url: {
+            'status': 'fetch_completed',
+            'url': url,
+            'title': 'Example fixture',
+            'content': 'Fetched fixture content',
+            'content_type': 'text/html',
+            'content_length': 23,
+        }
+        agent.persist_evidence = lambda **_kwargs: 'artifact-fetch-1'
 
         action_spec = {
             'actionType': 'fetch_page',
@@ -175,6 +184,15 @@ class TestFetcherAgent:
         """Test that fetcher can handle FETCH_PAGE"""
         budget = {'tokens': 5000, 'iterations': 20, 'seconds': 120}
         agent = FetcherAgent('fetcher-1', 'fetcher', budget)
+        agent.real_fetch_page = lambda url: {
+            'status': 'fetch_completed',
+            'url': url,
+            'title': 'Example fixture',
+            'content': 'Fetched fixture content',
+            'content_type': 'text/html',
+            'content_length': 23,
+        }
+        agent.persist_evidence = lambda **_kwargs: 'artifact-fetch-1'
 
         action_spec = {
             'actionType': 'fetch_page',
