@@ -154,6 +154,12 @@ jobs:
           AGENTCO_TEST_DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
         run: make master-gate
 
+      - name: Verify generated status is current
+        run: make status-check
+
+      - name: Verify suite leaves tree clean
+        run: test -z "$(git status --porcelain)"
+
   test-frontend:
     name: Next.js Frontend
     runs-on: ubuntu-latest

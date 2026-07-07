@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Generate README implementation status from BUILD_LEDGER.yaml."""
+"""Generate or check README implementation status from BUILD_LEDGER.yaml."""
 from __future__ import annotations
 
+import argparse
 import subprocess
 from pathlib import Path
 
@@ -75,12 +76,19 @@ def _inject(readme: str, block: str) -> str:
     return readme[:start] + block + readme[end:]
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true", help="Exit nonzero if README status is stale; write nothing.")
+    args = parser.parse_args(argv)
+
     ledger = _load_ledger()
     block = _render_status(ledger)
     current = README_PATH.read_text(encoding="utf-8")
     updated = _inject(current, block)
     if updated != current:
+        if args.check:
+            print(f"{README_PATH.relative_to(ROOT)} status block is stale")
+            return 1
         README_PATH.write_text(updated, encoding="utf-8")
         print(f"Updated {README_PATH.relative_to(ROOT)}")
     else:

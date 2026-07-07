@@ -29,3 +29,41 @@ python3.13 -m pytest agents/tests/integration/test_agent_dispatch_e2e.py::test_f
 s.... [100%]
 4 passed, 1 skipped
 ```
+
+## Task 2 — No-Diff Verification
+
+Initial dirty paths after default Python suite plus `make status` in a clean clone:
+
+```text
+M README.md
+M evals/acceptance/pawdent_agent_decisions.jsonl
+M evals/acceptance/pawdent_business_run.md
+M evals/acceptance/pawdent_calibration_ledger.csv
+M evals/acceptance/pawdent_monthly_financials.csv
+M evals/acceptance/pawdent_summary.json
+M reports/system_run/latest/doctor_report.json
+M reports/system_run/latest/doctor_report.md
+M reports/system_run/latest/goal_run.json
+M reports/system_run/latest/production_posture_verification.json
+```
+
+Fixes:
+
+- `scripts/generate_status.py --check` now verifies the README block without writing.
+- `make status` keeps write behavior; `make status-check` is non-writing and exits nonzero on stale README status.
+- `README.md` was regenerated so `status-check` passes from main.
+- Runtime verification scripts honor `AGENTCO_REPORT_DIR` for test/untracked outputs.
+- PawDent simulation honors `AGENTCO_ACCEPTANCE_DIR`; its tests monkeypatch module output paths to `tmp_path`.
+- Production posture and run-best-effort tests redirect generated reports to `tmp_path`.
+- CI master gate now runs `make status-check` and `test -z "$(git status --porcelain)"` after the gate.
+- `frontend/next-env.d.ts` was updated to the current Next-generated dev route type path so `next dev`/frontend smoke no longer rewrites the tracked file.
+
+Focused verification:
+
+```text
+python3.13 -m pytest tests/test_pawdent_business_simulation.py runtime/orchestration/tests/test_run_best_effort.py tests/test_verify_production_posture.py -q
+13 passed
+
+make status-check
+README.md already up to date
+```

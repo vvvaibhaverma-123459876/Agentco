@@ -13,7 +13,7 @@ This repository is a local production-posture runnable research/runtime system. 
 | Verified items | `68/71 (95.77%)` |
 | Termination predicate met | `false` |
 | Generated from ledger timestamp | `2026-07-06T04:45:11Z` |
-| Build ledger commit | `c26d4f6` |
+| Build ledger commit | `ebe700f` |
 
 <!-- STATUS:END -->
 

@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 
-REPORT_DIR = Path("reports/system_run/latest")
+REPORT_DIR = Path(os.environ.get("AGENTCO_REPORT_DIR", "reports/system_run/latest"))
 REPORT_PATH = REPORT_DIR / "production_posture_verification.json"
 
 REQUIRED_SECRET_VARS = [

@@ -17,7 +17,7 @@ from .modes import RUNTIME_MODES, choose_runtime_mode, classify_mode, production
 
 
 ROOT = Path(__file__).resolve().parents[2]
-REPORT_DIR = ROOT / "reports" / "system_run" / "latest"
+REPORT_DIR = Path(os.environ.get("AGENTCO_REPORT_DIR", ROOT / "reports" / "system_run" / "latest"))
 
 
 @dataclass
