@@ -23,7 +23,6 @@ Run:
 """
 from __future__ import annotations
 
-import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -41,25 +40,12 @@ from reserve.credentials.proof_of_calibration import (
     load_credential,
     verify_credential,
 )
+from reserve.tests.dsn import reserve_test_dsn
 
-DSN = os.environ.get(
-    "AGENTCO_TEST_DATABASE_URL",
-    "postgresql://agentco:password@localhost:5433/agentco?host=/tmp",
-)
-if DSN:
-    try:
-        import sys as _sys
-        from pathlib import Path as _Path
-
-        _sys.path.insert(0, str(_Path(__file__).resolve().parents[2]))
-        from pg_test_isolation import isolated_dsn
-
-        # Destructive fixture: run in an isolated sibling database so shared
-        # tables (prediction_ledger and friends) are never dropped out from
-        # under other suites.
-        DSN = isolated_dsn(DSN)
-    except Exception:
-        DSN = None  # Postgres unreachable; skip guards below handle it
+try:
+    DSN = reserve_test_dsn(__file__)
+except Exception as exc:
+    pytest.skip(str(exc), allow_module_level=True)
 
 MIGRATION_ROOT = Path(__file__).resolve().parents[2]
 
