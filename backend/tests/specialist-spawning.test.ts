@@ -27,9 +27,8 @@ describe('Specialist Subprocess Spawning', () => {
     teamActivation = new TeamActivationService();
   });
 
-  afterEach(async () => {
-    // Cleanup any active specialists
-    // Note: In a real test, we'd terminate each specialist
+  afterAll(async () => {
+    await teamActivation.shutdown();
   });
 
   test('should spawn a researcher specialist with HTTP endpoint', async () => {

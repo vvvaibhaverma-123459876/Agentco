@@ -35,6 +35,7 @@ async function createActor(prefix: string) {
 describe('hash chain anchor', () => {
   beforeAll(async () => {
     await applyMigrations();
+    await db.query('TRUNCATE hash_chain_anchors, event_outbox, event_log RESTART IDENTITY CASCADE');
   });
 
   test('creates and verifies an internal Postgres anchor for event and audit chain heads', async () => {

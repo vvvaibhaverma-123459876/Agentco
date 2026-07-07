@@ -28,6 +28,10 @@ describe('transactional outbox', () => {
     await applyMigrations();
   });
 
+  beforeEach(async () => {
+    await db.query('TRUNCATE event_outbox, event_log RESTART IDENTITY CASCADE');
+  });
+
   test('atomically enqueues an outbox row for every canonical event', async () => {
     const actor = await createActor('outbox-atomic-service');
     const event = await eventLog.append({

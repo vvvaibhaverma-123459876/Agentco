@@ -153,6 +153,10 @@ export class TeamActivationService {
     structuredLogger.logProcessEvent('stopped', 'Graceful shutdown complete');
   }
 
+  async shutdown(): Promise<void> {
+    await this.gracefulShutdown();
+  }
+
   /**
    * Activate a specialist agent with bounded resources
    */

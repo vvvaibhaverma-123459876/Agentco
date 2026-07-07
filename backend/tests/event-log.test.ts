@@ -14,6 +14,7 @@ async function applyMigrations() {
 describe('canonical event log', () => {
   beforeAll(async () => {
     await applyMigrations();
+    await db.query('TRUNCATE event_outbox, event_log RESTART IDENTITY CASCADE');
   });
 
   test('appends hash-chained events for active actors and verifies integrity', async () => {

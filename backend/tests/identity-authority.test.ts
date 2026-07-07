@@ -16,12 +16,20 @@ async function applyIdentityMigration() {
 }
 
 describe('identity authority routes', () => {
+  let app: Awaited<ReturnType<typeof build>> | undefined;
+
   beforeAll(async () => {
     await applyIdentityMigration();
   });
 
+  afterEach(async () => {
+    if (app) {
+      app = undefined;
+    }
+  });
+
   test('registers an agent actor and writes event plus audit records', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
 
     const response = await app.inject({
@@ -77,12 +85,10 @@ describe('identity authority routes', () => {
       [actor.id, [event.rows[0].event_id]]
     );
     expect(audit.rowCount).toBe(1);
-
-    await app.close();
   });
 
   test('grants and verifies permission without allowing missing permissions', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
 
     const actorResponse = await app.inject({
@@ -139,12 +145,10 @@ describe('identity authority routes', () => {
     expect(allowed.json().allowed).toBe(true);
     expect(allowed.json().reason).toBe('direct_permission_granted');
     expect(allowed.json().chain[0].source).toBe('direct_permission');
-
-    await app.close();
   });
 
   test('assigns canonical roles to active actors and records the role event', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
 
     const actorResponse = await app.inject({
@@ -194,12 +198,10 @@ describe('identity authority routes', () => {
       [event.rows[0].event_id, actorId]
     );
     expect(canonicalEvent.rowCount).toBe(1);
-
-    await app.close();
   });
 
   test('role assignments grant mapped permissions with persisted authority-chain provenance', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
 
     const actorResponse = await app.inject({
@@ -252,12 +254,10 @@ describe('identity authority routes', () => {
     expect(persisted.rows[0].allowed).toBe(true);
     expect(persisted.rows[0].chain[0].source).toBe('role_permission');
     expect(persisted.rows[0].event_log_id).toBe(allowed.json().event_log_id);
-
-    await app.close();
   });
 
   test('delegation grants permission through an explicit principal-to-delegate authority chain', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
 
     const principalResponse = await app.inject({
@@ -334,12 +334,10 @@ describe('identity authority routes', () => {
       delegate_actor_id: delegateId,
       delegation_id: delegation.json().delegation_id,
     });
-
-    await app.close();
   });
 
   test('missing actor authority checks deny and persist provenance through authority service actor', async () => {
-    const app = await build();
+    app = await build();
     const missingActorId = '11111111-1111-4111-8111-111111111111';
 
     const denied = await app.inject({
@@ -377,12 +375,10 @@ describe('identity authority routes', () => {
     );
     expect(event.rowCount).toBe(1);
     expect(event.rows[0].name).toBe('agentco-authority-service');
-
-    await app.close();
   });
 
   test('registers public Ed25519 keys and verifies signatures without storing private material', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
     const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
     const publicKeyPem = publicKey.export({ type: 'spki', format: 'pem' }).toString();
@@ -474,12 +470,10 @@ describe('identity authority routes', () => {
       [registered.json().key.fingerprint_sha256]
     );
     expect(event.rowCount).toBe(1);
-
-    await app.close();
   });
 
   test('rotates active keys and revokes key verification capability', async () => {
-    const app = await build();
+    app = await build();
     const suffix = Date.now().toString();
     const first = crypto.generateKeyPairSync('ed25519');
     const second = crypto.generateKeyPairSync('ed25519');
@@ -579,7 +573,5 @@ describe('identity authority routes', () => {
     });
     expect(afterRevoke.statusCode).toBe(403);
     expect(afterRevoke.json().reason).toBe('active_key_missing');
-
-    await app.close();
   });
 });

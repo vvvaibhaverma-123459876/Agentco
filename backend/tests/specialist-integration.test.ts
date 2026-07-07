@@ -27,6 +27,10 @@ describe('Specialist-Orchestrator Integration', () => {
     executor = new ActionExecutorService();
   });
 
+  afterAll(async () => {
+    await teamActivation.shutdown();
+  });
+
   async function createGoal(text: string): Promise<string> {
     const goalId = uuidv4();
     await db.query(

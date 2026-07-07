@@ -91,3 +91,35 @@ Tests:       162 passed, 162 total
 cd backend && npm run build
 tsc passed
 ```
+
+## Task 4 — Jest Open Handles
+
+Verdict before fix: GENUINE. `backend/jest.config.ts` still carried the Phase 5 `forceExit` workaround. Running backend Jest without it showed that the suites passed but Jest did not return to the shell. `--detectOpenHandles` identified `pg` TCP handles from the shared DB pool, and the specialist suites left spawned Python subprocesses alive when tests only asserted activation.
+
+Fixes:
+
+- Removed `forceExit` from `backend/jest.config.ts`.
+- Set the backend `pg` pool `allowExitOnIdle` under Jest so idle test DB sockets do not keep the event loop alive.
+- Exposed `TeamActivationService.shutdown()` as a public wrapper around the existing graceful specialist shutdown path.
+- Added `afterAll` cleanup to `team-activation.test.ts`, `specialist-integration.test.ts`, and `specialist-spawning.test.ts`.
+- Made the action-loop no-content fetch test use an explicit no-content web adapter instead of falling through to live DNS.
+- Made event-log, hash-anchor, and transactional-outbox tests reset their own event/outbox/anchor tables so stale developer DB chain rows do not poison default Jest.
+- Made `identity-authority.test.ts` close its Fastify app from `afterEach`, even on failed assertions.
+
+Focused verification:
+
+```text
+cd backend && npm test -- action-loop.test.ts --runInBand --detectOpenHandles
+Test Suites: 1 passed, 1 total
+Tests:       17 passed, 17 total
+
+cd backend && npm test -- team-activation.test.ts specialist-integration.test.ts specialist-spawning.test.ts --runInBand --detectOpenHandles
+Test Suites: 3 passed, 3 total
+Tests:       5 todo, 24 passed, 29 total
+
+cd backend && npm test -- event-log.test.ts hash-chain-anchor.test.ts transactional-outbox.test.ts identity-authority.test.ts --runInBand --detectOpenHandles
+Test Suites: 4 passed, 4 total
+Tests:       17 passed, 17 total
+```
+
+Full-suite note: the subsequent full backend run returned to the shell without `forceExit`; it exposed stale shared-DB chain fixtures, which were fixed above.

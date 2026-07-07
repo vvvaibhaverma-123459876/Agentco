@@ -1,19 +1,21 @@
 import { db } from '../db/client';
 import { disconnectProducer } from '../db/kafka';
 
-let shutdownStarted = false;
+let producerDisconnected = false;
+let dbClosed = false;
 
 export interface ShutdownOptions {
   closeDb?: boolean;
 }
 
 export async function shutdownRuntimeResources(options: ShutdownOptions = {}): Promise<void> {
-  if (shutdownStarted) return;
-  shutdownStarted = true;
+  if (!producerDisconnected) {
+    producerDisconnected = true;
+    await disconnectProducer();
+  }
 
-  await disconnectProducer();
-
-  if (options.closeDb) {
+  if (options.closeDb && !dbClosed) {
+    dbClosed = true;
     await db.end();
   }
 }

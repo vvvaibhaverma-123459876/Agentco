@@ -104,6 +104,12 @@ describe('Action Loop Integration', () => {
 
     it('should block FETCH_PAGE without real content instead of recording placeholder evidence', async () => {
       const isolatedExecutor = new ActionExecutorService();
+      isolatedExecutor.setWebAdapter({
+        getName: () => 'NoContentTestAdapter',
+        isReady: async () => true,
+        search: async () => [],
+        fetch: async () => null,
+      });
       const spec: ActionSpec = {
         actionId: uuidv4(),
         actionType: ActionType.FETCH_PAGE,
