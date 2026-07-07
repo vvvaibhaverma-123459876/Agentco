@@ -43,6 +43,10 @@ const BASE_ENTRY: AuditEntry = {
   session_id: TEST_SESSION,
 };
 
+beforeAll(async () => {
+  await superDb.query('TRUNCATE decision_log RESTART IDENTITY CASCADE');
+});
+
 afterAll(async () => {
   await agentcoDb.end();
   await superDb.end();

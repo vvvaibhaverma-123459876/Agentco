@@ -33,7 +33,7 @@ describe('autonomy run cross-run reuse (D1)', () => {
   afterAll(async () => { if (servicePool) await servicePool.end(); });
 
   test('run-1 promoted lesson is retrieved into run-2 planning; cold control lacks it', async () => {
-    const agentId = 'autonomy_action_planner';
+    const agentId = `autonomy_action_planner_${crypto.randomUUID().slice(0, 8)}`;
     const domain = `d1_${Date.now()}`;
     const runId = `run_${Date.now()}`;
     const marker = `helion_${Date.now()}`;
@@ -64,7 +64,9 @@ describe('autonomy run cross-run reuse (D1)', () => {
 
     const promo = await autonomousPromotion.promoteResolvedForRun({ runId, agentId });
     expect(promo.promoted).toBeGreaterThanOrEqual(1);
-    const memoryId = promo.outcomes.find(o => o.promoted)!.memoryId!;
+    const ownOutcome = promo.outcomes.find(o => o.predictionId === predictionId);
+    expect(ownOutcome).toMatchObject({ promoted: true });
+    const memoryId = ownOutcome!.memoryId!;
 
     // --- Run 2: a related planning step in the same domain/agent retrieves it. ---
     const planner = new AutonomyActionPlannerService();
