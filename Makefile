@@ -1,6 +1,6 @@
 PYTHON ?= python3.13
 
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates status status-check remaining build-ledger-sync civilization-slice
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates release-gate status status-check remaining build-ledger-sync civilization-slice
 
 python-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
@@ -92,6 +92,33 @@ production-posture:
 release-gates:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/verify_release_gates.py --update-ledger
+
+release-gate:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@echo "== [0/11] clean tree before gate =="
+	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty before release-gate"; exit 1)
+	@echo "== [1/11] status check =="
+	@$(MAKE) status-check
+	@echo "== [2/11] Python default suite =="
+	@PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m pytest -q
+	@echo "== [3/11] backend install =="
+	cd backend && npm ci
+	@echo "== [4/11] backend migrations =="
+	@if [ -n "$$DATABASE_URL" ]; then cd backend && npm run db:migrate; else echo "DATABASE_URL not set; DB-backed tests may skip with reason"; fi
+	@echo "== [5/11] backend build =="
+	cd backend && npm run build
+	@echo "== [6/11] backend Jest =="
+	cd backend && npm test -- --runInBand
+	@echo "== [7/11] route-auth contract =="
+	cd backend && npm test -- route-auth-contract.test.ts --runInBand
+	@echo "== [8/11] decision_log chain cross-writer test =="
+	cd backend && npm test -- audit-chain-cross-writer.test.ts --runInBand
+	@echo "== [9/11] frontend install =="
+	cd frontend && npm ci
+	@echo "== [10/11] frontend typecheck =="
+	cd frontend && ./node_modules/.bin/tsc --noEmit
+	@echo "== [11/11] clean tree after gate =="
+	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty after release-gate"; exit 1)
 
 docker-production-smoke:
 	@docker compose up -d postgres redis zookeeper kafka vault prometheus grafana
@@ -419,7 +446,7 @@ verify-clean-room:
 	@echo "== [2/6] backend typecheck =="
 	cd backend && ./node_modules/.bin/tsc --noEmit
 	@echo "== [3/6] backend tests =="
-	cd backend && npm test -- --runInBand --forceExit
+	cd backend && npm test -- --runInBand
 	@echo "== [4/6] python smoke (no live keys) =="
 	$(PYTHON) -m pytest calibration runtime learning synthesis evals/regression -q \
 		--ignore=evals/regression/test_pg_ledger_immutability.py \

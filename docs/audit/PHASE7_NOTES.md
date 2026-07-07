@@ -141,3 +141,29 @@ cd backend && npm test -- route-auth-contract.test.ts --runInBand
 Test Suites: 1 passed, 1 total
 Tests:       162 passed, 162 total
 ```
+
+## Task 6 — Release Credibility Gate
+
+Verdict before fix: GENUINE. The repository had partial gates (`master-gate`,
+`verify-clean-room`, `release-gates`) but no single clean-clone/no-diff command
+matching the re-audit credibility target. CI still used a backend Jest
+`--forceExit` escape hatch and README quick-start examples also documented
+forced exit.
+
+Fixes:
+
+- Added `make release-gate` with initial and final clean-tree assertions.
+- The gate runs `make status-check`, the Python default suite, backend
+  `npm ci`, migrations when `DATABASE_URL` is present, backend build, backend
+  Jest without `forceExit`, the route-auth contract suite, the cross-writer
+  decision-log chain test, frontend `npm ci`, and frontend `tsc --noEmit`.
+- Updated CI's release job to run `make release-gate` and removed the backend
+  Jest `--forceExit` argument.
+- Updated README to document `make release-gate` as the stranger-trust command
+  and removed stale `forceExit` examples.
+
+Verification:
+
+```text
+pending final release-gate run
+```

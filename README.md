@@ -89,14 +89,26 @@ cd backend
 npm install
 npm run db:migrate
 npx tsc --noEmit
-npm test -- --runInBand --forceExit
+npm test -- --runInBand
 ```
 
 The backend suite is expected to pass from a clean clone against an empty
 database. Live-web/live-LLM suites (source discovery, real-web smoke, live
 adapters) skip unless `RUN_REAL_WEB_TESTS=1` / `RUN_REAL_LLM_TESTS=1` and
 provider credentials are configured. CI (`.github/workflows/ci.yml`) runs the
-same clean-room path, including the Refoundation Master Gate job.
+same clean-room path, including the Release Credibility Gate job.
+
+For release credibility, run the full no-diff gate from a clean worktree:
+
+```bash
+make release-gate
+```
+
+This is the command a stranger should run to trust the repo. It checks the
+README status block without writing, runs the Python default suite, installs
+and verifies backend/frontend dependencies, runs backend Jest without
+`forceExit`, exercises the route-auth contract and decision-log chain test, and
+asserts the git tree is still clean at the end.
 
 ## Web Evidence Intake
 
@@ -140,7 +152,7 @@ The current verified E2E backend slice is covered by:
 
 ```bash
 cd backend
-npx jest tests/civilization-learning-e2e.test.ts --runInBand --forceExit
+npx jest tests/civilization-learning-e2e.test.ts --runInBand
 ```
 
 It proves:
