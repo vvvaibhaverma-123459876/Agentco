@@ -46,4 +46,35 @@ No trigger disabling is justified for `prediction_ledger`.
 
 ## Task 3 - Least-privilege gate findings
 
-Pending.
+Structural fix:
+
+- `scripts/setup_release_gate_role.sql` creates/updates a dedicated
+  `agentco_gate` login role.
+- The role is explicitly `NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION`.
+- Grants are limited to `CONNECT`, `USAGE ON SCHEMA public`,
+  `SELECT/INSERT/UPDATE/DELETE ON ALL TABLES IN SCHEMA public`, and sequence
+  usage/update. It does not receive ownership, superuser, or table-owner-only
+  privileges such as disabling system triggers.
+- `make release-gate` now separates:
+  - `RELEASE_GATE_MIGRATION_DATABASE_URL`: schema-owner/admin DSN for applying
+    migrations;
+  - `RELEASE_GATE_SETUP_DATABASE_URL`: schema-owner/admin DSN for refreshing
+    the gate role grants after migrations;
+  - `RELEASE_GATE_DATABASE_URL`: low-privilege DSN used by the Python and
+    backend verification suites.
+
+Local setup note: the existing local `agentco` role owns normal app access but
+does not have `CREATEROLE`, so it correctly cannot run the role setup script:
+
+```text
+ERROR: permission denied to create role
+DETAIL: Only roles with the CREATEROLE attribute may create roles.
+```
+
+The local admin role is `Zet` (`rolsuper=true`, `rolcreaterole=true`) and was
+used only to create/update `agentco_gate`; the gate itself must run as
+`agentco_gate`.
+
+Least-privilege gate failures:
+
+Pending full gate run.
