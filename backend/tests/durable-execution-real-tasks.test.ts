@@ -1,5 +1,6 @@
 import { DurableExecutionService, WorkflowTask } from '../src/services/durable-execution.service';
 import { db } from '../src/db/client';
+import { disconnectProducer } from '../src/db/kafka';
 
 function task(task_type: string, payload: Record<string, unknown>): WorkflowTask {
   return {
@@ -15,6 +16,10 @@ function task(task_type: string, payload: Record<string, unknown>): WorkflowTask
 describe('DurableExecutionService real review/decision handlers', () => {
   const originalFetch = global.fetch;
   const originalEnv = { ...process.env };
+
+  afterAll(async () => {
+    await disconnectProducer();
+  });
 
   afterEach(() => {
     global.fetch = originalFetch;

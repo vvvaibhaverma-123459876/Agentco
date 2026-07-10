@@ -109,3 +109,19 @@ Least-privilege gate failures:
 - `backend/tests/civilization-runtime-live-e2e.test.ts`: not a privilege issue;
   full-suite state bleed from a fixed domain let the runtime resolve older
   overdue predictions first. Fixed with a unique domain per test module.
+- `backend/tests/action-loop.test.ts`: full backend runs exposed another
+  privilege-safe cleanup ordering bug after prior runs left judiciary rows.
+  `rulings` references `disputes`, so app-role cleanup now deletes `rulings`
+  before `disputes`.
+- `backend/tests/institutional-synthesis.test.ts`: not a privilege issue;
+  full-suite runs exposed nondeterministic row ordering for contributing claim
+  IDs and work-cycle phases. Assertions now compare sets where the contract is
+  membership, not order.
+- `backend/tests/contradiction-learning-e2e.test.ts`: not a privilege issue;
+  retrieval used the shared `autonomy_research` domain and could be outranked by
+  old full-suite memories. The test now uses a unique domain tied to its marker.
+- Backend Jest open handles: the full suite was green but did not exit because
+  Kafka producers remained connected in test environments that publish events.
+  Fixed by adding `backend/tests/setup-after-env.ts`, which disconnects the
+  Kafka producer after each Jest test file; direct Kafka-producing suites also
+  keep explicit cleanup.

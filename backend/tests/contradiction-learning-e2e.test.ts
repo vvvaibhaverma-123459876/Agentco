@@ -23,10 +23,10 @@ import { independentResolver } from '../src/services/independent-resolver.servic
 import { memoryPromotionPipeline } from '../src/services/memory-promotion-pipeline.service';
 import { memoryRetrieval } from '../src/services/memory-retrieval.service';
 
-const DOMAIN = 'autonomy_research';
 const AGENT = `contradiction-e2e-${crypto.randomUUID().slice(0, 8)}`;
 // Unique marker so retrieval assertions cannot collide with other suites.
 const MARKER = `saffron-gully-${crypto.randomUUID().slice(0, 6)}`;
+const DOMAIN = `autonomy_research_${MARKER}`;
 
 let servicePool: Pool;
 let goalId: string;
