@@ -19,6 +19,7 @@ import fs from 'fs';
 import path from 'path';
 import { describe, expect, test, beforeAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { goalFormation } from '../src/services/goal-formation.service';
 import {
   supervisedFreeRun,
@@ -54,7 +55,7 @@ async function applyMigrations() {
     '111_self_improvement_loop.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

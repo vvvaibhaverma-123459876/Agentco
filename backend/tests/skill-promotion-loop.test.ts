@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { LearnerService } from '../src/services/learner.service';
 import { domainRegistry } from '../src/services/domain-registry.service';
 import { institutionsService } from '../src/services/institutions.service';
@@ -30,7 +31,7 @@ async function applyMigrations() {
     '108_skill_promotion_loop.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 import { killSwitchService } from '../src/services/kill-switch.service';
 
@@ -9,7 +10,7 @@ async function applyMigration() {
     path.resolve(__dirname, '../src/db/migrations/098_governance_kill_switch.sql'),
     'utf8'
   );
-  await db.query(migration);
+  await migrationDb.query(migration);
 }
 
 describe('governance kill switch', () => {

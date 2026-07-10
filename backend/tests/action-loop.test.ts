@@ -23,15 +23,15 @@ describe('Action Loop Integration', () => {
   beforeEach(async () => {
     executor.setWebAdapter(new MockWebAdapter());
     // Clear test data before each test
-    await db.query('TRUNCATE autonomy_actions CASCADE');
-    await db.query('TRUNCATE autonomy_claims CASCADE');
-    await db.query('TRUNCATE autonomy_evidence CASCADE');
+    await db.query('DELETE FROM autonomy_actions');
+    await db.query('DELETE FROM autonomy_claims');
+    await db.query('DELETE FROM autonomy_evidence');
   });
 
   afterEach(async () => {
-    await db.query('TRUNCATE autonomy_actions CASCADE');
-    await db.query('TRUNCATE autonomy_claims CASCADE');
-    await db.query('TRUNCATE autonomy_evidence CASCADE');
+    await db.query('DELETE FROM autonomy_actions');
+    await db.query('DELETE FROM autonomy_claims');
+    await db.query('DELETE FROM autonomy_evidence');
   });
 
   describe('Planner Output Validation', () => {

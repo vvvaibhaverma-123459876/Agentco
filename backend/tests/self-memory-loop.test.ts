@@ -19,6 +19,7 @@ import fs from 'fs';
 import path from 'path';
 import { describe, expect, test, beforeAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { memoryRetrieval } from '../src/services/memory-retrieval.service';
 import { ActionSpec, ActionType, ActionStatus, RiskLevel } from '../src/types/action.types';
@@ -36,7 +37,7 @@ async function applyMigrations() {
     '083_transactional_outbox.sql',
     '114_self_memory_retrievable.sql',
   ]) {
-    await db.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
+    await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
   }
 }
 

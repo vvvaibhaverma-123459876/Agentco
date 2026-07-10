@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { domainRegistry } from '../src/services/domain-registry.service';
 import { generalityMetricTracker } from '../src/services/generality-metric-tracker.service';
 import { institutionsService } from '../src/services/institutions.service';
@@ -20,7 +21,7 @@ async function applyMigrations() {
     '103_generality_metric_tracker.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

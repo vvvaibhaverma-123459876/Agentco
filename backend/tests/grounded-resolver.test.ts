@@ -15,6 +15,7 @@ import { Pool } from 'pg';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
 import { resolutionServiceDatabaseUrl } from '../src/db/dsn';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { ledgerResolutionService } from '../src/services/resolution-service.service';
 import { groundedResolver } from '../src/services/grounded-resolver.service';
@@ -73,7 +74,7 @@ describe('grounded resolver (B4)', () => {
 
   beforeAll(async () => {
     for (const name of ['004_decision_log.sql', '009_trust_scores.sql', '011_prediction_ledger.sql', '050_autonomy_action_loop.sql', '079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql']) {
-      await db.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
+      await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
     }
     server = http.createServer((_req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html' });

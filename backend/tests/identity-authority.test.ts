@@ -3,6 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { build } from '../src/server';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 
 function authHeaders(): Record<string, string> {
   return process.env.AGENTCO_API_KEY ? { 'x-api-key': process.env.AGENTCO_API_KEY } : {};
@@ -11,7 +12,7 @@ function authHeaders(): Record<string, string> {
 async function applyIdentityMigration() {
   for (const name of ['079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql', '084_authority_chain.sql', '085_authority_chain_decision_actor_compatibility.sql', '086_key_ring.sql']) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

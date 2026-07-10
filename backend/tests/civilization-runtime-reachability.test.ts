@@ -2,6 +2,7 @@ import { describe, expect, test } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { civilizationRuntimeService } from '../src/services/civilization-runtime.service';
 import { domainRegistry } from '../src/services/domain-registry.service';
 import { institutionsService } from '../src/services/institutions.service';
@@ -22,7 +23,7 @@ async function applyMigrations() {
     '102_domain_registry.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

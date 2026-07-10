@@ -21,6 +21,7 @@ import fs from 'fs';
 import path from 'path';
 import { describe, expect, test, beforeAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { institutionsService } from '../src/services/institutions.service';
 import { FindingType } from '../src/services/institution-claim-vetting.service';
 import { civilizationLiveFlow } from '../src/services/civilization-live-flow.service';
@@ -45,7 +46,7 @@ async function applyMigrations() {
     '113_institutional_knowledge_promotions.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

@@ -26,7 +26,8 @@ if (process.env.AGENTCO_TEST_DATABASE_URL) {
 }
 process.env.DATABASE_URL ??= 'postgresql://agentco:password@localhost:5432/agentco';
 process.env.AGENTCO_TEST_DATABASE_URL ??= process.env.DATABASE_URL;
-process.env.SUPERUSER_DATABASE_URL ??= process.env.DATABASE_URL;
+process.env.SUPERUSER_DATABASE_URL ??=
+  process.env.RELEASE_GATE_MIGRATION_DATABASE_URL ?? process.env.DATABASE_URL;
 
 // Cap the shared DB pool in tests: the full serial suite runs many files
 // against one Postgres (max_connections default 100) plus per-suite service

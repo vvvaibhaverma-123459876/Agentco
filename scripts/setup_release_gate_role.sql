@@ -31,3 +31,18 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public
   GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO :"gate_role";
+
+SELECT format(
+  'CREATE POLICY agent_memory_%I_gate_access ON agent_memory FOR ALL TO %I USING (true) WITH CHECK (true)',
+  :'gate_role',
+  :'gate_role'
+)
+WHERE to_regclass('public.agent_memory') IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'agent_memory'
+      AND policyname = format('agent_memory_%s_gate_access', :'gate_role')
+  )
+\gexec

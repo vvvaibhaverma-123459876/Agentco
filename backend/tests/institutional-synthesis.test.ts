@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { institutionsService } from '../src/services/institutions.service';
 import { FindingType } from '../src/services/institution-claim-vetting.service';
 import { institutionalSynthesisService } from '../src/services/institutional-synthesis.service';
@@ -19,7 +20,7 @@ async function applyMigrations() {
     '083_transactional_outbox.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

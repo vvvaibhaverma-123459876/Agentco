@@ -16,6 +16,7 @@ import fs from 'fs';
 import path from 'path';
 import { describe, expect, test, beforeAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { institutionsService } from '../src/services/institutions.service';
 import { civilizationLiveFlow } from '../src/services/civilization-live-flow.service';
 import { memoryRetrieval } from '../src/services/memory-retrieval.service';
@@ -34,7 +35,7 @@ async function applyMigrations() {
     '079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql',
     '113_institutional_knowledge_promotions.sql',
   ]) {
-    await db.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
+    await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
   }
 }
 

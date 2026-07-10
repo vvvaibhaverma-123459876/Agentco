@@ -25,13 +25,13 @@ describe('Team Activation Service', () => {
 
   beforeEach(async () => {
     // Clear test data
-    await db.query('TRUNCATE autonomy_team_activations CASCADE');
-    await db.query('TRUNCATE autonomy_goals CASCADE');
+    await db.query('DELETE FROM autonomy_team_activations');
+    await db.query('DELETE FROM autonomy_goals');
   });
 
   afterEach(async () => {
-    await db.query('TRUNCATE autonomy_team_activations CASCADE');
-    await db.query('TRUNCATE autonomy_goals CASCADE');
+    await db.query('DELETE FROM autonomy_team_activations');
+    await db.query('DELETE FROM autonomy_goals');
   });
 
   afterAll(async () => {
