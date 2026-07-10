@@ -11,6 +11,8 @@ from typing import Any, Protocol
 
 logger = logging.getLogger(__name__)
 
+CURRENT_DECISION_LOG_SERIALIZATION_VERSION = "v3.sorted-json-versioned"
+
 
 def _utc_timestamp_ms() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
@@ -107,6 +109,7 @@ class DurableAuditWriter:
                     input_summary = data["description"][:500]
                     output_summary = output_summary[:500]
                     content = canonical_decision_log_content({
+                        "serialization_version": CURRENT_DECISION_LOG_SERIALIZATION_VERSION,
                         "log_id": log_id,
                         "timestamp": timestamp,
                         "prev_hash": prev_hash,
@@ -127,8 +130,9 @@ class DurableAuditWriter:
                         INSERT INTO decision_log
                             (log_id, agent_id, action_type, input_summary, output_summary,
                              confidence_score, risk_level, human_approved, human_approver_id,
-                             downstream_events, session_id, timestamp, chain_hash, prev_hash)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                             downstream_events, session_id, timestamp, chain_hash, prev_hash,
+                             serialization_version)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                         RETURNING log_id
                         """,
                         (
@@ -146,6 +150,7 @@ class DurableAuditWriter:
                             timestamp,
                             chain_hash,
                             prev_hash,
+                            CURRENT_DECISION_LOG_SERIALIZATION_VERSION,
                         ),
                     )
             return {"log_id": log_id, "chain_hash": chain_hash, "backend": "decision_log"}
