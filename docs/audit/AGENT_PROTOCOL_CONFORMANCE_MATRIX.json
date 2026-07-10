@@ -1,0 +1,585 @@
+{
+  "active_count": 11,
+  "active_missing_from_registry": [],
+  "agents": [
+    {
+      "agent_id": "ceo-agent",
+      "allowed_actions": [
+        "strategic_pivot",
+        "approve_budget",
+        "budget_approval"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "CEOAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.executive.ceo_agent_v2.CEOAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/executive/ceo_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "cfo-agent",
+      "allowed_actions": [
+        "approve_spend",
+        "runway_check",
+        "financial_forecast"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "CFOAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.executive.cfo_agent_v2.CFOAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/executive/cfo_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "coo-agent",
+      "allowed_actions": [
+        "structural_change",
+        "set_operational_target"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "COOAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.executive.coo_agent_v2.COOAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/executive/coo_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "coder-agent",
+      "allowed_actions": [
+        "write_code",
+        "scope_change",
+        "security_alert"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "CoderAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.engineering.coder_agent_v2.CoderAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/engineering/coder_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "reviewer-agent",
+      "allowed_actions": [
+        "approve_review",
+        "merge_pr",
+        "reject_pr"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "ReviewerAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.engineering.reviewer_agent_v2.ReviewerAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/engineering/reviewer_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "devops-agent",
+      "allowed_actions": [
+        "deploy",
+        "auto_rollback",
+        "rollback_failed_escalation",
+        "novel_incident_hard_pause"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "DevOpsAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.engineering.devops_agent_v2.DevOpsAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/engineering/devops_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "pm-agent",
+      "allowed_actions": [
+        "prioritize_feature",
+        "approve_scope_change",
+        "update_roadmap"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "PMAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.product.pm_agent_v2.PMAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/product/pm_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "privacy-agent",
+      "allowed_actions": [
+        "breach_response",
+        "compliance_check",
+        "data_access_request"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "PrivacyAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.legal.privacy_agent_v2.PrivacyAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/legal/privacy_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "config-agent",
+      "allowed_actions": [
+        "update_prompt",
+        "rollback_prompt",
+        "update_permissions"
+      ],
+      "audit": "DurableAuditWriter/InMemoryAuditWriter via BaseAgentV2._write_audit",
+      "authorization": "BaseAgentV2._authorize_action",
+      "budget": "SpendGuardrail.check_before_call",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "ConfigAgentV2.run",
+      "evidence": "BaseAgentV2._capture_evidence",
+      "finalization": "BaseAgentV2 protocol success/failure records",
+      "implementation": "agents.people_ops.config_agent_v2.ConfigAgentV2",
+      "retry_attempt_id": "AuditEntryV2.attempt_id -> DurableAuditWriter idempotent retries",
+      "runtime_contract": "BaseAgentV2",
+      "source": "agents/people_ops/config_agent_v2.py",
+      "status": "PASS",
+      "tool_policy": "BaseAgentV2.execute_tool allowlist"
+    },
+    {
+      "agent_id": "research-agent",
+      "allowed_actions": [
+        "record_observation"
+      ],
+      "audit": "auditLog.append canonical decision_log writer",
+      "authorization": "agent-registry assertAgentCanRunTask",
+      "budget": "DurableExecutionService bounded task contract; no direct model call for record_observation",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "CivilizationService -> DurableExecutionService(record_observation)",
+      "evidence": "provenance.attestAction action_attestation_id",
+      "finalization": "workflow_tasks status/result/error",
+      "implementation": null,
+      "retry_attempt_id": "workflow task_id session boundary; no direct decision_log write",
+      "runtime_contract": "TypeScript DurableExecutionService",
+      "source": "backend/src/services/durable-execution.service.ts",
+      "status": "PASS",
+      "tool_policy": "DurableExecutionService task-type allowlist"
+    },
+    {
+      "agent_id": "calibration-reasoner",
+      "allowed_actions": [
+        "record_observation"
+      ],
+      "audit": "auditLog.append canonical decision_log writer",
+      "authorization": "agent-registry assertAgentCanRunTask",
+      "budget": "DurableExecutionService bounded task contract; no direct model call for record_observation",
+      "classification": "active",
+      "direct_protected_ledger_writes": [],
+      "entrypoint": "CivilizationService -> DurableExecutionService(record_observation)",
+      "evidence": "provenance.attestAction action_attestation_id",
+      "finalization": "workflow_tasks status/result/error",
+      "implementation": null,
+      "retry_attempt_id": "workflow task_id session boundary; no direct decision_log write",
+      "runtime_contract": "TypeScript DurableExecutionService",
+      "source": "backend/src/services/durable-execution.service.ts",
+      "status": "PASS",
+      "tool_policy": "DurableExecutionService task-type allowlist"
+    },
+    {
+      "agent_id": "specialist-agent",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.specialist_agent.SpecialistAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "background-researcher-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.background_researcher.BackgroundResearcherAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "claim-validator-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.claim_validator.ClaimValidatorAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "code-reviewer-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.code_reviewer.CodeReviewerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "comparative-analyst-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.comparative_analyst.ComparativeAnalystAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "contradiction-hunter-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.contradiction_hunter.ContradictionHunterAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "data-analyst-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.data_analyst.DataAnalystAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "doc-analyzer-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.doc_analyzer.DocAnalyzerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "evidence-linker-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.evidence_linker.EvidenceLinkerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "evidence-summarizer-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.evidence_summarizer.EvidenceSummarizerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "fetcher-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.fetcher.FetcherAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "quality-auditor-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.quality_auditor.QualityAuditorAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "researcher-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.researcher.ResearcherAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "reviewer-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.reviewer.ReviewerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "sentiment-analyzer-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.sentiment_analyzer.SentimentAnalyzerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "source-validator-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.source_validator.SourceValidatorAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "synthesizer-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.synthesizer.SynthesizerAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "temporal-analyst-specialist",
+      "classification": "experimental",
+      "entrypoint": "TeamActivationService -> python -m agents.autonomy.<role> -> SpecialistAgent /execute",
+      "implementation": "agents.autonomy.temporal_analyst.TemporalAnalystAgent",
+      "notes": "V1 autonomy specialist process; not advertised as production governed runtime.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "prioritizer-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "architect-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "ux-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "brand-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "ab-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "sdr-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "ae-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "revops-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "content-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "seo-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "ads-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "analytics-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "support-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "success-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "voice-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "performance-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "recruiter-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "contract-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "risk-agent",
+      "classification": "deprecated",
+      "entrypoint": "archive/agents_v1",
+      "implementation": null,
+      "notes": "Archived V1 department agent.",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "test-agent",
+      "classification": "test-only",
+      "entrypoint": "runtime/tests",
+      "implementation": null,
+      "notes": "",
+      "status": "NOT_ACTIVE"
+    },
+    {
+      "agent_id": "e2e-dispatch-agent",
+      "classification": "test-only",
+      "entrypoint": "agents/tests/integration",
+      "implementation": null,
+      "notes": "",
+      "status": "NOT_ACTIVE"
+    }
+  ],
+  "deprecated_exposed_as_runnable": [],
+  "generated_by": "scripts/generate_agent_conformance_matrix.py",
+  "manifest_active_ids": [
+    "calibration-reasoner",
+    "ceo-agent",
+    "cfo-agent",
+    "coder-agent",
+    "config-agent",
+    "coo-agent",
+    "devops-agent",
+    "pm-agent",
+    "privacy-agent",
+    "research-agent",
+    "reviewer-agent"
+  ],
+  "registry_runnable_ids": [
+    "calibration-reasoner",
+    "ceo-agent",
+    "cfo-agent",
+    "coder-agent",
+    "config-agent",
+    "coo-agent",
+    "devops-agent",
+    "pm-agent",
+    "privacy-agent",
+    "research-agent",
+    "reviewer-agent"
+  ],
+  "registry_runnable_not_active": []
+}
