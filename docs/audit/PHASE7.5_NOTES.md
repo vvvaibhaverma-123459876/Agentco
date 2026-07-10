@@ -111,8 +111,8 @@ Least-privilege gate failures:
   overdue predictions first. Fixed with a unique domain per test module.
 - `backend/tests/action-loop.test.ts`: full backend runs exposed another
   privilege-safe cleanup ordering bug after prior runs left judiciary rows.
-  `rulings` references `disputes`, so app-role cleanup now deletes `rulings`
-  before `disputes`.
+  `precedents` references `rulings`, and `rulings` references `disputes`, so
+  app-role cleanup now deletes `precedents`, then `rulings`, then `disputes`.
 - `backend/tests/institutional-synthesis.test.ts`: not a privilege issue;
   full-suite runs exposed nondeterministic row ordering for contributing claim
   IDs and work-cycle phases. Assertions now compare sets where the contract is
