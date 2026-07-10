@@ -78,6 +78,10 @@ function routeKey(route: SourceRoute): string {
   return `${route.method} ${route.route}`;
 }
 
+function activeRouteSourceTexts(): Array<{ file: string; text: string }> {
+  return activeRouteSources().map((file) => ({ file, text: fs.readFileSync(file, 'utf8') }));
+}
+
 function sampleUrl(route: string): string {
   return route.replace(/:([A-Za-z_][A-Za-z0-9_]*)/g, (_match, name: string) => {
     if (name.toLowerCase().includes('index')) return '1';
@@ -158,5 +162,78 @@ describe('route auth sensitivity matrix', () => {
     });
     expect(authenticated.statusCode).toBe(200);
     await freshApp.close();
+  });
+
+  test('HEAD has the same auth posture as GET on protected routes', async () => {
+    rateLimiterService.resetAll();
+    const getResponse = await app.inject({ method: 'GET', url: '/api/agents' });
+
+    rateLimiterService.resetAll();
+    const headResponse = await app.inject({ method: 'HEAD', url: '/api/agents' });
+
+    expect(getResponse.statusCode).toBe(401);
+    expect(headResponse.statusCode).toBe(401);
+  });
+
+  test('trailing slash and path case variants do not bypass auth', async () => {
+    for (const url of ['/api/agents/', '/API/AGENTS']) {
+      rateLimiterService.resetAll();
+      const unauthenticated = await app.inject({ method: 'GET', url });
+      expect(unauthenticated.statusCode).toBe(401);
+      expect(unauthenticated.json()).toEqual({ error: 'unauthorized' });
+
+      rateLimiterService.resetAll();
+      const authenticated = await app.inject({
+        method: 'GET',
+        url,
+        headers: { 'x-api-key': API_KEY },
+      });
+      expect(authenticated.statusCode).toBe(404);
+      expect(authenticated.json()).toEqual(expect.objectContaining({ error: expect.any(String) }));
+    }
+  });
+
+  test('invalid UUID path params return a sanitized 400', async () => {
+    rateLimiterService.resetAll();
+    const response = await app.inject({
+      method: 'GET',
+      url: '/api/agents/tasks/not-a-uuid',
+      headers: { 'x-api-key': API_KEY },
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json()).toEqual({ error: 'Invalid path parameter', id: expect.any(String) });
+  });
+
+  test('forced handler errors return sanitized 500s with correlation ids', async () => {
+    const freshApp = await build();
+    freshApp.get('/phase7-forced-throw', async () => {
+      throw new Error('raw database driver detail should not cross the wire');
+    });
+
+    rateLimiterService.resetAll();
+    const response = await freshApp.inject({
+      method: 'GET',
+      url: '/phase7-forced-throw',
+      headers: { 'x-api-key': API_KEY },
+    });
+
+    expect(response.statusCode).toBe(500);
+    expect(response.json()).toEqual({ error: 'Internal server error', id: expect.any(String) });
+    expect(response.body).not.toContain('raw database driver detail');
+    await freshApp.close();
+  });
+
+  test('active route handlers do not return caught exception messages directly', () => {
+    const forbidden = [
+      /send\(\{[\s\S]*?error:\s*(?:error|err|e)\.message[\s\S]*?\}\)/,
+      /send\(\{[\s\S]*?message:\s*error\.message[\s\S]*?\}\)/,
+      /send\(\{[\s\S]*?error:\s*String\(e\)[\s\S]*?\}\)/,
+    ];
+    const offenders = activeRouteSourceTexts().flatMap(({ file, text }) =>
+      forbidden.some((pattern) => pattern.test(text)) ? [path.relative(path.resolve(__dirname, '..'), file)] : []
+    );
+
+    expect(offenders).toEqual([]);
   });
 });

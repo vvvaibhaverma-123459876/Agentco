@@ -27,6 +27,8 @@ import { identityRoutes } from './routes/identity.routes';
 import { resourceLedgerRoutes } from './routes/resource-ledger.routes';
 import { metricsService } from './services/autonomy-metrics.service';
 import { shutdownRuntimeResources } from './runtime/shutdown';
+import { publicMessageForError, statusCodeForError } from './http-errors';
+import { validateUuidPathParams } from './routes/param-validation';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -74,24 +76,29 @@ export async function build() {
     if (provided !== apiKey) {
       return reply.status(401).send({ error: 'unauthorized' });
     }
+
+    validateUuidPathParams(request);
   });
 
   // Centralized error handler
   app.setErrorHandler(async (error: any, request, reply) => {
-    const requestId = request.id || 'unknown';
-    const statusCode = error?.statusCode || 500;
-    const message = error?.message || 'Internal server error';
+    const id = request.id || 'unknown';
+    const statusCode = statusCodeForError(error);
+    const message = publicMessageForError(error);
 
-    console.error(`[${requestId}] Error in ${request.method} ${request.url}:`, error);
+    console.error(`[${id}] Error in ${request.method} ${request.url}:`, error);
 
-    const response = {
-      error: message,
-      status_code: statusCode,
-      request_id: requestId,
-      timestamp: new Date().toISOString(),
-    };
+    const response = { error: message, id };
 
     reply.status(statusCode).send(response);
+  });
+
+  app.setNotFoundHandler(async (request, reply) => {
+    const apiKey = process.env.AGENTCO_API_KEY;
+    if (apiKey && getProvidedApiKey(request) !== apiKey) {
+      return reply.status(401).send({ error: 'unauthorized' });
+    }
+    return reply.status(404).send({ error: 'not found', id: request.id || 'unknown' });
   });
 
   await app.register(agentRoutes);

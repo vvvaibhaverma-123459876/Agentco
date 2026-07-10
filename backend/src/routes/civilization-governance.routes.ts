@@ -21,7 +21,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const version = await calibrationConstitutionService.createVersion(content, signerEntityId, signature);
       return reply.status(201).send(version);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -32,7 +32,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await calibrationConstitutionService.activateVersion(versionId);
       return reply.send({ status: 'activated', versionId });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -42,7 +42,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const constitution = await calibrationConstitutionService.getActive();
       return reply.send(constitution);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -53,7 +53,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const result = await calibrationConstitutionService.validateChange(changeType, affectedTables, affectedColumns);
       return reply.send(result);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -63,7 +63,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const surfaces = await calibrationConstitutionService.getProtectedSurfaces();
       return reply.send(surfaces);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -78,7 +78,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const policy = await trustPolicyService.createDraft(policyType, promotionScope, content, creatorEntityId);
       return reply.status(201).send(policy);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -90,7 +90,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       if (!policy) return reply.status(404).send({ error: 'policy not found' });
       return reply.send(policy);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -102,7 +102,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await trustPolicyService.submitForReview(policyId, reviewerEntityId);
       return reply.send({ status: 'submitted_for_review' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -114,7 +114,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await trustPolicyService.approve(policyId, approverEntityId, reason);
       return reply.send({ status: 'approved' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -124,7 +124,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const policies = await trustPolicyService.listActivePolicies();
       return reply.send(policies);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -135,7 +135,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const policies = await trustPolicyService.getByType(policyType);
       return reply.send(policies);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -155,7 +155,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       );
       return reply.status(201).send(request);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -167,7 +167,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       if (!request) return reply.status(404).send({ error: 'request not found' });
       return reply.send(request);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -178,7 +178,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await calibrationChangeGovernanceService.submitForReview(requestId);
       return reply.send({ status: 'submitted_for_review' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -196,7 +196,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       );
       return reply.send({ status: 'approved' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -206,7 +206,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const changes = await calibrationChangeGovernanceService.listPending();
       return reply.send(changes);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -248,7 +248,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       );
       return reply.status(201).send(assessment);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -260,7 +260,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       if (!assessment) return reply.status(404).send({ error: 'assessment not found' });
       return reply.send(assessment);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -272,7 +272,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       if (!assessment) return reply.status(404).send({ error: 'assessment not found' });
       return reply.send({ recommendation: assessment.recommendation, blocked: assessment.blocking_issues });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -295,7 +295,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       );
       return reply.status(201).send(event);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -307,7 +307,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const reputation = await trustReputationService.computeReputation(entityType, entityId);
       return reply.send({ reputation, events });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -318,7 +318,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const weight = await trustReputationService.getTrustWeight(entityType, entityId);
       return reply.send({ trust_weight: weight });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -329,7 +329,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const snapshots = await trustReputationService.listSnapshots(entityType, entityId);
       return reply.send(snapshots);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -362,7 +362,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       );
       return reply.status(201).send(event);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -373,7 +373,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const drifts = await calibrationDriftMonitorService.listUnresolved(limit, offset);
       return reply.send(drifts);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -383,7 +383,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const drifts = await calibrationDriftMonitorService.getCriticalDrifts();
       return reply.send(drifts);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -395,7 +395,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await calibrationDriftMonitorService.resolveDrift(driftId, resolutionType, undefined, 'system', reason);
       return reply.send({ status: 'resolved' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -416,7 +416,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       );
       return reply.status(201).send(canary);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -428,7 +428,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await trustPolicyCanaryService.recordMetric(canaryId, metricName, metricValue, status);
       return reply.send({ status: 'recorded' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -440,7 +440,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await trustPolicyCanaryService.promoteCanary(canaryId, traceId);
       return reply.send({ status: 'promoted' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -452,7 +452,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       await trustPolicyCanaryService.rollback(canaryId, reason, traceId);
       return reply.send({ status: 'rolled_back' });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -474,7 +474,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
         drift: { unresolved_count: unresolved.length, emergency_freeze: emergencyFreeze },
       });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -498,7 +498,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       const tick = await civilizationRuntimeService.runReachabilityTick(runtimeMode ?? 'api_l14_runtime');
       return reply.status(tick.status === 'passed' ? 201 : 503).send(tick);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -525,7 +525,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
       });
       return reply.status(tick.status === 'dispatched' ? 201 : 409).send(tick);
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -544,7 +544,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
         tick,
       });
     } catch (e) {
-      return reply.status(400).send({ error: String(e), scheduler: civilizationSchedulerService.status() });
+      return reply.status(400).send({ error: 'Invalid request', scheduler: civilizationSchedulerService.status() });
     }
   });
 
@@ -554,7 +554,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
     try {
       return reply.send(civilizationSchedulerService.start(intervalMs ?? 60_000));
     } catch (e) {
-      return reply.status(400).send({ error: String(e), scheduler: civilizationSchedulerService.status() });
+      return reply.status(400).send({ error: 'Invalid request', scheduler: civilizationSchedulerService.status() });
     }
   });
 
@@ -579,7 +579,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
         governance_status: 'active',
       });
     } catch (e) {
-      return reply.status(400).send({ error: String(e) });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 }

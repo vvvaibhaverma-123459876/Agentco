@@ -81,6 +81,7 @@ describe('decision_log cross-writer hash chain', () => {
       console.warn(`SKIP: decision_log live-service test requires Postgres/migrations: ${availability.reason}`);
       return;
     }
+    await db.query('TRUNCATE decision_log RESTART IDENTITY CASCADE');
 
     const repoRoot = path.resolve(__dirname, '../..');
     const sessionId = crypto.randomUUID();

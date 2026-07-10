@@ -19,6 +19,7 @@ export const db: Pool = new Pool({
   // Postgres (max_connections default 100) plus per-suite service pools does
   // not exhaust connections. Production default is unchanged.
   max: Number(process.env.AGENTCO_PG_POOL_MAX) || 20,
+  allowExitOnIdle: process.env.JEST_WORKER_ID !== undefined,
   idleTimeoutMillis: 10000,
   connectionTimeoutMillis: 5000,
 });

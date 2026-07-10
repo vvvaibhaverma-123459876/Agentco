@@ -16,7 +16,7 @@ from urllib.parse import quote, urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
-REPORT_DIR = ROOT / "reports" / "system_run" / "latest"
+REPORT_DIR = Path(os.environ.get("AGENTCO_REPORT_DIR", ROOT / "reports" / "system_run" / "latest"))
 DEFAULT_DB_URL = "postgresql://agentco:password@localhost:5432/agentco"
 _AUDIT_TIMESTAMP_COUNTER = 0
 

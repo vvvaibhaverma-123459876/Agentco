@@ -16,10 +16,19 @@ from agents.db import get_db
 from agents.civilization_service import CivilizationService
 
 
+def _db_or_skip():
+    db = get_db()
+    try:
+        db.connect()
+    except Exception as exc:
+        pytest.skip(f"Postgres civilization integration unavailable: {exc}")
+    return db
+
+
 @pytest.fixture
 def test_data():
     """Create real test data in DB (in FK order). Cleanup after test."""
-    db = get_db()
+    db = _db_or_skip()
 
     # Create goal
     goal_id = str(uuid.uuid4())

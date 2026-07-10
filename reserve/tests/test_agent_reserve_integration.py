@@ -101,6 +101,7 @@ def test_agent_earns_reserve_credential_from_real_predictions(db, monkeypatch):
             domain="engineering",
             claim_type="forecast",
             ground_truth_source="external_monitoring",
+            historical_registration_reason="test fixture seeds already-resolved historical predictions",
         )
         assert pid is not None
         pids.append(pid)

@@ -26,6 +26,7 @@ Run:
 """
 from __future__ import annotations
 
+import os
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -308,7 +309,8 @@ def test_collusion_resistance_property_audit_values(db):
 
 def test_write_trace(db):
     """Write Phase 2 acceptance trace."""
-    trace_path = MIGRATION_ROOT / "evals" / "acceptance" / "staking_and_decisions_trace.md"
+    acceptance_dir = Path(os.environ.get("AGENTCO_ACCEPTANCE_DIR", MIGRATION_ROOT / "reports" / "acceptance"))
+    trace_path = acceptance_dir / "staking_and_decisions_trace.md"
     trace_path.parent.mkdir(parents=True, exist_ok=True)
     body = "\n".join(TRACE_LINES)
     from datetime import date

@@ -23,6 +23,7 @@ Run:
 import asyncio
 import json
 import os
+import socket
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -42,6 +43,35 @@ def _conn():
     c = psycopg2.connect(DB_URL)
     c.autocommit = True
     return c
+
+
+def _postgres_ready() -> tuple[bool, str]:
+    try:
+        c = _conn()
+        with c.cursor() as cur:
+            cur.execute("SELECT to_regclass('public.decision_log'), to_regclass('public.event_history')")
+            decision_log, event_history = cur.fetchone()
+        c.close()
+        if not decision_log or not event_history:
+            return False, "live-service: required Postgres tables decision_log/event_history unavailable"
+        return True, "live-service: Postgres ready"
+    except Exception as exc:
+        return False, f"live-service: Postgres unavailable at DATABASE_URL={DB_URL!r}: {exc}"
+
+
+def _kafka_ready() -> tuple[bool, str]:
+    for broker in BROKERS.split(","):
+        host, _, port_text = broker.partition(":")
+        try:
+            with socket.create_connection((host, int(port_text or "9092")), timeout=1.0):
+                return True, "live-service: Kafka socket ready"
+        except Exception:
+            continue
+    return False, f"live-service: Kafka unavailable at KAFKA_BROKERS={BROKERS!r}"
+
+
+_POSTGRES_READY, _POSTGRES_REASON = _postgres_ready()
+_KAFKA_READY, _KAFKA_REASON = _kafka_ready()
 
 
 def _llm_reachable() -> bool:
@@ -133,6 +163,8 @@ def db():
     c.close()
 
 
+@pytest.mark.skipif(not _POSTGRES_READY, reason=_POSTGRES_REASON)
+@pytest.mark.skipif(not _KAFKA_READY, reason=_KAFKA_REASON)
 def test_full_dispatch_path_touches_real_postgres_ledger_audit_and_kafka(db):
     """One agent task → real ledger row + real audit row + real Kafka event."""
     from core.tools import register_all_tools

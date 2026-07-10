@@ -161,6 +161,7 @@ class BaseAgentV2:
         domain: str = "general",
         claim_type: str = "general",
         ground_truth_source: str = "external_auditor",
+        historical_registration_reason: str | None = None,
     ) -> Optional[str]:
         """
         Pre-register a falsifiable forward claim in the Prediction Ledger.
@@ -186,6 +187,7 @@ class BaseAgentV2:
             horizon_class="short" if (resolution_date - datetime.now(timezone.utc)).days < 31 else "medium",
             domain=domain,
             claim_type=claim_type,
+            historical_registration_reason=historical_registration_reason,
         )
         prediction_id = self._ledger.pre_register(reg)
         logger.info(

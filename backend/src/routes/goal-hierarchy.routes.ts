@@ -24,7 +24,7 @@ export async function goalHierarchyRoutes(
 
       return reply.status(201).send(rootGoal);
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -48,7 +48,7 @@ export async function goalHierarchyRoutes(
 
       return reply.status(201).send(subGoal);
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -72,7 +72,7 @@ export async function goalHierarchyRoutes(
 
       return reply.status(201).send(taskGoal);
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -91,7 +91,7 @@ export async function goalHierarchyRoutes(
 
       return reply.send(hierarchy);
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -114,7 +114,7 @@ export async function goalHierarchyRoutes(
         status: 'rolled_up',
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -149,7 +149,7 @@ export async function goalHierarchyRoutes(
         status: 'deduplicated',
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -184,7 +184,7 @@ export async function goalHierarchyRoutes(
         status: result.status,
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -204,7 +204,7 @@ export async function goalHierarchyRoutes(
         total: patterns.length,
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -235,7 +235,7 @@ export async function goalHierarchyRoutes(
         performance: performance,
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -269,7 +269,7 @@ export async function goalHierarchyRoutes(
         work_request_id: work_request_id,
       });
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 }

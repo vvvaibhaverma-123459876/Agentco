@@ -74,7 +74,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -131,7 +131,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -181,7 +181,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -238,7 +238,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -292,7 +292,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -350,7 +350,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -405,7 +405,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -484,7 +484,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
         }
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -535,7 +535,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
       } catch (error: any) {
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }
@@ -586,7 +586,7 @@ export async function autonomyDashboardRoutes(fastify: FastifyInstance) {
       } catch (error: any) {
         reply.code(500).send({
           status: 'error',
-          message: error.message,
+          message: 'Request failed',
         });
       }
     }

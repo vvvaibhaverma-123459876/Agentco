@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -66,16 +67,18 @@ def test_best_effort_production_never_downgrades_to_offline(monkeypatch):
     assert "cannot downgrade" in written["run_best_effort"]["blocked_reason"]
 
 
-def test_run_best_effort_offline_fixture_exits_successfully():
+def test_run_best_effort_offline_fixture_exits_successfully(tmp_path):
+    env = {**os.environ, "AGENTCO_REPORT_DIR": str(tmp_path)}
     proc = subprocess.run(
         [sys.executable, "-m", "runtime.orchestration.run_best_effort", "--mode", "offline_fixture"],
         cwd=ROOT,
+        env=env,
         text=True,
         capture_output=True,
         timeout=30,
         check=False,
     )
     assert proc.returncode == 0, proc.stdout + proc.stderr
-    report = json.loads((ROOT / "reports/system_run/latest/doctor_report.json").read_text())
+    report = json.loads((tmp_path / "doctor_report.json").read_text())
     assert report["selected_runtime_mode"] == "offline_fixture"
     assert report["run_best_effort"]["completed"] is True

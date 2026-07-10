@@ -258,6 +258,7 @@ def test_reader_track_record_and_format(memory_db):
         resolution_date=datetime.now(timezone.utc) - timedelta(days=1),
         ground_truth_source="test_harness",
         horizon_class="short", domain="tech_news", claim_type="general",
+        historical_registration_reason="test fixture seeds an already-resolved historical prediction",
     )
     pid = ledger.pre_register(reg)
     with conn.cursor() as cur:

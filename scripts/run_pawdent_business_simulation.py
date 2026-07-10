@@ -43,7 +43,7 @@ PRODUCT = "Monthly dog dental-care kit with dental chews, brushing wipes, breath
 DOMAIN = "pet_care_subscription"
 CLAIM_TYPE = "monthly_business_prediction"
 
-ACCEPTANCE_DIR = ROOT / "evals" / "acceptance"
+ACCEPTANCE_DIR = Path(os.environ.get("AGENTCO_ACCEPTANCE_DIR", ROOT / "evals" / "acceptance"))
 REPORT_PATH = ACCEPTANCE_DIR / "pawdent_business_run.md"
 DECISIONS_PATH = ACCEPTANCE_DIR / "pawdent_agent_decisions.jsonl"
 FINANCIALS_PATH = ACCEPTANCE_DIR / "pawdent_monthly_financials.csv"
@@ -690,6 +690,11 @@ def run_simulation(args: argparse.Namespace, use_trust_weighting: bool = False, 
                 claim_type=CLAIM_TYPE,
                 horizon_class="short",
             )
+            resolution_date = (
+                datetime.now(timezone.utc) - timedelta(milliseconds=1)
+                if args.no_db
+                else datetime.now(timezone.utc) + timedelta(milliseconds=5)
+            )
             reg = PredictionRegistration(
                 claim=spec.claim,
                 probability=round(spec.confidence, 4),
@@ -703,11 +708,12 @@ def run_simulation(args: argparse.Namespace, use_trust_weighting: bool = False, 
                 producing_agent_id=agent_id,
                 producing_prompt_version="pawdent_business_simulation_v1",
                 resolution_criterion=spec.resolution_condition,
-                resolution_date=datetime.now(timezone.utc) + timedelta(milliseconds=5),
+                resolution_date=resolution_date,
                 ground_truth_source=spec.resolution_source,
                 horizon_class="short",
                 domain=DOMAIN,
                 claim_type=CLAIM_TYPE,
+                historical_registration_reason="accelerated no-db simulation resolves synthetic monthly actuals immediately" if args.no_db else None,
             )
             prediction_id = ledger.pre_register(reg)
             registered.append((spec, prediction_id, trust_before))

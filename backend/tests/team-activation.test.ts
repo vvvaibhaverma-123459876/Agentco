@@ -4,7 +4,7 @@
  * Tests specialist role validation, budget enforcement, and lifecycle management
  */
 
-import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
+import { describe, it, expect, beforeEach, afterEach, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
 import { TeamActivationService, SpecialistActivationRequest } from '../src/services/team-activation.service';
 import { isValidSpecialistRole, SPECIALIST_ROLES } from '../src/types/specialist-roles';
@@ -32,6 +32,10 @@ describe('Team Activation Service', () => {
   afterEach(async () => {
     await db.query('TRUNCATE autonomy_team_activations CASCADE');
     await db.query('TRUNCATE autonomy_goals CASCADE');
+  });
+
+  afterAll(async () => {
+    await teamActivation.shutdown();
   });
 
   describe('Role Validation', () => {

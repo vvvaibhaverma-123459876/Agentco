@@ -138,7 +138,7 @@ class ScenarioAgent(BaseAgentV2):
             description=f"Emit {len(hypotheses)} provisional hypotheses for cycle {cycle_id}",
             payload={"cycle_id": cycle_id, "hypotheses": hypotheses_dicts},
             risk_level="low",
-            stated_confidence=0.65,
+            stated_confidence=0.75,
             domain="learning",
             claim_type="hypothesis_generation",
         )

@@ -57,7 +57,7 @@ export async function institutionWorkAssignmentRoutes(
 
       return reply.status(201).send(workRequest);
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -80,7 +80,7 @@ export async function institutionWorkAssignmentRoutes(
 
       return reply.send(workRequest);
     } catch (e: any) {
-      return reply.status(400).send({ error: e.message });
+      return reply.status(400).send({ error: 'Invalid request' });
     }
   });
 
@@ -106,7 +106,7 @@ export async function institutionWorkAssignmentRoutes(
           total: workRequests.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -138,7 +138,7 @@ export async function institutionWorkAssignmentRoutes(
 
         return reply.status(201).send(result);
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );
@@ -163,7 +163,7 @@ export async function institutionWorkAssignmentRoutes(
           total: specialists.length,
         });
       } catch (e: any) {
-        return reply.status(400).send({ error: e.message });
+        return reply.status(400).send({ error: 'Invalid request' });
       }
     }
   );

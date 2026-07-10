@@ -36,31 +36,24 @@ def _conn():
 
 @pytest.fixture(scope="module", autouse=True)
 def _setup():
+    try:
+        conn = _conn()
+        conn.close()
+    except Exception as exc:
+        pytest.skip(f"Postgres decision_log integration unavailable: {exc}")
+
     # Register the real handlers once for the whole module.
     register_all_tools()
     yield
     # Clean up any rows this test created.
-    conn = _conn()
-    conn.autocommit = True
-    with conn.cursor() as cur:
-        cur.execute(
-            """DO $$ BEGIN
-                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
-                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
-                   ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete;
-                 END IF;
-               END $$;"""
-        )
-        cur.execute("DELETE FROM decision_log WHERE agent_id LIKE 'test-tool-%'")
-        cur.execute(
-            """DO $$ BEGIN
-                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
-                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
-                   ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete;
-                 END IF;
-               END $$;"""
-        )
-    conn.close()
+    try:
+        conn = _conn()
+        conn.autocommit = True
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM decision_log WHERE agent_id LIKE 'test-tool-%'")
+        conn.close()
+    except Exception as exc:
+        print(f"decision_log cleanup skipped: {exc}")
 
 
 def _count_rows(agent_id: str, marker: str) -> int:

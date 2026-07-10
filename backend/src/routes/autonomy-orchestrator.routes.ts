@@ -41,7 +41,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
       reply.code(500).send({
         status: 'error',
         message: 'LEVEL_3 autonomy loop failed',
-        error: error.message,
+        error: 'Request failed',
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       });
     }
@@ -68,7 +68,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
       } catch (error: any) {
         reply.code(400).send({
           status: 'error',
-          error: error.message,
+          error: 'Request failed',
         });
       }
     }
@@ -139,7 +139,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
         reply.code(500).send({
           status: 'error',
           message: 'Autonomy action loop failed',
-          error: error.message,
+          error: 'Request failed',
           stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
         });
       }
@@ -194,7 +194,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
       } catch (error: any) {
         reply.code(500).send({
           status: 'error',
-          error: error.message,
+          error: 'Request failed',
         });
       }
     }
@@ -246,7 +246,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
       } catch (error: any) {
         reply.code(500).send({
           status: 'error',
-          error: error.message,
+          error: 'Request failed',
         });
       }
     }
@@ -299,7 +299,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
       } catch (error: any) {
         reply.code(500).send({
           status: 'error',
-          error: error.message,
+          error: 'Request failed',
         });
       }
     }
