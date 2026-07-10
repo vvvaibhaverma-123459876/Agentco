@@ -33,7 +33,9 @@ from runtime.base_agent.audit_writer import (
     DurableAuditWriter,
     InMemoryAuditWriter,
 )
+from runtime.base_agent.agent_manifest import ACTIVE_AGENT_PROFILES
 from runtime.base_agent.model_tiers import model_for
+from runtime.base_agent.spend_guardrail import SpendCapExceeded
 from runtime.base_agent.spend_guardrail import SpendGuardrail
 from runtime.base_agent.structured_output import get_validated_output
 from agentco_security.env_guard import assert_production_secrets
@@ -70,6 +72,7 @@ class AuditEntryV2:
     prediction_id: Optional[str]
     override_id: Optional[str]
     outcome: str                    # "executed" | "blocked" | "rejected"
+    attempt_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     trace_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
@@ -88,6 +91,8 @@ class BaseAgentV2:
     """
 
     PROMPT_VERSION: str = "2.0.0"    # Subclasses MUST override with their own semver
+    ALLOWED_ACTION_TYPES: set[str] | None = None
+    ALLOWED_TOOLS: set[str] = set()
 
     def __init__(
         self,
@@ -97,11 +102,17 @@ class BaseAgentV2:
         allow_test_audit_writer: bool = False,
     ):
         self.agent_id = agent_id
+        self._protocol_profile = next((profile for profile in ACTIVE_AGENT_PROFILES if profile.agent_id == agent_id), None)
+        if self.ALLOWED_ACTION_TYPES is None and self._protocol_profile is not None:
+            self.ALLOWED_ACTION_TYPES = set(self._protocol_profile.allowed_actions)
         self._cal = calibration_engine or {}
         self._ledger = self._cal.get("ledger")
         self._trust = self._cal.get("trust")
         self._resolution = self._cal.get("resolution")
         self._audit_failures = 0
+        self._protocol_evidence: list[dict[str, Any]] = []
+        self._protocol_successes: list[dict[str, Any]] = []
+        self._protocol_failures: list[dict[str, Any]] = []
         if audit_writer is not None:
             self._audit_writer = audit_writer
         elif allow_test_audit_writer or (
@@ -272,6 +283,15 @@ class BaseAgentV2:
         """
         from runtime.escalation.escalation_gate import HumanApprovalRequired
 
+        attempt_id = str(uuid.uuid4())
+        self._authorize_action(action)
+        self._capture_evidence(action, prediction_id, attempt_id)
+        try:
+            self._spend.check_before_call()
+        except SpendCapExceeded:
+            self._record_failure(action, attempt_id, outcome="spend_blocked", error="spend limit exceeded")
+            raise
+
         trusted_out = self._confidence.get_trusted(
             agent_id=self.agent_id,
             stated=action.stated_confidence,
@@ -308,11 +328,13 @@ class BaseAgentV2:
             self._write_audit(
                 action, trusted_out, prediction_id, override_id, "blocked",
                 require_ack=action.risk_level in {"high", "critical"},
+                attempt_id=attempt_id,
             )
+            self._record_failure(action, attempt_id, outcome="blocked", error="human approval required")
             raise
 
         if action.risk_level in {"high", "critical"}:
-            self._write_audit(action, trusted_out, prediction_id, override_id, outcome, require_ack=True)
+            self._write_audit(action, trusted_out, prediction_id, override_id, outcome, require_ack=True, attempt_id=attempt_id)
 
         # Action cleared — emit signed event envelope
         envelope = self._build_envelope(action, trusted_out, prediction_id)
@@ -322,7 +344,8 @@ class BaseAgentV2:
         )
 
         if action.risk_level not in {"high", "critical"}:
-            self._write_audit(action, trusted_out, prediction_id, override_id, outcome, require_ack=False)
+            self._write_audit(action, trusted_out, prediction_id, override_id, outcome, require_ack=False, attempt_id=attempt_id)
+        self._record_success(action, attempt_id, outcome=outcome)
         return {
             "outcome": outcome,
             "override_id": override_id,
@@ -330,7 +353,49 @@ class BaseAgentV2:
             "stated_confidence": trusted_out.stated_confidence,
             "envelope": envelope,
             "prediction_id": prediction_id,
+            "attempt_id": attempt_id,
         }
+
+    async def execute_tool(self, tool_name: str, tool_input: dict[str, Any]) -> Any:
+        if tool_name not in self.ALLOWED_TOOLS:
+            raise PermissionError(f"agent {self.agent_id} has not declared tool {tool_name!r}")
+        from agents.core.tool_registry import execute_tool
+        return await execute_tool(self.agent_id, tool_name, tool_input)
+
+    def _authorize_action(self, action: AgentActionV2) -> None:
+        allowed = self.ALLOWED_ACTION_TYPES
+        if allowed is not None and action.action_type not in allowed:
+            raise PermissionError(f"agent {self.agent_id} cannot execute undeclared action {action.action_type!r}")
+
+    def _capture_evidence(self, action: AgentActionV2, prediction_id: Optional[str], attempt_id: str) -> None:
+        self._protocol_evidence.append({
+            "attempt_id": attempt_id,
+            "agent_id": self.agent_id,
+            "action_type": action.action_type,
+            "description": action.description,
+            "payload": dict(action.payload),
+            "prediction_id": prediction_id,
+            "captured_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+    def _record_success(self, action: AgentActionV2, attempt_id: str, *, outcome: str) -> None:
+        self._protocol_successes.append({
+            "attempt_id": attempt_id,
+            "agent_id": self.agent_id,
+            "action_type": action.action_type,
+            "outcome": outcome,
+            "finalized_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+    def _record_failure(self, action: AgentActionV2, attempt_id: str, *, outcome: str, error: str) -> None:
+        self._protocol_failures.append({
+            "attempt_id": attempt_id,
+            "agent_id": self.agent_id,
+            "action_type": action.action_type,
+            "outcome": outcome,
+            "error": error,
+            "finalized_at": datetime.now(timezone.utc).isoformat(),
+        })
 
     def _build_envelope(self, action: AgentActionV2, trusted_out, prediction_id: Optional[str]) -> dict:
         envelope = {
@@ -360,6 +425,7 @@ class BaseAgentV2:
         outcome: str,
         *,
         require_ack: bool,
+        attempt_id: str | None = None,
     ):
         entry = AuditEntryV2(
             agent_id=self.agent_id,
@@ -373,6 +439,7 @@ class BaseAgentV2:
             prediction_id=prediction_id,
             override_id=override_id,
             outcome=outcome,
+            attempt_id=attempt_id or str(uuid.uuid4()),
         )
         if self._audit_writer is None:
             self._audit_failures += 1
@@ -530,6 +597,18 @@ class BaseAgentV2:
         if isinstance(self._audit_writer, InMemoryAuditWriter):
             return [asdict(e) for e in self._audit_writer.entries]
         return []
+
+    @property
+    def protocol_evidence(self) -> list[dict[str, Any]]:
+        return list(self._protocol_evidence)
+
+    @property
+    def protocol_successes(self) -> list[dict[str, Any]]:
+        return list(self._protocol_successes)
+
+    @property
+    def protocol_failures(self) -> list[dict[str, Any]]:
+        return list(self._protocol_failures)
 
     @property
     def audit_failure_count(self) -> int:
