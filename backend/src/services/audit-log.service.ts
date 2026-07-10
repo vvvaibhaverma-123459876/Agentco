@@ -13,7 +13,9 @@ import crypto from 'crypto';
 import { PoolClient } from 'pg';
 import { db, query } from '../db/client';
 
-export const CURRENT_DECISION_LOG_SERIALIZATION_VERSION = 'v3.sorted-json-versioned';
+export const DECISION_LOG_VERSION_V3 = 'v3.sorted-json-versioned';
+export const CURRENT_DECISION_LOG_SERIALIZATION_VERSION = 'v4.sorted-json-versioned-attempt';
+const DECISION_LOG_CHAIN_LOCK_KEY = 'agentco.decision_log.hash_chain';
 
 export interface AuditEntry {
   agent_id: string;
@@ -26,6 +28,7 @@ export interface AuditEntry {
   human_approver_id?: string;
   downstream_events?: string[];
   session_id?: string;
+  attempt_id?: string | null;
 }
 
 export interface AuditRecord extends AuditEntry {
@@ -34,10 +37,12 @@ export interface AuditRecord extends AuditEntry {
   chain_hash: string;
   prev_hash: string;
   serialization_version?: string | null;
+  attempt_id?: string | null;
 }
 
 interface CanonicalDecisionLogFields {
   serialization_version?: string;
+  attempt_id?: string;
   log_id: string;
   timestamp: string;
   prev_hash: string;
@@ -60,6 +65,7 @@ interface DecisionLogChainRow {
   prev_hash: string;
   chain_hash: string;
   serialization_version?: string | null;
+  attempt_id?: string | null;
   agent_id: string;
   action_type: string;
   input_summary: string;
@@ -166,6 +172,16 @@ function versionedFieldsForRow(row: DecisionLogChainRow, timestamp: string): Can
   if (!row.serialization_version) {
     throw new Error('versioned decision_log row missing serialization_version');
   }
+  if (row.serialization_version === CURRENT_DECISION_LOG_SERIALIZATION_VERSION) {
+    if (!row.attempt_id) {
+      throw new Error('v4 decision_log row missing attempt_id');
+    }
+    return {
+      serialization_version: row.serialization_version,
+      attempt_id: row.attempt_id,
+      ...fieldsForRow(row, timestamp),
+    };
+  }
   return {
     serialization_version: row.serialization_version,
     ...fieldsForRow(row, timestamp),
@@ -180,12 +196,16 @@ export function decisionLogChainHashForVersion(
   row: DecisionLogChainRow,
   version: string
 ): { version: string; hash: string } | null {
-  if (version !== CURRENT_DECISION_LOG_SERIALIZATION_VERSION) return null;
-  const fields = versionedFieldsForRow(row, normalizeTimestamp(row.timestamp));
-  return {
-    version,
-    hash: hashDecisionLogContent(row.prev_hash, canonicalDecisionLogContent(fields)),
-  };
+  if (![DECISION_LOG_VERSION_V3, CURRENT_DECISION_LOG_SERIALIZATION_VERSION].includes(version)) return null;
+  try {
+    const fields = versionedFieldsForRow(row, normalizeTimestamp(row.timestamp));
+    return {
+      version,
+      hash: hashDecisionLogContent(row.prev_hash, canonicalDecisionLogContent(fields)),
+    };
+  } catch {
+    return null;
+  }
 }
 
 export function acceptedDecisionLogChainHashes(row: DecisionLogChainRow): Array<{ version: string; hash: string }> {
@@ -248,11 +268,12 @@ export class AuditLogService {
 
     const log_id = crypto.randomUUID();
     const timestamp = new Date().toISOString();
+    const attempt_id = entry.attempt_id ?? crypto.randomUUID();
     const client = await db.connect();
 
     try {
       await client.query('BEGIN');
-      const record = await this.appendWithClient(client, entry, { log_id, timestamp });
+      const record = await this.appendWithClient(client, { ...entry, attempt_id }, { log_id, timestamp });
       await client.query('COMMIT');
       return record.log_id;
     } catch (err) {
@@ -272,6 +293,8 @@ export class AuditLogService {
     this.validateEntry(entry);
     const log_id = options.log_id ?? crypto.randomUUID();
     const timestamp = normalizeTimestamp(options.timestamp ?? new Date().toISOString());
+    const attempt_id = entry.attempt_id ?? crypto.randomUUID();
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [DECISION_LOG_CHAIN_LOCK_KEY]);
     const previous = await client.query<{ chain_hash: string }>(
       `SELECT chain_hash
          FROM decision_log
@@ -289,6 +312,7 @@ export class AuditLogService {
     const serialization_version = CURRENT_DECISION_LOG_SERIALIZATION_VERSION;
     const content = canonicalDecisionLogContent({
       serialization_version,
+      attempt_id,
       log_id,
       timestamp,
       prev_hash,
@@ -310,11 +334,13 @@ export class AuditLogService {
          (log_id, agent_id, action_type, input_summary, output_summary,
           confidence_score, risk_level, human_approved, human_approver_id,
           downstream_events, session_id, timestamp, chain_hash, prev_hash,
-          serialization_version)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+          serialization_version, attempt_id)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+       ON CONFLICT (attempt_id) WHERE attempt_id IS NOT NULL DO NOTHING
        RETURNING log_id, agent_id, action_type, input_summary, output_summary,
                  confidence_score, risk_level, human_approved, human_approver_id,
-                 downstream_events, session_id, timestamp, chain_hash, prev_hash`,
+                 downstream_events, session_id, timestamp, chain_hash, prev_hash,
+                 serialization_version, attempt_id`,
       [
         log_id,
         entry.agent_id,
@@ -331,9 +357,26 @@ export class AuditLogService {
         chain_hash,
         prev_hash,
         serialization_version,
+        attempt_id,
       ]
     );
-    return result.rows[0];
+    if (result.rows[0]) {
+      return result.rows[0];
+    }
+
+    const existing = await client.query<AuditRecord>(
+      `SELECT log_id, agent_id, action_type, input_summary, output_summary,
+              confidence_score, risk_level, human_approved, human_approver_id,
+              downstream_events, session_id, timestamp, chain_hash, prev_hash,
+              serialization_version, attempt_id
+         FROM decision_log
+        WHERE attempt_id = $1`,
+      [attempt_id]
+    );
+    if (!existing.rows[0]) {
+      throw new Error(`audit attempt ${attempt_id} conflicted but no row was found`);
+    }
+    return existing.rows[0];
   }
 
   async query(filters: {
@@ -380,7 +423,7 @@ export class AuditLogService {
       `SELECT log_id, agent_id, action_type, input_summary, output_summary,
               confidence_score, risk_level, human_approved, human_approver_id,
               downstream_events, session_id, timestamp, timestamp::text AS timestamp_text,
-              chain_hash, prev_hash, serialization_version
+              chain_hash, prev_hash, serialization_version, attempt_id
        FROM decision_log
        WHERE chain_hash ~ '^[0-9a-f]{64}$'
          AND prev_hash ~ '^[0-9a-f]{64}$'

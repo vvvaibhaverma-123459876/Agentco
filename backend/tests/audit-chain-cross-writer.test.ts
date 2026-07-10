@@ -164,7 +164,7 @@ describe('decision_log cross-writer hash chain', () => {
       `SELECT log_id, agent_id, action_type, input_summary, output_summary,
               confidence_score, risk_level, human_approved, human_approver_id,
               downstream_events, session_id, timestamp, timestamp::text AS timestamp_text,
-              chain_hash, prev_hash, serialization_version
+              chain_hash, prev_hash, serialization_version, attempt_id
          FROM decision_log
         WHERE agent_id = $1
           AND session_id = $2
@@ -173,6 +173,7 @@ describe('decision_log cross-writer hash chain', () => {
     );
     for (const row of chainRows.rows) {
       expect(row.serialization_version).toBe(CURRENT_DECISION_LOG_SERIALIZATION_VERSION);
+      expect(row.attempt_id).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
       expect(acceptedDecisionLogChainHashes(row)).toEqual([
         { version: CURRENT_DECISION_LOG_SERIALIZATION_VERSION, hash: row.chain_hash },
       ]);
@@ -204,7 +205,7 @@ describe('decision_log cross-writer hash chain', () => {
       `SELECT log_id, agent_id, action_type, input_summary, output_summary,
               confidence_score, risk_level, human_approved, human_approver_id,
               downstream_events, session_id, timestamp, timestamp::text AS timestamp_text,
-              chain_hash, prev_hash, serialization_version
+              chain_hash, prev_hash, serialization_version, attempt_id
          FROM decision_log
         WHERE log_id = $1`,
       [logId]
@@ -285,5 +286,48 @@ describe('decision_log cross-writer hash chain', () => {
     });
 
     expect(await auditLog.verifyChainIntegrity()).toEqual({ valid: false, broken_at: logId });
+  });
+
+  test('duplicate TS attempt_id returns existing row without appending', async () => {
+    const availability = await decisionLogAvailable();
+    if (!availability.available) {
+      console.warn(`SKIP: decision_log live-service test requires Postgres/migrations: ${availability.reason}`);
+      return;
+    }
+    await migrationDb.query('TRUNCATE decision_log RESTART IDENTITY CASCADE');
+
+    const attemptId = crypto.randomUUID();
+    const agentId = `duplicate-attempt-${crypto.randomBytes(4).toString('hex')}`;
+    const first = await auditLog.append({
+      agent_id: agentId,
+      action_type: 'decision',
+      input_summary: 'first attempt body',
+      output_summary: 'first attempt output',
+      confidence_score: 0.5,
+      risk_level: 'low',
+      session_id: crypto.randomUUID(),
+      attempt_id: attemptId,
+    });
+    const second = await auditLog.append({
+      agent_id: agentId,
+      action_type: 'decision',
+      input_summary: 'conflicting retry body',
+      output_summary: 'conflicting retry output',
+      confidence_score: 0.9,
+      risk_level: 'medium',
+      session_id: crypto.randomUUID(),
+      attempt_id: attemptId,
+    });
+
+    expect(second).toBe(first);
+    const rows = await db.query(
+      `SELECT COUNT(*)::int AS count, MIN(input_summary) AS input_summary
+         FROM decision_log
+        WHERE attempt_id = $1`,
+      [attemptId]
+    );
+    expect(Number(rows.rows[0].count)).toBe(1);
+    expect(rows.rows[0].input_summary).toBe('first attempt body');
+    expect(await auditLog.verifyChainIntegrity()).toEqual({ valid: true });
   });
 });

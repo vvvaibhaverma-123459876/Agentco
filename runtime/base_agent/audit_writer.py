@@ -4,6 +4,7 @@ import hashlib
 import json
 import logging
 import os
+import time
 import uuid
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -11,7 +12,8 @@ from typing import Any, Protocol
 
 logger = logging.getLogger(__name__)
 
-CURRENT_DECISION_LOG_SERIALIZATION_VERSION = "v3.sorted-json-versioned"
+CURRENT_DECISION_LOG_SERIALIZATION_VERSION = "v4.sorted-json-versioned-attempt"
+DECISION_LOG_CHAIN_LOCK_KEY = "agentco.decision_log.hash_chain"
 
 
 def _utc_timestamp_ms() -> str:
@@ -50,9 +52,11 @@ class DurableAuditWriter:
 
     VALID_ACTION_TYPES = {"decision", "api_call", "event_published", "escalation"}
 
-    def __init__(self, dsn: str, *, connect_timeout: int = 3):
+    def __init__(self, dsn: str, *, connect_timeout: int = 3, max_retries: int = 3, retry_backoff_seconds: float = 0.05):
         self._dsn = dsn
         self._connect_timeout = connect_timeout
+        self._max_retries = max_retries
+        self._retry_backoff_seconds = retry_backoff_seconds
 
     @classmethod
     def from_env(cls) -> "DurableAuditWriter | None":
@@ -68,6 +72,25 @@ class DurableAuditWriter:
             raise AuditUnavailableError("psycopg2 is required for DurableAuditWriter") from exc
 
         data = asdict(entry) if hasattr(entry, "__dataclass_fields__") else dict(entry)
+        attempt_id = str(data.get("attempt_id") or uuid.uuid4())
+        data["attempt_id"] = attempt_id
+        if isinstance(entry, dict):
+            entry.setdefault("attempt_id", attempt_id)
+
+        last_exc: Exception | None = None
+        for attempt in range(1, self._max_retries + 1):
+            try:
+                return self._write_once(data, attempt_id=attempt_id, psycopg2=psycopg2)
+            except Exception as exc:
+                last_exc = exc
+                if attempt == self._max_retries:
+                    break
+                time.sleep(self._retry_backoff_seconds * attempt)
+
+        logger.error("Durable audit write failed for agent=%s: %s", data.get("agent_id"), last_exc)
+        raise AuditUnavailableError(str(last_exc)) from last_exc
+
+    def _write_once(self, data: dict[str, Any], *, attempt_id: str, psycopg2: Any) -> dict[str, str]:
         log_id = str(uuid.uuid4())
         timestamp = _utc_timestamp_ms()
         prev_hash = "0" * 64
@@ -92,6 +115,7 @@ class DurableAuditWriter:
             conn = psycopg2.connect(self._dsn, connect_timeout=self._connect_timeout)
             with conn:
                 with conn.cursor() as cur:
+                    cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (DECISION_LOG_CHAIN_LOCK_KEY,))
                     cur.execute(
                         """
                         SELECT chain_hash
@@ -110,6 +134,7 @@ class DurableAuditWriter:
                     output_summary = output_summary[:500]
                     content = canonical_decision_log_content({
                         "serialization_version": CURRENT_DECISION_LOG_SERIALIZATION_VERSION,
+                        "attempt_id": attempt_id,
                         "log_id": log_id,
                         "timestamp": timestamp,
                         "prev_hash": prev_hash,
@@ -131,9 +156,10 @@ class DurableAuditWriter:
                             (log_id, agent_id, action_type, input_summary, output_summary,
                              confidence_score, risk_level, human_approved, human_approver_id,
                              downstream_events, session_id, timestamp, chain_hash, prev_hash,
-                             serialization_version)
-                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-                        RETURNING log_id
+                             serialization_version, attempt_id)
+                        VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                        ON CONFLICT (attempt_id) WHERE attempt_id IS NOT NULL DO NOTHING
+                        RETURNING log_id, chain_hash
                         """,
                         (
                             log_id,
@@ -151,12 +177,34 @@ class DurableAuditWriter:
                             chain_hash,
                             prev_hash,
                             CURRENT_DECISION_LOG_SERIALIZATION_VERSION,
+                            attempt_id,
                         ),
                     )
-            return {"log_id": log_id, "chain_hash": chain_hash, "backend": "decision_log"}
-        except Exception as exc:
-            logger.error("Durable audit write failed for agent=%s", data.get("agent_id"), exc_info=True)
-            raise AuditUnavailableError(str(exc)) from exc
+                    row = cur.fetchone()
+                    if row:
+                        return {
+                            "log_id": str(row[0]),
+                            "chain_hash": row[1],
+                            "attempt_id": attempt_id,
+                            "backend": "decision_log",
+                        }
+                    cur.execute(
+                        """
+                        SELECT log_id, chain_hash
+                          FROM decision_log
+                         WHERE attempt_id = %s
+                        """,
+                        (attempt_id,),
+                    )
+                    existing = cur.fetchone()
+                    if existing:
+                        return {
+                            "log_id": str(existing[0]),
+                            "chain_hash": existing[1],
+                            "attempt_id": attempt_id,
+                            "backend": "decision_log",
+                        }
+                    raise AuditUnavailableError(f"audit attempt {attempt_id} conflicted but no row was found")
         finally:
             if conn is not None:
                 conn.close()
