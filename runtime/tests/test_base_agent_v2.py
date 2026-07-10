@@ -10,6 +10,7 @@ Verifies:
 """
 import pytest
 import os
+import uuid
 from datetime import datetime, timedelta, timezone
 
 from calibration import create_calibration_engine
@@ -208,6 +209,20 @@ class _FailingAuditWriter:
 
 
 class TestBaseAgentV2DurableAudit:
+    def _live_decision_log(self):
+        dsn = os.environ.get("AGENTCO_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
+        if not dsn:
+            pytest.skip("live-service: no AGENTCO_TEST_DATABASE_URL or DATABASE_URL configured")
+        psycopg2 = pytest.importorskip("psycopg2", reason="live-service: psycopg2 unavailable")
+        try:
+            conn = psycopg2.connect(dsn, connect_timeout=2)
+            with conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT 1 FROM decision_log LIMIT 1")
+            return dsn, psycopg2
+        except Exception as exc:
+            pytest.skip(f"live-service: decision_log unavailable: {exc}")
+
     def test_high_risk_action_with_failing_audit_writer_is_blocked(self):
         cal = _make_engine()
         agent = ConcreteAgentV2("audit-fail-agent", calibration_engine=cal)
@@ -234,18 +249,7 @@ class TestBaseAgentV2DurableAudit:
         assert writer.write({"trace_id": "t-1"})["backend"] == "memory"
 
     def test_durable_audit_writer_round_trip_live_postgres(self):
-        dsn = os.environ.get("AGENTCO_TEST_DATABASE_URL") or os.environ.get("DATABASE_URL")
-        if not dsn:
-            pytest.skip("live-service: no AGENTCO_TEST_DATABASE_URL or DATABASE_URL configured")
-        psycopg2 = pytest.importorskip("psycopg2", reason="live-service: psycopg2 unavailable")
-        try:
-            conn = psycopg2.connect(dsn, connect_timeout=2)
-            with conn:
-                with conn.cursor() as cur:
-                    cur.execute("SELECT 1 FROM decision_log LIMIT 1")
-            conn.close()
-        except Exception as exc:
-            pytest.skip(f"live-service: decision_log unavailable: {exc}")
+        dsn, _ = self._live_decision_log()
 
         agent = ConcreteAgentV2(
             "durable-audit-agent",
@@ -264,3 +268,85 @@ class TestBaseAgentV2DurableAudit:
 
         assert result["outcome"] == "executed"
         assert agent.audit_failure_count == 0
+
+    def test_lost_ack_retry_uses_same_attempt_id_and_action_proceeds_live_postgres(self):
+        dsn, psycopg2 = self._live_decision_log()
+        agent = ConcreteAgentV2(
+            f"lost-ack-agent-{uuid.uuid4().hex[:8]}",
+            calibration_engine=_make_engine(),
+        )
+        action = AgentActionV2(
+            action_type="deploy_config",
+            description="Approved high-risk action with lost audit ACK",
+            payload={},
+            risk_level="high",
+            stated_confidence=0.9,
+        )
+        try:
+            agent.execute_action(action)
+        except HumanApprovalRequired as exc:
+            token = agent.approve_action(exc.override_id, approver_id="human-governor-1")
+
+        writer = DurableAuditWriter(dsn, max_retries=2, retry_backoff_seconds=0)
+        original_write_once = writer._write_once
+        calls = {"count": 0}
+
+        def lost_ack_once(data, *, attempt_id, psycopg2):
+            calls["count"] += 1
+            ack = original_write_once(data, attempt_id=attempt_id, psycopg2=psycopg2)
+            if calls["count"] == 1:
+                raise AuditUnavailableError("simulated lost ack after commit")
+            return ack
+
+        writer._write_once = lost_ack_once
+        agent._audit_writer = writer
+
+        result = agent.execute_action(action, pre_approved_token=token)
+
+        assert result["outcome"] == "executed"
+        assert agent.audit_failure_count == 0
+        assert calls["count"] == 2
+        with psycopg2.connect(dsn, connect_timeout=2) as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT attempt_id, COUNT(*)::int
+                      FROM decision_log
+                     WHERE agent_id = %s
+                       AND input_summary = %s
+                     GROUP BY attempt_id
+                    """,
+                    (agent.agent_id, action.description),
+                )
+                rows = cur.fetchall()
+        assert len(rows) == 1
+        assert rows[0][0] is not None
+        assert rows[0][1] == 1
+
+    def test_genuine_audit_write_failure_exhausts_retries_and_writes_zero_rows_live_postgres(self):
+        dsn, psycopg2 = self._live_decision_log()
+        attempt_id = str(uuid.uuid4())
+        writer = DurableAuditWriter(dsn, max_retries=2, retry_backoff_seconds=0)
+
+        def fail_before_insert(data, *, attempt_id, psycopg2):
+            raise AuditUnavailableError("simulated write failure before insert")
+
+        writer._write_once = fail_before_insert
+
+        with pytest.raises(AuditUnavailableError, match="simulated write failure before insert"):
+            writer.write({
+                "attempt_id": attempt_id,
+                "agent_id": "write-failure-agent",
+                "action_type": "decision",
+                "description": "this write never reaches postgres",
+                "trusted_confidence": 0.6,
+                "risk_level": "high",
+                "outcome": "blocked",
+                "trace_id": str(uuid.uuid4()),
+            })
+
+        with psycopg2.connect(dsn, connect_timeout=2) as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*)::int FROM decision_log WHERE attempt_id = %s", (attempt_id,))
+                count = cur.fetchone()[0]
+        assert count == 0
