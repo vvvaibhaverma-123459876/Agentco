@@ -156,9 +156,16 @@ def db():
                  END IF;
                END $$;"""
         )
-        cur.execute("ALTER TABLE prediction_ledger DISABLE TRIGGER ALL")
+        cur.execute(
+            """DELETE FROM contradictions
+               WHERE prediction_id IN (
+                   SELECT prediction_id
+                   FROM prediction_ledger
+                   WHERE producing_agent_id=%s
+               )""",
+            ("e2e-dispatch-agent",),
+        )
         cur.execute("DELETE FROM prediction_ledger WHERE producing_agent_id=%s", ("e2e-dispatch-agent",))
-        cur.execute("ALTER TABLE prediction_ledger ENABLE TRIGGER ALL")
         cur.execute("DELETE FROM event_history WHERE producer_agent_id=%s", (E2E_AGENT,))
     c.close()
 
