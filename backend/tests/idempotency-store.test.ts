@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 import { idempotencyStore } from '../src/services/idempotency-store.service';
 
@@ -12,7 +13,7 @@ async function applyMigrations() {
     '096_idempotency_store.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

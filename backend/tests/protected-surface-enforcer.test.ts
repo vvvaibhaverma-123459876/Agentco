@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { selfModValidator } from '../src/services/self-modification-validator.service';
 import { isProtected, validateProtectedSurfaces } from '../src/services/protected-surface-validator.service';
 
@@ -10,7 +11,7 @@ async function applyCompatibilityMigration() {
     path.resolve(__dirname, '../src/db/migrations/097_self_modification_validation_compatibility.sql'),
     'utf8'
   );
-  await db.query(migration);
+  await migrationDb.query(migration);
 }
 
 async function createCandidate(artifact: Record<string, unknown>): Promise<string> {

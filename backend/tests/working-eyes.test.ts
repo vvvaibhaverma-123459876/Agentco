@@ -16,6 +16,7 @@ import http from 'http';
 import path from 'path';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { RealWebAdapter } from '../src/adapters/real-web-adapter';
 import { claimGrounding } from '../src/services/claim-grounding.service';
@@ -26,7 +27,7 @@ const FACT = 'The Zephyr-9 turbine sustains 4200 rpm under rated load without vi
 
 async function applyMigrations() {
   for (const name of ['004_decision_log.sql', '050_autonomy_action_loop.sql', '079_identity_authority.sql']) {
-    await db.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
+    await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
   }
 }
 

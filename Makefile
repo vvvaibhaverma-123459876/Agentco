@@ -99,20 +99,22 @@ release-gate:
 	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty before release-gate"; exit 1)
 	@echo "== [1/11] status check =="
 	@$(MAKE) status-check
-	@echo "== [2/11] Python default suite =="
-	@PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m pytest -q
-	@echo "== [3/11] backend install =="
+	@echo "== [2/11] backend install =="
 	cd backend && npm ci
-	@echo "== [4/11] backend migrations =="
-	@if [ -n "$$DATABASE_URL" ]; then cd backend && npm run db:migrate; else echo "DATABASE_URL not set; DB-backed tests may skip with reason"; fi
+	@echo "== [3/11] backend migrations =="
+	@MIGRATION_DSN="$${RELEASE_GATE_MIGRATION_DATABASE_URL:-$$DATABASE_URL}"; if [ -n "$$MIGRATION_DSN" ]; then cd backend && DATABASE_URL="$$MIGRATION_DSN" npm run db:migrate; else echo "DATABASE_URL not set; DB-backed tests may skip with reason"; fi
+	@echo "== [3a/11] least-privilege gate role grants =="
+	@if [ -n "$$RELEASE_GATE_SETUP_DATABASE_URL" ]; then psql "$$RELEASE_GATE_SETUP_DATABASE_URL" -v gate_role="$${RELEASE_GATE_ROLE:-agentco_gate}" -v gate_password="$${RELEASE_GATE_ROLE_PASSWORD:?RELEASE_GATE_ROLE_PASSWORD is required when RELEASE_GATE_SETUP_DATABASE_URL is set}" -f scripts/setup_release_gate_role.sql >/dev/null; else echo "RELEASE_GATE_SETUP_DATABASE_URL not set; assuming gate role already has privileges"; fi
+	@echo "== [4/11] Python default suite =="
+	@GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; PYTHONDONTWRITEBYTECODE=1 DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" $(PYTHON) -m pytest -q
 	@echo "== [5/11] backend build =="
 	cd backend && npm run build
 	@echo "== [6/11] backend Jest =="
-	cd backend && npm test -- --runInBand
+	GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; cd backend && DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" npm test -- --runInBand
 	@echo "== [7/11] route-auth contract =="
-	cd backend && npm test -- route-auth-contract.test.ts --runInBand
+	GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; cd backend && DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" npm test -- route-auth-contract.test.ts --runInBand
 	@echo "== [8/11] decision_log chain cross-writer test =="
-	cd backend && npm test -- audit-chain-cross-writer.test.ts --runInBand
+	GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; cd backend && DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" npm test -- audit-chain-cross-writer.test.ts --runInBand
 	@echo "== [9/11] frontend install =="
 	cd frontend && npm ci
 	@echo "== [10/11] frontend typecheck =="

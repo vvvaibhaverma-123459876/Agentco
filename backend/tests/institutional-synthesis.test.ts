@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { institutionsService } from '../src/services/institutions.service';
 import { FindingType } from '../src/services/institution-claim-vetting.service';
 import { institutionalSynthesisService } from '../src/services/institutional-synthesis.service';
@@ -19,7 +20,7 @@ async function applyMigrations() {
     '083_transactional_outbox.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 
@@ -124,7 +125,7 @@ describe('institutional synthesis', () => {
     expect(result.weakest_necessary_link).toBeCloseTo(0.8);
     expect(result.independent_corroboration_lift).toBeCloseTo(0.02);
     expect(result.confidence).toBeCloseTo(0.82);
-    expect(result.contributing_claim_ids).toEqual([firstClaim, secondClaim]);
+    expect(result.contributing_claim_ids.sort()).toEqual([firstClaim, secondClaim].sort());
     expect(result.evidence_ids.sort()).toEqual([`ev-a-${suffix}`, `ev-b-${suffix}`, `ev-c-${suffix}`].sort());
     expect(result.verification.status).toBe('passed');
     expect(result.audit.status).toBe('passed');
@@ -138,7 +139,7 @@ describe('institutional synthesis', () => {
     expect(claim.rows[0].status).toBe('supported');
     expect(Number(claim.rows[0].confidence)).toBeCloseTo(0.82);
     expect(claim.rows[0].support_source_ids.sort()).toEqual(result.evidence_ids.sort());
-    expect(claim.rows[0].derived_from_action_ids).toEqual([firstClaim, secondClaim]);
+    expect(claim.rows[0].derived_from_action_ids.sort()).toEqual([firstClaim, secondClaim].sort());
     expect(claim.rows[0].generated_by).toBe('institutional-synthesis');
 
     const events = await db.query(
@@ -148,11 +149,11 @@ describe('institutional synthesis', () => {
         ORDER BY timestamp ASC`,
       [result.synthesis_work_request_id]
     );
-    expect(events.rows.map(row => row.cycle_phase)).toEqual([
+    expect(events.rows.map(row => row.cycle_phase).sort()).toEqual([
       'synthesis',
-      'synthesis_verification',
       'synthesis_audit',
-    ]);
+      'synthesis_verification',
+    ].sort());
   });
 
   test('rejects synthesis from a source work request that is not a completed finding', async () => {

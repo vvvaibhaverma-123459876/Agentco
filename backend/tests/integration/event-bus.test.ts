@@ -16,6 +16,7 @@ import crypto from 'crypto';
 import net from 'net';
 import { Pool } from 'pg';
 import { EventBusService, AgentEvent, SignedEvent } from '../../src/services/event-bus.service';
+import { disconnectProducer } from '../../src/db/kafka';
 
 const DSN =
   process.env.DATABASE_URL ||
@@ -55,6 +56,7 @@ function makeEvent(overrides: Partial<AgentEvent> = {}): AgentEvent {
 }
 
 afterAll(async () => {
+  await disconnectProducer();
   await db.end();
 });
 

@@ -24,8 +24,16 @@ def _connect_or_skip():
         pytest.skip(f"Postgres spend ledger integration unavailable: {exc}")
 
 
+def _admin_connect_or_skip():
+    dsn = os.environ.get("RELEASE_GATE_MIGRATION_DATABASE_URL") or _dsn()
+    try:
+        return psycopg2.connect(dsn)
+    except Exception as exc:
+        pytest.skip(f"Postgres spend ledger migration setup unavailable: {exc}")
+
+
 def _apply_migrations():
-    conn = _connect_or_skip()
+    conn = _admin_connect_or_skip()
     conn.autocommit = True
     try:
         with conn.cursor() as cur:

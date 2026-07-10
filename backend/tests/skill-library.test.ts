@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { LearnerService } from '../src/services/learner.service';
 import { regressionTestGenerator } from '../src/services/regression-test-generator.service';
 import { skillLibrary } from '../src/services/skill-library.service';
@@ -18,7 +19,7 @@ async function applyMigrations() {
     '105_skill_library.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

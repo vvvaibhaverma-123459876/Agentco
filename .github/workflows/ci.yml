@@ -140,10 +140,28 @@ jobs:
       - name: Verify pytest collection
         run: PYTHONDONTWRITEBYTECODE=1 python3.13 -m pytest --collect-only -q
 
-      - name: Run release credibility gate
+      - name: Prepare release gate database role
         env:
           DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
-          AGENTCO_TEST_DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+        run: |
+          cd backend
+          npm ci
+          npm run db:migrate
+          cd ..
+          psql "$DATABASE_URL" \
+            -v gate_role=agentco_gate \
+            -v gate_password=gate_password \
+            -f scripts/setup_release_gate_role.sql
+
+      - name: Run release credibility gate
+        env:
+          DATABASE_URL: postgresql://agentco_gate:gate_password@localhost:5432/agentco
+          AGENTCO_TEST_DATABASE_URL: postgresql://agentco_gate:gate_password@localhost:5432/agentco
+          RELEASE_GATE_DATABASE_URL: postgresql://agentco_gate:gate_password@localhost:5432/agentco
+          RELEASE_GATE_MIGRATION_DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+          RELEASE_GATE_SETUP_DATABASE_URL: postgresql://agentco:password@localhost:5432/agentco
+          RELEASE_GATE_ROLE: agentco_gate
+          RELEASE_GATE_ROLE_PASSWORD: gate_password
         run: make release-gate
 
   test-frontend:

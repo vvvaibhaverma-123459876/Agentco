@@ -20,6 +20,7 @@ import http from 'http';
 import path from 'path';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { AutonomyActionPlannerService } from '../src/services/autonomy-action-planner.service';
 import { skillRetrieval } from '../src/services/skill-retrieval.service';
 import { LearnerService } from '../src/services/learner.service';
@@ -53,7 +54,7 @@ async function applyMigrations() {
     '110_skill_usage_events.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

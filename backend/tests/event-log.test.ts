@@ -1,20 +1,21 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 import { eventLog } from '../src/services/event-log.service';
 
 async function applyMigrations() {
   for (const name of ['079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql']) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 
 describe('canonical event log', () => {
   beforeAll(async () => {
     await applyMigrations();
-    await db.query('TRUNCATE event_outbox, event_log RESTART IDENTITY CASCADE');
+    await migrationDb.query('TRUNCATE event_outbox, event_log RESTART IDENTITY CASCADE');
   });
 
   test('appends hash-chained events for active actors and verifies integrity', async () => {

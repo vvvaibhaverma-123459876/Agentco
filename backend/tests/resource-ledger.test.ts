@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { build } from '../src/server';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 import { resourceLedger } from '../src/services/resource-ledger.service';
 
@@ -12,7 +13,7 @@ function authHeaders(): Record<string, string> {
 async function applyMigrations() {
   for (const name of ['079_identity_authority.sql', '080_event_log.sql', '081_resource_ledger.sql', '082_resource_reservations.sql', '083_transactional_outbox.sql']) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

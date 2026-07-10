@@ -13,6 +13,7 @@ creates it on first use, and returns a DSN pointing at it.
 """
 from __future__ import annotations
 
+import os
 from urllib.parse import urlparse, urlunparse
 
 
@@ -20,11 +21,16 @@ def isolated_dsn(base_dsn: str, suffix: str = "pyciv") -> str:
     """Return a DSN for an isolated sibling database, creating it if needed."""
     import psycopg2
 
-    parsed = urlparse(base_dsn)
+    # Destructive schema fixtures are migration tests, not app-runtime paths.
+    # Under release-gate they must use the explicit schema-owner/admin DSN so
+    # the ordinary gate role never needs CREATE/DROP/ownership privileges.
+    admin_dsn = os.environ.get("RELEASE_GATE_MIGRATION_DATABASE_URL") or base_dsn
+
+    parsed = urlparse(admin_dsn)
     base_name = parsed.path.lstrip("/") or "postgres"
     isolated_name = f"{base_name}_{suffix}"
 
-    conn = psycopg2.connect(base_dsn)
+    conn = psycopg2.connect(admin_dsn)
     conn.autocommit = True
     try:
         with conn.cursor() as cur:

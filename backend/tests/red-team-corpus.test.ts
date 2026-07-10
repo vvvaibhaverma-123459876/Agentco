@@ -12,6 +12,7 @@ import http from 'http';
 import path from 'path';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { ActionExecutorService } from '../src/services/action-executor.service';
 import { AutonomyActionPlannerService } from '../src/services/autonomy-action-planner.service';
 import { assertPublicHttpUrl, UNTRUSTED_CONTENT_BANNER } from '../src/adapters/url-safety';
@@ -71,7 +72,7 @@ describe('red-team corpus (D5/D6)', () => {
 
   beforeAll(async () => {
     for (const name of ['004_decision_log.sql', '050_autonomy_action_loop.sql', '079_identity_authority.sql']) {
-      await db.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
+      await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
     }
     let idx = 0;
     server = http.createServer((req, res) => {

@@ -23,6 +23,7 @@ import http from 'http';
 import path from 'path';
 import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { AutonomyActionPlannerService } from '../src/services/autonomy-action-planner.service';
 import { calibrationAwareRouting } from '../src/services/calibration-aware-routing.service';
 
@@ -31,7 +32,7 @@ const FIXTURE_PORT = 18922;
 async function applyMigrations() {
   for (const name of ['009_trust_scores.sql', '079_identity_authority.sql', '080_event_log.sql', '083_transactional_outbox.sql']) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

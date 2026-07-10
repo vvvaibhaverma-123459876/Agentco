@@ -2,6 +2,7 @@ import { spawnSync } from 'child_process';
 import crypto from 'crypto';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { acceptedDecisionLogChainHashes, auditLog } from '../src/services/audit-log.service';
 
 const DSN = process.env.DATABASE_URL || 'postgresql://agentco:password@localhost:5433/agentco?host=/tmp';
@@ -81,7 +82,7 @@ describe('decision_log cross-writer hash chain', () => {
       console.warn(`SKIP: decision_log live-service test requires Postgres/migrations: ${availability.reason}`);
       return;
     }
-    await db.query('TRUNCATE decision_log RESTART IDENTITY CASCADE');
+    await migrationDb.query('TRUNCATE decision_log RESTART IDENTITY CASCADE');
 
     const repoRoot = path.resolve(__dirname, '../..');
     const sessionId = crypto.randomUUID();

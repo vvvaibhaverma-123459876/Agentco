@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { auditLog } from '../src/services/audit-log.service';
 import { eventLog } from '../src/services/event-log.service';
 import { hashChainAnchor } from '../src/services/hash-chain-anchor.service';
@@ -17,7 +18,7 @@ async function applyMigrations() {
     '087_hash_chain_anchors.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 
@@ -35,7 +36,7 @@ async function createActor(prefix: string) {
 describe('hash chain anchor', () => {
   beforeAll(async () => {
     await applyMigrations();
-    await db.query('TRUNCATE hash_chain_anchors, event_outbox, event_log, decision_log RESTART IDENTITY CASCADE');
+    await migrationDb.query('TRUNCATE hash_chain_anchors, event_outbox, event_log, decision_log RESTART IDENTITY CASCADE');
   });
 
   test('creates and verifies an internal Postgres anchor for event and audit chain heads', async () => {

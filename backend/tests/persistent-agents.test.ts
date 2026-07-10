@@ -10,11 +10,12 @@ import fs from 'fs';
 import path from 'path';
 import { describe, expect, test, beforeAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { persistentAgentRegistry, PersistentAgentRegistryService } from '../src/services/persistent-agent-registry.service';
 
 async function applyMigrations() {
   for (const name of ['009_trust_scores.sql', '015_agent_memories.sql', '017_agent_memories_lifecycle.sql', '116_persistent_agents.sql']) {
-    await db.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
+    await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8'));
   }
 }
 

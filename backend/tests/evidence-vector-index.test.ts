@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { evidenceRegistry } from '../src/services/evidence-registry.service';
 import { evidenceVectorIndex } from '../src/services/evidence-vector-index.service';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
@@ -18,7 +19,7 @@ async function applyMigrations() {
     '101_evidence_vector_index.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

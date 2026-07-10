@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { LearnerService } from '../src/services/learner.service';
 import { proofOfCompetence } from '../src/services/proof-of-competence.service';
 import { regressionTestGenerator } from '../src/services/regression-test-generator.service';
@@ -20,7 +21,7 @@ async function applyMigrations() {
     '106_proof_of_competence.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { institutionsService } from '../src/services/institutions.service';
 import { institutionClaimVettingService } from '../src/services/institution-claim-vetting.service';
 
@@ -19,7 +20,7 @@ async function applyMigrations() {
     '053_work_assignment_schema.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

@@ -139,26 +139,18 @@ def db():
     yield c
     # Cleanup: remove this test's rows (triggers disabled where append-only).
     with c.cursor() as cur:
+        # decision_log is intentionally append-only; keep the e2e audit record
+        # instead of requiring table-owner privileges to disable no-delete.
         cur.execute(
-            """DO $$ BEGIN
-                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
-                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
-                   ALTER TABLE decision_log DISABLE TRIGGER trg_decision_log_no_delete;
-                 END IF;
-               END $$;"""
+            """DELETE FROM contradictions
+               WHERE prediction_id IN (
+                   SELECT prediction_id
+                   FROM prediction_ledger
+                   WHERE producing_agent_id=%s
+               )""",
+            ("e2e-dispatch-agent",),
         )
-        cur.execute("DELETE FROM decision_log WHERE agent_id=%s AND input_summary LIKE 'E2E%%'", (E2E_AGENT,))
-        cur.execute(
-            """DO $$ BEGIN
-                 IF EXISTS (SELECT 1 FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
-                            WHERE c.relname = 'decision_log' AND t.tgname = 'trg_decision_log_no_delete') THEN
-                   ALTER TABLE decision_log ENABLE TRIGGER trg_decision_log_no_delete;
-                 END IF;
-               END $$;"""
-        )
-        cur.execute("ALTER TABLE prediction_ledger DISABLE TRIGGER ALL")
         cur.execute("DELETE FROM prediction_ledger WHERE producing_agent_id=%s", ("e2e-dispatch-agent",))
-        cur.execute("ALTER TABLE prediction_ledger ENABLE TRIGGER ALL")
         cur.execute("DELETE FROM event_history WHERE producer_agent_id=%s", (E2E_AGENT,))
     c.close()
 

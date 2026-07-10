@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { disputeRegistry, precedentStore, rulingService } from '../src/services/judiciary.service';
 
 async function applyMigrations() {
@@ -13,7 +14,7 @@ async function applyMigrations() {
     '109_judiciary.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 

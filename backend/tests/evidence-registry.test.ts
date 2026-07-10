@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { evidenceRegistry } from '../src/services/evidence-registry.service';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 
@@ -16,7 +17,7 @@ async function applyMigrations() {
     '088_evidence_registry_events.sql',
   ]) {
     const migration = fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${name}`), 'utf8');
-    await db.query(migration);
+    await migrationDb.query(migration);
   }
 }
 
