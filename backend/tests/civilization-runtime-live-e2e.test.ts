@@ -32,7 +32,7 @@ import { supervisedRuntime } from '../src/services/supervised-runtime.service';
 import { killSwitchService } from '../src/services/kill-switch.service';
 import { ledgerResolutionService } from '../src/services/resolution-service.service';
 
-const DOMAIN = 'autonomy_research';
+const DOMAIN = `autonomy_research_${crypto.randomUUID().slice(0, 8)}`;
 const AGENT = `civ-runtime-e2e-${crypto.randomUUID().slice(0, 8)}`;
 const MARKER = `cinnabar-ridge-${crypto.randomUUID().slice(0, 6)}`;
 

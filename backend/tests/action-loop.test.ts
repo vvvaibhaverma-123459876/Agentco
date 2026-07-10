@@ -24,12 +24,14 @@ describe('Action Loop Integration', () => {
     executor.setWebAdapter(new MockWebAdapter());
     // Clear test data before each test
     await db.query('DELETE FROM autonomy_actions');
+    await db.query('DELETE FROM disputes');
     await db.query('DELETE FROM autonomy_claims');
     await db.query('DELETE FROM autonomy_evidence');
   });
 
   afterEach(async () => {
     await db.query('DELETE FROM autonomy_actions');
+    await db.query('DELETE FROM disputes');
     await db.query('DELETE FROM autonomy_claims');
     await db.query('DELETE FROM autonomy_evidence');
   });

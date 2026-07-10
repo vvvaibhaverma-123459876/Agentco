@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, afterAll } from '@jest/globals';
 import { db } from '../src/db/client';
+import { migrationDb } from './support/migration-db';
 import { TeamActivationService, SpecialistActivationRequest } from '../src/services/team-activation.service';
 import { isValidSpecialistRole, SPECIALIST_ROLES } from '../src/types/specialist-roles';
 import { v4 as uuidv4 } from 'uuid';
@@ -25,13 +26,11 @@ describe('Team Activation Service', () => {
 
   beforeEach(async () => {
     // Clear test data
-    await db.query('DELETE FROM autonomy_team_activations');
-    await db.query('DELETE FROM autonomy_goals');
+    await migrationDb.query('TRUNCATE autonomy_team_activations, autonomy_goals CASCADE');
   });
 
   afterEach(async () => {
-    await db.query('DELETE FROM autonomy_team_activations');
-    await db.query('DELETE FROM autonomy_goals');
+    await migrationDb.query('TRUNCATE autonomy_team_activations, autonomy_goals CASCADE');
   });
 
   afterAll(async () => {

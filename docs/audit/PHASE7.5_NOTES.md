@@ -77,4 +77,35 @@ used only to create/update `agentco_gate`; the gate itself must run as
 
 Least-privilege gate failures:
 
-Pending full gate run.
+- `agents/tests/integration/test_agent_dispatch_e2e.py`: teardown attempted
+  table-owner trigger disabling on both `prediction_ledger` and `decision_log`.
+  Fixed by ordered FK-safe cleanup for `prediction_ledger` and by leaving
+  append-only `decision_log` evidence intact.
+- Python destructive schema fixtures under `evals/regression/`, `reserve/tests/`,
+  and `tests/civilization/`: fixtures used `AGENTCO_TEST_DATABASE_URL` for
+  `DROP TABLE`/migration setup. Fixed by deriving isolated destructive fixture
+  databases from `RELEASE_GATE_MIGRATION_DATABASE_URL` when present.
+- `runtime/tests/test_spend_guardrail_ledger.py`: applied resource-ledger
+  migrations through the app DSN. Fixed by using the migration DSN for setup
+  while the ledger under test still uses the app DSN.
+- Backend migration helpers in 30+ Jest suites: applied SQL migrations through
+  the app `db` pool. Fixed with `backend/tests/support/migration-db.ts`, which
+  is fed by `RELEASE_GATE_MIGRATION_DATABASE_URL`; service/runtime queries keep
+  using the low-privilege `db` pool.
+- Backend cleanup using `TRUNCATE`: ordinary app cleanup in `action-loop` was
+  replaced with ordered `DELETE`; append-only/chain fixture resets were moved
+  to the migration pool.
+- `backend/tests/integration/memory-store.test.ts`: low-privilege app inserts
+  hit `agent_memory` RLS. Fixed by adding a role-specific RLS policy for the
+  gate role in `scripts/setup_release_gate_role.sql`, rather than granting
+  owner/superuser privileges.
+- `backend/tests/team-activation.test.ts`: `TRUNCATE` first failed due missing
+  app `TRUNCATE`, then `DELETE FROM autonomy_goals` hit the append-only delete
+  trigger. Fixed by using migration-pool fixture reset; service writes still use
+  the app pool.
+- `backend/tests/action-loop.test.ts`: ordered app cleanup initially missed
+  `disputes`, whose FK restricts claim deletion. Fixed by deleting `disputes`
+  before `autonomy_claims`.
+- `backend/tests/civilization-runtime-live-e2e.test.ts`: not a privilege issue;
+  full-suite state bleed from a fixed domain let the runtime resolve older
+  overdue predictions first. Fixed with a unique domain per test module.
