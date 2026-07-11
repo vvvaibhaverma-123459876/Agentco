@@ -486,23 +486,39 @@ autonomy-open-world-5min:
 .PHONY: verify-clean-room
 verify-clean-room:
 	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL must point at a local Postgres database"; exit 1; fi
-	@echo "== [1/6] backend install/migrate =="
-	cd backend && npm install --no-audit --no-fund && npm run db:migrate
-	@echo "== [2/6] backend typecheck =="
+	@echo "== [0/12] clean tree before clean-room =="
+	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty before verify-clean-room"; exit 1)
+	@echo "== [1/12] gate integrity and documented target checks =="
+	@$(MAKE) gate-integrity
+	@$(MAKE) verify-advertised-targets
+	@echo "== [2/12] backend locked install/migrate =="
+	cd backend && npm ci && npm run db:migrate
+	@echo "== [3/12] backend typecheck =="
 	cd backend && ./node_modules/.bin/tsc --noEmit
-	@echo "== [3/6] backend tests =="
+	@echo "== [4/12] backend build =="
+	cd backend && npm run build
+	@echo "== [5/12] backend tests =="
 	cd backend && npm test -- --runInBand
-	@echo "== [4/6] python smoke (no live keys) =="
-	$(PYTHON) -m pytest calibration runtime learning synthesis evals/regression -q \
-		--ignore=evals/regression/test_pg_ledger_immutability.py \
-		--ignore=evals/regression/test_pg_ledger_persistence.py
-	@echo "== [5/6] build ledger gates =="
+	@echo "== [6/12] frontend locked install/typecheck/build =="
+	cd frontend && npm ci && ./node_modules/.bin/tsc --noEmit && npm run build
+	@echo "== [7/12] pytest collection =="
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m pytest --collect-only -q
+	@echo "== [8/12] python default suite =="
+	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m pytest -q
+	@echo "== [9/12] generated report freshness =="
+	@$(MAKE) status-check
+	@$(MAKE) agent-protocol-matrix-check
+	@$(MAKE) evaluation-calibration-report-check
+	@$(MAKE) controlled-learning-report-check
+	@$(MAKE) self-improvement-report-check
+	cd backend && npm run agentco:score-validation -- --check
+	@echo "== [10/12] build ledger gates =="
 	$(PYTHON) scripts/build_ledger.py status
-	@echo "== [6/6] score validation =="
-	@if [ -f backend/dist/cli/score-validation.js ] || [ -f backend/src/cli/score-validation.ts ]; then \
-		cd backend && ./node_modules/.bin/ts-node src/cli/score-validation.ts || exit 1; \
-	else echo "score validation CLI not present yet"; fi
-	@echo "verify-clean-room: ALL GREEN"
+	@echo "== [11/12] release gate =="
+	@$(MAKE) release-gate
+	@echo "== [12/12] clean tree after clean-room =="
+	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty after verify-clean-room"; exit 1)
+	@echo "verify-clean-room complete"
 
 audit-clean-room: verify-clean-room
 

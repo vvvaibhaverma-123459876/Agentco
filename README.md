@@ -25,7 +25,8 @@ The source of truth for implementation status is:
 
 Older phase reports have been moved to [docs/history/](docs/history/) and are historical artifacts only. If they conflict with the build ledger, treat them as superseded.
 
-To verify the current state reproducibly from a clean clone (no LLM/web keys required):
+To verify the current state reproducibly from a clean clone, provide an empty
+local Postgres database via `DATABASE_URL` and run:
 
 ```bash
 make verify-clean-room
@@ -95,7 +96,7 @@ Prerequisites:
 export DATABASE_URL="postgresql://localhost/agentco"
 
 cd backend
-npm install
+npm ci
 npm run db:migrate
 npx tsc --noEmit
 npm test -- --runInBand
@@ -113,12 +114,13 @@ For release credibility, run the full no-diff gate from a clean worktree:
 make release-gate
 ```
 
-This is the command a stranger should run to trust the repo. It checks the
-README status block without writing, verifies generated governance reports and
-the score-validation acceptance matrix, runs the Python default suite, installs
-and verifies backend/frontend dependencies, runs backend Jest without
-`forceExit`, exercises the route-auth contract and decision-log chain test, and
-asserts the git tree is still clean at the end.
+This is the command a stranger should run to trust the repo locally. It checks
+the README status block without writing, rejects active fake-success gate
+patterns, validates documented Make targets, verifies generated governance
+reports and the score-validation acceptance matrix, runs the Python default
+suite, installs and verifies backend/frontend dependencies, runs backend Jest
+without `forceExit`, exercises the route-auth contract and decision-log chain
+test, and asserts the git tree is still clean at the end.
 
 ### Runtime Configuration Contract
 
