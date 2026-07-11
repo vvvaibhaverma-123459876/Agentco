@@ -208,6 +208,25 @@ describe('resource ledger', () => {
     expect(Number(afterSettle?.balance)).toBe(300);
     expect(Number(afterSettle?.reserved_balance)).toBe(0);
 
+    const partialReservation = await resourceLedger.reserve({
+      account_id: account.id,
+      actor_id: actor.id,
+      amount: 100,
+      reason: 'partial LLM call',
+      idempotency_key: `partial-reservation-${account.id}`,
+      expires_at: new Date(Date.now() + 60_000).toISOString(),
+    });
+    const partialSettled = await resourceLedger.settleReservationUsage(
+      partialReservation.id,
+      actor.id,
+      `partial-settle-${partialReservation.id}`,
+      25,
+    );
+    expect(Number(partialSettled.amount)).toBe(25);
+    const afterPartialSettle = await resourceLedger.getAccount(account.id);
+    expect(Number(afterPartialSettle?.balance)).toBe(275);
+    expect(Number(afterPartialSettle?.reserved_balance)).toBe(0);
+
     const releaseReservation = await resourceLedger.reserve({
       account_id: account.id,
       actor_id: actor.id,
@@ -218,7 +237,7 @@ describe('resource ledger', () => {
     });
     await resourceLedger.releaseReservation(releaseReservation.id, actor.id);
     const afterRelease = await resourceLedger.getAccount(account.id);
-    expect(Number(afterRelease?.balance)).toBe(300);
+    expect(Number(afterRelease?.balance)).toBe(275);
     expect(Number(afterRelease?.reserved_balance)).toBe(0);
   });
 

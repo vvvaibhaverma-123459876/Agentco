@@ -222,9 +222,19 @@ export class ResourceLedgerService {
   }
 
   async settleReservation(reservationId: string, actorId: string, idempotencyKey: string): Promise<ResourceTransaction> {
+    return this.settleReservationUsage(reservationId, actorId, idempotencyKey);
+  }
+
+  async settleReservationUsage(
+    reservationId: string,
+    actorId: string,
+    idempotencyKey: string,
+    actualAmount?: number
+  ): Promise<ResourceTransaction> {
     requireUuid(reservationId, 'reservation_id');
     requireUuid(actorId, 'actor_id');
     if (!idempotencyKey?.trim()) throw new Error('idempotency_key is required');
+    if (actualAmount !== undefined) requireAmount(actualAmount);
     const client = await db.connect();
     try {
       await client.query('BEGIN');
@@ -248,9 +258,13 @@ export class ResourceLedgerService {
       }
 
       const account = await this.lockActiveAccount(client, reservation.account_id);
-      const amount = Number(reservation.amount);
+      const reservedAmount = Number(reservation.amount);
+      const amount = actualAmount ?? reservedAmount;
+      if (amount > reservedAmount) {
+        throw new Error(`actual usage ${amount} exceeds reserved amount ${reservedAmount}`);
+      }
       const nextBalance = Number(account.balance) - amount;
-      const nextReserved = Number(account.reserved_balance) - amount;
+      const nextReserved = Number(account.reserved_balance) - reservedAmount;
       if (nextBalance < 0 || nextReserved < 0) throw new Error(`insufficient reserved ${account.resource_type} balance`);
 
       const eventId = await this.writeEventAndAudit(client, {
@@ -263,6 +277,8 @@ export class ResourceLedgerService {
           account_id: reservation.account_id,
           actor_id: actorId,
           amount,
+          reserved_amount: reservedAmount,
+          released_amount: reservedAmount - amount,
           balance_after: nextBalance,
           reserved_balance_after: nextReserved,
           idempotency_key: idempotencyKey,

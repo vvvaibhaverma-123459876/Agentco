@@ -136,6 +136,11 @@ asserts the git tree is still clean at the end.
 - Backend LLM calls go through the central provider wrapper. Tune bounded
   execution with `LLM_REQUEST_TIMEOUT_MS`, `LLM_TOTAL_DEADLINE_MS`,
   `LLM_MAX_RETRIES`, `LLM_RETRY_BASE_MS`, and `LLM_MAX_OUTPUT_TOKENS`.
+  Production/staging LLM calls also require durable budget wiring:
+  `LLM_RESOURCE_ACTOR_ID` and `LLM_RESOURCE_ACCOUNT_ID` must reference an
+  active actor and an `llm_tokens` resource account. The provider reserves
+  before the model call, settles actual provider usage when reported, releases
+  unused reservation, and fails closed if the ledger is unavailable.
 - Event bus delivery uses `EVENT_BUS_DELIVERY_MODE`. Production/staging default
   to `outbox`, which atomically writes `event_history` plus `event_bus_outbox`
   before relay. `sync` is intended only for local development compatibility.

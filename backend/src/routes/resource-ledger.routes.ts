@@ -93,15 +93,16 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
     async (
       request: FastifyRequest<{
         Params: { reservationId: string };
-        Body: { actor_id: string; idempotency_key: string };
+        Body: { actor_id: string; idempotency_key: string; actual_amount?: number };
       }>,
       reply
     ) => {
       try {
-        const transaction = await resourceLedger.settleReservation(
+        const transaction = await resourceLedger.settleReservationUsage(
           request.params.reservationId,
           request.body.actor_id,
-          request.body.idempotency_key
+          request.body.idempotency_key,
+          request.body.actual_amount
         );
         return reply.status(201).send({ transaction });
       } catch (error) {

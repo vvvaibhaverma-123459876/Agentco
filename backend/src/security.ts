@@ -12,6 +12,10 @@ function hasDevPassword(value: string | undefined): boolean {
   return Boolean(value && /:\/\/[^:]+:password@/.test(value));
 }
 
+function hasLlmCredentials(env: NodeJS.ProcessEnv): boolean {
+  return Boolean(env.LLM_API_KEY || env.OPENAI_API_KEY);
+}
+
 export function assertProductionSecrets(env: NodeJS.ProcessEnv = process.env): void {
   if (!isProductionEnv(env)) return;
 
@@ -24,6 +28,11 @@ export function assertProductionSecrets(env: NodeJS.ProcessEnv = process.env): v
   if (hasDevPassword(env.DATABASE_URL)) failures.push('DATABASE_URL');
   if (hasDevPassword(env.AGENTCO_TEST_DATABASE_URL)) failures.push('AGENTCO_TEST_DATABASE_URL');
   if (env.RESERVE_SIGNING_KEY === 'dev-insecure-key') failures.push('RESERVE_SIGNING_KEY');
+  if (hasLlmCredentials(env)) {
+    if (env.LLM_BUDGET_ENFORCEMENT === 'disabled') failures.push('LLM_BUDGET_ENFORCEMENT');
+    if (!env.LLM_RESOURCE_ACTOR_ID) failures.push('LLM_RESOURCE_ACTOR_ID');
+    if (!env.LLM_RESOURCE_ACCOUNT_ID) failures.push('LLM_RESOURCE_ACCOUNT_ID');
+  }
 
   if (failures.length > 0) {
     throw new Error(
