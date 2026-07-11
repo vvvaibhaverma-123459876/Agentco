@@ -1,0 +1,214 @@
+from __future__ import annotations
+
+from dataclasses import replace
+from typing import Any
+
+from runtime.base_agent.audit_writer import AuditUnavailableError, AuditWriter, InMemoryAuditWriter
+from runtime.controlled_learning.schema import BenchmarkImpact
+from runtime.evaluation.schema import EvaluationAuditEntry
+from runtime.self_improvement.schema import (
+    IMPROVEMENT_EXPERIMENT_VERSION,
+    ExperimentKind,
+    ExperimentOutcome,
+    ExperimentUsage,
+    ImprovementExperiment,
+    ResourceBudget,
+    RiskLevel,
+    experiment_id_for,
+    stable_json,
+)
+
+
+class SelfImprovementError(RuntimeError):
+    """Raised when a bounded self-improvement experiment violates scope or safety controls."""
+
+
+class ExperimentStore:
+    def __init__(self) -> None:
+        self._experiments: dict[str, ImprovementExperiment] = {}
+        self._fingerprints: dict[str, str] = {}
+
+    def put(self, experiment: ImprovementExperiment) -> ImprovementExperiment:
+        existing = self._experiments.get(experiment.experiment_id)
+        fingerprint = experiment.fingerprint()
+        if existing is not None:
+            if self._fingerprints[experiment.experiment_id] != fingerprint:
+                raise SelfImprovementError(f"historical experiment cannot be altered: {experiment.experiment_id}")
+            if existing.audit_log_id is None and experiment.audit_log_id is not None:
+                self._experiments[experiment.experiment_id] = experiment
+                return experiment
+            return existing
+        self._experiments[experiment.experiment_id] = experiment
+        self._fingerprints[experiment.experiment_id] = fingerprint
+        return experiment
+
+    def all(self) -> tuple[ImprovementExperiment, ...]:
+        return tuple(self._experiments.values())
+
+
+class BoundedExperimentRunner:
+    ALLOWED_KINDS: set[ExperimentKind] = {
+        "prompt_variant",
+        "policy_proposal",
+        "tool_selection_strategy",
+        "memory_rule_proposal",
+        "model_routing_strategy",
+    }
+    FORBIDDEN_CHANGE_TYPES = {"model_weight_update", "unrestricted_code_rewrite"}
+    PRODUCTION_SURFACES = {"production_data", "credential", "policy", "tool", "model", "memory_rule"}
+
+    def __init__(self, store: ExperimentStore | None = None, audit_writer: AuditWriter | None = None):
+        self.store = store or ExperimentStore()
+        self.audit_writer = audit_writer or InMemoryAuditWriter(allow_test_mode=True)
+        self.production_state: dict[str, str] = {"prompt": "prompt-v1", "policy": "policy-v1"}
+
+    def run(
+        self,
+        *,
+        hypothesis: str,
+        target_capability: str,
+        proposed_change: dict[str, Any],
+        evidence_refs: tuple[str, ...],
+        benchmark_refs: tuple[str, ...],
+        allowed_scope: tuple[str, ...],
+        resource_budget: ResourceBudget,
+        risk_level: RiskLevel,
+        evaluator: str,
+        proposer_id: str,
+        experiment_kind: ExperimentKind,
+        requested_tools: tuple[str, ...] = (),
+        allowed_tools: tuple[str, ...] = (),
+        resource_usage: ExperimentUsage | None = None,
+        benchmark_impact: BenchmarkImpact | None = None,
+        wants_production_mutation: bool = False,
+        approval_actor: str | None = None,
+    ) -> ImprovementExperiment:
+        resource_budget.validate()
+        experiment_id = experiment_id_for(
+            hypothesis=hypothesis,
+            target_capability=target_capability,
+            proposed_change=proposed_change,
+            allowed_scope=allowed_scope,
+            proposer_id=proposer_id,
+        )
+        existing = next((item for item in self.store.all() if item.experiment_id == experiment_id), None)
+        if existing is not None:
+            return existing
+
+        usage = resource_usage or ExperimentUsage(seconds=1, spend_cents=1, tool_calls=len(requested_tools), scope_items=len(allowed_scope))
+        violations = self._violations(
+            proposed_change=proposed_change,
+            evidence_refs=evidence_refs,
+            benchmark_refs=benchmark_refs,
+            allowed_scope=allowed_scope,
+            resource_budget=resource_budget,
+            resource_usage=usage,
+            experiment_kind=experiment_kind,
+            requested_tools=requested_tools,
+            allowed_tools=allowed_tools,
+            wants_production_mutation=wants_production_mutation,
+            proposer_id=proposer_id,
+            approval_actor=approval_actor,
+        )
+        outcome: ExperimentOutcome = "accepted"
+        recommendation = "propose_phase11_artifact"
+        if violations:
+            outcome = "blocked"
+            recommendation = "none"
+        elif benchmark_impact and benchmark_impact.regression:
+            outcome = "rejected"
+            recommendation = "none"
+
+        experiment = ImprovementExperiment(
+            experiment_id=experiment_id,
+            hypothesis=hypothesis,
+            target_capability=target_capability,
+            proposed_change=proposed_change,
+            evidence_refs=evidence_refs,
+            benchmark_refs=benchmark_refs,
+            allowed_scope=allowed_scope,
+            resource_budget=resource_budget,
+            risk_level=risk_level,
+            evaluator=evaluator,
+            proposer_id=proposer_id,
+            experiment_kind=experiment_kind,
+            outcome=outcome,
+            promotion_recommendation=recommendation,
+            resource_usage=usage,
+            safety_violations=tuple(violations),
+        )
+        ack = self._audit(experiment)
+        audited = replace(experiment, audit_log_id=ack["log_id"], audit_backend=ack.get("backend", "unknown"))
+        return self.store.put(audited)
+
+    def _violations(
+        self,
+        *,
+        proposed_change: dict[str, Any],
+        evidence_refs: tuple[str, ...],
+        benchmark_refs: tuple[str, ...],
+        allowed_scope: tuple[str, ...],
+        resource_budget: ResourceBudget,
+        resource_usage: ExperimentUsage,
+        experiment_kind: ExperimentKind,
+        requested_tools: tuple[str, ...],
+        allowed_tools: tuple[str, ...],
+        wants_production_mutation: bool,
+        proposer_id: str,
+        approval_actor: str | None,
+    ) -> list[str]:
+        violations: list[str] = []
+        if experiment_kind not in self.ALLOWED_KINDS:
+            violations.append("unsupported_experiment_kind")
+        if proposed_change.get("change_type") in self.FORBIDDEN_CHANGE_TYPES:
+            violations.append("forbidden_change_type")
+        if not allowed_scope:
+            violations.append("missing_scope")
+        if not evidence_refs or not benchmark_refs:
+            violations.append("missing_evidence_or_benchmark_refs")
+        if any(ref.startswith("tampered:") for ref in evidence_refs):
+            violations.append("tampered_evidence")
+        if any(item.startswith("production:") for item in allowed_scope):
+            violations.append("scope_escape")
+        if wants_production_mutation:
+            violations.append("production_mutation_rejected")
+        if set(requested_tools) - set(allowed_tools):
+            violations.append("unauthorized_tool")
+        if resource_usage.seconds > resource_budget.max_seconds:
+            violations.append("time_budget_exceeded")
+        if resource_usage.spend_cents > resource_budget.max_spend_cents:
+            violations.append("spend_budget_exceeded")
+        if resource_usage.tool_calls > resource_budget.max_tool_calls:
+            violations.append("tool_budget_exceeded")
+        if resource_usage.scope_items > resource_budget.max_scope_items:
+            violations.append("scope_budget_exceeded")
+        if approval_actor == proposer_id:
+            violations.append("self_approval_rejected")
+        return violations
+
+    def _audit(self, experiment: ImprovementExperiment) -> dict[str, str]:
+        entry = EvaluationAuditEntry(
+            agent_id=experiment.evaluator,
+            prompt_version=IMPROVEMENT_EXPERIMENT_VERSION,
+            action_type="decision",
+            description=stable_json({
+                "experiment_id": experiment.experiment_id,
+                "hypothesis": experiment.hypothesis,
+                "outcome": experiment.outcome,
+                "promotion_recommendation": experiment.promotion_recommendation,
+                "safety_violations": experiment.safety_violations,
+            }),
+            stated_confidence=1.0,
+            trusted_confidence=1.0,
+            risk_level="medium" if experiment.outcome == "accepted" else "low",
+            domain="bounded_self_improvement",
+            prediction_id=None,
+            override_id=None,
+            outcome=experiment.outcome,
+            attempt_id=experiment.experiment_id,
+            trace_id=experiment.experiment_id,
+        )
+        ack = self.audit_writer.write(entry)
+        if not ack or not ack.get("log_id"):
+            raise AuditUnavailableError("self-improvement experiment was not audited")
+        return ack
