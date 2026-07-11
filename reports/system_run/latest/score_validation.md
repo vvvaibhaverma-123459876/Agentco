@@ -1,6 +1,6 @@
 # Score Validation (signal-gated)
 
-Generated 2026-07-11T08:29:25.199Z at commit `ef5292e9711ac49a0286d613fe849bdca6ef8347`.
+Generated 2026-07-11T08:32:44.468Z at commit `7c34154630784aaa84453864ad9fd1e6e177722f`.
 
 Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.
 
