@@ -1,0 +1,1272 @@
+{
+  "active_agent_count": 11,
+  "active_agent_ids": [
+    "calibration-reasoner",
+    "ceo-agent",
+    "cfo-agent",
+    "coder-agent",
+    "config-agent",
+    "coo-agent",
+    "devops-agent",
+    "pm-agent",
+    "privacy-agent",
+    "research-agent",
+    "reviewer-agent"
+  ],
+  "all_records_audited": true,
+  "audit_record_count": 14,
+  "benchmark_version": "phase10.benchmark.v1",
+  "case_count": 14,
+  "case_results": [
+    {
+      "actual_pass": true,
+      "agent_id": "ceo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "f6221afd-4fc2-52c8-8ae5-6adf4562fe95",
+      "case_id": "phase10.benchmark.v1:ceo-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "f6221afd-4fc2-52c8-8ae5-6adf4562fe95",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "cfo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "8094f2d7-8f96-5caf-817b-edc7dd034663",
+      "case_id": "phase10.benchmark.v1:cfo-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "8094f2d7-8f96-5caf-817b-edc7dd034663",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "coo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "a39f0917-92fe-5860-847b-ef3aea0f7786",
+      "case_id": "phase10.benchmark.v1:coo-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "a39f0917-92fe-5860-847b-ef3aea0f7786",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "coder-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "d7f1134d-5a88-52de-9e40-1c24f7e5e429",
+      "case_id": "phase10.benchmark.v1:coder-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "d7f1134d-5a88-52de-9e40-1c24f7e5e429",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "reviewer-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "b6651a5d-3a86-5703-9504-b71ed5559c16",
+      "case_id": "phase10.benchmark.v1:reviewer-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "b6651a5d-3a86-5703-9504-b71ed5559c16",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "devops-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "8ef2e3e3-5143-5ced-b24a-75f320ba6b1d",
+      "case_id": "phase10.benchmark.v1:devops-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "8ef2e3e3-5143-5ced-b24a-75f320ba6b1d",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "pm-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "e51ae30f-7b02-54a3-bbd2-fc563f1f0a26",
+      "case_id": "phase10.benchmark.v1:pm-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "e51ae30f-7b02-54a3-bbd2-fc563f1f0a26",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "privacy-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "2ddb3f7e-b390-5b00-94b9-634028bb231b",
+      "case_id": "phase10.benchmark.v1:privacy-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "2ddb3f7e-b390-5b00-94b9-634028bb231b",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "config-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "622b4adf-848d-5956-bd21-32e404addf63",
+      "case_id": "phase10.benchmark.v1:config-agent:positive",
+      "category": "BaseAgentV2",
+      "evaluation_id": "622b4adf-848d-5956-bd21-32e404addf63",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "research-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "278478b3-2344-5370-93a7-1c83d2c7e324",
+      "case_id": "phase10.benchmark.v1:research-agent:positive",
+      "category": "TypeScript DurableExecutionService",
+      "evaluation_id": "278478b3-2344-5370-93a7-1c83d2c7e324",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": true,
+      "agent_id": "calibration-reasoner",
+      "audit_backend": "memory",
+      "audit_log_id": "fe16b264-6183-500e-bcd9-e3c9632663f1",
+      "case_id": "phase10.benchmark.v1:calibration-reasoner:positive",
+      "category": "TypeScript DurableExecutionService",
+      "evaluation_id": "fe16b264-6183-500e-bcd9-e3c9632663f1",
+      "expected_pass": true,
+      "failure_category": "none"
+    },
+    {
+      "actual_pass": false,
+      "agent_id": "ceo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "480a4ad4-5af7-5ff6-bc09-80d0b3723e38",
+      "case_id": "phase10.benchmark.v1:negative:unsupported-high-confidence",
+      "category": "negative",
+      "evaluation_id": "480a4ad4-5af7-5ff6-bc09-80d0b3723e38",
+      "expected_pass": false,
+      "failure_category": "unsupported_claim"
+    },
+    {
+      "actual_pass": false,
+      "agent_id": "reviewer-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "500c3dce-6997-595d-b2da-232ebe90dc2b",
+      "case_id": "phase10.benchmark.v1:negative:tampered-evidence",
+      "category": "negative",
+      "evaluation_id": "500c3dce-6997-595d-b2da-232ebe90dc2b",
+      "expected_pass": false,
+      "failure_category": "tampered_evidence"
+    },
+    {
+      "actual_pass": false,
+      "agent_id": "privacy-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "508e59d1-4817-5980-abce-71f53e625946",
+      "case_id": "phase10.benchmark.v1:negative:evaluator-disagreement",
+      "category": "negative",
+      "evaluation_id": "508e59d1-4817-5980-abce-71f53e625946",
+      "expected_pass": false,
+      "failure_category": "evaluator_disagreement"
+    }
+  ],
+  "covered_active_agent_ids": [
+    "calibration-reasoner",
+    "ceo-agent",
+    "cfo-agent",
+    "coder-agent",
+    "config-agent",
+    "coo-agent",
+    "devops-agent",
+    "pm-agent",
+    "privacy-agent",
+    "research-agent",
+    "reviewer-agent"
+  ],
+  "evaluation_version": "phase10.eval.v1",
+  "generated_by": "scripts/generate_evaluation_calibration_report.py",
+  "metrics": {
+    "abstention_rate": 0.0,
+    "accuracy_by_confidence_bucket": {
+      "0.0-0.2": {
+        "accuracy": 0.0,
+        "avg_confidence": 0.0,
+        "count": 0
+      },
+      "0.2-0.4": {
+        "accuracy": 0.0,
+        "avg_confidence": 0.0,
+        "count": 0
+      },
+      "0.4-0.6": {
+        "accuracy": 0.0,
+        "avg_confidence": 0.0,
+        "count": 0
+      },
+      "0.6-0.8": {
+        "accuracy": 0.5,
+        "avg_confidence": 0.65,
+        "count": 2
+      },
+      "0.8-1.0": {
+        "accuracy": 1.0,
+        "avg_confidence": 0.904167,
+        "count": 12
+      }
+    },
+    "brier_score": 0.054464,
+    "evaluator_disagreement_rate": 0.071429,
+    "expected_calibration_error": 0.103571,
+    "failure_categories": {
+      "evaluator_disagreement": 1,
+      "none": 11,
+      "tampered_evidence": 1,
+      "unsupported_claim": 1
+    },
+    "record_count": 14,
+    "unsupported_claim_rate": 0.071429
+  },
+  "missing_active_agent_ids": [],
+  "records": [
+    {
+      "abstained": false,
+      "agent_id": "ceo-agent",
+      "attempt_id": "attempt-ceo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "f6221afd-4fc2-52c8-8ae5-6adf4562fe95",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "f6221afd-4fc2-52c8-8ae5-6adf4562fe95",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "ceo-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-ceo-agent"
+      ],
+      "task_id": "task-ceo-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "cfo-agent",
+      "attempt_id": "attempt-cfo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "8094f2d7-8f96-5caf-817b-edc7dd034663",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "8094f2d7-8f96-5caf-817b-edc7dd034663",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "cfo-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-cfo-agent"
+      ],
+      "task_id": "task-cfo-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "coo-agent",
+      "attempt_id": "attempt-coo-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "a39f0917-92fe-5860-847b-ef3aea0f7786",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "a39f0917-92fe-5860-847b-ef3aea0f7786",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "coo-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-coo-agent"
+      ],
+      "task_id": "task-coo-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "coder-agent",
+      "attempt_id": "attempt-coder-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "d7f1134d-5a88-52de-9e40-1c24f7e5e429",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "d7f1134d-5a88-52de-9e40-1c24f7e5e429",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "coder-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-coder-agent"
+      ],
+      "task_id": "task-coder-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "reviewer-agent",
+      "attempt_id": "attempt-reviewer-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "b6651a5d-3a86-5703-9504-b71ed5559c16",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "b6651a5d-3a86-5703-9504-b71ed5559c16",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "reviewer-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-reviewer-agent"
+      ],
+      "task_id": "task-reviewer-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "devops-agent",
+      "attempt_id": "attempt-devops-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "8ef2e3e3-5143-5ced-b24a-75f320ba6b1d",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "8ef2e3e3-5143-5ced-b24a-75f320ba6b1d",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "devops-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-devops-agent"
+      ],
+      "task_id": "task-devops-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "pm-agent",
+      "attempt_id": "attempt-pm-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "e51ae30f-7b02-54a3-bbd2-fc563f1f0a26",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "e51ae30f-7b02-54a3-bbd2-fc563f1f0a26",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "pm-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-pm-agent"
+      ],
+      "task_id": "task-pm-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "privacy-agent",
+      "attempt_id": "attempt-privacy-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "2ddb3f7e-b390-5b00-94b9-634028bb231b",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "2ddb3f7e-b390-5b00-94b9-634028bb231b",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "privacy-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-privacy-agent"
+      ],
+      "task_id": "task-privacy-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "config-agent",
+      "attempt_id": "attempt-config-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "622b4adf-848d-5956-bd21-32e404addf63",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "622b4adf-848d-5956-bd21-32e404addf63",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "config-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-config-agent"
+      ],
+      "task_id": "task-config-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "research-agent",
+      "attempt_id": "attempt-research-agent",
+      "audit_backend": "memory",
+      "audit_log_id": "278478b3-2344-5370-93a7-1c83d2c7e324",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "278478b3-2344-5370-93a7-1c83d2c7e324",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "research-agent completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-research-agent"
+      ],
+      "task_id": "task-research-agent"
+    },
+    {
+      "abstained": false,
+      "agent_id": "calibration-reasoner",
+      "attempt_id": "attempt-calibration-reasoner",
+      "audit_backend": "memory",
+      "audit_log_id": "fe16b264-6183-500e-bcd9-e3c9632663f1",
+      "brier_score": 0.01,
+      "calibration_error": 0.1,
+      "correctness_score": 1.0,
+      "evaluation_id": "fe16b264-6183-500e-bcd9-e3c9632663f1",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "passed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.100",
+          "score": 0.9
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "none",
+      "output_or_claim": "calibration-reasoner completed governed evaluation task",
+      "predicted_confidence": 0.9,
+      "supporting_evidence_refs": [
+        "evidence-calibration-reasoner"
+      ],
+      "task_id": "task-calibration-reasoner"
+    },
+    {
+      "abstained": false,
+      "agent_id": "ceo-agent",
+      "attempt_id": "attempt-negative-unsupported",
+      "audit_backend": "memory",
+      "audit_log_id": "480a4ad4-5af7-5ff6-bc09-80d0b3723e38",
+      "brier_score": 0.0025,
+      "calibration_error": 0.05,
+      "correctness_score": 1.0,
+      "evaluation_id": "480a4ad4-5af7-5ff6-bc09-80d0b3723e38",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "failed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "unsupported_claim",
+          "passed": false,
+          "rationale": "claim is absent from cited evidence",
+          "score": 0.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "unsupported_claim",
+          "passed": false,
+          "rationale": "unsupported high-confidence claim",
+          "score": 0.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.050",
+          "score": 0.95
+        }
+      ],
+      "evidence_quality_score": 0.0,
+      "failure_category": "unsupported_claim",
+      "output_or_claim": "The market will double tomorrow.",
+      "predicted_confidence": 0.95,
+      "supporting_evidence_refs": [
+        "evidence-unrelated"
+      ],
+      "task_id": "task-negative-unsupported"
+    },
+    {
+      "abstained": false,
+      "agent_id": "reviewer-agent",
+      "attempt_id": "attempt-negative-tampered",
+      "audit_backend": "memory",
+      "audit_log_id": "500c3dce-6997-595d-b2da-232ebe90dc2b",
+      "brier_score": 0.16,
+      "calibration_error": 0.4,
+      "correctness_score": 1.0,
+      "evaluation_id": "500c3dce-6997-595d-b2da-232ebe90dc2b",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "failed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "output matches expected answer",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "tampered_evidence",
+          "passed": false,
+          "rationale": "evidence hash mismatch",
+          "score": 0.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "absolute calibration error=0.400",
+          "score": 0.6
+        }
+      ],
+      "evidence_quality_score": 0.0,
+      "failure_category": "tampered_evidence",
+      "output_or_claim": "Reviewer approved safe change.",
+      "predicted_confidence": 0.6,
+      "supporting_evidence_refs": [
+        "evidence-tampered"
+      ],
+      "task_id": "task-negative-tampered"
+    },
+    {
+      "abstained": false,
+      "agent_id": "privacy-agent",
+      "attempt_id": "attempt-negative-disagreement",
+      "audit_backend": "memory",
+      "audit_log_id": "508e59d1-4817-5980-abce-71f53e625946",
+      "brier_score": 0.49,
+      "calibration_error": 0.7,
+      "correctness_score": 0.0,
+      "evaluation_id": "508e59d1-4817-5980-abce-71f53e625946",
+      "evaluation_timestamp": "2026-07-11T00:00:00+00:00",
+      "evaluation_version": "phase10.eval.v1",
+      "evaluator_id": "phase10-independent-evaluator",
+      "evaluator_result": "failed",
+      "evaluator_results": [
+        {
+          "evaluator_name": "factual_correctness",
+          "failure_category": "incorrect",
+          "passed": false,
+          "rationale": "output does not match expected answer",
+          "score": 0.0
+        },
+        {
+          "evaluator_name": "evidence_support",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "claim appears in cited evidence",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "unsupported_claim",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "tool_result_consistency",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "policy_compliance",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "task_completion",
+          "failure_category": "none",
+          "passed": true,
+          "rationale": "",
+          "score": 1.0
+        },
+        {
+          "evaluator_name": "confidence_calibration",
+          "failure_category": "incorrect",
+          "passed": false,
+          "rationale": "absolute calibration error=0.700",
+          "score": 0.3
+        }
+      ],
+      "evidence_quality_score": 1.0,
+      "failure_category": "evaluator_disagreement",
+      "output_or_claim": "Access request is compliant.",
+      "predicted_confidence": 0.7,
+      "supporting_evidence_refs": [
+        "evidence-privacy"
+      ],
+      "task_id": "task-negative-disagreement"
+    }
+  ],
+  "unsupported_high_confidence_passed": []
+}
