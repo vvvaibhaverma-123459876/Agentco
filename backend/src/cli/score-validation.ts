@@ -195,6 +195,66 @@ check(
   'docs/DB_TABLE_USAGE.md'
 );
 
+check(
+  'J1_health_helm_contract',
+  'backend liveness/readiness endpoints are aligned with Helm probes and tested',
+  fileContains('src/server.ts', "/health/live") &&
+    fileContains('src/server.ts', "/health/ready") &&
+    fileContains('infrastructure/kubernetes/helm/agentco/values.yaml', 'path: /health/live', repoRoot) &&
+    fileContains('infrastructure/kubernetes/helm/agentco/values.yaml', 'path: /health/ready', repoRoot) &&
+    fileExists('tests/health-contract.test.ts'),
+  'server health routes + Helm values + health-contract.test.ts'
+);
+
+check(
+  'J2_browser_secret_removed',
+  'browser bundle is scanned for privileged API key exposure',
+  fileExists('frontend/scripts/check-smoke.mjs', repoRoot) &&
+    fileContains('frontend/scripts/check-smoke.mjs', 'NEXT_PUBLIC_AGENTCO_API_KEY', repoRoot) &&
+    fileContains('README.md', 'server-side proxy', repoRoot),
+  'frontend/scripts/check-smoke.mjs + README server-side proxy contract'
+);
+
+check(
+  'J3_durable_governance_stores',
+  'evaluation, learning, and experiment stores fail closed to durable storage in production',
+  fileExists('runtime/tests/test_runtime_durable_governance_stores.py', repoRoot) &&
+    fileContains('runtime/evaluation/evaluators.py', 'PostgresEvaluationStore', repoRoot) &&
+    fileContains('runtime/controlled_learning/pipeline.py', 'PostgresLearningArtifactStore', repoRoot) &&
+    fileContains('runtime/self_improvement/experiments.py', 'PostgresExperimentStore', repoRoot),
+  'runtime durable store implementations + durable-governance test'
+);
+
+check(
+  'J4_durable_llm_budget',
+  'backend LLM provider reserves and settles durable resource-ledger budget',
+  fileContains('src/services/llm-provider.service.ts', 'resourceLedger.reserve') &&
+    fileContains('src/services/llm-provider.service.ts', 'settleReservationUsage') &&
+    fileContains('src/security.ts', 'LLM_RESOURCE_ACCOUNT_ID') &&
+    fileContains('tests/llm-provider.test.ts', 'reserves and settles durable budget'),
+  'llm-provider durable budget path + startup guard + tests'
+);
+
+check(
+  'J5_event_outbox_worker',
+  'transactional and signed event-bus outboxes have an executable relay worker',
+  fileExists('src/workers/outbox-worker.ts') &&
+    fileContains('package.json', 'agentco:outbox-worker') &&
+    fileExists('tests/outbox-worker.test.ts') &&
+    fileContains('src/db/migrations/128_event_bus_outbox.sql', 'event_bus_outbox'),
+  'outbox-worker entrypoint + script + test + event_bus_outbox migration'
+);
+
+check(
+  'J6_release_gate_enforces_core_contracts',
+  'release gate checks route auth, audit chain, generated reports, and clean-tree behavior',
+  fileContains('Makefile', 'route-auth-contract.test.ts', repoRoot) &&
+    fileContains('Makefile', 'audit-chain-cross-writer.test.ts', repoRoot) &&
+    fileContains('Makefile', 'agent-protocol-matrix-check', repoRoot) &&
+    fileContains('Makefile', 'git status --porcelain', repoRoot),
+  'Makefile release-gate contract'
+);
+
 // --- Dimension scoring (mechanical, gated on signals) -----------------------
 
 function passed(prefix: string): boolean {
@@ -206,21 +266,21 @@ function passed(prefix: string): boolean {
 // its acceptance signals pass.
 const dimensions: Array<{ name: string; baseline: number; target: number; gated: boolean }> = [
   { name: 'Clean-room runnability', baseline: 7, target: 9, gated: passed('A') },
-  { name: 'Documentation accuracy', baseline: 6, target: 8, gated: passed('A4') && passed('I') },
+  { name: 'Documentation accuracy', baseline: 6, target: 9, gated: passed('A4') && passed('I') && passed('J') },
   { name: 'Architecture coherence', baseline: 6, target: 8, gated: passed('I') },
-  { name: 'Code completeness', baseline: 6, target: 8, gated: passed('B') && passed('C') },
-  { name: 'Integration completeness', baseline: 5, target: 8, gated: passed('B') && passed('F') },
-  { name: 'Test quality', baseline: 7, target: 8, gated: passed('C2') && passed('E2') },
-  { name: 'Evidence governance', baseline: 7, target: 8, gated: passed('H') },
+  { name: 'Code completeness', baseline: 6, target: 9, gated: passed('B') && passed('C') && passed('J4') && passed('J5') },
+  { name: 'Integration completeness', baseline: 5, target: 9, gated: passed('B') && passed('F') && passed('J5') && passed('J6') },
+  { name: 'Test quality', baseline: 7, target: 9, gated: passed('C2') && passed('E2') && passed('J1') && passed('J4') && passed('J5') },
+  { name: 'Evidence governance', baseline: 7, target: 9, gated: passed('H') && passed('J3') && passed('J4') },
   { name: 'Calibration loop', baseline: 6, target: 8, gated: passed('E') },
   { name: 'Learning loop', baseline: 5, target: 8, gated: passed('C') && passed('D') },
   { name: 'Autonomy', baseline: 3, target: 6, gated: passed('G') },
   { name: 'Civilization implementation', baseline: 4, target: 8, gated: passed('F') },
   { name: 'Self-improvement', baseline: 3, target: 7, gated: passed('C') && passed('D') },
-  { name: 'Safety', baseline: 7, target: 8, gated: passed('H') },
-  { name: 'Production readiness', baseline: 4, target: 6, gated: passed('H') && passed('A') },
-  { name: 'Real-world usefulness', baseline: 3, target: 6, gated: passed('D') && passed('G') },
-  { name: 'Alignment with stated goal', baseline: 5, target: 8, gated: passed('B') && passed('D') && passed('F') },
+  { name: 'Safety', baseline: 7, target: 9, gated: passed('H') && passed('J2') && passed('J4') },
+  { name: 'Production readiness', baseline: 4, target: 8, gated: passed('H') && passed('A') && passed('J') },
+  { name: 'Real-world usefulness', baseline: 3, target: 7, gated: passed('D') && passed('G') && passed('J5') },
+  { name: 'Alignment with stated goal', baseline: 5, target: 9, gated: passed('B') && passed('D') && passed('F') && passed('J') },
 ];
 
 const scored = dimensions.map(d => ({

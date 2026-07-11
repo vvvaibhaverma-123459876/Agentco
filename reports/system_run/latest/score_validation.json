@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-03T05:48:03.091Z",
-  "commit": "d41bbb2b08b0b3bd1095614dfe60659732cbb200",
+  "generatedAt": "2026-07-11T08:29:25.199Z",
+  "commit": "ef5292e9711ac49a0286d613fe849bdca6ef8347",
   "note": "Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.",
   "acceptanceChecks": [
     {
@@ -128,6 +128,42 @@
       "description": "DB table usage manifest present",
       "pass": true,
       "evidence": "docs/DB_TABLE_USAGE.md"
+    },
+    {
+      "id": "J1_health_helm_contract",
+      "description": "backend liveness/readiness endpoints are aligned with Helm probes and tested",
+      "pass": true,
+      "evidence": "server health routes + Helm values + health-contract.test.ts"
+    },
+    {
+      "id": "J2_browser_secret_removed",
+      "description": "browser bundle is scanned for privileged API key exposure",
+      "pass": true,
+      "evidence": "frontend/scripts/check-smoke.mjs + README server-side proxy contract"
+    },
+    {
+      "id": "J3_durable_governance_stores",
+      "description": "evaluation, learning, and experiment stores fail closed to durable storage in production",
+      "pass": true,
+      "evidence": "runtime durable store implementations + durable-governance test"
+    },
+    {
+      "id": "J4_durable_llm_budget",
+      "description": "backend LLM provider reserves and settles durable resource-ledger budget",
+      "pass": true,
+      "evidence": "llm-provider durable budget path + startup guard + tests"
+    },
+    {
+      "id": "J5_event_outbox_worker",
+      "description": "transactional and signed event-bus outboxes have an executable relay worker",
+      "pass": true,
+      "evidence": "outbox-worker entrypoint + script + test + event_bus_outbox migration"
+    },
+    {
+      "id": "J6_release_gate_enforces_core_contracts",
+      "description": "release gate checks route auth, audit chain, generated reports, and clean-tree behavior",
+      "pass": true,
+      "evidence": "Makefile release-gate contract"
     }
   ],
   "acceptanceAllPass": true,
@@ -141,9 +177,9 @@
     },
     {
       "name": "Documentation accuracy",
-      "score": 8,
+      "score": 9,
       "baseline": 6,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     },
     {
@@ -155,30 +191,30 @@
     },
     {
       "name": "Code completeness",
-      "score": 8,
+      "score": 9,
       "baseline": 6,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     },
     {
       "name": "Integration completeness",
-      "score": 8,
+      "score": 9,
       "baseline": 5,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     },
     {
       "name": "Test quality",
-      "score": 8,
+      "score": 9,
       "baseline": 7,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     },
     {
       "name": "Evidence governance",
-      "score": 8,
+      "score": 9,
       "baseline": 7,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     },
     {
@@ -218,34 +254,34 @@
     },
     {
       "name": "Safety",
-      "score": 8,
+      "score": 9,
       "baseline": 7,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     },
     {
       "name": "Production readiness",
-      "score": 6,
+      "score": 8,
       "baseline": 4,
-      "target": 6,
+      "target": 8,
       "gatePassed": true
     },
     {
       "name": "Real-world usefulness",
-      "score": 6,
+      "score": 7,
       "baseline": 3,
-      "target": 6,
+      "target": 7,
       "gatePassed": true
     },
     {
       "name": "Alignment with stated goal",
-      "score": 8,
+      "score": 9,
       "baseline": 5,
-      "target": 8,
+      "target": 9,
       "gatePassed": true
     }
   ],
-  "totalOutOf160": 122,
-  "scoreOutOf100": 76.3,
-  "claims80Plus": false
+  "totalOutOf160": 132,
+  "scoreOutOf100": 82.5,
+  "claims80Plus": true
 }

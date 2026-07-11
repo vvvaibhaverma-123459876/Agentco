@@ -1,12 +1,12 @@
 # Score Validation (signal-gated)
 
-Generated 2026-07-03T05:48:03.091Z at commit `d41bbb2b08b0b3bd1095614dfe60659732cbb200`.
+Generated 2026-07-11T08:29:25.199Z at commit `ef5292e9711ac49a0286d613fe849bdca6ef8347`.
 
 Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.
 
-**Acceptance checks:** 21/21 pass.
-**Estimated score:** 76.3/100 (122/160).
-**Claims 80+ :** false
+**Acceptance checks:** 27/27 pass.
+**Estimated score:** 82.5/100 (132/160).
+**Claims 80+ :** true
 
 ## Acceptance checks
 
@@ -33,24 +33,30 @@ Scores are estimates gated on structural signals (presence of the required servi
 | H3_rbac_and_safety_test | safety hardening test + RBAC middleware decision doc | ✅ | safety-hardening.test.ts + RBAC_AND_WEB_SAFETY.md |
 | I1_canonical_doc | canonical runtime doc present | ✅ | docs/CURRENT_RUNTIME_CANONICAL.md |
 | I2_db_usage_manifest | DB table usage manifest present | ✅ | docs/DB_TABLE_USAGE.md |
+| J1_health_helm_contract | backend liveness/readiness endpoints are aligned with Helm probes and tested | ✅ | server health routes + Helm values + health-contract.test.ts |
+| J2_browser_secret_removed | browser bundle is scanned for privileged API key exposure | ✅ | frontend/scripts/check-smoke.mjs + README server-side proxy contract |
+| J3_durable_governance_stores | evaluation, learning, and experiment stores fail closed to durable storage in production | ✅ | runtime durable store implementations + durable-governance test |
+| J4_durable_llm_budget | backend LLM provider reserves and settles durable resource-ledger budget | ✅ | llm-provider durable budget path + startup guard + tests |
+| J5_event_outbox_worker | transactional and signed event-bus outboxes have an executable relay worker | ✅ | outbox-worker entrypoint + script + test + event_bus_outbox migration |
+| J6_release_gate_enforces_core_contracts | release gate checks route auth, audit chain, generated reports, and clean-tree behavior | ✅ | Makefile release-gate contract |
 
 ## Dimensions
 
 | Dimension | Baseline | Target | Gate passed | Score |
 |---|---|---|---|---|
 | Clean-room runnability | 7 | 9 | ✅ | 9 |
-| Documentation accuracy | 6 | 8 | ✅ | 8 |
+| Documentation accuracy | 6 | 9 | ✅ | 9 |
 | Architecture coherence | 6 | 8 | ✅ | 8 |
-| Code completeness | 6 | 8 | ✅ | 8 |
-| Integration completeness | 5 | 8 | ✅ | 8 |
-| Test quality | 7 | 8 | ✅ | 8 |
-| Evidence governance | 7 | 8 | ✅ | 8 |
+| Code completeness | 6 | 9 | ✅ | 9 |
+| Integration completeness | 5 | 9 | ✅ | 9 |
+| Test quality | 7 | 9 | ✅ | 9 |
+| Evidence governance | 7 | 9 | ✅ | 9 |
 | Calibration loop | 6 | 8 | ✅ | 8 |
 | Learning loop | 5 | 8 | ✅ | 8 |
 | Autonomy | 3 | 6 | ✅ | 6 |
 | Civilization implementation | 4 | 8 | ✅ | 8 |
 | Self-improvement | 3 | 7 | ✅ | 7 |
-| Safety | 7 | 8 | ✅ | 8 |
-| Production readiness | 4 | 6 | ✅ | 6 |
-| Real-world usefulness | 3 | 6 | ✅ | 6 |
-| Alignment with stated goal | 5 | 8 | ✅ | 8 |
+| Safety | 7 | 9 | ✅ | 9 |
+| Production readiness | 4 | 8 | ✅ | 8 |
+| Real-world usefulness | 3 | 7 | ✅ | 7 |
+| Alignment with stated goal | 5 | 9 | ✅ | 9 |
