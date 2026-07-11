@@ -5,7 +5,7 @@ from dataclasses import replace
 import pytest
 
 from runtime.base_agent.agent_manifest import ACTIVE_AGENT_PROFILES
-from runtime.base_agent.audit_writer import InMemoryAuditWriter
+from runtime.base_agent.audit_writer import AuditUnavailableError, InMemoryAuditWriter
 from runtime.evaluation.benchmark import active_agent_benchmark_cases, benchmark_cases
 from runtime.evaluation.evaluators import EvaluationError, EvaluationService, ImmutableEvaluationStore
 from runtime.evaluation.metrics import calibration_metrics
@@ -168,3 +168,13 @@ def test_machine_report_validates_phase10_gate_conditions():
     assert report["active_agent_count"] == 11
     assert report["missing_active_agent_ids"] == []
     assert report["all_records_audited"]
+
+
+def test_production_evaluation_requires_explicit_durable_dependencies(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+
+    with pytest.raises(AuditUnavailableError, match="durable audit writer"):
+        EvaluationService(store=ImmutableEvaluationStore())
+
+    with pytest.raises(EvaluationError, match="durable evaluation repository"):
+        EvaluationService(audit_writer=InMemoryAuditWriter(allow_test_mode=True))

@@ -117,6 +117,9 @@ describe('route auth sensitivity matrix', () => {
   test('only the minimal liveness probe is public', () => {
     expect(rows.filter((row) => row.classification === 'PUBLIC')).toEqual([
       { route: '/health', method: 'GET', classification: 'PUBLIC' },
+      { route: '/health/detailed', method: 'GET', classification: 'PUBLIC' },
+      { route: '/health/live', method: 'GET', classification: 'PUBLIC' },
+      { route: '/health/ready', method: 'GET', classification: 'PUBLIC' },
     ]);
   });
 

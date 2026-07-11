@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from runtime.base_agent.audit_writer import AuditUnavailableError
 from runtime.controlled_learning.schema import BenchmarkImpact
 from runtime.self_improvement.experiments import BoundedExperimentRunner, ExperimentStore, SelfImprovementError
 from runtime.self_improvement.report import build_experiment_report, validate_experiment_report
@@ -173,3 +174,12 @@ def test_machine_report_validates_phase12_gate_conditions():
     assert report["all_experiments_audited"] is True
     assert report["safety_violations"]
 
+
+def test_production_self_improvement_requires_explicit_durable_dependencies(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+
+    with pytest.raises(SelfImprovementError, match="durable experiment repository"):
+        BoundedExperimentRunner(audit_writer=MemoryAuditWriter())
+
+    with pytest.raises(AuditUnavailableError, match="durable audit writer"):
+        BoundedExperimentRunner(store=ExperimentStore())

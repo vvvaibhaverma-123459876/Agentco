@@ -68,7 +68,9 @@ backend:
 
   # OpenAI-compatible LLM endpoint (Ollama by default; override per environment).
   llmBaseUrl: http://ollama:11434/v1
-  # Secret name containing LLM_API_KEY, JWT_SECRET, DATABASE_URL, etc.
+  # Secret name containing AGENTCO_API_KEY, EVENT_BUS_SIGNING_KEY,
+  # EVENT_BUS_HMAC_KEY, JWT_SECRET, DATABASE_URL, REDIS_URL, KAFKA_BROKERS,
+  # LLM_API_KEY, VAULT_TOKEN, and RESERVE_SIGNING_KEY.
   existingSecret: agentco-backend-secrets
 
   livenessProbe:
@@ -151,7 +153,12 @@ frontend:
 
   env:
     NODE_ENV: production
-    NEXT_PUBLIC_API_URL: https://agentco.example.com/api
+    # Browser-visible API base must be an origin only; paths are appended by
+    # the frontend client. Leave blank for same-origin Next API proxying.
+    NEXT_PUBLIC_API_URL: ""
+    # Server-only Next API proxy target. The frontend proxy injects the service
+    # API key from Kubernetes Secret; browsers never receive that key.
+    AGENTCO_API_URL: http://agentco-backend:3001
 
   livenessProbe:
     httpGet:

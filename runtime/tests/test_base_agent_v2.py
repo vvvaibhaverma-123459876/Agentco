@@ -248,6 +248,28 @@ class TestBaseAgentV2DurableAudit:
         writer = InMemoryAuditWriter(allow_test_mode=True)
         assert writer.write({"trace_id": "t-1"})["backend"] == "memory"
 
+    def test_production_agent_requires_durable_audit_writer(self, monkeypatch):
+        class StrictAgent(BaseAgentV2):
+            PROMPT_VERSION = "2.0.0-test"
+
+            def run(self, task: dict):
+                pass
+
+        monkeypatch.setenv("AGENTCO_ENV", "production")
+        monkeypatch.delenv("DATABASE_URL", raising=False)
+        monkeypatch.delenv("AGENTCO_TEST_DATABASE_URL", raising=False)
+        monkeypatch.delenv("AGENTCO_TEST_AUDIT_WRITER", raising=False)
+
+        with pytest.raises(AuditUnavailableError, match="in-memory audit writer is forbidden"):
+            ConcreteAgentV2("prod-agent-without-audit", calibration_engine=_make_engine())
+
+        with pytest.raises(AuditUnavailableError, match="in-memory audit writer is forbidden"):
+            StrictAgent(
+                "prod-agent-with-memory-audit",
+                calibration_engine=_make_engine(),
+                audit_writer=InMemoryAuditWriter(allow_test_mode=True),
+            )
+
     def test_durable_audit_writer_round_trip_live_postgres(self):
         dsn, _ = self._live_decision_log()
 

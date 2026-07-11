@@ -5,6 +5,14 @@ import { eventBus } from './event-bus.service';
 import { provenance } from './provenance.service';
 import { assertAgentCanRunTask, ensureAgentRegistryActors } from '../agent-registry';
 
+function isProductionLike(): boolean {
+  return process.env.AGENTCO_ENV === 'production' || process.env.AGENTCO_ENV === 'staging' || process.env.NODE_ENV === 'production';
+}
+
+function llmRequestTimeoutMs(): number {
+  return Number(process.env.LLM_REQUEST_TIMEOUT_MS ?? 30000);
+}
+
 export type TaskStatus = 'queued' | 'running' | 'done' | 'failed' | 'blocked';
 
 export interface WorkflowTask {
@@ -82,7 +90,10 @@ export class DurableExecutionService {
         correlation_id: task.task_id,
         risk_level,
         requires_ack: false,
-      }).catch(() => undefined);
+      }).catch((error) => {
+        if (isProductionLike()) throw error;
+        console.warn('[EVENT_PUBLISH_DEGRADED]', error instanceof Error ? error.message : String(error));
+      });
       await query(
         `UPDATE workflow_tasks
          SET status='done', completed_at=now(), result=$2, audit_log_id=$3, event_id=$4, action_attestation_id=$5
@@ -263,22 +274,35 @@ export class DurableExecutionService {
     }
     const baseUrl = (process.env.LLM_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
     const model = process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini';
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: user },
-        ],
-      }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), llmRequestTimeoutMs());
+    let response: Response;
+    try {
+      response = await fetch(`${baseUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          temperature: 0,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+          ],
+        }),
+        signal: controller.signal,
+      });
+    } catch (error) {
+      if ((error as { name?: string })?.name === 'AbortError') {
+        throw new Error(`durable LLM task timed out after ${llmRequestTimeoutMs()}ms`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!response.ok) {
       throw new Error(`durable LLM task failed: HTTP ${response.status}`);
     }

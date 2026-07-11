@@ -51,6 +51,11 @@ make verify-clean-room
 - L14 coordinator graph/tick API routes, bounded scheduler controls, and reachability checks across the current core service graph.
 - Mission progress evidence gate that separates verified claims from partial or unproven long-horizon claims.
 - Docker production smoke for local infrastructure services when Docker and configured secrets are available.
+- Public liveness/readiness health endpoints aligned with Kubernetes probes:
+  `/health`, `/health/live`, `/health/ready`, and `/health/detailed`.
+- Browser dashboard API calls use the frontend server-side proxy for service
+  credentials; privileged backend API keys must not be exposed through
+  `NEXT_PUBLIC_*` variables.
 
 ## What Is Partial
 
@@ -60,6 +65,10 @@ make verify-clean-room
 - Hosted production operations are not certified: SLOs, disaster recovery, backups, monitoring response, incident response, and long-running operations evidence remain required.
 - Real-world production source discovery still depends on live URL reachability and configured external services.
 - Disabled migrations under `backend/src/db/unsupported_migrations/` remain unsupported/future.
+- Evaluation, controlled-learning, and bounded-experiment modules fail closed
+  instead of selecting in-memory stores in production, but a fully hosted durable
+  operations workflow still requires production database credentials and
+  deployment verification.
 
 ## What Is Test-Only Or Simulated
 
@@ -109,6 +118,19 @@ README status block without writing, runs the Python default suite, installs
 and verifies backend/frontend dependencies, runs backend Jest without
 `forceExit`, exercises the route-auth contract and decision-log chain test, and
 asserts the git tree is still clean at the end.
+
+### Runtime Configuration Contract
+
+- `NEXT_PUBLIC_API_URL` is browser-visible and must be an origin only, for
+  example `https://agentco.example.com`; do not include `/api`. Leave it blank
+  for same-origin Next API proxying.
+- `AGENTCO_API_URL` is server-only and points the frontend proxy at the backend
+  origin, for example `http://agentco-backend:3001`.
+- `AGENTCO_API_KEY` is a privileged service key and must remain server-side. The
+  frontend proxy injects it when forwarding `/api/*` requests to the backend.
+- Backend readiness checks mandatory dependencies with bounded timeouts.
+  `KAFKA_MANDATORY=true` makes Kafka part of readiness; production defaults to
+  mandatory Kafka when brokers are configured.
 
 ## Web Evidence Intake
 

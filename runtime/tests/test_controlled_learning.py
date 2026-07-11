@@ -4,7 +4,7 @@ from dataclasses import replace
 
 import pytest
 
-from runtime.base_agent.audit_writer import InMemoryAuditWriter
+from runtime.base_agent.audit_writer import AuditUnavailableError, InMemoryAuditWriter
 from runtime.controlled_learning.pipeline import (
     ControlledLearningError,
     ControlledLearningPipeline,
@@ -166,3 +166,13 @@ def test_machine_report_validates_phase11_gate_conditions():
     assert report["rollback_coverage"]
     assert report["regression_blocked"]
     assert report["all_promotions_audited"]
+
+
+def test_production_controlled_learning_requires_explicit_durable_dependencies(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+
+    with pytest.raises(ControlledLearningError, match="durable artifact repository"):
+        ControlledLearningPipeline(audit_writer=InMemoryAuditWriter(allow_test_mode=True))
+
+    with pytest.raises(AuditUnavailableError, match="durable audit writer"):
+        ControlledLearningPipeline(store=LearningArtifactStore())

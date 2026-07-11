@@ -4,20 +4,20 @@ Generated from active Fastify route registrations in `backend/src/server.ts`, `b
 
 ## Classification Policy
 
-- `PUBLIC`: health/liveness only; no runtime mode, provider, DB, metrics, audit, governance, identity, resource, or dashboard state.
+- `PUBLIC`: health probes only. Liveness exposes process state; readiness/detailed health expose sanitized dependency status without credentials, connection strings, stack traces, audit data, governance data, identity state, resource ledgers, or dashboard state.
 - `AUTH-READ`: reads application/system state and requires the configured API key when `AGENTCO_API_KEY` is set.
 - `AUTH-WRITE`: mutates state or starts work and requires the configured API key.
 
-Public browser access uses `NEXT_PUBLIC_AGENTCO_API_KEY` as a low-privilege bearer token for dashboard reads. That key is browser-exposed by design and is not per-user authentication. The successor design should replace it with real user/session auth plus server-side authorization.
+Public browser access must not receive a privileged service API key. Browser dashboard requests go through the frontend server-side API proxy, which injects service credentials from server-only environment variables.
 
 ## Counts
 
 | classification | routes |
 |---|---:|
-| PUBLIC | 1 |
-| AUTH-READ | 82 |
+| PUBLIC | 4 |
+| AUTH-READ | 81 |
 | AUTH-WRITE | 71 |
-| TOTAL | 154 |
+| TOTAL | 157 |
 
 ## Matrix
 
@@ -148,7 +148,9 @@ Public browser access uses `NEXT_PUBLIC_AGENTCO_API_KEY` as a low-privilege bear
 | `/api/overrides/overdue` | GET/HEAD | Human override queue or resolution state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/validation/reports` | GET/HEAD | Validation report state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/health` | GET/HEAD | Minimal liveness status and timestamp | PUBLIC | Only public route: liveness probe with no runtime/provider/system state. |
-| `/health/detailed` | GET/HEAD | Runtime/provider/component health state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/health/detailed` | GET/HEAD | Sanitized dependency health state | PUBLIC | Public dependency probe returns sanitized status only; no credentials, connection strings, stack traces, audit, governance, identity, or dashboard state. |
+| `/health/live` | GET/HEAD | Minimal liveness status and timestamp | PUBLIC | Kubernetes liveness probe with no dependency requirement. |
+| `/health/ready` | GET/HEAD | Sanitized readiness dependency state | PUBLIC | Kubernetes readiness probe returns sanitized dependency status only. |
 | `/health/runtime` | GET/HEAD | Runtime/provider/component health state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/identity/actors` | POST | Identity, role, delegation, key, or verification mutation | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/identity/delegations/grant` | POST | Identity, role, delegation, key, or verification mutation | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
@@ -180,4 +182,4 @@ Public browser access uses `NEXT_PUBLIC_AGENTCO_API_KEY` as a low-privilege bear
 
 ## Uncertain Classifications
 
-None. Routes that look health-like but expose runtime/provider/component/system state, such as `/health/runtime`, `/health/detailed`, `/system/health`, and `/api/civilization/health`, are intentionally classified `AUTH-READ`.
+None. Routes that look health-like but expose runtime/provider/component/system state beyond sanitized dependency readiness, such as `/health/runtime`, `/system/health`, and `/api/civilization/health`, are intentionally classified `AUTH-READ`.

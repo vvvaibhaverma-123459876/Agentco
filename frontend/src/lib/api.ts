@@ -1,9 +1,8 @@
 import type { Agent, AuditEntry, OverrideRequest } from '@/types';
 import { agentcoAuthHeaders } from './api/auth';
+import { apiUrl } from './api/url';
 
 type QueryValue = string | number | boolean | undefined | null;
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 function toQuery(params?: Record<string, QueryValue>): string {
   if (!params) return '';
@@ -45,7 +44,7 @@ async function request<T>(
 
       const method = options.method?.toUpperCase() ?? 'GET';
 
-      const response = await fetch(`${API_BASE_URL}${path}${toQuery(params)}`, {
+      const response = await fetch(apiUrl(path, toQuery(params)), {
         ...options,
         headers,
       });

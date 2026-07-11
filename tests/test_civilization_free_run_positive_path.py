@@ -17,8 +17,8 @@ from agents.civilization_service import CivilizationService
 
 
 def _db_or_skip():
-    db = get_db()
     try:
+        db = get_db()
         db.connect()
     except Exception as exc:
         pytest.skip(f"Postgres civilization integration unavailable: {exc}")

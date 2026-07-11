@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import uuid
 from dataclasses import replace
 from datetime import datetime, timezone
@@ -204,6 +205,11 @@ class EvaluationService:
         store: ImmutableEvaluationStore | None = None,
         timestamp_factory=None,
     ):
+        production = os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production"
+        if production and audit_writer is None:
+            raise AuditUnavailableError("production evaluation requires an explicit durable audit writer")
+        if production and store is None:
+            raise EvaluationError("production evaluation requires an explicit durable evaluation repository")
         self.audit_writer = audit_writer or InMemoryAuditWriter(allow_test_mode=True)
         self.store = store or ImmutableEvaluationStore()
         self._timestamp_factory = timestamp_factory or (lambda: datetime.now(timezone.utc).isoformat())

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
@@ -94,6 +95,11 @@ class ControlledLearningPipeline:
     PROTECTED_SURFACES: set[ProtectedSurface] = {"prompt", "policy", "tool", "model", "memory_rule"}
 
     def __init__(self, store: LearningArtifactStore | None = None, audit_writer: AuditWriter | None = None):
+        production = os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production"
+        if production and store is None:
+            raise ControlledLearningError("production controlled learning requires an explicit durable artifact repository")
+        if production and audit_writer is None:
+            raise AuditUnavailableError("production controlled learning requires an explicit durable audit writer")
         self.store = store or LearningArtifactStore()
         self.audit_writer = audit_writer or InMemoryAuditWriter(allow_test_mode=True)
         self.active_versions: dict[str, str] = {}
@@ -198,6 +204,10 @@ class ControlledLearningPipeline:
             raise ControlledLearningError("promotion requires Phase 10 evaluation evidence")
         if not all(record_id.startswith("phase10:") for record_id in artifact.evaluation_record_ids):
             raise ControlledLearningError("evaluation evidence must be Phase 10 records")
+        if os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production":
+            raise ControlledLearningError(
+                "production promotion requires record-backed Phase 10 evidence repository integration"
+            )
 
     def _reject_tampered_evidence(self, artifact: LearningArtifact) -> None:
         if any(ref.startswith("tampered:") for ref in artifact.evidence_refs):

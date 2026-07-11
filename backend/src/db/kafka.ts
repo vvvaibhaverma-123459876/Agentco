@@ -39,6 +39,16 @@ export function createConsumer(groupId: string): Consumer {
   return kafka.consumer({ groupId, sessionTimeout: 30000 });
 }
 
+export async function checkKafkaHealth(): Promise<void> {
+  const admin = kafka.admin();
+  try {
+    await admin.connect();
+    await admin.fetchTopicMetadata();
+  } finally {
+    await admin.disconnect().catch(() => undefined);
+  }
+}
+
 export async function disconnectProducer(): Promise<void> {
   if (_producer) {
     try {

@@ -29,6 +29,7 @@ import { metricsService } from './services/autonomy-metrics.service';
 import { shutdownRuntimeResources } from './runtime/shutdown';
 import { publicMessageForError, statusCodeForError } from './http-errors';
 import { validateUuidPathParams } from './routes/param-validation';
+import { dependencyHealthReport, processHealth } from './health';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
 const HOST = process.env.HOST ?? '0.0.0.0';
@@ -118,11 +119,15 @@ export async function build() {
   await app.register(resourceLedgerRoutes);
   await app.register(systemRoutes);
 
-  // Basic health check
-  app.get('/health', { config: { auth: { public: true } } }, async () => ({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-  }));
+  // Public health probes. These intentionally bypass normal API auth so
+  // orchestrators can make liveness/readiness decisions before routing traffic.
+  app.get('/health', { config: { auth: { public: true } } }, async (request) =>
+    processHealth(request.id || 'unknown')
+  );
+
+  app.get('/health/live', { config: { auth: { public: true } } }, async (request) =>
+    processHealth(request.id || 'unknown')
+  );
 
   app.get('/health/runtime', async () => ({
     status: 'ok',
@@ -132,36 +137,17 @@ export async function build() {
     timestamp: new Date().toISOString(),
   }));
 
-  // Detailed health check with component status
-  app.get('/health/detailed', async (request, reply) => {
-    const checks: Record<string, boolean> = {};
+  app.get('/health/ready', { config: { auth: { public: true } } }, async (request, reply) => {
+    const report = await dependencyHealthReport(request.id || 'unknown');
+    reply.status(report.status === 'ready' ? 200 : 503).send(report);
+  });
 
-    try {
-      await import('./db/client').then(async ({ db }) => {
-        const result = await db.query('SELECT 1');
-        checks.database = !!result.rows.length;
-      });
-    } catch (err) {
-      checks.database = false;
-      console.warn('Health check: database check failed:', err);
-    }
-
-    // Kafka check (optional - producer may not be connected yet)
-    try {
-      await import('./db/kafka').then(async ({ kafka }) => {
-        checks.kafka = true;
-      });
-    } catch (err) {
-      checks.kafka = false;
-    }
-
-    const allHealthy = Object.values(checks).every(v => v);
-    const statusCode = allHealthy ? 200 : 503;
-
-    reply.status(statusCode).send({
-      status: allHealthy ? 'healthy' : 'degraded',
-      checks,
-      timestamp: new Date().toISOString(),
+  app.get('/health/detailed', { config: { auth: { public: true } } }, async (request, reply) => {
+    const report = await dependencyHealthReport(request.id || 'unknown');
+    reply.status(report.status === 'ready' ? 200 : 503).send({
+      ...report,
+      runtime_mode: activeRuntimeMode(),
+      providers: configuredProviders(),
     });
   });
 

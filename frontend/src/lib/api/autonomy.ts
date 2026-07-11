@@ -6,9 +6,9 @@
  */
 
 import { agentcoAuthHeaders } from './auth';
+import { apiUrl } from './url';
 
-const API_ROOT = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001').replace(/\/$/, '');
-const API_BASE = `${API_ROOT}/api`;
+const API_BASE = '/api';
 
 function apiFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
   const headers = agentcoAuthHeaders(init.headers);
@@ -77,7 +77,7 @@ export interface EvalScorecard {
  * Get autonomy run details
  */
 export async function getAutonomyRun(runId: string): Promise<AutonomyRun> {
-  const response = await apiFetch(`${API_BASE}/autonomy/runs/${runId}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/runs/${runId}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch autonomy run: ${response.statusText}`);
   }
@@ -88,7 +88,7 @@ export async function getAutonomyRun(runId: string): Promise<AutonomyRun> {
  * List recent autonomy runs
  */
 export async function listAutonomyRuns(limit: number = 10): Promise<AutonomyRun[]> {
-  const response = await apiFetch(`${API_BASE}/autonomy/runs?limit=${limit}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/runs?limit=${limit}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch autonomy runs: ${response.statusText}`);
   }
@@ -100,7 +100,7 @@ export async function listAutonomyRuns(limit: number = 10): Promise<AutonomyRun[
  * Get autonomy task details
  */
 export async function getAutonomyTask(taskId: string): Promise<AutonomyTask> {
-  const response = await apiFetch(`${API_BASE}/autonomy/tasks/${taskId}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/tasks/${taskId}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch autonomy task: ${response.statusText}`);
   }
@@ -111,7 +111,7 @@ export async function getAutonomyTask(taskId: string): Promise<AutonomyTask> {
  * List autonomy tasks
  */
 export async function listAutonomyTasks(limit: number = 20): Promise<AutonomyTask[]> {
-  const response = await apiFetch(`${API_BASE}/autonomy/tasks?limit=${limit}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/tasks?limit=${limit}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch autonomy tasks: ${response.statusText}`);
   }
@@ -123,7 +123,7 @@ export async function listAutonomyTasks(limit: number = 20): Promise<AutonomyTas
  * Get learner candidate details
  */
 export async function getLearnerCandidate(candidateId: string): Promise<LearnerCandidate> {
-  const response = await apiFetch(`${API_BASE}/autonomy/candidates/${candidateId}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/candidates/${candidateId}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch candidate: ${response.statusText}`);
   }
@@ -134,7 +134,7 @@ export async function getLearnerCandidate(candidateId: string): Promise<LearnerC
  * List learner candidates
  */
 export async function listLearnerCandidates(limit: number = 20): Promise<LearnerCandidate[]> {
-  const response = await apiFetch(`${API_BASE}/autonomy/candidates?limit=${limit}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/candidates?limit=${limit}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch candidates: ${response.statusText}`);
   }
@@ -146,7 +146,7 @@ export async function listLearnerCandidates(limit: number = 20): Promise<Learner
  * Get eval scorecard
  */
 export async function getEvalScorecard(scorecardId: string): Promise<EvalScorecard> {
-  const response = await apiFetch(`${API_BASE}/autonomy/evals/scorecards/${scorecardId}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/evals/scorecards/${scorecardId}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch scorecard: ${response.statusText}`);
   }
@@ -157,7 +157,7 @@ export async function getEvalScorecard(scorecardId: string): Promise<EvalScoreca
  * List eval scorecards
  */
 export async function listEvalScorecards(limit: number = 20): Promise<EvalScorecard[]> {
-  const response = await apiFetch(`${API_BASE}/autonomy/evals/scorecards?limit=${limit}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/evals/scorecards?limit=${limit}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch scorecards: ${response.statusText}`);
   }
@@ -177,7 +177,7 @@ export async function getAutonomyDashboard(): Promise<{
   avgPromotionScore: number;
   recentRuns: AutonomyRun[];
 }> {
-  const response = await apiFetch(`${API_BASE}/autonomy/dashboard/overview`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/dashboard/overview`));
   if (!response.ok) {
     throw new Error(`Failed to fetch dashboard overview: ${response.statusText}`);
   }
@@ -195,7 +195,7 @@ export async function getAuditTrail(runId: string): Promise<Array<{
   timestamp: string;
   details: Record<string, any>;
 }>> {
-  const response = await apiFetch(`${API_BASE}/autonomy/audit?run_id=${runId}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/audit?run_id=${runId}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch audit trail: ${response.statusText}`);
   }
@@ -215,7 +215,7 @@ export async function getTraces(runId: string): Promise<Array<{
   status: string;
   timestamp: string;
 }>> {
-  const response = await apiFetch(`${API_BASE}/autonomy/observability/traces?run_id=${runId}`);
+  const response = await apiFetch(apiUrl(`${API_BASE}/autonomy/observability/traces?run_id=${runId}`));
   if (!response.ok) {
     throw new Error(`Failed to fetch traces: ${response.statusText}`);
   }
@@ -228,7 +228,7 @@ export async function getTraces(runId: string): Promise<Array<{
  */
 export async function healthCheck(): Promise<boolean> {
   try {
-    const response = await apiFetch(`${API_ROOT}/health`, { method: 'GET' });
+    const response = await apiFetch(apiUrl('/health'), { method: 'GET' });
     return response.ok;
   } catch {
     return false;

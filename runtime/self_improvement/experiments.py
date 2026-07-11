@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import replace
 from typing import Any
 
@@ -58,6 +59,11 @@ class BoundedExperimentRunner:
     PRODUCTION_SURFACES = {"production_data", "credential", "policy", "tool", "model", "memory_rule"}
 
     def __init__(self, store: ExperimentStore | None = None, audit_writer: AuditWriter | None = None):
+        production = os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production"
+        if production and store is None:
+            raise SelfImprovementError("production self-improvement requires an explicit durable experiment repository")
+        if production and audit_writer is None:
+            raise AuditUnavailableError("production self-improvement requires an explicit durable audit writer")
         self.store = store or ExperimentStore()
         self.audit_writer = audit_writer or InMemoryAuditWriter(allow_test_mode=True)
         self.production_state: dict[str, str] = {"prompt": "prompt-v1", "policy": "policy-v1"}

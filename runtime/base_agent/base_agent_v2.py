@@ -46,6 +46,10 @@ assert_production_secrets()
 _HMAC_KEY = os.environ.get("EVENT_BUS_HMAC_KEY", "dev-insecure-key").encode()
 
 
+def _is_production_runtime() -> bool:
+    return os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production"
+
+
 @dataclass
 class AgentActionV2:
     """Represents a single action an agent is about to take."""
@@ -122,6 +126,15 @@ class BaseAgentV2:
             self._audit_writer = InMemoryAuditWriter(allow_test_mode=True)
         else:
             self._audit_writer = DurableAuditWriter.from_env()
+        if _is_production_runtime():
+            if self._audit_writer is None:
+                raise AuditUnavailableError(
+                    f"durable audit writer is required in production for agent={self.agent_id}"
+                )
+            if isinstance(self._audit_writer, InMemoryAuditWriter):
+                raise AuditUnavailableError(
+                    f"in-memory audit writer is forbidden in production for agent={self.agent_id}"
+                )
         # Reserve engine — wired lazily when a DB-backed ledger is present.
         self._reserve = None
 
@@ -444,7 +457,7 @@ class BaseAgentV2:
         if self._audit_writer is None:
             self._audit_failures += 1
             message = f"No audit writer configured for agent={self.agent_id}"
-            if require_ack:
+            if require_ack or _is_production_runtime():
                 raise AuditUnavailableError(message)
             logger.error(message)
             return None
@@ -452,7 +465,7 @@ class BaseAgentV2:
             ack = self._audit_writer.write(entry)
         except Exception as exc:
             self._audit_failures += 1
-            if require_ack:
+            if require_ack or _is_production_runtime():
                 if isinstance(exc, AuditUnavailableError):
                     raise
                 raise AuditUnavailableError(str(exc)) from exc
@@ -460,7 +473,7 @@ class BaseAgentV2:
             return None
         if not ack or not ack.get("log_id"):
             self._audit_failures += 1
-            if require_ack:
+            if require_ack or _is_production_runtime():
                 raise AuditUnavailableError("audit writer returned no acknowledgement")
             logger.error("Audit writer returned no acknowledgement for agent=%s", self.agent_id)
             return None

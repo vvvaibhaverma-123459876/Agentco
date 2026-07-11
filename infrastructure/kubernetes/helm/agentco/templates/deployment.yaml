@@ -132,6 +132,21 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
                   key: LLM_API_KEY
+            - name: AGENTCO_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: AGENTCO_API_KEY
+            - name: EVENT_BUS_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: EVENT_BUS_SIGNING_KEY
+            - name: EVENT_BUS_HMAC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: EVENT_BUS_HMAC_KEY
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -177,6 +192,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
                   key: VAULT_TOKEN
+            - name: RESERVE_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: RESERVE_SIGNING_KEY
           livenessProbe:
             {{- toYaml .Values.backend.livenessProbe | nindent 12 }}
           readinessProbe:
