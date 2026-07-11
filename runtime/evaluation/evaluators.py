@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import os
+import json
 import uuid
-from dataclasses import replace
+from dataclasses import asdict, replace
 from datetime import datetime, timezone
-from typing import Iterable
+from typing import Any, Iterable
 
 from runtime.base_agent.audit_writer import AuditUnavailableError, AuditWriter, InMemoryAuditWriter
 from runtime.evaluation.schema import (
@@ -45,6 +46,141 @@ class ImmutableEvaluationStore:
 
     def records(self) -> tuple[EvaluationRecord, ...]:
         return tuple(self._records.values())
+
+
+class PostgresEvaluationStore(ImmutableEvaluationStore):
+    """Postgres-backed immutable evaluation repository for production runtime use."""
+
+    def __init__(self, dsn: str) -> None:
+        if not dsn:
+            raise EvaluationError("PostgresEvaluationStore requires a database DSN")
+        super().__init__()
+        self._dsn = dsn
+
+    def put(self, record: EvaluationRecord) -> EvaluationRecord:
+        payload = asdict(record)
+        fingerprint = record.fingerprint()
+        psycopg2 = _psycopg2()
+        conn = psycopg2.connect(self._dsn)
+        conn.autocommit = False
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO runtime_evaluation_records
+                      (evaluation_id, agent_id, task_id, attempt_id, evaluator_id,
+                       evaluation_version, evaluator_result, failure_category,
+                       payload, fingerprint, audit_log_id, audit_backend)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,%s)
+                    ON CONFLICT (evaluation_id) DO UPDATE
+                       SET audit_log_id = COALESCE(runtime_evaluation_records.audit_log_id, EXCLUDED.audit_log_id),
+                           audit_backend = COALESCE(runtime_evaluation_records.audit_backend, EXCLUDED.audit_backend)
+                     WHERE runtime_evaluation_records.fingerprint = EXCLUDED.fingerprint
+                    RETURNING payload, audit_log_id, audit_backend
+                    """,
+                    [
+                        record.evaluation_id,
+                        record.agent_id,
+                        record.task_id,
+                        record.attempt_id,
+                        record.evaluator_id,
+                        record.evaluation_version,
+                        record.evaluator_result,
+                        record.failure_category,
+                        stable_json(payload),
+                        fingerprint,
+                        record.audit_log_id,
+                        record.audit_backend,
+                    ],
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise EvaluationError(f"evaluation record is immutable: {record.evaluation_id}")
+            conn.commit()
+            return _evaluation_record_from_row(row[0], row[1], row[2])
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def get(self, evaluation_id: str) -> EvaluationRecord:
+        psycopg2 = _psycopg2()
+        conn = psycopg2.connect(self._dsn)
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT payload, audit_log_id, audit_backend FROM runtime_evaluation_records WHERE evaluation_id = %s",
+                    [evaluation_id],
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise EvaluationError(f"unknown evaluation record: {evaluation_id}")
+                return _evaluation_record_from_row(row[0], row[1], row[2])
+        finally:
+            conn.close()
+
+    def records(self) -> tuple[EvaluationRecord, ...]:
+        psycopg2 = _psycopg2()
+        conn = psycopg2.connect(self._dsn)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT payload, audit_log_id, audit_backend FROM runtime_evaluation_records ORDER BY created_at, evaluation_id")
+                return tuple(_evaluation_record_from_row(row[0], row[1], row[2]) for row in cur.fetchall())
+        finally:
+            conn.close()
+
+
+def configured_evaluation_store() -> PostgresEvaluationStore:
+    dsn = os.environ.get("AGENTCO_EVALUATION_DATABASE_URL") or os.environ.get("DATABASE_URL") or os.environ.get("AGENTCO_TEST_DATABASE_URL")
+    if not dsn:
+        raise EvaluationError("production evaluation requires AGENTCO_EVALUATION_DATABASE_URL or DATABASE_URL")
+    return PostgresEvaluationStore(dsn)
+
+
+def _evaluation_record_from_payload(payload: dict[str, Any]) -> EvaluationRecord:
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    results = tuple(EvaluatorResult(**item) for item in payload.get("evaluator_results", ()))
+    return EvaluationRecord(
+        evaluation_id=payload["evaluation_id"],
+        agent_id=payload["agent_id"],
+        task_id=payload["task_id"],
+        attempt_id=payload["attempt_id"],
+        output_or_claim=payload["output_or_claim"],
+        supporting_evidence_refs=tuple(payload.get("supporting_evidence_refs", ())),
+        predicted_confidence=float(payload["predicted_confidence"]),
+        evaluator_result=payload["evaluator_result"],
+        correctness_score=float(payload["correctness_score"]),
+        evidence_quality_score=float(payload["evidence_quality_score"]),
+        calibration_error=float(payload["calibration_error"]),
+        failure_category=payload["failure_category"],
+        evaluation_timestamp=payload["evaluation_timestamp"],
+        evaluation_version=payload["evaluation_version"],
+        evaluator_id=payload["evaluator_id"],
+        brier_score=float(payload["brier_score"]),
+        abstained=bool(payload["abstained"]),
+        evaluator_results=results,
+        audit_log_id=payload.get("audit_log_id"),
+        audit_backend=payload.get("audit_backend"),
+    )
+
+
+def _evaluation_record_from_row(payload: dict[str, Any], audit_log_id: Any, audit_backend: str | None) -> EvaluationRecord:
+    record = _evaluation_record_from_payload(payload)
+    return replace(
+        record,
+        audit_log_id=str(audit_log_id) if audit_log_id is not None else record.audit_log_id,
+        audit_backend=audit_backend or record.audit_backend,
+    )
+
+
+def _psycopg2() -> Any:
+    try:
+        import psycopg2
+    except Exception as exc:
+        raise EvaluationError("psycopg2 is required for durable evaluation storage") from exc
+    return psycopg2
 
 
 def normalize_text(value: str) -> str:
@@ -206,10 +342,12 @@ class EvaluationService:
         timestamp_factory=None,
     ):
         production = os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production"
+        if production and store is None:
+            store = configured_evaluation_store()
         if production and audit_writer is None:
             raise AuditUnavailableError("production evaluation requires an explicit durable audit writer")
-        if production and store is None:
-            raise EvaluationError("production evaluation requires an explicit durable evaluation repository")
+        if production and isinstance(audit_writer, InMemoryAuditWriter):
+            raise AuditUnavailableError("production evaluation cannot use InMemoryAuditWriter")
         self.audit_writer = audit_writer or InMemoryAuditWriter(allow_test_mode=True)
         self.store = store or ImmutableEvaluationStore()
         self._timestamp_factory = timestamp_factory or (lambda: datetime.now(timezone.utc).isoformat())

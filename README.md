@@ -128,6 +128,11 @@ asserts the git tree is still clean at the end.
   origin, for example `http://agentco-backend:3001`.
 - `AGENTCO_API_KEY` is a privileged service key and must remain server-side. The
   frontend proxy injects it when forwarding `/api/*` requests to the backend.
+- Phase 10-12 runtime governance stores are durable in production/staging.
+  `AGENTCO_EVALUATION_DATABASE_URL`, `AGENTCO_LEARNING_DATABASE_URL`, and
+  `AGENTCO_EXPERIMENT_DATABASE_URL` may override `DATABASE_URL`; otherwise the
+  services use `DATABASE_URL`. If no durable DSN exists, evaluation, controlled
+  learning, and bounded experiments fail closed instead of using memory stores.
 - Backend readiness checks mandatory dependencies with bounded timeouts.
   `KAFKA_MANDATORY=true` makes Kafka part of readiness; production defaults to
   mandatory Kafka when brokers are configured.

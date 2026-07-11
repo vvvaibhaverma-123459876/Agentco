@@ -7,7 +7,7 @@ import pytest
 from runtime.base_agent.agent_manifest import ACTIVE_AGENT_PROFILES
 from runtime.base_agent.audit_writer import AuditUnavailableError, InMemoryAuditWriter
 from runtime.evaluation.benchmark import active_agent_benchmark_cases, benchmark_cases
-from runtime.evaluation.evaluators import EvaluationError, EvaluationService, ImmutableEvaluationStore
+from runtime.evaluation.evaluators import EvaluationError, EvaluationService, ImmutableEvaluationStore, PostgresEvaluationStore
 from runtime.evaluation.metrics import calibration_metrics
 from runtime.evaluation.report import build_evaluation_report, validate_report
 from runtime.evaluation.schema import EvidenceReference, EvaluationInput
@@ -15,6 +15,15 @@ from runtime.evaluation.schema import EvidenceReference, EvaluationInput
 
 def _service() -> EvaluationService:
     return EvaluationService(audit_writer=InMemoryAuditWriter(allow_test_mode=True))
+
+
+class DurableAuditStub:
+    def __init__(self) -> None:
+        self.entries = []
+
+    def write(self, entry):
+        self.entries.append(entry)
+        return {"log_id": entry.attempt_id, "backend": "stub"}
 
 
 def _input(**overrides) -> EvaluationInput:
@@ -172,9 +181,29 @@ def test_machine_report_validates_phase10_gate_conditions():
 
 def test_production_evaluation_requires_explicit_durable_dependencies(monkeypatch):
     monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_TEST_DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_EVALUATION_DATABASE_URL", raising=False)
 
     with pytest.raises(AuditUnavailableError, match="durable audit writer"):
         EvaluationService(store=ImmutableEvaluationStore())
 
-    with pytest.raises(EvaluationError, match="durable evaluation repository"):
+    with pytest.raises(EvaluationError, match="AGENTCO_EVALUATION_DATABASE_URL"):
+        EvaluationService(audit_writer=DurableAuditStub())
+
+
+def test_production_evaluation_rejects_in_memory_audit_writer(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.setenv("AGENTCO_EVALUATION_DATABASE_URL", "postgresql://example.invalid/agentco")
+
+    with pytest.raises(AuditUnavailableError, match="InMemoryAuditWriter"):
         EvaluationService(audit_writer=InMemoryAuditWriter(allow_test_mode=True))
+
+
+def test_production_evaluation_auto_selects_postgres_store(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.setenv("AGENTCO_EVALUATION_DATABASE_URL", "postgresql://example.invalid/agentco")
+
+    service = EvaluationService(audit_writer=DurableAuditStub())
+
+    assert isinstance(service.store, PostgresEvaluationStore)

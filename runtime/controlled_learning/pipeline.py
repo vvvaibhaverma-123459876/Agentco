@@ -20,6 +20,7 @@ from runtime.controlled_learning.schema import (
     stable_json,
 )
 from runtime.evaluation.schema import EvaluationAuditEntry
+from runtime.evaluation.evaluators import EvaluationError, PostgresEvaluationStore
 
 
 class ControlledLearningError(RuntimeError):
@@ -48,6 +49,98 @@ class LearningArtifactStore:
 
     def all(self) -> tuple[LearningArtifact, ...]:
         return tuple(self._artifacts.values())
+
+
+class PostgresLearningArtifactStore(LearningArtifactStore):
+    """Postgres-backed controlled-learning artifact repository."""
+
+    def __init__(self, dsn: str) -> None:
+        if not dsn:
+            raise ControlledLearningError("PostgresLearningArtifactStore requires a database DSN")
+        super().__init__()
+        self._dsn = dsn
+
+    def put(self, artifact: LearningArtifact) -> LearningArtifact:
+        payload = asdict(artifact)
+        fingerprint = artifact.fingerprint()
+        surface = artifact.proposed_change.get("surface")
+        psycopg2 = _psycopg2()
+        conn = psycopg2.connect(self._dsn)
+        conn.autocommit = False
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    INSERT INTO runtime_learning_artifacts
+                      (artifact_id, artifact_version, proposer_id, state, approval_status,
+                       surface, previous_active_artifact_id, payload, immutable_fingerprint)
+                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s)
+                    ON CONFLICT (artifact_id) DO UPDATE
+                       SET state = EXCLUDED.state,
+                           approval_status = EXCLUDED.approval_status,
+                           surface = EXCLUDED.surface,
+                           previous_active_artifact_id = EXCLUDED.previous_active_artifact_id,
+                           payload = EXCLUDED.payload
+                     WHERE runtime_learning_artifacts.immutable_fingerprint = EXCLUDED.immutable_fingerprint
+                    RETURNING payload
+                    """,
+                    [
+                        artifact.artifact_id,
+                        artifact.artifact_version,
+                        artifact.proposer_id,
+                        artifact.state,
+                        artifact.approval_status,
+                        surface,
+                        artifact.previous_active_artifact_id,
+                        json.dumps(payload, sort_keys=True, default=str),
+                        fingerprint,
+                    ],
+                )
+                row = cur.fetchone()
+                if row is None:
+                    raise ControlledLearningError(f"historical artifact cannot be altered: {artifact.artifact_id}")
+            conn.commit()
+            return _artifact_from_dict(row[0])
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
+
+    def get(self, artifact_id: str) -> LearningArtifact:
+        psycopg2 = _psycopg2()
+        conn = psycopg2.connect(self._dsn)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT payload FROM runtime_learning_artifacts WHERE artifact_id = %s", [artifact_id])
+                row = cur.fetchone()
+                if row is None:
+                    raise ControlledLearningError(f"unknown learning artifact: {artifact_id}")
+                return _artifact_from_dict(row[0])
+        finally:
+            conn.close()
+
+    def all(self) -> tuple[LearningArtifact, ...]:
+        psycopg2 = _psycopg2()
+        conn = psycopg2.connect(self._dsn)
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT payload FROM runtime_learning_artifacts ORDER BY created_at, artifact_id")
+                return tuple(_artifact_from_dict(row[0]) for row in cur.fetchall())
+        finally:
+            conn.close()
+
+
+def configured_learning_store() -> PostgresLearningArtifactStore:
+    dsn = os.environ.get("AGENTCO_LEARNING_DATABASE_URL") or os.environ.get("DATABASE_URL") or os.environ.get("AGENTCO_TEST_DATABASE_URL")
+    if not dsn:
+        raise ControlledLearningError("production controlled learning requires AGENTCO_LEARNING_DATABASE_URL or DATABASE_URL")
+    return PostgresLearningArtifactStore(dsn)
+
+
+def configured_evidence_store() -> PostgresEvaluationStore | None:
+    dsn = os.environ.get("AGENTCO_EVALUATION_DATABASE_URL") or os.environ.get("DATABASE_URL") or os.environ.get("AGENTCO_TEST_DATABASE_URL")
+    return PostgresEvaluationStore(dsn) if dsn else None
 
 
 class FileLearningArtifactStore(LearningArtifactStore):
@@ -94,14 +187,26 @@ def _artifact_from_dict(data: dict[str, Any]) -> LearningArtifact:
 class ControlledLearningPipeline:
     PROTECTED_SURFACES: set[ProtectedSurface] = {"prompt", "policy", "tool", "model", "memory_rule"}
 
-    def __init__(self, store: LearningArtifactStore | None = None, audit_writer: AuditWriter | None = None):
+    def __init__(
+        self,
+        store: LearningArtifactStore | None = None,
+        audit_writer: AuditWriter | None = None,
+        evaluation_store: Any | None = None,
+    ):
         production = os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production"
+        if production and store is None:
+            store = configured_learning_store()
+        if production and evaluation_store is None:
+            evaluation_store = configured_evidence_store()
         if production and store is None:
             raise ControlledLearningError("production controlled learning requires an explicit durable artifact repository")
         if production and audit_writer is None:
             raise AuditUnavailableError("production controlled learning requires an explicit durable audit writer")
+        if production and isinstance(audit_writer, InMemoryAuditWriter):
+            raise AuditUnavailableError("production controlled learning cannot use InMemoryAuditWriter")
         self.store = store or LearningArtifactStore()
         self.audit_writer = audit_writer or InMemoryAuditWriter(allow_test_mode=True)
+        self.evaluation_store = evaluation_store
         self.active_versions: dict[str, str] = {}
 
     def propose(
@@ -202,12 +307,24 @@ class ControlledLearningPipeline:
     def _require_phase10_evidence(self, artifact: LearningArtifact) -> None:
         if not artifact.evaluation_record_ids:
             raise ControlledLearningError("promotion requires Phase 10 evaluation evidence")
+        if os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production":
+            if self.evaluation_store is None:
+                raise ControlledLearningError("production promotion requires record-backed Phase 10 evidence repository")
+            for record_id in artifact.evaluation_record_ids:
+                try:
+                    record = self.evaluation_store.get(record_id)
+                except EvaluationError as exc:
+                    raise ControlledLearningError(f"missing Phase 10 evaluation record: {record_id}") from exc
+                if record.evaluation_version != "phase10.eval.v1":
+                    raise ControlledLearningError(f"unsupported evaluation version: {record.evaluation_version}")
+                if not record.passed:
+                    raise ControlledLearningError(f"failed evaluation cannot support promotion: {record_id}")
+                expected_subject = artifact.proposed_change.get("subject_id")
+                if expected_subject and record.agent_id != expected_subject:
+                    raise ControlledLearningError("evaluation evidence belongs to the wrong subject")
+            return
         if not all(record_id.startswith("phase10:") for record_id in artifact.evaluation_record_ids):
             raise ControlledLearningError("evaluation evidence must be Phase 10 records")
-        if os.environ.get("AGENTCO_ENV") in {"production", "staging"} or os.environ.get("NODE_ENV") == "production":
-            raise ControlledLearningError(
-                "production promotion requires record-backed Phase 10 evidence repository integration"
-            )
 
     def _reject_tampered_evidence(self, artifact: LearningArtifact) -> None:
         if any(ref.startswith("tampered:") for ref in artifact.evidence_refs):
@@ -282,3 +399,11 @@ def rollback_trigger_for(artifact: LearningArtifact) -> RollbackTrigger | None:
     if any(not event.audit_log_id for event in artifact.promotion_history + artifact.rollback_history):
         return "audit_chain_failure"
     return None
+
+
+def _psycopg2() -> Any:
+    try:
+        import psycopg2
+    except Exception as exc:
+        raise ControlledLearningError("psycopg2 is required for durable controlled-learning storage") from exc
+    return psycopg2

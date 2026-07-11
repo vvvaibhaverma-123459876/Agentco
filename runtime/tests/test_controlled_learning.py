@@ -10,13 +10,60 @@ from runtime.controlled_learning.pipeline import (
     ControlledLearningPipeline,
     FileLearningArtifactStore,
     LearningArtifactStore,
+    PostgresLearningArtifactStore,
 )
 from runtime.controlled_learning.report import build_learning_report, validate_learning_report
 from runtime.controlled_learning.schema import BenchmarkImpact
+from runtime.evaluation.schema import EvaluationRecord, EvaluatorResult
 
 
 def _pipeline(store=None) -> ControlledLearningPipeline:
     return ControlledLearningPipeline(store=store, audit_writer=InMemoryAuditWriter(allow_test_mode=True))
+
+
+class DurableAuditStub:
+    def __init__(self) -> None:
+        self.entries = []
+
+    def write(self, entry):
+        self.entries.append(entry)
+        return {"log_id": entry.attempt_id, "backend": "stub"}
+
+
+class EvaluationStoreStub:
+    def __init__(self, records):
+        self.records = records
+
+    def get(self, evaluation_id):
+        if evaluation_id not in self.records:
+            from runtime.evaluation.evaluators import EvaluationError
+            raise EvaluationError(f"unknown evaluation record: {evaluation_id}")
+        return self.records[evaluation_id]
+
+
+def _eval_record(*, evaluation_id="eval-record-1", agent_id="ceo-agent", passed=True):
+    return EvaluationRecord(
+        evaluation_id=evaluation_id,
+        agent_id=agent_id,
+        task_id="task-1",
+        attempt_id="attempt-1",
+        output_or_claim="claim",
+        supporting_evidence_refs=("evidence-1",),
+        predicted_confidence=0.9,
+        evaluator_result="passed" if passed else "failed",
+        correctness_score=1.0 if passed else 0.0,
+        evidence_quality_score=1.0,
+        calibration_error=0.1,
+        failure_category="none" if passed else "incorrect",
+        evaluation_timestamp="2026-07-11T00:00:00Z",
+        evaluation_version="phase10.eval.v1",
+        evaluator_id="independent-evaluator",
+        brier_score=0.01,
+        abstained=False,
+        evaluator_results=(EvaluatorResult("factual_correctness", passed, 1.0 if passed else 0.0),),
+        audit_log_id="00000000-0000-0000-0000-000000000001",
+        audit_backend="stub",
+    )
 
 
 def _artifact(pipeline: ControlledLearningPipeline, **overrides):
@@ -170,9 +217,73 @@ def test_machine_report_validates_phase11_gate_conditions():
 
 def test_production_controlled_learning_requires_explicit_durable_dependencies(monkeypatch):
     monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_TEST_DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_LEARNING_DATABASE_URL", raising=False)
 
-    with pytest.raises(ControlledLearningError, match="durable artifact repository"):
+    with pytest.raises(ControlledLearningError, match="AGENTCO_LEARNING_DATABASE_URL"):
         ControlledLearningPipeline(audit_writer=InMemoryAuditWriter(allow_test_mode=True))
 
     with pytest.raises(AuditUnavailableError, match="durable audit writer"):
         ControlledLearningPipeline(store=LearningArtifactStore())
+
+
+def test_production_controlled_learning_rejects_in_memory_audit_writer(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.setenv("AGENTCO_LEARNING_DATABASE_URL", "postgresql://example.invalid/agentco")
+    monkeypatch.setenv("AGENTCO_EVALUATION_DATABASE_URL", "postgresql://example.invalid/agentco")
+
+    with pytest.raises(AuditUnavailableError, match="InMemoryAuditWriter"):
+        ControlledLearningPipeline(audit_writer=InMemoryAuditWriter(allow_test_mode=True))
+
+
+def test_production_controlled_learning_auto_selects_postgres_store(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.setenv("AGENTCO_LEARNING_DATABASE_URL", "postgresql://example.invalid/agentco")
+    monkeypatch.setenv("AGENTCO_EVALUATION_DATABASE_URL", "postgresql://example.invalid/agentco")
+
+    pipeline = ControlledLearningPipeline(audit_writer=DurableAuditStub())
+
+    assert isinstance(pipeline.store, PostgresLearningArtifactStore)
+
+
+def test_production_controlled_learning_requires_record_backed_phase10_evidence(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    record = _eval_record(evaluation_id="eval-record-1", agent_id="ceo-agent", passed=True)
+    pipeline = ControlledLearningPipeline(
+        store=LearningArtifactStore(),
+        audit_writer=DurableAuditStub(),
+        evaluation_store=EvaluationStoreStub({record.evaluation_id: record}),
+    )
+    artifact = _artifact(
+        pipeline,
+        evaluation_record_ids=(record.evaluation_id,),
+        proposed_change={"surface": "prompt", "subject_id": "ceo-agent", "version": "prompt-v2"},
+    )
+
+    evaluated = pipeline.evaluate_offline(artifact.artifact_id)
+
+    assert evaluated.state == "evaluated"
+
+
+def test_production_controlled_learning_rejects_missing_or_failed_records(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    failed = _eval_record(evaluation_id="failed-eval", passed=False)
+    pipeline = ControlledLearningPipeline(
+        store=LearningArtifactStore(),
+        audit_writer=DurableAuditStub(),
+        evaluation_store=EvaluationStoreStub({"failed-eval": failed}),
+    )
+    missing = _artifact(pipeline, evaluation_record_ids=("missing-eval",))
+
+    with pytest.raises(ControlledLearningError, match="missing Phase 10"):
+        pipeline.evaluate_offline(missing.artifact_id)
+
+    rejected = _artifact(
+        pipeline,
+        evaluation_record_ids=("failed-eval",),
+        proposed_change={"surface": "policy", "version": "policy-v2"},
+        evidence_refs=("evidence:failed",),
+    )
+    with pytest.raises(ControlledLearningError, match="failed evaluation"):
+        pipeline.evaluate_offline(rejected.artifact_id)

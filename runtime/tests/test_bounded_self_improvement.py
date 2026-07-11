@@ -4,7 +4,8 @@ import pytest
 
 from runtime.base_agent.audit_writer import AuditUnavailableError
 from runtime.controlled_learning.schema import BenchmarkImpact
-from runtime.self_improvement.experiments import BoundedExperimentRunner, ExperimentStore, SelfImprovementError
+from runtime.evaluation.schema import EvaluationRecord, EvaluatorResult
+from runtime.self_improvement.experiments import BoundedExperimentRunner, ExperimentStore, PostgresExperimentStore, SelfImprovementError
 from runtime.self_improvement.report import build_experiment_report, validate_experiment_report
 from runtime.self_improvement.schema import ExperimentUsage, ImprovementExperiment, ResourceBudget
 
@@ -16,6 +17,42 @@ class MemoryAuditWriter:
     def write(self, entry):
         self.entries.append(entry)
         return {"log_id": entry.attempt_id, "backend": "memory"}
+
+
+class EvaluationStoreStub:
+    def __init__(self, records):
+        self.records = records
+
+    def get(self, evaluation_id):
+        if evaluation_id not in self.records:
+            from runtime.evaluation.evaluators import EvaluationError
+            raise EvaluationError(f"unknown evaluation record: {evaluation_id}")
+        return self.records[evaluation_id]
+
+
+def eval_record(*, evaluation_id="eval-record-1", agent_id="ceo-agent", passed=True):
+    return EvaluationRecord(
+        evaluation_id=evaluation_id,
+        agent_id=agent_id,
+        task_id="task-1",
+        attempt_id="attempt-1",
+        output_or_claim="claim",
+        supporting_evidence_refs=("evidence-1",),
+        predicted_confidence=0.9,
+        evaluator_result="passed" if passed else "failed",
+        correctness_score=1.0 if passed else 0.0,
+        evidence_quality_score=1.0,
+        calibration_error=0.1,
+        failure_category="none" if passed else "incorrect",
+        evaluation_timestamp="2026-07-11T00:00:00Z",
+        evaluation_version="phase10.eval.v1",
+        evaluator_id="independent-evaluator",
+        brier_score=0.01,
+        abstained=False,
+        evaluator_results=(EvaluatorResult("factual_correctness", passed, 1.0 if passed else 0.0),),
+        audit_log_id="00000000-0000-0000-0000-000000000001",
+        audit_backend="stub",
+    )
 
 
 def budget() -> ResourceBudget:
@@ -177,9 +214,71 @@ def test_machine_report_validates_phase12_gate_conditions():
 
 def test_production_self_improvement_requires_explicit_durable_dependencies(monkeypatch):
     monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_TEST_DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_EXPERIMENT_DATABASE_URL", raising=False)
 
-    with pytest.raises(SelfImprovementError, match="durable experiment repository"):
+    with pytest.raises(SelfImprovementError, match="AGENTCO_EXPERIMENT_DATABASE_URL"):
         BoundedExperimentRunner(audit_writer=MemoryAuditWriter())
 
     with pytest.raises(AuditUnavailableError, match="durable audit writer"):
         BoundedExperimentRunner(store=ExperimentStore())
+
+
+def test_production_self_improvement_rejects_in_memory_audit_writer(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.setenv("AGENTCO_EXPERIMENT_DATABASE_URL", "postgresql://example.invalid/agentco")
+    monkeypatch.setenv("AGENTCO_EVALUATION_DATABASE_URL", "postgresql://example.invalid/agentco")
+
+    from runtime.base_agent.audit_writer import InMemoryAuditWriter
+
+    with pytest.raises(AuditUnavailableError, match="InMemoryAuditWriter"):
+        BoundedExperimentRunner(audit_writer=InMemoryAuditWriter(allow_test_mode=True))
+
+
+def test_production_self_improvement_auto_selects_postgres_store(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    monkeypatch.setenv("AGENTCO_EXPERIMENT_DATABASE_URL", "postgresql://example.invalid/agentco")
+    monkeypatch.setenv("AGENTCO_EVALUATION_DATABASE_URL", "postgresql://example.invalid/agentco")
+
+    runner = BoundedExperimentRunner(audit_writer=MemoryAuditWriter())
+
+    assert isinstance(runner.store, PostgresExperimentStore)
+
+
+def test_production_self_improvement_requires_record_backed_evidence(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    record = eval_record(evaluation_id="eval-record-1", agent_id="ceo-agent", passed=True)
+    agent = BoundedExperimentRunner(
+        store=ExperimentStore(),
+        audit_writer=MemoryAuditWriter(),
+        evaluation_store=EvaluationStoreStub({record.evaluation_id: record}),
+    )
+
+    accepted = run_experiment(
+        agent,
+        evidence_refs=(record.evaluation_id,),
+        proposed_change={"surface": "prompt", "change_type": "prompt_variant", "subject_id": "ceo-agent"},
+    )
+
+    assert accepted.outcome == "accepted"
+
+
+def test_production_self_improvement_blocks_missing_or_failed_evidence_records(monkeypatch):
+    monkeypatch.setenv("AGENTCO_ENV", "production")
+    failed = eval_record(evaluation_id="failed-eval", passed=False)
+    agent = BoundedExperimentRunner(
+        store=ExperimentStore(),
+        audit_writer=MemoryAuditWriter(),
+        evaluation_store=EvaluationStoreStub({"failed-eval": failed}),
+    )
+
+    missing = run_experiment(agent, evidence_refs=("missing-eval",))
+    failed_result = run_experiment(
+        agent,
+        hypothesis="failed eval cannot support bounded experiment",
+        evidence_refs=("failed-eval",),
+    )
+
+    assert "missing_evaluation_record" in missing.safety_violations
+    assert "failed_evaluation_record" in failed_result.safety_violations
