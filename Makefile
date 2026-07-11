@@ -1,6 +1,6 @@
 PYTHON ?= python3.13
 
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates release-gate status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates release-gate status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
 
 python-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
@@ -97,6 +97,14 @@ controlled-learning-report-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/generate_controlled_learning_report.py --check
 
+self-improvement-report:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/generate_self_improvement_report.py
+
+self-improvement-report-check:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/generate_self_improvement_report.py --check
+
 remaining:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/build_ledger.py remaining
@@ -119,37 +127,39 @@ release-gates:
 
 release-gate:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
-	@echo "== [0/11] clean tree before gate =="
+	@echo "== [0/12] clean tree before gate =="
 	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty before release-gate"; exit 1)
-	@echo "== [1/11] status check =="
+	@echo "== [1/12] status check =="
 	@$(MAKE) status-check
-	@echo "== [1a/11] agent protocol conformance matrix check =="
+	@echo "== [1a/12] agent protocol conformance matrix check =="
 	@$(MAKE) agent-protocol-matrix-check
-	@echo "== [1b/11] evaluation calibration report check =="
+	@echo "== [1b/12] evaluation calibration report check =="
 	@$(MAKE) evaluation-calibration-report-check
-	@echo "== [1c/11] controlled learning report check =="
+	@echo "== [1c/12] controlled learning report check =="
 	@$(MAKE) controlled-learning-report-check
-	@echo "== [2/11] backend install =="
+	@echo "== [1d/12] bounded self-improvement report check =="
+	@$(MAKE) self-improvement-report-check
+	@echo "== [2/12] backend install =="
 	cd backend && npm ci
-	@echo "== [3/11] backend migrations =="
+	@echo "== [3/12] backend migrations =="
 	@MIGRATION_DSN="$${RELEASE_GATE_MIGRATION_DATABASE_URL:-$$DATABASE_URL}"; if [ -n "$$MIGRATION_DSN" ]; then cd backend && DATABASE_URL="$$MIGRATION_DSN" npm run db:migrate; else echo "DATABASE_URL not set; DB-backed tests may skip with reason"; fi
-	@echo "== [3a/11] least-privilege gate role grants =="
+	@echo "== [3a/12] least-privilege gate role grants =="
 	@if [ -n "$$RELEASE_GATE_SETUP_DATABASE_URL" ]; then psql "$$RELEASE_GATE_SETUP_DATABASE_URL" -v gate_role="$${RELEASE_GATE_ROLE:-agentco_gate}" -v gate_password="$${RELEASE_GATE_ROLE_PASSWORD:?RELEASE_GATE_ROLE_PASSWORD is required when RELEASE_GATE_SETUP_DATABASE_URL is set}" -f scripts/setup_release_gate_role.sql >/dev/null; else echo "RELEASE_GATE_SETUP_DATABASE_URL not set; assuming gate role already has privileges"; fi
-	@echo "== [4/11] Python default suite =="
+	@echo "== [4/12] Python default suite =="
 	@GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; PYTHONDONTWRITEBYTECODE=1 DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" $(PYTHON) -m pytest -q
-	@echo "== [5/11] backend build =="
+	@echo "== [5/12] backend build =="
 	cd backend && npm run build
-	@echo "== [6/11] backend Jest =="
+	@echo "== [6/12] backend Jest =="
 	GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; cd backend && DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" npm test -- --runInBand
-	@echo "== [7/11] route-auth contract =="
+	@echo "== [7/12] route-auth contract =="
 	GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; cd backend && DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" npm test -- route-auth-contract.test.ts --runInBand
-	@echo "== [8/11] decision_log chain cross-writer test =="
+	@echo "== [8/12] decision_log chain cross-writer test =="
 	GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; cd backend && DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" npm test -- audit-chain-cross-writer.test.ts --runInBand
-	@echo "== [9/11] frontend install =="
+	@echo "== [9/12] frontend install =="
 	cd frontend && npm ci
-	@echo "== [10/11] frontend typecheck =="
+	@echo "== [10/12] frontend typecheck =="
 	cd frontend && ./node_modules/.bin/tsc --noEmit
-	@echo "== [11/11] clean tree after gate =="
+	@echo "== [12/12] clean tree after gate =="
 	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty after release-gate"; exit 1)
 
 docker-production-smoke:
