@@ -114,7 +114,8 @@ make release-gate
 ```
 
 This is the command a stranger should run to trust the repo. It checks the
-README status block without writing, runs the Python default suite, installs
+README status block without writing, verifies generated governance reports and
+the score-validation acceptance matrix, runs the Python default suite, installs
 and verifies backend/frontend dependencies, runs backend Jest without
 `forceExit`, exercises the route-auth contract and decision-log chain test, and
 asserts the git tree is still clean at the end.
@@ -145,8 +146,10 @@ asserts the git tree is still clean at the end.
   to `outbox`, which atomically writes `event_history` plus `event_bus_outbox`
   before relay. `sync` is intended only for local development compatibility.
   Run the relay with `cd backend && npm run agentco:outbox-worker`; it drains
-  both the canonical `event_outbox` and the signed event-bus outbox. Tune it
-  with `AGENTCO_OUTBOX_WORKER_POLL_MS`, `AGENTCO_OUTBOX_WORKER_BATCH_SIZE`,
+  both the canonical `event_outbox` and the signed event-bus outbox. The Helm
+  chart deploys this relay as a separate `outbox-worker` workload so API pods
+  do not need to publish backlog events inline. Tune it with
+  `AGENTCO_OUTBOX_WORKER_POLL_MS`, `AGENTCO_OUTBOX_WORKER_BATCH_SIZE`,
   `AGENTCO_OUTBOX_WORKER_MAX_ATTEMPTS`, and `AGENTCO_OUTBOX_WORKER_ID`.
 - Backend readiness checks mandatory dependencies with bounded timeouts.
   `KAFKA_MANDATORY=true` makes Kafka part of readiness; production defaults to

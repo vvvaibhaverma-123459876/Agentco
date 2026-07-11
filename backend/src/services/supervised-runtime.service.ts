@@ -105,7 +105,10 @@ export class SupervisedRuntimeService {
     try {
       const client = await servicePool.connect();
       try {
-        const sweep = await independentResolver.resolveDuePredictions({ serviceClient: client });
+        const sweep = await independentResolver.resolveDuePredictions({
+          serviceClient: client,
+          domain: domainKey,
+        });
         result.predictionsResolvedTrue = sweep.resolvedTrue;
         result.predictionsResolvedFalse = sweep.resolvedFalse;
       } finally {

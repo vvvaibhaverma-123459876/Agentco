@@ -1,10 +1,10 @@
 # Score Validation (signal-gated)
 
-Generated 2026-07-11T08:32:44.468Z at commit `7c34154630784aaa84453864ad9fd1e6e177722f`.
+Generated 2026-07-11T22:42:18.788Z at commit `4e9f7c43bcff2a0ced73e6653e0171ad28eebf7e`.
 
 Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.
 
-**Acceptance checks:** 27/27 pass.
+**Acceptance checks:** 29/29 pass.
 **Estimated score:** 82.5/100 (132/160).
 **Claims 80+ :** true
 
@@ -39,6 +39,8 @@ Scores are estimates gated on structural signals (presence of the required servi
 | J4_durable_llm_budget | backend LLM provider reserves and settles durable resource-ledger budget | ✅ | llm-provider durable budget path + startup guard + tests |
 | J5_event_outbox_worker | transactional and signed event-bus outboxes have an executable relay worker | ✅ | outbox-worker entrypoint + script + test + event_bus_outbox migration |
 | J6_release_gate_enforces_core_contracts | release gate checks route auth, audit chain, generated reports, and clean-tree behavior | ✅ | Makefile release-gate contract |
+| J7_helm_deployment_topology | Helm chart contains backend, frontend, Services, Ingress, autoscaling, disruption budgets, migration job, and outbox worker | ✅ | Helm topology templates + helm-deployment-contract.test.ts |
+| J8_forensic_audit_controls | audit controls include requirements-to-behaviour, external dependency, completeness, and post-remediation ledgers | ✅ | forensic audit controls generator + generated ledgers + regression test |
 
 ## Dimensions
 

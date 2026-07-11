@@ -37,7 +37,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/config: {{ include "agentco.configChecksum" . | sha256sum }}
         {{- with .Values.backend.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -91,7 +91,7 @@ spec:
               memory: 32Mi
       containers:
         - name: backend
-          image: "{{ .Values.global.image.registry }}/{{ trimPrefix (printf "%s/" .Values.global.image.registry) .Values.backend.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.global.image.registry }}/{{ trimPrefix (printf "%s/" .Values.global.image.registry) .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Values.global.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.backend.image.pullPolicy | default .Values.global.image.pullPolicy }}
           ports:
             - name: http
@@ -132,6 +132,21 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
                   key: LLM_API_KEY
+                  optional: true
+            - name: LLM_RESOURCE_ACTOR_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: LLM_RESOURCE_ACTOR_ID
+            - name: LLM_RESOURCE_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: LLM_RESOURCE_ACCOUNT_ID
+            - name: EVENT_BUS_DELIVERY_MODE
+              value: {{ .Values.backend.eventBusDeliveryMode | default "outbox" | quote }}
+            - name: KAFKA_MANDATORY
+              value: {{ .Values.backend.kafkaMandatory | default "true" | quote }}
             - name: AGENTCO_API_KEY
               valueFrom:
                 secretKeyRef:
@@ -172,16 +187,19 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
                   key: PINECONE_API_KEY
+                  optional: true
             - name: PINECONE_ENVIRONMENT
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
                   key: PINECONE_ENVIRONMENT
+                  optional: true
             - name: PINECONE_INDEX_NAME
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.backend.existingSecret }}
                   key: PINECONE_INDEX_NAME
+                  optional: true
             - name: VAULT_ADDR
               valueFrom:
                 secretKeyRef:
@@ -274,4 +292,18 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- else }}
 {{- .Values.externalRedis.host }}
 {{- end }}
+{{- end }}
+
+{{- define "agentco.configChecksum" -}}
+backend:
+  nodeEnv: {{ .Values.backend.env.NODE_ENV | quote }}
+  port: {{ .Values.backend.service.targetPort | quote }}
+  logLevel: {{ .Values.backend.env.LOG_LEVEL | quote }}
+  llmBaseUrl: {{ .Values.backend.llmBaseUrl | quote }}
+  eventBusDeliveryMode: {{ .Values.backend.eventBusDeliveryMode | default "outbox" | quote }}
+  kafkaMandatory: {{ .Values.backend.kafkaMandatory | default "true" | quote }}
+frontend:
+  nodeEnv: {{ .Values.frontend.env.NODE_ENV | quote }}
+  publicApiUrl: {{ .Values.frontend.env.NEXT_PUBLIC_API_URL | quote }}
+  apiUrl: {{ .Values.frontend.env.AGENTCO_API_URL | quote }}
 {{- end }}

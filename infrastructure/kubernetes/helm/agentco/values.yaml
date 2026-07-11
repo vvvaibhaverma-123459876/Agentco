@@ -33,6 +33,7 @@ backend:
   image:
     repository: ghcr.io/agentco/backend
     # tag inherits from global.image.tag
+    tag: ""
     pullPolicy: IfNotPresent
 
   replicaCount: 2
@@ -68,10 +69,30 @@ backend:
 
   # OpenAI-compatible LLM endpoint (Ollama by default; override per environment).
   llmBaseUrl: http://ollama:11434/v1
+  eventBusDeliveryMode: outbox
+  kafkaMandatory: "true"
   # Secret name containing AGENTCO_API_KEY, EVENT_BUS_SIGNING_KEY,
   # EVENT_BUS_HMAC_KEY, JWT_SECRET, DATABASE_URL, REDIS_URL, KAFKA_BROKERS,
-  # LLM_API_KEY, VAULT_TOKEN, and RESERVE_SIGNING_KEY.
+  # LLM_API_KEY, LLM_RESOURCE_ACTOR_ID, LLM_RESOURCE_ACCOUNT_ID, VAULT_TOKEN,
+  # and RESERVE_SIGNING_KEY.
   existingSecret: agentco-backend-secrets
+
+  outboxWorker:
+    enabled: true
+    replicaCount: 1
+    pollMs: "1000"
+    batchSize: "50"
+    maxAttempts: "5"
+
+  migrationJob:
+    enabled: true
+    # Migration credentials are intentionally separate from runtime credentials.
+    # The referenced secret key should contain the schema-owner/admin DSN used
+    # only by this one-shot Helm hook.
+    existingSecret: agentco-migration-secrets
+    databaseUrlKey: MIGRATION_DATABASE_URL
+    backoffLimit: 2
+    activeDeadlineSeconds: 600
 
   livenessProbe:
     httpGet:
@@ -127,6 +148,7 @@ frontend:
   enabled: true
   image:
     repository: ghcr.io/agentco/frontend
+    tag: ""
     pullPolicy: IfNotPresent
 
   replicaCount: 2
@@ -255,7 +277,9 @@ redis:
   enabled: true
   architecture: standalone
   auth:
-    enabled: false
+    enabled: true
+    existingSecret: agentco-redis-secret
+    existingSecretPasswordKey: password
   master:
     persistence:
       enabled: true

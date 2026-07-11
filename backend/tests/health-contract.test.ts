@@ -108,6 +108,8 @@ describe('health and readiness contract', () => {
       'REDIS_URL',
       'KAFKA_BROKERS',
       'LLM_API_KEY',
+      'LLM_RESOURCE_ACTOR_ID',
+      'LLM_RESOURCE_ACCOUNT_ID',
       'VAULT_TOKEN',
       'RESERVE_SIGNING_KEY',
     ]) {

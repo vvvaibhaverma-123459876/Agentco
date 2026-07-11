@@ -139,6 +139,8 @@ release-gate:
 	@$(MAKE) controlled-learning-report-check
 	@echo "== [1d/12] bounded self-improvement report check =="
 	@$(MAKE) self-improvement-report-check
+	@echo "== [1e/12] score validation check =="
+	cd backend && npm run agentco:score-validation -- --check
 	@echo "== [2/12] backend install =="
 	cd backend && npm ci
 	@echo "== [3/12] backend migrations =="

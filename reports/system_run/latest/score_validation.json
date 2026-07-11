@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-11T08:32:44.468Z",
-  "commit": "7c34154630784aaa84453864ad9fd1e6e177722f",
+  "generatedAt": "2026-07-11T22:42:18.788Z",
+  "commit": "4e9f7c43bcff2a0ced73e6653e0171ad28eebf7e",
   "note": "Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.",
   "acceptanceChecks": [
     {
@@ -164,6 +164,18 @@
       "description": "release gate checks route auth, audit chain, generated reports, and clean-tree behavior",
       "pass": true,
       "evidence": "Makefile release-gate contract"
+    },
+    {
+      "id": "J7_helm_deployment_topology",
+      "description": "Helm chart contains backend, frontend, Services, Ingress, autoscaling, disruption budgets, migration job, and outbox worker",
+      "pass": true,
+      "evidence": "Helm topology templates + helm-deployment-contract.test.ts"
+    },
+    {
+      "id": "J8_forensic_audit_controls",
+      "description": "audit controls include requirements-to-behaviour, external dependency, completeness, and post-remediation ledgers",
+      "pass": true,
+      "evidence": "forensic audit controls generator + generated ledgers + regression test"
     }
   ],
   "acceptanceAllPass": true,

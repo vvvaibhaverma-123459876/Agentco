@@ -1,0 +1,81 @@
+{{- if and .Values.backend.enabled .Values.backend.outboxWorker.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "agentco.fullname" . }}-outbox-worker
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agentco.labels" . | nindent 4 }}
+    app.kubernetes.io/component: outbox-worker
+spec:
+  replicas: {{ .Values.backend.outboxWorker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "agentco.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: outbox-worker
+  template:
+    metadata:
+      labels:
+        {{- include "agentco.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: outbox-worker
+        {{- with .Values.global.commonLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include "agentco.configChecksum" . | sha256sum }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "agentco.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: outbox-worker
+          image: "{{ .Values.global.image.registry }}/{{ trimPrefix (printf "%s/" .Values.global.image.registry) .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy | default .Values.global.image.pullPolicy }}
+          command: ["node", "dist/workers/outbox-worker.js"]
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.backend.env.NODE_ENV | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.backend.env.LOG_LEVEL | quote }}
+            - name: AGENTCO_OUTBOX_WORKER_POLL_MS
+              value: {{ .Values.backend.outboxWorker.pollMs | quote }}
+            - name: AGENTCO_OUTBOX_WORKER_BATCH_SIZE
+              value: {{ .Values.backend.outboxWorker.batchSize | quote }}
+            - name: AGENTCO_OUTBOX_WORKER_MAX_ATTEMPTS
+              value: {{ .Values.backend.outboxWorker.maxAttempts | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: DATABASE_URL
+            - name: KAFKA_BROKERS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: KAFKA_BROKERS
+            - name: EVENT_BUS_SIGNING_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: EVENT_BUS_SIGNING_KEY
+            - name: EVENT_BUS_HMAC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: EVENT_BUS_HMAC_KEY
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.backend.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}

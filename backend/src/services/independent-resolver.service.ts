@@ -189,6 +189,7 @@ export class IndependentResolverService {
   async resolveDuePredictions(input: {
     serviceClient: PoolClient;
     producingAgentId?: string;
+    domain?: string;
     limit?: number;
   }): Promise<{ considered: number; resolvedFalse: number; resolvedTrue: number }> {
     const limit = Math.max(1, Math.min(input.limit ?? 25, 100));
@@ -198,9 +199,10 @@ export class IndependentResolverService {
           AND resolution_date < NOW()
           AND confidence_basis ? 'falsifiable'
           AND ($1::text IS NULL OR producing_agent_id = $1)
+          AND ($2::text IS NULL OR domain = $2)
         ORDER BY resolution_date ASC
-        LIMIT $2`,
-      [input.producingAgentId ?? null, limit]
+        LIMIT $3`,
+      [input.producingAgentId ?? null, input.domain ?? null, limit]
     );
     let resolvedFalse = 0;
     let resolvedTrue = 0;

@@ -21,6 +21,7 @@ import * as path from 'path';
 
 const backendRoot = path.resolve(__dirname, '..', '..');
 const repoRoot = path.resolve(backendRoot, '..');
+const checkOnly = process.argv.includes('--check');
 
 function fileExists(rel: string, base = backendRoot): boolean {
   return fs.existsSync(path.resolve(base, rel));
@@ -255,6 +256,35 @@ check(
   'Makefile release-gate contract'
 );
 
+check(
+  'J7_helm_deployment_topology',
+  'Helm chart contains backend, frontend, Services, Ingress, autoscaling, disruption budgets, migration job, and outbox worker',
+  fileExists('infrastructure/kubernetes/helm/agentco/templates/deployment.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/frontend-deployment.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/services.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/ingress.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/hpa.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/pdb.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/migration-job.yaml', repoRoot) &&
+    fileExists('infrastructure/kubernetes/helm/agentco/templates/outbox-worker-deployment.yaml', repoRoot) &&
+    fileExists('tests/helm-deployment-contract.test.ts'),
+  'Helm topology templates + helm-deployment-contract.test.ts'
+);
+
+check(
+  'J8_forensic_audit_controls',
+  'audit controls include requirements-to-behaviour, external dependency, completeness, and post-remediation ledgers',
+  fileExists('scripts/generate_forensic_audit_controls.py', repoRoot) &&
+    fileExists('docs/audit/FORENSIC_AUDIT_CONTROLS.json', repoRoot) &&
+    fileExists('docs/audit/FORENSIC_AUDIT_CONTROLS.md', repoRoot) &&
+    fileContains('docs/audit/FORENSIC_AUDIT_CONTROLS.md', 'Requirements-To-Behaviour Matrix', repoRoot) &&
+    fileContains('docs/audit/FORENSIC_AUDIT_CONTROLS.md', 'Cross-Repository And External Dependency Audit', repoRoot) &&
+    fileContains('docs/audit/FORENSIC_AUDIT_CONTROLS.md', 'Finding Completeness Ledger', repoRoot) &&
+    fileContains('docs/audit/FORENSIC_AUDIT_CONTROLS.md', 'Independent Post-Remediation Re-Audit Checklist', repoRoot) &&
+    fileContains('tests/test_forensic_inventory.py', 'test_forensic_audit_controls_cover_requirements_dependencies_and_completeness', repoRoot),
+  'forensic audit controls generator + generated ledgers + regression test'
+);
+
 // --- Dimension scoring (mechanical, gated on signals) -----------------------
 
 function passed(prefix: string): boolean {
@@ -314,9 +344,6 @@ const report = {
 };
 
 const outDir = path.resolve(repoRoot, 'reports/system_run/latest');
-fs.mkdirSync(outDir, { recursive: true });
-fs.writeFileSync(path.join(outDir, 'score_validation.json'), JSON.stringify(report, null, 2) + '\n');
-
 const md = [
   '# Score Validation (signal-gated)',
   '',
@@ -343,12 +370,20 @@ const md = [
   ),
   '',
 ].join('\n');
-fs.writeFileSync(path.join(outDir, 'score_validation.md'), md);
+if (!checkOnly) {
+  fs.mkdirSync(outDir, { recursive: true });
+  fs.writeFileSync(path.join(outDir, 'score_validation.json'), JSON.stringify(report, null, 2) + '\n');
+  fs.writeFileSync(path.join(outDir, 'score_validation.md'), md);
+}
 
 console.log(`[score-validation] ${checks.filter(c => c.pass).length}/${checks.length} checks pass`);
 console.log(`[score-validation] estimated score ${scoreOutOf100}/100; claims80Plus=${report.claims80Plus}`);
-console.log(`[score-validation] report written to ${outDir}/score_validation.{json,md}`);
-if (!allChecksPass) {
+if (checkOnly) {
+  console.log('[score-validation] check mode: report not written');
+} else {
+  console.log(`[score-validation] report written to ${outDir}/score_validation.{json,md}`);
+}
+if (!allChecksPass || !report.claims80Plus) {
   console.error('[score-validation] some acceptance checks failed:');
   for (const c of checks.filter(x => !x.pass)) console.error(`  ❌ ${c.id}: ${c.description}`);
   process.exitCode = 1;
