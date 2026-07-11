@@ -1,0 +1,221 @@
+{
+  "active_versions": {
+    "prompt": "b2f71494-7790-5880-b092-38c1767cec85"
+  },
+  "all_promotions_audited": true,
+  "artifact_count": 4,
+  "artifacts": [
+    {
+      "approval_status": "approved:human-governor:auth-baseline",
+      "artifact_id": "243cb4e2-7471-57bc-a884-ea192a56c511",
+      "artifact_version": "phase11.learning-artifact.v1",
+      "benchmark_impact": {
+        "baseline_score": 0.9,
+        "benchmark_version": "phase10.benchmark.v1",
+        "calibration_delta": 0.0,
+        "candidate_score": 0.91,
+        "unsupported_claim_delta": 0.0
+      },
+      "created_at": "2026-07-11T00:00:00+00:00",
+      "evaluation_record_ids": [
+        "phase10:baseline-eval"
+      ],
+      "evidence_refs": [
+        "evidence:baseline"
+      ],
+      "previous_active_artifact_id": null,
+      "promotion_history": [
+        {
+          "actor_id": "release-manager",
+          "artifact_id": "243cb4e2-7471-57bc-a884-ea192a56c511",
+          "audit_backend": "memory",
+          "audit_log_id": "243cb4e2-7471-57bc-a884-ea192a56c511:approved->canary:staged canary",
+          "event_id": "243cb4e2-7471-57bc-a884-ea192a56c511:approved->canary:staged canary",
+          "from_state": "approved",
+          "reason": "staged canary",
+          "timestamp": "2026-07-11T00:00:00+00:00",
+          "to_state": "canary"
+        },
+        {
+          "actor_id": "release-manager",
+          "artifact_id": "243cb4e2-7471-57bc-a884-ea192a56c511",
+          "audit_backend": "memory",
+          "audit_log_id": "243cb4e2-7471-57bc-a884-ea192a56c511:canary->promoted:promoted controlled learning artifact",
+          "event_id": "243cb4e2-7471-57bc-a884-ea192a56c511:canary->promoted:promoted controlled learning artifact",
+          "from_state": "canary",
+          "reason": "promoted controlled learning artifact",
+          "timestamp": "2026-07-11T00:00:00+00:00",
+          "to_state": "promoted"
+        }
+      ],
+      "proposed_change": {
+        "change": "controlled prompt update",
+        "surface": "prompt",
+        "version": "prompt-v1"
+      },
+      "proposer_id": "phase11-proposer",
+      "rollback_history": [],
+      "source_observations": [
+        "observation: prompt ambiguity in reviewed tasks"
+      ],
+      "state": "promoted"
+    },
+    {
+      "approval_status": "approved:human-governor:auth-candidate",
+      "artifact_id": "b2f71494-7790-5880-b092-38c1767cec85",
+      "artifact_version": "phase11.learning-artifact.v1",
+      "benchmark_impact": {
+        "baseline_score": 0.91,
+        "benchmark_version": "phase10.benchmark.v1",
+        "calibration_delta": 0.0,
+        "candidate_score": 0.93,
+        "unsupported_claim_delta": 0.0
+      },
+      "created_at": "2026-07-11T00:00:00+00:00",
+      "evaluation_record_ids": [
+        "phase10:candidate-eval"
+      ],
+      "evidence_refs": [
+        "evidence:candidate"
+      ],
+      "previous_active_artifact_id": "243cb4e2-7471-57bc-a884-ea192a56c511",
+      "promotion_history": [
+        {
+          "actor_id": "release-manager",
+          "artifact_id": "b2f71494-7790-5880-b092-38c1767cec85",
+          "audit_backend": "memory",
+          "audit_log_id": "b2f71494-7790-5880-b092-38c1767cec85:approved->canary:staged canary",
+          "event_id": "b2f71494-7790-5880-b092-38c1767cec85:approved->canary:staged canary",
+          "from_state": "approved",
+          "reason": "staged canary",
+          "timestamp": "2026-07-11T00:00:00+00:00",
+          "to_state": "canary"
+        },
+        {
+          "actor_id": "release-manager",
+          "artifact_id": "b2f71494-7790-5880-b092-38c1767cec85",
+          "audit_backend": "memory",
+          "audit_log_id": "b2f71494-7790-5880-b092-38c1767cec85:canary->promoted:promoted controlled learning artifact",
+          "event_id": "b2f71494-7790-5880-b092-38c1767cec85:canary->promoted:promoted controlled learning artifact",
+          "from_state": "canary",
+          "reason": "promoted controlled learning artifact",
+          "timestamp": "2026-07-11T00:00:00+00:00",
+          "to_state": "promoted"
+        }
+      ],
+      "proposed_change": {
+        "change": "controlled prompt update",
+        "surface": "prompt",
+        "version": "prompt-v2"
+      },
+      "proposer_id": "phase11-proposer",
+      "rollback_history": [],
+      "source_observations": [
+        "observation: support language improved in Phase 10 eval"
+      ],
+      "state": "promoted"
+    },
+    {
+      "approval_status": "approved:human-governor:auth-degraded",
+      "artifact_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf",
+      "artifact_version": "phase11.learning-artifact.v1",
+      "benchmark_impact": {
+        "baseline_score": 0.93,
+        "benchmark_version": "phase10.benchmark.v1",
+        "calibration_delta": 0.08,
+        "candidate_score": 0.94,
+        "unsupported_claim_delta": 0.0
+      },
+      "created_at": "2026-07-11T00:00:00+00:00",
+      "evaluation_record_ids": [
+        "phase10:degraded-eval"
+      ],
+      "evidence_refs": [
+        "evidence:degraded"
+      ],
+      "previous_active_artifact_id": null,
+      "promotion_history": [
+        {
+          "actor_id": "release-manager",
+          "artifact_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf",
+          "audit_backend": "memory",
+          "audit_log_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf:approved->canary:staged canary",
+          "event_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf:approved->canary:staged canary",
+          "from_state": "approved",
+          "reason": "staged canary",
+          "timestamp": "2026-07-11T00:00:00+00:00",
+          "to_state": "canary"
+        }
+      ],
+      "proposed_change": {
+        "change": "controlled policy update",
+        "surface": "policy",
+        "version": "policy-v2"
+      },
+      "proposer_id": "phase11-proposer",
+      "rollback_history": [
+        {
+          "actor_id": "release-manager",
+          "artifact_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf",
+          "audit_backend": "memory",
+          "audit_log_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf:canary->rolled_back:rollback:calibration_degradation",
+          "event_id": "76c6df25-53da-5a64-a4fa-4d41aeea1daf:canary->rolled_back:rollback:calibration_degradation",
+          "from_state": "canary",
+          "reason": "rollback:calibration_degradation",
+          "timestamp": "2026-07-11T00:00:00+00:00",
+          "to_state": "rolled_back"
+        }
+      ],
+      "source_observations": [
+        "observation: candidate caused calibration drift"
+      ],
+      "state": "rolled_back"
+    },
+    {
+      "approval_status": "rejected",
+      "artifact_id": "683909bd-0666-571f-b960-be4c085d9904",
+      "artifact_version": "phase11.learning-artifact.v1",
+      "benchmark_impact": {
+        "baseline_score": 0.93,
+        "benchmark_version": "phase10.benchmark.v1",
+        "calibration_delta": 0.0,
+        "candidate_score": 0.8,
+        "unsupported_claim_delta": 0.0
+      },
+      "created_at": "2026-07-11T00:00:00+00:00",
+      "evaluation_record_ids": [
+        "phase10:regression-eval"
+      ],
+      "evidence_refs": [
+        "evidence:regression"
+      ],
+      "previous_active_artifact_id": null,
+      "promotion_history": [],
+      "proposed_change": {
+        "change": "controlled memory_rule update",
+        "surface": "memory_rule",
+        "version": "memory-rule-v2"
+      },
+      "proposer_id": "phase11-proposer",
+      "rollback_history": [],
+      "source_observations": [
+        "observation: benchmark declined"
+      ],
+      "state": "rejected"
+    }
+  ],
+  "audit_event_count": 6,
+  "automatic_triggers": {
+    "683909bd-0666-571f-b960-be4c085d9904": "benchmark_regression",
+    "76c6df25-53da-5a64-a4fa-4d41aeea1daf": "calibration_degradation"
+  },
+  "generated_by": "scripts/generate_controlled_learning_report.py",
+  "missing_evaluation_evidence": [],
+  "promotion_event_count": 5,
+  "promotion_lineage_preserved": true,
+  "recoverable_active_versions": true,
+  "regression_blocked": true,
+  "rollback_coverage": true,
+  "rollback_event_count": 1,
+  "unauthorized_production_mutation": []
+}
