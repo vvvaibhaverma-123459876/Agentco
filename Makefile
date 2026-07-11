@@ -1,6 +1,6 @@
 PYTHON ?= python3.13
 
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates release-gate status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check
+.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates release-gate status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check
 
 python-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
@@ -89,6 +89,14 @@ evaluation-calibration-report-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/generate_evaluation_calibration_report.py --check
 
+controlled-learning-report:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/generate_controlled_learning_report.py
+
+controlled-learning-report-check:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/generate_controlled_learning_report.py --check
+
 remaining:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/build_ledger.py remaining
@@ -119,6 +127,8 @@ release-gate:
 	@$(MAKE) agent-protocol-matrix-check
 	@echo "== [1b/11] evaluation calibration report check =="
 	@$(MAKE) evaluation-calibration-report-check
+	@echo "== [1c/11] controlled learning report check =="
+	@$(MAKE) controlled-learning-report-check
 	@echo "== [2/11] backend install =="
 	cd backend && npm ci
 	@echo "== [3/11] backend migrations =="
