@@ -1,32 +1,32 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1614,
+  "tracked_file_count": 1624,
   "category_counts": {
     "Database migration": 125,
     "Deployment infrastructure": 22,
     "Deprecated code": 48,
-    "Development tooling": 108,
-    "Documentation": 289,
+    "Development tooling": 110,
+    "Documentation": 294,
     "Experimental code": 151,
-    "Generated artifact": 99,
+    "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 258,
+    "Test infrastructure": 259,
     "Unknown purpose": 29
   },
   "top_level_counts": {
     "backend": 441,
-    "docs": 219,
+    "docs": 222,
     "evals": 180,
-    "scripts": 120,
+    "scripts": 122,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
-    "reports": 44,
+    "reports": 48,
     "frontend": 36,
     "reserve": 33,
-    "tests": 32,
+    "tests": 33,
     "calibration": 30,
     "results": 20,
     "infrastructure": 18,
@@ -75,11 +75,11 @@
     "pytest.ini": 1
   },
   "extension_counts": {
-    ".py": 527,
-    ".md": 359,
+    ".py": 530,
+    ".md": 362,
     ".ts": 290,
     ".sql": 126,
-    ".json": 118,
+    ".json": 122,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 21,
@@ -5412,6 +5412,24 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/BASELINE_COMMAND_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BASELINE_EXECUTION_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BASELINE_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/civilization_migration_map.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -7902,6 +7920,18 @@
       "extension": ".md"
     },
     {
+      "path": "reports/system_run/latest/gate_integrity.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/system_run/latest/gate_integrity.md",
+      "category": "Documentation",
+      "top_level": "reports",
+      "extension": ".md"
+    },
+    {
       "path": "reports/system_run/latest/goal_run.json",
       "category": "Generated artifact",
       "top_level": "reports",
@@ -7933,6 +7963,18 @@
     },
     {
       "path": "reports/system_run/latest/longitudinal_learning_report.md",
+      "category": "Documentation",
+      "top_level": "reports",
+      "extension": ".md"
+    },
+    {
+      "path": "reports/system_run/latest/make_target_validation.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/system_run/latest/make_target_validation.md",
       "category": "Documentation",
       "top_level": "reports",
       "extension": ".md"
@@ -9312,6 +9354,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_gate_integrity.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_level3_architecture.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9328,6 +9376,12 @@
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/verify_make_targets.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/verify_memory_influence_live.py",
@@ -9673,6 +9727,12 @@
     },
     {
       "path": "tests/test_forensic_inventory.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_gate_integrity_controls.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1614`
+- Tracked files: `1624`
 
 ## Category Counts
 
@@ -11,13 +11,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 125 |
 | Deployment infrastructure | 22 |
 | Deprecated code | 48 |
-| Development tooling | 108 |
-| Documentation | 289 |
+| Development tooling | 110 |
+| Documentation | 294 |
 | Experimental code | 151 |
-| Generated artifact | 99 |
+| Generated artifact | 101 |
 | Production runtime code | 456 |
 | Prompt/template | 29 |
-| Test infrastructure | 258 |
+| Test infrastructure | 259 |
 | Unknown purpose | 29 |
 
 ## Top-Level Counts
@@ -25,17 +25,17 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 441 |
-| `docs` | 219 |
+| `docs` | 222 |
 | `evals` | 180 |
-| `scripts` | 120 |
+| `scripts` | 122 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
 | `archive` | 48 |
-| `reports` | 44 |
+| `reports` | 48 |
 | `frontend` | 36 |
 | `reserve` | 33 |
-| `tests` | 32 |
+| `tests` | 33 |
 | `calibration` | 30 |
 | `results` | 20 |
 | `infrastructure` | 18 |
@@ -972,6 +972,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/ROUTE_SENSITIVITY_MATRIX.md` | Documentation |
 | `docs/audit/SELF_IMPROVEMENT_EXPERIMENT_REPORT.json` | Documentation |
 | `docs/audit/V1_SEVERITY_REACHABILITY.md` | Documentation |
+| `docs/audit/current/BASELINE_COMMAND_RESULTS.json` | Documentation |
+| `docs/audit/current/BASELINE_EXECUTION_REPORT.md` | Documentation |
+| `docs/audit/current/BASELINE_FINDINGS.json` | Documentation |
 | `docs/civilization_migration_map.md` | Documentation |
 | `docs/history/5MIN_TEST_FINAL_REPORT.md` | Documentation |
 | `docs/history/5MIN_TEST_RESULTS_SUMMARY.md` | Documentation |
@@ -1387,12 +1390,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports/system_run/latest/docker_startup_verification.md` | Documentation |
 | `reports/system_run/latest/doctor_report.json` | Generated artifact |
 | `reports/system_run/latest/doctor_report.md` | Documentation |
+| `reports/system_run/latest/gate_integrity.json` | Generated artifact |
+| `reports/system_run/latest/gate_integrity.md` | Documentation |
 | `reports/system_run/latest/goal_run.json` | Generated artifact |
 | `reports/system_run/latest/goal_run.md` | Documentation |
 | `reports/system_run/latest/live_cross_domain_goal_run.json` | Generated artifact |
 | `reports/system_run/latest/live_cross_domain_goal_run.md` | Documentation |
 | `reports/system_run/latest/longitudinal_learning_report.json` | Generated artifact |
 | `reports/system_run/latest/longitudinal_learning_report.md` | Documentation |
+| `reports/system_run/latest/make_target_validation.json` | Generated artifact |
+| `reports/system_run/latest/make_target_validation.md` | Documentation |
 | `reports/system_run/latest/memory_influence_verification.json` | Generated artifact |
 | `reports/system_run/latest/memory_influence_verification.md` | Documentation |
 | `reports/system_run/latest/migration_verification.json` | Generated artifact |
@@ -1622,9 +1629,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_docker_startup.py` | Development tooling |
+| `scripts/verify_gate_integrity.py` | Development tooling |
 | `scripts/verify_level3_architecture.py` | Development tooling |
 | `scripts/verify_level3_db_evidence.py` | Development tooling |
 | `scripts/verify_level4_certification.sh` | Development tooling |
+| `scripts/verify_make_targets.py` | Development tooling |
 | `scripts/verify_memory_influence_live.py` | Development tooling |
 | `scripts/verify_migrations_native.py` | Development tooling |
 | `scripts/verify_mission_progress.py` | Development tooling |
@@ -1683,6 +1692,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_durable_runtime_cleanup.py` | Test infrastructure |
 | `tests/test_execute_durable_task.py` | Test infrastructure |
 | `tests/test_forensic_inventory.py` | Test infrastructure |
+| `tests/test_gate_integrity_controls.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |

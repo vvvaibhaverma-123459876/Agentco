@@ -1,11 +1,14 @@
 # Score Validation (signal-gated)
 
-Generated 2026-07-11T22:42:18.788Z at commit `4e9f7c43bcff2a0ced73e6653e0171ad28eebf7e`.
+Generated 2026-07-11T23:28:31.568Z at commit `8ee5a55d300cd13672172570bed1ba49a869dca0`.
+Input hash: `08ba6275f318d2b6cab4951013f6f5e533a9da3005394eb136d9cc2d22d6a065`.
 
-Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.
+This report separates structural acceptance from verified behaviour. The structural score is based on repository signals. This command does NOT execute the test suites and therefore does not emit an overall production-readiness score; run `make release-gate` and clean-room/staging commands for behavioural proof.
 
-**Acceptance checks:** 29/29 pass.
-**Estimated score:** 82.5/100 (132/160).
+**Acceptance checks:** 30/30 pass.
+**Structural score:** 82.5/100 (132/160).
+**Verified behaviour score:** not emitted by this structural validator.
+**Existing report fresh for HEAD:** true
 **Claims 80+ :** true
 
 ## Acceptance checks
@@ -41,6 +44,7 @@ Scores are estimates gated on structural signals (presence of the required servi
 | J6_release_gate_enforces_core_contracts | release gate checks route auth, audit chain, generated reports, and clean-tree behavior | ✅ | Makefile release-gate contract |
 | J7_helm_deployment_topology | Helm chart contains backend, frontend, Services, Ingress, autoscaling, disruption budgets, migration job, and outbox worker | ✅ | Helm topology templates + helm-deployment-contract.test.ts |
 | J8_forensic_audit_controls | audit controls include requirements-to-behaviour, external dependency, completeness, and post-remediation ledgers | ✅ | forensic audit controls generator + generated ledgers + regression test |
+| J9_gate_integrity_controls | release gate includes fake-success scanner and advertised-target validation | ✅ | gate-integrity scanner + advertised target validator + Makefile release-gate wiring |
 
 ## Dimensions
 

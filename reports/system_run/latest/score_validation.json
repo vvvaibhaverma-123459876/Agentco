@@ -1,7 +1,8 @@
 {
-  "generatedAt": "2026-07-11T22:42:18.788Z",
-  "commit": "4e9f7c43bcff2a0ced73e6653e0171ad28eebf7e",
-  "note": "Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.",
+  "generatedAt": "2026-07-11T23:28:31.568Z",
+  "commit": "8ee5a55d300cd13672172570bed1ba49a869dca0",
+  "inputHash": "08ba6275f318d2b6cab4951013f6f5e533a9da3005394eb136d9cc2d22d6a065",
+  "note": "This report separates structural acceptance from verified behaviour. The structural score is based on repository signals. This command does NOT execute the test suites and therefore does not emit an overall production-readiness score; run `make release-gate` and clean-room/staging commands for behavioural proof.",
   "acceptanceChecks": [
     {
       "id": "A1_clean_room_target",
@@ -176,6 +177,12 @@
       "description": "audit controls include requirements-to-behaviour, external dependency, completeness, and post-remediation ledgers",
       "pass": true,
       "evidence": "forensic audit controls generator + generated ledgers + regression test"
+    },
+    {
+      "id": "J9_gate_integrity_controls",
+      "description": "release gate includes fake-success scanner and advertised-target validation",
+      "pass": true,
+      "evidence": "gate-integrity scanner + advertised target validator + Makefile release-gate wiring"
     }
   ],
   "acceptanceAllPass": true,
@@ -294,6 +301,11 @@
     }
   ],
   "totalOutOf160": 132,
-  "scoreOutOf100": 82.5,
-  "claims80Plus": true
+  "structuralScoreOutOf100": 82.5,
+  "verifiedBehaviorScoreOutOf100": null,
+  "scorePolicy": "Structural score must not be presented as verified behaviour.",
+  "claims80Plus": true,
+  "existingReportFresh": true,
+  "existingReportCommit": "missing",
+  "existingReportInputHash": "missing"
 }

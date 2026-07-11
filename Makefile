@@ -1,6 +1,6 @@
 PYTHON ?= python3.13
 
-.PHONY: dev smoke smoke-python smoke-node migrate test validation master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify release-gates release-gate status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
+.PHONY: dev smoke smoke-python smoke-node migrate test validation verify slice reachability master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-crash-recovery-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run civilization-calibration-trust-smoke python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify production-smoke-test production-safety-test staging-smoke-test staging-governance-gate staging-load-test staging-validation-gate release-gates release-gate gate-integrity verify-advertised-targets audit-clean-room status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
 
 python-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
@@ -125,10 +125,22 @@ release-gates:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/verify_release_gates.py --update-ledger
 
+gate-integrity:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_gate_integrity.py --check
+
+verify-advertised-targets:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_make_targets.py --check
+
 release-gate:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@echo "== [0/12] clean tree before gate =="
 	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty before release-gate"; exit 1)
+	@echo "== [0a/12] gate integrity check =="
+	@$(MAKE) gate-integrity
+	@echo "== [0b/12] advertised target check =="
+	@$(MAKE) verify-advertised-targets
 	@echo "== [1/12] status check =="
 	@$(MAKE) status-check
 	@echo "== [1a/12] agent protocol conformance matrix check =="
@@ -173,6 +185,24 @@ docker-startup-verify:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/verify_docker_startup.py
 
+production-smoke-test:
+	@$(PYTHON) scripts/test_production_smoke.py
+
+production-safety-test:
+	@$(PYTHON) scripts/test_production_security_gate.py
+
+staging-smoke-test:
+	@bash scripts/test_staging_smoke.sh
+
+staging-governance-gate:
+	@bash scripts/test_staging_governance_gate.sh
+
+staging-load-test:
+	@$(PYTHON) scripts/test_staging_load.py
+
+staging-validation-gate:
+	@bash scripts/run_staging_validation_gate.sh
+
 dev:
 	docker compose --profile dev up -d
 	cd backend && npm install
@@ -203,6 +233,16 @@ test: smoke db-tests
 
 validation:
 	$(PYTHON) scripts/run_real_world_validation.py
+
+verify: release-gate
+
+slice: civilization-slice
+
+reachability: release-gates
+
+civilization-calibration-trust-smoke:
+	$(PYTHON) scripts/test_calibration_constitution.py
+	$(PYTHON) scripts/test_trust_policy.py
 
 vendor-risk-smoke:
 	@echo "Running enterprise vendor risk triage benchmark (smoke test)..."
@@ -311,6 +351,10 @@ autonomy-rollback-test:
 	@echo "🎯 Running LEVEL_4 Area 5: Rollback Hardening Test..."
 	$(PYTHON) scripts/test_rollback.py
 
+autonomy-crash-recovery-test:
+	@echo "🎯 Running LEVEL_4 Area 3: Crash Recovery Test..."
+	$(PYTHON) scripts/test_crash_recovery.py
+
 autonomy-rbac-test:
 	@echo "🎯 Running LEVEL_4 Area 6: RBAC Hardening Test..."
 	$(PYTHON) scripts/test_rbac.py
@@ -368,15 +412,11 @@ autonomy-phases-5-8-test:
 
 autonomy-learner-test:
 	@echo "🎯 Running PHASE 9: Learner & Replay Tests..."
-	@echo "  Testing: Replay batches, learner runs, candidate generation"
-	@echo "  Verifying: Real trajectories, baseline metrics, artifact hashes"
-	$(PYTHON) -c "print('✅ PHASE 9 learner tests would verify real logic')"
+	$(PYTHON) -m pytest runtime/tests/test_controlled_learning.py -q
 
 autonomy-simulator-test:
 	@echo "🎯 Running PHASE 10: Simulator Tests..."
-	@echo "  Testing: Deterministic simulators, trajectory persistence"
-	@echo "  Verifying: Same seed = same trajectory, no fake success"
-	$(PYTHON) -c "print('✅ PHASE 10 simulator tests would verify determinism')"
+	$(PYTHON) -m pytest tests/test_pawdent_business_simulation.py -q
 
 autonomy-phases-9-13-smoke:
 	@echo "🎯 Running PHASES 9-13: Self-Improvement Loop Smoke Test..."
@@ -405,48 +445,9 @@ autonomy-civilization-learning-test:
 # ============================================================================
 
 production-release-gate:
-	@echo ""
-	@echo "╔════════════════════════════════════════════════════════════════╗"
-	@echo "║     PRODUCTION RELEASE GATE - Deployment Readiness Audit      ║"
-	@echo "╚════════════════════════════════════════════════════════════════╝"
-	@echo ""
-	@echo "Step 1/7: Backend Compilation Verification"
-	cd backend && npm run build || (echo "✗ FAILED: Backend does not compile"; exit 1)
-	@echo "✓ Backend compiles successfully"
-	@echo ""
-	@echo "Step 2/7: Baseline Tests"
-	npm test 2>&1 | grep -E "passed|failed" || echo "✓ Tests runnable"
-	@echo ""
-	@echo "Step 3/7: Production Configuration Validation"
-	@test -f .env.production.example || (echo "✗ FAILED: Missing .env.production.example"; exit 1)
-	@echo "✓ Production config template exists"
-	@echo ""
-	@echo "Step 4/7: Database Migration Check"
-	@echo "  (Requires DATABASE_URL to test - skipping in CI)"
-	@echo "✓ Migration framework verified"
-	@echo ""
-	@echo "Step 5/7: Production Security Gate"
-	$(PYTHON) scripts/test_production_security_gate.py || (echo "✗ FAILED: Security gate failed"; exit 1)
-	@echo ""
-	@echo "Step 6/7: Production Smoke Test"
-	$(PYTHON) scripts/test_production_smoke.py || (echo "⚠ WARNING: Backend not running (expected in CI)"; true)
-	@echo ""
-	@echo "Step 7/7: Documentation Check"
-	@test -f docs/PRODUCTION_DEPLOYMENT_GUIDE.md || (echo "✗ FAILED: Missing deployment guide"; exit 1)
-	@test -f docs/INCIDENT_RESPONSE_RUNBOOK.md || echo "⚠ WARNING: Missing incident response runbook"
-	@echo "✓ Documentation verified"
-	@echo ""
-	@echo "╔════════════════════════════════════════════════════════════════╗"
-	@echo "║                    FINAL VERDICT                              ║"
-	@echo "╚════════════════════════════════════════════════════════════════╝"
-	@echo ""
-	@echo "✓ ALL GATES PASSED - READY FOR PRODUCTION"
-	@echo ""
-	@echo "Status: PRODUCTION_READY"
-	@echo "Date: $$(date)"
-	@echo "Exit Code: 0"
-	@echo ""
-	@exit 0
+	@echo "production-release-gate is retired because it masked failures."
+	@echo "Use the canonical command instead: make release-gate"
+	@exit 2
 
 autonomy-real-web-free-run:
 	@echo "🚀 STARTING REAL-WEB AUTONOMOUS BEHAVIOR OBSERVATION"
@@ -502,6 +503,8 @@ verify-clean-room:
 		cd backend && ./node_modules/.bin/ts-node src/cli/score-validation.ts || exit 1; \
 	else echo "score validation CLI not present yet"; fi
 	@echo "verify-clean-room: ALL GREEN"
+
+audit-clean-room: verify-clean-room
 
 .PHONY: longitudinal-learning
 longitudinal-learning:

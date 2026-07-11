@@ -16,12 +16,19 @@
  */
 
 import { execSync } from 'child_process';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 
 const backendRoot = path.resolve(__dirname, '..', '..');
 const repoRoot = path.resolve(backendRoot, '..');
 const checkOnly = process.argv.includes('--check');
+let commit = 'unknown';
+try {
+  commit = execSync('git rev-parse HEAD', { cwd: repoRoot }).toString().trim();
+} catch {
+  /* not a git checkout */
+}
 
 function fileExists(rel: string, base = backendRoot): boolean {
   return fs.existsSync(path.resolve(base, rel));
@@ -30,6 +37,34 @@ function fileExists(rel: string, base = backendRoot): boolean {
 function fileContains(rel: string, needle: string, base = backendRoot): boolean {
   const p = path.resolve(base, rel);
   return fs.existsSync(p) && fs.readFileSync(p, 'utf8').includes(needle);
+}
+
+function hashReportInputs(): string {
+  const inputs = [
+    'Makefile',
+    'backend/src/cli/score-validation.ts',
+    'scripts/verify_gate_integrity.py',
+    'scripts/verify_make_targets.py',
+    'scripts/generate_forensic_audit_controls.py',
+    'scripts/generate_forensic_inventory.py',
+    'docs/audit/FORENSIC_AUDIT_CONTROLS.json',
+    'docs/audit/FORENSIC_FILE_INVENTORY.json',
+    'tests/test_forensic_inventory.py',
+    'tests/test_gate_integrity_controls.py',
+  ];
+  const digest = crypto.createHash('sha256');
+  for (const rel of inputs) {
+    const full = path.resolve(repoRoot, rel);
+    digest.update(rel);
+    digest.update('\0');
+    if (fs.existsSync(full)) {
+      digest.update(fs.readFileSync(full));
+    } else {
+      digest.update('MISSING');
+    }
+    digest.update('\0');
+  }
+  return digest.digest('hex');
 }
 
 interface Check {
@@ -285,6 +320,16 @@ check(
   'forensic audit controls generator + generated ledgers + regression test'
 );
 
+check(
+  'J9_gate_integrity_controls',
+  'release gate includes fake-success scanner and advertised-target validation',
+  fileExists('scripts/verify_gate_integrity.py', repoRoot) &&
+    fileExists('scripts/verify_make_targets.py', repoRoot) &&
+    fileContains('Makefile', 'gate-integrity', repoRoot) &&
+    fileContains('Makefile', 'verify-advertised-targets', repoRoot),
+  'gate-integrity scanner + advertised target validator + Makefile release-gate wiring'
+);
+
 // --- Dimension scoring (mechanical, gated on signals) -----------------------
 
 function passed(prefix: string): boolean {
@@ -323,24 +368,40 @@ const scored = dimensions.map(d => ({
 const totalOutOf160 = scored.reduce((sum, d) => sum + d.score, 0);
 const scoreOutOf100 = Math.round((totalOutOf160 / 160) * 1000) / 10;
 
-let commit = 'unknown';
-try {
-  commit = execSync('git rev-parse HEAD', { cwd: repoRoot }).toString().trim();
-} catch {
-  /* not a git checkout */
-}
-
 const allChecksPass = checks.every(c => c.pass);
+const inputHash = hashReportInputs();
+const existingReportPath = path.resolve(repoRoot, 'reports/system_run/latest/score_validation.json');
+let existingReportFresh = true;
+let existingReportCommit = 'missing';
+let existingReportInputHash = 'missing';
+if (checkOnly && fs.existsSync(existingReportPath)) {
+  try {
+    const existing = JSON.parse(fs.readFileSync(existingReportPath, 'utf8'));
+    existingReportCommit = String(existing.commit ?? 'missing');
+    existingReportInputHash = String(existing.inputHash ?? 'missing');
+    existingReportFresh = existingReportInputHash === inputHash;
+  } catch {
+    existingReportFresh = false;
+    existingReportCommit = 'unreadable';
+    existingReportInputHash = 'unreadable';
+  }
+}
 const report = {
   generatedAt: new Date().toISOString(),
   commit,
-  note: 'Scores are estimates gated on structural signals (presence of the required services, migrations, CLIs, tests, and docs). They do NOT execute the test suites; run `make verify-clean-room` for behavioral proof.',
+  inputHash,
+  note: 'This report separates structural acceptance from verified behaviour. The structural score is based on repository signals. This command does NOT execute the test suites and therefore does not emit an overall production-readiness score; run `make release-gate` and clean-room/staging commands for behavioural proof.',
   acceptanceChecks: checks,
   acceptanceAllPass: allChecksPass,
   dimensions: scored,
   totalOutOf160,
-  scoreOutOf100,
+  structuralScoreOutOf100: scoreOutOf100,
+  verifiedBehaviorScoreOutOf100: null,
+  scorePolicy: 'Structural score must not be presented as verified behaviour.',
   claims80Plus: allChecksPass && scoreOutOf100 >= 80,
+  existingReportFresh,
+  existingReportCommit,
+  existingReportInputHash,
 };
 
 const outDir = path.resolve(repoRoot, 'reports/system_run/latest');
@@ -348,11 +409,14 @@ const md = [
   '# Score Validation (signal-gated)',
   '',
   `Generated ${report.generatedAt} at commit \`${commit}\`.`,
+  `Input hash: \`${inputHash}\`.`,
   '',
   report.note,
   '',
   `**Acceptance checks:** ${checks.filter(c => c.pass).length}/${checks.length} pass.`,
-  `**Estimated score:** ${scoreOutOf100}/100 (${totalOutOf160}/160).`,
+  `**Structural score:** ${scoreOutOf100}/100 (${totalOutOf160}/160).`,
+  '**Verified behaviour score:** not emitted by this structural validator.',
+  `**Existing report fresh for HEAD:** ${existingReportFresh}`,
   `**Claims 80+ :** ${report.claims80Plus}`,
   '',
   '## Acceptance checks',
@@ -377,13 +441,16 @@ if (!checkOnly) {
 }
 
 console.log(`[score-validation] ${checks.filter(c => c.pass).length}/${checks.length} checks pass`);
-console.log(`[score-validation] estimated score ${scoreOutOf100}/100; claims80Plus=${report.claims80Plus}`);
+console.log(`[score-validation] structural score ${scoreOutOf100}/100; verifiedBehaviorScore=null; claims80Plus=${report.claims80Plus}`);
 if (checkOnly) {
   console.log('[score-validation] check mode: report not written');
 } else {
   console.log(`[score-validation] report written to ${outDir}/score_validation.{json,md}`);
 }
-if (!allChecksPass || !report.claims80Plus) {
+if (checkOnly && !existingReportFresh) {
+  console.error(`[score-validation] stale existing report input hash: ${existingReportInputHash} != ${inputHash}`);
+}
+if (!allChecksPass || !report.claims80Plus || (checkOnly && !existingReportFresh)) {
   console.error('[score-validation] some acceptance checks failed:');
   for (const c of checks.filter(x => !x.pass)) console.error(`  ❌ ${c.id}: ${c.description}`);
   process.exitCode = 1;

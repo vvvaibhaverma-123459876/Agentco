@@ -123,7 +123,6 @@ def build_report() -> dict[str, Any]:
             "tests/civilization-runtime-reachability.test.ts",
             "tests/civilization-runtime-routes.test.ts",
             "--runInBand",
-            "--forceExit",
         ],
         timeout=90,
     )

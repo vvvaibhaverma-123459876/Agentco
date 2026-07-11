@@ -1,0 +1,54 @@
+{
+  "baseline_tag": "audit-baseline-2026-07",
+  "baseline_commit": "b3e6fa44a6075c44062374c0ce9be5edaa23483f",
+  "findings": [
+    {
+      "id": "GATE-001",
+      "severity": "S2",
+      "status": "reproduced_from_static_evidence",
+      "title": "Retired production-release-gate masked failures and printed production-ready",
+      "evidence": "Makefile:407-449 at baseline",
+      "required_regression": "scripts/verify_gate_integrity.py must fail if active gates print production-readiness language or mask failures"
+    },
+    {
+      "id": "GATE-002",
+      "severity": "S2",
+      "status": "reproduced_from_static_evidence",
+      "title": "autonomy-learner-test was print-only",
+      "evidence": "Makefile:369-373 at baseline",
+      "required_regression": "autonomy-learner-test must execute a real test runner"
+    },
+    {
+      "id": "GATE-003",
+      "severity": "S2",
+      "status": "reproduced_from_static_evidence",
+      "title": "autonomy-simulator-test was print-only",
+      "evidence": "Makefile:375-379 at baseline",
+      "required_regression": "autonomy-simulator-test must execute a real test runner"
+    },
+    {
+      "id": "GATE-004",
+      "severity": "S2",
+      "status": "reproduced_from_static_evidence",
+      "title": "Active release-gate verifier used Jest forceExit",
+      "evidence": "scripts/verify_release_gates.py:116-127 at baseline",
+      "required_regression": "gate-integrity scanner must reject forceExit in protected release scripts"
+    },
+    {
+      "id": "GATE-005",
+      "severity": "S3",
+      "status": "reproduced_by_command",
+      "title": "Documentation advertised missing Make targets",
+      "evidence": "python3.13 scripts/verify_make_targets.py initially reported 20 missing targets",
+      "required_regression": "verify_make_targets.py --check must report zero missing targets"
+    },
+    {
+      "id": "GATE-006",
+      "severity": "S3",
+      "status": "reproduced_from_static_evidence",
+      "title": "Score validation did not separate structural score from verified behaviour",
+      "evidence": "backend/src/cli/score-validation.ts at baseline",
+      "required_regression": "score_validation.json must expose structuralScoreOutOf100 and verifiedBehaviorScoreOutOf100 separately"
+    }
+  ]
+}
