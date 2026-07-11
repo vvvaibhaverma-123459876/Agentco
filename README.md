@@ -144,6 +144,10 @@ asserts the git tree is still clean at the end.
 - Event bus delivery uses `EVENT_BUS_DELIVERY_MODE`. Production/staging default
   to `outbox`, which atomically writes `event_history` plus `event_bus_outbox`
   before relay. `sync` is intended only for local development compatibility.
+  Run the relay with `cd backend && npm run agentco:outbox-worker`; it drains
+  both the canonical `event_outbox` and the signed event-bus outbox. Tune it
+  with `AGENTCO_OUTBOX_WORKER_POLL_MS`, `AGENTCO_OUTBOX_WORKER_BATCH_SIZE`,
+  `AGENTCO_OUTBOX_WORKER_MAX_ATTEMPTS`, and `AGENTCO_OUTBOX_WORKER_ID`.
 - Backend readiness checks mandatory dependencies with bounded timeouts.
   `KAFKA_MANDATORY=true` makes Kafka part of readiness; production defaults to
   mandatory Kafka when brokers are configured.
