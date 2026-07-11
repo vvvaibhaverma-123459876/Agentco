@@ -11,6 +11,8 @@
  * This improves expert-level accuracy from 71.7% → 78%+
  */
 
+import { llmProvider } from './llm-provider.service';
+
 interface ExpertAgent {
   domain: string;
   expertise_level: number; // 0-1
@@ -270,52 +272,19 @@ export class MultiAgentEnsembleService {
     question: string,
     reasoning: string[]
   ): Promise<{ answer: string; confidence: number; reasoning_chain: string[] }> {
-    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for multi-agent expert responses');
-    }
-
-    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
-    const model = process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini';
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.1,
-        response_format: { type: 'json_object' },
-        messages: [
-          {
-            role: 'system',
-            content:
-              `You are the ${expert.domain} specialist in a bounded AgentCo expert ensemble. ` +
-              `Specialization: ${expert.specialization}. Return JSON with keys answer, confidence, and reasoning_chain. ` +
-              `confidence must be 0 to 1 and reasoning_chain must be an array of concise evidence-grounded steps.`,
-          },
-          {
-            role: 'user',
-            content:
-              `Question: ${question}\n` +
-              `Preferred reasoning structure:\n${reasoning.join('\n')}`,
-          },
-        ],
-      }),
+    const result = await llmProvider.callJson({
+      operation: `expert ensemble:${expert.domain}`,
+      temperature: 0.1,
+      maxTokens: 900,
+      system:
+        `You are the ${expert.domain} specialist in a bounded AgentCo expert ensemble. ` +
+        `Specialization: ${expert.specialization}. Return JSON with keys answer, confidence, and reasoning_chain. ` +
+        `confidence must be 0 to 1 and reasoning_chain must be an array of concise evidence-grounded steps.`,
+      user:
+        `Question: ${question}\n` +
+        `Preferred reasoning structure:\n${reasoning.join('\n')}`,
     });
-
-    if (!response.ok) {
-      throw new Error(`Expert LLM call failed for ${expert.domain}: HTTP ${response.status}`);
-    }
-
-    const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
-    const content = payload.choices?.[0]?.message?.content;
-    if (!content) {
-      throw new Error(`Expert LLM call returned empty content for ${expert.domain}`);
-    }
-
-    const parsed = JSON.parse(content) as { answer?: string; confidence?: number; reasoning_chain?: string[] };
+    const parsed = result.json as { answer?: string; confidence?: number; reasoning_chain?: string[] };
     if (!parsed.answer || typeof parsed.confidence !== 'number') {
       throw new Error(`Expert LLM call returned invalid JSON for ${expert.domain}`);
     }

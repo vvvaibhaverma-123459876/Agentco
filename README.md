@@ -133,6 +133,12 @@ asserts the git tree is still clean at the end.
   `AGENTCO_EXPERIMENT_DATABASE_URL` may override `DATABASE_URL`; otherwise the
   services use `DATABASE_URL`. If no durable DSN exists, evaluation, controlled
   learning, and bounded experiments fail closed instead of using memory stores.
+- Backend LLM calls go through the central provider wrapper. Tune bounded
+  execution with `LLM_REQUEST_TIMEOUT_MS`, `LLM_TOTAL_DEADLINE_MS`,
+  `LLM_MAX_RETRIES`, `LLM_RETRY_BASE_MS`, and `LLM_MAX_OUTPUT_TOKENS`.
+- Event bus delivery uses `EVENT_BUS_DELIVERY_MODE`. Production/staging default
+  to `outbox`, which atomically writes `event_history` plus `event_bus_outbox`
+  before relay. `sync` is intended only for local development compatibility.
 - Backend readiness checks mandatory dependencies with bounded timeouts.
   `KAFKA_MANDATORY=true` makes Kafka part of readiness; production defaults to
   mandatory Kafka when brokers are configured.

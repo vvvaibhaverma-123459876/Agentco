@@ -18,6 +18,7 @@ import { memoryRetrieval } from './memory-retrieval.service';
 import { skillRetrieval, RetrievedSkill, SkillRiskTier } from './skill-retrieval.service';
 import { calibrationAwareRouting, RankedAgents } from './calibration-aware-routing.service';
 import { wrapUntrustedContent } from '../adapters/url-safety';
+import { llmProvider } from './llm-provider.service';
 
 export class AutonomyActionPlannerService {
   /**
@@ -57,14 +58,6 @@ export class AutonomyActionPlannerService {
     attemptNumber: number = 0,
     previousError?: string
   ): Promise<string> {
-    // Use configured LLM provider, default to OpenAI
-    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
-    const apiUrl = `${baseUrl}/chat/completions`;
-    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for autonomy action planning');
-    }
-
     // Add error feedback to messages on retry
     let messagesWithFeedback = [...messages];
     if (attemptNumber > 0 && previousError) {
@@ -77,50 +70,16 @@ export class AutonomyActionPlannerService {
       ];
     }
 
-    let lastError;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini',
-            messages: messagesWithFeedback,
-            max_tokens: 500,
-            temperature: 0.7,
-          }),
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status} ${response.statusText}`);
-        }
-
-        const data: any = await response.json();
-        const content = data.choices?.[0]?.message?.content;
-        if (!content) {
-          throw new Error('Empty response from API');
-        }
-
-        return content;
-      } catch (error) {
-        lastError = error;
-        if (attempt < 2) {
-          const delay = Math.pow(2, attempt) * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-        }
-      }
-    }
-
-    throw new Error(`LLM call failed after 3 retries: ${lastError}`);
+    const system = messagesWithFeedback.find(message => message.role === 'system')?.content ?? '';
+    const user = messagesWithFeedback.filter(message => message.role !== 'system').map(message => message.content).join('\n\n');
+    const result = await llmProvider.callJson({
+      operation: 'autonomy action planning',
+      system,
+      user,
+      temperature: 0.7,
+      maxTokens: 500,
+    });
+    return JSON.stringify(result.json);
   }
 
   /**

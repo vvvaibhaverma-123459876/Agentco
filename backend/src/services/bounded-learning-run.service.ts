@@ -21,6 +21,7 @@ import { SourceDiscoveryEngine } from './source-discovery.service';
 import { RealWebAdapter } from '../adapters/real-web-adapter';
 import { ActionStatus } from '../types/action.types';
 import { assertDeterministicProviderAllowed } from '../runtime-mode';
+import { llmProvider } from './llm-provider.service';
 
 interface BoundedLearningRunConfig {
   goal: string;
@@ -467,8 +468,8 @@ export class BoundedCivilizationLearningRun {
     }
 
     // Use OpenAI for real extraction if credentials available
-    if (config.provider === 'openai' && process.env.OPENAI_API_KEY) {
-      console.log(`  Using OpenAI GPT-4o-mini for extraction`);
+    if (config.provider === 'openai' && (process.env.LLM_API_KEY || process.env.OPENAI_API_KEY)) {
+      console.log(`  Using configured LLM provider for extraction`);
       for (const doc of documents) {
         try {
           const extracted = await this.extractClaimsWithOpenAI(doc);
@@ -507,9 +508,8 @@ export class BoundedCivilizationLearningRun {
   }
 
   private async extractClaimsWithOpenAI(document: any): Promise<any[]> {
-    const openaiKey = process.env.OPENAI_API_KEY || process.env.LLM_API_KEY;
-    if (!openaiKey) {
-      console.warn('  ⚠️ No OpenAI API key available');
+    if (!(process.env.LLM_API_KEY || process.env.OPENAI_API_KEY)) {
+      console.warn('  ⚠️ No LLM API key available');
       return [];
     }
 
@@ -520,65 +520,23 @@ export class BoundedCivilizationLearningRun {
     }
 
     try {
-      console.log(`  Calling OpenAI for ${document.url}...`);
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${openaiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a claim extractor. Extract 1-3 factual claims from the provided content.
-Return ONLY a valid JSON array with objects having: text (string), confidence (0-1 number).
-Example: [{"text": "claim 1", "confidence": 0.9}]
+      console.log(`  Calling bounded LLM provider for ${document.url}...`);
+      const response = await llmProvider.callJson({
+        operation: 'bounded learning claim extraction',
+        temperature: 0.3,
+        maxTokens: 500,
+        system: `You are a claim extractor. Extract 1-3 factual claims from the provided content.
+Return JSON with key claims, where claims is an array of objects having: text (string), confidence (0-1 number).
+Example: {"claims":[{"text": "claim 1", "confidence": 0.9}]}
 Claims must be supported by evidence in the content.
 Do not invent claims not present in the text.`,
-            },
-            {
-              role: 'user',
-              content: `Extract claims from:\n\nTitle: ${document.title}\n\nContent:\n${document.extractedText.substring(0, 3000)}`,
-            },
-          ],
-          temperature: 0.3,
-          max_tokens: 500,
-        }),
+        user: `Extract claims from:\n\nTitle: ${document.title}\n\nContent:\n${document.extractedText.substring(0, 3000)}`,
       });
-
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
-      }
-
-      const data: any = await response.json();
-      const content = data.choices?.[0]?.message?.content;
-
-      if (!content) {
-        console.warn('  ⚠️ OpenAI returned empty response');
-        return [];
-      }
-
-      // Parse JSON response - handle markdown code blocks and plain JSON
       try {
-        // Try to extract from markdown code block first
-        let jsonText = content;
-        const codeBlockMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-        if (codeBlockMatch) {
-          jsonText = codeBlockMatch[1].trim();
-        } else {
-          // Try to find JSON array
-          const arrayMatch = content.match(/\[[\s\S]*\]/);
-          if (arrayMatch) {
-            jsonText = arrayMatch[0];
-          }
-        }
-
-        const parsed = JSON.parse(jsonText);
+        const parsed = response.json.claims;
         if (Array.isArray(parsed)) {
           if (parsed.length > 0) {
-            console.log(`  ✅ Extracted ${parsed.length} claims from OpenAI`);
+            console.log(`  ✅ Extracted ${parsed.length} claims from bounded LLM provider`);
             return parsed.map((claim: any) => ({
               id: uuidv4(),
               text: claim.text || '',
@@ -590,7 +548,7 @@ Do not invent claims not present in the text.`,
           }
         }
       } catch (parseError: any) {
-        console.warn(`  ⚠️ Failed to parse OpenAI JSON: ${parseError.message}\n     Response: ${content.substring(0, 150)}`);
+        console.warn(`  ⚠️ Failed to parse claim extraction JSON: ${parseError.message}`);
       }
 
       return [];

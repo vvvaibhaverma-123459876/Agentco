@@ -2,15 +2,12 @@ import crypto from 'crypto';
 import { query, withClient } from '../db/client';
 import { auditLog } from './audit-log.service';
 import { eventBus } from './event-bus.service';
+import { llmProvider } from './llm-provider.service';
 import { provenance } from './provenance.service';
 import { assertAgentCanRunTask, ensureAgentRegistryActors } from '../agent-registry';
 
 function isProductionLike(): boolean {
   return process.env.AGENTCO_ENV === 'production' || process.env.AGENTCO_ENV === 'staging' || process.env.NODE_ENV === 'production';
-}
-
-function llmRequestTimeoutMs(): number {
-  return Number(process.env.LLM_REQUEST_TIMEOUT_MS ?? 30000);
 }
 
 export type TaskStatus = 'queued' | 'running' | 'done' | 'failed' | 'blocked';
@@ -268,50 +265,14 @@ export class DurableExecutionService {
   }
 
   private async callLLMJson(system: string, user: string): Promise<Record<string, any>> {
-    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for durable LLM-backed task execution');
-    }
-    const baseUrl = (process.env.LLM_BASE_URL || 'https://api.openai.com/v1').replace(/\/$/, '');
-    const model = process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini';
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), llmRequestTimeoutMs());
-    let response: Response;
-    try {
-      response = await fetch(`${baseUrl}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model,
-          temperature: 0,
-          response_format: { type: 'json_object' },
-          messages: [
-            { role: 'system', content: system },
-            { role: 'user', content: user },
-          ],
-        }),
-        signal: controller.signal,
-      });
-    } catch (error) {
-      if ((error as { name?: string })?.name === 'AbortError') {
-        throw new Error(`durable LLM task timed out after ${llmRequestTimeoutMs()}ms`);
-      }
-      throw error;
-    } finally {
-      clearTimeout(timeout);
-    }
-    if (!response.ok) {
-      throw new Error(`durable LLM task failed: HTTP ${response.status}`);
-    }
-    const body = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
-    const content = body.choices?.[0]?.message?.content;
-    if (!content) {
-      throw new Error('durable LLM task returned empty content');
-    }
-    return JSON.parse(content);
+    const result = await llmProvider.callJson({
+      system,
+      user,
+      operation: 'durable LLM task',
+      temperature: 0,
+      maxTokens: 1200,
+    });
+    return result.json as Record<string, any>;
   }
 }
 

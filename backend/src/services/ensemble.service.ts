@@ -6,6 +6,8 @@
  *           Kuhn et al. (2023) - Semantic uncertainty
  */
 
+import { llmProvider } from './llm-provider.service';
+
 interface ModelAnswer {
   model: string;
   answer: string;
@@ -167,41 +169,14 @@ export class EnsembleService {
   }
 
   private async callLLM(modelLabel: string, systemPrompt: string, question: string): Promise<ModelAnswer> {
-    const apiKey = process.env.LLM_API_KEY || process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('LLM_API_KEY or OPENAI_API_KEY is required for ensemble voting');
-    }
-
-    const baseUrl = process.env.LLM_BASE_URL || 'https://api.openai.com/v1';
-    const model = process.env.LLM_MODEL_DEFAULT || 'gpt-4o-mini';
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.1,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: `${systemPrompt} Return JSON with keys answer, confidence, and reasoning. Confidence must be 0 to 1.` },
-          { role: 'user', content: question },
-        ],
-      }),
+    const result = await llmProvider.callJson({
+      operation: `ensemble vote:${modelLabel}`,
+      system: `${systemPrompt} Return JSON with keys answer, confidence, and reasoning. Confidence must be 0 to 1.`,
+      user: question,
+      temperature: 0.1,
+      maxTokens: 800,
     });
-
-    if (!response.ok) {
-      throw new Error(`LLM ensemble call failed for ${modelLabel}: HTTP ${response.status}`);
-    }
-
-    const payload = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
-    const content = payload.choices?.[0]?.message?.content;
-    if (!content) {
-      throw new Error(`LLM ensemble call returned empty content for ${modelLabel}`);
-    }
-
-    const parsed = JSON.parse(content) as { answer?: string; confidence?: number; reasoning?: string };
+    const parsed = result.json as { answer?: string; confidence?: number; reasoning?: string };
     if (!parsed.answer || typeof parsed.confidence !== 'number') {
       throw new Error(`LLM ensemble call returned invalid JSON for ${modelLabel}`);
     }
