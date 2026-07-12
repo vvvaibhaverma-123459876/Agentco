@@ -160,7 +160,8 @@ release-gate:
 	@echo "== [3a/12] least-privilege gate role grants =="
 	@if [ -n "$$RELEASE_GATE_SETUP_DATABASE_URL" ]; then psql "$$RELEASE_GATE_SETUP_DATABASE_URL" -v gate_role="$${RELEASE_GATE_ROLE:-agentco_gate}" -v gate_password="$${RELEASE_GATE_ROLE_PASSWORD:?RELEASE_GATE_ROLE_PASSWORD is required when RELEASE_GATE_SETUP_DATABASE_URL is set}" -f scripts/setup_release_gate_role.sql >/dev/null; else echo "RELEASE_GATE_SETUP_DATABASE_URL not set; assuming gate role already has privileges"; fi
 	@echo "== [4/12] Python default suite =="
-	@GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; PYTHONDONTWRITEBYTECODE=1 DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" $(PYTHON) -m pytest -q
+	@mkdir -p artifacts/audit/release-gate
+	@GATE_DSN="$${RELEASE_GATE_DATABASE_URL:-$$DATABASE_URL}"; TEST_DSN="$${AGENTCO_TEST_DATABASE_URL:-$$GATE_DSN}"; PYTHONDONTWRITEBYTECODE=1 DATABASE_URL="$$GATE_DSN" AGENTCO_TEST_DATABASE_URL="$$TEST_DSN" $(PYTHON) scripts/verify_pytest_skips.py --report artifacts/audit/release-gate/pytest-report.json --summary-output artifacts/audit/release-gate/pytest-summary.json -- -q
 	@echo "== [5/12] backend build =="
 	cd backend && npm run build
 	@echo "== [6/12] backend Jest =="
@@ -223,7 +224,7 @@ smoke-node:
 	@if [ -x frontend/node_modules/.bin/tsc ]; then cd frontend && ./node_modules/.bin/tsc --noEmit; else echo "frontend node_modules missing; run make dev"; fi
 
 db-tests:
-	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set, skipping DB tests"; exit 0; fi
+	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set; db-tests require an explicit database"; exit 2; fi
 	$(PYTHON) -m pytest evals/regression/test_pg_ledger_immutability.py evals/regression/test_pg_ledger_persistence.py -q
 
 load-test:
@@ -271,7 +272,7 @@ vendor-risk-full:
 master-gate: smoke db-tests validation
 	cd backend && npm run build
 	cd frontend && npm run build
-	@echo "✓ All gates passed: smoke tests, DB validation, release validation"
+	@echo "master-gate complete: smoke tests, DB validation, release validation"
 
 # ========== TRUE AUTONOMY IMPLEMENTATION COMMANDS ==========
 
@@ -324,7 +325,7 @@ autonomy-level3-smoke:
 
 autonomy-level3-test:
 	@echo "🔬 Running LEVEL_3 integration tests..."
-	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set, skipping"; exit 0; fi
+	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL not set; autonomy-level3-test requires an explicit database"; exit 2; fi
 	$(PYTHON) -m pytest tests/integration/test_level3_autonomy_loop.py -v
 	@echo "✓ LEVEL_3 tests passed"
 
@@ -478,49 +479,16 @@ autonomy-open-world-5min:
 .PHONY: production-release-gate autonomy-real-web-free-run autonomy-open-world-5min
 
 # ---------------------------------------------------------------------------
-# Clean-room verification: everything below must pass on a machine with NO
-# OpenAI/web credentials, given only Node, Python 3.13, and a Postgres
-# reachable via DATABASE_URL. Live LLM/web suites are opt-in elsewhere
-# (RUN_REAL_LLM_TESTS=1 / RUN_REAL_WEB_TESTS=1).
+# Clean-room verification: provisions its own disposable PostgreSQL container,
+# runs migrations from zero, records command evidence, and cleans up all owned
+# resources. Live LLM/web suites are opt-in elsewhere.
 # ---------------------------------------------------------------------------
-.PHONY: verify-clean-room
-verify-clean-room:
-	@if [ -z "$$DATABASE_URL" ]; then echo "DATABASE_URL must point at a local Postgres database"; exit 1; fi
-	@echo "== [0/12] clean tree before clean-room =="
-	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty before verify-clean-room"; exit 1)
-	@echo "== [1/12] gate integrity and documented target checks =="
-	@$(MAKE) gate-integrity
-	@$(MAKE) verify-advertised-targets
-	@echo "== [2/12] backend locked install/migrate =="
-	cd backend && npm ci && npm run db:migrate
-	@echo "== [3/12] backend typecheck =="
-	cd backend && ./node_modules/.bin/tsc --noEmit
-	@echo "== [4/12] backend build =="
-	cd backend && npm run build
-	@echo "== [5/12] backend tests =="
-	cd backend && npm test -- --runInBand
-	@echo "== [6/12] frontend locked install/typecheck/build =="
-	cd frontend && npm ci && ./node_modules/.bin/tsc --noEmit && npm run build
-	@echo "== [7/12] pytest collection =="
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m pytest --collect-only -q
-	@echo "== [8/12] python default suite =="
-	PYTHONDONTWRITEBYTECODE=1 $(PYTHON) -m pytest -q
-	@echo "== [9/12] generated report freshness =="
-	@$(MAKE) status-check
-	@$(MAKE) agent-protocol-matrix-check
-	@$(MAKE) evaluation-calibration-report-check
-	@$(MAKE) controlled-learning-report-check
-	@$(MAKE) self-improvement-report-check
-	cd backend && npm run agentco:score-validation -- --check
-	@echo "== [10/12] build ledger gates =="
-	$(PYTHON) scripts/build_ledger.py status
-	@echo "== [11/12] release gate =="
-	@$(MAKE) release-gate
-	@echo "== [12/12] clean tree after clean-room =="
-	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty after verify-clean-room"; exit 1)
-	@echo "verify-clean-room complete"
+.PHONY: verify-clean-room audit-clean-room
+verify-clean-room: audit-clean-room
 
-audit-clean-room: verify-clean-room
+audit-clean-room:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/audit_clean_room.py
 
 .PHONY: longitudinal-learning
 longitudinal-learning:

@@ -1,0 +1,104 @@
+{
+  "exceptions": [
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest runtime/tests -q",
+      "justification": "Legacy developer helper; canonical release and clean-room gates use governed pytest execution.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest runtime/orchestration/tests tests/test_verify_agentco_goal_run.py evals/north_star_cross_domain/tests -q",
+      "justification": "Legacy focused system helper; zero-test governance is enforced by release-gate and audit-clean-room.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest calibration runtime learning synthesis evals/regression -q",
+      "justification": "Developer smoke target; canonical gate wraps the full default suite with skip governance.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest evals/regression/test_pg_ledger_immutability.py evals/regression/test_pg_ledger_persistence.py -q",
+      "justification": "Focused DB regression helper; target now fails loudly without DATABASE_URL.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "low"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest evals/regression/test_load.py -q",
+      "justification": "Optional load-test helper is outside the canonical release and clean-room evidence path.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest backend/tests/security/ -v",
+      "justification": "Focused security helper; canonical gate and clean-room command provide governed full-suite execution.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest tests/integration/test_level3_autonomy_loop.py -v",
+      "justification": "Focused legacy autonomy integration helper; target now fails loudly without DATABASE_URL.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "MASKED_FAILURE",
+      "file": "Makefile",
+      "line": null,
+      "match": "pkill -f \"run_level3_functional_verification.sh\" || true",
+      "justification": "Cleanup of a best-effort background process in a legacy concurrency helper; not part of canonical release or clean-room gates.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest runtime/tests/test_controlled_learning.py -q",
+      "justification": "Focused learner regression helper; canonical gate and clean-room command provide governed full-suite execution.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    },
+    {
+      "rule": "PYTEST_ZERO_TESTS",
+      "file": "Makefile",
+      "line": null,
+      "match": "$(PYTHON) -m pytest tests/test_pawdent_business_simulation.py -q",
+      "justification": "Focused simulator regression helper; canonical gate and clean-room command provide governed full-suite execution.",
+      "owner": "audit",
+      "expiry_date": "2026-10-31",
+      "risk": "medium"
+    }
+  ]
+}

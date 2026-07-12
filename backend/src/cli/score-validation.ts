@@ -371,7 +371,7 @@ const scoreOutOf100 = Math.round((totalOutOf160 / 160) * 1000) / 10;
 const allChecksPass = checks.every(c => c.pass);
 const inputHash = hashReportInputs();
 const existingReportPath = path.resolve(repoRoot, 'reports/system_run/latest/score_validation.json');
-let existingReportFresh = true;
+let trackedStructuralSnapshotInputHashCurrent = true;
 let existingReportCommit = 'missing';
 let existingReportInputHash = 'missing';
 if (checkOnly && fs.existsSync(existingReportPath)) {
@@ -379,9 +379,9 @@ if (checkOnly && fs.existsSync(existingReportPath)) {
     const existing = JSON.parse(fs.readFileSync(existingReportPath, 'utf8'));
     existingReportCommit = String(existing.commit ?? 'missing');
     existingReportInputHash = String(existing.inputHash ?? 'missing');
-    existingReportFresh = existingReportInputHash === inputHash;
+    trackedStructuralSnapshotInputHashCurrent = existingReportInputHash === inputHash;
   } catch {
-    existingReportFresh = false;
+    trackedStructuralSnapshotInputHashCurrent = false;
     existingReportCommit = 'unreadable';
     existingReportInputHash = 'unreadable';
   }
@@ -399,7 +399,7 @@ const report = {
   verifiedBehaviorScoreOutOf100: null,
   scorePolicy: 'Structural score must not be presented as verified behaviour.',
   claims80Plus: allChecksPass && scoreOutOf100 >= 80,
-  existingReportFresh,
+  trackedStructuralSnapshotInputHashCurrent,
   existingReportCommit,
   existingReportInputHash,
 };
@@ -416,7 +416,7 @@ const md = [
   `**Acceptance checks:** ${checks.filter(c => c.pass).length}/${checks.length} pass.`,
   `**Structural score:** ${scoreOutOf100}/100 (${totalOutOf160}/160).`,
   '**Verified behaviour score:** not emitted by this structural validator.',
-  `**Existing report fresh for HEAD:** ${existingReportFresh}`,
+  `**Tracked structural snapshot input hash is current:** ${trackedStructuralSnapshotInputHashCurrent}`,
   `**Claims 80+ :** ${report.claims80Plus}`,
   '',
   '## Acceptance checks',
@@ -447,10 +447,10 @@ if (checkOnly) {
 } else {
   console.log(`[score-validation] report written to ${outDir}/score_validation.{json,md}`);
 }
-if (checkOnly && !existingReportFresh) {
+if (checkOnly && !trackedStructuralSnapshotInputHashCurrent) {
   console.error(`[score-validation] stale existing report input hash: ${existingReportInputHash} != ${inputHash}`);
 }
-if (!allChecksPass || !report.claims80Plus || (checkOnly && !existingReportFresh)) {
+if (!allChecksPass || !report.claims80Plus || (checkOnly && !trackedStructuralSnapshotInputHashCurrent)) {
   console.error('[score-validation] some acceptance checks failed:');
   for (const c of checks.filter(x => !x.pass)) console.error(`  ❌ ${c.id}: ${c.description}`);
   process.exitCode = 1;

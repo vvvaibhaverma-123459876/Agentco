@@ -1,32 +1,32 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1624,
+  "tracked_file_count": 1634,
   "category_counts": {
     "Database migration": 125,
-    "Deployment infrastructure": 22,
+    "Deployment infrastructure": 23,
     "Deprecated code": 48,
-    "Development tooling": 110,
-    "Documentation": 294,
+    "Development tooling": 114,
+    "Documentation": 297,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 259,
-    "Unknown purpose": 29
+    "Test infrastructure": 260,
+    "Unknown purpose": 30
   },
   "top_level_counts": {
     "backend": 441,
-    "docs": 222,
+    "docs": 225,
     "evals": 180,
-    "scripts": 122,
+    "scripts": 126,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
     "frontend": 36,
+    "tests": 34,
     "reserve": 33,
-    "tests": 33,
     "calibration": 30,
     "results": 20,
     "infrastructure": 18,
@@ -38,7 +38,7 @@
     "ingestion": 9,
     "requirements": 4,
     "validation": 4,
-    ".github": 2,
+    ".github": 3,
     "agentco_security": 2,
     "dashboard": 2,
     "data": 2,
@@ -72,14 +72,15 @@
     "docker-compose.yml": 1,
     "pg_test_isolation.py": 1,
     "prompts": 1,
-    "pytest.ini": 1
+    "pytest.ini": 1,
+    "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 530,
-    ".md": 362,
+    ".py": 536,
+    ".md": 363,
     ".ts": 290,
     ".sql": 126,
-    ".json": 122,
+    ".json": 124,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 21,
@@ -88,7 +89,7 @@
     ".txt": 16,
     ".sh": 14,
     "(none)": 8,
-    ".yml": 6,
+    ".yml": 7,
     ".example": 3,
     ".mjs": 2,
     ".test": 1,
@@ -127,6 +128,12 @@
     },
     {
       "path": ".github/workflows/ci.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/clean-room-audit.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -5430,6 +5437,24 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/TEST_SKIP_ALLOWLIST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/civilization_migration_map.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -7770,6 +7795,12 @@
       "extension": ".ini"
     },
     {
+      "path": "pytest_skip_report_plugin.py",
+      "category": "Unknown purpose",
+      "top_level": "pytest_skip_report_plugin.py",
+      "extension": ".py"
+    },
+    {
       "path": "reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md",
       "category": "Documentation",
       "top_level": "reports",
@@ -8718,6 +8749,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/audit_clean_room.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/audit_llm_integration.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9354,6 +9391,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_execution_ledger.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_gate_integrity.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9390,6 +9433,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_migration_integrity.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_migrations_native.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9409,6 +9458,12 @@
     },
     {
       "path": "scripts/verify_production_posture.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_pytest_skips.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9697,6 +9752,12 @@
     },
     {
       "path": "tests/test_civilization_vertical_slice.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_clean_room_evidence_controls.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

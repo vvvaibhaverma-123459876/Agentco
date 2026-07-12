@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -105,7 +106,7 @@ def main() -> int:
         "extension_counts": dict(extensions.most_common()),
         "files": inventory,
     }
-    OUT_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    json_text = json.dumps(payload, indent=2) + "\n"
 
     lines = [
         "# Forensic File Inventory",
@@ -127,7 +128,20 @@ def main() -> int:
     lines.extend(["", "## Full File Ledger", "", "| Path | Category |", "|---|---|"])
     for item in inventory:
         lines.append(f"| `{item['path']}` | {item['category']} |")
-    OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    md_text = "\n".join(lines) + "\n"
+    if "--check" in sys.argv:
+        stale = []
+        if not OUT_JSON.exists() or OUT_JSON.read_text(encoding="utf-8") != json_text:
+            stale.append(str(OUT_JSON.relative_to(ROOT)))
+        if not OUT_MD.exists() or OUT_MD.read_text(encoding="utf-8") != md_text:
+            stale.append(str(OUT_MD.relative_to(ROOT)))
+        if stale:
+            print(f"forensic inventory stale: {', '.join(stale)}")
+            return 2
+        print("forensic inventory current")
+        return 0
+    OUT_JSON.write_text(json_text, encoding="utf-8")
+    OUT_MD.write_text(md_text, encoding="utf-8")
 
     print(f"wrote {OUT_JSON.relative_to(ROOT)} and {OUT_MD.relative_to(ROOT)}")
     return 0
