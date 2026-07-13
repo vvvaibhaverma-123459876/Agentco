@@ -70,7 +70,7 @@ describe('Helm deployment contract', () => {
     expect(migrationJob).toContain('.Values.backend.migrationJob.databaseUrlKey');
     expect(values).toContain('agentco-migration-secrets');
     expect(values).toContain('databaseUrlKey: MIGRATION_DATABASE_URL');
-    expect(dockerfile).toContain('/app/src/db/migrations ./dist/db/migrations');
+    expect(dockerfile).toContain('/app/src/db/migrations ./src/db/migrations');
   });
 
   test('deployment image tags consume component-specific deploy workflow overrides', () => {
