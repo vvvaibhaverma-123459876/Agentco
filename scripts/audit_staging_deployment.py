@@ -1355,7 +1355,7 @@ def run_staging_audit() -> None:
             const { eventLog } = require('./dist/services/event-log.service');
             (async () => {
               const actor = '33333333-3333-4333-8333-333333333333';
-              await db.query("INSERT INTO actors (id, actor_type, name, status) VALUES ($1,'system','staging-audit','active') ON CONFLICT (id) DO UPDATE SET status='active'", [actor]);
+              await db.query("INSERT INTO actors (id, actor_type, name, status) VALUES ($1,'service','staging-audit','active') ON CONFLICT (id) DO UPDATE SET status='active'", [actor]);
               const event = await eventLog.append({ event_type: 'test.staging_audit', actor_id: actor, payload: { batch: '04' } });
               console.log(JSON.stringify({event_id: event.id, event_type: event.event_type}));
               await db.end();
