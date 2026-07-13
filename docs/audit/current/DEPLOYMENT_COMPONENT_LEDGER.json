@@ -1,0 +1,149 @@
+{
+  "components": [
+    {
+      "Dockerfile": "backend/Dockerfile",
+      "build_context": "backend/",
+      "component": "backend",
+      "configuration": [
+        "DATABASE_URL",
+        "REDIS_URL",
+        "KAFKA_BROKERS",
+        "AGENTCO_API_KEY"
+      ],
+      "dependencies": [
+        "PostgreSQL",
+        "Redis",
+        "Kafka"
+      ],
+      "deployment_evidence": "make audit-staging-deployment",
+      "entrypoint": "node dist/server.js",
+      "image": "agentco-backend:<commit>",
+      "liveness_probe": "/health/live",
+      "migration_dependency": "requires migration job completion before readiness",
+      "network_access": "PostgreSQL, Redis, Kafka",
+      "observability": "/metrics and structured logs",
+      "persistent_storage": "PostgreSQL PVC",
+      "port": 3001,
+      "readiness_probe": "/health/ready",
+      "resources": "requests and limits defined in generated staging manifests and Helm values",
+      "rollback_behaviour": "Kubernetes rollout undo",
+      "scaling_model": "Deployment rolling update",
+      "secret_requirements": [
+        "runtime database DSN",
+        "API key",
+        "event signing keys",
+        "JWT secret"
+      ],
+      "security_context": "runAsNonRoot, no privilege escalation, drop all capabilities",
+      "service": "agentco-backend",
+      "service_account": "agentco-runtime",
+      "shutdown_behaviour": "SIGTERM Fastify close and runtime resource shutdown",
+      "startup_probe": "/health/live",
+      "status": "verified_deployed_after_audit"
+    },
+    {
+      "Dockerfile": "frontend/Dockerfile",
+      "build_context": "frontend/",
+      "component": "frontend",
+      "configuration": [
+        "AGENTCO_API_URL",
+        "AGENTCO_API_KEY"
+      ],
+      "dependencies": [
+        "backend"
+      ],
+      "deployment_evidence": "make audit-staging-deployment",
+      "entrypoint": "node server.js",
+      "image": "agentco-frontend:<commit>",
+      "liveness_probe": "/api/health",
+      "migration_dependency": "none",
+      "network_access": "backend only",
+      "observability": "pod logs",
+      "persistent_storage": "none",
+      "port": 3000,
+      "readiness_probe": "/api/health",
+      "resources": "requests and limits defined",
+      "rollback_behaviour": "Kubernetes rollout undo",
+      "scaling_model": "Deployment rolling update",
+      "secret_requirements": [
+        "server-side backend API key"
+      ],
+      "security_context": "runAsNonRoot, no privilege escalation, drop all capabilities",
+      "service": "agentco-frontend",
+      "service_account": "agentco-frontend",
+      "shutdown_behaviour": "Next.js server SIGTERM",
+      "startup_probe": "/api/health",
+      "status": "verified_deployed_after_audit"
+    },
+    {
+      "Dockerfile": "backend/Dockerfile",
+      "build_context": "backend/",
+      "component": "outbox-worker",
+      "configuration": [
+        "DATABASE_URL",
+        "KAFKA_BROKERS",
+        "EVENT_BUS_SIGNING_KEY"
+      ],
+      "dependencies": [
+        "PostgreSQL",
+        "Kafka"
+      ],
+      "deployment_evidence": "make audit-staging-deployment",
+      "entrypoint": "node dist/workers/outbox-worker.js",
+      "image": "agentco-backend:<commit>",
+      "liveness_probe": "process supervision by Kubernetes",
+      "migration_dependency": "requires event outbox tables",
+      "network_access": "PostgreSQL and Kafka",
+      "observability": "relay batch logs and outbox metrics",
+      "persistent_storage": "PostgreSQL outbox tables",
+      "port": null,
+      "readiness_probe": "not exposed; deployment health by running pod and outbox drain proof",
+      "resources": "requests and limits defined",
+      "rollback_behaviour": "Kubernetes rollout undo with retained outbox state",
+      "scaling_model": "single worker in local audit; SKIP LOCKED allows later horizontal scale",
+      "secret_requirements": [
+        "runtime database DSN",
+        "event signing keys"
+      ],
+      "security_context": "runAsNonRoot, no privilege escalation, drop all capabilities",
+      "service": null,
+      "service_account": "agentco-worker",
+      "shutdown_behaviour": "SIGTERM stop flag and Kafka disconnect",
+      "startup_probe": "process start",
+      "status": "verified_deployed_after_audit"
+    },
+    {
+      "Dockerfile": "backend/Dockerfile",
+      "build_context": "backend/",
+      "component": "migration-job",
+      "configuration": [
+        "MIGRATION_DATABASE_URL as DATABASE_URL"
+      ],
+      "dependencies": [
+        "PostgreSQL"
+      ],
+      "deployment_evidence": "make audit-staging-deployment",
+      "entrypoint": "node dist/db/migrate.js",
+      "image": "agentco-backend:<commit>",
+      "liveness_probe": "activeDeadlineSeconds",
+      "migration_dependency": "runs before backend rollout",
+      "network_access": "PostgreSQL only",
+      "observability": "job logs",
+      "persistent_storage": "schema_migrations",
+      "port": null,
+      "readiness_probe": "job completion",
+      "resources": "bounded job resources",
+      "rollback_behaviour": "forward-compatible migration policy documented",
+      "scaling_model": "one-shot job",
+      "secret_requirements": [
+        "schema-owner/admin migration DSN"
+      ],
+      "security_context": "runAsNonRoot, no privilege escalation, drop all capabilities",
+      "service": null,
+      "service_account": "agentco-migration",
+      "shutdown_behaviour": "failed job blocks rollout",
+      "startup_probe": "job start",
+      "status": "verified_deployed_after_audit"
+    }
+  ]
+}

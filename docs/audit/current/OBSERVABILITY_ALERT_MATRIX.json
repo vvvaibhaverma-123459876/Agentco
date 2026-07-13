@@ -1,0 +1,34 @@
+{
+  "alerts": [
+    {
+      "alert": "backend unavailable",
+      "delivery": "local alert receiver",
+      "signal": "readiness failure"
+    },
+    {
+      "alert": "outbox backlog",
+      "delivery": "local alert receiver",
+      "signal": "pending/dead-letter query"
+    },
+    {
+      "alert": "dead-letter event",
+      "delivery": "local alert receiver",
+      "signal": "event_outbox dead_lettered"
+    },
+    {
+      "alert": "Kafka publication failure",
+      "delivery": "local alert receiver",
+      "signal": "forced worker publish failure"
+    },
+    {
+      "alert": "migration failure",
+      "delivery": "local alert receiver",
+      "signal": "failed migration job"
+    },
+    {
+      "alert": "backup failure",
+      "delivery": "local alert receiver",
+      "signal": "backup command nonzero"
+    }
+  ]
+}
