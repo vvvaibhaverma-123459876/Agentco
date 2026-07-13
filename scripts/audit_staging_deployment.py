@@ -113,22 +113,36 @@ def run(ctx: AuditContext, command_id: str, argv: list[str], *, cwd: Path | None
     merged_env = os.environ.copy()
     if env:
         merged_env.update(env)
-    result = subprocess.run(
-        argv,
-        cwd=str(cwd or ROOT),
-        env=merged_env,
-        input=input_text,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-    )
+    try:
+        result = subprocess.run(
+            argv,
+            cwd=str(cwd or ROOT),
+            env=merged_env,
+            input=input_text,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        stdout = result.stdout
+        stderr = result.stderr
+        exit_code = result.returncode
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        if isinstance(stdout, bytes):
+            stdout = stdout.decode(errors="replace")
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode(errors="replace")
+        stderr = f"{stderr}\nTIMEOUT after {timeout} seconds".strip() + "\n"
+        exit_code = 124
+        result = subprocess.CompletedProcess(argv, exit_code, stdout, stderr)
     end_s = utc_now()
     idx = len(ctx.commands) + 1
     safe_command_id = re.sub(r"[^A-Za-z0-9_.-]+", "-", command_id).strip("-")
     stdout_rel = f"commands/{idx:03d}_{safe_command_id}.stdout.txt"
     stderr_rel = f"commands/{idx:03d}_{safe_command_id}.stderr.txt"
-    ctx.record_artifact(stdout_rel, redact(result.stdout))
-    ctx.record_artifact(stderr_rel, redact(result.stderr))
+    ctx.record_artifact(stdout_rel, redact(stdout))
+    ctx.record_artifact(stderr_rel, redact(stderr))
     ctx.commands.append(
         CommandRecord(
             command_id=command_id,
@@ -138,15 +152,15 @@ def run(ctx: AuditContext, command_id: str, argv: list[str], *, cwd: Path | None
             start_time=start_s,
             end_time=end_s,
             duration_seconds=round(time.time() - start, 3),
-            exit_code=result.returncode,
+            exit_code=exit_code,
             stdout_artifact=stdout_rel,
             stderr_artifact=stderr_rel,
             run_id=ctx.run_id,
             commit=ctx.commit,
         )
     )
-    if result.returncode != 0 and not allow_failure:
-        raise RuntimeError(f"{command_id} failed with exit {result.returncode}; see {stdout_rel} / {stderr_rel}")
+    if exit_code != 0 and not allow_failure:
+        raise RuntimeError(f"{command_id} failed with exit {exit_code}; see {stdout_rel} / {stderr_rel}")
     return result
 
 
@@ -1436,7 +1450,13 @@ spec:
         )
         run(ctx, "restore-create-db", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "createdb", "-h", "127.0.0.1", "-U", "postgres", "agentco_restore"])
         restore_start = time.time()
-        run(ctx, "restore-backup", ["kubectl", "-n", ctx.namespace, "exec", "-i", "deploy/postgres-restore", "--", "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "agentco_restore", "-v", "ON_ERROR_STOP=1"], input_text=backup.stdout, timeout=180)
+        backup_file = ctx.temp_dir / "agentco-backup.sql"
+        backup_file.write_text(backup.stdout)
+        restore_pod = run(ctx, "get-restore-postgres-pod", ["kubectl", "-n", ctx.namespace, "get", "pod", "-l", "app=postgres-restore", "-o", "jsonpath={.items[0].metadata.name}"]).stdout.strip()
+        if not restore_pod:
+            raise RuntimeError("restore postgres pod was not found")
+        run(ctx, "copy-backup-to-restore-pod", ["kubectl", "-n", ctx.namespace, "cp", str(backup_file), f"{restore_pod}:/tmp/agentco-backup.sql"], timeout=120)
+        run(ctx, "restore-backup", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "agentco_restore", "-v", "ON_ERROR_STOP=1", "-f", "/tmp/agentco-backup.sql"], timeout=240)
         restore_check = run(ctx, "restore-verify-event", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "agentco_restore", "-tAc", f"SELECT COUNT(*) FROM event_log WHERE id = '{ctx.results['seed']['event_id']}';"])
         ctx.results["restore"] = {"duration_seconds": round(time.time() - restore_start, 3), "known_event_count": restore_check.stdout.strip()}
 
