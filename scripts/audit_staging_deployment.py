@@ -645,6 +645,15 @@ spec:
       containers:
         - name: kafka
           image: confluentinc/cp-kafka:7.6.1
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z zookeeper 2181; do
+                echo "waiting for zookeeper"
+                sleep 2
+              done
+              /etc/confluent/docker/run
           env:
             - name: KAFKA_BROKER_ID
               value: "1"
@@ -682,6 +691,17 @@ spec:
       restartPolicy: Never
       serviceAccountName: agentco-migration
       securityContext: {{ runAsNonRoot: true, runAsUser: 1001, fsGroup: 1001 }}
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z postgres 5432; do
+                echo "waiting for postgres"
+                sleep 2
+              done
       containers:
         - name: migrate
           image: {images["backend_a"]}
@@ -1423,6 +1443,15 @@ spec:
             run(ctx, "collect-pods", ["kubectl", "-n", ctx.namespace, "get", "pods", "-o", "wide"], allow_failure=True)
         with contextlib.suppress(Exception):
             run(ctx, "collect-events", ["kubectl", "-n", ctx.namespace, "get", "events", "--sort-by=.lastTimestamp"], allow_failure=True)
+        for log_name, selector in [
+            ("logs-migration-job", "job/agentco-migrate"),
+            ("logs-backend", "deploy/agentco-backend"),
+            ("logs-outbox-worker", "deploy/agentco-outbox-worker"),
+            ("logs-kafka", "deploy/kafka"),
+            ("logs-zookeeper", "deploy/zookeeper"),
+        ]:
+            with contextlib.suppress(Exception):
+                run(ctx, log_name, ["kubectl", "-n", ctx.namespace, "logs", selector, "--all-containers=true", "--tail=200"], allow_failure=True)
         cleanup_ok = True
         with contextlib.suppress(Exception):
             res = run(ctx, "kind-delete-cluster", ["kind", "delete", "cluster", "--name", ctx.cluster], allow_failure=True, timeout=300)
