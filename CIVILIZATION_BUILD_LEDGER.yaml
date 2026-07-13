@@ -12,66 +12,86 @@ meta:
   statuses: [not_started, in_progress, blocked, implemented, integrated, verified]
 phases:
   C0_canonical_runtime_freeze:
-    status: in_progress
+    status: verified
     items:
       - id: C0.RuntimeInventory
         layer: C0
         system: canonical runtime map
-        status: in_progress
+        status: verified
         depends_on: []
-        source_artifacts: [docs/audit/current/RUNTIME_COMPONENT_LEDGER.md, scripts/generate_runtime_reachability.py]
-        evidence: []
-        notes: Inventory active + duplicate runtime paths; emit canonical_runtime_map.json.
+        source_artifacts: [docs/civilization/CANONICAL_RUNTIME_MAP.md, docs/civilization/canonical_runtime_map.json]
+        evidence:
+          - 'docs/audit/current/RUNTIME_REACHABILITY.md snapshot f64ae909 (135 verified entry points)'
+          - 'make audit-runtime-integration exit 0 (2026-07-13, artifacts/runtime-integration/20260713T154347Z-b3e4d4a8)'
+        notes: Inventory of active + duplicate runtime paths complete.
       - id: C0.CanonicalPathSelection
         layer: C0
         system: canonical path decisions
-        status: not_started
+        status: verified
         depends_on: [C0.RuntimeInventory]
-        notes: Document canonical identity/task/event/resource/evidence/governance/coordinator paths + duplicate disposition.
+        source_artifacts: [docs/civilization/CANONICAL_RUNTIME_MAP.md]
+        evidence:
+          - 'Disposition table D1-D10 covering python civilization stack, dual outbox (RTI-002), rbac boundary, dashboard stub, disabled surfaces, agents_v1, spend_ledger exception, memory_kernel, fake-success make targets, frontend client'
+        notes: One canonical path per concern documented; no parallel runtime introduced.
       - id: C0.EnvBaseline
         layer: C0
         system: build environment + suite baseline
-        status: in_progress
+        status: verified
         depends_on: []
-        notes: Isolated Postgres (port 5544) + empty-DB migration + tsc + backend jest baseline; never touches operator's containers.
+        verification_commands:
+          - 'npm run db:migrate (empty DB agentco-build-pg:5544) -> exit 0, 117 applied'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'npm test -- --runInBand --forceExit -> exit 0: 101 suites passed/3 skipped, 643 tests passed/8 skipped/5 todo, 108s'
+        notes: Isolated stack pg:5544 kafka:9192 redis:6399; operator containers untouched.
       - id: C0.ReachabilityBaseline
         layer: C0
         system: reachability gate baseline
-        status: not_started
+        status: verified
         depends_on: [C0.EnvBaseline]
-        notes: Run existing reachability tooling; record baseline for later civilization reachability gate.
+        verification_commands:
+          - 'make audit-runtime-integration PYTHON=python3.13 -> exit 0'
+        notes: Baseline recorded; civilization reachability additions land with C12.
   C1_civilization_kernel:
-    status: not_started
+    status: in_progress
     items:
       - id: C1.MigrationCivilizationKernel
         layer: C1
         system: civilizations schema
-        status: not_started
+        status: verified
         depends_on: [C0.CanonicalPathSelection]
-        notes: civilizations, versions, charters, jurisdictions, protected_invariants, emergency_states, objectives; lifecycle CHECKs; append-only version/charter history.
+        migration_artifacts: [backend/src/db/migrations/129_civilization_kernel.sql]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 129_civilization_kernel.sql, exit 0'
+        notes: 8 tables; lifecycle CHECKs; single-active partial unique; SET LOCAL transition gate; append-only + immutability triggers; REVOKEs.
       - id: C1.CivilizationKernelService
         layer: C1
         system: kernel service
-        status: not_started
+        status: integrated
         depends_on: [C1.MigrationCivilizationKernel]
-        notes: Lifecycle forming→active→restricted→emergency→recovering→suspended→retired; emergency expiry; retired immutability; event/audit/outbox in same tx.
+        source_artifacts: [backend/src/services/civilization-kernel.service.ts]
+        notes: Lifecycle map enforced; emergency requires authorized_decision_ref + bounded ttl; auto-expiry sweep transitions to recovering; event_log + decision_log in same tx.
       - id: C1.CivilizationBootstrapSeed
         layer: C1
         system: deterministic bootstrap
-        status: not_started
+        status: integrated
         depends_on: [C1.CivilizationKernelService]
-        notes: One active civilization root + protected invariants; idempotent seed.
+        notes: ensureCivilizationRoot() idempotent; AgentCo root + default charter + 10 tier-0 invariants + global jurisdiction.
       - id: C1.CivilizationRoutes
         layer: C1
         system: kernel APIs
-        status: not_started
+        status: integrated
         depends_on: [C1.CivilizationKernelService]
+        source_artifacts: [backend/src/routes/civilization-kernel.routes.ts]
+        runtime_entrypoints: ['/api/civilization/kernel/* registered in backend/src/server.ts']
       - id: C1.KernelTests
         layer: C1
         system: kernel tests
-        status: not_started
+        status: integrated
         depends_on: [C1.CivilizationBootstrapSeed, C1.CivilizationRoutes]
-        notes: Unit+DB integration+negative (illegal transitions, emergency auto-expiry, retired immutability, scoping).
+        test_artifacts: [backend/tests/civilization-kernel.test.ts]
+        verification_commands:
+          - 'npx jest tests/civilization-kernel.test.ts --runInBand --forceExit -> 8/8 passed'
+        notes: Full-suite regression run pending before items flip to verified.
   C2_citizenry:
     status: not_started
     items:
