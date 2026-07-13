@@ -14,6 +14,7 @@ import argparse
 import base64
 import contextlib
 import hashlib
+import http.client
 import json
 import os
 import platform
@@ -1214,13 +1215,19 @@ def port_forward(ctx: AuditContext, name: str, resource: str, local_port: int, r
         )
 
 
-def http_json(url: str, headers: dict[str, str] | None = None) -> tuple[int, str]:
-    req = urllib.request.Request(url, headers=headers or {})
-    try:
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return resp.status, resp.read().decode()
-    except urllib.error.HTTPError as exc:
-        return exc.code, exc.read().decode()
+def http_json(url: str, headers: dict[str, str] | None = None, *, attempts: int = 10, delay: float = 1.0) -> tuple[int, str]:
+    last_error = ""
+    for _ in range(attempts):
+        req = urllib.request.Request(url, headers=headers or {})
+        try:
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return resp.status, resp.read().decode()
+        except urllib.error.HTTPError as exc:
+            return exc.code, exc.read().decode()
+        except (urllib.error.URLError, TimeoutError, http.client.RemoteDisconnected, ConnectionResetError) as exc:
+            last_error = str(exc)
+            time.sleep(delay)
+    return 0, last_error
 
 
 def exec_sql(ctx: AuditContext, command_id: str, sql: str, *, database: str = "agentco", allow_failure: bool = False) -> subprocess.CompletedProcess[str]:
@@ -1458,6 +1465,14 @@ spec:
 
         if ctx.results["http"]["backend_ready"] != 200:
             raise RuntimeError("backend readiness did not pass")
+        if ctx.results["http"]["backend_live"] != 200:
+            raise RuntimeError("backend liveness did not pass")
+        if ctx.results["http"]["frontend_health"] != 200:
+            raise RuntimeError("frontend health did not pass")
+        if ctx.results["http"]["backend_unauthorized"] not in {401, 403}:
+            raise RuntimeError("backend unauthenticated request did not fail closed")
+        if ctx.results["http"]["backend_authorized"] != 200:
+            raise RuntimeError("backend authenticated request did not pass")
         if ctx.results["network_policy"]["frontend_to_postgres_exit"] != 0:
             raise RuntimeError("NetworkPolicy negative probe failed; local cluster likely lacks policy enforcement")
         if not ctx.results["alerts"]["delivered"]:
