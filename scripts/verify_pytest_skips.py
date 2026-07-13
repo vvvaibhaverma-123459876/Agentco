@@ -7,15 +7,24 @@ import argparse
 import fnmatch
 import json
 import os
+import socket
 import subprocess
 import sys
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlparse
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ALLOWLIST = ROOT / "docs" / "audit" / "current" / "TEST_SKIP_ALLOWLIST.json"
+
+
+@dataclass(frozen=True)
+class EnvironmentRequirement:
+    name: str
+    condition: str
+    value: str | None = None
 
 
 @dataclass(frozen=True)
@@ -26,8 +35,32 @@ class SkipEntry:
     owner: str
     mandatory_for_clean_room: bool
     expiry_date: str
-    required_environment: list[str]
+    required_environment: list[EnvironmentRequirement]
     finding_reference: str | None = None
+
+
+def parse_environment_requirement(raw: object) -> EnvironmentRequirement:
+    if isinstance(raw, str):
+        if "=" in raw:
+            name, value = raw.split("=", 1)
+            return EnvironmentRequirement(name=name, condition="equals", value=value)
+        if raw in {"AGENTCO_TEST_DATABASE_URL", "DATABASE_URL"}:
+            return EnvironmentRequirement(name=raw, condition="postgres_reachable")
+        if raw == "KAFKA_BROKERS":
+            return EnvironmentRequirement(name=raw, condition="kafka_reachable")
+        return EnvironmentRequirement(name=raw, condition="present")
+    if not isinstance(raw, dict):
+        raise ValueError(f"required_environment entry must be object or string, got {raw!r}")
+    name = str(raw.get("name", ""))
+    condition = str(raw.get("condition", ""))
+    value = raw.get("value")
+    if not name:
+        raise ValueError("required_environment entry missing name")
+    if condition not in {"present", "absent", "equals", "not_equals", "postgres_reachable", "kafka_reachable"}:
+        raise ValueError(f"malformed required_environment condition for {name}: {condition}")
+    if condition in {"equals", "not_equals"} and value is None:
+        raise ValueError(f"required_environment condition {condition} for {name} requires value")
+    return EnvironmentRequirement(name=name, condition=condition, value=str(value) if value is not None else None)
 
 
 def load_allowlist(path: Path) -> list[SkipEntry]:
@@ -43,7 +76,7 @@ def load_allowlist(path: Path) -> list[SkipEntry]:
             owner=str(item["owner"]),
             mandatory_for_clean_room=bool(item["mandatory_for_clean_room"]),
             expiry_date=str(item["expiry_date"]),
-            required_environment=[str(value) for value in item.get("required_environment", [])],
+            required_environment=[parse_environment_requirement(value) for value in item.get("required_environment", [])],
             finding_reference=str(item["finding_reference"]) if item.get("finding_reference") else None,
         )
         for item in entries
@@ -54,6 +87,69 @@ def matches(pattern: str, node_id: str) -> bool:
     if any(token in pattern for token in "*?[]"):
         return fnmatch.fnmatch(node_id, pattern)
     return pattern == node_id
+
+
+def _tcp_reachable(host: str, port: int, timeout: float = 1.0) -> bool:
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+def environment_available(requirement: EnvironmentRequirement) -> bool:
+    current = os.environ.get(requirement.name)
+    if requirement.condition == "present":
+        return bool(current)
+    if requirement.condition == "absent":
+        return current is None
+    if requirement.condition == "equals":
+        return current == requirement.value
+    if requirement.condition == "not_equals":
+        return current is not None and current != requirement.value
+    if requirement.condition == "postgres_reachable":
+        if not current:
+            return False
+        try:
+            import psycopg2  # type: ignore[import]
+
+            conn = psycopg2.connect(current, connect_timeout=2)
+            conn.close()
+            return True
+        except Exception:
+            return False
+    if requirement.condition == "kafka_reachable":
+        brokers = current or "localhost:9092"
+        for broker in brokers.split(","):
+            host, _, port_text = broker.strip().partition(":")
+            if host and port_text.isdigit() and _tcp_reachable(host, int(port_text)):
+                return True
+        return False
+    raise ValueError(f"unsupported required_environment condition: {requirement.condition}")
+
+
+def missing_environment_names(entry: SkipEntry) -> list[str]:
+    return [item.name for item in entry.required_environment if not environment_available(item)]
+
+
+def skip_reason_matches_missing_environment(skip_reason: str, missing_names: list[str]) -> bool:
+    if not missing_names:
+        return True
+    reason = skip_reason.lower()
+    aliases = {
+        "AGENTCO_TEST_DATABASE_URL": ["agentco_test_database_url", "postgres", "database", "decision_log", "ledger"],
+        "DATABASE_URL": ["database_url", "postgres", "database"],
+        "KAFKA_BROKERS": ["kafka", "broker"],
+        "RUN_REAL_LLM_TESTS": ["llm", "provider", "run_real_llm_tests"],
+        "SKIP_LOAD_TEST": ["load", "skip_load_test"],
+        "AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS": ["destructive", "reserve"],
+        "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS": ["destructive", "migration"],
+    }
+    for name in missing_names:
+        terms = aliases.get(name, [name.lower()])
+        if not any(term in reason for term in terms):
+            return False
+    return True
 
 
 def validate_report(report: dict, allowlist: list[SkipEntry]) -> tuple[bool, list[str], dict[str, int]]:
@@ -86,6 +182,23 @@ def validate_report(report: dict, allowlist: list[SkipEntry]) -> tuple[bool, lis
                 errors.append(f"expired skip allowlist entry matched {node_id}: {entry.expiry_date}")
             if entry.mandatory_for_clean_room:
                 errors.append(f"mandatory clean-room test is allowlisted to skip: {node_id}")
+            skip_reason = str(skip.get("reason", ""))
+            missing_names = missing_environment_names(entry)
+            if entry.required_environment and not missing_names:
+                errors.append(f"SKIP_DESPITE_AVAILABLE_ENVIRONMENT: {node_id}")
+            if missing_names and not skip_reason_matches_missing_environment(skip_reason, missing_names):
+                errors.append(
+                    f"SKIP_REASON_MISMATCH: {node_id} missing={missing_names} reason={skip_reason[:200]}"
+                )
+            if (
+                entry.classification == "external_network"
+                and any(item.name in {"AGENTCO_TEST_DATABASE_URL", "DATABASE_URL"} for item in entry.required_environment)
+            ):
+                errors.append(f"DB_SKIP_CLASSIFIED_EXTERNAL_NETWORK: {node_id}")
+            if os.environ.get("AGENTCO_TEST_DATABASE_URL") and "AGENTCO_TEST_DATABASE_URL not set" in skip_reason:
+                errors.append(f"DB_VAR_PRESENT_BUT_REASON_CLAIMS_MISSING: {node_id}")
+            if os.environ.get("DATABASE_URL") and "DATABASE_URL not set" in skip_reason:
+                errors.append(f"DB_VAR_PRESENT_BUT_REASON_CLAIMS_MISSING: {node_id}")
             break
         if not matched:
             errors.append(f"unapproved skip: {node_id} reason={skip.get('reason', '')[:200]}")

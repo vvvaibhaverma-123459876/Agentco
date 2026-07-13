@@ -11,11 +11,14 @@
       "owner": "audit",
       "reason": "live-service: Kafka unavailable at KAFKA_BROKERS='localhost:9092'\")",
       "required_environment": [
-        "KAFKA_BROKERS"
+        {
+          "name": "KAFKA_BROKERS",
+          "condition": "kafka_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -23,11 +26,14 @@
       "owner": "audit",
       "reason": "Postgres decision_log integration unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\"",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -35,11 +41,14 @@
       "owner": "audit",
       "reason": "Postgres decision_log integration unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\"",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -47,7 +56,10 @@
       "owner": "audit",
       "reason": "Postgres decision_log integration unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\"",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
@@ -59,7 +71,11 @@
       "owner": "audit",
       "reason": "Load test skipped by default (slow). Run with SKIP_LOAD_TEST=0')",
       "required_environment": [
-        "SKIP_LOAD_TEST=0"
+        {
+          "name": "SKIP_LOAD_TEST",
+          "condition": "equals",
+          "value": "0"
+        }
       ]
     },
     {
@@ -71,11 +87,15 @@
       "owner": "audit",
       "reason": "Load test skipped by default (slow). Run with SKIP_LOAD_TEST=0')",
       "required_environment": [
-        "SKIP_LOAD_TEST=0"
+        {
+          "name": "SKIP_LOAD_TEST",
+          "condition": "equals",
+          "value": "0"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -83,11 +103,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -95,11 +118,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -107,11 +133,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -119,11 +148,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -131,11 +163,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -143,11 +178,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -155,11 +193,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -167,11 +208,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -179,11 +223,19 @@
       "owner": "audit",
       "reason": "requires AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS=1; this legacy test rebuilds public reserve tables')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -191,11 +243,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -203,11 +258,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -215,11 +273,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -227,41 +288,59 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "other",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
       "node_id": "runtime/tests/test_base_agent_v2.py::TestBaseAgentV2DurableAudit::test_durable_audit_writer_round_trip_live_postgres",
       "owner": "audit",
       "reason": "live-service: decision_log unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\" (127.0",
-      "required_environment": []
+      "required_environment": [
+        {
+          "name": "DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
+      ]
     },
     {
-      "classification": "other",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
       "node_id": "runtime/tests/test_base_agent_v2.py::TestBaseAgentV2DurableAudit::test_lost_ack_retry_uses_same_attempt_id_and_action_proceeds_live_postgres",
       "owner": "audit",
       "reason": "live-service: decision_log unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\" (127.0",
-      "required_environment": []
+      "required_environment": [
+        {
+          "name": "DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
+      ]
     },
     {
-      "classification": "other",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
       "node_id": "runtime/tests/test_base_agent_v2.py::TestBaseAgentV2DurableAudit::test_genuine_audit_write_failure_exhausts_retries_and_writes_zero_rows_live_postgres",
       "owner": "audit",
       "reason": "live-service: decision_log unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\" (127.0",
-      "required_environment": []
+      "required_environment": [
+        {
+          "name": "DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
+      ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -269,11 +348,14 @@
       "owner": "audit",
       "reason": "live-service: Postgres unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\" (127.0.0.1",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -281,11 +363,14 @@
       "owner": "audit",
       "reason": "Postgres spend ledger migration setup unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localh",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -293,11 +378,14 @@
       "owner": "audit",
       "reason": "Postgres spend ledger migration setup unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localh",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -305,11 +393,14 @@
       "owner": "audit",
       "reason": "Postgres spend ledger migration setup unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localh",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -317,11 +408,14 @@
       "owner": "audit",
       "reason": "Postgres spend ledger migration setup unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localh",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -329,11 +423,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -341,11 +438,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -353,11 +453,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -365,11 +468,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -377,11 +483,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -389,11 +498,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -401,11 +513,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -413,11 +528,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set \u2014 real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -425,11 +543,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -437,11 +558,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -449,11 +573,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -461,11 +588,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -473,11 +603,14 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL not set')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -485,11 +618,14 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -497,11 +633,14 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -509,11 +648,14 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -521,11 +663,14 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -533,11 +678,14 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -545,7 +693,10 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
@@ -557,8 +708,11 @@
       "owner": "audit",
       "reason": "requires a live LLM provider; set RUN_REAL_LLM_TESTS=1 with working credentials')",
       "required_environment": [
-        "RUN_REAL_LLM_TESTS",
-        "LLM_API_KEY"
+        {
+          "name": "RUN_REAL_LLM_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
@@ -570,12 +724,15 @@
       "owner": "audit",
       "reason": "requires a live LLM provider; set RUN_REAL_LLM_TESTS=1 with working credentials')",
       "required_environment": [
-        "RUN_REAL_LLM_TESTS",
-        "LLM_API_KEY"
+        {
+          "name": "RUN_REAL_LLM_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -583,7 +740,10 @@
       "owner": "audit",
       "reason": "real Postgres required')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
@@ -595,12 +755,15 @@
       "owner": "audit",
       "reason": "requires a live LLM provider; set RUN_REAL_LLM_TESTS=1 with working credentials')",
       "required_environment": [
-        "RUN_REAL_LLM_TESTS",
-        "LLM_API_KEY"
+        {
+          "name": "RUN_REAL_LLM_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -608,11 +771,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -620,11 +791,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -632,11 +811,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -644,11 +831,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -656,11 +851,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -668,11 +871,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -680,11 +891,19 @@
       "owner": "audit",
       "reason": "AGENTCO_TEST_DATABASE_URL and AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS=1 are required because this rebuilds the target schema')",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
+          "name": "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS",
+          "condition": "equals",
+          "value": "1"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -692,11 +911,14 @@
       "owner": "audit",
       "reason": "Postgres civilization integration unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\"",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -704,11 +926,14 @@
       "owner": "audit",
       "reason": "Postgres civilization integration unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localhost\"",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -716,11 +941,14 @@
       "owner": "audit",
       "reason": "Postgres unavailable for evidence extraction test: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"localh",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     },
     {
-      "classification": "external_network",
+      "classification": "local_clean_room_service",
       "expiry_date": "2026-10-31",
       "finding_reference": "REMEDIATION-02A-SKIP-GOVERNANCE",
       "mandatory_for_clean_room": false,
@@ -728,7 +956,10 @@
       "owner": "audit",
       "reason": "Postgres specialist isolation integration unavailable: connection to server at \"localhost\" (::1), port 5432 failed: Operation not permitted\\n\\tIs the server running on that host and accepting TCP/IP connections?\\nconnection to server at \"lo",
       "required_environment": [
-        "AGENTCO_TEST_DATABASE_URL"
+        {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        }
       ]
     }
   ]

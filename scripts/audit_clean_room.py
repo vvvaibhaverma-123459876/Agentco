@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import os
 import platform
+import re
 import secrets
 import shutil
 import subprocess
@@ -33,15 +34,18 @@ def utc_now() -> str:
 
 @dataclass
 class CommandRecord:
-    name: str
-    command: list[str]
+    command_id: str
+    argv: list[str]
     cwd: str
+    environment_names: list[str]
     start_time: str
     end_time: str
     duration_seconds: float
     exit_code: int
     stdout_artifact: str
     stderr_artifact: str
+    run_id: str
+    commit: str
 
 
 @dataclass
@@ -77,45 +81,75 @@ def git(args: list[str]) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
 
-def run_command(state: CleanRoomState, name: str, command: list[str], cwd: Path | None = None, env: dict[str, str] | None = None) -> None:
+SECRET_PATTERNS = ("PASSWORD", "TOKEN", "SECRET", "API_KEY", "AUTHORIZATION")
+
+
+def redact_value(value: str) -> str:
+    text = re.sub(r"(postgres(?:ql)?://[^:/@\s]+:)([^@\s]+)(@)", r"\1<redacted>\3", value)
+    text = re.sub(r"((?:PASSWORD|TOKEN|SECRET|API_KEY|AUTHORIZATION)=)([^\s]+)", r"\1<redacted>", text, flags=re.IGNORECASE)
+    return text
+
+
+def redact_argv(argv: list[str]) -> list[str]:
+    return [redact_value(item) for item in argv]
+
+
+def env_names(env: dict[str, str] | None) -> list[str]:
+    return sorted((env or {}).keys())
+
+
+def command_artifact_paths(state: CleanRoomState, command_id: str) -> tuple[Path, Path]:
     index = len(state.commands) + 1
-    stdout_path = state.commands_dir / f"{index:03d}_{name}.stdout.txt"
-    stderr_path = state.commands_dir / f"{index:03d}_{name}.stderr.txt"
+    stdout_path = state.commands_dir / f"{index:03d}_{command_id}.stdout.txt"
+    stderr_path = state.commands_dir / f"{index:03d}_{command_id}.stderr.txt"
+    return stdout_path, stderr_path
+
+
+def run_command(
+    state: CleanRoomState,
+    command_id: str,
+    command: list[str],
+    cwd: Path | None = None,
+    env: dict[str, str] | None = None,
+    required: bool = True,
+) -> int:
+    if any(existing.command_id == command_id for existing in state.commands):
+        raise RuntimeError(f"duplicate command id: {command_id}")
+    stdout_path, stderr_path = command_artifact_paths(state, command_id)
     start_monotonic = time.monotonic()
     start_time = utc_now()
     merged_env = os.environ.copy()
     if env:
         merged_env.update(env)
-    completed: subprocess.CompletedProcess[str] | None = None
-    try:
-        completed = subprocess.run(
-            command,
-            cwd=cwd or ROOT,
-            env=merged_env,
-            text=True,
-            capture_output=True,
-            check=True,
-        )
-    except subprocess.CalledProcessError as exc:
-        completed = exc
+    completed = subprocess.run(
+        command,
+        cwd=cwd or ROOT,
+        env=merged_env,
+        text=True,
+        capture_output=True,
+    )
     end_time = utc_now()
     duration = round(time.monotonic() - start_monotonic, 3)
     stdout_path.write_text(completed.stdout or "")
     stderr_path.write_text(completed.stderr or "")
     record = CommandRecord(
-        name=name,
-        command=command,
+        command_id=command_id,
+        argv=redact_argv(command),
         cwd=str((cwd or ROOT).relative_to(ROOT) if (cwd or ROOT).is_relative_to(ROOT) else cwd or ROOT),
+        environment_names=env_names(env),
         start_time=start_time,
         end_time=end_time,
         duration_seconds=duration,
         exit_code=int(completed.returncode),
         stdout_artifact=str(stdout_path.relative_to(state.run_dir)),
         stderr_artifact=str(stderr_path.relative_to(state.run_dir)),
+        run_id=state.run_id,
+        commit=git(["rev-parse", "HEAD"]),
     )
     state.commands.append(record)
-    if completed.returncode != 0:
-        raise RuntimeError(f"{name} failed with exit code {completed.returncode}")
+    if required and completed.returncode != 0:
+        raise RuntimeError(f"{command_id} failed with exit code {completed.returncode}")
+    return int(completed.returncode)
 
 
 def quiet_output(command: list[str], env: dict[str, str] | None = None) -> str:
@@ -236,24 +270,64 @@ def write_runtime_summary(state: CleanRoomState, verdict: str, error: str | None
 
 def cleanup(state: CleanRoomState) -> bool:
     results: dict[str, object] = {}
-    commands = [
-        ("drop-database", ["dropdb", "--if-exists", state.database]),
-        ("remove-container", ["docker", "rm", "-f", state.container]),
-        ("remove-volume", ["docker", "volume", "rm", state.volume]),
-    ]
     env = {"PGPASSWORD": state.password, "PGHOST": "127.0.0.1", "PGPORT": state.host_port or "", "PGUSER": state.username}
     ok = True
-    for name, command in commands:
-        if name == "drop-database" and not state.host_port:
-            results[name] = {"exit_code": 127, "skipped": "postgres port unavailable"}
+    if not state.host_port:
+        results["cleanup-drop-database"] = {"exit_code": 127, "skipped": "postgres port unavailable"}
+        ok = False
+    else:
+        code = run_command(state, "cleanup-drop-database", ["dropdb", "--if-exists", state.database], env=env, required=False)
+        results["cleanup-drop-database"] = {"exit_code": code}
+        if code != 0:
             ok = False
-            continue
-        completed = subprocess.run(command, cwd=ROOT, text=True, capture_output=True, env={**os.environ, **env})
-        results[name] = {"exit_code": completed.returncode, "stderr": completed.stderr[-500:]}
-        if completed.returncode != 0 and name != "drop-database":
+
+    for command_id, command in [
+        ("cleanup-remove-container", ["docker", "rm", "-f", state.container]),
+        ("cleanup-remove-volume", ["docker", "volume", "rm", state.volume]),
+        ("cleanup-verify-container-removed", ["docker", "container", "inspect", state.container]),
+        ("cleanup-verify-volume-removed", ["docker", "volume", "inspect", state.volume]),
+    ]:
+        code = run_command(state, command_id, command, required=False)
+        absent_check = command_id.startswith("cleanup-verify-")
+        success = code != 0 if absent_check else code == 0
+        results[command_id] = {"exit_code": code, "success": success}
+        if not success:
             ok = False
     state.cleanup = {"success": ok, "steps": results}
     return ok
+
+
+def run_release_components_once(state: CleanRoomState, env: dict[str, str]) -> None:
+    run_command(state, "release-gate-integrity", [sys.executable, "scripts/verify_gate_integrity.py", "--check"])
+    run_command(state, "release-make-targets", [sys.executable, "scripts/verify_make_targets.py", "--check"])
+    run_command(state, "release-status-check", ["make", "status-check"])
+    run_command(state, "release-agent-protocol-matrix-check", ["make", "agent-protocol-matrix-check"])
+    run_command(state, "release-evaluation-calibration-report-check", ["make", "evaluation-calibration-report-check"])
+    run_command(state, "release-controlled-learning-report-check", ["make", "controlled-learning-report-check"])
+    run_command(state, "release-self-improvement-report-check", ["make", "self-improvement-report-check"])
+    run_command(state, "release-score-validation", ["npm", "run", "agentco:score-validation", "--", "--check"], cwd=ROOT / "backend")
+    run_command(
+        state,
+        "pytest-governed",
+        [
+            sys.executable,
+            "scripts/verify_pytest_skips.py",
+            "--report",
+            str(state.test_dir / "pytest-report.json"),
+            "--summary-output",
+            str(state.test_dir / "pytest-summary.json"),
+            "--",
+            "-q",
+        ],
+        env=env,
+    )
+    run_command(state, "backend-build", ["npm", "run", "build"], cwd=ROOT / "backend")
+    run_command(state, "backend-jest", ["npm", "test", "--", "--runInBand"], cwd=ROOT / "backend", env=env)
+    run_command(state, "backend-route-auth-contract", ["npm", "test", "--", "route-auth-contract.test.ts", "--runInBand"], cwd=ROOT / "backend", env=env)
+    run_command(state, "backend-audit-chain-cross-writer", ["npm", "test", "--", "audit-chain-cross-writer.test.ts", "--runInBand"], cwd=ROOT / "backend", env=env)
+    run_command(state, "frontend-install", ["npm", "ci"], cwd=ROOT / "frontend")
+    run_command(state, "frontend-typecheck", ["./node_modules/.bin/tsc", "--noEmit"], cwd=ROOT / "frontend")
+    run_command(state, "frontend-build", ["npm", "run", "build"], cwd=ROOT / "frontend", env={"NEXT_TELEMETRY_DISABLED": "1"})
 
 
 def main() -> int:
@@ -271,6 +345,8 @@ def main() -> int:
             "RELEASE_GATE_DATABASE_URL": state.database_url,
             "RELEASE_GATE_MIGRATION_DATABASE_URL": state.database_url,
             "RESOLUTION_SERVICE_PASSWORD": "test",
+            "AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS": "1",
+            "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS": "1",
             "PYTHONDONTWRITEBYTECODE": "1",
         }
         run_command(state, "create-database", ["createdb", state.database], env={"PGPASSWORD": state.password, "PGHOST": "127.0.0.1", "PGPORT": state.host_port or "", "PGUSER": state.username})
@@ -331,22 +407,7 @@ def main() -> int:
                 )
             )
             raise RuntimeError("second migration run changed schema fingerprint")
-        run_command(
-            state,
-            "pytest-governed",
-            [
-                sys.executable,
-                "scripts/verify_pytest_skips.py",
-                "--report",
-                str(state.test_dir / "pytest-report.json"),
-                "--summary-output",
-                str(state.test_dir / "pytest-summary.json"),
-                "--",
-                "-q",
-            ],
-            env=env,
-        )
-        run_command(state, "release-gate", ["make", "release-gate"], env=env)
+        run_release_components_once(state, env)
         ensure_git_clean()
         verdict = "PASS"
     except Exception as exc:
