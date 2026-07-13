@@ -21,7 +21,7 @@ on:
       - 'infrastructure/**'
       - 'docs/audit/current/**'
   push:
-    branches: [main]
+    branches: [main, 'audit/**']
   workflow_dispatch:
 
 permissions:
