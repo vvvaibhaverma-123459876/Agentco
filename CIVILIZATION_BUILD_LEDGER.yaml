@@ -135,33 +135,44 @@ phases:
           - 'npx jest tests/citizenship.test.ts --runInBand --forceExit -> 7/7 passed'
         notes: 11 routes registered + classified in route sensitivity matrix (171->182). Full regression green 2026-07-14 — exit 0; 103 suites passed/3 skipped; 683 passed/8 skipped/5 todo.
   C3_societies_institutions:
-    status: not_started
+    status: verified
     items:
       - id: C3.MigrationSocieties
         layer: C3
         system: societies schema
-        status: not_started
+        status: verified
         depends_on: [C1.MigrationCivilizationKernel]
-        notes: societies, society_memberships, society_charters, society_jurisdictions, society status; institutions gain society_id or civilization-wide jurisdiction flag.
+        migration_artifacts: [backend/src/db/migrations/131_societies_and_institution_charters.sql]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 131_societies_and_institution_charters.sql, exit 0'
+        notes: societies + transitions/charters/jurisdictions/memberships; institution society memberships, jurisdiction grants, charters, mandates/powers/limits, inter-institution contracts. Society jurisdiction subset-of-civilization enforced by composite FK; schema-agnostic grant guard (jsonb minus mutable columns).
       - id: C3.SocietyService
         layer: C3
-        status: not_started
+        status: verified
         depends_on: [C3.MigrationSocieties, C1.CivilizationKernelService]
-        notes: ">=2 active societies; jurisdiction subset-of-civilization; suspension blocks new protected work, preserves history."
+        source_artifacts: [backend/src/services/society.service.ts]
+        notes: lifecycle forming->active->suspended->dissolved (gated); suspension blocks joins/attachments; dissolution requires empty society; ensureDefaultSocieties seeds 2 active societies with global jurisdiction; topology projection.
       - id: C3.InstitutionCompletion
         layer: C3
-        status: not_started
+        status: verified
         depends_on: [C3.MigrationSocieties]
-        notes: institution charters/mandates/powers/limits versioned; inter_institution_contracts lifecycle+settlement; suspension semantics.
+        source_artifacts: [backend/src/services/institution-governance.service.ts]
+        notes: append-only versioned charters; mandates/powers/limits grant rows; power grants require authorized_decision_ref and non-self granting actor; contracts proposed->accepted->active->fulfilled|breached|terminated with settlement, frozen terms, proposer-cannot-accept.
       - id: C3.MandatoryInstitutionsSeed
         layer: C3
-        status: not_started
+        status: verified
         depends_on: [C3.InstitutionCompletion, C1.CivilizationBootstrapSeed]
-        notes: Evidence Court, Calibration Office, Safety Council, Memory Bureau, Treasury, Evaluation Lab, Judiciary, Expansion Board, Identity Registry, Observability Office — each with 5 mandatory departments via canonical creation path.
+        notes: 10 mandatory institutions (Evidence Court, Calibration Office, Safety Council, Memory Bureau, Treasury, Evaluation Lab, Judiciary, Expansion Board, Identity Registry, Observability Office) each with 5 departments via canonical creation path, charter v1, core mandate, powers, limits, global jurisdiction; idempotent.
       - id: C3.SocietyRoutesAndTests
         layer: C3
-        status: not_started
+        status: verified
         depends_on: [C3.SocietyService, C3.MandatoryInstitutionsSeed]
+        source_artifacts: [backend/src/routes/society.routes.ts]
+        test_artifacts: [backend/tests/societies-institutions.test.ts]
+        verification_commands:
+          - 'npx jest tests/societies-institutions.test.ts --runInBand --forceExit -> 8/8 passed'
+          - 'npx jest tests/route-auth-contract.test.ts -> 207 passed (matrix 182->200)'
+        notes: Full regression green 2026-07-14 — exit 0; 104 suites passed/3 skipped; 691 passed/8 skipped/5 todo.
   C4_coalitions:
     status: not_started
     items:
@@ -415,7 +426,7 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 52
-  verified: 14
+  verified: 19
   integrated: 0
   implemented: 0
   in_progress: 0

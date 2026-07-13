@@ -20,6 +20,7 @@ import { autonomyDashboardRoutes } from './routes/autonomy-dashboard.routes';
 import { civilizationGovernanceRoutes } from './routes/civilization-governance.routes';
 import { civilizationKernelRoutes } from './routes/civilization-kernel.routes';
 import { citizenshipRoutes } from './routes/citizenship.routes';
+import { societyRoutes } from './routes/society.routes';
 import { governanceRoutes } from './routes/governance.routes';
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
@@ -115,6 +116,7 @@ export async function build() {
   await app.register(civilizationGovernanceRoutes);
   await app.register(civilizationKernelRoutes);
   await app.register(citizenshipRoutes);
+  await app.register(societyRoutes);
   await app.register(governanceRoutes);
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);

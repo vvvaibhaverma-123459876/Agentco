@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 87 |
-| AUTH-WRITE | 90 |
-| TOTAL | 182 |
+| AUTH-READ | 90 |
+| AUTH-WRITE | 105 |
+| TOTAL | 200 |
 
 ## Matrix
 
@@ -99,6 +99,8 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/constitution/protected-surfaces` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/constitution/validate-change` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/constitution/versions` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/contracts` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/contracts/:contractId/transition` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/departments/:departmentId/specialists` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/drift/:driftId/resolve` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/drift/critical` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
@@ -108,13 +110,20 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/goals/:goalId/unlock` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/governance/summary` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/health` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/institutions/:institutionId/charter` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/institutions/:institutionId/deadlock-check` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/deadlock-incidents` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/institutions/:institutionId/governance` | GET/HEAD | Society/institution governance/contract state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/institutions/:institutionId/jurisdiction` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/institutions/:institutionId/limits` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/institutions/:institutionId/mandates` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/institutions/:institutionId/powers` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/institutions/:institutionId/reputation-distribution` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/specialist-assignments` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/institutions/:institutionId/top-performers` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/underperformers` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/work-requests` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/institutions/bootstrap-mandatory` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel/:civilizationId/activate` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel/:civilizationId/charter` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
@@ -148,6 +157,15 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/runtime/scheduler/run-once` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/runtime/scheduler/start` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/runtime/scheduler/stop` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies` | GET/HEAD | Society/institution governance/contract state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/societies` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/:societyId/citizens` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/:societyId/citizens/:citizenId/leave` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/:societyId/institutions` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/:societyId/jurisdictions` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/:societyId/transition` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/bootstrap-defaults` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/societies/topology` | GET/HEAD | Society/institution governance/contract state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/status` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/credential/:agent_id` | GET/HEAD | Agent credential material or credential lookup | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/governance/audit-trail` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
