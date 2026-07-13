@@ -196,7 +196,11 @@ reports/system_run/*/
 reports/acceptance/
 artifacts/audit/
 artifacts/runtime-integration/
+artifacts/staging-deployment/
 backend/.runtime-integration/
+
+# Helm dependency archives are rebuilt from Chart.lock.
+infrastructure/kubernetes/helm/agentco/charts/
 
 # Local secret env files (never commit)
 codex.env

@@ -1,0 +1,36 @@
+{
+  "environment": "local-real Kubernetes via Kind",
+  "hosted_boundaries": {
+    "cloud_backup_storage": "unverified",
+    "live_llm_provider": "unverified",
+    "managed_kafka": "unverified",
+    "managed_kubernetes": "unverified",
+    "managed_postgresql": "unverified",
+    "managed_redis": "unverified",
+    "production_alert_destination": "unverified"
+  },
+  "processes": [
+    "PostgreSQL",
+    "Redis",
+    "Zookeeper",
+    "Kafka",
+    "backend",
+    "frontend",
+    "outbox-worker",
+    "alert-receiver"
+  ],
+  "release_sequence": [
+    "build immutable images",
+    "create Kind cluster",
+    "deploy data services",
+    "run migration job with migration identity",
+    "grant runtime identity",
+    "deploy backend/outbox/frontend",
+    "verify readiness",
+    "exercise workflow",
+    "backup/restore",
+    "rolling update and rollback",
+    "failure injection",
+    "cleanup"
+  ]
+}

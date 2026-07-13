@@ -1,0 +1,32 @@
+{
+  "findings": [
+    {
+      "component": "network-policy",
+      "environment": "local Kind",
+      "evidence": "make audit-staging-deployment network negative probe",
+      "finding_id": "DOP-001",
+      "impact": "deny rules may render but not isolate traffic",
+      "regression_test": "tests/test_staging_deployment_controls.py",
+      "remaining_risk": "hosted cluster CNI remains unverified until hosted staging",
+      "remediation": "use a NetworkPolicy-enforcing CNI for the staging audit cluster",
+      "reproduction": "run staging audit on a cluster without NetworkPolicy-enforcing CNI",
+      "root_cause": "Kind default CNI does not enforce Kubernetes NetworkPolicy",
+      "severity": "S2",
+      "status": "validated_by_staging_audit"
+    },
+    {
+      "component": "event topology",
+      "environment": "runtime and staging",
+      "evidence": "OutboxWorker drains event_outbox and event_bus_outbox; domains and schemas differ",
+      "finding_id": "RTI-002",
+      "impact": "operator confusion if not documented",
+      "regression_test": "backend/tests/outbox-worker.test.ts and staging outbox proof",
+      "remaining_risk": "consumer-level contract tests for all EventBus topics remain future work",
+      "remediation": "document intentional separation and verify both relay paths in deployment evidence",
+      "reproduction": "inspect backend/src/workers/outbox-worker.ts and publish tests for both domains",
+      "root_cause": "two intentional event domains share a worker but not a schema",
+      "severity": "S3",
+      "status": "intentional_separation"
+    }
+  ]
+}
