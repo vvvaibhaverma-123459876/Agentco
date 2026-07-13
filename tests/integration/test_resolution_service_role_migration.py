@@ -63,14 +63,25 @@ def _substitute_env_vars(sql_text: str) -> str:
 
 
 def _drop_resolution_service_role(cur) -> None:
-    """Drop the test role without unsupported DROP ROLE CASCADE syntax."""
+    """Best-effort local cleanup for the cluster-global resolution_service role.
+
+    PostgreSQL roles are cluster-global. In the clean-room audit, the main
+    migrated database and other isolated sibling databases can legitimately
+    hold grants for the same role. This fixture verifies fresh migration grants
+    for its own isolated schema; it must not require dropping a role that other
+    clean-room databases still reference.
+    """
     cur.execute("SELECT 1 FROM pg_roles WHERE rolname = 'resolution_service'")
     if cur.fetchone() is None:
         return
 
     cur.execute("REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA public FROM resolution_service")
     cur.execute("REVOKE ALL PRIVILEGES ON SCHEMA public FROM resolution_service")
-    cur.execute("DROP ROLE resolution_service")
+    try:
+        cur.execute("DROP ROLE resolution_service")
+    except psycopg2.errors.DependentObjectsStillExist:
+        cur.connection.rollback()
+        cur.connection.autocommit = True
 
 
 @pytest.fixture(scope="module")
