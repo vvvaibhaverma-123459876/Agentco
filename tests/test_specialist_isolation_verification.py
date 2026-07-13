@@ -15,14 +15,19 @@ production-grade enough to build on.
 """
 import asyncio
 import json
+import os
 import subprocess
+import sys
 import time
 import uuid
 import requests
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from agents.db import get_db
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _db_or_skip():
@@ -135,21 +140,24 @@ class SpecialistIsolationVerifier:
         print(f"✅ Spawning specialist on port {self.specialist_port}")
 
         # Start specialist subprocess with environment
-        import os
         env = os.environ.copy()
-        env['PYTHONPATH'] = '/Users/Zet/Agentco'
-        env['DATABASE_URL'] = 'postgresql://agentco:password@localhost:5432/agentco'
+        env['PYTHONPATH'] = str(ROOT)
+        env['DATABASE_URL'] = (
+            os.environ.get('AGENTCO_TEST_DATABASE_URL')
+            or os.environ.get('DATABASE_URL')
+            or ''
+        )
 
         self.specialist_process = subprocess.Popen(
             [
-                "python", "-m", "agents.autonomy.evidence_summarizer",
+                sys.executable, "-m", "agents.autonomy.evidence_summarizer",
                 f"--specialist-id=test-{uuid.uuid4()}",
                 f"--port={self.specialist_port}",
                 "--role=evidence_summarizer",
             ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            cwd="/Users/Zet/Agentco",
+            cwd=str(ROOT),
             env=env
         )
 

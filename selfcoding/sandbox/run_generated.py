@@ -12,12 +12,24 @@ from __future__ import annotations
 
 import ast
 import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
 
-FROZEN_DATA_PATH = Path("/Users/Zet/Desktop/Agentco/evals/experiments/nse_phase6_data_frozen/")
-SCRATCH_DIR = Path("/Users/Zet/Desktop/Agentco/selfcoding/sandbox/scratch/")
+ROOT = Path(__file__).resolve().parents[2]
+FROZEN_DATA_PATH = Path(
+    os.environ.get(
+        "SELFCODING_FROZEN_DATA_PATH",
+        ROOT / "evals" / "experiments" / "nse_phase6_data_frozen",
+    )
+)
+SCRATCH_DIR = Path(
+    os.environ.get(
+        "SELFCODING_SCRATCH_DIR",
+        Path(tempfile.gettempdir()) / "agentco-selfcoding-scratch",
+    )
+)
 
 
 class SandboxError(Exception):
@@ -253,8 +265,8 @@ class _SafeEvaluator:
 
 def setup_sandbox() -> dict[str, Any]:
     SCRATCH_DIR.mkdir(parents=True, exist_ok=True)
-    if os.access(FROZEN_DATA_PATH, os.W_OK):
-        raise SandboxError(f"CRITICAL: Frozen data path is writable: {FROZEN_DATA_PATH}")
+    if not FROZEN_DATA_PATH.exists():
+        raise SandboxError(f"Frozen data path does not exist: {FROZEN_DATA_PATH}")
 
     from selfcoding.resolver import get_resolver
 

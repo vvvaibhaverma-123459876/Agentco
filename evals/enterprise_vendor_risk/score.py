@@ -195,7 +195,7 @@ class VendorRiskScorer:
         tpr = tp / max(np.sum(sorted_outcomes), 1)
         fpr = fp / max(np.sum(1 - sorted_outcomes), 1)
 
-        auroc = np.trapz(tpr, fpr)
+        auroc = np.trapezoid(tpr, fpr)
         return float(np.clip(auroc, 0.0, 1.0))
 
     def aggregate_scores(self, results: dict, cases: dict) -> dict:
