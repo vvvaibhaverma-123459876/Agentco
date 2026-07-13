@@ -119,7 +119,9 @@ def environment_available(requirement: EnvironmentRequirement) -> bool:
         except Exception:
             return False
     if requirement.condition == "kafka_reachable":
-        brokers = current or "localhost:9092"
+        if not current:
+            return False
+        brokers = current
         for broker in brokers.split(","):
             host, _, port_text = broker.strip().partition(":")
             if host and port_text.isdigit() and _tcp_reachable(host, int(port_text)):
