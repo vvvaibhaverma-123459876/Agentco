@@ -50,6 +50,8 @@ spec:
           env:
             - name: NODE_ENV
               value: {{ .Values.frontend.env.NODE_ENV | quote }}
+            - name: HOSTNAME
+              value: {{ .Values.frontend.env.HOSTNAME | quote }}
             - name: PORT
               value: {{ .Values.frontend.service.targetPort | quote }}
             - name: NEXT_PUBLIC_API_URL

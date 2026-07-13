@@ -883,6 +883,7 @@ spec:
             - containerPort: 3000
           env:
             - {{ name: NODE_ENV, value: production }}
+            - {{ name: HOSTNAME, value: "0.0.0.0" }}
             - {{ name: PORT, value: "3000" }}
             - {{ name: AGENTCO_API_URL, value: "http://agentco-backend:3001" }}
             - name: AGENTCO_API_KEY

@@ -175,6 +175,7 @@ frontend:
 
   env:
     NODE_ENV: production
+    HOSTNAME: 0.0.0.0
     # Browser-visible API base must be an origin only; paths are appended by
     # the frontend client. Leave blank for same-origin Next API proxying.
     NEXT_PUBLIC_API_URL: ""

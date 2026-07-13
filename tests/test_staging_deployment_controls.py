@@ -95,3 +95,15 @@ def test_backend_image_contains_migration_runner_source_path():
     dockerfile = (ROOT / "backend/Dockerfile").read_text()
 
     assert "/app/src/db/migrations ./src/db/migrations" in dockerfile
+
+
+def test_frontend_container_binds_all_interfaces_for_kubernetes_and_port_forward():
+    dockerfile = (ROOT / "frontend/Dockerfile").read_text()
+    values = (ROOT / "infrastructure/kubernetes/helm/agentco/values.yaml").read_text()
+    template = (ROOT / "infrastructure/kubernetes/helm/agentco/templates/frontend-deployment.yaml").read_text()
+    staging_script = (ROOT / "scripts/audit_staging_deployment.py").read_text()
+
+    assert "ENV HOSTNAME=0.0.0.0" in dockerfile
+    assert "HOSTNAME: 0.0.0.0" in values
+    assert "name: HOSTNAME" in template
+    assert 'name: HOSTNAME, value: "0.0.0.0"' in staging_script
