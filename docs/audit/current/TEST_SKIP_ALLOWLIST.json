@@ -12,6 +12,10 @@
       "reason": "live-service: Kafka unavailable at KAFKA_BROKERS='localhost:9092'\")",
       "required_environment": [
         {
+          "name": "AGENTCO_TEST_DATABASE_URL",
+          "condition": "postgres_reachable"
+        },
+        {
           "name": "KAFKA_BROKERS",
           "condition": "kafka_reachable"
         }

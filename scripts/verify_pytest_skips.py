@@ -147,11 +147,12 @@ def skip_reason_matches_missing_environment(skip_reason: str, missing_names: lis
         "AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS": ["destructive", "reserve"],
         "AGENTCO_ALLOW_DESTRUCTIVE_MIGRATION_TESTS": ["destructive", "migration"],
     }
+    matched_any = False
     for name in missing_names:
         terms = aliases.get(name, [name.lower()])
-        if not any(term in reason for term in terms):
-            return False
-    return True
+        if any(term in reason for term in terms):
+            matched_any = True
+    return matched_any
 
 
 def validate_report(report: dict, allowlist: list[SkipEntry]) -> tuple[bool, list[str], dict[str, int]]:
