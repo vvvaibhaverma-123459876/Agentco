@@ -109,7 +109,9 @@ markupsafe==3.0.3
     #   jinja2
     #   werkzeug
 numpy==2.5.1
-    # via -r requirements/requirements-dev.txt
+    # via
+    #   -r requirements/requirements-dev.txt
+    #   pandas
 openai==2.44.0
     # via
     #   -r agents/requirements.txt
@@ -154,6 +156,8 @@ packaging==26.2
     #   langsmith
     #   opentelemetry-instrumentation
     #   pytest
+pandas==3.0.3
+    # via -r requirements/requirements-dev.txt
 pinecone-client==6.0.0
     # via -r agents/requirements.txt
 pinecone-plugin-interface==0.0.7
@@ -188,7 +192,9 @@ pytest-asyncio==1.4.0
 pytest-cov==7.1.0
     # via -r agents/requirements.txt
 python-dateutil==2.9.0.post0
-    # via pinecone-client
+    # via
+    #   pandas
+    #   pinecone-client
 pyyaml==6.0.3
     # via langchain-core
 redis==8.0.1
