@@ -1,0 +1,392 @@
+# CIVILIZATION_BUILD_LEDGER.yaml — machine-readable ledger for the civilization-layer build.
+# Rules: status advances only with executable evidence; never mark verified without commands+exit codes;
+# termination_predicate_met stays false until every completion condition passes (see brief §14).
+meta:
+  schema_version: 1
+  generated_by: claude-fable-5-build-session
+  created: '2026-07-13'
+  last_updated: '2026-07-13'
+  base_commit: 997e66ce700e0c93896f13f7d6f559d0a50b15dd
+  branch: feature/civilization-layer
+  termination_predicate_met: false
+  statuses: [not_started, in_progress, blocked, implemented, integrated, verified]
+phases:
+  C0_canonical_runtime_freeze:
+    status: in_progress
+    items:
+      - id: C0.RuntimeInventory
+        layer: C0
+        system: canonical runtime map
+        status: in_progress
+        depends_on: []
+        source_artifacts: [docs/audit/current/RUNTIME_COMPONENT_LEDGER.md, scripts/generate_runtime_reachability.py]
+        evidence: []
+        notes: Inventory active + duplicate runtime paths; emit canonical_runtime_map.json.
+      - id: C0.CanonicalPathSelection
+        layer: C0
+        system: canonical path decisions
+        status: not_started
+        depends_on: [C0.RuntimeInventory]
+        notes: Document canonical identity/task/event/resource/evidence/governance/coordinator paths + duplicate disposition.
+      - id: C0.EnvBaseline
+        layer: C0
+        system: build environment + suite baseline
+        status: in_progress
+        depends_on: []
+        notes: Isolated Postgres (port 5544) + empty-DB migration + tsc + backend jest baseline; never touches operator's containers.
+      - id: C0.ReachabilityBaseline
+        layer: C0
+        system: reachability gate baseline
+        status: not_started
+        depends_on: [C0.EnvBaseline]
+        notes: Run existing reachability tooling; record baseline for later civilization reachability gate.
+  C1_civilization_kernel:
+    status: not_started
+    items:
+      - id: C1.MigrationCivilizationKernel
+        layer: C1
+        system: civilizations schema
+        status: not_started
+        depends_on: [C0.CanonicalPathSelection]
+        notes: civilizations, versions, charters, jurisdictions, protected_invariants, emergency_states, objectives; lifecycle CHECKs; append-only version/charter history.
+      - id: C1.CivilizationKernelService
+        layer: C1
+        system: kernel service
+        status: not_started
+        depends_on: [C1.MigrationCivilizationKernel]
+        notes: Lifecycle forming→active→restricted→emergency→recovering→suspended→retired; emergency expiry; retired immutability; event/audit/outbox in same tx.
+      - id: C1.CivilizationBootstrapSeed
+        layer: C1
+        system: deterministic bootstrap
+        status: not_started
+        depends_on: [C1.CivilizationKernelService]
+        notes: One active civilization root + protected invariants; idempotent seed.
+      - id: C1.CivilizationRoutes
+        layer: C1
+        system: kernel APIs
+        status: not_started
+        depends_on: [C1.CivilizationKernelService]
+      - id: C1.KernelTests
+        layer: C1
+        system: kernel tests
+        status: not_started
+        depends_on: [C1.CivilizationBootstrapSeed, C1.CivilizationRoutes]
+        notes: Unit+DB integration+negative (illegal transitions, emergency auto-expiry, retired immutability, scoping).
+  C2_citizenry:
+    status: not_started
+    items:
+      - id: C2.MigrationCitizenship
+        layer: C2
+        system: citizenship schema
+        status: not_started
+        depends_on: [C1.MigrationCivilizationKernel]
+        notes: citizens (actor-backed, agent|human|service), citizenship_records append-only, role_eligibility (institution+time scope), autonomy_envelopes (domain), risk_clearances, citizen_sanctions, citizen_successions.
+      - id: C2.CitizenshipService
+        layer: C2
+        system: citizenship lifecycle
+        status: not_started
+        depends_on: [C2.MigrationCitizenship]
+        notes: candidate→probationary→active→restricted→suspended→reinstated|expelled|retired; suspension blocks protected execution immediately; succession without identity transfer.
+      - id: C2.CitizenshipEnforcementHook
+        layer: C2
+        system: protected-action citizenship gate
+        status: not_started
+        depends_on: [C2.CitizenshipService]
+        notes: identity-authority verify path requires active citizenship + role eligibility for civilization work.
+      - id: C2.TrustLinkedRoutingAndBudgets
+        layer: C2
+        system: trust→budget/routing modifiers
+        status: not_started
+        depends_on: [C2.CitizenshipService]
+        notes: (actor,domain) trust alters budgets, routing, review requirements; evidence via tests.
+      - id: C2.CitizenRoutesAndTests
+        layer: C2
+        status: not_started
+        depends_on: [C2.CitizenshipEnforcementHook, C2.TrustLinkedRoutingAndBudgets]
+  C3_societies_institutions:
+    status: not_started
+    items:
+      - id: C3.MigrationSocieties
+        layer: C3
+        system: societies schema
+        status: not_started
+        depends_on: [C1.MigrationCivilizationKernel]
+        notes: societies, society_memberships, society_charters, society_jurisdictions, society status; institutions gain society_id or civilization-wide jurisdiction flag.
+      - id: C3.SocietyService
+        layer: C3
+        status: not_started
+        depends_on: [C3.MigrationSocieties, C1.CivilizationKernelService]
+        notes: ">=2 active societies; jurisdiction subset-of-civilization; suspension blocks new protected work, preserves history."
+      - id: C3.InstitutionCompletion
+        layer: C3
+        status: not_started
+        depends_on: [C3.MigrationSocieties]
+        notes: institution charters/mandates/powers/limits versioned; inter_institution_contracts lifecycle+settlement; suspension semantics.
+      - id: C3.MandatoryInstitutionsSeed
+        layer: C3
+        status: not_started
+        depends_on: [C3.InstitutionCompletion, C1.CivilizationBootstrapSeed]
+        notes: Evidence Court, Calibration Office, Safety Council, Memory Bureau, Treasury, Evaluation Lab, Judiciary, Expansion Board, Identity Registry, Observability Office — each with 5 mandatory departments via canonical creation path.
+      - id: C3.SocietyRoutesAndTests
+        layer: C3
+        status: not_started
+        depends_on: [C3.SocietyService, C3.MandatoryInstitutionsSeed]
+  C4_coalitions:
+    status: not_started
+    items:
+      - id: C4.MigrationCoalitions
+        layer: C4
+        status: not_started
+        depends_on: [C3.MigrationSocieties]
+        notes: coalitions, memberships, charters, coordination_threads/messages, proposals, negotiation_rounds, commitments, contracts, delegations, consensus_results, dissent_records, settlements.
+      - id: C4.CoalitionLifecycleService
+        layer: C4
+        status: not_started
+        depends_on: [C4.MigrationCoalitions, C3.SocietyService]
+        notes: proposed→negotiating→constituted→active→completing→settled→dissolved|failed; consensus per charter; dissent retained; dissolution revokes delegated authority; extends existing coalition-formation.service.
+      - id: C4.CoalitionDeadlockEscalation
+        layer: C4
+        status: not_started
+        depends_on: [C4.CoalitionLifecycleService]
+        notes: wire existing deadlock-detector to governance/judiciary escalation.
+      - id: C4.CoalitionRoutesAndTests
+        layer: C4
+        status: not_started
+        depends_on: [C4.CoalitionDeadlockEscalation]
+  C5_missions:
+    status: not_started
+    items:
+      - id: C5.MigrationMissions
+        layer: C5
+        status: not_started
+        depends_on: [C1.MigrationCivilizationKernel]
+        notes: strategic_goals, missions, mission_plans, mission_dependencies (+acyclic check), workstreams, mission task/action linkage to agent_tasks/actions, evidence bundles, outcomes, attestations.
+      - id: C5.MissionLifecycleService
+        layer: C5
+        status: not_started
+        depends_on: [C5.MigrationMissions, C2.CitizenshipService]
+        notes: full lifecycle; completion blocked until required tasks+evidence+settlement+audit complete; attestation generator emits full bundle.
+      - id: C5.MissionSagaIntegration
+        layer: C5
+        status: not_started
+        depends_on: [C5.MissionLifecycleService]
+        notes: workstreams execute via saga-coordinator + durable tasks; retries/attempts persisted; compensation for reversible actions.
+      - id: C5.MissionRoutesAndTests
+        layer: C5
+        status: not_started
+        depends_on: [C5.MissionSagaIntegration]
+  C6_economy:
+    status: not_started
+    items:
+      - id: C6.MigrationEconomy
+        layer: C6
+        status: not_started
+        depends_on: [C1.MigrationCivilizationKernel, C3.MigrationSocieties]
+        notes: treasuries, budget_proposals, budget_allocations, resource_policies, penalties, cost_attribution_records; account scoping across civilization/society/institution/coalition/mission/citizen.
+      - id: C6.TreasuryService
+        layer: C6
+        status: not_started
+        depends_on: [C6.MigrationEconomy]
+        notes: allocation flows; penalties require governance/judiciary authority; attribution rollups; reconciliation detects imbalance.
+      - id: C6.EconomyEnforcement
+        layer: C6
+        status: not_started
+        depends_on: [C6.TreasuryService, C2.TrustLinkedRoutingAndBudgets]
+        notes: risk/trust-linked budget policy; exhaustion → explicit queue/shed/block; duplicate settlement rejected.
+      - id: C6.EconomyRoutesAndTests
+        layer: C6
+        status: not_started
+        depends_on: [C6.EconomyEnforcement]
+  C7_governance:
+    status: not_started
+    items:
+      - id: C7.MigrationGovernance
+        layer: C7
+        status: not_started
+        depends_on: [C1.MigrationCivilizationKernel]
+        notes: policies, policy_versions, governance_proposals, sponsors, impact_assessments, deliberations, votes, quorum_rules, governance_decisions, vetoes, overrides, emergency_powers (expiry NOT NULL), policy_activations, policy_rollbacks; constitution linkage to existing calibration_constitution.
+      - id: C7.GovernanceProposalService
+        layer: C7
+        status: not_started
+        depends_on: [C7.MigrationGovernance, C2.CitizenshipService]
+        notes: draft→sponsored→impact_review→deliberation→voting→approved|rejected→activation_pending→active→superseded|repealed|rolled_back; bounded reputation-weighted voting; quorum; conflict-of-interest checks.
+      - id: C7.PolicyRuntimeEnforcement
+        layer: C7
+        status: not_started
+        depends_on: [C7.GovernanceProposalService]
+        notes: active policies consulted in protected-action lifecycle; test proves behaviour change on activation and again on rollback (E2E scenario C).
+      - id: C7.EmergencyPowers
+        layer: C7
+        status: not_started
+        depends_on: [C7.MigrationGovernance, C1.CivilizationKernelService]
+        notes: scoped, observable, auto-expiring; integrates existing kill-switch; expiry sweep.
+      - id: C7.GovernanceRoutesAndTests
+        layer: C7
+        status: not_started
+        depends_on: [C7.PolicyRuntimeEnforcement, C7.EmergencyPowers]
+  C8_judiciary:
+    status: not_started
+    items:
+      - id: C8.MigrationJudiciaryCompletion
+        layer: C8
+        status: not_started
+        depends_on: [C7.MigrationGovernance]
+        notes: hearings, evidence_submissions, jurisdiction_decisions, enforcement_orders, appeals, appellate_rulings, dissenting_opinions on top of existing judiciary tables.
+      - id: C8.JudiciaryLifecycleCompletion
+        layer: C8
+        status: not_started
+        depends_on: [C8.MigrationJudiciaryCompletion]
+        notes: opened→jurisdiction_check→evidence_collection→hearing→ruling→enforcement→appeal→final→closed; independence checks; enforcement orders mutate runtime state through authorized paths; appeals to distinct panel; precedent search.
+      - id: C8.JudiciaryRoutesAndTests
+        layer: C8
+        status: not_started
+        depends_on: [C8.JudiciaryLifecycleCompletion]
+  C9_epistemics:
+    status: not_started
+    items:
+      - id: C9.RetractionPropagation
+        layer: C9
+        status: not_started
+        depends_on: [C0.CanonicalPathSelection]
+        notes: retraction propagates to dependent claims/memories/decisions (builds on contradictions_and_demotions migration 118).
+      - id: C9.CivilizationKnowledgeViews
+        layer: C9
+        status: not_started
+        depends_on: [C1.CivilizationKernelService]
+        notes: civilization/institution knowledge projections; retrieval returns provenance + trust context.
+      - id: C9.EpistemicsNegativeSuite
+        layer: C9
+        status: not_started
+        depends_on: [C9.RetractionPropagation]
+        notes: verify existing gates (unsupported→verified memory blocked; same-source resolution rejected; fixture evidence blocked in production) + close gaps.
+  C10_learning:
+    status: not_started
+    items:
+      - id: C10.IndependentEvaluator
+        layer: C10
+        status: not_started
+        depends_on: [C0.CanonicalPathSelection]
+        notes: evaluator ≠ proposer enforced; held-out benchmark cases.
+      - id: C10.CanaryAndRollback
+        layer: C10
+        status: not_started
+        depends_on: [C10.IndependentEvaluator]
+        notes: canary runs, promotion decisions, executable + tested rollback, post-promotion monitoring.
+      - id: C10.FailureToCandidate
+        layer: C10
+        status: not_started
+        depends_on: [C5.MissionLifecycleService]
+        notes: task/mission failure auto-creates learning candidate with failure analysis (E2E scenario E precondition).
+      - id: C10.LearningTests
+        layer: C10
+        status: not_started
+        depends_on: [C10.CanaryAndRollback, C10.FailureToCandidate]
+  C11_expansion:
+    status: not_started
+    items:
+      - id: C11.MigrationExpansion
+        layer: C11
+        status: not_started
+        depends_on: [C7.MigrationGovernance]
+        notes: expansion_proposals, risk_reviews, limited_trials, capabilities, capability_versions, capability_grants, capability_restrictions, capability_revocations, domain_versions.
+      - id: C11.ExpansionGateCompletion
+        layer: C11
+        status: not_started
+        depends_on: [C11.MigrationExpansion, C10.CanaryAndRollback]
+        notes: proposed→risk_review→benchmark_design→limited_trial→calibration_review→governance_review→approved|restricted|rejected→monitored→expanded|revoked; restriction changes routing immediately; revocation cancels/escalates queued work.
+      - id: C11.ExpansionTests
+        layer: C11
+        status: not_started
+        depends_on: [C11.ExpansionGateCompletion]
+  C12_civilization_os:
+    status: not_started
+    items:
+      - id: C12.SchedulerDaemon
+        layer: C12
+        status: not_started
+        depends_on: [C1.CivilizationKernelService]
+        notes: continuous daemon + bounded run-once; pg-advisory-lock leader election; heartbeats; start/stop/pause/drain; stuck-work detection; kill-switch + backpressure integration; extends civilization-scheduler.service.
+      - id: C12.RoutersAndLoop
+        layer: C12
+        status: not_started
+        depends_on: [C12.SchedulerDaemon, C5.MissionSagaIntegration, C4.CoalitionLifecycleService, C7.PolicyRuntimeEnforcement, C8.JudiciaryLifecycleCompletion, C10.FailureToCandidate, C11.ExpansionGateCompletion, C6.EconomyEnforcement]
+        notes: WorkSourcer, GoalPrioritizer, InstitutionRouter, CoalitionCoordinator, MissionCoordinator, GovernanceRouter, JudiciaryRouter, LearningRouter, ExpansionRouter, EventRouter, LoopSupervisor, EmergencyController, GeneralityReporter — one integrated tick loop per brief §5.13.
+      - id: C12.RestartRecovery
+        layer: C12
+        status: not_started
+        depends_on: [C12.RoutersAndLoop]
+        notes: restart recovery; no duplicate missions/actions after replay; civilization-wide status projection.
+      - id: C12.OSTests
+        layer: C12
+        status: not_started
+        depends_on: [C12.RestartRecovery]
+  C13_operator_plane:
+    status: not_started
+    items:
+      - id: C13.OperatorAPIs
+        layer: C13
+        status: not_started
+        depends_on: [C12.RoutersAndLoop]
+        notes: governed backend APIs for every §6 view; protected actions require auth; pagination/filtering.
+      - id: C13.OperatorFrontend
+        layer: C13
+        status: not_started
+        depends_on: [C13.OperatorAPIs]
+        notes: Next.js operator views; no fake data; confirmation+reason for destructive/emergency ops; correlation-ID links.
+      - id: C13.OperatorTests
+        layer: C13
+        status: not_started
+        depends_on: [C13.OperatorFrontend]
+  C14_reliability_security_deployment:
+    status: not_started
+    items:
+      - id: C14.MessagingResilience
+        layer: C14
+        status: not_started
+        depends_on: [C12.RestartRecovery]
+        notes: DLQ inspect/replay via governed actions; poison-message handling; projection rebuild verification; outbox lag monitoring.
+      - id: C14.ObservabilityCompletion
+        layer: C14
+        status: not_started
+        depends_on: [C12.RoutersAndLoop]
+        notes: metrics for brief §9 list; SLO definitions; alert rules; dashboards; scheduler heartbeat metric.
+      - id: C14.DeploymentAlignment
+        layer: C14
+        status: not_started
+        depends_on: [C12.SchedulerDaemon]
+        notes: compose/Helm entries for scheduler daemon + workers + consumers; migration job ordering; probes; executable checks that deployment references real entry points.
+      - id: C14.SecurityHardening
+        layer: C14
+        status: not_started
+        depends_on: [C13.OperatorAPIs]
+        notes: brief §4.3 checks; negative/adversarial suite (§10.6); secret scan; dependency audit.
+      - id: C14.ReliabilityTests
+        layer: C14
+        status: not_started
+        depends_on: [C14.MessagingResilience, C14.DeploymentAlignment, C14.SecurityHardening]
+  C15_completion_proof:
+    status: not_started
+    items:
+      - id: C15.E2EScenarios
+        layer: C15
+        status: not_started
+        depends_on: [C12.OSTests, C13.OperatorTests, C14.ReliabilityTests]
+        notes: scenarios A–H as executable suites.
+      - id: C15.CompletionEvidence
+        layer: C15
+        status: not_started
+        depends_on: [C15.E2EScenarios]
+        notes: reports/civilization_completion/latest/* generator (23 artifacts, machine-generated, commit-bound).
+      - id: C15.ReconciliationAndGate
+        layer: C15
+        status: not_started
+        depends_on: [C15.CompletionEvidence]
+        notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
+rollups:
+  total_items: 52
+  verified: 0
+  integrated: 0
+  implemented: 0
+  in_progress: 3
+  not_started: 49
+  blocked: 0
