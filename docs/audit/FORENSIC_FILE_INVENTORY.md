@@ -2,22 +2,22 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1635`
+- Tracked files: `1656`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
 | Database migration | 125 |
-| Deployment infrastructure | 23 |
+| Deployment infrastructure | 24 |
 | Deprecated code | 48 |
-| Development tooling | 114 |
-| Documentation | 298 |
+| Development tooling | 117 |
+| Documentation | 314 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 456 |
 | Prompt/template | 29 |
-| Test infrastructure | 260 |
+| Test infrastructure | 261 |
 | Unknown purpose | 30 |
 
 ## Top-Level Counts
@@ -25,16 +25,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 441 |
-| `docs` | 226 |
+| `docs` | 242 |
 | `evals` | 180 |
-| `scripts` | 126 |
+| `scripts` | 129 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `reports` | 48 |
 | `frontend` | 36 |
-| `tests` | 34 |
+| `tests` | 35 |
 | `reserve` | 33 |
 | `calibration` | 30 |
 | `results` | 20 |
@@ -45,9 +45,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `learning` | 13 |
 | `synthesis` | 10 |
 | `ingestion` | 9 |
+| `.github` | 4 |
 | `requirements` | 4 |
 | `validation` | 4 |
-| `.github` | 3 |
 | `agentco_security` | 2 |
 | `dashboard` | 2 |
 | `data` | 2 |
@@ -95,6 +95,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.github/workflows/ci.yml` | Deployment infrastructure |
 | `.github/workflows/clean-room-audit.yml` | Deployment infrastructure |
 | `.github/workflows/deploy.yml` | Deployment infrastructure |
+| `.github/workflows/runtime-integration-audit.yml` | Deployment infrastructure |
 | `.gitignore` | Development tooling |
 | `.python-version` | Development tooling |
 | `AGENTCO_AUDIT_EXECUTIVE_SUMMARY.md` | Unknown purpose |
@@ -974,12 +975,28 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/ROUTE_SENSITIVITY_MATRIX.md` | Documentation |
 | `docs/audit/SELF_IMPROVEMENT_EXPERIMENT_REPORT.json` | Documentation |
 | `docs/audit/V1_SEVERITY_REACHABILITY.md` | Documentation |
+| `docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.json` | Documentation |
+| `docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.md` | Documentation |
+| `docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md` | Documentation |
 | `docs/audit/current/BASELINE_COMMAND_RESULTS.json` | Documentation |
 | `docs/audit/current/BASELINE_EXECUTION_REPORT.md` | Documentation |
 | `docs/audit/current/BASELINE_FINDINGS.json` | Documentation |
+| `docs/audit/current/CI_BASELINE_RECONCILIATION.md` | Documentation |
+| `docs/audit/current/CLAIM_EVIDENCE_MATRIX.json` | Documentation |
+| `docs/audit/current/CLAIM_EVIDENCE_MATRIX.md` | Documentation |
+| `docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json` | Documentation |
 | `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
+| `docs/audit/current/INTEGRATION_CONTRACT_MATRIX.json` | Documentation |
+| `docs/audit/current/INTEGRATION_CONTRACT_MATRIX.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
+| `docs/audit/current/REMEDIATION_03_RUNTIME_ARCHITECTURE_INTEGRATION.md` | Documentation |
+| `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
+| `docs/audit/current/RUNTIME_COMPONENT_LEDGER.md` | Documentation |
+| `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.json` | Documentation |
+| `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md` | Documentation |
+| `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
+| `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization_migration_map.md` | Documentation |
 | `docs/history/5MIN_TEST_FINAL_REPORT.md` | Documentation |
@@ -1532,6 +1549,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/agentco_integration_audit.py` | Development tooling |
 | `scripts/audit_clean_room.py` | Development tooling |
 | `scripts/audit_llm_integration.py` | Development tooling |
+| `scripts/audit_runtime_integration.py` | Development tooling |
 | `scripts/autonomous_10min_advancement.py` | Development tooling |
 | `scripts/autonomous_prediction_loop.py` | Development tooling |
 | `scripts/autonomy_open_world_5min.py` | Development tooling |
@@ -1557,6 +1575,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/generate_evaluation_calibration_report.py` | Development tooling |
 | `scripts/generate_forensic_audit_controls.py` | Development tooling |
 | `scripts/generate_forensic_inventory.py` | Development tooling |
+| `scripts/generate_runtime_reachability.py` | Development tooling |
 | `scripts/generate_self_improvement_report.py` | Development tooling |
 | `scripts/generate_status.py` | Development tooling |
 | `scripts/hourly_codex_resume.sh` | Development tooling |
@@ -1592,6 +1611,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_pawdent_business_simulation.py` | Development tooling |
 | `scripts/run_real_world_validation.py` | Development tooling |
 | `scripts/run_staging_validation_gate.sh` | Development tooling |
+| `scripts/scan_committed_secrets.py` | Development tooling |
 | `scripts/setup_release_gate_role.sql` | Development tooling |
 | `scripts/smoke_frontend_auth.sh` | Development tooling |
 | `scripts/smoke_one_task.py` | Development tooling |
@@ -1707,6 +1727,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_gate_integrity_controls.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
+| `tests/test_runtime_integration_controls.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
 | `tests/test_specialist_isolation_verification.py` | Test infrastructure |
 | `tests/test_trust_monotonicity.py` | Test infrastructure |

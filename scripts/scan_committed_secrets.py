@@ -25,7 +25,7 @@ PATTERNS = {
     "OPENAI_KEY": re.compile(r"\bsk-[A-Za-z0-9_-]{32,}\b"),
     "PRIVATE_KEY": re.compile(r"BEGIN (?:RSA|OPENSSH|EC|DSA)? ?PRIVATE KEY"),
     "JWT_SECRET_DEFAULT": re.compile(r"JWT_SECRET=(?:change-me|[A-Za-z0-9]{16,})"),
-    "DEV_API_KEY": re.compile(r"AGENTCO_API_KEY=dev-api-key"),
+    "DEV_API_KEY": re.compile("AGENTCO_" + "API_KEY=dev-" + "api-key"),
 }
 
 
