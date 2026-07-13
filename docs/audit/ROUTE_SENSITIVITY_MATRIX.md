@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 85 |
-| AUTH-WRITE | 81 |
-| TOTAL | 171 |
+| AUTH-READ | 87 |
+| AUTH-WRITE | 90 |
+| TOTAL | 182 |
 
 ## Matrix
 
@@ -82,6 +82,17 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/changes/:requestId/review` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/changes/pending` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/changes/request` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens` | GET/HEAD | Citizenship status/sanction/role/envelope state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/citizens` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/:citizenId` | GET/HEAD | Citizenship status/sanction/role/envelope state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/citizens/:citizenId/envelope` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/:citizenId/roles` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/:citizenId/sanctions` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/:citizenId/suspend` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/:citizenId/transition` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/roles/:eligibilityId/revoke` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/sanctions/:sanctionId/lift` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/citizens/successions` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/consistency-check` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/constitution/activate` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/constitution/active` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |

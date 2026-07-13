@@ -52,7 +52,7 @@ phases:
           - 'make audit-runtime-integration PYTHON=python3.13 -> exit 0'
         notes: Baseline recorded; civilization reachability additions land with C12.
   C1_civilization_kernel:
-    status: in_progress
+    status: verified
     items:
       - id: C1.MigrationCivilizationKernel
         layer: C1
@@ -66,63 +66,74 @@ phases:
       - id: C1.CivilizationKernelService
         layer: C1
         system: kernel service
-        status: integrated
+        status: verified
         depends_on: [C1.MigrationCivilizationKernel]
         source_artifacts: [backend/src/services/civilization-kernel.service.ts]
         notes: Lifecycle map enforced; emergency requires authorized_decision_ref + bounded ttl; auto-expiry sweep transitions to recovering; event_log + decision_log in same tx.
       - id: C1.CivilizationBootstrapSeed
         layer: C1
         system: deterministic bootstrap
-        status: integrated
+        status: verified
         depends_on: [C1.CivilizationKernelService]
         notes: ensureCivilizationRoot() idempotent; AgentCo root + default charter + 10 tier-0 invariants + global jurisdiction.
       - id: C1.CivilizationRoutes
         layer: C1
         system: kernel APIs
-        status: integrated
+        status: verified
         depends_on: [C1.CivilizationKernelService]
         source_artifacts: [backend/src/routes/civilization-kernel.routes.ts]
         runtime_entrypoints: ['/api/civilization/kernel/* registered in backend/src/server.ts']
       - id: C1.KernelTests
         layer: C1
         system: kernel tests
-        status: integrated
+        status: verified
         depends_on: [C1.CivilizationBootstrapSeed, C1.CivilizationRoutes]
         test_artifacts: [backend/tests/civilization-kernel.test.ts]
         verification_commands:
           - 'npx jest tests/civilization-kernel.test.ts --runInBand --forceExit -> 8/8 passed'
-        notes: Full-suite regression run pending before items flip to verified.
+          - 'npm test -- --runInBand --forceExit -> exit 0: 102 suites passed/3 skipped, 665 passed/8 skipped/5 todo (2026-07-13, incl. route-auth 178)'
+        notes: Route sensitivity matrix extended (157->171); route-auth contract green.
   C2_citizenry:
-    status: not_started
+    status: verified
     items:
       - id: C2.MigrationCitizenship
         layer: C2
         system: citizenship schema
-        status: not_started
+        status: verified
         depends_on: [C1.MigrationCivilizationKernel]
-        notes: citizens (actor-backed, agent|human|service), citizenship_records append-only, role_eligibility (institution+time scope), autonomy_envelopes (domain), risk_clearances, citizen_sanctions, citizen_successions.
+        migration_artifacts: [backend/src/db/migrations/130_citizenship.sql]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 130_citizenship.sql, exit 0'
+        notes: citizens, citizenship_records (append-only), citizen_sanctions (authority-required), citizen_role_eligibility (institution VARCHAR + time scope), citizen_autonomy_envelopes (domain), citizen_successions; guards + REVOKEs. Risk clearance is modeled by envelope max_risk_level.
       - id: C2.CitizenshipService
         layer: C2
         system: citizenship lifecycle
-        status: not_started
+        status: verified
         depends_on: [C2.MigrationCitizenship]
-        notes: candidate→probationary→active→restricted→suspended→reinstated|expelled|retired; suspension blocks protected execution immediately; succession without identity transfer.
+        source_artifacts: [backend/src/services/citizenship.service.ts]
+        notes: lifecycle map + sanction-gated suspension/expulsion; reinstatement requires lifted sanctions; self-sanction blocked; succession transfers active roles only.
       - id: C2.CitizenshipEnforcementHook
         layer: C2
         system: protected-action citizenship gate
-        status: not_started
+        status: verified
         depends_on: [C2.CitizenshipService]
-        notes: identity-authority verify path requires active citizenship + role eligibility for civilization work.
+        source_artifacts: [backend/src/services/durable-execution.service.ts, backend/src/services/team-activation.service.ts]
+        notes: assertProtectedExecutionAllowed wired into durable-execution enqueue+run and team-activation spawn; registry agents + specialist roles auto-enroll active (recorded); denials emit citizenship.execution_blocked events.
       - id: C2.TrustLinkedRoutingAndBudgets
         layer: C2
         system: trust→budget/routing modifiers
-        status: not_started
+        status: verified
         depends_on: [C2.CitizenshipService]
-        notes: (actor,domain) trust alters budgets, routing, review requirements; evidence via tests.
+        notes: budgetMultiplierFor = envelope multiplier x trust modifier (unknown 1.0, <0.5 -> 0.5, force_downgrade -> 0.25); applied to specialist spawn budgets. Calibration-aware routing already ranks by trust; envelope risk bounds enforced in gate.
       - id: C2.CitizenRoutesAndTests
         layer: C2
-        status: not_started
+        status: verified
         depends_on: [C2.CitizenshipEnforcementHook, C2.TrustLinkedRoutingAndBudgets]
+        source_artifacts: [backend/src/routes/citizenship.routes.ts]
+        test_artifacts: [backend/tests/citizenship.test.ts]
+        verification_commands:
+          - 'npx jest tests/citizenship.test.ts --runInBand --forceExit -> 7/7 passed'
+        notes: 11 routes registered + classified in route sensitivity matrix (171->182). Full regression green 2026-07-14 — exit 0; 103 suites passed/3 skipped; 683 passed/8 skipped/5 todo.
   C3_societies_institutions:
     status: not_started
     items:
@@ -404,9 +415,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 52
-  verified: 0
+  verified: 14
   integrated: 0
   implemented: 0
-  in_progress: 3
-  not_started: 49
+  in_progress: 0
+  not_started: 38
   blocked: 0
+  last_recomputed: '2026-07-14'
