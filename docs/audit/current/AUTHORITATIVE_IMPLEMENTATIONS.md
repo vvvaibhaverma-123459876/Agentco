@@ -1,6 +1,6 @@
 # Authoritative Implementations
 
-Commit: `b663f7a51ec75e04590b4361c8ef92c323251ef3`
+Tracked structural snapshot input hash: `d222041325198eaeeee5107a73ece1708a6c86c0631ce0d620e43218d78e091d`
 
 | Concept | Implementation | Decision | Evidence |
 | --- | --- | --- | --- |

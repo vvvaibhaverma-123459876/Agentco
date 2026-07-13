@@ -9,6 +9,7 @@ does not assign production readiness.
 from __future__ import annotations
 
 import ast
+import hashlib
 import json
 import re
 import subprocess
@@ -74,6 +75,22 @@ class EntryPoint:
 
 def git_head() -> str:
     return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+
+
+def structural_snapshot_id() -> str:
+    roots = ["backend/src", "agents/autonomy", "runtime", "learning", "synthesis", "evals/enterprise_vendor_risk"]
+    digest = hashlib.sha256()
+    for root in roots:
+        for path in sorted((ROOT / root).rglob("*")):
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            if path.suffix not in {".ts", ".py", ".json", ".sql"}:
+                continue
+            digest.update(str(path.relative_to(ROOT)).encode())
+            digest.update(b"\0")
+            digest.update(path.read_bytes())
+            digest.update(b"\0")
+    return digest.hexdigest()
 
 
 def read(path: Path) -> str:
@@ -302,7 +319,7 @@ def write_json(path: Path, value: object) -> None:
 
 
 def write_markdown(path: Path, title: str, rows: list[dict[str, object]], columns: list[str]) -> None:
-    lines = [f"# {title}", "", f"Generated from commit `{git_head()}`.", ""]
+    lines = [f"# {title}", "", f"Tracked structural snapshot input hash `{structural_snapshot_id()}`.", ""]
     lines.append("| " + " | ".join(columns) + " |")
     lines.append("| " + " | ".join("---" for _ in columns) + " |")
     for row in rows:
@@ -313,11 +330,12 @@ def write_markdown(path: Path, title: str, rows: list[dict[str, object]], column
 
 def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
-    head = git_head()
-    components = [asdict(c) for c in discover_components(head)]
+    snapshot = structural_snapshot_id()
+    snapshot_ref = f"tracked_structural_snapshot:{snapshot}"
+    components = [asdict(c) for c in discover_components(snapshot_ref)]
     entries = [asdict(e) for e in discover_entrypoints()]
 
-    write_json(OUT / "RUNTIME_COMPONENT_LEDGER.json", {"commit": head, "components": components})
+    write_json(OUT / "RUNTIME_COMPONENT_LEDGER.json", {"source_input_hash": snapshot, "components": components})
     write_markdown(
         OUT / "RUNTIME_COMPONENT_LEDGER.md",
         "Runtime Component Ledger",
@@ -325,7 +343,7 @@ def main() -> int:
         ["component_id", "path", "classification", "authoritative_status", "process_type", "entrypoint", "external_dependencies"],
     )
 
-    write_json(OUT / "RUNTIME_REACHABILITY.json", {"commit": head, "entrypoints": entries})
+    write_json(OUT / "RUNTIME_REACHABILITY.json", {"source_input_hash": snapshot, "entrypoints": entries})
     write_markdown(
         OUT / "RUNTIME_REACHABILITY.md",
         "Runtime Reachability",
@@ -334,7 +352,7 @@ def main() -> int:
     )
 
     architecture = {
-        "commit": head,
+        "source_input_hash": snapshot,
         "process_topology": [
             {"path": "frontend -> backend", "status": "configured_unexecuted_in_batch"},
             {"path": "backend Fastify -> PostgreSQL", "status": "verified_local_real"},
@@ -351,7 +369,7 @@ def main() -> int:
     write_json(OUT / "ACTUAL_RUNTIME_ARCHITECTURE.json", architecture)
     (OUT / "ACTUAL_RUNTIME_ARCHITECTURE.md").write_text(
         "# Actual Runtime Architecture\n\n"
-        f"Generated from commit `{head}`.\n\n"
+        f"Tracked structural snapshot input hash `{snapshot}`.\n\n"
         "## Process Topology\n\n"
         "- Verified active path: backend Fastify, PostgreSQL, Redis probe, Kafka, outbox worker, Python specialist subprocess.\n"
         "- Configured but unexecuted path: browser-to-frontend proxy full UI path in this batch.\n"
@@ -390,7 +408,7 @@ def main() -> int:
     ]
     (OUT / "AUTHORITATIVE_IMPLEMENTATIONS.md").write_text(
         "# Authoritative Implementations\n\n"
-        f"Commit: `{head}`\n\n"
+        f"Tracked structural snapshot input hash: `{snapshot}`\n\n"
         "| Concept | Implementation | Decision | Evidence |\n| --- | --- | --- | --- |\n"
         + "\n".join(f"| {a} | {b} | {c} | {d} |" for a, b, c, d in concepts)
         + "\n\nConsolidation recommendation: keep the event-log transactional outbox as the authoritative durable event path and either adapt or retire `event_bus_outbox` after a compatibility plan.\n"
@@ -407,7 +425,7 @@ def main() -> int:
         ("evaluation", "learning proposal", "Python runtime", "integration_tested", "release gate report checks"),
     ]
     matrix = [{"producer": a, "consumer": b, "transport": c, "status": d, "runtime_test": e} for a, b, c, d, e in contracts]
-    write_json(OUT / "INTEGRATION_CONTRACT_MATRIX.json", {"commit": head, "contracts": matrix})
+    write_json(OUT / "INTEGRATION_CONTRACT_MATRIX.json", {"source_input_hash": snapshot, "contracts": matrix})
     write_markdown(OUT / "INTEGRATION_CONTRACT_MATRIX.md", "Integration Contract Matrix", matrix, ["producer", "consumer", "transport", "status", "runtime_test"])
 
     findings = [
@@ -432,7 +450,7 @@ def main() -> int:
             "remaining_risk": "Operational complexity until one path is consolidated.",
         },
     ]
-    write_json(OUT / "RUNTIME_INTEGRATION_FINDINGS.json", {"commit": head, "findings": findings})
+    write_json(OUT / "RUNTIME_INTEGRATION_FINDINGS.json", {"source_input_hash": snapshot, "findings": findings})
     write_markdown(OUT / "RUNTIME_INTEGRATION_FINDINGS.md", "Runtime Integration Findings", findings, ["finding_id", "severity", "component", "workflow", "status", "remaining_risk"])
 
     claims = [
@@ -441,11 +459,11 @@ def main() -> int:
         {"claim": "Active agents use governed protocol", "evidence_level": "integration_tested", "status": "verified", "evidence": "agent protocol matrix and release gate"},
         {"claim": "General intelligence / civilization learns continuously", "evidence_level": "static_contract", "status": "unverified", "evidence": "mechanisms exist; longitudinal proof not in scope"},
     ]
-    write_json(OUT / "CLAIM_EVIDENCE_MATRIX.json", {"commit": head, "claims": claims})
+    write_json(OUT / "CLAIM_EVIDENCE_MATRIX.json", {"source_input_hash": snapshot, "claims": claims})
     write_markdown(OUT / "CLAIM_EVIDENCE_MATRIX.md", "Claim Evidence Matrix", claims, ["claim", "evidence_level", "status", "evidence"])
 
     coverage = {
-        "commit": head,
+        "source_input_hash": snapshot,
         "reviewed_files": sorted({c["path"] for c in components if c["classification"] in {"authoritative_runtime", "runtime_support"}}),
         "active_runtime_files_reviewed": sum(1 for c in components if c["classification"] == "authoritative_runtime"),
         "note": "Batch 03 reviews active runtime scope only; this is not a full repository line audit.",

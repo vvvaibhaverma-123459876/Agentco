@@ -13,7 +13,6 @@
       "executable_status": "event_log transactional outbox verified; event_bus outbox classified as parallel active implementation"
     }
   ],
-  "commit": "b663f7a51ec75e04590b4361c8ef92c323251ef3",
   "process_topology": [
     {
       "path": "frontend -> backend",
@@ -35,5 +34,6 @@
       "path": "Python BaseAgentV2 -> durable audit writer -> decision_log",
       "status": "verified_local_real via release/clean-room tests"
     }
-  ]
+  ],
+  "source_input_hash": "d222041325198eaeeee5107a73ece1708a6c86c0631ce0d620e43218d78e091d"
 }
