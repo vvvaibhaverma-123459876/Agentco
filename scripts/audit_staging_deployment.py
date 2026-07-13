@@ -1231,6 +1231,8 @@ def run_staging_audit() -> None:
         run(ctx, "kind-version", ["kind", "version"])
         run(ctx, "kubectl-version", ["kubectl", "version", "--client=true", "-o", "json"])
         run(ctx, "helm-version", ["helm", "version", "--template", "{{.Version}}"])
+        run(ctx, "helm-repo-add-bitnami", ["helm", "repo", "add", "bitnami", "https://charts.bitnami.com/bitnami", "--force-update"], timeout=120)
+        run(ctx, "helm-repo-update", ["helm", "repo", "update", "bitnami"], timeout=180)
         run(ctx, "helm-dependency-build", ["helm", "dependency", "build", str(CHART)], timeout=180)
         run(ctx, "helm-template-no-subcharts", ["helm", "template", "agentco", str(CHART), "--set", "postgresql.enabled=false", "--set", "redis.enabled=false", "--set", "kafka.enabled=false"])
 
