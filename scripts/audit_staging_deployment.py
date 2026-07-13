@@ -1391,7 +1391,7 @@ def run_staging_audit() -> None:
         ctx.results["outbox_query"] = outbox_state.stdout
 
         backup_start = time.time()
-        backup = run(ctx, "postgres-backup", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres", "--", "pg_dump", "-U", "postgres", "-d", "agentco"], timeout=180)
+        backup = run(ctx, "postgres-backup", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres", "--", "pg_dump", "--no-owner", "--no-privileges", "-U", "postgres", "-d", "agentco"], timeout=180)
         backup_bytes = backup.stdout.encode()
         backup_sha = hashlib.sha256(backup_bytes).hexdigest()
         ctx.record_artifact("backup-restore/backup.sql", backup_bytes)
