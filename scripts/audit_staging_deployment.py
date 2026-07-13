@@ -1418,7 +1418,22 @@ spec:
         restore_file.write_text(restore_manifest)
         run(ctx, "apply-restore-postgres", ["kubectl", "apply", "-f", str(restore_file)])
         wait_rollout(ctx, "deployment/postgres-restore", 180)
-        run(ctx, "wait-restore-postgres-ready", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"], timeout=120)
+        run(
+            ctx,
+            "wait-restore-postgres-ready",
+            [
+                "kubectl",
+                "-n",
+                ctx.namespace,
+                "exec",
+                "deploy/postgres-restore",
+                "--",
+                "sh",
+                "-c",
+                'i=0; while [ "$i" -lt 60 ]; do if pg_isready -h 127.0.0.1 -U postgres; then exit 0; fi; i=$((i + 1)); sleep 2; done; exit 1',
+            ],
+            timeout=140,
+        )
         run(ctx, "restore-create-db", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "createdb", "-h", "127.0.0.1", "-U", "postgres", "agentco_restore"])
         restore_start = time.time()
         run(ctx, "restore-backup", ["kubectl", "-n", ctx.namespace, "exec", "-i", "deploy/postgres-restore", "--", "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "agentco_restore", "-v", "ON_ERROR_STOP=1"], input_text=backup.stdout, timeout=180)
