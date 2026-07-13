@@ -123,8 +123,9 @@ def run(ctx: AuditContext, command_id: str, argv: list[str], *, cwd: Path | None
     )
     end_s = utc_now()
     idx = len(ctx.commands) + 1
-    stdout_rel = f"commands/{idx:03d}_{command_id}.stdout.txt"
-    stderr_rel = f"commands/{idx:03d}_{command_id}.stderr.txt"
+    safe_command_id = re.sub(r"[^A-Za-z0-9_.-]+", "-", command_id).strip("-")
+    stdout_rel = f"commands/{idx:03d}_{safe_command_id}.stdout.txt"
+    stderr_rel = f"commands/{idx:03d}_{safe_command_id}.stderr.txt"
     ctx.record_artifact(stdout_rel, redact(result.stdout))
     ctx.record_artifact(stderr_rel, redact(result.stderr))
     ctx.commands.append(
@@ -680,6 +681,7 @@ spec:
     spec:
       restartPolicy: Never
       serviceAccountName: agentco-migration
+      securityContext: {{ runAsNonRoot: true, runAsUser: 1001, fsGroup: 1001 }}
       containers:
         - name: migrate
           image: {images["backend_a"]}
@@ -697,6 +699,7 @@ spec:
                 secretKeyRef: {{ name: agentco-migration-secrets, key: DATABASE_URL }}
           securityContext:
             runAsNonRoot: true
+            runAsUser: 1001
             allowPrivilegeEscalation: false
             capabilities: {{ drop: ["ALL"] }}
 ---
