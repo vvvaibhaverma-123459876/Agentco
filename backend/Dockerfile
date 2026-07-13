@@ -13,7 +13,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 RUN addgroup --system --gid 1001 agentco && adduser --system --uid 1001 agentco
 COPY --from=builder --chown=agentco:agentco /app/dist ./dist
-COPY --from=builder --chown=agentco:agentco /app/src/db/migrations ./dist/db/migrations
+COPY --from=builder --chown=agentco:agentco /app/src/db/migrations ./src/db/migrations
 USER agentco
 EXPOSE 3001
 CMD ["node", "dist/server.js"]

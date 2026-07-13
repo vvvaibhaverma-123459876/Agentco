@@ -87,3 +87,9 @@ def test_staging_audit_workflow_runs_canonical_make_target():
     content = workflow.read_text()
     assert "make audit-staging-deployment" in content
     assert "continue-on-error" not in content
+
+
+def test_backend_image_contains_migration_runner_source_path():
+    dockerfile = (ROOT / "backend/Dockerfile").read_text()
+
+    assert "/app/src/db/migrations ./src/db/migrations" in dockerfile
