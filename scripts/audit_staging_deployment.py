@@ -1418,10 +1418,11 @@ spec:
         restore_file.write_text(restore_manifest)
         run(ctx, "apply-restore-postgres", ["kubectl", "apply", "-f", str(restore_file)])
         wait_rollout(ctx, "deployment/postgres-restore", 180)
-        run(ctx, "restore-create-db", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "createdb", "-U", "postgres", "agentco_restore"])
+        run(ctx, "wait-restore-postgres-ready", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"], timeout=120)
+        run(ctx, "restore-create-db", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "createdb", "-h", "127.0.0.1", "-U", "postgres", "agentco_restore"])
         restore_start = time.time()
-        run(ctx, "restore-backup", ["kubectl", "-n", ctx.namespace, "exec", "-i", "deploy/postgres-restore", "--", "psql", "-U", "postgres", "-d", "agentco_restore", "-v", "ON_ERROR_STOP=1"], input_text=backup.stdout, timeout=180)
-        restore_check = run(ctx, "restore-verify-event", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "psql", "-U", "postgres", "-d", "agentco_restore", "-tAc", f"SELECT COUNT(*) FROM event_log WHERE id = '{ctx.results['seed']['event_id']}';"])
+        run(ctx, "restore-backup", ["kubectl", "-n", ctx.namespace, "exec", "-i", "deploy/postgres-restore", "--", "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "agentco_restore", "-v", "ON_ERROR_STOP=1"], input_text=backup.stdout, timeout=180)
+        restore_check = run(ctx, "restore-verify-event", ["kubectl", "-n", ctx.namespace, "exec", "deploy/postgres-restore", "--", "psql", "-h", "127.0.0.1", "-U", "postgres", "-d", "agentco_restore", "-tAc", f"SELECT COUNT(*) FROM event_log WHERE id = '{ctx.results['seed']['event_id']}';"])
         ctx.results["restore"] = {"duration_seconds": round(time.time() - restore_start, 3), "known_event_count": restore_check.stdout.strip()}
 
         rollout_start = time.time()
