@@ -484,12 +484,13 @@ data:
     ALTER DEFAULT PRIVILEGES FOR ROLE agentco_migration IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO agentco_runtime;
     ALTER DEFAULT PRIVILEGES FOR ROLE agentco_migration IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO agentco_runtime;
 """
-    workloads = f"""
+    namespace_doc = f"""
 apiVersion: v1
 kind: Namespace
 metadata:
   name: {ns}
----
+"""
+    workloads = f"""
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -1093,7 +1094,16 @@ spec:
         - protocol: TCP
           port: 9092
 """
-    return init_sql + "\n---\n" + secret + "\n---\n" + workloads + "\n---\n" + apps + "\n---\n" + policies, init_sql.replace(secrets_map["postgres_password"], "[REDACTED]").replace(secrets_map["migration_password"], "[REDACTED]").replace(secrets_map["runtime_password"], "[REDACTED]") + "\n---\n" + workloads + "\n---\n" + apps.replace(images["backend_a"], "agentco-backend:<digest>").replace(images["frontend"], "agentco-frontend:<digest>") + "\n---\n" + policies
+    manifest = namespace_doc + "\n---\n" + init_sql + "\n---\n" + secret + "\n---\n" + workloads + "\n---\n" + apps + "\n---\n" + policies
+    redacted_manifest = (
+        redact(manifest)
+        .replace(images["backend_a"], "agentco-backend:<digest>")
+        .replace(images["backend_b"], "agentco-backend:<digest>")
+        .replace(images["frontend"], "agentco-frontend:<digest>")
+    )
+    for value in secrets_map.values():
+        redacted_manifest = redacted_manifest.replace(value, "[REDACTED]")
+    return manifest, redacted_manifest
 
 
 def wait_rollout(ctx: AuditContext, name: str, timeout_s: int = 180) -> None:
