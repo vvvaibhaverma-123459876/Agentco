@@ -1,0 +1,61 @@
+{
+  "contracts": [
+    {
+      "consumer": "backend",
+      "producer": "frontend",
+      "runtime_test": "frontend typecheck/build; no browser E2E in Batch 03",
+      "status": "configured_unexecuted",
+      "transport": "HTTP"
+    },
+    {
+      "consumer": "PostgreSQL",
+      "producer": "backend",
+      "runtime_test": "migrations + runtime integration",
+      "status": "verified_local_real",
+      "transport": "pg"
+    },
+    {
+      "consumer": "Redis",
+      "producer": "backend",
+      "runtime_test": "runtime integration ping/set/get",
+      "status": "verified_local_real",
+      "transport": "ioredis"
+    },
+    {
+      "consumer": "event_outbox",
+      "producer": "event_log transaction",
+      "runtime_test": "runtime integration",
+      "status": "verified_local_real",
+      "transport": "PostgreSQL transaction"
+    },
+    {
+      "consumer": "Kafka",
+      "producer": "outbox worker",
+      "runtime_test": "runtime integration",
+      "status": "verified_local_real",
+      "transport": "KafkaJS"
+    },
+    {
+      "consumer": "consumer",
+      "producer": "Kafka",
+      "runtime_test": "runtime integration consumer read",
+      "status": "verified_local_real",
+      "transport": "KafkaJS"
+    },
+    {
+      "consumer": "tool registry",
+      "producer": "agent",
+      "runtime_test": "release/clean-room agent tests",
+      "status": "verified_local_real",
+      "transport": "Python runtime"
+    },
+    {
+      "consumer": "learning proposal",
+      "producer": "evaluation",
+      "runtime_test": "release gate report checks",
+      "status": "integration_tested",
+      "transport": "Python runtime"
+    }
+  ],
+  "source_input_hash": "f64ae9091016abc0cd6fec5814e5a2595fbb6638f63a72114671ef49217b2d05"
+}

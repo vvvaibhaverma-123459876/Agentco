@@ -1,41 +1,45 @@
-name: Clean-Room Audit
+name: Runtime Integration Audit
 
 on:
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'audit/**'
     paths:
-      - 'Makefile'
-      - '.github/workflows/**'
       - 'backend/**'
-      - 'frontend/**'
       - 'agents/**'
       - 'runtime/**'
       - 'learning/**'
       - 'synthesis/**'
-      - 'evals/**'
-      - 'tests/**'
       - 'scripts/**'
-      - 'requirements/**'
-      - 'docker-compose*.yml'
-      - 'Dockerfile*'
-      - 'infrastructure/**'
-      - 'docs/audit/current/**'
-  push:
-    branches: [main, 'audit/**']
-  workflow_dispatch:
-
-permissions:
-  contents: read
+      - 'Makefile'
+      - '.github/workflows/runtime-integration-audit.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'agents/**'
+      - 'runtime/**'
+      - 'learning/**'
+      - 'synthesis/**'
+      - 'scripts/**'
+      - 'Makefile'
+      - '.github/workflows/runtime-integration-audit.yml'
 
 concurrency:
-  group: clean-room-audit-${{ github.ref }}
+  group: runtime-integration-audit-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  audit-clean-room:
-    name: Local clean-room audit
+  runtime-integration:
+    name: Local runtime integration audit
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      actions: read
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,19 +59,19 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+            backend/package.json
+            frontend/package.json
 
       - name: Install Python dependencies
         run: pip install -r requirements/requirements.lock.txt
 
-      - name: Run isolated clean-room audit
-        run: make audit-clean-room
+      - name: Run isolated runtime integration audit
+        run: make audit-runtime-integration
 
-      - name: Upload clean-room audit artifacts
+      - name: Upload runtime integration artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: clean-room-audit-${{ github.sha }}
-          path: artifacts/audit/
-          if-no-files-found: warn
+          name: runtime-integration-${{ github.sha }}
+          path: artifacts/runtime-integration/**
+          if-no-files-found: error

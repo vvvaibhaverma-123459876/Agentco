@@ -195,6 +195,8 @@ reports/system_run/*/
 !reports/system_run/latest/
 reports/acceptance/
 artifacts/audit/
+artifacts/runtime-integration/
+backend/.runtime-integration/
 
 # Local secret env files (never commit)
 codex.env

@@ -1,31 +1,31 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1635,
+  "tracked_file_count": 1656,
   "category_counts": {
     "Database migration": 125,
-    "Deployment infrastructure": 23,
+    "Deployment infrastructure": 24,
     "Deprecated code": 48,
-    "Development tooling": 114,
-    "Documentation": 298,
+    "Development tooling": 117,
+    "Documentation": 314,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 260,
+    "Test infrastructure": 261,
     "Unknown purpose": 30
   },
   "top_level_counts": {
     "backend": 441,
-    "docs": 226,
+    "docs": 242,
     "evals": 180,
-    "scripts": 126,
+    "scripts": 129,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
     "frontend": 36,
-    "tests": 34,
+    "tests": 35,
     "reserve": 33,
     "calibration": 30,
     "results": 20,
@@ -36,9 +36,9 @@
     "learning": 13,
     "synthesis": 10,
     "ingestion": 9,
+    ".github": 4,
     "requirements": 4,
     "validation": 4,
-    ".github": 3,
     "agentco_security": 2,
     "dashboard": 2,
     "data": 2,
@@ -76,11 +76,11 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 536,
-    ".md": 364,
+    ".py": 540,
+    ".md": 373,
     ".ts": 290,
+    ".json": 131,
     ".sql": 126,
-    ".json": 124,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 21,
@@ -88,8 +88,8 @@
     ".tsx": 17,
     ".txt": 16,
     ".sh": 14,
+    ".yml": 8,
     "(none)": 8,
-    ".yml": 7,
     ".example": 3,
     ".mjs": 2,
     ".test": 1,
@@ -140,6 +140,12 @@
     },
     {
       "path": ".github/workflows/deploy.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/runtime-integration-audit.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -5419,6 +5425,24 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BASELINE_COMMAND_RESULTS.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -5437,10 +5461,46 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/CI_BASELINE_RECONCILIATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CLAIM_EVIDENCE_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CLAIM_EVIDENCE_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/INTEGRATION_CONTRACT_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/INTEGRATION_CONTRACT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md",
@@ -5450,6 +5510,48 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_03_RUNTIME_ARCHITECTURE_INTEGRATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/RUNTIME_COMPONENT_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/RUNTIME_COMPONENT_LEDGER.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/RUNTIME_REACHABILITY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/RUNTIME_REACHABILITY.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -8767,6 +8869,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/audit_runtime_integration.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/autonomous_10min_advancement.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -8912,6 +9020,12 @@
     },
     {
       "path": "scripts/generate_forensic_inventory.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/generate_runtime_reachability.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9125,6 +9239,12 @@
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/scan_committed_secrets.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/setup_release_gate_role.sql",
@@ -9812,6 +9932,12 @@
     },
     {
       "path": "tests/test_pawdent_business_simulation.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_runtime_integration_controls.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

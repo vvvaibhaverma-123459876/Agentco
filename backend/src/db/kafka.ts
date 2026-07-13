@@ -7,13 +7,14 @@ import { Kafka, Producer, Consumer, CompressionTypes, logLevel } from 'kafkajs';
 const brokers = (process.env.KAFKA_BROKERS ?? 'localhost:9092').split(',');
 const retries = Number(process.env.KAFKA_RETRIES ?? 5);
 const initialRetryTime = Number(process.env.KAFKA_INITIAL_RETRY_MS ?? 300);
-const factor = Number(process.env.KAFKA_RETRY_FACTOR ?? 2);
+const factor = Number(process.env.KAFKA_RETRY_FACTOR ?? 0.2);
+const multiplier = Number(process.env.KAFKA_RETRY_MULTIPLIER ?? 2);
 
 export const kafka = new Kafka({
   clientId: 'agentco-backend',
   brokers,
   logLevel: logLevel.WARN,
-  retry: { retries, initialRetryTime, factor },
+  retry: { retries, initialRetryTime, factor, multiplier },
 });
 
 let _producer: Producer | null = null;
