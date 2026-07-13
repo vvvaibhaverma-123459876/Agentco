@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1634`
+- Tracked files: `1635`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 23 |
 | Deprecated code | 48 |
 | Development tooling | 114 |
-| Documentation | 297 |
+| Documentation | 298 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 456 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 441 |
-| `docs` | 225 |
+| `docs` | 226 |
 | `evals` | 180 |
 | `scripts` | 126 |
 | `agents` | 111 |
@@ -979,6 +979,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BASELINE_FINDINGS.json` | Documentation |
 | `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
+| `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization_migration_map.md` | Documentation |
 | `docs/history/5MIN_TEST_FINAL_REPORT.md` | Documentation |

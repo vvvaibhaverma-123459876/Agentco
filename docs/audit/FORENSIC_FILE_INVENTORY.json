@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1634,
+  "tracked_file_count": 1635,
   "category_counts": {
     "Database migration": 125,
     "Deployment infrastructure": 23,
     "Deprecated code": 48,
     "Development tooling": 114,
-    "Documentation": 297,
+    "Documentation": 298,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 441,
-    "docs": 225,
+    "docs": 226,
     "evals": 180,
     "scripts": 126,
     "agents": 111,
@@ -77,7 +77,7 @@
   },
   "extension_counts": {
     ".py": 536,
-    ".md": 363,
+    ".md": 364,
     ".ts": 290,
     ".sql": 126,
     ".json": 124,
@@ -5444,6 +5444,12 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
