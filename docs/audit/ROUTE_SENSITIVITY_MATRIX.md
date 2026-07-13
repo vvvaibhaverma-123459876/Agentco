@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 81 |
-| AUTH-WRITE | 71 |
-| TOTAL | 157 |
+| AUTH-READ | 85 |
+| AUTH-WRITE | 81 |
+| TOTAL | 171 |
 
 ## Matrix
 
@@ -104,6 +104,20 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/institutions/:institutionId/top-performers` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/underperformers` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/work-requests` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/kernel` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/:civilizationId/activate` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/:civilizationId/charter` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/:civilizationId/charter/active` | GET/HEAD | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/kernel/:civilizationId/emergency` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/:civilizationId/invariants` | GET/HEAD | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/kernel/:civilizationId/objectives` | GET/HEAD | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/kernel/:civilizationId/objectives` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/:civilizationId/transition` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/bootstrap` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/emergency/:emergencyId/revoke` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/emergency/expire-sweep` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/objectives/:objectiveId/status` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/kernel/root` | GET/HEAD | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/policies` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/policies/:policyId` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/policies/:policyId/approve` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
