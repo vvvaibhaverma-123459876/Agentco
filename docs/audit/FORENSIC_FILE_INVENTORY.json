@@ -1,42 +1,42 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1656,
+  "tracked_file_count": 1673,
   "category_counts": {
     "Database migration": 125,
-    "Deployment infrastructure": 24,
+    "Deployment infrastructure": 27,
     "Deprecated code": 48,
-    "Development tooling": 117,
-    "Documentation": 314,
+    "Development tooling": 118,
+    "Documentation": 326,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 261,
+    "Test infrastructure": 262,
     "Unknown purpose": 30
   },
   "top_level_counts": {
     "backend": 441,
-    "docs": 242,
+    "docs": 254,
     "evals": 180,
-    "scripts": 129,
+    "scripts": 130,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
     "frontend": 36,
-    "tests": 35,
+    "tests": 36,
     "reserve": 33,
     "calibration": 30,
+    "infrastructure": 20,
     "results": 20,
-    "infrastructure": 18,
     "selfcoding": 17,
     "civilization": 15,
     "autonomy": 13,
     "learning": 13,
     "synthesis": 10,
     "ingestion": 9,
-    ".github": 4,
+    ".github": 5,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -76,10 +76,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 540,
-    ".md": 373,
+    ".py": 542,
+    ".md": 381,
     ".ts": 290,
-    ".json": 131,
+    ".json": 135,
     ".sql": 126,
     ".jsonl": 40,
     ".csv": 38,
@@ -88,7 +88,7 @@
     ".tsx": 17,
     ".txt": 16,
     ".sh": 14,
-    ".yml": 8,
+    ".yml": 9,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
@@ -97,6 +97,8 @@
     ".zip": 1,
     ".js": 1,
     ".css": 1,
+    ".lock": 1,
+    ".tpl": 1,
     ".hcl": 1,
     ".ini": 1,
     ".pem": 1
@@ -146,6 +148,12 @@
     },
     {
       "path": ".github/workflows/runtime-integration-audit.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/staging-deployment-audit.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -5425,6 +5433,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/ACTUAL_DEPLOYMENT_TOPOLOGY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/ACTUAL_DEPLOYMENT_TOPOLOGY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -5438,6 +5458,12 @@
     },
     {
       "path": "docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BACKUP_RESTORE_VERIFICATION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5479,6 +5505,30 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/DEPLOYMENT_COMPONENT_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/DEPLOYMENT_COMPONENT_LEDGER.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -5491,6 +5541,12 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/INTEGRATION_CONTRACT_MATRIX.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -5498,6 +5554,18 @@
     },
     {
       "path": "docs/audit/current/INTEGRATION_CONTRACT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5516,6 +5584,18 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_03_RUNTIME_ARCHITECTURE_INTEGRATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_04_DEPLOYMENT_OPERATIONAL_RESILIENCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/ROLLBACK_VERIFICATION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -7609,10 +7689,22 @@
       "extension": ".yaml"
     },
     {
+      "path": "infrastructure/kubernetes/helm/agentco/Chart.lock",
+      "category": "Deployment infrastructure",
+      "top_level": "infrastructure",
+      "extension": ".lock"
+    },
+    {
       "path": "infrastructure/kubernetes/helm/agentco/Chart.yaml",
       "category": "Deployment infrastructure",
       "top_level": "infrastructure",
       "extension": ".yaml"
+    },
+    {
+      "path": "infrastructure/kubernetes/helm/agentco/templates/_helpers.tpl",
+      "category": "Deployment infrastructure",
+      "top_level": "infrastructure",
+      "extension": ".tpl"
     },
     {
       "path": "infrastructure/kubernetes/helm/agentco/templates/deployment.yaml",
@@ -8875,6 +8967,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/audit_staging_deployment.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/autonomous_10min_advancement.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9950,6 +10048,12 @@
     },
     {
       "path": "tests/test_specialist_isolation_verification.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_staging_deployment_controls.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"
