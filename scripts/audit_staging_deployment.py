@@ -1010,6 +1010,22 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
+  name: allow-migration-postgres
+  namespace: {ns}
+spec:
+  podSelector:
+    matchLabels: {{ app: agentco-migrate }}
+  policyTypes: ["Egress"]
+  egress:
+    - to:
+        - podSelector: {{ matchLabels: {{ app: postgres }} }}
+      ports:
+        - protocol: TCP
+          port: 5432
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
   name: allow-postgres-ingress
   namespace: {ns}
 spec:
@@ -1054,6 +1070,7 @@ spec:
     - from:
         - podSelector: {{ matchLabels: {{ app: agentco-backend }} }}
         - podSelector: {{ matchLabels: {{ app: agentco-outbox-worker }} }}
+        - podSelector: {{ matchLabels: {{ app: kafka }} }}
       ports:
         - protocol: TCP
           port: 9092
@@ -1063,6 +1080,11 @@ spec:
       ports:
         - protocol: TCP
           port: 2181
+    - to:
+        - podSelector: {{ matchLabels: {{ app: kafka }} }}
+      ports:
+        - protocol: TCP
+          port: 9092
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
