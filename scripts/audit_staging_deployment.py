@@ -661,8 +661,12 @@ spec:
               value: zookeeper:2181
             - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
               value: PLAINTEXT:PLAINTEXT
+            - name: KAFKA_LISTENERS
+              value: PLAINTEXT://0.0.0.0:9092
             - name: KAFKA_ADVERTISED_LISTENERS
               value: PLAINTEXT://kafka:9092
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: PLAINTEXT
             - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
               value: "1"
             - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
