@@ -35,6 +35,24 @@ def _apply_runtime_migration(dsn: str) -> None:
             cur.execute("SELECT to_regclass('public.decision_log')")
             if cur.fetchone()[0] is None:
                 pytest.skip("live-service: decision_log table is not migrated")
+            cur.execute(
+                """
+                SELECT
+                    to_regclass('public.runtime_evaluation_records'),
+                    to_regclass('public.runtime_learning_artifacts'),
+                    to_regclass('public.runtime_improvement_experiments')
+                """
+            )
+            if all(cur.fetchone()):
+                return
+
+    migration_dsn = (
+        os.environ.get("RELEASE_GATE_MIGRATION_DATABASE_URL")
+        or os.environ.get("RELEASE_GATE_SETUP_DATABASE_URL")
+        or dsn
+    )
+    with psycopg2.connect(migration_dsn, connect_timeout=2) as conn:
+        with conn.cursor() as cur:
             cur.execute(migration.read_text())
 
 

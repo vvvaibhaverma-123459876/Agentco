@@ -49,3 +49,15 @@ The first Batch 03 replacement run on branch `audit/remediation-03-runtime-archi
 | Release Credibility Gate | `README.md status block is stale` | `actions/checkout` used the default shallow clone. `scripts/generate_status.py` needs `git log -- BUILD_LEDGER.yaml`; with depth `1`, the ledger commit rendered as `unknown`. | CI checkout steps now use `fetch-depth: 0` so history-dependent provenance checks produce the same status block as local verification. |
 
 These were corrected without disabling jobs, adding skips, masking exit codes, or changing release-gate assertions.
+
+The second Batch 03 replacement run exposed two remaining CI-only database
+contract defects:
+
+| Job | Error | Root cause | Correction |
+| --- | --- | --- | --- |
+| Python Agent Tests / Release Credibility Gate | `FATAL: password authentication failed for user "resolution_service"` in `evals/regression/test_pg_ledger_immutability.py` | The test legitimately connects as `resolution_service` with password `test`, but the CI migration command did not set `RESOLUTION_SERVICE_PASSWORD`, so migration `124_prediction_resolution_service_role.sql` created the role with the backend development default password. Clean-room already set this variable, so the defect was CI drift. | General CI now sets `RESOLUTION_SERVICE_PASSWORD=test` anywhere it runs migrations or governed tests against the CI database. |
+| Release Credibility Gate | `psycopg2.errors.InsufficientPrivilege: permission denied for schema public` in `runtime/tests/test_runtime_durable_governance_stores.py` | The release gate correctly runs runtime tests as least-privileged role `agentco_gate`, but the durable-store test replayed migration DDL using the runtime DSN instead of treating schema setup as migration/admin work. | The test now first checks whether the runtime governance tables already exist. If schema setup is required, it uses `RELEASE_GATE_MIGRATION_DATABASE_URL` or `RELEASE_GATE_SETUP_DATABASE_URL`; the persistence assertions still run through the runtime DSN. |
+
+These corrections preserve the Phase 7.5 least-privilege split: migration/admin
+credentials are used only for schema setup, while runtime tests continue to use
+the non-owner role.
