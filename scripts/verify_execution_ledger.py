@@ -63,6 +63,19 @@ def main() -> int:
         errors.append(f"ledger final verdict is {ledger.get('final_verdict')}")
     if not ledger.get("cleanup", {}).get("success"):
         errors.append("ledger cleanup did not succeed")
+    test_summary = ledger.get("test_summary")
+    if not isinstance(test_summary, dict):
+        errors.append("ledger missing test_summary")
+    else:
+        if test_summary.get("pytest_exit_code") != 0:
+            errors.append(f"ledger pytest exit code is {test_summary.get('pytest_exit_code')}")
+        if test_summary.get("collected", 0) <= 0:
+            errors.append("ledger test_summary collected zero tests")
+    skip_summary = ledger.get("skip_summary")
+    if not isinstance(skip_summary, dict):
+        errors.append("ledger missing skip_summary")
+    elif "skip_classifications" not in skip_summary:
+        errors.append("ledger skip_summary missing skip_classifications")
     commands = ledger.get("commands", [])
     if not commands:
         errors.append("ledger recorded no commands")

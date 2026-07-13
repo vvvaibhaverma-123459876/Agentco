@@ -130,6 +130,8 @@ def test_execution_ledger_rejects_wrong_commit(tmp_path):
         "commit": "not-head",
         "final_verdict": "PASS",
         "cleanup": {"success": True},
+        "test_summary": {"pytest_exit_code": 0, "collected": 1},
+        "skip_summary": {"skip_classifications": {}},
         "commands": [{
             "command_id": "docker-version",
             "run_id": "run-a",
@@ -161,6 +163,8 @@ def test_execution_ledger_rejects_missing_records_other_run_and_secret(tmp_path)
         "commit": head,
         "final_verdict": "PASS",
         "cleanup": {"success": True},
+        "test_summary": {"pytest_exit_code": 0, "collected": 1},
+        "skip_summary": {"skip_classifications": {}},
         "commands": [{
             "command_id": "docker-version",
             "run_id": "run-b",
@@ -182,6 +186,38 @@ def test_execution_ledger_rejects_missing_records_other_run_and_secret(tmp_path)
     assert "another run" in proc.stdout
     assert "unredacted secret" in proc.stdout
     assert "missing required command ids" in proc.stdout
+
+
+def test_execution_ledger_rejects_missing_test_and_skip_summaries(tmp_path):
+    (tmp_path / "out.txt").write_text("")
+    (tmp_path / "err.txt").write_text("")
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    ledger = tmp_path / "EXECUTION_LEDGER.json"
+    ledger.write_text(json.dumps({
+        "run_id": "run-a",
+        "commit": head,
+        "final_verdict": "PASS",
+        "cleanup": {"success": True},
+        "commands": [{
+            "command_id": "docker-version",
+            "run_id": "run-a",
+            "commit": head,
+            "exit_code": 0,
+            "stdout_artifact": "out.txt",
+            "stderr_artifact": "err.txt",
+            "argv": ["docker", "--version"],
+        }],
+    }) + "\n")
+    proc = subprocess.run(
+        ["python3.13", "scripts/verify_execution_ledger.py", str(ledger)],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert proc.returncode == 2
+    assert "ledger missing test_summary" in proc.stdout
+    assert "ledger missing skip_summary" in proc.stdout
 
 
 def test_command_runner_records_failure_without_success(tmp_path):

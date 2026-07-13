@@ -222,6 +222,15 @@ def start_postgres(state: CleanRoomState) -> None:
 
 def write_runtime_summary(state: CleanRoomState, verdict: str, error: str | None) -> None:
     commit = git(["rev-parse", "HEAD"])
+    pytest_summary_path = state.test_dir / "pytest-summary.json"
+    test_summary = None
+    skip_summary = None
+    if pytest_summary_path.exists():
+        test_summary = json.loads(pytest_summary_path.read_text())
+        skip_summary = {
+            "skipped": test_summary.get("skipped"),
+            "skip_classifications": test_summary.get("skip_classifications", {}),
+        }
     ledger = {
         "run_id": state.run_id,
         "commit": commit,
@@ -240,6 +249,8 @@ def write_runtime_summary(state: CleanRoomState, verdict: str, error: str | None
         "database_volume": state.volume,
         "database_name": state.database,
         "commands": [asdict(command) for command in state.commands],
+        "test_summary": test_summary,
+        "skip_summary": skip_summary,
         "cleanup": state.cleanup,
         "final_verdict": verdict,
         "error": error,
@@ -258,6 +269,8 @@ def write_runtime_summary(state: CleanRoomState, verdict: str, error: str | None
                 f"Database container: `{state.container}`",
                 f"Database name: `{state.database}`",
                 f"Commands recorded: `{len(state.commands)}`",
+                f"Test summary: `{test_summary or 'unavailable'}`",
+                f"Skip summary: `{skip_summary or 'unavailable'}`",
                 f"Cleanup: `{state.cleanup}`",
                 f"Error: `{error or 'none'}`",
                 "",
