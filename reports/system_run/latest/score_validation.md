@@ -1,7 +1,7 @@
 # Score Validation (signal-gated)
 
-Generated 2026-07-13T08:49:57.772Z at commit `31d14db2eed84a10483b867c79ddf8eedbdd8e50`.
-Input hash: `532856c96a2845d591c870f2431fc8878269d033ef3d63a4956f3e0e524ee555`.
+Generated 2026-07-13T10:27:51.501Z at commit `e25b1e64f6f93b0afb8ba992b6af66f189875811`.
+Input hash: `1593674c6bd9ab1b3c2c494c4bbe1e6d64034e80cb1617880ce5d8af6eb8dda4`.
 
 This report separates structural acceptance from verified behaviour. The structural score is based on repository signals. This command does NOT execute the test suites and therefore does not emit an overall production-readiness score; run `make release-gate` and clean-room/staging commands for behavioural proof.
 
