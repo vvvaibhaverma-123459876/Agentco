@@ -23,12 +23,16 @@ certifi==2026.6.17
     #   httpx
     #   pinecone-client
     #   requests
+cffi==2.1.0
+    # via cryptography
 charset-normalizer==3.4.8
     # via requests
 click==8.4.2
     # via flask
 coverage==7.15.0
     # via pytest-cov
+cryptography==49.0.0
+    # via -r requirements/requirements-dev.txt
 distro==1.9.0
     # via
     #   langsmith
@@ -104,6 +108,8 @@ markupsafe==3.0.3
     #   flask
     #   jinja2
     #   werkzeug
+numpy==2.5.1
+    # via -r requirements/requirements-dev.txt
 openai==2.44.0
     # via
     #   -r agents/requirements.txt
@@ -158,6 +164,8 @@ pluggy==1.6.0
     #   pytest-cov
 psycopg2-binary==2.9.12
     # via -r agents/requirements.txt
+pycparser==3.0
+    # via cffi
 pydantic==2.13.4
     # via
     #   langchain
