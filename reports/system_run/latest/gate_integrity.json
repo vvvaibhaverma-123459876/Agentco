@@ -1,0 +1,12 @@
+{
+  "branch": "audit/remediation-01-gate-integrity",
+  "commit": "b3e6fa44a6075c44062374c0ce9be5edaa23483f",
+  "findings": [],
+  "generated_at": "2026-07-11T23:25:07Z",
+  "protected_files": [
+    "Makefile",
+    "scripts/verify_release_gates.py"
+  ],
+  "success": true,
+  "working_tree": "dirty"
+}

@@ -244,11 +244,11 @@ class TestEvidenceSummarizerAgent:
         source_id = f'src-{uuid.uuid4().hex[:12]}'
         db = get_db()
         try:
-            db.execute_query(
+            db.execute_update(
                 """INSERT INTO autonomy_evidence (source_id, url, title, snippet, retrieved_at)
                    VALUES (%s, %s, %s, %s, NOW())""",
-                [source_id, 'https://example.org/specialist-evidence',
-                 'Specialist evidence fixture', 'A short snippet used to verify real extraction.'],
+                (source_id, 'https://example.org/specialist-evidence',
+                 'Specialist evidence fixture', 'A short snippet used to verify real extraction.'),
             )
         except Exception as exc:
             pytest.skip(f'Postgres unavailable for evidence extraction test: {exc}')

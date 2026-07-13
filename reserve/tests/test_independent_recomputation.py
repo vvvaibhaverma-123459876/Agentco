@@ -34,7 +34,7 @@ if DSN:
         # Destructive fixture: run in an isolated sibling database so shared
         # tables (prediction_ledger and friends) are never dropped out from
         # under other suites.
-        DSN = isolated_dsn(DSN)
+        DSN = isolated_dsn(DSN, suffix="reserve_test")
     except Exception:
         DSN = None  # Postgres unreachable; skip guards below handle it
 ALLOW_DESTRUCTIVE = os.environ.get("AGENTCO_ALLOW_DESTRUCTIVE_RESERVE_TESTS") == "1"

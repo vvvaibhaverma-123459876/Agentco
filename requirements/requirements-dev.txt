@@ -1,1 +1,5 @@
 pytest>=8.0
+numpy>=2.0
+pandas>=2.2
+scikit-learn>=1.7
+cryptography>=43.0

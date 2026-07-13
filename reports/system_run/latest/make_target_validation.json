@@ -1,0 +1,10 @@
+{
+  "advertised_target_count": 214,
+  "branch": "audit/remediation-01-gate-integrity",
+  "commit": "b3e6fa44a6075c44062374c0ce9be5edaa23483f",
+  "generated_at": "2026-07-11T23:25:07Z",
+  "makefile_target_count": 98,
+  "missing": [],
+  "success": true,
+  "working_tree": "dirty"
+}

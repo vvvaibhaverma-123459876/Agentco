@@ -2,40 +2,40 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1614`
+- Tracked files: `1635`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
 | Database migration | 125 |
-| Deployment infrastructure | 22 |
+| Deployment infrastructure | 23 |
 | Deprecated code | 48 |
-| Development tooling | 108 |
-| Documentation | 289 |
+| Development tooling | 114 |
+| Documentation | 298 |
 | Experimental code | 151 |
-| Generated artifact | 99 |
+| Generated artifact | 101 |
 | Production runtime code | 456 |
 | Prompt/template | 29 |
-| Test infrastructure | 258 |
-| Unknown purpose | 29 |
+| Test infrastructure | 260 |
+| Unknown purpose | 30 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 441 |
-| `docs` | 219 |
+| `docs` | 226 |
 | `evals` | 180 |
-| `scripts` | 120 |
+| `scripts` | 126 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
 | `archive` | 48 |
-| `reports` | 44 |
+| `reports` | 48 |
 | `frontend` | 36 |
+| `tests` | 34 |
 | `reserve` | 33 |
-| `tests` | 32 |
 | `calibration` | 30 |
 | `results` | 20 |
 | `infrastructure` | 18 |
@@ -47,7 +47,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `ingestion` | 9 |
 | `requirements` | 4 |
 | `validation` | 4 |
-| `.github` | 2 |
+| `.github` | 3 |
 | `agentco_security` | 2 |
 | `dashboard` | 2 |
 | `data` | 2 |
@@ -82,6 +82,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `pg_test_isolation.py` | 1 |
 | `prompts` | 1 |
 | `pytest.ini` | 1 |
+| `pytest_skip_report_plugin.py` | 1 |
 
 ## Full File Ledger
 
@@ -92,6 +93,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.env.production.example` | Development tooling |
 | `.env.staging.example` | Development tooling |
 | `.github/workflows/ci.yml` | Deployment infrastructure |
+| `.github/workflows/clean-room-audit.yml` | Deployment infrastructure |
 | `.github/workflows/deploy.yml` | Deployment infrastructure |
 | `.gitignore` | Development tooling |
 | `.python-version` | Development tooling |
@@ -972,6 +974,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/ROUTE_SENSITIVITY_MATRIX.md` | Documentation |
 | `docs/audit/SELF_IMPROVEMENT_EXPERIMENT_REPORT.json` | Documentation |
 | `docs/audit/V1_SEVERITY_REACHABILITY.md` | Documentation |
+| `docs/audit/current/BASELINE_COMMAND_RESULTS.json` | Documentation |
+| `docs/audit/current/BASELINE_EXECUTION_REPORT.md` | Documentation |
+| `docs/audit/current/BASELINE_FINDINGS.json` | Documentation |
+| `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
+| `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
+| `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
+| `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization_migration_map.md` | Documentation |
 | `docs/history/5MIN_TEST_FINAL_REPORT.md` | Documentation |
 | `docs/history/5MIN_TEST_RESULTS_SUMMARY.md` | Documentation |
@@ -1362,6 +1371,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `provenance/__init__.py` | Production runtime code |
 | `provenance/attestation.py` | Production runtime code |
 | `pytest.ini` | Development tooling |
+| `pytest_skip_report_plugin.py` | Unknown purpose |
 | `reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md` | Documentation |
 | `reports/system_run/latest/LIVE_OPENAI_SYSTEM_BEHAVIOR_REPORT.md` | Documentation |
 | `reports/system_run/latest/MIGRATION_STATUS_REPORT.md` | Documentation |
@@ -1387,12 +1397,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports/system_run/latest/docker_startup_verification.md` | Documentation |
 | `reports/system_run/latest/doctor_report.json` | Generated artifact |
 | `reports/system_run/latest/doctor_report.md` | Documentation |
+| `reports/system_run/latest/gate_integrity.json` | Generated artifact |
+| `reports/system_run/latest/gate_integrity.md` | Documentation |
 | `reports/system_run/latest/goal_run.json` | Generated artifact |
 | `reports/system_run/latest/goal_run.md` | Documentation |
 | `reports/system_run/latest/live_cross_domain_goal_run.json` | Generated artifact |
 | `reports/system_run/latest/live_cross_domain_goal_run.md` | Documentation |
 | `reports/system_run/latest/longitudinal_learning_report.json` | Generated artifact |
 | `reports/system_run/latest/longitudinal_learning_report.md` | Documentation |
+| `reports/system_run/latest/make_target_validation.json` | Generated artifact |
+| `reports/system_run/latest/make_target_validation.md` | Documentation |
 | `reports/system_run/latest/memory_influence_verification.json` | Generated artifact |
 | `reports/system_run/latest/memory_influence_verification.md` | Documentation |
 | `reports/system_run/latest/migration_verification.json` | Generated artifact |
@@ -1516,6 +1530,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `runtime/tool_registry/__init__.py` | Production runtime code |
 | `scripts/agentco_evolution_test.py` | Development tooling |
 | `scripts/agentco_integration_audit.py` | Development tooling |
+| `scripts/audit_clean_room.py` | Development tooling |
 | `scripts/audit_llm_integration.py` | Development tooling |
 | `scripts/autonomous_10min_advancement.py` | Development tooling |
 | `scripts/autonomous_prediction_loop.py` | Development tooling |
@@ -1622,14 +1637,19 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_docker_startup.py` | Development tooling |
+| `scripts/verify_execution_ledger.py` | Development tooling |
+| `scripts/verify_gate_integrity.py` | Development tooling |
 | `scripts/verify_level3_architecture.py` | Development tooling |
 | `scripts/verify_level3_db_evidence.py` | Development tooling |
 | `scripts/verify_level4_certification.sh` | Development tooling |
+| `scripts/verify_make_targets.py` | Development tooling |
 | `scripts/verify_memory_influence_live.py` | Development tooling |
+| `scripts/verify_migration_integrity.py` | Development tooling |
 | `scripts/verify_migrations_native.py` | Development tooling |
 | `scripts/verify_mission_progress.py` | Development tooling |
 | `scripts/verify_openai_connectivity.py` | Development tooling |
 | `scripts/verify_production_posture.py` | Development tooling |
+| `scripts/verify_pytest_skips.py` | Development tooling |
 | `scripts/verify_release_gates.py` | Development tooling |
 | `scripts/verify_resolution_service.py` | Development tooling |
 | `scripts/wait_for_postgres.sh` | Development tooling |
@@ -1678,11 +1698,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_build_ledger.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
 | `tests/test_civilization_vertical_slice.py` | Test infrastructure |
+| `tests/test_clean_room_evidence_controls.py` | Test infrastructure |
 | `tests/test_compose_bind_sources.py` | Test infrastructure |
 | `tests/test_db_client_runtime_config.py` | Test infrastructure |
 | `tests/test_durable_runtime_cleanup.py` | Test infrastructure |
 | `tests/test_execute_durable_task.py` | Test infrastructure |
 | `tests/test_forensic_inventory.py` | Test infrastructure |
+| `tests/test_gate_integrity_controls.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |

@@ -25,11 +25,17 @@ The source of truth for implementation status is:
 
 Older phase reports have been moved to [docs/history/](docs/history/) and are historical artifacts only. If they conflict with the build ledger, treat them as superseded.
 
-To verify the current state reproducibly from a clean clone (no LLM/web keys required):
+To verify the current state reproducibly from a clean clone, run the isolated
+clean-room audit. It provisions a disposable PostgreSQL container/database,
+runs migrations from version zero, records every command and exit code under
+`artifacts/audit/<run-id>/`, and removes the container and volume afterward:
 
 ```bash
-make verify-clean-room
+make audit-clean-room
 ```
+
+`make verify-clean-room` is an alias for `make audit-clean-room`; do not use an
+externally supplied database as clean-room proof.
 
 ## What Is Real Now
 
@@ -95,7 +101,7 @@ Prerequisites:
 export DATABASE_URL="postgresql://localhost/agentco"
 
 cd backend
-npm install
+npm ci
 npm run db:migrate
 npx tsc --noEmit
 npm test -- --runInBand
@@ -104,8 +110,9 @@ npm test -- --runInBand
 The backend suite is expected to pass from a clean clone against an empty
 database. Live-web/live-LLM suites (source discovery, real-web smoke, live
 adapters) skip unless `RUN_REAL_WEB_TESTS=1` / `RUN_REAL_LLM_TESTS=1` and
-provider credentials are configured. CI (`.github/workflows/ci.yml`) runs the
-same clean-room path, including the Release Credibility Gate job.
+provider credentials are configured. CI runs the release credibility gate and a
+separate clean-room audit workflow; the clean-room workflow uploads runtime
+evidence artifacts and does not use production credentials.
 
 For release credibility, run the full no-diff gate from a clean worktree:
 
@@ -113,12 +120,13 @@ For release credibility, run the full no-diff gate from a clean worktree:
 make release-gate
 ```
 
-This is the command a stranger should run to trust the repo. It checks the
-README status block without writing, verifies generated governance reports and
-the score-validation acceptance matrix, runs the Python default suite, installs
-and verifies backend/frontend dependencies, runs backend Jest without
-`forceExit`, exercises the route-auth contract and decision-log chain test, and
-asserts the git tree is still clean at the end.
+This is the command a stranger should run to trust the repo locally. It checks
+the README status block without writing, rejects active fake-success gate
+patterns, validates documented Make targets, verifies generated governance
+reports and the score-validation acceptance matrix, runs the Python default
+suite, installs and verifies backend/frontend dependencies, runs backend Jest
+without `forceExit`, exercises the route-auth contract and decision-log chain
+test, and asserts the git tree is still clean at the end.
 
 ### Runtime Configuration Contract
 

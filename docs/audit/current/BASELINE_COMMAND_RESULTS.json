@@ -1,0 +1,75 @@
+{
+  "baseline_tag": "audit-baseline-2026-07",
+  "baseline_commit": "b3e6fa44a6075c44062374c0ce9be5edaa23483f",
+  "branch": "audit/remediation-01-gate-integrity",
+  "working_tree_at_initial_capture": "clean",
+  "tracked_file_count": 1614,
+  "commands": [
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "important_output": "",
+      "interpretation": "baseline worktree was clean before branch changes"
+    },
+    {
+      "command": "git rev-parse HEAD",
+      "exit_code": 0,
+      "important_output": "b3e6fa44a6075c44062374c0ce9be5edaa23483f",
+      "interpretation": "baseline commit captured"
+    },
+    {
+      "command": "git ls-files | wc -l",
+      "exit_code": 0,
+      "important_output": "1614",
+      "interpretation": "tracked file count captured"
+    },
+    {
+      "command": "python3.13 --version",
+      "exit_code": 0,
+      "important_output": "Python 3.13.9",
+      "interpretation": "Python runtime available"
+    },
+    {
+      "command": "node --version",
+      "exit_code": 0,
+      "important_output": "v24.17.0",
+      "interpretation": "Node runtime available"
+    },
+    {
+      "command": "npm --version",
+      "exit_code": 0,
+      "important_output": "11.13.0",
+      "interpretation": "npm available"
+    },
+    {
+      "command": "docker --version",
+      "exit_code": 0,
+      "important_output": "Docker version 29.5.3, build d1c06ef",
+      "interpretation": "Docker CLI available"
+    },
+    {
+      "command": "docker compose version",
+      "exit_code": 0,
+      "important_output": "Docker Compose version v5.1.4",
+      "interpretation": "Docker Compose available"
+    },
+    {
+      "command": "helm version",
+      "exit_code": 127,
+      "important_output": "zsh:1: command not found: helm",
+      "interpretation": "UNVERIFIED_EXTERNAL_DEPENDENCY: Helm validation cannot be claimed locally"
+    },
+    {
+      "command": "kubectl version --client",
+      "exit_code": 0,
+      "important_output": "Client Version: v1.34.1; Kustomize Version: v5.7.1",
+      "interpretation": "kubectl client available"
+    },
+    {
+      "command": "psql --version",
+      "exit_code": 0,
+      "important_output": "psql (PostgreSQL) 16.14 (Homebrew)",
+      "interpretation": "PostgreSQL CLI available"
+    }
+  ]
+}

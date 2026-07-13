@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_forensic_inventory_covers_every_tracked_file():
     subprocess.run(
-        ["python3.13", "scripts/generate_forensic_inventory.py"],
+        ["python3.13", "scripts/generate_forensic_inventory.py", "--check"],
         cwd=ROOT,
         check=True,
         capture_output=True,
@@ -32,7 +32,7 @@ def test_forensic_inventory_covers_every_tracked_file():
 
 def test_forensic_audit_controls_cover_requirements_dependencies_and_completeness():
     subprocess.run(
-        ["python3.13", "scripts/generate_forensic_audit_controls.py"],
+        ["python3.13", "scripts/generate_forensic_audit_controls.py", "--check"],
         cwd=ROOT,
         check=True,
         capture_output=True,

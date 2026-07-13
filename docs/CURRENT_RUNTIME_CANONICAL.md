@@ -21,8 +21,14 @@ The real, tested runtime is the Fastify/Postgres backend under `backend/`:
 Verify everything clean-room (no LLM/web keys required):
 
 ```bash
-make verify-clean-room
+make audit-clean-room
 ```
+
+`make audit-clean-room` owns its PostgreSQL lifecycle: it starts a disposable
+container, creates a unique empty database, runs migrations from version zero,
+checks migration idempotency, records runtime evidence under
+`artifacts/audit/<run-id>/`, and cleans up the database, container, and volume.
+`make verify-clean-room` is only an alias for this command.
 
 ## Closed loops now implemented (previously open)
 
@@ -61,4 +67,6 @@ without credentials (see `conftest.py`).
 - `docs/DB_TABLE_USAGE.md`
 - `reports/system_run/latest/score_validation.json` (from
   `npm run agentco:score-validation`)
+- `artifacts/audit/<run-id>/EXECUTION_LEDGER.json` — ignored runtime execution
+  evidence produced by `make audit-clean-room`, not a tracked structural report.
 - `docs/history/` — historical only; never current truth.

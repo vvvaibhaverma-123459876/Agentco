@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -372,7 +373,7 @@ def main() -> int:
         "finding_completeness_ledger": completeness,
         "independent_post_remediation_reaudit": post_remediation_reaudit,
     }
-    OUT_JSON.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    json_text = json.dumps(payload, indent=2) + "\n"
 
     lines = [
         "# Forensic Audit Controls",
@@ -430,7 +431,20 @@ def main() -> int:
     ])
     for item in post_remediation_reaudit:
         lines.append(f"| {item['check']} | {item['method']} | {item['status']} |")
-    OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    md_text = "\n".join(lines) + "\n"
+    if "--check" in sys.argv:
+        stale = []
+        if not OUT_JSON.exists() or OUT_JSON.read_text(encoding="utf-8") != json_text:
+            stale.append(str(OUT_JSON.relative_to(ROOT)))
+        if not OUT_MD.exists() or OUT_MD.read_text(encoding="utf-8") != md_text:
+            stale.append(str(OUT_MD.relative_to(ROOT)))
+        if stale:
+            print(f"forensic audit controls stale: {', '.join(stale)}")
+            return 2
+        print("forensic audit controls current")
+        return 0
+    OUT_JSON.write_text(json_text, encoding="utf-8")
+    OUT_MD.write_text(md_text, encoding="utf-8")
     print(f"wrote {OUT_JSON.relative_to(ROOT)} and {OUT_MD.relative_to(ROOT)}")
     return 0
 

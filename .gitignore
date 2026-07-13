@@ -194,6 +194,7 @@ learning_run_*.json
 reports/system_run/*/
 !reports/system_run/latest/
 reports/acceptance/
+artifacts/audit/
 
 # Local secret env files (never commit)
 codex.env

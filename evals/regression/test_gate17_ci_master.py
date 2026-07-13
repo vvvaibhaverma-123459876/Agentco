@@ -12,7 +12,8 @@ def test_ci_runs_declared_release_gate():
     assert "release-gate:" in makefile
     release_gate = makefile.split("release-gate:")[1].split("docker-production-smoke:")[0]
     assert "status-check" in release_gate
-    assert "$(PYTHON) -m pytest -q" in release_gate
+    assert "scripts/verify_pytest_skips.py" in release_gate
+    assert "--summary-output artifacts/audit/release-gate/pytest-summary.json" in release_gate
     assert "npm test -- --runInBand" in release_gate
     assert "route-auth-contract.test.ts" in release_gate
     assert "audit-chain-cross-writer.test.ts" in release_gate
