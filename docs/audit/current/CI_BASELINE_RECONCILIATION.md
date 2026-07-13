@@ -37,3 +37,15 @@ make audit-runtime-integration
 ## Final Conclusion
 
 The base CI failure was a CI-command convergence defect plus one secret-scan false positive, not proof that the clean-room evidence was invalid. Batch 03 keeps general CI active and aligns it with governed verification commands instead of disabling failed jobs.
+
+## Replacement-Run Corrections
+
+The first Batch 03 replacement run on branch `audit/remediation-03-runtime-architecture-integration` exposed three additional CI-only defects:
+
+| Job | Error | Root cause | Correction |
+| --- | --- | --- | --- |
+| Python Agent Tests | `FileNotFoundError: [Errno 2] No such file or directory: 'rg'` from `scripts/generate_runtime_reachability.py` | The reachability generator assumed ripgrep was installed on the GitHub runner. Local development had `rg`; the runner did not. | `scripts/generate_runtime_reachability.py` now uses `rg` when available and falls back to a Python regex scan over the same active source roots. |
+| Python Agent Tests | `SKIP_REASON_MISMATCH` for live Postgres `decision_log` tests | General CI did not provision or migrate PostgreSQL for the Python job, while the governed skip policy correctly treats database-backed tests as runnable when clean local infrastructure is present. | The Python job now provisions PostgreSQL, installs backend migration dependencies, runs migrations, and sets both `DATABASE_URL` and `AGENTCO_TEST_DATABASE_URL`. |
+| Release Credibility Gate | `README.md status block is stale` | `actions/checkout` used the default shallow clone. `scripts/generate_status.py` needs `git log -- BUILD_LEDGER.yaml`; with depth `1`, the ledger commit rendered as `unknown`. | CI checkout steps now use `fetch-depth: 0` so history-dependent provenance checks produce the same status block as local verification. |
+
+These were corrected without disabling jobs, adding skips, masking exit codes, or changing release-gate assertions.

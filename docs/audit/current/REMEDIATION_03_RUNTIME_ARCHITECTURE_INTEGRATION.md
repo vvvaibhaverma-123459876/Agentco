@@ -82,9 +82,10 @@ The command proves:
 - transactional outbox row creation
 - outbox relay to Kafka
 - Kafka consumer readback
+- worker restart/idempotency proof with no duplicate publication
 - Python agent dispatch E2E with Kafka available
 - specialist subprocess spawn over HTTP
-- outbox failure injection visibility
+- outbox failure injection visibility with a durable `dead_lettered` row
 - cleanup of containers, network, and volumes
 
 ## Defects Found
@@ -99,7 +100,8 @@ Findings are recorded in `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.json`.
 The runtime harness includes:
 
 - unauthenticated HTTP request check
-- outbox publisher failure injection
+- outbox publisher failure injection that creates an event, forces publish failure, and verifies `event_outbox.status = dead_lettered`
+- outbox worker restart/idempotency check that reruns the relay after successful publication and verifies no duplicate publish
 - Kafka consumer readback failure if no message arrives
 - cleanup verification failure if resources remain
 

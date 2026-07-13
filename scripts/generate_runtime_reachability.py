@@ -12,6 +12,7 @@ import ast
 import hashlib
 import json
 import re
+import shutil
 import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -102,11 +103,31 @@ def rel(path: Path) -> str:
 
 
 def rg(pattern: str, *paths: str) -> list[str]:
-    cmd = ["rg", "-n", pattern, *paths]
-    proc = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
-    if proc.returncode not in (0, 1):
-        raise RuntimeError(proc.stderr)
-    return proc.stdout.splitlines()
+    if shutil.which("rg"):
+        cmd = ["rg", "-n", pattern, *paths]
+        proc = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
+        if proc.returncode not in (0, 1):
+            raise RuntimeError(proc.stderr)
+        return proc.stdout.splitlines()
+
+    regex = re.compile(pattern)
+    lines: list[str] = []
+    for base in paths:
+        root = ROOT / base
+        candidates = [root] if root.is_file() else sorted(root.rglob("*"))
+        for path in candidates:
+            if not path.is_file() or "__pycache__" in path.parts:
+                continue
+            if path.suffix not in {".py", ".ts", ".tsx", ".js", ".json", ".sql", ".md"}:
+                continue
+            try:
+                text = path.read_text(errors="replace")
+            except OSError:
+                continue
+            for line_no, line in enumerate(text.splitlines(), start=1):
+                if regex.search(line):
+                    lines.append(f"{path.relative_to(ROOT)}:{line_no}:{line}")
+    return lines
 
 
 def ts_imports(path: Path) -> list[str]:

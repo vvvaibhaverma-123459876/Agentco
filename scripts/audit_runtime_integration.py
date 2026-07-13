@@ -360,6 +360,17 @@ async function main() {
     return;
   }
   if (mode === 'failure') {
+    const actorId = crypto.randomUUID();
+    await db.query(`INSERT INTO actors (id, actor_type, name, status, metadata_json) VALUES ($1,'service','Runtime Failure Probe','active',$2::jsonb) ON CONFLICT (id) DO NOTHING`, [actorId, JSON.stringify({ source: 'runtime-integration-failure' })]);
+    const eventLog = new EventLogService();
+    const event = await eventLog.append({
+      event_type: 'test.runtime_integration_failure',
+      actor_id: actorId,
+      object_type: 'runtime_probe',
+      object_id: crypto.randomUUID(),
+      payload: { correlation },
+      correlation_id: correlation,
+    });
     const worker = new OutboxWorker({
       pollIntervalMs: 100,
       batchSize: 10,
@@ -373,7 +384,24 @@ async function main() {
       shutdown: async () => {},
     });
     const result = await worker.runOnce();
-    console.log(JSON.stringify({ mode, result }));
+    const row = await db.query(`SELECT status, attempts, last_error FROM event_outbox WHERE event_log_id=$1`, [event.id]);
+    console.log(JSON.stringify({ mode, correlation, event_id: event.id, result, row: row.rows }));
+    await shutdownRuntimeResources({ closeDb: true });
+    return;
+  }
+  if (mode === 'restart-check') {
+    const worker = new OutboxWorker({
+      pollIntervalMs: 100,
+      batchSize: 10,
+      maxAttempts: 3,
+      workerId: `runtime-integration-restart-${process.pid}`,
+      once: true,
+    });
+    const result = await worker.runOnce();
+    const rows = await db.query(`SELECT status, attempts FROM event_outbox WHERE envelope->>'correlation_id'=$1 ORDER BY created_at`, [correlation]);
+    console.log(JSON.stringify({ mode, correlation, relay: result, rows: rows.rows }));
+    await disconnectProducer();
+    await shutdownRuntimeResources({ closeDb: true });
     return;
   }
   throw new Error(`unknown mode ${mode}`);
@@ -417,8 +445,10 @@ def run_workflows(state: State) -> None:
     env = {**env, "RUNTIME_INTEGRATION_CORRELATION_ID": correlation}
     outbox = run(state, "outbox-publish-proof", ["npx", "ts-node", probe_arg, "outbox"], cwd=ROOT / "backend", env=env, timeout=90)
     consume = run(state, "kafka-consume-proof", ["npx", "ts-node", probe_arg, "consume"], cwd=ROOT / "backend", env=env, timeout=90)
+    restart = run(state, "outbox-worker-restart-idempotency-proof", ["npx", "ts-node", probe_arg, "restart-check"], cwd=ROOT / "backend", env=env, timeout=90)
     state.workflow_results["outbox"] = json.loads(outbox.stdout.strip().splitlines()[-1])
     state.workflow_results["kafka_consume"] = json.loads(consume.stdout.strip().splitlines()[-1])
+    state.workflow_results["restart_recovery"] = json.loads(restart.stdout.strip().splitlines()[-1])
 
     run(state, "agent-dispatch-e2e", [sys.executable, "-m", "pytest", "agents/tests/integration/test_agent_dispatch_e2e.py", "-q"], env=env, timeout=180)
     run(state, "specialist-spawn-jest", ["npm", "test", "--", "specialist-spawning.test.ts", "--runInBand"], cwd=ROOT / "backend", env=env, timeout=120)
