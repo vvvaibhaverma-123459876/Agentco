@@ -1,0 +1,2671 @@
+{
+  "commit": "b663f7a51ec75e04590b4361c8ef92c323251ef3",
+  "entrypoints": [
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module websocket",
+      "events_emitted": [],
+      "first_handler": "websocket",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:47",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module agentRoutes",
+      "events_emitted": [],
+      "first_handler": "agentRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:105",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module overrideRoutes",
+      "events_emitted": [],
+      "first_handler": "overrideRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:106",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module auditRoutes",
+      "events_emitted": [],
+      "first_handler": "auditRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:107",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module credentialRoutes",
+      "events_emitted": [],
+      "first_handler": "credentialRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:108",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module learningRoutes",
+      "events_emitted": [],
+      "first_handler": "learningRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:109",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module autonomyTaskRoutes",
+      "events_emitted": [],
+      "first_handler": "autonomyTaskRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:110",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module autonomyOrchestratorRoutes",
+      "events_emitted": [],
+      "first_handler": "autonomyOrchestratorRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:111",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module autonomyDashboardRoutes",
+      "events_emitted": [],
+      "first_handler": "autonomyDashboardRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:112",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module civilizationGovernanceRoutes",
+      "events_emitted": [],
+      "first_handler": "civilizationGovernanceRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:113",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module governanceRoutes",
+      "events_emitted": [],
+      "first_handler": "governanceRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:114",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module institutionWorkAssignmentRoutes",
+      "events_emitted": [],
+      "first_handler": "institutionWorkAssignmentRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:115",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module goalHierarchyRoutes",
+      "events_emitted": [],
+      "first_handler": "goalHierarchyRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:116",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module phase3HardeningRoutes",
+      "events_emitted": [],
+      "first_handler": "phase3HardeningRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:117",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module identityRoutes",
+      "events_emitted": [],
+      "first_handler": "identityRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:118",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module resourceLedgerRoutes",
+      "events_emitted": [],
+      "first_handler": "resourceLedgerRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:119",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "default protected unless route config public",
+      "authorization_requirement": "route/service specific",
+      "entry_point": "Fastify route module systemRoutes",
+      "events_emitted": [],
+      "first_handler": "systemRoutes",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/server.ts:120",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [],
+      "status": "verified_static_registration",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/agents",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/agents.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/agents.routes.ts:14",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "learningService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/agents/tasks",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/agents.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/agents.routes.ts:143",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "learningService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/audit",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/audit.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/audit.routes.ts:5",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/audit/integrity",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/audit.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/audit.routes.ts:21",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/autonomy/dashboard/overview",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/autonomy-dashboard.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "audit_events",
+        "autonomy_runs",
+        "autonomy_tasks",
+        "eval_scorecards",
+        "learner_candidates",
+        "observability_traces"
+      ],
+      "registration_location": "backend/src/routes/autonomy-dashboard.routes.ts:418",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/run-level3-smoke",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/autonomy-orchestrator.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "autonomy_actions",
+        "autonomy_claims",
+        "autonomy_evidence",
+        "request"
+      ],
+      "registration_location": "backend/src/routes/autonomy-orchestrator.routes.ts:16",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/constitution/versions",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:18",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/constitution/activate",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:29",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/constitution/active",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:40",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/constitution/validate-change",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:50",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/constitution/protected-surfaces",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:61",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/policies",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:75",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/policies/:policyId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:86",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/policies/:policyId/review",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:98",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/policies/:policyId/approve",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:110",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/policies/active",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:122",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/policies/by-type/:policyType",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:132",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/changes/request",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:147",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/changes/:requestId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:163",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/changes/:requestId/review",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:175",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/changes/:requestId/approve",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:186",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/changes/pending",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:204",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/assessments",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:218",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/assessments/:assessmentId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:256",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/assessments/:assessmentId/recommendation",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:268",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/reputation/events",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:284",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/reputation/:entityType/:entityId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:303",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/reputation/:entityType/:entityId/trust-weight",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:315",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/reputation/snapshots/:entityType/:entityId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:326",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/drift/detect",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:341",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/drift/unresolved",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:370",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/drift/critical",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:381",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/drift/:driftId/resolve",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:391",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/canary/start",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:407",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/canary/:canaryId/metric",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:424",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/canary/:canaryId/promote",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:436",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/canary/:canaryId/rollback",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:448",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/status",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:464",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/health",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:482",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/runtime/graph",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:487",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/runtime/reachability-tick",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:495",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/runtime/dispatch-tick",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:506",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/runtime/scheduler",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:533",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/runtime/scheduler/run-once",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:538",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/runtime/scheduler/start",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:552",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/runtime/scheduler/stop",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:562",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/governance/summary",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/civilization-governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:567",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationChangeGovernanceService",
+        "calibrationConstitutionService",
+        "calibrationDriftMonitorService",
+        "civilizationRuntimeService",
+        "civilizationSchedulerService",
+        "trustImpactAssessmentService",
+        "trustPolicyCanaryService",
+        "trustPolicyService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/institutions/:institutionId/root-goal",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:11",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/goals/:parentGoalId/sub-goals",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:35",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/goals/:parentSubGoalId/tasks",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:59",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/autonomy/institutions/:institutionId/goal-hierarchy",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:83",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/goals/:parentGoalId/rollup",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:102",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/evidence/:sourceEvidenceId/deduplicate",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:125",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/evidence/:evidenceId/share",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:160",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/autonomy/specialist-teams/patterns",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:195",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/specialist-teams/record-pattern",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:215",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/allocation/record-decision",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/goal-hierarchy.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "completed"
+      ],
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:246",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "goalHierarchyService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/roles",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:57",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/permissions",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:79",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/entities/:entityId/roles",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:101",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/audit-trail",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:125",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/constitution",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:154",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/status",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:175",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/governance/roles/:entityId/assign",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:202",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/governance/roles/:entityId/revoke",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:238",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/governance/bootstrap",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:270",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/governance/policies/:policyId/approve",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:296",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/governance/emergency-freeze",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:345",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/governance/why/:action_id",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:392",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/validation/reports",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/governance.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "action_attestations",
+        "entity"
+      ],
+      "registration_location": "backend/src/routes/governance.routes.ts:412",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "calibrationConstitutionService",
+        "governanceRBACService",
+        "trustReputationService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/actors",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:34",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/roles/assign",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:46",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/permissions/grant",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:58",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/delegations/grant",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:70",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/keys",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:82",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/keys/:keyId/revoke",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:94",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/keys/verify-signature",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:106",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /identity/verify",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/identity.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/identity.routes.ts:118",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "identityAuthorityService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/autonomy/work-requests",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/institution-work-assignment.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "institution"
+      ],
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:11",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "institutionWorkAssignmentService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/autonomy/work-requests/:requestId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/institution-work-assignment.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "institution"
+      ],
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:68",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "institutionWorkAssignmentService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/institutions/:institutionId/work-requests",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/institution-work-assignment.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "institution"
+      ],
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:91",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "institutionWorkAssignmentService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/institutions/:institutionId/specialist-assignments",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/institution-work-assignment.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "institution"
+      ],
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:118",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "institutionWorkAssignmentService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/departments/:departmentId/specialists",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/institution-work-assignment.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "institution"
+      ],
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:150",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "institutionWorkAssignmentService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/overrides",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/override.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/override.routes.ts:7",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/overrides/overdue",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/override.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/override.routes.ts:14",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/goals/:goalId/lock",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:12",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/goals/:goalId/unlock",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:53",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/institutions/:institutionId/deadlock-check",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:80",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/consistency-check",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:105",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/institutions/:institutionId/deadlock-incidents",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:138",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/institutions/:institutionId/reputation-distribution",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:163",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/institutions/:institutionId/underperformers",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:184",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/institutions/:institutionId/top-performers",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:211",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/reputation-anomalies/:institutionId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:238",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /api/civilization/reputation-trend/:entityId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:263",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/batch-update-reputations",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/phase3-hardening.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "multiple"
+      ],
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:299",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "deadlockDetectorService",
+        "reputationScaleService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/accounts",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:30",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /resources/accounts/:accountId",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:42",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/transactions/credit",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:55",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/transactions/debit",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:67",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/reservations",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:79",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/reservations/:reservationId/settle",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:91",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/reservations/:reservationId/release",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:114",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /resources/reservations/expire",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/resource-ledger.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:129",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/health",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:66",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/runtime-mode",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:72",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/capabilities",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:76",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/fallbacks",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:90",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/feature-gates",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:95",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/version",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:101",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/migrations",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:110",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/build-status",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:128",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "GET /system/readiness",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/system.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "schema_migrations"
+      ],
+      "registration_location": "backend/src/routes/system.routes.ts:130",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": []
+    },
+    {
+      "authentication_requirement": "process env",
+      "authorization_requirement": "not_applicable",
+      "entry_point": "CLI backend outbox worker",
+      "events_emitted": [
+        "Kafka"
+      ],
+      "first_handler": "backend/src/workers/outbox-worker.ts",
+      "outbound_calls": [],
+      "persistence_effects": [
+        "event_outbox",
+        "event_bus_outbox"
+      ],
+      "registration_location": "backend/package.json:scripts.agentco:outbox-worker",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [
+        "TransactionalOutboxService",
+        "EventBusService"
+      ],
+      "status": "verified_local_real",
+      "terminal_output": "console/exit code",
+      "tests": [
+        "backend/tests"
+      ]
+    },
+    {
+      "authentication_requirement": "parent backend request",
+      "authorization_requirement": "specialist role registry",
+      "entry_point": "Python specialist subprocess",
+      "events_emitted": [],
+      "first_handler": "agents.autonomy.<role>",
+      "outbound_calls": [
+        "HTTP loopback"
+      ],
+      "persistence_effects": [
+        "autonomy_team_activations",
+        "autonomy_evidence"
+      ],
+      "registration_location": "backend/src/services/team-activation.service.ts:spawnSpecialistProcess",
+      "runtime_trace": "make audit-runtime-integration",
+      "service_chain": [
+        "SpecialistAgent"
+      ],
+      "status": "verified_local_real",
+      "terminal_output": "HTTP JSON",
+      "tests": [
+        "backend/tests/specialist-spawning.test.ts",
+        "agents/tests/test_specialist_server_runtime.py"
+      ]
+    }
+  ]
+}

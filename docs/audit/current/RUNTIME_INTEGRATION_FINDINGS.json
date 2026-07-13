@@ -1,0 +1,25 @@
+{
+  "commit": "b663f7a51ec75e04590b4361c8ef92c323251ef3",
+  "findings": [
+    {
+      "component": "CI",
+      "evidence": "CI run 29238640790 used divergent commands and PR merge checkout.",
+      "finding_id": "RTI-001",
+      "remaining_risk": "Hosted production remains unverified.",
+      "root_cause": "CI duplicated release checks instead of invoking canonical governed commands.",
+      "severity": "S2",
+      "status": "resolved_in_batch",
+      "workflow": "general CI"
+    },
+    {
+      "component": "eventing",
+      "evidence": "Both event_outbox and event_bus_outbox exist as active relay paths.",
+      "finding_id": "RTI-002",
+      "remaining_risk": "Operational complexity until one path is consolidated.",
+      "root_cause": "Parallel event mechanisms introduced across phases.",
+      "severity": "S3",
+      "status": "backlog",
+      "workflow": "outbox"
+    }
+  ]
+}

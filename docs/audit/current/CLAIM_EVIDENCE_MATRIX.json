@@ -1,0 +1,29 @@
+{
+  "claims": [
+    {
+      "claim": "Clean-room verification is isolated and fail-closed",
+      "evidence": "make audit-clean-room and GHA artifact from Batch 02B",
+      "evidence_level": "local_real",
+      "status": "verified"
+    },
+    {
+      "claim": "Runtime eventing uses Kafka",
+      "evidence": "make audit-runtime-integration event_outbox path",
+      "evidence_level": "local_real",
+      "status": "verified_with_limitations"
+    },
+    {
+      "claim": "Active agents use governed protocol",
+      "evidence": "agent protocol matrix and release gate",
+      "evidence_level": "integration_tested",
+      "status": "verified"
+    },
+    {
+      "claim": "General intelligence / civilization learns continuously",
+      "evidence": "mechanisms exist; longitudinal proof not in scope",
+      "evidence_level": "static_contract",
+      "status": "unverified"
+    }
+  ],
+  "commit": "b663f7a51ec75e04590b4361c8ef92c323251ef3"
+}

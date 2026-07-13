@@ -1,0 +1,39 @@
+{
+  "claimed_vs_executable": [
+    {
+      "claim": "all active agents governed",
+      "executable_status": "verified by agent protocol matrix and release gate"
+    },
+    {
+      "claim": "bounded learning/self-improvement",
+      "executable_status": "mechanisms tested locally; no autonomous production mutation proof claimed"
+    },
+    {
+      "claim": "Kafka-backed eventing",
+      "executable_status": "event_log transactional outbox verified; event_bus outbox classified as parallel active implementation"
+    }
+  ],
+  "commit": "b663f7a51ec75e04590b4361c8ef92c323251ef3",
+  "process_topology": [
+    {
+      "path": "frontend -> backend",
+      "status": "configured_unexecuted_in_batch"
+    },
+    {
+      "path": "backend Fastify -> PostgreSQL",
+      "status": "verified_local_real"
+    },
+    {
+      "path": "backend EventLogService -> event_outbox -> outbox worker -> Kafka",
+      "status": "verified_local_real"
+    },
+    {
+      "path": "backend TeamActivationService -> python3.13 -m agents.autonomy.<role>",
+      "status": "verified_local_real"
+    },
+    {
+      "path": "Python BaseAgentV2 -> durable audit writer -> decision_log",
+      "status": "verified_local_real via release/clean-room tests"
+    }
+  ]
+}
