@@ -294,7 +294,7 @@ def docs_data() -> dict[str, Any]:
     ]
     topology = {
         "environment": "local-real Kubernetes via Kind",
-        "processes": ["PostgreSQL", "Redis", "Zookeeper", "Kafka", "backend", "frontend", "outbox-worker", "alert-receiver"],
+        "processes": ["PostgreSQL", "Redis", "Kafka-compatible broker (Redpanda)", "backend", "frontend", "outbox-worker", "alert-receiver"],
         "release_sequence": [
             "build immutable images",
             "create Kind cluster",
@@ -347,6 +347,20 @@ def docs_data() -> dict[str, Any]:
             "regression_test": "backend/tests/outbox-worker.test.ts and staging outbox proof",
             "status": "intentional_separation",
             "remaining_risk": "consumer-level contract tests for all EventBus topics remain future work",
+        },
+        {
+            "finding_id": "DOP-002",
+            "severity": "S3",
+            "component": "local Kafka-compatible broker",
+            "environment": "local Kind",
+            "evidence": "staging harness uses Redpanda while production Helm may use Kafka",
+            "reproduction": "inspect scripts/audit_staging_deployment.py Kafka deployment",
+            "root_cause": "Confluent cp-kafka was unstable in Kind on the local architecture during audit",
+            "impact": "local-real evidence proves Kafka protocol integration, not vendor-specific Kafka packaging",
+            "remediation": "use Redpanda as the local Kafka-compatible broker and keep hosted Kafka unverified",
+            "regression_test": "tests/test_staging_deployment_controls.py",
+            "status": "accepted_local_real_boundary",
+            "remaining_risk": "managed/hosted Kafka remains unverified until hosted staging",
         },
     ]
     alerts = [
@@ -644,39 +658,25 @@ spec:
     spec:
       containers:
         - name: kafka
-          image: confluentinc/cp-kafka:7.6.1
-          command:
-            - sh
-            - -c
-            - |
-              until nc -z zookeeper 2181; do
-                echo "waiting for zookeeper"
-                sleep 2
-              done
-              /etc/confluent/docker/run
-          env:
-            - name: KAFKA_BROKER_ID
-              value: "1"
-            - name: KAFKA_ZOOKEEPER_CONNECT
-              value: zookeeper:2181
-            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
-              value: PLAINTEXT:PLAINTEXT
-            - name: KAFKA_LISTENERS
-              value: PLAINTEXT://0.0.0.0:9092
-            - name: KAFKA_ADVERTISED_LISTENERS
-              value: PLAINTEXT://kafka:9092
-            - name: KAFKA_INTER_BROKER_LISTENER_NAME
-              value: PLAINTEXT
-            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
-              value: "1"
-            - name: KAFKA_TRANSACTION_STATE_LOG_MIN_ISR
-              value: "1"
-            - name: KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
-              value: "1"
-            - name: KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS
-              value: "0"
-            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
-              value: "true"
+          image: redpandadata/redpanda:v24.3.6
+          command: ["/usr/bin/rpk"]
+          args:
+            - redpanda
+            - start
+            - --overprovisioned
+            - --smp
+            - "1"
+            - --memory
+            - 512M
+            - --reserve-memory
+            - 0M
+            - --node-id
+            - "0"
+            - --check=false
+            - --kafka-addr
+            - PLAINTEXT://0.0.0.0:9092
+            - --advertise-kafka-addr
+            - PLAINTEXT://kafka:9092
           ports:
             - containerPort: 9092
 """

@@ -13,12 +13,14 @@ def test_rti_002_is_intentional_separation_with_both_outboxes():
     assert findings["RTI-002"]["status"] == "intentional_separation"
     assert "event_outbox" in findings["RTI-002"]["evidence"]
     assert "event_bus_outbox" in findings["RTI-002"]["evidence"]
+    assert findings["DOP-002"]["status"] == "accepted_local_real_boundary"
 
 
 def test_hosted_environment_boundaries_remain_unverified():
     topology = audit_staging_deployment.docs_data()["topology"]
 
     assert topology["environment"] == "local-real Kubernetes via Kind"
+    assert "Kafka-compatible broker (Redpanda)" in topology["processes"]
     assert topology["hosted_boundaries"]["managed_kubernetes"] == "unverified"
     assert topology["hosted_boundaries"]["production_alert_destination"] == "unverified"
 

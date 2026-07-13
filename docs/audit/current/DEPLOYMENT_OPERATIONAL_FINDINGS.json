@@ -27,6 +27,20 @@
       "root_cause": "two intentional event domains share a worker but not a schema",
       "severity": "S3",
       "status": "intentional_separation"
+    },
+    {
+      "component": "local Kafka-compatible broker",
+      "environment": "local Kind",
+      "evidence": "staging harness uses Redpanda while production Helm may use Kafka",
+      "finding_id": "DOP-002",
+      "impact": "local-real evidence proves Kafka protocol integration, not vendor-specific Kafka packaging",
+      "regression_test": "tests/test_staging_deployment_controls.py",
+      "remaining_risk": "managed/hosted Kafka remains unverified until hosted staging",
+      "remediation": "use Redpanda as the local Kafka-compatible broker and keep hosted Kafka unverified",
+      "reproduction": "inspect scripts/audit_staging_deployment.py Kafka deployment",
+      "root_cause": "Confluent cp-kafka was unstable in Kind on the local architecture during audit",
+      "severity": "S3",
+      "status": "accepted_local_real_boundary"
     }
   ]
 }

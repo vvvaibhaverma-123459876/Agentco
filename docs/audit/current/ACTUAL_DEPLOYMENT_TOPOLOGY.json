@@ -12,8 +12,7 @@
   "processes": [
     "PostgreSQL",
     "Redis",
-    "Zookeeper",
-    "Kafka",
+    "Kafka-compatible broker (Redpanda)",
     "backend",
     "frontend",
     "outbox-worker",
