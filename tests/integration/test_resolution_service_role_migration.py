@@ -15,6 +15,7 @@ Tests:
 from __future__ import annotations
 
 import os
+import subprocess
 import uuid
 from pathlib import Path
 
@@ -30,7 +31,7 @@ if DSN:
 
         # Destructive fixture: run in an isolated sibling database so shared
         # backend-migrated tables are never replaced with this suite's schema.
-        DSN = isolated_dsn(DSN)
+        DSN = isolated_dsn(DSN, suffix="migration_role")
     except Exception:
         DSN = None  # Postgres unreachable; the skip guard below handles it
 pytestmark = pytest.mark.skipif(
@@ -90,42 +91,15 @@ def fresh_db():
     PROOF OF MIGRATION COMPLETENESS:
     Apply ALL migrations from scratch (no manual setup) and verify role exists.
     """
+    env = {
+        **os.environ,
+        "DATABASE_URL": DSN,
+        "RESOLUTION_SERVICE_PASSWORD": os.environ.get("RESOLUTION_SERVICE_PASSWORD", "test"),
+    }
+    subprocess.check_call(["npm", "run", "db:migrate"], cwd=ROOT / "backend", env=env)
+
     conn = psycopg2.connect(DSN)
     conn.autocommit = True
-
-    with conn.cursor() as cur:
-        # Drop all tables that migrations create (tear down any prior test run)
-        tables_to_drop = [
-            "prediction_ledger",
-            "beliefs",
-            "agent_state",
-            "agent_memory",
-            "shared_knowledge",
-            "decision_log",
-            "event_history",
-            "prompt_registry",
-            "performance_metrics",
-            "customer_data",
-            "trust_scores",
-            "decision_log_chain",
-            "override_queue",
-        ]
-        for tbl in tables_to_drop:
-            cur.execute(f"DROP TABLE IF EXISTS {tbl} CASCADE")
-
-        _drop_resolution_service_role(cur)
-
-    # Apply all migrations in order
-    with conn.cursor() as cur:
-        migration_files = _get_migration_files()
-        for migration_file in migration_files:
-            sql_text = migration_file.read_text()
-            sql_text = _substitute_env_vars(sql_text)
-            try:
-                cur.execute(sql_text)
-            except Exception as e:
-                print(f"Migration {migration_file.name} failed: {e}")
-                raise
 
     yield conn
 
