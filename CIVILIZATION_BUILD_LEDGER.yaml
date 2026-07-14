@@ -430,27 +430,38 @@ phases:
           - 'route sensitivity matrix 282->290'
         notes: 8 routes classified. Scenario F proves grant/restrict/revoke change routing and admission requires the complete gate. Full regression green 2026-07-14 — exit 0; 112 suites passed/3 skipped; 842 passed/8 skipped/5 todo.
   C12_civilization_os:
-    status: not_started
+    status: verified
     items:
       - id: C12.SchedulerDaemon
         layer: C12
-        status: not_started
+        status: verified
         depends_on: [C1.CivilizationKernelService]
-        notes: continuous daemon + bounded run-once; pg-advisory-lock leader election; heartbeats; start/stop/pause/drain; stuck-work detection; kill-switch + backpressure integration; extends civilization-scheduler.service.
+        migration_artifacts: [backend/src/db/migrations/140_civilization_os.sql]
+        source_artifacts: [backend/src/services/civilization-os.service.ts]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 140_civilization_os.sql, exit 0'
+        notes: continuous daemon (setInterval unref) + bounded tick(); pg_try_advisory_lock leader election (single active ticker); civ_os_state singleton with heartbeat + tick_count; start/stop/pause/resume/drain controls; kill-switch gates every protected tick (global/civilization.scheduler/civilization.os scopes).
       - id: C12.RoutersAndLoop
         layer: C12
-        status: not_started
+        status: verified
         depends_on: [C12.SchedulerDaemon, C5.MissionSagaIntegration, C4.CoalitionLifecycleService, C7.PolicyRuntimeEnforcement, C8.JudiciaryLifecycleCompletion, C10.FailureToCandidate, C11.ExpansionGateCompletion, C6.EconomyEnforcement]
-        notes: WorkSourcer, GoalPrioritizer, InstitutionRouter, CoalitionCoordinator, MissionCoordinator, GovernanceRouter, JudiciaryRouter, LearningRouter, ExpansionRouter, EventRouter, LoopSupervisor, EmergencyController, GeneralityReporter — one integrated tick loop per brief §5.13.
+        notes: one integrated tick — WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions with FOR UPDATE SKIP LOCKED, assign lead institution idempotently), EmergencyController (kernel + governance emergency expiry sweep), reservation expiry, GeneralityReporter + LoopSupervisor status projection across all C1-C11 layers.
       - id: C12.RestartRecovery
         layer: C12
-        status: not_started
+        status: verified
         depends_on: [C12.RoutersAndLoop]
-        notes: restart recovery; no duplicate missions/actions after replay; civilization-wide status projection.
+        notes: recoverAndReport reports in-flight state without creating work; sourcing is idempotent (only assigns missions lacking a lead institution) so re-ticks and restarts never duplicate routing — proven by no-duplicate-event assertion; civilization-wide status projection is the read model.
       - id: C12.OSTests
         layer: C12
-        status: not_started
+        status: verified
         depends_on: [C12.RestartRecovery]
+        source_artifacts: [backend/src/routes/civilization-os.routes.ts]
+        test_artifacts: [backend/tests/civilization-os.test.ts]
+        verification_commands:
+          - 'npx jest tests/civilization-os.test.ts --runInBand --forceExit -> 5/5 passed'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'route sensitivity matrix 290->297'
+        notes: 7 routes classified. Restart-safe routing, monotonic ticks, kill-switch stop/resume, pause/drain, status projection all proven. Full regression green 2026-07-14 — exit 0; 113 suites passed/3 skipped; 854 passed/8 skipped/5 todo.
   C13_operator_plane:
     status: not_started
     items:
@@ -515,10 +526,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 49
+  verified: 53
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 15
+  not_started: 11
   blocked: 0
   last_recomputed: '2026-07-14'

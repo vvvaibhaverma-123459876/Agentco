@@ -9,13 +9,13 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 |---|---|
 | Branch | `feature/civilization-layer` |
 | Base commit | `997e66ce700e0c93896f13f7d6f559d0a50b15dd` (GitHub main, PRs #21–#23 merged) |
-| Current phase | **C4 — coalitions** (verified); next: C5 objectives/goals/missions |
-| Current item | C5 missions schema + lifecycle service |
-| Completion gate | `termination_predicate_met: false` — 23/64 verified, 0 integrated |
-| Test results | C4 coalitions 7/7; route-auth contract 219/219; backend full regression 105 suites passed / 3 skipped, 728 passed / 8 skipped / 5 todo |
-| Migration state | 129_civilization_kernel through 132_institution_coalitions applied cleanly on the isolated empty-DB stack |
+| Current phase | **C12 — civilization operating system** (integrated; full regression running); next: C13 operator plane |
+| Completion gate | `termination_predicate_met: false` — C0–C11 verified (49/64), C12 integrated |
+| Test results | C12 OS 5/5; latest full regression at C11: 112 suites passed / 3 skipped, 842 passed / 8 skipped / 5 todo |
+| Migration state | 129–140 applied cleanly on the isolated empty-DB stack (verified from scratch) |
+| Git / PR | Branch `feature/civilization-layer` pushed to origin; **PR #26** open against `main` (C0–C11). Push is operator-authorized; keep fast-forwarding new phases. |
 | Known blockers | none |
-| Next executable action | C5: missions migration, lifecycle service, saga integration, routes and tests |
+| Next executable action | commit C12; then C13 operator plane (backend APIs + frontend views), C14 reliability/security/deployment, C15 completion proof |
 
 ## Environment decisions (recorded)
 
@@ -33,14 +33,14 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 | C2 citizenry | **VERIFIED** | migration 130; gate wired into durable-execution + specialist spawn; 7/7 tests; full suite green |
 | C3 societies + institutions | **VERIFIED** | migration 131; societies, mandatory institutions, charters/mandates/contracts; 8/8 tests; full suite green |
 | C4 coalitions | **VERIFIED** | migration 132; lifecycle, negotiation, consensus, commitments, delegation, settlement, escalation; 7/7 tests; full suite green |
-| C5 objectives/goals/missions | not started | |
-| C6 economy | not started | |
-| C7 governance | not started | |
-| C8 judiciary | not started | |
-| C9 collective epistemics | not started | |
-| C10 learning + safe evolution | not started | |
-| C11 capability/domain expansion | not started | |
-| C12 civilization operating system | not started | |
+| C5 objectives/goals/missions | **VERIFIED** | migration 133; gated completion + attestation; 6/6 tests |
+| C6 economy | **VERIFIED** | migration 134; treasury/budgets/penalties/reconciliation; 5/5 tests |
+| C7 governance | **VERIFIED** | migration 135; proposals/voting/enforceable policy; scenario C; 6/6 tests |
+| C8 judiciary | **VERIFIED** | migration 136; enforcement mutates state; scenario D; 4/4 tests |
+| C9 collective epistemics | **VERIFIED** | migration 137; provenance graph + transitive retraction; 4/4 tests |
+| C10 learning + safe evolution | **VERIFIED** | migration 138; failure→promote/rollback; scenario E; 6/6 tests |
+| C11 capability/domain expansion | **VERIFIED** | migration 139; gate + grant/restrict/revoke routing; scenario F; 4/4 tests |
+| C12 civilization operating system | INTEGRATED | migration 140; leader-elected continuous tick + routers + restart recovery; 5/5 tests; full regression running |
 | C13 operator plane | not started | |
 | C14 reliability/security/deployment | not started | |
 | C15 completion proof | not started | |
