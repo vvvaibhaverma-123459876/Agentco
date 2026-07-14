@@ -1458,14 +1458,14 @@
             "exit_code": 0
           }
         ],
-        "commit_sha": "b288f3b60591e1b83d438748e42fb0b2d547cc6c",
-        "completion_time": "2026-07-14T10:40:00Z",
+        "commit_sha": "a46616a735c7857d5fed488a4e4aefa6e224677f",
+        "completion_time": "2026-07-14T11:03:46Z",
         "configuration_hash": "eaf9445ba8c815832f86fbc3fb2bf9178dba9390bf83e2c7fb075b669c5149c3",
         "cost_estimates": {
           "usd": 0.0
         },
         "database_version": "not_required_for_deterministic_fixture",
-        "dirty_status": "dirty",
+        "dirty_status": "clean",
         "environment": "local",
         "evaluator_versions": [
           "longitudinal-evaluator-v1"
@@ -1645,7 +1645,7 @@
           "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d"
         ],
         "kafka_version": "not_required_for_deterministic_fixture",
-        "manifest_hash": "0fbcf03b16c1879fd4a61685e173102001a7c2d5aa0796254137872468c3647d",
+        "manifest_hash": "de3ee4eab5a75a81c488adbd0b15e92bdafd06cc156e5d5a8e18d98b99651e1b",
         "model_adapter": "deterministic_fixture",
         "model_identifier": "agentco-longitudinal-fixture-v1",
         "node_version": "v24.17.0",
@@ -1728,7 +1728,7 @@
         "runtime_version": "batch06-local-deterministic-v1",
         "seed": 101,
         "skips": [],
-        "start_time": "2026-07-14T10:40:00Z",
+        "start_time": "2026-07-14T11:03:46Z",
         "timeouts": {
           "campaign_seconds": 60,
           "per_case_seconds": 1.0
@@ -3221,14 +3221,14 @@
             "exit_code": 0
           }
         ],
-        "commit_sha": "b288f3b60591e1b83d438748e42fb0b2d547cc6c",
-        "completion_time": "2026-07-14T10:39:59Z",
+        "commit_sha": "a46616a735c7857d5fed488a4e4aefa6e224677f",
+        "completion_time": "2026-07-14T11:03:45Z",
         "configuration_hash": "363ebc5970cbf357516d3d345229bb67b68a2723868e374206e99b58092734f7",
         "cost_estimates": {
           "usd": 0.0
         },
         "database_version": "not_required_for_deterministic_fixture",
-        "dirty_status": "dirty",
+        "dirty_status": "clean",
         "environment": "local",
         "evaluator_versions": [
           "longitudinal-evaluator-v1"
@@ -3414,7 +3414,7 @@
           "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d"
         ],
         "kafka_version": "not_required_for_deterministic_fixture",
-        "manifest_hash": "fbe45fd4fff278d9782a69fc7408151cfac07a3914e5424657d1568268dc751a",
+        "manifest_hash": "dd925c1f930fa2626fb3bb610d920bcb8b2b50ed7cbcc5be09ea635033e2f0cd",
         "model_adapter": "deterministic_fixture",
         "model_identifier": "agentco-longitudinal-fixture-v1",
         "node_version": "v24.17.0",
@@ -3497,7 +3497,7 @@
         "runtime_version": "batch06-local-deterministic-v1",
         "seed": 101,
         "skips": [],
-        "start_time": "2026-07-14T10:39:59Z",
+        "start_time": "2026-07-14T11:03:45Z",
         "timeouts": {
           "campaign_seconds": 60,
           "per_case_seconds": 1.0
@@ -4945,14 +4945,14 @@
             "exit_code": 0
           }
         ],
-        "commit_sha": "b288f3b60591e1b83d438748e42fb0b2d547cc6c",
-        "completion_time": "2026-07-14T10:39:59Z",
+        "commit_sha": "a46616a735c7857d5fed488a4e4aefa6e224677f",
+        "completion_time": "2026-07-14T11:03:45Z",
         "configuration_hash": "931b033c34e76193fe04536fd4fd5dee1cb5bbc5dd6be4cbbd8d267605299cd7",
         "cost_estimates": {
           "usd": 0.0
         },
         "database_version": "not_required_for_deterministic_fixture",
-        "dirty_status": "dirty",
+        "dirty_status": "clean",
         "environment": "local",
         "evaluator_versions": [
           "longitudinal-evaluator-v1"
@@ -5138,7 +5138,7 @@
           "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d"
         ],
         "kafka_version": "not_required_for_deterministic_fixture",
-        "manifest_hash": "8125058bd04c60459aad1178bb4e5c53c73128078aece4e840fcae37b725abf5",
+        "manifest_hash": "cb3628277736dd3a0ec1e5d03aaec96c4dff33f23485a02c7dd004f5211aeb7f",
         "model_adapter": "deterministic_fixture",
         "model_identifier": "agentco-longitudinal-fixture-v1",
         "node_version": "v24.17.0",
@@ -5221,7 +5221,7 @@
         "runtime_version": "batch06-local-deterministic-v1",
         "seed": 202,
         "skips": [],
-        "start_time": "2026-07-14T10:39:59Z",
+        "start_time": "2026-07-14T11:03:45Z",
         "timeouts": {
           "campaign_seconds": 60,
           "per_case_seconds": 1.0
@@ -6669,14 +6669,14 @@
             "exit_code": 0
           }
         ],
-        "commit_sha": "b288f3b60591e1b83d438748e42fb0b2d547cc6c",
-        "completion_time": "2026-07-14T10:40:00Z",
+        "commit_sha": "a46616a735c7857d5fed488a4e4aefa6e224677f",
+        "completion_time": "2026-07-14T11:03:45Z",
         "configuration_hash": "36b5125dd751c6db2634476406c3a7ab333c8a7c2a67b3b8c98562e6b2119b66",
         "cost_estimates": {
           "usd": 0.0
         },
         "database_version": "not_required_for_deterministic_fixture",
-        "dirty_status": "dirty",
+        "dirty_status": "clean",
         "environment": "local",
         "evaluator_versions": [
           "longitudinal-evaluator-v1"
@@ -6862,7 +6862,7 @@
           "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d"
         ],
         "kafka_version": "not_required_for_deterministic_fixture",
-        "manifest_hash": "d8bed6bddf08f617f993d668fdaa8a14be273513ae79e76cbeebb274617a815a",
+        "manifest_hash": "9c0c6090b24de037cd0b3a456288f312711a81509bad6130f0de3bd9fdd25d9e",
         "model_adapter": "deterministic_fixture",
         "model_identifier": "agentco-longitudinal-fixture-v1",
         "node_version": "v24.17.0",
@@ -6945,7 +6945,7 @@
         "runtime_version": "batch06-local-deterministic-v1",
         "seed": 303,
         "skips": [],
-        "start_time": "2026-07-14T10:40:00Z",
+        "start_time": "2026-07-14T11:03:45Z",
         "timeouts": {
           "campaign_seconds": 60,
           "per_case_seconds": 1.0
@@ -8393,14 +8393,14 @@
             "exit_code": 0
           }
         ],
-        "commit_sha": "b288f3b60591e1b83d438748e42fb0b2d547cc6c",
-        "completion_time": "2026-07-14T10:40:00Z",
+        "commit_sha": "a46616a735c7857d5fed488a4e4aefa6e224677f",
+        "completion_time": "2026-07-14T11:03:45Z",
         "configuration_hash": "0722c9cb72081201d82d77434c2ae9fe0d1493195b1469e19b1584f9c74e0881",
         "cost_estimates": {
           "usd": 0.0
         },
         "database_version": "not_required_for_deterministic_fixture",
-        "dirty_status": "dirty",
+        "dirty_status": "clean",
         "environment": "local",
         "evaluator_versions": [
           "longitudinal-evaluator-v1"
@@ -8586,7 +8586,7 @@
           "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d"
         ],
         "kafka_version": "not_required_for_deterministic_fixture",
-        "manifest_hash": "b09f828a8d28e02a5474ce866e076bb62a39f80052ba8fde8b34a559b4551f55",
+        "manifest_hash": "2d8f32f9494a0742fc409e6668e635fba923ab2ae515c30ada543d2e4b4d2317",
         "model_adapter": "deterministic_fixture",
         "model_identifier": "agentco-longitudinal-fixture-v1",
         "node_version": "v24.17.0",
@@ -8669,7 +8669,7 @@
         "runtime_version": "batch06-local-deterministic-v1",
         "seed": 404,
         "skips": [],
-        "start_time": "2026-07-14T10:40:00Z",
+        "start_time": "2026-07-14T11:03:45Z",
         "timeouts": {
           "campaign_seconds": 60,
           "per_case_seconds": 1.0
@@ -10117,14 +10117,14 @@
             "exit_code": 0
           }
         ],
-        "commit_sha": "b288f3b60591e1b83d438748e42fb0b2d547cc6c",
-        "completion_time": "2026-07-14T10:40:00Z",
+        "commit_sha": "a46616a735c7857d5fed488a4e4aefa6e224677f",
+        "completion_time": "2026-07-14T11:03:46Z",
         "configuration_hash": "c95e81df4394f993a303a652b9b6769d416795913d6c7e6af473abe28c05f704",
         "cost_estimates": {
           "usd": 0.0
         },
         "database_version": "not_required_for_deterministic_fixture",
-        "dirty_status": "dirty",
+        "dirty_status": "clean",
         "environment": "local",
         "evaluator_versions": [
           "longitudinal-evaluator-v1"
@@ -10310,7 +10310,7 @@
           "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d"
         ],
         "kafka_version": "not_required_for_deterministic_fixture",
-        "manifest_hash": "b1d4454f84eee80f3b9d701c783a172d3d9556da2b40e0130a845064367fe7be",
+        "manifest_hash": "2816dea4505e624fe56980c3f83ce70ec53fb522aec907f5eae15d33b182568c",
         "model_adapter": "deterministic_fixture",
         "model_identifier": "agentco-longitudinal-fixture-v1",
         "node_version": "v24.17.0",
@@ -10393,7 +10393,7 @@
         "runtime_version": "batch06-local-deterministic-v1",
         "seed": 505,
         "skips": [],
-        "start_time": "2026-07-14T10:40:00Z",
+        "start_time": "2026-07-14T11:03:46Z",
         "timeouts": {
           "campaign_seconds": 60,
           "per_case_seconds": 1.0

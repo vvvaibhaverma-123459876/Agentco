@@ -748,6 +748,21 @@ def generate_all() -> dict[str, Any]:
     return results
 
 
+def run_campaign_artifact(campaign: str) -> dict[str, Any]:
+    if campaign != CAMPAIGN_ID:
+        raise SystemExit(f"unknown campaign: {campaign}")
+    registry = json.loads((BENCHMARKS / "registry.json").read_text())
+    errors = validate_registry(registry)
+    if errors:
+        raise SystemExit("\n".join(errors))
+    results = campaign_results(registry)
+    recompute_errors = recompute_campaign(results)
+    if recompute_errors:
+        raise SystemExit("\n".join(recompute_errors))
+    write_artifacts(results)
+    return results
+
+
 def update_claim_matrix(registry: dict[str, Any]) -> None:
     path = DOCS / "CLAIM_EVIDENCE_MATRIX.json"
     existing = json.loads(path.read_text()) if path.exists() else {"claims": []}
@@ -797,13 +812,17 @@ def check_all() -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("command", choices=["generate", "check", "campaign", "compare"])
+    parser.add_argument("command", choices=["generate", "check", "campaign", "campaign-artifact", "compare"])
     parser.add_argument("--campaign", default=CAMPAIGN_ID)
     args = parser.parse_args()
     if args.command in {"generate", "campaign"}:
         if args.campaign != CAMPAIGN_ID:
             raise SystemExit(f"unknown campaign: {args.campaign}")
         results = generate_all()
+        print(json.dumps({"success": True, "campaign_id": results["campaign_id"], "run_count": len(results["run_ids"])}, sort_keys=True))
+        return 0
+    if args.command == "campaign-artifact":
+        results = run_campaign_artifact(args.campaign)
         print(json.dumps({"success": True, "campaign_id": results["campaign_id"], "run_count": len(results["run_ids"])}, sort_keys=True))
         return 0
     if args.command == "check":

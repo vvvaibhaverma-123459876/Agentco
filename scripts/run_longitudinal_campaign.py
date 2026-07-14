@@ -17,7 +17,7 @@ def main() -> int:
     args = parser.parse_args()
     import sys
 
-    sys.argv = [sys.argv[0], "campaign", "--campaign", args.campaign]
+    sys.argv = [sys.argv[0], "campaign-artifact", "--campaign", args.campaign]
     return foundation_main()
 
 
