@@ -1,0 +1,52 @@
+{
+  "report_version": "cross-version-ancestry-v1",
+  "baseline_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+  "raw_candidate_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+  "civilization_layer_source_head": "75406a50882ad84bd7a5a18ee84b6309d908a034",
+  "merge_base": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+  "pr25_merge_sha": "5ec0d66fd126a2493b0111328f1d35741d57daef",
+  "pr25_parents": [
+    "2d1eff732c1b14bea09eee5b7c41979be41a1372",
+    "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04"
+  ],
+  "pr26_merge_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+  "pr26_parents": [
+    "5ec0d66fd126a2493b0111328f1d35741d57daef",
+    "75406a50882ad84bd7a5a18ee84b6309d908a034"
+  ],
+  "automatic_merge_resolution": "GitHub merge commit with no textual conflict reported in local history inspection.",
+  "semantic_conflicts": [
+    {
+      "id": "CV-SEM-001",
+      "component": "database migrations",
+      "evidence": "Both backend/src/db/migrations/129_civilization_kernel.sql and backend/src/db/migrations/129_longitudinal_mission_evidence.sql exist in Version B.",
+      "risk": "Numeric prefix reuse can make migration identity ambiguous unless full filename identity and content hash tracking are enforced."
+    }
+  ],
+  "version_b_unique_scope": {
+    "summary": "Civilization runtime services, routes, migrations, tests, build ledger, and route sensitivity updates were introduced by PR #26 on top of Batch 06A.",
+    "representative_files": [
+      "CIVILIZATION_BUILD_LEDGER.yaml",
+      "backend/src/db/migrations/129_civilization_kernel.sql",
+      "backend/src/db/migrations/130_citizenship.sql",
+      "backend/src/routes/civilization-kernel.routes.ts",
+      "backend/src/services/civilization-kernel.service.ts",
+      "backend/tests/civilization-kernel.test.ts",
+      "docs/civilization/PLAN_AND_PROGRESS.md"
+    ]
+  },
+  "files_modified_by_both_lineages": [
+    ".github/workflows/clean-room-audit.yml",
+    ".github/workflows/runtime-integration-audit.yml",
+    ".github/workflows/staging-deployment-audit.yml",
+    "Makefile",
+    "backend/src/server.ts",
+    "docs/audit/FORENSIC_FILE_INVENTORY.json",
+    "docs/audit/FORENSIC_FILE_INVENTORY.md",
+    "docs/audit/ROUTE_SENSITIVITY_MATRIX.md",
+    "docs/audit/current/CLAIM_EVIDENCE_MATRIX.json",
+    "docs/audit/current/RUNTIME_COMPONENT_LEDGER.json",
+    "reports/system_run/latest/score_validation.json"
+  ],
+  "conclusion": "Version B is preserved as the raw merged candidate. Version C is required to add explicit migration identity/content-hash safeguards before blind paired evaluation."
+}
