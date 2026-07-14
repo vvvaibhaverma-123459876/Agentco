@@ -91,7 +91,9 @@ CREATE TABLE IF NOT EXISTS mission_tasks (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   workstream_id UUID NOT NULL REFERENCES workstreams(id) ON DELETE RESTRICT,
   mission_id UUID NOT NULL REFERENCES missions(id) ON DELETE RESTRICT,
-  workflow_task_id UUID REFERENCES workflow_tasks(task_id),
+  -- Optional link to the canonical durable task; SET NULL so the pre-existing
+  -- workflow_tasks lifecycle (and its test cleanup) is never blocked.
+  workflow_task_id UUID REFERENCES workflow_tasks(task_id) ON DELETE SET NULL,
   title TEXT NOT NULL,
   agent_id TEXT,
   task_type TEXT,
@@ -120,7 +122,10 @@ CREATE TABLE IF NOT EXISTS mission_action_attempts (
 CREATE TABLE IF NOT EXISTS mission_evidence_bundle (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   mission_id UUID NOT NULL REFERENCES missions(id) ON DELETE RESTRICT,
-  evidence_id UUID NOT NULL REFERENCES autonomy_evidence(id),
+  -- Join table over the pre-existing (deletable) autonomy_evidence. CASCADE so
+  -- evidence lifecycle is never blocked; the mission attestation snapshots the
+  -- evidence_ids at completion, preserving the durable record independently.
+  evidence_id UUID NOT NULL REFERENCES autonomy_evidence(id) ON DELETE CASCADE,
   linked_by_actor_id UUID NOT NULL REFERENCES actors(id) ON DELETE RESTRICT,
   event_log_id UUID REFERENCES event_log(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -216,9 +221,11 @@ END $$ LANGUAGE plpgsql;
 DO $$
 DECLARE t TEXT;
 BEGIN
+  -- mission_evidence_bundle intentionally omitted: it is a join table over the
+  -- deletable autonomy_evidence with ON DELETE CASCADE (see column comment).
   FOREACH t IN ARRAY ARRAY[
     'strategic_goals','missions','mission_dependencies','mission_state_transitions','workstreams',
-    'mission_tasks','mission_action_attempts','mission_evidence_bundle','mission_outcomes',
+    'mission_tasks','mission_action_attempts','mission_outcomes',
     'mission_settlements','mission_attestations'
   ] LOOP
     EXECUTE format('DROP TRIGGER IF EXISTS trg_%s_no_delete ON %I', t, t);

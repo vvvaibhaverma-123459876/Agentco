@@ -23,6 +23,7 @@ import { citizenshipRoutes } from './routes/citizenship.routes';
 import { societyRoutes } from './routes/society.routes';
 import { coalitionRoutes } from './routes/coalition.routes';
 import { missionRoutes } from './routes/mission.routes';
+import { treasuryRoutes } from './routes/treasury.routes';
 import { governanceRoutes } from './routes/governance.routes';
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
@@ -121,6 +122,7 @@ export async function build() {
   await app.register(societyRoutes);
   await app.register(coalitionRoutes);
   await app.register(missionRoutes);
+  await app.register(treasuryRoutes);
   await app.register(governanceRoutes);
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);

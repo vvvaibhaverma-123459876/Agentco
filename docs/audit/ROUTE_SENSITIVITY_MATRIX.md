@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 94 |
-| AUTH-WRITE | 129 |
-| TOTAL | 227 |
+| AUTH-READ | 96 |
+| AUTH-WRITE | 139 |
+| TOTAL | 239 |
 
 ## Matrix
 
@@ -193,6 +193,18 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/societies/topology` | GET/HEAD | Society/institution governance/contract state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/status` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/strategic-goals` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/accounts` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/accounts/:scopeType/:scopeId/:resourceType` | GET/HEAD | Treasury/budget/penalty/cost/reconciliation state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/treasury/budgets` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/budgets/:proposalId/allocate` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/budgets/:proposalId/decide` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/costs` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/costs/rollup/:dimension` | GET/HEAD | Treasury/budget/penalty/cost/reconciliation state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/treasury/evaluate` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/fund` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/penalties` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/policies` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/treasury/reconcile` | POST | Treasury/budget/penalty/cost/reconciliation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/workstreams/:workstreamId/complete` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/workstreams/:workstreamId/tasks` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/credential/:agent_id` | GET/HEAD | Agent credential material or credential lookup | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
