@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1857`
+- Tracked files: `1858`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 30 |
 | Deprecated code | 48 |
 | Development tooling | 137 |
-| Documentation | 420 |
+| Documentation | 421 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 480 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 488 |
-| `docs` | 348 |
+| `docs` | 349 |
 | `evals` | 180 |
 | `scripts` | 149 |
 | `agents` | 111 |
@@ -1144,6 +1144,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07D_EVIDENCE_BINDING_AND_V2.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07E_FINAL_EVIDENCE_SEMANTIC_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
