@@ -29,6 +29,7 @@ def validate(campaign_dir: Path = DEFAULT_CAMPAIGN) -> list[str]:
     manifest = load(manifest_path)
     if manifest.get("control_manifest_version") not in {
         "subject-native-cross-version-campaign-v1",
+        "subject-native-cross-version-campaign-v2",
         "real-cross-version-campaign-v1",
     }:
         errors.append("UNKNOWN_CAMPAIGN_VERSION")

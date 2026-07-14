@@ -14,6 +14,8 @@ on:
       - "scripts/verify_cross_version_harness_independence.py"
       - "scripts/verify_subject_runtime_evidence.py"
       - "scripts/verify_subject_request_consumption.py"
+      - "scripts/verify_subject_answer_ownership.py"
+      - "scripts/verify_campaign_evidence_binding.py"
       - "scripts/compare_cross_version_campaign.py"
       - "scripts/verify_migration_identity.py"
       - "cross_version_adapters/**"
@@ -36,7 +38,7 @@ on:
       campaign:
         description: "Cross-version campaign ID"
         required: true
-        default: "subject-native-cross-version-v1"
+        default: "subject-native-cross-version-v2"
 
 permissions:
   contents: read
@@ -55,7 +57,7 @@ jobs:
       BASELINE: ${{ github.event.inputs.baseline || 'fb27dc0529d3c5d11480503bfbcf6f2d156f5b04' }}
       RAW_CANDIDATE: ${{ github.event.inputs.raw_candidate || '651794a41513db1e40930f08c253ef261af7c1e7' }}
       RECONCILED_CANDIDATE: ${{ github.event.inputs.reconciled_candidate || github.event.pull_request.head.sha || github.sha }}
-      CAMPAIGN: ${{ github.event.inputs.campaign || 'subject-native-cross-version-v1' }}
+      CAMPAIGN: ${{ github.event.inputs.campaign || 'subject-native-cross-version-v2' }}
     steps:
       - name: Checkout exact branch head
         uses: actions/checkout@v4
@@ -87,6 +89,12 @@ jobs:
 
       - name: Validate subject request-consumption verifier
         run: python3.13 scripts/verify_subject_request_consumption.py --check
+
+      - name: Validate answer ownership verifier
+        run: python3.13 scripts/verify_subject_answer_ownership.py --check
+
+      - name: Validate campaign evidence-binding verifier
+        run: python3.13 scripts/verify_campaign_evidence_binding.py --check
 
       - name: Run cross-version protocol tests
         run: python3.13 -m pytest tests/test_cross_version_campaign.py -q

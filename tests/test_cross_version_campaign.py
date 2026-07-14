@@ -5,7 +5,9 @@ from scripts import (
     calculate_longitudinal_milestones,
     verify_cross_version_campaign,
     verify_cross_version_harness_independence,
+    verify_campaign_evidence_binding,
     verify_subject_request_consumption,
+    verify_subject_answer_ownership,
     verify_migration_identity,
     verify_subject_runtime_evidence,
 )
@@ -133,6 +135,39 @@ def subject_native_campaign_fixture(path: Path) -> Path:
     return path
 
 
+def subject_native_v2_campaign_fixture(path: Path) -> Path:
+    subject_native_campaign_fixture(path)
+    manifest_path = path / "CONTROL_MANIFEST.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest.update(
+        {
+            "control_manifest_version": "subject-native-cross-version-campaign-v2",
+            "campaign_execution_sha": RECONCILED,
+            "workflow_head_sha": RECONCILED,
+            "adapter_freeze_sha": BASELINE,
+            "adapter_freeze_tree_hash": "dummy-tree",
+            "completed_count": 30,
+            "failed_count": 0,
+            "timeout_count": 0,
+            "unsupported_count": 330,
+            "internal_payload_manifest_hash": "0" * 64,
+        }
+    )
+    manifest_path.write_text(json.dumps(manifest))
+    for run_path in (path / "runs").glob("subject-*.json"):
+        run = json.loads(run_path.read_text())
+        for item in run["case_results"]:
+            if item["status"] == "completed":
+                item["operation_classification"] = "runtime_primitive"
+                item["answer_ownership"] = {
+                    "owned_by_subject": True,
+                    "classification": "runtime_primitive",
+                    "evidence": ["subject function returned result", "request hash was echoed"],
+                }
+        run_path.write_text(json.dumps(run))
+    return path
+
+
 def test_migration_identity_ledger_accepts_contracts():
     ledger = verify_migration_identity.build_ledger()
 
@@ -165,6 +200,40 @@ def test_subject_native_campaign_requires_request_consumption(tmp_path):
     assert verify_cross_version_campaign.validate(campaign_dir, BASELINE, RAW, RECONCILED) == []
     assert verify_subject_runtime_evidence.validate(campaign_dir) == []
     assert verify_subject_request_consumption.validate(campaign_dir) == []
+
+
+def test_calibration_cannot_be_classified_as_capability(tmp_path):
+    campaign_dir = subject_native_v2_campaign_fixture(tmp_path / "campaign")
+    run_path = campaign_dir / "runs" / "subject-aaaa.json"
+    run = json.loads(run_path.read_text())
+    run["case_results"][0]["domain"] = "calibration"
+    run["case_results"][0]["operation_classification"] = "capability_task"
+    run_path.write_text(json.dumps(run))
+
+    errors = verify_subject_answer_ownership.validate(campaign_dir)
+
+    assert any(error.startswith("CALIBRATION_NOT_RUNTIME_PRIMITIVE:version-a") for error in errors)
+    assert any(error.startswith("CALIBRATION_MISCLASSIFIED_AS_CAPABILITY:version-a") for error in errors)
+
+
+def test_evidence_binding_requires_adapter_freeze_sha(tmp_path):
+    campaign_dir = subject_native_v2_campaign_fixture(tmp_path / "campaign")
+    manifest_path = campaign_dir / "CONTROL_MANIFEST.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["adapter_freeze_sha"] = None
+    manifest_path.write_text(json.dumps(manifest))
+
+    assert "MISSING_ADAPTER_FREEZE_SHA" in verify_campaign_evidence_binding.validate(campaign_dir)
+
+
+def test_evidence_binding_rejects_total_mismatch(tmp_path):
+    campaign_dir = subject_native_v2_campaign_fixture(tmp_path / "campaign")
+    manifest_path = campaign_dir / "CONTROL_MANIFEST.json"
+    manifest = json.loads(manifest_path.read_text())
+    manifest["completed_count"] = 999
+    manifest_path.write_text(json.dumps(manifest))
+
+    assert "COMPLETED_TOTAL_MISMATCH" in verify_campaign_evidence_binding.validate(campaign_dir)
 
 
 def test_completed_subject_native_case_without_consumption_fails(tmp_path):

@@ -567,6 +567,12 @@ subject-native-cross-version-campaign:
 	@$(PYTHON) scripts/verify_subject_request_consumption.py \
 		--check \
 		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_subject_answer_ownership.py \
+		--check \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_campaign_evidence_binding.py \
+		--check \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
 
 .PHONY: longitudinal-learning
 longitudinal-learning:

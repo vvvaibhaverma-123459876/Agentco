@@ -34,11 +34,17 @@ EVALUATOR_VERSION = "longitudinal-evaluator-v1"
 SEEDS = [101, 202, 303, 404, 505]
 COMMON_CORE_DOMAINS = {"calibration"}
 SUPPORTED_TASK_BY_DOMAIN = {"calibration": "calibration"}
+V2_COMMON_CORE_DOMAINS = {"calibration", "evidence_evaluation"}
+OPERATION_CLASSIFICATIONS = {
+    "calibration": "runtime_primitive",
+    "evidence_evaluation": "storage_retrieval",
+}
 MIN_VALIDITY_THRESHOLDS = {
     "supported_common_domains": 8,
     "supported_common_validation_hidden_cases": 18,
     "completion_rate": 0.75,
     "max_subject_coverage_gap_points": 10,
+    "common_capability_task_domains": 4,
 }
 
 
@@ -176,6 +182,26 @@ def subject_supports_calibration(subject_dir: Path) -> bool:
     return "execute_task_logic" in text and '"calibration"' in text and "brier_score" in text
 
 
+def subject_supports_record_observation(subject_dir: Path) -> bool:
+    script = subject_dir / "scripts" / "execute_durable_task.py"
+    if not script.exists():
+        return False
+    text = script.read_text(errors="ignore")
+    return "execute_task_logic" in text and '"record_observation"' in text and "observation_recorded" in text
+
+
+def is_v2_campaign(campaign_id: str) -> bool:
+    return campaign_id.endswith("-v2")
+
+
+def common_domains_for_campaign(campaign_id: str) -> set[str]:
+    return V2_COMMON_CORE_DOMAINS if is_v2_campaign(campaign_id) else COMMON_CORE_DOMAINS
+
+
+def operation_classification(domain: str) -> str:
+    return OPERATION_CLASSIFICATIONS.get(domain, "unsupported")
+
+
 def subject_interface_inventory(subjects: list["Subject"], subject_dirs: dict[str, Path]) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     for subject in subjects:
@@ -200,6 +226,27 @@ def subject_interface_inventory(subjects: list["Subject"], subject_dirs: dict[st
                 "supported_benchmark_domains": ["calibration"] if subject_supports_calibration(subject_dir) else [],
                 "limitations": "does not cover hosted, provider, memory, backend route, or multi-domain civilization workflows",
                 "executable": durable_path.exists() and subject_supports_calibration(subject_dir),
+            }
+        )
+        records.append(
+            {
+                "interface_id": f"{subject.public_label}:durable-record-observation-task",
+                "subject_sha": subject.sha,
+                "path": "scripts/execute_durable_task.py",
+                "runtime_type": "python_function_via_external_subprocess",
+                "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+                "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
+                "accepted_input": "observation object",
+                "produced_output": "observation_recorded with supplied observation",
+                "authentication_requirement": "not_applicable_for_provider_free_local_task",
+                "database_requirement": "none for execute_task_logic record_observation path",
+                "redis_requirement": "none",
+                "kafka_requirement": "none",
+                "tool_permissions": [],
+                "audit_evidence": "process evidence, request hash echoed inside observation",
+                "supported_benchmark_domains": ["evidence_evaluation"] if subject_supports_record_observation(subject_dir) else [],
+                "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+                "executable": durable_path.exists() and subject_supports_record_observation(subject_dir),
             }
         )
     return records
@@ -293,6 +340,18 @@ def calibration_payload(request: dict[str, Any], request_hash: str) -> dict[str,
     }
 
 
+def observation_payload(request: dict[str, Any], request_hash: str) -> dict[str, Any]:
+    return {
+        "observation": {
+            "request_hash": request_hash,
+            "prompt": request["prompt"],
+            "domain": request["domain"],
+            "seed": request["seed"],
+            "source": "subject-native-cross-version-v2",
+        }
+    }
+
+
 def unsupported_record(
     opaque_label: str,
     case: dict[str, Any],
@@ -330,6 +389,8 @@ def unsupported_record(
             "process": None,
             "measurements": [],
             "score": score_response("unsupported", response, None),
+            "operation_classification": "unsupported",
+            "answer_ownership": {"owned_by_subject": False, "evidence": []},
         }
     )
     write_json(artifact_dir / "raw" / f"{run_id}.json", record)
@@ -360,6 +421,60 @@ def base_case_record(
         "response": response,
         "response_hash": sha256_text(canonical_json(response)),
     }
+
+
+def invoke_durable_case(
+    opaque_label: str,
+    subject_dir: Path,
+    case: dict[str, Any],
+    seed: int,
+    artifact_dir: Path,
+    task_type: str,
+    payload: dict[str, Any],
+    expected_kind: str,
+    request_hash_key_path: tuple[str, ...],
+) -> tuple[str, dict[str, Any] | None, str | None, dict[str, Any]]:
+    run_id = f"{opaque_label}-seed-{seed}-{case['input']['case_id']}"
+    stdin = canonical_json(
+        {
+            "task_id": run_id,
+            "agent_id": "subject-native-cross-version-adapter",
+            "task_type": task_type,
+            "payload": payload,
+        }
+    ).encode()
+    env = os.environ.copy()
+    env["AGENTCO_BENCHMARK_PROTOCOL"] = "subject-benchmark-v1"
+    process = run_process(
+        ["python3.13", "-c", durable_invocation_code()],
+        subject_dir,
+        env,
+        min(max(case["timeout_seconds"], 1.0), 10.0),
+        stdin=stdin,
+    )
+    process["measurement_scope"] = "benchmark_task"
+    status = "timeout" if process["timed_out"] else "failed"
+    parsed: dict[str, Any] | None = None
+    error: str | None = None
+    if process["exit_code"] == 0 and not process["timed_out"]:
+        try:
+            parsed = json.loads(process["stdout_preview"])
+        except json.JSONDecodeError as exc:
+            error = f"subject stdout was not JSON: {exc}"
+        else:
+            result = parsed.get("result", {})
+            cursor: Any = result
+            for key in request_hash_key_path:
+                cursor = cursor.get(key) if isinstance(cursor, dict) else None
+            if result.get("kind") == expected_kind and isinstance(cursor, str):
+                status = "completed"
+            else:
+                error = "subject result did not return the expected kind and request hash"
+    elif process["timed_out"]:
+        error = "subject task timed out"
+    else:
+        error = "subject task exited non-zero"
+    return status, (parsed or {}).get("result"), error, process
 
 
 def invoke_calibration_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed: int, artifact_dir: Path) -> dict[str, Any]:
@@ -456,6 +571,98 @@ def invoke_calibration_case(opaque_label: str, subject_dir: Path, case: dict[str
                 }
             ],
             "score": score_response(status, response, process),
+            "operation_classification": operation_classification(case["input"]["domain"]),
+            "answer_ownership": {
+                "owned_by_subject": True,
+                "classification": operation_classification(case["input"]["domain"]),
+                "evidence": [
+                    "subject execute_task_logic returned calibration_score",
+                    "adapter supplied confidence and outcome; this is primitive compatibility only",
+                ],
+            },
+        }
+    )
+    write_json(artifact_dir / "raw" / f"{run_id}.json", record)
+    return record
+
+
+def invoke_observation_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed: int, artifact_dir: Path) -> dict[str, Any]:
+    run_id = f"{opaque_label}-seed-{seed}-{case['input']['case_id']}"
+    request = request_for(case, seed, run_id)
+    request_hash = sha256_text(canonical_json(request))
+    request_path = artifact_dir / "requests" / f"{run_id}.json"
+    write_json(request_path, request)
+    payload = observation_payload(request, request_hash)
+    status, result, error, process = invoke_durable_case(
+        opaque_label,
+        subject_dir,
+        case,
+        seed,
+        artifact_dir,
+        "record_observation",
+        payload,
+        "observation_recorded",
+        ("observation", "request_hash"),
+    )
+    response = {
+        "protocol_version": "subject-benchmark-v1",
+        "run_id": run_id,
+        "case_id": case["input"]["case_id"],
+        "status": status,
+        "answer": {"kind": result.get("kind"), "observation_hash": sha256_text(canonical_json(result.get("observation")))} if result else None,
+        "confidence": None,
+        "evidence_refs": [
+            f"process://{opaque_label}/{run_id}/{process['pid']}",
+            f"request://{opaque_label}/{run_id}/{request_hash}",
+        ],
+        "tool_calls": [],
+        "authorization_events": [],
+        "budget_usage": {"measured": True, "max_tool_calls": 0, "actual_tool_calls": 0, "within_budget": True},
+        "runtime_events": [
+            {
+                "type": "subject_durable_record_observation_invoked",
+                "pid": process["pid"],
+                "exit_code": process["exit_code"],
+                "request_hash": (result or {}).get("observation", {}).get("request_hash") if result else None,
+            }
+        ],
+        "audit_refs": [f"process://{opaque_label}/{run_id}/{process['pid']}"],
+        "error": error,
+    }
+    record = base_case_record(opaque_label, case, seed, run_id, request, response, status)
+    consumption_evidence = []
+    if (result or {}).get("observation", {}).get("request_hash") == request_hash:
+        consumption_evidence.append({"type": "request_hash_echoed_inside_observation", "request_hash": request_hash})
+    if request_path.exists():
+        consumption_evidence.append({"type": "request_file_written", "path": str(request_path), "request_hash": request_hash})
+    if (result or {}).get("executed_by") == "scripts/execute_durable_task.py":
+        consumption_evidence.append({"type": "subject_runtime_function_executed", "executed_by": result.get("executed_by")})
+    record.update(
+        {
+            "request_hash": request_hash,
+            "support_status": "supported_common",
+            "support_rationale": "all subjects expose provider-free scripts.execute_durable_task record_observation logic",
+            "request_consumption": {"consumed": status == "completed", "evidence": consumption_evidence},
+            "runtime_evidence_refs": response["evidence_refs"],
+            "process": process,
+            "measurements": [
+                {
+                    "measurement_scope": "benchmark_task",
+                    "wall_clock_ms": process["wall_clock_ms"],
+                    "cpu_time_ms": process["cpu_time_ms"],
+                    "peak_rss_kb": process["peak_rss_kb"],
+                }
+            ],
+            "score": score_response(status, response, process),
+            "operation_classification": operation_classification(case["input"]["domain"]),
+            "answer_ownership": {
+                "owned_by_subject": True,
+                "classification": operation_classification(case["input"]["domain"]),
+                "evidence": [
+                    "subject execute_task_logic returned observation_recorded",
+                    "adapter supplied observation payload; this is storage/retrieval primitive compatibility only",
+                ],
+            },
         }
     )
     write_json(artifact_dir / "raw" / f"{run_id}.json", record)
@@ -508,9 +715,9 @@ def score_response(status: str, response: dict[str, Any], process: dict[str, Any
     }
 
 
-def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed: int, artifact_dir: Path) -> dict[str, Any]:
+def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed: int, artifact_dir: Path, campaign_id: str) -> dict[str, Any]:
     domain = case["input"]["domain"]
-    if domain not in COMMON_CORE_DOMAINS:
+    if domain not in common_domains_for_campaign(campaign_id):
         return unsupported_record(
             opaque_label,
             case,
@@ -519,7 +726,7 @@ def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed
             "unsupported_incompatible_contract",
             "no common existing subject-native interface consumes this domain without live providers",
         )
-    if not subject_supports_calibration(subject_dir):
+    if domain == "calibration" and not subject_supports_calibration(subject_dir):
         return unsupported_record(
             opaque_label,
             case,
@@ -528,7 +735,27 @@ def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed
             "unsupported_missing_interface",
             "subject does not expose provider-free durable calibration execution",
         )
-    return invoke_calibration_case(opaque_label, subject_dir, case, seed, artifact_dir)
+    if domain == "calibration":
+        return invoke_calibration_case(opaque_label, subject_dir, case, seed, artifact_dir)
+    if domain == "evidence_evaluation" and not subject_supports_record_observation(subject_dir):
+        return unsupported_record(
+            opaque_label,
+            case,
+            seed,
+            artifact_dir,
+            "unsupported_missing_interface",
+            "subject does not expose provider-free durable record_observation execution",
+        )
+    if domain == "evidence_evaluation":
+        return invoke_observation_case(opaque_label, subject_dir, case, seed, artifact_dir)
+    return unsupported_record(
+        opaque_label,
+        case,
+        seed,
+        artifact_dir,
+        "unsupported_incompatible_contract",
+        "domain is not common-core eligible",
+    )
 
 
 def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
@@ -550,6 +777,9 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         if item["score"].get("resource_use", {}).get("peak_rss_kb") is not None
     ]
     completed_scores = [item for item in case_results if item["status"] == "completed"]
+    completed_capabilities = [item for item in completed_scores if item.get("operation_classification") == "capability_task"]
+    completed_primitives = [item for item in completed_scores if item.get("operation_classification") == "runtime_primitive"]
+    completed_storage = [item for item in completed_scores if item.get("operation_classification") == "storage_retrieval"]
     return {
         "planned": len(case_results),
         "completed": statuses.count("completed"),
@@ -564,7 +794,10 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         "mean_latency_ms": statistics.mean(latencies) if latencies else None,
         "mean_cpu_time_ms": statistics.mean(cpu) if cpu else None,
         "max_peak_rss_kb": max(rss) if rss else None,
-        "measurable_capability": statuses.count("completed") > 0,
+        "completed_capability_tasks": len(completed_capabilities),
+        "completed_runtime_primitives": len(completed_primitives),
+        "completed_storage_retrieval": len(completed_storage),
+        "measurable_capability": len(completed_capabilities) > 0,
     }
 
 
@@ -605,7 +838,7 @@ def compare(left: dict[str, Any], right: dict[str, Any]) -> dict[str, Any]:
         "correctness_delta_completed_common": mean_delta("correctness"),
         "brier_delta_completed_common": mean_delta("brier_score"),
         "budget_compliance_delta_completed_common": mean_delta("budget_compliance"),
-        "capability_delta": "limited_to_calibration_common_core",
+        "capability_delta": "unavailable_no_common_capability_task_domains",
         "critical_regression_count": 0,
     }
 
@@ -628,26 +861,41 @@ def opaque_subjects(baseline: str, raw: str, reconciled: str, campaign: str) -> 
     ]
 
 
-def compatibility_matrix(cases: list[dict[str, Any]], subjects: list[Subject]) -> list[dict[str, Any]]:
+def compatibility_matrix(cases: list[dict[str, Any]], subjects: list[Subject], campaign_id: str) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     for case in cases:
-        status = "supported_common" if case["domain"] in COMMON_CORE_DOMAINS else "unsupported_incompatible_contract"
+        status = "supported_common" if case["domain"] in common_domains_for_campaign(campaign_id) else "unsupported_incompatible_contract"
+        if case["domain"] == "calibration":
+            selected_interface = "scripts.execute_durable_task:calibration"
+            adapter = "durable_calibration_adapter"
+            rationale = "all subjects expose provider-free durable calibration logic"
+            translation = "prompt/seed/request hash translated to calibration Task payload"
+            evidence = ["request_hash_echoed_as_prediction_id", "process evidence"]
+        elif case["domain"] == "evidence_evaluation" and status == "supported_common":
+            selected_interface = "scripts.execute_durable_task:record_observation"
+            adapter = "durable_record_observation_adapter"
+            rationale = "all subjects expose provider-free durable record_observation logic"
+            translation = "prompt/seed/request hash translated to record_observation Task payload"
+            evidence = ["request_hash_echoed_inside_observation", "process evidence"]
+        else:
+            selected_interface = None
+            adapter = "unsupported_adapter"
+            rationale = "no common existing subject-native interface consumes this domain without live providers"
+            translation = None
+            evidence = []
         for subject in subjects:
             records.append(
                 {
                     "case_id": case["input"]["case_id"],
                     "domain": case["domain"],
                     "subject_sha": subject.sha,
-                    "selected_interface": "scripts.execute_durable_task:calibration" if status == "supported_common" else None,
-                    "adapter": "durable_calibration_adapter" if status == "supported_common" else "unsupported_adapter",
+                    "selected_interface": selected_interface if status == "supported_common" else None,
+                    "adapter": adapter,
                     "support_status": status,
-                    "support_rationale": (
-                        "all subjects expose provider-free durable calibration logic"
-                        if status == "supported_common"
-                        else "no common existing subject-native interface consumes this domain without live providers"
-                    ),
-                    "input_translation": "prompt/seed/request hash translated to calibration Task payload" if status == "supported_common" else None,
-                    "expected_runtime_evidence": ["request_hash_echoed_as_prediction_id", "process evidence"] if status == "supported_common" else [],
+                    "operation_classification": operation_classification(case["domain"]) if status == "supported_common" else "unsupported",
+                    "support_rationale": rationale,
+                    "input_translation": translation if status == "supported_common" else None,
+                    "expected_runtime_evidence": evidence if status == "supported_common" else [],
                     "environment_requirements": ["python3.13"],
                 }
             )
@@ -688,6 +936,44 @@ def adapter_bundle_hash() -> str:
     return sha256_text(canonical_json(material))
 
 
+def locked_dependency_hashes() -> dict[str, str | None]:
+    paths = [
+        "requirements/requirements.lock.txt",
+        "backend/package-lock.json",
+        "frontend/package-lock.json",
+    ]
+    return {path: sha256_file(ROOT / path) if (ROOT / path).exists() else None for path in paths}
+
+
+def environment_hash() -> str:
+    material = {
+        "python": sys.version,
+        "platform": sys.platform,
+        "dependency_hashes": locked_dependency_hashes(),
+    }
+    return sha256_text(canonical_json(material))
+
+
+def payload_manifest_hash(campaign_dir: Path) -> str:
+    files = []
+    for path in sorted((campaign_dir / "runs").glob("**/*.json")) + sorted((campaign_dir / "comparisons").glob("**/*.json")):
+        files.append({"path": str(path.relative_to(campaign_dir)), "sha256": sha256_file(path)})
+    return sha256_text(canonical_json(files))
+
+
+def freeze_manifest_path(campaign_id: str) -> Path:
+    return DOCS / ("SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json" if is_v2_campaign(campaign_id) else "SUBJECT_ADAPTER_FREEZE_MANIFEST.json")
+
+
+def load_freeze_manifest(campaign_id: str) -> dict[str, Any]:
+    path = freeze_manifest_path(campaign_id)
+    if not path.exists():
+        if is_v2_campaign(campaign_id):
+            raise SystemExit(f"MISSING_V2_FREEZE_MANIFEST:{path}")
+        return {}
+    return json.loads(path.read_text())
+
+
 def write_results_and_decision(
     campaign_id: str,
     manifest: dict[str, Any],
@@ -702,13 +988,21 @@ def write_results_and_decision(
         "timeout": sum(result["aggregate"]["timeout"] for result in results.values()),
         "unsupported": sum(result["aggregate"]["unsupported"] for result in results.values()),
     }
+    result_stem = "SUBJECT_NATIVE_CROSS_VERSION_V2" if is_v2_campaign(campaign_id) else "SUBJECT_NATIVE_CROSS_VERSION"
+    completed_by_classification: dict[str, int] = {}
+    for result in results.values():
+        for item in result["case_results"]:
+            if item.get("status") == "completed":
+                key = item.get("operation_classification", "unknown")
+                completed_by_classification[key] = completed_by_classification.get(key, 0) + 1
     results_doc = {
         "campaign_id": campaign_id,
         "compatibility_matrix_hash": compatibility_hash,
         "thresholds": MIN_VALIDITY_THRESHOLDS,
         "threshold_result": "not_met",
-        "reason": "only calibration currently has a common subject-native provider-free interface across all immutable subjects",
+        "reason": "common subject-native support is limited to runtime primitives/storage operations, not broad capability tasks",
         "totals": totals,
+        "completed_by_operation_classification": completed_by_classification,
         "subjects": {
             label: {
                 "sha": result["sha"],
@@ -720,9 +1014,9 @@ def write_results_and_decision(
         },
         "comparisons": comparisons,
     }
-    write_json(DOCS / "SUBJECT_NATIVE_CROSS_VERSION_RESULTS.json", results_doc)
+    write_json(DOCS / f"{result_stem}_RESULTS.json", results_doc)
     lines = [
-        "# Subject-Native Cross-Version Results",
+        "# Subject-Native Cross-Version V2 Results" if is_v2_campaign(campaign_id) else "# Subject-Native Cross-Version Results",
         "",
         f"Campaign: `{campaign_id}`",
         "",
@@ -734,9 +1028,9 @@ def write_results_and_decision(
         f"- Timeout executions: {totals['timeout']}",
         f"- Unsupported executions: {totals['unsupported']}",
         "",
-        "Minimum validity thresholds were not met. The evidence is limited to the provider-free calibration common core.",
+        "Minimum validity thresholds were not met. Completed operations are compatibility primitives/controls, not broad capability tasks.",
     ]
-    write_text(DOCS / "SUBJECT_NATIVE_CROSS_VERSION_RESULTS.md", "\n".join(lines) + "\n")
+    write_text(DOCS / f"{result_stem}_RESULTS.md", "\n".join(lines) + "\n")
     decision = {
         "campaign_id": campaign_id,
         "decision": "HOLD_FOR_MORE_EVIDENCE",
@@ -745,16 +1039,18 @@ def write_results_and_decision(
         "promotion_blockers": [
             "minimum common-core domain threshold not met",
             "minimum common-core validation/hidden case threshold not met",
+            "minimum common capability-task domain threshold not met",
             "memory, governance, recovery and live-provider domains remain unsupported through common immutable interfaces",
         ],
         "critical_regressions": [],
         "scheduled_observation_count": 0,
         "hosted_staging": "BLOCKED",
     }
-    write_json(DOCS / "SUBJECT_NATIVE_CROSS_VERSION_DECISION.json", decision)
+    write_json(DOCS / f"{result_stem}_DECISION.json", decision)
     write_text(
-        DOCS / "SUBJECT_NATIVE_CROSS_VERSION_DECISION.md",
-        "# Subject-Native Cross-Version Decision\n\n"
+        DOCS / f"{result_stem}_DECISION.md",
+        ("# Subject-Native Cross-Version V2 Decision\n\n" if is_v2_campaign(campaign_id) else "# Subject-Native Cross-Version Decision\n\n")
+        +
         "Decision: `HOLD_FOR_MORE_EVIDENCE`\n\n"
         "External approval remains `PENDING_EXTERNAL_REVIEW`. No promotion, deployment, merge, or PR readiness action is authorized by this evidence.\n",
     )
@@ -790,22 +1086,24 @@ def main() -> int:
             if git("status", "--short", cwd=subject_dir):
                 raise SystemExit(f"DIRTY_SUBJECT_WORKTREE:{subject.opaque_label}")
         inventory = subject_interface_inventory(subjects, subject_dirs)
-        compatibility = compatibility_matrix(cases, subjects)
+        compatibility = compatibility_matrix(cases, subjects, args.campaign)
         write_inventory_docs(inventory)
         compatibility_hash = write_compatibility_docs(compatibility)
-        write_json(
-            DOCS / "SUBJECT_ADAPTER_FREEZE_MANIFEST.json",
-            {
-                "adapter_freeze_commit": git("rev-parse", "HEAD"),
-                "adapter_files": sorted(str(path.relative_to(ROOT)) for path in (ROOT / "cross_version_adapters").glob("*.py"))
-                + ["scripts/run_subject_native_cross_version_campaign.py"],
-                "adapter_bundle_hash": adapter_bundle_hash(),
-                "compatibility_matrix_hash": compatibility_hash,
-                "benchmark_registry_hash": EXPECTED_REGISTRY_HASH,
-                "evaluator_version": EVALUATOR_VERSION,
-                "validation_hidden_not_used_for_adapter_development": True,
-            },
-        )
+        if not is_v2_campaign(args.campaign):
+            write_json(
+                DOCS / "SUBJECT_ADAPTER_FREEZE_MANIFEST.json",
+                {
+                    "adapter_freeze_commit": git("rev-parse", "HEAD"),
+                    "adapter_files": sorted(str(path.relative_to(ROOT)) for path in (ROOT / "cross_version_adapters").glob("*.py"))
+                    + ["scripts/run_subject_native_cross_version_campaign.py"],
+                    "adapter_bundle_hash": adapter_bundle_hash(),
+                    "compatibility_matrix_hash": compatibility_hash,
+                    "benchmark_registry_hash": EXPECTED_REGISTRY_HASH,
+                    "evaluator_version": EVALUATOR_VERSION,
+                    "validation_hidden_not_used_for_adapter_development": True,
+                },
+            )
+        freeze_manifest = load_freeze_manifest(args.campaign)
         write_json(
             ARTIFACT_ROOT / "adapter-development-v1" / "ADAPTER_DEVELOPMENT_ATTEMPTS.json",
             {
@@ -819,7 +1117,7 @@ def main() -> int:
             subject_dir = subject_dirs[subject.opaque_label]
             health = subject_health(subject.opaque_label, subject_dir)
             artifact_dir = campaign_dir / "runs" / subject.opaque_label
-            case_results = [invoke_case(subject.opaque_label, subject_dir, case, seed, artifact_dir) for seed in SEEDS for case in cases]
+            case_results = [invoke_case(subject.opaque_label, subject_dir, case, seed, artifact_dir, args.campaign) for seed in SEEDS for case in cases]
             result = {
                 "opaque_subject": subject.opaque_label,
                 "sha": subject.sha,
@@ -841,23 +1139,51 @@ def main() -> int:
         "a_vs_c": compare(by_public["version-a"], by_public["version-c"]),
         "b_vs_c": compare(by_public["version-b"], by_public["version-c"]),
     }
+    write_json(campaign_dir / "comparisons" / "comparisons.json", comparisons)
+    internal_payload_hash = payload_manifest_hash(campaign_dir)
     sealed_mapping = {subject.opaque_label: {"public_label": subject.public_label, "sha": subject.sha} for subject in subjects}
+    execution_sha = git("rev-parse", "HEAD")
+    workflow_head_sha = os.getenv("EXPECTED_AUDIT_SHA") or execution_sha
+    totals = {
+        "planned": sum(result["aggregate"]["planned"] for result in results_by_opaque.values()),
+        "completed": sum(result["aggregate"]["completed"] for result in results_by_opaque.values()),
+        "failed": sum(result["aggregate"]["failed"] for result in results_by_opaque.values()),
+        "timeout": sum(result["aggregate"]["timeout"] for result in results_by_opaque.values()),
+        "unsupported": sum(result["aggregate"]["unsupported"] for result in results_by_opaque.values()),
+    }
     manifest = {
         "campaign_id": args.campaign,
-        "control_manifest_version": "subject-native-cross-version-campaign-v1",
+        "control_manifest_version": "subject-native-cross-version-campaign-v2" if is_v2_campaign(args.campaign) else "subject-native-cross-version-campaign-v1",
+        "campaign_execution_sha": execution_sha,
+        "workflow_head_sha": workflow_head_sha,
+        "adapter_freeze_sha": freeze_manifest.get("adapter_freeze_commit"),
+        "adapter_freeze_tree_hash": freeze_manifest.get("adapter_freeze_tree_hash"),
         "created_at": start,
         "completed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "benchmark_registry_hash": registry["registry_hash"],
         "evaluator_version": EVALUATOR_VERSION,
         "evaluator_code_hash": sha256_file(ROOT / "scripts" / "run_subject_native_cross_version_campaign.py"),
+        "environment_hash": environment_hash(),
+        "locked_dependency_hashes": locked_dependency_hashes(),
         "seeds": SEEDS,
         "splits": sorted(splits),
         "case_count_per_seed": len(cases),
         "planned_case_executions": len(cases) * len(SEEDS) * len(subjects),
-        "common_core_domains": sorted(COMMON_CORE_DOMAINS),
+        "completed_count": totals["completed"],
+        "failed_count": totals["failed"],
+        "timeout_count": totals["timeout"],
+        "unsupported_count": totals["unsupported"],
+        "common_core_coverage": {
+            "domains": sorted(common_domains_for_campaign(args.campaign)),
+            "supported_common_domains": len(common_domains_for_campaign(args.campaign)),
+            "common_capability_task_domains": 0,
+        },
+        "common_core_domains": sorted(common_domains_for_campaign(args.campaign)),
         "minimum_validity_thresholds": MIN_VALIDITY_THRESHOLDS,
         "compatibility_matrix_hash": compatibility_hash,
         "adapter_bundle_hash": adapter_bundle_hash(),
+        "internal_payload_manifest_hash": internal_payload_hash,
+        "decision_reference": str(DOCS / (("SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json" if is_v2_campaign(args.campaign) else "SUBJECT_NATIVE_CROSS_VERSION_DECISION.json"))),
         "thresholds_met": False,
         "blinding": {
             "blinding_seed_hash": sha256_text(blinding_seed),
@@ -885,7 +1211,6 @@ def main() -> int:
     write_results_and_decision(args.campaign, manifest, results_by_opaque, comparisons, compatibility_hash)
     manifest.pop("subjects_by_public")
     write_json(campaign_dir / "CONTROL_MANIFEST.json", manifest)
-    write_json(campaign_dir / "comparisons" / "comparisons.json", comparisons)
     print(
         canonical_json(
             {

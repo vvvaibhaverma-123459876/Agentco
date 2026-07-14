@@ -23,7 +23,7 @@ def validate(campaign_dir: Path, baseline: str, raw: str, reconciled: str) -> li
         return ["MISSING_CONTROL_MANIFEST"]
     manifest = load(manifest_path)
     campaign_version = manifest.get("control_manifest_version")
-    if campaign_version not in {"real-cross-version-campaign-v1", "subject-native-cross-version-campaign-v1"}:
+    if campaign_version not in {"real-cross-version-campaign-v1", "subject-native-cross-version-campaign-v1", "subject-native-cross-version-campaign-v2"}:
         errors.append("SYNTHETIC_OR_UNKNOWN_CAMPAIGN_MANIFEST")
     if manifest.get("methodology") not in {
         "subject_process_invocation_no_synthetic_outputs",

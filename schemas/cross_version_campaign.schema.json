@@ -18,7 +18,8 @@
     "control_manifest_version": {
       "enum": [
         "real-cross-version-campaign-v1",
-        "subject-native-cross-version-campaign-v1"
+        "subject-native-cross-version-campaign-v1",
+        "subject-native-cross-version-campaign-v2"
       ]
     },
     "methodology": {
@@ -56,5 +57,15 @@
     "thresholds_met": { "type": "boolean" },
     "compatibility_matrix_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "adapter_bundle_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    ,
+    "campaign_execution_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "workflow_head_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "adapter_freeze_sha": { "type": ["string", "null"] },
+    "adapter_freeze_tree_hash": { "type": ["string", "null"] },
+    "internal_payload_manifest_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "completed_count": { "type": "integer", "minimum": 0 },
+    "failed_count": { "type": "integer", "minimum": 0 },
+    "timeout_count": { "type": "integer", "minimum": 0 },
+    "unsupported_count": { "type": "integer", "minimum": 0 }
   }
 }
