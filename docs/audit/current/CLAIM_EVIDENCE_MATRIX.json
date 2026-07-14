@@ -29,7 +29,7 @@
       "claim": "Longitudinal mission evidence foundation exists",
       "cross_seed": true,
       "cross_version": false,
-      "evidence": "initial-foundation-v1 five-seed deterministic campaign, registry 3a1c54f4e54c3f2d7df0b0720dff5112d8179ae4f79fe7f95d2cd0bc2f322d1e",
+      "evidence": "initial-foundation-v1 five-seed deterministic campaign; same-day local evidence only",
       "evidence_level": "repeated_same_version",
       "hosted": false,
       "independent_review": false,
@@ -38,5 +38,5 @@
       "status": "verified_with_limitations"
     }
   ],
-  "source_input_hash": "b75da379fe095e8f04a7e981e497eddae2850565ba01de857d03becd3adb4db6"
+  "source_input_hash": "b939546f73128bed0da96f74859eee503a95dc9259e818837f33130c12ec16c0"
 }

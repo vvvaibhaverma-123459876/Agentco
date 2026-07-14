@@ -770,7 +770,7 @@ def update_claim_matrix(registry: dict[str, Any]) -> None:
     claims.append(
         {
             "claim": "Longitudinal mission evidence foundation exists",
-            "evidence": f"{CAMPAIGN_ID} five-seed deterministic campaign, registry {registry['registry_hash']}",
+            "evidence": f"{CAMPAIGN_ID} five-seed deterministic campaign; same-day local evidence only",
             "evidence_level": "repeated_same_version",
             "status": "verified_with_limitations",
             "repeated_same_version": True,
@@ -785,10 +785,17 @@ def update_claim_matrix(registry: dict[str, Any]) -> None:
     existing["claims"] = claims
     existing["source_input_hash"] = sha256_json({"claims": claims})
     write_json(path, existing)
+    rows = "\n".join(
+        f"| {item['claim']} | {item.get('evidence_level')} | {item.get('status')} | {item.get('evidence')} |"
+        for item in claims
+    )
     write_md(
         DOCS / "CLAIM_EVIDENCE_MATRIX.md",
         "# Claim Evidence Matrix\n\n"
-        + "\n".join(f"- {item['claim']}: `{item.get('status')}` / `{item.get('evidence_level')}`" for item in claims),
+        f"Tracked structural snapshot input hash `{existing['source_input_hash']}`.\n\n"
+        "| claim | evidence_level | status | evidence |\n"
+        "| --- | --- | --- | --- |\n"
+        f"{rows}\n",
     )
 
 
