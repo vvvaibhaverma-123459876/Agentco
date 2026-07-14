@@ -2743,7 +2743,7 @@
       "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
       "content_hash": "a0232191fa205f66aaf1d446c75b157afd58ee5dcea5ece3416aa1d0b1363240",
       "filename": "140_governed_capability_runtime.sql",
-      "origin_commit": "unknown",
+      "origin_commit": "8c0e4e9874cfb7652989724123a6110ea5313369",
       "rollback_classification": "forward_fix_required",
       "schema_objects_created": [
         "idx_capability_attempts_request_id",
