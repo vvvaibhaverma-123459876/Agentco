@@ -5,6 +5,7 @@ import { eventLog } from './event-log.service';
 import { civilizationKernel } from './civilization-kernel.service';
 import { governanceService } from './governance.service';
 import { killSwitchService } from './kill-switch.service';
+import { civilizationMetrics } from './civilization-metrics.service';
 import { PublicHttpError } from '../http-errors';
 
 /**
@@ -320,6 +321,12 @@ export class CivilizationOsService {
          JSON.stringify(status), INSTANCE, event.id]
       );
       await client.query('COMMIT');
+      civilizationMetrics.recordTick({
+        was_leader: input.was_leader,
+        reservations_expired: input.reservations_expired ?? 0,
+        heartbeat_epoch: Math.floor(new Date(event.occurred_at ?? Date.now()).getTime() / 1000) || Math.floor(Date.now() / 1000),
+        status,
+      });
       return {
         tick_number: tickNumber, was_leader: input.was_leader, mode: input.mode,
         work_sourced: input.work_sourced ?? 0, work_routed: input.work_routed ?? 0,

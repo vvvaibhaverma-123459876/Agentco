@@ -1,0 +1,71 @@
+{{- if and .Values.backend.enabled .Values.backend.civilizationScheduler.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "agentco.fullname" . }}-civilization-scheduler
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "agentco.labels" . | nindent 4 }}
+    app.kubernetes.io/component: civilization-scheduler
+spec:
+  # Single logical scheduler; the OS tick holds a Postgres advisory lock, so
+  # extra replicas are safe (only one ticks) but one is sufficient.
+  replicas: {{ .Values.backend.civilizationScheduler.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "agentco.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: civilization-scheduler
+  template:
+    metadata:
+      labels:
+        {{- include "agentco.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: civilization-scheduler
+        {{- with .Values.global.commonLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        checksum/config: {{ include "agentco.configChecksum" . | sha256sum }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "agentco.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.backend.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: civilization-scheduler
+          image: "{{ .Values.global.image.registry }}/{{ trimPrefix (printf "%s/" .Values.global.image.registry) .Values.backend.image.repository }}:{{ .Values.backend.image.tag | default .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy | default .Values.global.image.pullPolicy }}
+          command: ["node", "dist/workers/civilization-scheduler-worker.js"]
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.backend.env.NODE_ENV | quote }}
+            - name: LOG_LEVEL
+              value: {{ .Values.backend.env.LOG_LEVEL | quote }}
+            - name: CIVILIZATION_OS_POLL_MS
+              value: {{ .Values.backend.civilizationScheduler.pollMs | quote }}
+            - name: CIVILIZATION_OS_WORKER_ID
+              value: {{ include "agentco.fullname" . }}-civilization-scheduler
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: DATABASE_URL
+            - name: KAFKA_BROKERS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backend.existingSecret }}
+                  key: KAFKA_BROKERS
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.backend.containerSecurityContext | nindent 12 }}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+{{- end }}
