@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 99 |
-| AUTH-WRITE | 163 |
-| TOTAL | 266 |
+| AUTH-READ | 102 |
+| AUTH-WRITE | 165 |
+| TOTAL | 271 |
 
 ## Matrix
 
@@ -177,6 +177,11 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/kernel/emergency/expire-sweep` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel/objectives/:objectiveId/status` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel/root` | GET/HEAD | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/knowledge` | GET/HEAD | Collective knowledge provenance/retraction/view state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/knowledge/provenance` | POST | Collective knowledge provenance/retraction/view state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/knowledge/retract` | POST | Collective knowledge provenance/retraction/view state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/knowledge/retractions/:retractionId` | GET/HEAD | Collective knowledge provenance/retraction/view state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/knowledge/status/:type/:id` | GET/HEAD | Collective knowledge provenance/retraction/view state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/mission-tasks/:taskId/attempts` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions/:missionId` | GET/HEAD | Mission/goal/workstream/task/attestation state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |

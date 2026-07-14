@@ -341,23 +341,32 @@ phases:
           - 'route sensitivity matrix 253->266'
         notes: 13 routes classified. Scenario D proves rulings alter real runtime state (treasury debit) and appeals route to an independent authority. Full regression green 2026-07-14 — exit 0; 109 suites passed/3 skipped; 804 passed/8 skipped/5 todo.
   C9_epistemics:
-    status: not_started
+    status: verified
     items:
       - id: C9.RetractionPropagation
         layer: C9
-        status: not_started
+        status: verified
         depends_on: [C0.CanonicalPathSelection]
-        notes: retraction propagates to dependent claims/memories/decisions (builds on contradictions_and_demotions migration 118).
+        migration_artifacts: [backend/src/db/migrations/137_collective_epistemics.sql]
+        source_artifacts: [backend/src/services/collective-knowledge.service.ts]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 137_collective_epistemics.sql, exit 0'
+        notes: knowledge_provenance_edges + knowledge_retractions + retraction_propagations + decision_retraction_flags (append-only). retract() does BFS over the provenance graph plus auto-discovery of claim dependents via support_source_ids; marks claims retracted, demotes memories through the existing memory_demotions, flags decisions. Builds on migration 118 contradictions/demotions.
       - id: C9.CivilizationKnowledgeViews
         layer: C9
-        status: not_started
+        status: verified
         depends_on: [C1.CivilizationKernelService]
-        notes: civilization/institution knowledge projections; retrieval returns provenance + trust context.
+        notes: civilizationKnowledge() returns supported non-retracted claims + non-demoted non-superseded promoted memories, each joined to the latest non-downgraded (subject, domain) trust window for trust context; demoted memories drop out of the view.
       - id: C9.EpistemicsNegativeSuite
         layer: C9
-        status: not_started
+        status: verified
         depends_on: [C9.RetractionPropagation]
-        notes: verify existing gates (unsupported→verified memory blocked; same-source resolution rejected; fixture evidence blocked in production) + close gaps.
+        test_artifacts: [backend/tests/collective-knowledge.test.ts]
+        verification_commands:
+          - 'npx jest tests/collective-knowledge.test.ts --runInBand --forceExit -> 4/4 passed'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'route sensitivity matrix 266->271'
+        notes: New tests cover transitive retraction, immutability, trust-context views, self-edge rejection. Pre-existing epistemic gates remain covered by claim-grounding/source-independence/evidence-kernel suites (unsupported->verified memory blocked, same-source resolution rejected, fixture evidence blocked) — all still green in full regression. 5 routes classified. Full regression green 2026-07-14 — exit 0; 110 suites passed/3 skipped; 813 passed/8 skipped/5 todo.
   C10_learning:
     status: not_started
     items:
@@ -483,10 +492,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 39
+  verified: 42
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 25
+  not_started: 22
   blocked: 0
   last_recomputed: '2026-07-14'
