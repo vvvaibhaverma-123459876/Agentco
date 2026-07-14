@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1831`
+- Tracked files: `1843`
 
 ## Category Counts
 
@@ -11,8 +11,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 137 |
 | Deployment infrastructure | 30 |
 | Deprecated code | 48 |
-| Development tooling | 133 |
-| Documentation | 398 |
+| Development tooling | 135 |
+| Documentation | 408 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 480 |
@@ -25,9 +25,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 488 |
-| `docs` | 326 |
+| `docs` | 336 |
 | `evals` | 180 |
-| `scripts` | 145 |
+| `scripts` | 147 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
@@ -1066,6 +1066,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/CLAIM_EVIDENCE_MATRIX.md` | Documentation |
 | `docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.json` | Documentation |
 | `docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.md` | Documentation |
 | `docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.json` | Documentation |
 | `docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.md` | Documentation |
 | `docs/audit/current/CROSS_VERSION_DECISION.json` | Documentation |
@@ -1136,6 +1138,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_06A_LONGITUDINAL_REMOTE_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_06_LONGITUDINAL_MISSION_EVIDENCE_FOUNDATION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
@@ -1144,7 +1147,14 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
+| `docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md` | Documentation |
+| `docs/audit/current/SUBJECT_INTERFACE_INVENTORY.json` | Documentation |
+| `docs/audit/current/SUBJECT_INTERFACE_INVENTORY.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/PLAN_AND_PROGRESS.md` | Documentation |
@@ -1778,6 +1788,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_pawdent_business_simulation.py` | Development tooling |
 | `scripts/run_real_world_validation.py` | Development tooling |
 | `scripts/run_staging_validation_gate.sh` | Development tooling |
+| `scripts/run_subject_native_cross_version_campaign.py` | Development tooling |
 | `scripts/scan_committed_secrets.py` | Development tooling |
 | `scripts/setup_release_gate_role.sql` | Development tooling |
 | `scripts/smoke_frontend_auth.sh` | Development tooling |
@@ -1845,6 +1856,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_pytest_skips.py` | Development tooling |
 | `scripts/verify_release_gates.py` | Development tooling |
 | `scripts/verify_resolution_service.py` | Development tooling |
+| `scripts/verify_subject_request_consumption.py` | Development tooling |
 | `scripts/verify_subject_runtime_evidence.py` | Development tooling |
 | `scripts/wait_for_postgres.sh` | Development tooling |
 | `scripts/web_scraper_free.py` | Development tooling |

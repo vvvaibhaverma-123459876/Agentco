@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1831,
+  "tracked_file_count": 1843,
   "category_counts": {
     "Database migration": 137,
     "Deployment infrastructure": 30,
     "Deprecated code": 48,
-    "Development tooling": 133,
-    "Documentation": 398,
+    "Development tooling": 135,
+    "Documentation": 408,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 480,
@@ -16,9 +16,9 @@
   },
   "top_level_counts": {
     "backend": 488,
-    "docs": 326,
+    "docs": 336,
     "evals": 180,
-    "scripts": 145,
+    "scripts": 147,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
@@ -80,10 +80,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 570,
-    ".md": 425,
+    ".py": 572,
+    ".md": 430,
     ".ts": 325,
-    ".json": 170,
+    ".json": 175,
     ".sql": 138,
     ".jsonl": 40,
     ".csv": 38,
@@ -5953,6 +5953,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6373,6 +6385,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -6421,7 +6439,49 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_INTERFACE_INVENTORY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_INTERFACE_INVENTORY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -10225,6 +10285,12 @@
       "extension": ".sh"
     },
     {
+      "path": "scripts/run_subject_native_cross_version_campaign.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/scan_committed_secrets.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10622,6 +10688,12 @@
     },
     {
       "path": "scripts/verify_resolution_service.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_subject_request_consumption.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
