@@ -10,8 +10,11 @@ on:
       - "schemas/cross_version_campaign.schema.json"
       - "scripts/run_cross_version_campaign.py"
       - "scripts/verify_cross_version_campaign.py"
+      - "scripts/verify_cross_version_harness_independence.py"
+      - "scripts/verify_subject_runtime_evidence.py"
       - "scripts/compare_cross_version_campaign.py"
       - "scripts/verify_migration_identity.py"
+      - "cross_version_adapters/**"
       - "tests/test_cross_version_campaign.py"
       - "docs/audit/current/*CROSS_VERSION*"
       - "docs/audit/current/*CIVILIZATION*"
@@ -31,7 +34,7 @@ on:
       campaign:
         description: "Cross-version campaign ID"
         required: true
-        default: "cross-version-civilization-v1"
+        default: "real-cross-version-civilization-v1"
 
 permissions:
   contents: read
@@ -50,7 +53,7 @@ jobs:
       BASELINE: ${{ github.event.inputs.baseline || 'fb27dc0529d3c5d11480503bfbcf6f2d156f5b04' }}
       RAW_CANDIDATE: ${{ github.event.inputs.raw_candidate || '651794a41513db1e40930f08c253ef261af7c1e7' }}
       RECONCILED_CANDIDATE: ${{ github.event.inputs.reconciled_candidate || github.event.pull_request.head.sha || github.sha }}
-      CAMPAIGN: ${{ github.event.inputs.campaign || 'cross-version-civilization-v1' }}
+      CAMPAIGN: ${{ github.event.inputs.campaign || 'real-cross-version-civilization-v1' }}
     steps:
       - name: Checkout exact branch head
         uses: actions/checkout@v4
@@ -77,13 +80,16 @@ jobs:
       - name: Validate migration identity contracts
         run: python3.13 scripts/verify_migration_identity.py --check
 
+      - name: Validate harness independence
+        run: python3.13 scripts/verify_cross_version_harness_independence.py --check
+
       - name: Run cross-version protocol tests
         run: python3.13 -m pytest tests/test_cross_version_campaign.py -q
 
-      - name: Run full paired campaign on manual dispatch
+      - name: Run real paired campaign on manual dispatch
         if: github.event_name == 'workflow_dispatch'
         run: >-
-          make cross-version-campaign
+          make real-cross-version-campaign
           BASELINE="$BASELINE"
           RAW_CANDIDATE="$RAW_CANDIDATE"
           RECONCILED_CANDIDATE="$RECONCILED_CANDIDATE"

@@ -14,6 +14,21 @@
       "regression_test": "python3.13 scripts/verify_migration_identity.py --check",
       "status": "resolved_in_version_c",
       "remaining_risk": "Legacy rows with null content_hash are backfilled only when Version C migration runner is executed."
+    },
+    {
+      "finding_id": "CVF-002",
+      "severity": "S1",
+      "subject_version": "all",
+      "component": "cross-version campaign harness",
+      "domain": "evidence integrity",
+      "evidence": "Batch 07 deterministic_output() produced answers from subject labels and feature flags rather than subject-native runtime behavior.",
+      "reproduction": "Inspect scripts/run_cross_version_campaign.py at f7fabf28b6c992080c1bacee44e533db275c501a.",
+      "root_cause": "The first harness was a measurement scaffold but was incorrectly reported as behavioral paired evidence.",
+      "impact": "Unsupported Version C promotion proposal could have been created from synthetic evidence.",
+      "remediation": "Batch 07B invalidates the old campaign and replaces it with real subject process invocation and runtime-origin evidence checks.",
+      "regression_test": "python3.13 scripts/verify_cross_version_harness_independence.py --check",
+      "status": "resolved_in_07b_harness",
+      "remaining_risk": "Immutable subjects currently lack subject-benchmark-v1, so corrected behavioral capability remains unsupported rather than positive."
     }
   ]
 }

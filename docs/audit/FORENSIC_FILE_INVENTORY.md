@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1812`
+- Tracked files: `1831`
 
 ## Category Counts
 
@@ -11,23 +11,23 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 137 |
 | Deployment infrastructure | 30 |
 | Deprecated code | 48 |
-| Development tooling | 131 |
-| Documentation | 392 |
+| Development tooling | 133 |
+| Documentation | 398 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 480 |
 | Prompt/template | 29 |
 | Test infrastructure | 277 |
-| Unknown purpose | 36 |
+| Unknown purpose | 47 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 488 |
-| `docs` | 320 |
+| `docs` | 326 |
 | `evals` | 180 |
-| `scripts` | 143 |
+| `scripts` | 145 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
@@ -44,11 +44,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `autonomy` | 13 |
 | `learning` | 13 |
 | `synthesis` | 10 |
+| `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
 | `.github` | 8 |
+| `schemas` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
-| `schemas` | 3 |
 | `agentco_security` | 2 |
 | `benchmarks` | 2 |
 | `dashboard` | 2 |
@@ -926,6 +927,15 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `civilization/services/review_service.py` | Production runtime code |
 | `civilization/services/structured_logger.py` | Production runtime code |
 | `conftest.py` | Unknown purpose |
+| `cross_version_adapters/__init__.py` | Unknown purpose |
+| `cross_version_adapters/backend_runtime_adapter.py` | Unknown purpose |
+| `cross_version_adapters/base.py` | Unknown purpose |
+| `cross_version_adapters/data_analysis_adapter.py` | Unknown purpose |
+| `cross_version_adapters/governance_adapter.py` | Unknown purpose |
+| `cross_version_adapters/memory_adapter.py` | Unknown purpose |
+| `cross_version_adapters/python_agent_adapter.py` | Unknown purpose |
+| `cross_version_adapters/recovery_adapter.py` | Unknown purpose |
+| `cross_version_adapters/unsupported_adapter.py` | Unknown purpose |
 | `dashboard/src/app/calibration/page.tsx` | Production runtime code |
 | `dashboard/src/types/calibration.ts` | Production runtime code |
 | `data/external/bike_sharing/bike_sharing_dataset.zip` | Generated artifact |
@@ -1041,6 +1051,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BASELINE_COMMAND_RESULTS.json` | Documentation |
 | `docs/audit/current/BASELINE_EXECUTION_REPORT.md` | Documentation |
 | `docs/audit/current/BASELINE_FINDINGS.json` | Documentation |
+| `docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.json` | Documentation |
+| `docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |
@@ -1113,6 +1125,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/MISSION_CLAIM_DECOMPOSITION.md` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
+| `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
+| `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
@@ -1121,6 +1135,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md` | Documentation |
 | `docs/audit/current/REMEDIATION_06A_LONGITUDINAL_REMOTE_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_06_LONGITUDINAL_MISSION_EVIDENCE_FOUNDATION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
@@ -1129,6 +1144,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
+| `docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/PLAN_AND_PROGRESS.md` | Documentation |
@@ -1685,6 +1701,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `schemas/cross_version_campaign.schema.json` | Unknown purpose |
 | `schemas/longitudinal_history.schema.json` | Unknown purpose |
 | `schemas/longitudinal_run_manifest.schema.json` | Unknown purpose |
+| `schemas/subject_benchmark_request.schema.json` | Unknown purpose |
+| `schemas/subject_benchmark_response.schema.json` | Unknown purpose |
 | `scripts/agentco_evolution_test.py` | Development tooling |
 | `scripts/agentco_integration_audit.py` | Development tooling |
 | `scripts/aggregate_longitudinal_history.py` | Development tooling |
@@ -1807,6 +1825,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_benchmark_governance.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_cross_version_campaign.py` | Development tooling |
+| `scripts/verify_cross_version_harness_independence.py` | Development tooling |
 | `scripts/verify_docker_startup.py` | Development tooling |
 | `scripts/verify_execution_ledger.py` | Development tooling |
 | `scripts/verify_gate_integrity.py` | Development tooling |
@@ -1826,6 +1845,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_pytest_skips.py` | Development tooling |
 | `scripts/verify_release_gates.py` | Development tooling |
 | `scripts/verify_resolution_service.py` | Development tooling |
+| `scripts/verify_subject_runtime_evidence.py` | Development tooling |
 | `scripts/wait_for_postgres.sh` | Development tooling |
 | `scripts/web_scraper_free.py` | Development tooling |
 | `self_modification/__init__.py` | Production runtime code |

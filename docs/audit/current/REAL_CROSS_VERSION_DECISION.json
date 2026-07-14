@@ -1,0 +1,41 @@
+{
+  "decision_version": "real-cross-version-decision-v1",
+  "campaign_id": "real-cross-version-civilization-v1",
+  "decision": "HOLD_FOR_MORE_EVIDENCE",
+  "automatic_promotion": false,
+  "promotion_proposal_valid": false,
+  "external_approval_status": "PENDING_EXTERNAL_REVIEW",
+  "reason": "All 360 planned case executions invoked immutable subject processes, but every benchmark case was unsupported because the subjects do not expose subject-benchmark-v1.",
+  "subjects": {
+    "version-a": {
+      "sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "health": "healthy_with_limitations",
+      "completed": 0,
+      "unsupported": 120,
+      "failed": 0,
+      "timeout": 0
+    },
+    "version-b": {
+      "sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "health": "healthy_with_limitations",
+      "completed": 0,
+      "unsupported": 120,
+      "failed": 0,
+      "timeout": 0
+    },
+    "version-c": {
+      "sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "health": "healthy",
+      "completed": 0,
+      "unsupported": 120,
+      "failed": 0,
+      "timeout": 0
+    }
+  },
+  "blocking_conditions": [
+    "No subject produced a completed subject-benchmark-v1 response.",
+    "No capability delta can be inferred from unsupported cases.",
+    "Independent external approval remains pending."
+  ],
+  "self_approval": false
+}

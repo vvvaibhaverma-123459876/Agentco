@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentco.local/schemas/subject_benchmark_request.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "run_id", "case_id", "domain", "prompt", "seed", "budget", "tool_allowlist", "timeout_seconds"],
+  "properties": {
+    "protocol_version": { "const": "subject-benchmark-v1" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "case_id": { "type": "string", "minLength": 1 },
+    "domain": { "type": "string", "minLength": 1 },
+    "prompt": { "type": "string", "minLength": 1 },
+    "seed": { "type": "integer" },
+    "budget": { "type": "object" },
+    "tool_allowlist": { "type": "array", "items": { "type": "string" } },
+    "timeout_seconds": { "type": "number", "exclusiveMinimum": 0 }
+  }
+}

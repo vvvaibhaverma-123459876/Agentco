@@ -485,7 +485,7 @@ autonomy-open-world-5min:
 # runs migrations from zero, records command evidence, and cleans up all owned
 # resources. Live LLM/web suites are opt-in elsewhere.
 # ---------------------------------------------------------------------------
-.PHONY: verify-clean-room audit-clean-room cross-version-campaign
+.PHONY: verify-clean-room audit-clean-room cross-version-campaign real-cross-version-campaign
 verify-clean-room: audit-clean-room
 
 audit-clean-room:
@@ -533,7 +533,9 @@ longitudinal-campaign:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/run_longitudinal_campaign.py --campaign "$${CAMPAIGN:?CAMPAIGN is required}"
 
-cross-version-campaign:
+cross-version-campaign: real-cross-version-campaign
+
+real-cross-version-campaign:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/run_cross_version_campaign.py \
 		--baseline "$${BASELINE:?BASELINE is required}" \
@@ -545,6 +547,8 @@ cross-version-campaign:
 		--baseline "$${BASELINE:?BASELINE is required}" \
 		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
 		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}"
+	@$(PYTHON) scripts/verify_subject_runtime_evidence.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
 
 .PHONY: longitudinal-learning
 longitudinal-learning:

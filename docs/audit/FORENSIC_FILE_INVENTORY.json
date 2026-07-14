@@ -1,24 +1,24 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1812,
+  "tracked_file_count": 1831,
   "category_counts": {
     "Database migration": 137,
     "Deployment infrastructure": 30,
     "Deprecated code": 48,
-    "Development tooling": 131,
-    "Documentation": 392,
+    "Development tooling": 133,
+    "Documentation": 398,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 480,
     "Prompt/template": 29,
     "Test infrastructure": 277,
-    "Unknown purpose": 36
+    "Unknown purpose": 47
   },
   "top_level_counts": {
     "backend": 488,
-    "docs": 320,
+    "docs": 326,
     "evals": 180,
-    "scripts": 143,
+    "scripts": 145,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
@@ -35,11 +35,12 @@
     "autonomy": 13,
     "learning": 13,
     "synthesis": 10,
+    "cross_version_adapters": 9,
     "ingestion": 9,
     ".github": 8,
+    "schemas": 5,
     "requirements": 4,
     "validation": 4,
-    "schemas": 3,
     "agentco_security": 2,
     "benchmarks": 2,
     "dashboard": 2,
@@ -79,10 +80,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 559,
-    ".md": 421,
+    ".py": 570,
+    ".md": 425,
     ".ts": 325,
-    ".json": 166,
+    ".json": 170,
     ".sql": 138,
     ".jsonl": 40,
     ".csv": 38,
@@ -5118,6 +5119,60 @@
       "extension": ".py"
     },
     {
+      "path": "cross_version_adapters/__init__.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/backend_runtime_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/base.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/data_analysis_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/governance_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/memory_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/python_agent_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/recovery_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/unsupported_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
       "path": "dashboard/src/app/calibration/page.tsx",
       "category": "Production runtime code",
       "top_level": "dashboard",
@@ -5808,6 +5863,18 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6240,6 +6307,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/REAL_CROSS_VERSION_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/REAL_CROSS_VERSION_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6288,6 +6367,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -6331,6 +6416,12 @@
     },
     {
       "path": "docs/audit/current/RUNTIME_REACHABILITY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -9672,6 +9763,18 @@
       "extension": ".json"
     },
     {
+      "path": "schemas/subject_benchmark_request.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
+      "path": "schemas/subject_benchmark_response.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
       "path": "scripts/agentco_evolution_test.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10404,6 +10507,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_cross_version_harness_independence.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_docker_startup.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10513,6 +10622,12 @@
     },
     {
       "path": "scripts/verify_resolution_service.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_subject_runtime_evidence.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"

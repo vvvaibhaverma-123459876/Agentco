@@ -4,16 +4,27 @@
   "type": "object",
   "required": [
     "campaign_id",
+    "control_manifest_version",
+    "methodology",
     "benchmark_registry_hash",
     "evaluator_version",
+    "planned_case_executions",
+    "blinding",
     "subjects",
     "comparisons"
   ],
   "properties": {
     "campaign_id": { "type": "string" },
+    "control_manifest_version": { "const": "real-cross-version-campaign-v1" },
+    "methodology": { "const": "subject_process_invocation_no_synthetic_outputs" },
     "benchmark_registry_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
     "evaluator_version": { "type": "string" },
     "evaluator_code_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "planned_case_executions": { "type": "integer", "minimum": 1 },
+    "blinding": {
+      "type": "object",
+      "required": ["mapping_hash", "sealed_mapping", "unblinding_timestamp"]
+    },
     "seeds": {
       "type": "array",
       "items": { "type": "integer" },
