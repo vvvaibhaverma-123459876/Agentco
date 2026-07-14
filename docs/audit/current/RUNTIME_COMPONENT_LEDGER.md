@@ -1,6 +1,6 @@
 # Runtime Component Ledger
 
-Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc9259e818837f33130c12ec16c0`.
+Tracked structural snapshot input hash `6b793e0c16f912a6342d70fdd1602cefc18d7c3cc687981eeca8225d66bc78b7`.
 
 | component_id | path | classification | authoritative_status | process_type | entrypoint | external_dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -53,17 +53,28 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-routes-autonomy-dashboard-routes-ts | backend/src/routes/autonomy-dashboard.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | ['PostgreSQL'] |
 | backend-src-routes-autonomy-orchestrator-routes-ts | backend/src/routes/autonomy-orchestrator.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | ['PostgreSQL'] |
 | backend-src-routes-autonomy-tasks-routes-ts | backend/src/routes/autonomy-tasks.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-capability-expansion-routes-ts | backend/src/routes/capability-expansion.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-citizenship-routes-ts | backend/src/routes/citizenship.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-civilization-governance-routes-ts | backend/src/routes/civilization-governance.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-civilization-kernel-routes-ts | backend/src/routes/civilization-kernel.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-coalition-routes-ts | backend/src/routes/coalition.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-collective-knowledge-routes-ts | backend/src/routes/collective-knowledge.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-credential-routes-ts | backend/src/routes/credential.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-goal-hierarchy-routes-ts | backend/src/routes/goal-hierarchy.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-governance-proposals-routes-ts | backend/src/routes/governance-proposals.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-governance-routes-ts | backend/src/routes/governance.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-identity-routes-ts | backend/src/routes/identity.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-institution-work-assignment-routes-ts | backend/src/routes/institution-work-assignment.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-judiciary-case-routes-ts | backend/src/routes/judiciary-case.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-mission-routes-ts | backend/src/routes/mission.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-override-routes-ts | backend/src/routes/override.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-param-validation-ts | backend/src/routes/param-validation.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-phase3-hardening-routes-ts | backend/src/routes/phase3-hardening.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-resource-ledger-routes-ts | backend/src/routes/resource-ledger.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-safe-evolution-routes-ts | backend/src/routes/safe-evolution.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-society-routes-ts | backend/src/routes/society.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-system-routes-ts | backend/src/routes/system.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | ['PostgreSQL'] |
+| backend-src-routes-treasury-routes-ts | backend/src/routes/treasury.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-runtime-shutdown-ts | backend/src/runtime/shutdown.ts | runtime_support | support | library | None | ['Kafka'] |
 | backend-src-runtime-mode-ts | backend/src/runtime-mode.ts | runtime_support | support | library | None | ['LLM provider'] |
 | backend-src-security-ts | backend/src/security.ts | runtime_support | support | library | None | ['LLM provider', 'PostgreSQL'] |
@@ -86,6 +97,9 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-calibration-drift-monitor-service-ts | backend/src/services/calibration-drift-monitor.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-candidate-evaluation-service-ts | backend/src/services/candidate-evaluation.service.ts | runtime_support | support | service | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-services-capability-expansion-gate-service-ts | backend/src/services/capability-expansion-gate.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-capability-expansion-service-ts | backend/src/services/capability-expansion.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-citizenship-service-ts | backend/src/services/citizenship.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-civilization-kernel-service-ts | backend/src/services/civilization-kernel.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-live-flow-service-ts | backend/src/services/civilization-live-flow.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-runtime-service-ts | backend/src/services/civilization-runtime.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-scheduler-service-ts | backend/src/services/civilization-scheduler.service.ts | runtime_support | support | service | None | [] |
@@ -93,6 +107,8 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-claim-accuracy-tracker-service-ts | backend/src/services/claim-accuracy-tracker.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-claim-grounding-service-ts | backend/src/services/claim-grounding.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-coalition-formation-service-ts | backend/src/services/coalition-formation.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-coalition-service-ts | backend/src/services/coalition.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-collective-knowledge-service-ts | backend/src/services/collective-knowledge.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-confidence-service-ts | backend/src/services/confidence.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-crash-recovery-service-ts | backend/src/services/crash-recovery.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-credential-service-ts | backend/src/services/credential.service.ts | runtime_support | support | service | None | [] |
@@ -115,6 +131,7 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-goal-source-discovery-service-ts | backend/src/services/goal-source-discovery.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-governance-rbac-service-ts | backend/src/services/governance-rbac.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-governance-reputation-integration-service-ts | backend/src/services/governance-reputation-integration.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-governance-service-ts | backend/src/services/governance.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-grounded-resolver-service-ts | backend/src/services/grounded-resolver.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-hash-chain-anchor-service-ts | backend/src/services/hash-chain-anchor.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-idempotency-store-service-ts | backend/src/services/idempotency-store.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
@@ -122,11 +139,13 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-independent-resolver-service-ts | backend/src/services/independent-resolver.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-input-validator-service-ts | backend/src/services/input-validator.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-institution-claim-vetting-service-ts | backend/src/services/institution-claim-vetting.service.ts | runtime_support | support | service | None | [] |
+| backend-src-services-institution-governance-service-ts | backend/src/services/institution-governance.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-institution-work-assignment-service-ts | backend/src/services/institution-work-assignment.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-institutional-knowledge-bridge-service-ts | backend/src/services/institutional-knowledge-bridge.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-institutional-synthesis-service-ts | backend/src/services/institutional-synthesis.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-institutions-service-ts | backend/src/services/institutions.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-integration-service-ts | backend/src/services/integration.service.ts | runtime_support | support | service | None | [] |
+| backend-src-services-judiciary-case-service-ts | backend/src/services/judiciary-case.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-judiciary-review-service-ts | backend/src/services/judiciary-review.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-judiciary-service-ts | backend/src/services/judiciary.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-kb-expansion-service-ts | backend/src/services/kb-expansion.service.ts | runtime_support | support | service | None | ['LLM provider'] |
@@ -143,6 +162,7 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-memory-retrieval-service-ts | backend/src/services/memory-retrieval.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-memory-store-service-ts | backend/src/services/memory-store.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-metrics-service-ts | backend/src/services/metrics.service.ts | runtime_support | support | service | None | ['Kafka'] |
+| backend-src-services-mission-service-ts | backend/src/services/mission.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-multi-agent-ensemble-service-ts | backend/src/services/multi-agent-ensemble.service.ts | runtime_support | support | service | None | ['LLM provider'] |
 | backend-src-services-observability-service-ts | backend/src/services/observability.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-orchestrator-service-ts | backend/src/services/orchestrator.service.ts | runtime_support | support | service | None | [] |
@@ -151,6 +171,7 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-persistent-agent-registry-service-ts | backend/src/services/persistent-agent-registry.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-persistent-trust-scorer-service-ts | backend/src/services/persistent-trust-scorer.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-planner-service-ts | backend/src/services/planner.service.ts | runtime_support | support | service | None | [] |
+| backend-src-services-policy-enforcement-service-ts | backend/src/services/policy-enforcement.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-proof-of-competence-service-ts | backend/src/services/proof-of-competence.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-protected-surface-validator-service-ts | backend/src/services/protected-surface-validator.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-provenance-service-ts | backend/src/services/provenance.service.ts | runtime_support | support | service | None | [] |
@@ -166,6 +187,7 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-risk-tier-classifier-service-ts | backend/src/services/risk-tier-classifier.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-rollback-service-ts | backend/src/services/rollback.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-run-guard-service-ts | backend/src/services/run-guard.service.ts | runtime_support | support | service | None | ['LLM provider'] |
+| backend-src-services-safe-evolution-service-ts | backend/src/services/safe-evolution.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-safety-service-ts | backend/src/services/safety.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-saga-coordinator-service-ts | backend/src/services/saga-coordinator.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-self-modification-validator-service-ts | backend/src/services/self-modification-validator.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
@@ -175,6 +197,7 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-skill-library-service-ts | backend/src/services/skill-library.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-skill-promotion-loop-service-ts | backend/src/services/skill-promotion-loop.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-skill-retrieval-service-ts | backend/src/services/skill-retrieval.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-society-service-ts | backend/src/services/society.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-source-discovery-service-ts | backend/src/services/source-discovery.service.ts | runtime_support | support | service | None | ['LLM provider'] |
 | backend-src-services-structured-logger-service-ts | backend/src/services/structured-logger.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-supervised-free-run-service-ts | backend/src/services/supervised-free-run.service.ts | runtime_support | support | service | None | ['LLM provider'] |
@@ -184,6 +207,7 @@ Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc92
 | backend-src-services-team-activation-service-ts | backend/src/services/team-activation.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-trajectory-store-service-ts | backend/src/services/trajectory-store.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-transactional-outbox-service-ts | backend/src/services/transactional-outbox.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-treasury-service-ts | backend/src/services/treasury.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-trust-impact-assessment-service-ts | backend/src/services/trust-impact-assessment.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-trust-policy-canary-service-ts | backend/src/services/trust-policy-canary.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-trust-policy-service-ts | backend/src/services/trust-policy.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
