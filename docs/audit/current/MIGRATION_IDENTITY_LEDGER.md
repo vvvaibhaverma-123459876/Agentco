@@ -1,6 +1,6 @@
 # Migration Identity Ledger
 
-- Migration count: `129`
+- Migration count: `130`
 - Directory: `backend/src/db/migrations`
 
 ## Reused Sequence Contracts
@@ -143,3 +143,4 @@
 | 137 | `137_collective_epistemics.sql` | `2e8f5b628748b851` | `6a0806dd45a0` |
 | 138 | `138_safe_evolution.sql` | `669cbeb3b1f2e5e4` | `4cea7ad642d0` |
 | 139 | `139_capability_expansion.sql` | `269da9571bc96d27` | `75406a50882a` |
+| 140 | `140_governed_capability_runtime.sql` | `a0232191fa205f66` | `unknown` |

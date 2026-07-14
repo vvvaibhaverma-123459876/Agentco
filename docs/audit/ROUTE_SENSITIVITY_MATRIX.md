@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 105 |
-| AUTH-WRITE | 181 |
-| TOTAL | 290 |
+| AUTH-READ | 106 |
+| AUTH-WRITE | 184 |
+| TOTAL | 294 |
 
 ## Matrix
 
@@ -31,6 +31,10 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/agents/tasks/:task_id` | GET/HEAD | Agent registry/task/dispatch state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/audit` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/audit/integrity` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/v1/capabilities/attempts/:attemptId` | GET/HEAD | Capability attempt lifecycle, audit and result state | AUTH-READ | Exposes non-liveness capability execution state; default stance is authenticated read. |
+| `/v1/capabilities/attempts/:attemptId/cancel` | POST | Capability attempt lifecycle and cancellation state | AUTH-WRITE | Mutates or terminates capability execution state; must require API key. |
+| `/v1/capabilities/execute` | POST | Capability execution request/result state | AUTH-WRITE | Starts governed capability work; must require API key. |
+| `/v1/capabilities/execute-async` | POST | Capability execution request/attempt state | AUTH-WRITE | Starts governed capability work; must require API key. |
 | `/api/autonomy/action-loop` | POST | Autonomy run/task/candidate/evidence/action state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/autonomy/actions` | GET/HEAD | Autonomy run/task/candidate/evidence/action state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/autonomy/allocation/record-decision` | POST | Autonomy run/task/candidate/evidence/action state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |

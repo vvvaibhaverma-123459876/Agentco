@@ -36,6 +36,7 @@ import { phase3HardeningRoutes } from './routes/phase3-hardening.routes';
 import { systemRoutes } from './routes/system.routes';
 import { identityRoutes } from './routes/identity.routes';
 import { resourceLedgerRoutes } from './routes/resource-ledger.routes';
+import { capabilityRoutes } from './routes/capabilities.routes';
 import { metricsService } from './services/autonomy-metrics.service';
 import { shutdownRuntimeResources } from './runtime/shutdown';
 import { publicMessageForError, statusCodeForError } from './http-errors';
@@ -139,6 +140,7 @@ export async function build() {
   await app.register(phase3HardeningRoutes);
   await app.register(identityRoutes);
   await app.register(resourceLedgerRoutes);
+  await app.register(capabilityRoutes);
   await app.register(systemRoutes);
 
   // Public health probes. These intentionally bypass normal API auth so

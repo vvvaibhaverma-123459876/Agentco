@@ -1,0 +1,88 @@
+name: Capability Runtime Audit
+
+on:
+  pull_request:
+    branches: [audit/remediation-07-cross-version-civilization-evaluation, main]
+    paths:
+      - "agentco_capability/**"
+      - "backend/src/routes/capabilities.routes.ts"
+      - "backend/src/services/capability-runtime.service.ts"
+      - "backend/src/types/capability.types.ts"
+      - "backend/src/db/migrations/140_governed_capability_runtime.sql"
+      - "schemas/agentco_capability_*.schema.json"
+      - "scripts/run_governed_capability_genesis.py"
+      - "tests/test_capability_runtime.py"
+      - "backend/tests/capability-runtime.test.ts"
+      - "Makefile"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: capability-runtime-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  capability-runtime:
+    name: Capability runtime audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: requirements/requirements.lock.txt
+
+      - name: Install locked Python dependencies
+        run: python3.13 -m pip install -r requirements/requirements.lock.txt
+
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+
+      - name: Verify exact checkout
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_AUDIT_SHA"
+
+      - name: Capability runtime Python tests
+        run: python3.13 -m pytest tests/test_capability_runtime.py -q
+
+      - name: Capability runtime backend tests
+        run: cd backend && npm test -- capability-runtime.test.ts --runInBand
+
+      - name: Backend build
+        run: cd backend && npm run build
+
+      - name: Capability genesis campaign
+        run: make governed-capability-genesis
+
+      - name: Verify genesis commit binding
+        run: |
+          python3.13 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          manifest = json.loads(Path("artifacts/capability-runtime/governed-capability-genesis-v1/GENESIS_MANIFEST.json").read_text())
+          if manifest["campaign_execution_sha"] != os.environ["EXPECTED_AUDIT_SHA"]:
+              raise SystemExit("genesis manifest SHA does not match workflow head")
+          PY
+
+      - name: Upload capability runtime artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-runtime-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            artifacts/capability-runtime/**
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_RESULTS.*
+          if-no-files-found: warn
+          retention-days: 120

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentco.local/schemas/agentco_capability_request.schema.json",
+  "title": "AgentCo Capability Request",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "request_id",
+    "attempt_id",
+    "actor",
+    "tenant",
+    "task_type",
+    "prompt",
+    "budget",
+    "authorization_context"
+  ],
+  "properties": {
+    "protocol_version": { "const": "agentco-capability-v1" },
+    "request_id": { "type": "string", "minLength": 1 },
+    "attempt_id": { "type": "string", "minLength": 1 },
+    "actor": {
+      "type": "object",
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "tenant": { "type": "string", "minLength": 1 },
+    "task_type": {
+      "enum": [
+        "reasoning",
+        "planning",
+        "evidence_evaluation",
+        "claim_grounding",
+        "structured_transformation",
+        "safe_tool_selection",
+        "data_analysis",
+        "software_engineering",
+        "cross_domain_synthesis"
+      ]
+    },
+    "prompt": { "type": "string", "minLength": 1 },
+    "structured_input": { "type": "object" },
+    "context": { "type": "object" },
+    "memory_policy": { "type": "object" },
+    "tool_allowlist": {
+      "type": "array",
+      "items": {
+        "enum": ["calculator", "json_transformer", "fixture_reader", "fixture_sql", "fixture_test_runner"]
+      }
+    },
+    "provider_policy": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "enum": [
+            "deterministic_local_reference",
+            "mock_development",
+            "openai_compatible",
+            "anthropic_compatible",
+            "generic_http"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "budget": { "type": "object" },
+    "deadline": { "type": ["string", "null"] },
+    "idempotency_key": { "type": ["string", "null"] },
+    "authorization_context": { "type": "object" },
+    "trace_context": { "type": "object" }
+  },
+  "additionalProperties": false
+}
