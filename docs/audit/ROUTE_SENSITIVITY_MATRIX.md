@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 97 |
-| AUTH-WRITE | 152 |
-| TOTAL | 253 |
+| AUTH-READ | 99 |
+| AUTH-WRITE | 163 |
+| TOTAL | 266 |
 
 ## Matrix
 
@@ -150,6 +150,19 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/institutions/:institutionId/underperformers` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/work-requests` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/bootstrap-mandatory` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId` | GET/HEAD | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/judiciary/cases/:caseId/appeal` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/appeal/ruling` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/enforcement` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/evidence` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/evidence-collection` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/finalize` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/hearing` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/jurisdiction` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/cases/:caseId/ruling` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/judiciary/precedents/:disputeType` | GET/HEAD | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/judiciary/rulings/:rulingId/dissent` | POST | Judiciary case/ruling/enforcement/appeal/precedent state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel/:civilizationId/activate` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/kernel/:civilizationId/charter` | POST | Civilization kernel lifecycle/charter/emergency/objective state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |

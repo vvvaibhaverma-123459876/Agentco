@@ -25,6 +25,7 @@ import { coalitionRoutes } from './routes/coalition.routes';
 import { missionRoutes } from './routes/mission.routes';
 import { treasuryRoutes } from './routes/treasury.routes';
 import { governanceProposalRoutes } from './routes/governance-proposals.routes';
+import { judiciaryCaseRoutes } from './routes/judiciary-case.routes';
 import { governanceRoutes } from './routes/governance.routes';
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
@@ -125,6 +126,7 @@ export async function build() {
   await app.register(missionRoutes);
   await app.register(treasuryRoutes);
   await app.register(governanceProposalRoutes);
+  await app.register(judiciaryCaseRoutes);
   await app.register(governanceRoutes);
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);

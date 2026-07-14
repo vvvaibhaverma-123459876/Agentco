@@ -313,22 +313,33 @@ phases:
           - 'route sensitivity matrix 239->253'
         notes: 14 routes classified. Full regression green 2026-07-14 — exit 0; 108 suites passed/3 skipped; 787 passed/8 skipped/5 todo.
   C8_judiciary:
-    status: not_started
+    status: verified
     items:
       - id: C8.MigrationJudiciaryCompletion
         layer: C8
-        status: not_started
+        status: verified
         depends_on: [C7.MigrationGovernance]
-        notes: hearings, evidence_submissions, jurisdiction_decisions, enforcement_orders, appeals, appellate_rulings, dissenting_opinions on top of existing judiciary tables.
+        migration_artifacts: [backend/src/db/migrations/136_judiciary.sql]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 136_judiciary.sql, exit 0'
+        notes: judiciary_cases (11 dispute types, 10-state lifecycle, gated), transitions, evidence_submissions, hearings, rulings (unique trial + unique appellate per case), enforcement_orders, appeals, dissents, precedents; guards + REVOKEs. Existing contradiction disputes/rulings remain the L11 claim path; judiciary_case.source_dispute_id links escalated contradictions (one judiciary, not a fork).
       - id: C8.JudiciaryLifecycleCompletion
         layer: C8
-        status: not_started
+        status: verified
         depends_on: [C8.MigrationJudiciaryCompletion]
-        notes: opened→jurisdiction_check→evidence_collection→hearing→ruling→enforcement→appeal→final→closed; independence checks; enforcement orders mutate runtime state through authorized paths; appeals to distinct panel; precedent search.
+        source_artifacts: [backend/src/services/judiciary-case.service.ts]
+        notes: opened->jurisdiction_check->evidence_collection->hearing->ruling->enforcement->appeal->final->closed; judge independence (not complainant/respondent), appellate panel independent of trial judge; enforcement mutates real state via treasury.imposePenalty and citizenship.imposeSanction; signed rulings; duplicate final rulings blocked by unique indexes; precedent search; retained dissent.
       - id: C8.JudiciaryRoutesAndTests
         layer: C8
-        status: not_started
+        status: verified
         depends_on: [C8.JudiciaryLifecycleCompletion]
+        source_artifacts: [backend/src/routes/judiciary-case.routes.ts]
+        test_artifacts: [backend/tests/judiciary-case.test.ts]
+        verification_commands:
+          - 'npx jest tests/judiciary-case.test.ts --runInBand --forceExit -> 4/4 passed (incl. SCENARIO D)'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'route sensitivity matrix 253->266'
+        notes: 13 routes classified. Scenario D proves rulings alter real runtime state (treasury debit) and appeals route to an independent authority. Full regression green 2026-07-14 — exit 0; 109 suites passed/3 skipped; 804 passed/8 skipped/5 todo.
   C9_epistemics:
     status: not_started
     items:
@@ -472,10 +483,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 36
+  verified: 39
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 28
+  not_started: 25
   blocked: 0
   last_recomputed: '2026-07-14'
