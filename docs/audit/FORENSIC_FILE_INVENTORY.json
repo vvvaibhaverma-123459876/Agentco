@@ -1,31 +1,31 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1673,
+  "tracked_file_count": 1697,
   "category_counts": {
     "Database migration": 125,
-    "Deployment infrastructure": 27,
+    "Deployment infrastructure": 28,
     "Deprecated code": 48,
-    "Development tooling": 118,
-    "Documentation": 326,
+    "Development tooling": 120,
+    "Documentation": 346,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 262,
+    "Test infrastructure": 263,
     "Unknown purpose": 30
   },
   "top_level_counts": {
     "backend": 441,
-    "docs": 254,
+    "docs": 274,
     "evals": 180,
-    "scripts": 130,
+    "scripts": 132,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
+    "tests": 37,
     "frontend": 36,
-    "tests": 36,
     "reserve": 33,
     "calibration": 30,
     "infrastructure": 20,
@@ -36,7 +36,7 @@
     "learning": 13,
     "synthesis": 10,
     "ingestion": 9,
-    ".github": 5,
+    ".github": 6,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -76,10 +76,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 542,
-    ".md": 381,
+    ".py": 545,
+    ".md": 393,
     ".ts": 290,
-    ".json": 135,
+    ".json": 143,
     ".sql": 126,
     ".jsonl": 40,
     ".csv": 38,
@@ -88,7 +88,7 @@
     ".tsx": 17,
     ".txt": 16,
     ".sh": 14,
-    ".yml": 9,
+    ".yml": 10,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
@@ -142,6 +142,12 @@
     },
     {
       "path": ".github/workflows/deploy.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/hosted-staging-audit.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -5541,7 +5547,109 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_IDENTITY_ACCESS_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_IDENTITY_ACCESS_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_LOAD_AUTOSCALING_VERIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_OBSERVABILITY_ALERT_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_OBSERVABILITY_ALERT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_COMPONENT_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_COMPONENT_LEDGER.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_EXECUTION_CONTRACT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_EXECUTION_CONTRACT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_TOPOLOGY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_TOPOLOGY.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5554,6 +5662,18 @@
     },
     {
       "path": "docs/audit/current/INTEGRATION_CONTRACT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LIVE_PROVIDER_VERIFICATION_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/LIVE_PROVIDER_VERIFICATION_MATRIX.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5590,6 +5710,12 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_04_DEPLOYMENT_OPERATIONAL_RESILIENCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -9141,6 +9267,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/hosted_staging_audit.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/hourly_codex_resume.sh",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9627,6 +9759,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_hosted_staging_budget.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_level3_architecture.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10018,6 +10156,12 @@
     },
     {
       "path": "tests/test_gate_integrity_controls.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_hosted_staging_controls.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

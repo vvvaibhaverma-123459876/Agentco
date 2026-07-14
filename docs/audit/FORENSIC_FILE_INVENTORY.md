@@ -2,22 +2,22 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1673`
+- Tracked files: `1697`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
 | Database migration | 125 |
-| Deployment infrastructure | 27 |
+| Deployment infrastructure | 28 |
 | Deprecated code | 48 |
-| Development tooling | 118 |
-| Documentation | 326 |
+| Development tooling | 120 |
+| Documentation | 346 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 456 |
 | Prompt/template | 29 |
-| Test infrastructure | 262 |
+| Test infrastructure | 263 |
 | Unknown purpose | 30 |
 
 ## Top-Level Counts
@@ -25,16 +25,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 441 |
-| `docs` | 254 |
+| `docs` | 274 |
 | `evals` | 180 |
-| `scripts` | 130 |
+| `scripts` | 132 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `reports` | 48 |
+| `tests` | 37 |
 | `frontend` | 36 |
-| `tests` | 36 |
 | `reserve` | 33 |
 | `calibration` | 30 |
 | `infrastructure` | 20 |
@@ -45,7 +45,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `learning` | 13 |
 | `synthesis` | 10 |
 | `ingestion` | 9 |
-| `.github` | 5 |
+| `.github` | 6 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -95,6 +95,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.github/workflows/ci.yml` | Deployment infrastructure |
 | `.github/workflows/clean-room-audit.yml` | Deployment infrastructure |
 | `.github/workflows/deploy.yml` | Deployment infrastructure |
+| `.github/workflows/hosted-staging-audit.yml` | Deployment infrastructure |
 | `.github/workflows/runtime-integration-audit.yml` | Deployment infrastructure |
 | `.github/workflows/staging-deployment-audit.yml` | Deployment infrastructure |
 | `.gitignore` | Development tooling |
@@ -994,15 +995,35 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.md` | Documentation |
 | `docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json` | Documentation |
 | `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
+| `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
+| `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
+| `docs/audit/current/HOSTED_IDENTITY_ACCESS_MATRIX.json` | Documentation |
+| `docs/audit/current/HOSTED_IDENTITY_ACCESS_MATRIX.md` | Documentation |
+| `docs/audit/current/HOSTED_LOAD_AUTOSCALING_VERIFICATION.md` | Documentation |
+| `docs/audit/current/HOSTED_OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
+| `docs/audit/current/HOSTED_OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.json` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.md` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_COMPONENT_LEDGER.json` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_COMPONENT_LEDGER.md` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_EXECUTION_CONTRACT.json` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_EXECUTION_CONTRACT.md` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_FINDINGS.json` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_FINDINGS.md` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_TOPOLOGY.json` | Documentation |
+| `docs/audit/current/HOSTED_STAGING_TOPOLOGY.md` | Documentation |
 | `docs/audit/current/INTEGRATION_CONTRACT_MATRIX.json` | Documentation |
 | `docs/audit/current/INTEGRATION_CONTRACT_MATRIX.md` | Documentation |
+| `docs/audit/current/LIVE_PROVIDER_VERIFICATION_MATRIX.json` | Documentation |
+| `docs/audit/current/LIVE_PROVIDER_VERIFICATION_MATRIX.md` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_03_RUNTIME_ARCHITECTURE_INTEGRATION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_04_DEPLOYMENT_OPERATIONAL_RESILIENCE.md` | Documentation |
+| `docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.md` | Documentation |
@@ -1594,6 +1615,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/generate_runtime_reachability.py` | Development tooling |
 | `scripts/generate_self_improvement_report.py` | Development tooling |
 | `scripts/generate_status.py` | Development tooling |
+| `scripts/hosted_staging_audit.py` | Development tooling |
 | `scripts/hourly_codex_resume.sh` | Development tooling |
 | `scripts/nse_canonical_trust_weighting_test.py` | Development tooling |
 | `scripts/nse_data_fetcher.py` | Development tooling |
@@ -1675,6 +1697,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_docker_startup.py` | Development tooling |
 | `scripts/verify_execution_ledger.py` | Development tooling |
 | `scripts/verify_gate_integrity.py` | Development tooling |
+| `scripts/verify_hosted_staging_budget.py` | Development tooling |
 | `scripts/verify_level3_architecture.py` | Development tooling |
 | `scripts/verify_level3_db_evidence.py` | Development tooling |
 | `scripts/verify_level4_certification.sh` | Development tooling |
@@ -1741,6 +1764,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_execute_durable_task.py` | Test infrastructure |
 | `tests/test_forensic_inventory.py` | Test infrastructure |
 | `tests/test_gate_integrity_controls.py` | Test infrastructure |
+| `tests/test_hosted_staging_controls.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
