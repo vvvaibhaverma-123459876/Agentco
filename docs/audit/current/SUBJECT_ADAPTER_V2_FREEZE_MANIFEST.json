@@ -3,7 +3,7 @@
   "adapter_freeze_commit": "7dcc727fb3681d0130e6f8cd09a756d0861fa705",
   "adapter_freeze_tree_hash": "225c4c38d35fc9d56f1ee239cacf32a130509801",
   "benchmark_registry_hash": "3a1c54f4e54c3f2d7df0b0720dff5112d8179ae4f79fe7f95d2cd0bc2f322d1e",
-  "compatibility_matrix_hash": null,
+  "compatibility_matrix_hash": "44f82438773cd2fd2b292e98b1b3e6b586843529f19955ae28313c810375832d",
   "evaluator_version": "longitudinal-evaluator-v1",
   "support_classifications_frozen": true,
   "thresholds_frozen": {
