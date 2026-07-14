@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1843`
+- Tracked files: `1856`
 
 ## Category Counts
 
@@ -11,8 +11,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 137 |
 | Deployment infrastructure | 30 |
 | Deprecated code | 48 |
-| Development tooling | 135 |
-| Documentation | 408 |
+| Development tooling | 137 |
+| Documentation | 419 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 480 |
@@ -25,9 +25,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 488 |
-| `docs` | 336 |
+| `docs` | 347 |
 | `evals` | 180 |
-| `scripts` | 147 |
+| `scripts` | 149 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
@@ -1046,6 +1046,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/ACTUAL_DEPLOYMENT_TOPOLOGY.md` | Documentation |
 | `docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.json` | Documentation |
 | `docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.md` | Documentation |
+| `docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.json` | Documentation |
+| `docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.md` | Documentation |
 | `docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md` | Documentation |
 | `docs/audit/current/BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/BASELINE_COMMAND_RESULTS.json` | Documentation |
@@ -1059,6 +1061,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BENCHMARK_REGISTRY.md` | Documentation |
 | `docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.json` | Documentation |
 | `docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.md` | Documentation |
+| `docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.json` | Documentation |
+| `docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.md` | Documentation |
 | `docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.json` | Documentation |
 | `docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.md` | Documentation |
 | `docs/audit/current/CI_BASELINE_RECONCILIATION.md` | Documentation |
@@ -1148,6 +1152,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
 | `docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json` | Documentation |
+| `docs/audit/current/SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md` | Documentation |
 | `docs/audit/current/SUBJECT_INTERFACE_INVENTORY.json` | Documentation |
 | `docs/audit/current/SUBJECT_INTERFACE_INVENTORY.md` | Documentation |
@@ -1155,7 +1160,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.json` | Documentation |
 | `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
+| `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json` | Documentation |
+| `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/PLAN_AND_PROGRESS.md` | Documentation |
 | `docs/civilization/canonical_runtime_map.json` | Documentation |
@@ -1834,6 +1845,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_agentco_goal_run.py` | Development tooling |
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
 | `scripts/verify_benchmark_governance.py` | Development tooling |
+| `scripts/verify_campaign_evidence_binding.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_cross_version_campaign.py` | Development tooling |
 | `scripts/verify_cross_version_harness_independence.py` | Development tooling |
@@ -1856,6 +1868,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_pytest_skips.py` | Development tooling |
 | `scripts/verify_release_gates.py` | Development tooling |
 | `scripts/verify_resolution_service.py` | Development tooling |
+| `scripts/verify_subject_answer_ownership.py` | Development tooling |
 | `scripts/verify_subject_request_consumption.py` | Development tooling |
 | `scripts/verify_subject_runtime_evidence.py` | Development tooling |
 | `scripts/wait_for_postgres.sh` | Development tooling |

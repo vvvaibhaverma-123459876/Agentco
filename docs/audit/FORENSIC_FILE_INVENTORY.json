@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1843,
+  "tracked_file_count": 1856,
   "category_counts": {
     "Database migration": 137,
     "Deployment infrastructure": 30,
     "Deprecated code": 48,
-    "Development tooling": 135,
-    "Documentation": 408,
+    "Development tooling": 137,
+    "Documentation": 419,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 480,
@@ -16,9 +16,9 @@
   },
   "top_level_counts": {
     "backend": 488,
-    "docs": 336,
+    "docs": 347,
     "evals": 180,
-    "scripts": 147,
+    "scripts": 149,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
@@ -80,10 +80,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 572,
-    ".md": 430,
+    ".py": 574,
+    ".md": 435,
     ".ts": 325,
-    ".json": 175,
+    ".json": 181,
     ".sql": 138,
     ".jsonl": 40,
     ".csv": 38,
@@ -5833,6 +5833,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -5906,6 +5918,18 @@
     },
     {
       "path": "docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -6445,6 +6469,12 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -6487,10 +6517,46 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/TEST_SKIP_ALLOWLIST.json",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/civilization/CANONICAL_RUNTIME_MAP.md",
@@ -10561,6 +10627,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_campaign_evidence_binding.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_civilization_vertical_slice.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10688,6 +10760,12 @@
     },
     {
       "path": "scripts/verify_resolution_service.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_subject_answer_ownership.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
