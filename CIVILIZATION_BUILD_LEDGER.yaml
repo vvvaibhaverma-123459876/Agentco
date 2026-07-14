@@ -274,32 +274,44 @@ phases:
           - 'route sensitivity matrix 227->239'
         notes: 12 routes classified. Full regression green 2026-07-14 — exit 0; 107 suites passed/3 skipped; 767 passed/8 skipped/5 todo. Fixed a C5 FK regression surfaced here (mission_evidence_bundle evidence FK RESTRICT->CASCADE, mission_tasks.workflow_task_id ->SET NULL) so pre-existing autonomy_evidence/workflow_tasks cleanup is never blocked; attestation snapshots evidence ids durably; empty-DB migration reverified.
   C7_governance:
-    status: not_started
+    status: verified
     items:
       - id: C7.MigrationGovernance
         layer: C7
-        status: not_started
+        status: verified
         depends_on: [C1.MigrationCivilizationKernel]
-        notes: policies, policy_versions, governance_proposals, sponsors, impact_assessments, deliberations, votes, quorum_rules, governance_decisions, vetoes, overrides, emergency_powers (expiry NOT NULL), policy_activations, policy_rollbacks; constitution linkage to existing calibration_constitution.
+        migration_artifacts: [backend/src/db/migrations/135_governance.sql]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 135_governance.sql, exit 0'
+        notes: governance_proposals (12-state lifecycle, gated), proposal_sponsors, impact_assessments, deliberations, governance_votes, governance_decisions, runtime_policies (enforceable), policy_activations, governance_emergency_powers; guards + REVOKEs. Constitution linkage via existing calibration_constitution service.
       - id: C7.GovernanceProposalService
         layer: C7
-        status: not_started
+        status: verified
         depends_on: [C7.MigrationGovernance, C2.CitizenshipService]
-        notes: draft→sponsored→impact_review→deliberation→voting→approved|rejected→activation_pending→active→superseded|repealed|rolled_back; bounded reputation-weighted voting; quorum; conflict-of-interest checks.
+        source_artifacts: [backend/src/services/governance.service.ts]
+        notes: draft->sponsored->impact_review->deliberation->voting->approved|rejected->activation_pending->active->superseded|repealed|rolled_back; weighted simple/super/unanimous quorum with min_votes; separation of duties (author cannot sponsor or vote); constitutional proposals need supermajority + >=3 votes; tier-0 invariants rejected at creation.
       - id: C7.PolicyRuntimeEnforcement
         layer: C7
-        status: not_started
+        status: verified
         depends_on: [C7.GovernanceProposalService]
-        notes: active policies consulted in protected-action lifecycle; test proves behaviour change on activation and again on rollback (E2E scenario C).
+        source_artifacts: [backend/src/services/policy-enforcement.service.ts, backend/src/services/mission.service.ts]
+        notes: activated policy_change proposals create runtime_policies; policyEnforcement.assertAllowed wired into mission.create; block throws (fail-closed), require_review surfaces; rollback restores behaviour. E2E scenario C proven — critical mission blocked after activation, allowed after rollback.
       - id: C7.EmergencyPowers
         layer: C7
-        status: not_started
+        status: verified
         depends_on: [C7.MigrationGovernance, C1.CivilizationKernelService]
-        notes: scoped, observable, auto-expiring; integrates existing kill-switch; expiry sweep.
+        notes: scoped, bounded-ttl (<=7d), auto-expiring; optional kill-switch engagement via existing kill-switch.service; expireEmergencyPowers sweep releases the kill switch.
       - id: C7.GovernanceRoutesAndTests
         layer: C7
-        status: not_started
+        status: verified
         depends_on: [C7.PolicyRuntimeEnforcement, C7.EmergencyPowers]
+        source_artifacts: [backend/src/routes/governance-proposals.routes.ts]
+        test_artifacts: [backend/tests/governance.test.ts]
+        verification_commands:
+          - 'npx jest tests/governance.test.ts --runInBand --forceExit -> 6/6 passed (incl. SCENARIO C)'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'route sensitivity matrix 239->253'
+        notes: 14 routes classified. Full regression green 2026-07-14 — exit 0; 108 suites passed/3 skipped; 787 passed/8 skipped/5 todo.
   C8_judiciary:
     status: not_started
     items:
@@ -460,10 +472,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 31
+  verified: 36
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 33
+  not_started: 28
   blocked: 0
   last_recomputed: '2026-07-14'

@@ -4,6 +4,7 @@ import { db } from '../db/client';
 import { eventLog } from './event-log.service';
 import { auditLog } from './audit-log.service';
 import { civilizationKernel } from './civilization-kernel.service';
+import { policyEnforcement } from './policy-enforcement.service';
 import { PublicHttpError } from '../http-errors';
 
 /**
@@ -127,11 +128,20 @@ export class MissionService {
     lead_institution_id?: string;
     coalition_id?: string;
     risk_level?: 'low' | 'medium' | 'high' | 'critical';
+    domain?: string;
     depends_on_mission_ids?: string[];
     actor_id: string;
     civilization_id?: string;
   }): Promise<MissionRecord> {
     if (!input.title || input.title.trim().length === 0) throw new PublicHttpError(400, 'title is required');
+    // Governance policy gate (C7): an active policy may block or require review
+    // for mission creation. This is the demonstrable runtime behaviour that
+    // policy activation changes and rollback restores.
+    await policyEnforcement.assertAllowed({
+      action_type: 'mission.create',
+      domain: input.domain ?? null,
+      risk_level: input.risk_level ?? 'low',
+    });
     const client = await db.connect();
     try {
       await client.query('BEGIN');

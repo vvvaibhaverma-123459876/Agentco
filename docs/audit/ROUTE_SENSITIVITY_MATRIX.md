@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 96 |
-| AUTH-WRITE | 139 |
-| TOTAL | 239 |
+| AUTH-READ | 97 |
+| AUTH-WRITE | 152 |
+| TOTAL | 253 |
 
 ## Matrix
 
@@ -120,6 +120,20 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/drift/unresolved` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/goals/:goalId/lock` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/goals/:goalId/unlock` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/emergency-powers` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/emergency-powers/expire-sweep` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/policies/:policyId/rollback` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/policies/evaluate` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId` | GET/HEAD | Governance proposal/vote/policy/emergency-power state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/governance/proposals/:proposalId/activate` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/deliberation` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/deliberation/open` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/impact` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/sponsor` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/votes` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/voting/close` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/governance/proposals/:proposalId/voting/open` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/governance/summary` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/health` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/institutions/:institutionId/charter` | POST | Society/institution governance/contract state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
