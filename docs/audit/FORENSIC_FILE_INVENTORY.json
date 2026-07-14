@@ -1,30 +1,30 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1857,
+  "tracked_file_count": 1876,
   "category_counts": {
-    "Database migration": 137,
-    "Deployment infrastructure": 30,
+    "Database migration": 138,
+    "Deployment infrastructure": 31,
     "Deprecated code": 48,
-    "Development tooling": 137,
-    "Documentation": 420,
+    "Development tooling": 138,
+    "Documentation": 422,
     "Experimental code": 151,
     "Generated artifact": 101,
-    "Production runtime code": 480,
+    "Production runtime code": 483,
     "Prompt/template": 29,
-    "Test infrastructure": 277,
-    "Unknown purpose": 47
+    "Test infrastructure": 279,
+    "Unknown purpose": 56
   },
   "top_level_counts": {
-    "backend": 488,
-    "docs": 348,
+    "backend": 493,
+    "docs": 350,
     "evals": 180,
-    "scripts": 149,
+    "scripts": 150,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
-    "tests": 40,
+    "tests": 41,
     "frontend": 36,
     "reserve": 33,
     "calibration": 30,
@@ -35,10 +35,11 @@
     "autonomy": 13,
     "learning": 13,
     "synthesis": 10,
+    ".github": 9,
     "cross_version_adapters": 9,
     "ingestion": 9,
-    ".github": 8,
-    "schemas": 5,
+    "agentco_capability": 7,
+    "schemas": 7,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -80,11 +81,11 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 574,
-    ".md": 436,
-    ".ts": 325,
-    ".json": 181,
-    ".sql": 138,
+    ".py": 583,
+    ".md": 438,
+    ".ts": 329,
+    ".json": 183,
+    ".sql": 139,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 22,
@@ -92,7 +93,7 @@
     ".tsx": 17,
     ".txt": 16,
     ".sh": 14,
-    ".yml": 12,
+    ".yml": 13,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
@@ -131,6 +132,12 @@
       "category": "Development tooling",
       "top_level": ".env.staging.example",
       "extension": ".example"
+    },
+    {
+      "path": ".github/workflows/capability-runtime-audit.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
     },
     {
       "path": ".github/workflows/ci.yml",
@@ -263,6 +270,48 @@
       "category": "Unknown purpose",
       "top_level": "SYSTEM_CIVILIZATION.md",
       "extension": ".md"
+    },
+    {
+      "path": "agentco_capability/__init__.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/__main__.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/models.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/providers.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/runtime.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/storage.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/tools.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
     },
     {
       "path": "agentco_security/__init__.py",
@@ -2905,6 +2954,12 @@
       "extension": ".sql"
     },
     {
+      "path": "backend/src/db/migrations/140_governed_capability_runtime.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
       "path": "backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -3080,6 +3135,12 @@
     },
     {
       "path": "backend/src/routes/autonomy-tasks.routes.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/routes/capabilities.routes.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -3374,6 +3435,12 @@
     },
     {
       "path": "backend/src/services/capability-expansion.service.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/services/capability-runtime.service.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -4087,6 +4154,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/src/types/capability.types.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/src/types/specialist-roles.ts",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -4214,6 +4287,12 @@
     },
     {
       "path": "backend/tests/capability-expansion.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/capability-runtime.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -6421,7 +6500,19 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/REMEDIATION_07E_FINAL_EVIDENCE_SEMANTIC_CLOSURE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_08_GOVERNED_CAPABILITY_RUNTIME.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -9877,6 +9968,18 @@
       "extension": ".py"
     },
     {
+      "path": "schemas/agentco_capability_request.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
+      "path": "schemas/agentco_capability_response.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
       "path": "schemas/cross_version_campaign.schema.json",
       "category": "Unknown purpose",
       "top_level": "schemas",
@@ -10277,6 +10380,12 @@
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/run_governed_capability_genesis.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/run_integrated_learning_5min.py",
@@ -11048,6 +11157,12 @@
     },
     {
       "path": "tests/test_build_ledger.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_runtime.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

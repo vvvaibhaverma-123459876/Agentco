@@ -2,38 +2,38 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1857`
+- Tracked files: `1876`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
-| Database migration | 137 |
-| Deployment infrastructure | 30 |
+| Database migration | 138 |
+| Deployment infrastructure | 31 |
 | Deprecated code | 48 |
-| Development tooling | 137 |
-| Documentation | 420 |
+| Development tooling | 138 |
+| Documentation | 422 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
-| Production runtime code | 480 |
+| Production runtime code | 483 |
 | Prompt/template | 29 |
-| Test infrastructure | 277 |
-| Unknown purpose | 47 |
+| Test infrastructure | 279 |
+| Unknown purpose | 56 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 488 |
-| `docs` | 348 |
+| `backend` | 493 |
+| `docs` | 350 |
 | `evals` | 180 |
-| `scripts` | 149 |
+| `scripts` | 150 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `reports` | 48 |
-| `tests` | 40 |
+| `tests` | 41 |
 | `frontend` | 36 |
 | `reserve` | 33 |
 | `calibration` | 30 |
@@ -44,10 +44,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `autonomy` | 13 |
 | `learning` | 13 |
 | `synthesis` | 10 |
+| `.github` | 9 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `.github` | 8 |
-| `schemas` | 5 |
+| `agentco_capability` | 7 |
+| `schemas` | 7 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -96,6 +97,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.env.level3.test` | Development tooling |
 | `.env.production.example` | Development tooling |
 | `.env.staging.example` | Development tooling |
+| `.github/workflows/capability-runtime-audit.yml` | Deployment infrastructure |
 | `.github/workflows/ci.yml` | Deployment infrastructure |
 | `.github/workflows/clean-room-audit.yml` | Deployment infrastructure |
 | `.github/workflows/cross-version-evaluation.yml` | Deployment infrastructure |
@@ -118,6 +120,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `SETUP_WINDOWS.md` | Unknown purpose |
 | `SYSTEM.md` | Unknown purpose |
 | `SYSTEM_CIVILIZATION.md` | Unknown purpose |
+| `agentco_capability/__init__.py` | Unknown purpose |
+| `agentco_capability/__main__.py` | Unknown purpose |
+| `agentco_capability/models.py` | Unknown purpose |
+| `agentco_capability/providers.py` | Unknown purpose |
+| `agentco_capability/runtime.py` | Unknown purpose |
+| `agentco_capability/storage.py` | Unknown purpose |
+| `agentco_capability/tools.py` | Unknown purpose |
 | `agentco_security/__init__.py` | Production runtime code |
 | `agentco_security/env_guard.py` | Production runtime code |
 | `agents/__init__.py` | Production runtime code |
@@ -558,6 +567,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/db/migrations/137_collective_epistemics.sql` | Database migration |
 | `backend/src/db/migrations/138_safe_evolution.sql` | Database migration |
 | `backend/src/db/migrations/139_capability_expansion.sql` | Database migration |
+| `backend/src/db/migrations/140_governed_capability_runtime.sql` | Database migration |
 | `backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql` | Production runtime code |
 | `backend/src/db/run_migrations.py` | Production runtime code |
 | `backend/src/db/unsupported_migrations/020_evaluation_manifests.sql.disabled` | Production runtime code |
@@ -588,6 +598,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/routes/autonomy-dashboard.routes.ts` | Production runtime code |
 | `backend/src/routes/autonomy-orchestrator.routes.ts` | Production runtime code |
 | `backend/src/routes/autonomy-tasks.routes.ts` | Production runtime code |
+| `backend/src/routes/capabilities.routes.ts` | Production runtime code |
 | `backend/src/routes/capability-expansion.routes.ts` | Production runtime code |
 | `backend/src/routes/citizenship.routes.ts` | Production runtime code |
 | `backend/src/routes/civilization-governance.routes.ts` | Production runtime code |
@@ -637,6 +648,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/services/candidate-evaluation.service.ts` | Production runtime code |
 | `backend/src/services/capability-expansion-gate.service.ts` | Production runtime code |
 | `backend/src/services/capability-expansion.service.ts` | Production runtime code |
+| `backend/src/services/capability-runtime.service.ts` | Production runtime code |
 | `backend/src/services/citizenship.service.ts` | Production runtime code |
 | `backend/src/services/civilization-kernel.service.ts` | Production runtime code |
 | `backend/src/services/civilization-live-flow.service.ts` | Production runtime code |
@@ -755,6 +767,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/services/trustworthiness.service.ts` | Production runtime code |
 | `backend/src/services/worker-coordinator.service.ts` | Production runtime code |
 | `backend/src/types/action.types.ts` | Production runtime code |
+| `backend/src/types/capability.types.ts` | Production runtime code |
 | `backend/src/types/specialist-roles.ts` | Production runtime code |
 | `backend/src/workers/outbox-worker.ts` | Production runtime code |
 | `backend/src/workers/task-worker.ts` | Production runtime code |
@@ -777,6 +790,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/calibration-registration-invariants.test.ts` | Test infrastructure |
 | `backend/tests/capability-expansion-gate.test.ts` | Test infrastructure |
 | `backend/tests/capability-expansion.test.ts` | Test infrastructure |
+| `backend/tests/capability-runtime.test.ts` | Test infrastructure |
 | `backend/tests/citizenship.test.ts` | Test infrastructure |
 | `backend/tests/civilization-aware-rag.test.ts` | Test infrastructure |
 | `backend/tests/civilization-kernel.test.ts` | Test infrastructure |
@@ -1144,7 +1158,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07D_EVIDENCE_BINDING_AND_V2.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07E_FINAL_EVIDENCE_SEMANTIC_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_08_GOVERNED_CAPABILITY_RUNTIME.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.md` | Documentation |
@@ -1720,6 +1736,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `runtime/tests/test_runtime_durable_governance_stores.py` | Test infrastructure |
 | `runtime/tests/test_spend_guardrail_ledger.py` | Test infrastructure |
 | `runtime/tool_registry/__init__.py` | Production runtime code |
+| `schemas/agentco_capability_request.schema.json` | Unknown purpose |
+| `schemas/agentco_capability_response.schema.json` | Unknown purpose |
 | `schemas/cross_version_campaign.schema.json` | Unknown purpose |
 | `schemas/longitudinal_history.schema.json` | Unknown purpose |
 | `schemas/longitudinal_run_manifest.schema.json` | Unknown purpose |
@@ -1787,6 +1805,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_first_real_prediction.py` | Development tooling |
 | `scripts/run_fitness_subscription_simulation.py` | Development tooling |
 | `scripts/run_full_autonomy_loop_with_specialists.sh` | Development tooling |
+| `scripts/run_governed_capability_genesis.py` | Development tooling |
 | `scripts/run_integrated_learning_5min.py` | Development tooling |
 | `scripts/run_learner.py` | Development tooling |
 | `scripts/run_level3_autonomy_smoke.py` | Development tooling |
@@ -1916,6 +1935,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/integration/test_resolution_service_role_migration.py` | Test infrastructure |
 | `tests/integration/test_web_scraper_hardened.py` | Test infrastructure |
 | `tests/test_build_ledger.py` | Test infrastructure |
+| `tests/test_capability_runtime.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
 | `tests/test_civilization_vertical_slice.py` | Test infrastructure |
 | `tests/test_clean_room_evidence_controls.py` | Test infrastructure |
