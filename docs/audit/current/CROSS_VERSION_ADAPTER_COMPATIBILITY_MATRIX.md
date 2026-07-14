@@ -1,8 +1,8 @@
 # Cross-Version Adapter Compatibility Matrix
 
-Matrix hash: `3ff78ed74acf0ad0f96f8d35b44fd3c883ebc8be8dbdff7ad875ea64d1fe67ba`
+Matrix hash: `44f82438773cd2fd2b292e98b1b3e6b586843529f19955ae28313c810375832d`
 
 ## Counts
 
-- `supported_common`: 6
-- `unsupported_incompatible_contract`: 66
+- `supported_common`: 12
+- `unsupported_incompatible_contract`: 60

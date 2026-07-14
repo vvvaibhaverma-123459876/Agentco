@@ -75,7 +75,12 @@ def validate(campaign_dir: Path, baseline: str, raw: str, reconciled: str) -> li
                     errors.append(f"MISSING_PROCESS_MEASUREMENT:{public_label}:{item.get('case_id')}")
                 if process.get("stdout_hash") is None or process.get("stderr_hash") is None:
                     errors.append(f"MISSING_PROCESS_OUTPUT_HASH:{public_label}:{item.get('case_id')}")
-            if status == "completed" and item.get("response", {}).get("confidence") is None:
+            if (
+                status == "completed"
+                and item.get("operation_classification") in {None, "capability_task", "runtime_primitive"}
+                and item.get("domain") != "evidence_evaluation"
+                and item.get("response", {}).get("confidence") is None
+            ):
                 errors.append(f"COMPLETED_RESPONSE_MISSING_CONFIDENCE:{public_label}:{item.get('case_id')}")
             if campaign_version == "subject-native-cross-version-campaign-v1" and status == "completed":
                 consumption = item.get("request_consumption", {})

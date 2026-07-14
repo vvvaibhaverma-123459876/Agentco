@@ -22,6 +22,27 @@
       "tool_permissions": []
     },
     {
+      "accepted_input": "observation object",
+      "audit_evidence": "process evidence, request hash echoed inside observation",
+      "authentication_requirement": "not_applicable_for_provider_free_local_task",
+      "database_requirement": "none for execute_task_logic record_observation path",
+      "executable": true,
+      "interface_id": "version-a:durable-record-observation-task",
+      "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
+      "kafka_requirement": "none",
+      "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+      "path": "scripts/execute_durable_task.py",
+      "produced_output": "observation_recorded with supplied observation",
+      "redis_requirement": "none",
+      "runtime_type": "python_function_via_external_subprocess",
+      "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "supported_benchmark_domains": [
+        "evidence_evaluation"
+      ],
+      "tool_permissions": []
+    },
+    {
       "accepted_input": "prediction_id, confidence, outcome",
       "audit_evidence": "process evidence, request hash echoed as prediction_id",
       "authentication_requirement": "not_applicable_for_provider_free_local_task",
@@ -43,6 +64,27 @@
       "tool_permissions": []
     },
     {
+      "accepted_input": "observation object",
+      "audit_evidence": "process evidence, request hash echoed inside observation",
+      "authentication_requirement": "not_applicable_for_provider_free_local_task",
+      "database_requirement": "none for execute_task_logic record_observation path",
+      "executable": true,
+      "interface_id": "version-b:durable-record-observation-task",
+      "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
+      "kafka_requirement": "none",
+      "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+      "path": "scripts/execute_durable_task.py",
+      "produced_output": "observation_recorded with supplied observation",
+      "redis_requirement": "none",
+      "runtime_type": "python_function_via_external_subprocess",
+      "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "supported_benchmark_domains": [
+        "evidence_evaluation"
+      ],
+      "tool_permissions": []
+    },
+    {
       "accepted_input": "prediction_id, confidence, outcome",
       "audit_evidence": "process evidence, request hash echoed as prediction_id",
       "authentication_requirement": "not_applicable_for_provider_free_local_task",
@@ -60,6 +102,27 @@
       "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
       "supported_benchmark_domains": [
         "calibration"
+      ],
+      "tool_permissions": []
+    },
+    {
+      "accepted_input": "observation object",
+      "audit_evidence": "process evidence, request hash echoed inside observation",
+      "authentication_requirement": "not_applicable_for_provider_free_local_task",
+      "database_requirement": "none for execute_task_logic record_observation path",
+      "executable": true,
+      "interface_id": "version-c:durable-record-observation-task",
+      "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
+      "kafka_requirement": "none",
+      "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+      "path": "scripts/execute_durable_task.py",
+      "produced_output": "observation_recorded with supplied observation",
+      "redis_requirement": "none",
+      "runtime_type": "python_function_via_external_subprocess",
+      "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "supported_benchmark_domains": [
+        "evidence_evaluation"
       ],
       "tool_permissions": []
     }
