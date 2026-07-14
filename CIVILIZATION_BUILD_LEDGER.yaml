@@ -402,22 +402,33 @@ phases:
           - 'route sensitivity matrix 271->282'
         notes: 11 routes classified. Scenario E full loop proven. Full regression green 2026-07-14 — exit 0; 111 suites passed/3 skipped; 830 passed/8 skipped/5 todo.
   C11_expansion:
-    status: not_started
+    status: verified
     items:
       - id: C11.MigrationExpansion
         layer: C11
-        status: not_started
+        status: verified
         depends_on: [C7.MigrationGovernance]
-        notes: expansion_proposals, risk_reviews, limited_trials, capabilities, capability_versions, capability_grants, capability_restrictions, capability_revocations, domain_versions.
+        migration_artifacts: [backend/src/db/migrations/139_capability_expansion.sql]
+        source_artifacts: [backend/src/services/capability-expansion.service.ts]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 139_capability_expansion.sql, exit 0'
+        notes: expansion_proposals (12-state gate lifecycle), expansion_stage_records (5 stages, in-order), transitions, capabilities (versioned), capability_grants (scoped active|restricted|revoked with live-uniqueness). Consumes existing proof_of_competence/domain_registry, not a replacement.
       - id: C11.ExpansionGateCompletion
         layer: C11
-        status: not_started
+        status: verified
         depends_on: [C11.MigrationExpansion, C10.CanaryAndRollback]
-        notes: proposed→risk_review→benchmark_design→limited_trial→calibration_review→governance_review→approved|restricted|rejected→monitored→expanded|revoked; restriction changes routing immediately; revocation cancels/escalates queued work.
+        notes: proposed->risk_review->benchmark_design->limited_trial->calibration_review->governance_review->approved|restricted|rejected->monitored->expanded|revoked; stages must complete in order and each must pass; approval requires all 5 stages passed + a competence proof + an approver independent of the proposer; restriction flips the routing check immediately; revocation blocks new work (assertCapabilityGranted fail-closed).
       - id: C11.ExpansionTests
         layer: C11
-        status: not_started
+        status: verified
         depends_on: [C11.ExpansionGateCompletion]
+        source_artifacts: [backend/src/routes/capability-expansion.routes.ts]
+        test_artifacts: [backend/tests/capability-expansion.test.ts]
+        verification_commands:
+          - 'npx jest tests/capability-expansion.test.ts --runInBand --forceExit -> 4/4 passed (incl. SCENARIO F)'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'route sensitivity matrix 282->290'
+        notes: 8 routes classified. Scenario F proves grant/restrict/revoke change routing and admission requires the complete gate. Full regression green 2026-07-14 — exit 0; 112 suites passed/3 skipped; 842 passed/8 skipped/5 todo.
   C12_civilization_os:
     status: not_started
     items:
@@ -504,10 +515,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 46
+  verified: 49
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 18
+  not_started: 15
   blocked: 0
   last_recomputed: '2026-07-14'

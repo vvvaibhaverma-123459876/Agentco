@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 103 |
-| AUTH-WRITE | 175 |
-| TOTAL | 282 |
+| AUTH-READ | 105 |
+| AUTH-WRITE | 181 |
+| TOTAL | 290 |
 
 ## Matrix
 
@@ -118,6 +118,14 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/drift/critical` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/drift/detect` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/drift/unresolved` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/expansion/capability-status` | GET/HEAD | Capability/domain expansion proposal/grant/restriction state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/expansion/grants/:grantId/restrict` | POST | Capability/domain expansion proposal/grant/restriction state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/expansion/grants/:grantId/revoke` | POST | Capability/domain expansion proposal/grant/restriction state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/expansion/proposals` | POST | Capability/domain expansion proposal/grant/restriction state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/expansion/proposals/:proposalId` | GET/HEAD | Capability/domain expansion proposal/grant/restriction state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/expansion/proposals/:proposalId/approve` | POST | Capability/domain expansion proposal/grant/restriction state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/expansion/proposals/:proposalId/grant` | POST | Capability/domain expansion proposal/grant/restriction state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/expansion/proposals/:proposalId/stage` | POST | Capability/domain expansion proposal/grant/restriction state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/goals/:goalId/lock` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/goals/:goalId/unlock` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/governance/emergency-powers` | POST | Governance proposal/vote/policy/emergency-power state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
