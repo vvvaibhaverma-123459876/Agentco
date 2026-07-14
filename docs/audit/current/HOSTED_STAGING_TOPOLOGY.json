@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "topology": null,
+  "blocker": "No hosted staging topology exists yet."
+}

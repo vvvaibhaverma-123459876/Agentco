@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "findings": [
+    {
+      "finding_id": "HST-001",
+      "severity": "S2",
+      "component": "hosted-staging-execution",
+      "hosted_resource": "cloud account / IaC / DNS / provider credentials",
+      "evidence": "HOSTED_STAGING_EXECUTION_CONTRACT.json execution_status=BLOCKED",
+      "reproduction": "run scripts/verify_hosted_staging_budget.py --check-prerequisites",
+      "root_cause": "No hosted cloud toolchain or account binding is available in the current environment.",
+      "impact": "Batch 05 cannot produce hosted staging evidence.",
+      "remediation": "Bind a dedicated staging cloud account, IaC state backend, DNS zone, workload identity, registry, and bounded provider credentials.",
+      "regression_test": "tests/test_hosted_staging_controls.py",
+      "status": "open_blocking",
+      "remaining_risk": "Hosted production remains entirely unverified."
+    }
+  ]
+}

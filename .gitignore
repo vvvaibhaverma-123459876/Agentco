@@ -197,6 +197,7 @@ reports/acceptance/
 artifacts/audit/
 artifacts/runtime-integration/
 artifacts/staging-deployment/
+artifacts/hosted-staging/
 backend/.runtime-integration/
 
 # Helm dependency archives are rebuilt from Chart.lock.
