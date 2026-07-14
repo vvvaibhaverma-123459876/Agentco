@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 90 |
-| AUTH-WRITE | 105 |
-| TOTAL | 200 |
+| AUTH-READ | 91 |
+| AUTH-WRITE | 116 |
+| TOTAL | 212 |
 
 ## Matrix
 
@@ -93,6 +93,18 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/citizens/roles/:eligibilityId/revoke` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/citizens/sanctions/:sanctionId/lift` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/citizens/successions` | POST | Citizenship status/sanction/role/envelope state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId` | GET/HEAD | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/coalitions/:coalitionId/activate` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/commitments` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/consensus` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/constitute` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/delegations` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/dissents` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/negotiate` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/proposals` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/settle` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/coalitions/:coalitionId/terminate` | POST | Institution coalition negotiation/consensus/commitment/settlement state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/consistency-check` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/constitution/activate` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/constitution/active` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
