@@ -1,0 +1,23 @@
+{
+  "matrix_version": "cross-version-health-v1",
+  "subjects": [
+    {
+      "subject": "version-a",
+      "sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "status": "healthy_with_limitations",
+      "limitations": ["pre-existing legacy duplicate migration sequence contracts are not represented by the Batch 07 validator in this subject"]
+    },
+    {
+      "subject": "version-b",
+      "sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "status": "healthy_with_limitations",
+      "limitations": ["duplicate 129 migration prefix is present without migration content-hash validator"]
+    },
+    {
+      "subject": "version-c",
+      "sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "status": "healthy",
+      "limitations": []
+    }
+  ]
+}

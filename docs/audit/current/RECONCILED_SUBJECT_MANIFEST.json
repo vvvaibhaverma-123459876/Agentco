@@ -1,0 +1,33 @@
+{
+  "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+  "parent_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+  "files_changed": [
+    "backend/src/db/migrate.ts",
+    "docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.json",
+    "docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.md",
+    "docs/audit/current/MAINLINE_RECONCILIATION_FINDINGS.json",
+    "docs/audit/current/MAINLINE_RECONCILIATION_FINDINGS.md",
+    "docs/audit/current/MIGRATION_IDENTITY_LEDGER.json",
+    "docs/audit/current/MIGRATION_IDENTITY_LEDGER.md",
+    "scripts/verify_migration_identity.py"
+  ],
+  "findings_resolved": [
+    "CVR-001"
+  ],
+  "migration_fingerprint": {
+    "migration_count": 129,
+    "identity_ledger": "docs/audit/current/MIGRATION_IDENTITY_LEDGER.json",
+    "duplicate_sequence_129_contract": "Batch 07 reconciliation contract; full filename is stable migration ID and content hashes are tracked."
+  },
+  "dependency_lock_hashes": {
+    "backend_package_lock": "cb933b984a47a3a7349c22d24445f9a09fe763cc635edef5affc16cdb007b11d",
+    "frontend_package_lock": "eb5399960faf48db9f2c13e696ffce19228983859bb34edffd9ef36224f62274",
+    "python_requirements_lock": "afbff5a9cbe61b2deb38617b6948c3aa7a248203af71e04bc25321d7a0901918"
+  },
+  "runtime_entrypoint_hashes": {
+    "backend_migration_runner": "content-hash tracking added in backend/src/db/migrate.ts"
+  },
+  "benchmark_files_unchanged": true,
+  "evaluator_files_unchanged": true,
+  "dirty_status": "clean_at_freeze"
+}

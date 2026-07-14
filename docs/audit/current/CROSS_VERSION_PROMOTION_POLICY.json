@@ -1,0 +1,30 @@
+{
+  "policy_version": "cross-version-promotion-policy-v1",
+  "finalized_before_hidden_scoring": true,
+  "mandatory_blockers": [
+    "authorization_regression",
+    "budget_enforcement_regression",
+    "hidden_answer_leakage",
+    "audit_chain_integrity_regression",
+    "migration_incompatibility",
+    "critical_data_integrity_regression",
+    "self_approval_path",
+    "material_calibration_regression",
+    "material_failure_rate_increase",
+    "material_recovery_regression",
+    "evidence_omission",
+    "benchmark_or_evaluator_mismatch"
+  ],
+  "numeric_thresholds": {
+    "max_authorization_regressions": 0,
+    "max_budget_regressions": 0,
+    "max_hidden_answer_leakage": 0,
+    "max_critical_regressions": 0,
+    "max_task_success_regression_mean": 0.0,
+    "max_failure_rate_increase": 0.0,
+    "max_expected_calibration_error_increase": 0.01,
+    "max_latency_increase_without_disclosure_ms": 5.0
+  },
+  "claim_derived_tests_primary_promotion_evidence": false,
+  "automatic_promotion_allowed": false
+}

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentCo Cross-Version Campaign Manifest",
+  "type": "object",
+  "required": [
+    "campaign_id",
+    "benchmark_registry_hash",
+    "evaluator_version",
+    "subjects",
+    "comparisons"
+  ],
+  "properties": {
+    "campaign_id": { "type": "string" },
+    "benchmark_registry_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "evaluator_version": { "type": "string" },
+    "evaluator_code_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "seeds": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "minItems": 1
+    },
+    "subjects": {
+      "type": "object",
+      "required": ["version-a", "version-b", "version-c"]
+    },
+    "comparisons": {
+      "type": "object",
+      "required": ["a_vs_b", "a_vs_c", "b_vs_c"]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "findings": [
+    {
+      "finding_id": "CVF-001",
+      "severity": "S2",
+      "subject_version": "version-b",
+      "component": "database migrations",
+      "domain": "migration identity",
+      "evidence": "Version B has both 129_civilization_kernel.sql and 129_longitudinal_mission_evidence.sql while the runner tracks only filename/applied_at.",
+      "reproduction": "Inspect backend/src/db/migrations and backend/src/db/migrate.ts at 651794a41513db1e40930f08c253ef261af7c1e7.",
+      "root_cause": "Parallel branch migration prefix allocation.",
+      "impact": "Migration ordering remains deterministic but identity is ambiguous for audit and already-applied content changes.",
+      "remediation": "Version C adds migration content_hash and sequence_num tracking plus migration identity ledger validation.",
+      "regression_test": "python3.13 scripts/verify_migration_identity.py --check",
+      "status": "resolved_in_version_c",
+      "remaining_risk": "Legacy rows with null content_hash are backfilled only when Version C migration runner is executed."
+    }
+  ]
+}

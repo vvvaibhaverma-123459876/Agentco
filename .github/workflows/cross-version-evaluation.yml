@@ -1,0 +1,126 @@
+name: Cross-Version Evaluation Audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "Makefile"
+      - ".github/workflows/cross-version-evaluation.yml"
+      - "benchmarks/**"
+      - "schemas/cross_version_campaign.schema.json"
+      - "scripts/run_cross_version_campaign.py"
+      - "scripts/verify_cross_version_campaign.py"
+      - "scripts/compare_cross_version_campaign.py"
+      - "scripts/verify_migration_identity.py"
+      - "tests/test_cross_version_campaign.py"
+      - "docs/audit/current/*CROSS_VERSION*"
+      - "docs/audit/current/*CIVILIZATION*"
+  workflow_dispatch:
+    inputs:
+      baseline:
+        description: "Version A subject SHA"
+        required: true
+        default: "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04"
+      raw_candidate:
+        description: "Version B raw candidate SHA"
+        required: true
+        default: "651794a41513db1e40930f08c253ef261af7c1e7"
+      reconciled_candidate:
+        description: "Version C reconciled candidate SHA"
+        required: true
+      campaign:
+        description: "Cross-version campaign ID"
+        required: true
+        default: "cross-version-civilization-v1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cross-version-evaluation-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cross-version-protocol:
+    name: Cross-version protocol validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      BASELINE: ${{ github.event.inputs.baseline || 'fb27dc0529d3c5d11480503bfbcf6f2d156f5b04' }}
+      RAW_CANDIDATE: ${{ github.event.inputs.raw_candidate || '651794a41513db1e40930f08c253ef261af7c1e7' }}
+      RECONCILED_CANDIDATE: ${{ github.event.inputs.reconciled_candidate || github.event.pull_request.head.sha || github.sha }}
+      CAMPAIGN: ${{ github.event.inputs.campaign || 'cross-version-civilization-v1' }}
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: requirements/requirements.lock.txt
+
+      - name: Install locked Python dependencies
+        run: python3.13 -m pip install -r requirements/requirements.lock.txt
+
+      - name: Verify exact checkout
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_AUDIT_SHA"
+
+      - name: Validate benchmark governance
+        run: python3.13 scripts/verify_benchmark_governance.py --check
+
+      - name: Validate migration identity contracts
+        run: python3.13 scripts/verify_migration_identity.py --check
+
+      - name: Run cross-version protocol tests
+        run: python3.13 -m pytest tests/test_cross_version_campaign.py -q
+
+      - name: Run full paired campaign on manual dispatch
+        if: github.event_name == 'workflow_dispatch'
+        run: >-
+          make cross-version-campaign
+          BASELINE="$BASELINE"
+          RAW_CANDIDATE="$RAW_CANDIDATE"
+          RECONCILED_CANDIDATE="$RECONCILED_CANDIDATE"
+          CAMPAIGN="$CAMPAIGN"
+
+      - name: Verify manual campaign evidence commit context
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          python3.13 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          campaign = os.environ["CAMPAIGN"]
+          manifest_path = Path("artifacts/cross-version") / campaign / "CONTROL_MANIFEST.json"
+          if not manifest_path.exists():
+              raise SystemExit("missing cross-version control manifest")
+          manifest = json.loads(manifest_path.read_text())
+          expected = {
+              "version-a": os.environ["BASELINE"],
+              "version-b": os.environ["RAW_CANDIDATE"],
+              "version-c": os.environ["RECONCILED_CANDIDATE"],
+          }
+          for subject, sha in expected.items():
+              actual = manifest.get("subjects", {}).get(subject, {}).get("sha")
+              if actual != sha:
+                  raise SystemExit(f"{subject} subject SHA {actual} != {sha}")
+          PY
+
+      - name: Upload cross-version artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cross-version-evaluation-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            artifacts/cross-version/**
+            docs/audit/current/CROSS_VERSION_*.*
+            docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.*
+          if-no-files-found: warn
+          retention-days: 120

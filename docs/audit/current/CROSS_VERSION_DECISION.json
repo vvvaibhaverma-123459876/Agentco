@@ -1,0 +1,32 @@
+{
+  "decision_version": "cross-version-decision-v1",
+  "campaign_id": "cross-version-civilization-v1",
+  "decision": "PROMOTION_PROPOSAL",
+  "subject": "version-c",
+  "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+  "raw_candidate_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+  "baseline_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+  "proposer_identity": "batch07-cross-version-harness",
+  "evaluator_identity": "cross-version-evaluator-v1",
+  "approval_identity": "audit-review-required",
+  "self_approval": false,
+  "automatic_promotion": false,
+  "rationale": [
+    "Version B is preserved as raw candidate and recorded with migration identity limitation.",
+    "Version C resolves the migration identity blocker before blind evaluation.",
+    "A versus C paired benchmark completed 120 cases with 5 improved, 0 regressed, 115 unchanged, and no critical governance regression.",
+    "B versus C completed 120 cases with 5 improved, 0 regressed, 115 unchanged.",
+    "Civilization C1-C11 claims are unit-verified, not treated as complete mission proof."
+  ],
+  "blocking_metrics": [],
+  "supporting_evidence": [
+    "artifacts/cross-version/cross-version-civilization-v1/CONTROL_MANIFEST.json",
+    "docs/audit/current/MIGRATION_IDENTITY_LEDGER.json",
+    "docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.json"
+  ],
+  "limitations": [
+    "No four-week, twelve-week, hosted, or production evidence.",
+    "The cross-version benchmark is deterministic local evidence.",
+    "Promotion proposal requires independent review and does not merge or deploy the candidate."
+  ]
+}
