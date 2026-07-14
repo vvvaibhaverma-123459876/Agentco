@@ -1,0 +1,20 @@
+{
+  "adapter_bundle_hash": "bfd24edd0a484fa44bb0ee50dd2e414c131745a882e25dcf119910020ef95817",
+  "adapter_files": [
+    "cross_version_adapters/__init__.py",
+    "cross_version_adapters/backend_runtime_adapter.py",
+    "cross_version_adapters/base.py",
+    "cross_version_adapters/data_analysis_adapter.py",
+    "cross_version_adapters/governance_adapter.py",
+    "cross_version_adapters/memory_adapter.py",
+    "cross_version_adapters/python_agent_adapter.py",
+    "cross_version_adapters/recovery_adapter.py",
+    "cross_version_adapters/unsupported_adapter.py",
+    "scripts/run_subject_native_cross_version_campaign.py"
+  ],
+  "adapter_freeze_commit": "3dc72e250612abf36f51f4826c33fb98e5c1dae6",
+  "benchmark_registry_hash": "3a1c54f4e54c3f2d7df0b0720dff5112d8179ae4f79fe7f95d2cd0bc2f322d1e",
+  "compatibility_matrix_hash": "3ff78ed74acf0ad0f96f8d35b44fd3c883ebc8be8dbdff7ad875ea64d1fe67ba",
+  "evaluator_version": "longitudinal-evaluator-v1",
+  "validation_hidden_not_used_for_adapter_development": true
+}

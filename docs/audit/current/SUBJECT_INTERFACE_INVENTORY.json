@@ -1,0 +1,67 @@
+{
+  "records": [
+    {
+      "accepted_input": "prediction_id, confidence, outcome",
+      "audit_evidence": "process evidence, request hash echoed as prediction_id",
+      "authentication_requirement": "not_applicable_for_provider_free_local_task",
+      "database_requirement": "none for execute_task_logic calibration path",
+      "executable": true,
+      "interface_id": "version-a:durable-calibration-task",
+      "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='calibration')",
+      "kafka_requirement": "none",
+      "limitations": "does not cover hosted, provider, memory, backend route, or multi-domain civilization workflows",
+      "path": "scripts/execute_durable_task.py",
+      "produced_output": "calibration_score with prediction_id, confidence, outcome, brier_score",
+      "redis_requirement": "none",
+      "runtime_type": "python_function_via_external_subprocess",
+      "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "supported_benchmark_domains": [
+        "calibration"
+      ],
+      "tool_permissions": []
+    },
+    {
+      "accepted_input": "prediction_id, confidence, outcome",
+      "audit_evidence": "process evidence, request hash echoed as prediction_id",
+      "authentication_requirement": "not_applicable_for_provider_free_local_task",
+      "database_requirement": "none for execute_task_logic calibration path",
+      "executable": true,
+      "interface_id": "version-b:durable-calibration-task",
+      "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='calibration')",
+      "kafka_requirement": "none",
+      "limitations": "does not cover hosted, provider, memory, backend route, or multi-domain civilization workflows",
+      "path": "scripts/execute_durable_task.py",
+      "produced_output": "calibration_score with prediction_id, confidence, outcome, brier_score",
+      "redis_requirement": "none",
+      "runtime_type": "python_function_via_external_subprocess",
+      "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "supported_benchmark_domains": [
+        "calibration"
+      ],
+      "tool_permissions": []
+    },
+    {
+      "accepted_input": "prediction_id, confidence, outcome",
+      "audit_evidence": "process evidence, request hash echoed as prediction_id",
+      "authentication_requirement": "not_applicable_for_provider_free_local_task",
+      "database_requirement": "none for execute_task_logic calibration path",
+      "executable": true,
+      "interface_id": "version-c:durable-calibration-task",
+      "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='calibration')",
+      "kafka_requirement": "none",
+      "limitations": "does not cover hosted, provider, memory, backend route, or multi-domain civilization workflows",
+      "path": "scripts/execute_durable_task.py",
+      "produced_output": "calibration_score with prediction_id, confidence, outcome, brier_score",
+      "redis_requirement": "none",
+      "runtime_type": "python_function_via_external_subprocess",
+      "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "supported_benchmark_domains": [
+        "calibration"
+      ],
+      "tool_permissions": []
+    }
+  ]
+}

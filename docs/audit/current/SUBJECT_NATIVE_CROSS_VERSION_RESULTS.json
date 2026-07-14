@@ -1,0 +1,152 @@
+{
+  "campaign_id": "subject-native-cross-version-v1",
+  "comparisons": {
+    "a_vs_b": {
+      "brier_delta_completed_common": 0.0,
+      "budget_compliance_delta_completed_common": 0.0,
+      "capability_delta": "limited_to_calibration_common_core",
+      "common_core_paired_case_count": 10,
+      "completed_common_core_pair_count": 10,
+      "correctness_delta_completed_common": 0.0,
+      "critical_regression_count": 0,
+      "left": "subject-9f86",
+      "left_completed": 10,
+      "left_failed": 0,
+      "left_timeout": 0,
+      "left_unsupported": 110,
+      "missing_case_count": 0,
+      "paired_case_count": 120,
+      "right": "subject-438d",
+      "right_completed": 10,
+      "right_failed": 0,
+      "right_timeout": 0,
+      "right_unsupported": 110,
+      "task_success_delta": 0.0
+    },
+    "a_vs_c": {
+      "brier_delta_completed_common": 0.0,
+      "budget_compliance_delta_completed_common": 0.0,
+      "capability_delta": "limited_to_calibration_common_core",
+      "common_core_paired_case_count": 10,
+      "completed_common_core_pair_count": 10,
+      "correctness_delta_completed_common": 0.0,
+      "critical_regression_count": 0,
+      "left": "subject-9f86",
+      "left_completed": 10,
+      "left_failed": 0,
+      "left_timeout": 0,
+      "left_unsupported": 110,
+      "missing_case_count": 0,
+      "paired_case_count": 120,
+      "right": "subject-15dd",
+      "right_completed": 10,
+      "right_failed": 0,
+      "right_timeout": 0,
+      "right_unsupported": 110,
+      "task_success_delta": 0.0
+    },
+    "b_vs_c": {
+      "brier_delta_completed_common": 0.0,
+      "budget_compliance_delta_completed_common": 0.0,
+      "capability_delta": "limited_to_calibration_common_core",
+      "common_core_paired_case_count": 10,
+      "completed_common_core_pair_count": 10,
+      "correctness_delta_completed_common": 0.0,
+      "critical_regression_count": 0,
+      "left": "subject-438d",
+      "left_completed": 10,
+      "left_failed": 0,
+      "left_timeout": 0,
+      "left_unsupported": 110,
+      "missing_case_count": 0,
+      "paired_case_count": 120,
+      "right": "subject-15dd",
+      "right_completed": 10,
+      "right_failed": 0,
+      "right_timeout": 0,
+      "right_unsupported": 110,
+      "task_success_delta": 0.0
+    }
+  },
+  "compatibility_matrix_hash": "3ff78ed74acf0ad0f96f8d35b44fd3c883ebc8be8dbdff7ad875ea64d1fe67ba",
+  "reason": "only calibration currently has a common subject-native provider-free interface across all immutable subjects",
+  "subjects": {
+    "version-a": {
+      "aggregate": {
+        "completed": 10,
+        "failed": 0,
+        "max_peak_rss_kb": 36929536.0,
+        "mean_brier_score_completed_only": 0.28125,
+        "mean_budget_compliance_completed_only": 1.0,
+        "mean_correctness_completed_only": 1.0,
+        "mean_cpu_time_ms": 106.8165,
+        "mean_latency_ms": 140.406,
+        "mean_task_success": 0.08333333333333333,
+        "measurable_capability": true,
+        "planned": 120,
+        "supported_common": 10,
+        "timeout": 0,
+        "unsupported": 110
+      },
+      "health": "healthy_with_limitations",
+      "opaque_subject": "subject-9f86",
+      "sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04"
+    },
+    "version-b": {
+      "aggregate": {
+        "completed": 10,
+        "failed": 0,
+        "max_peak_rss_kb": 37273600.0,
+        "mean_brier_score_completed_only": 0.28125,
+        "mean_budget_compliance_completed_only": 1.0,
+        "mean_correctness_completed_only": 1.0,
+        "mean_cpu_time_ms": 100.57169999999999,
+        "mean_latency_ms": 130.8085,
+        "mean_task_success": 0.08333333333333333,
+        "measurable_capability": true,
+        "planned": 120,
+        "supported_common": 10,
+        "timeout": 0,
+        "unsupported": 110
+      },
+      "health": "healthy_with_limitations",
+      "opaque_subject": "subject-438d",
+      "sha": "651794a41513db1e40930f08c253ef261af7c1e7"
+    },
+    "version-c": {
+      "aggregate": {
+        "completed": 10,
+        "failed": 0,
+        "max_peak_rss_kb": 37273600.0,
+        "mean_brier_score_completed_only": 0.28125,
+        "mean_budget_compliance_completed_only": 1.0,
+        "mean_correctness_completed_only": 1.0,
+        "mean_cpu_time_ms": 99.639,
+        "mean_latency_ms": 130.0164,
+        "mean_task_success": 0.08333333333333333,
+        "measurable_capability": true,
+        "planned": 120,
+        "supported_common": 10,
+        "timeout": 0,
+        "unsupported": 110
+      },
+      "health": "healthy",
+      "opaque_subject": "subject-15dd",
+      "sha": "81cd17431f826d9d3cda06b9127758751e44b798"
+    }
+  },
+  "threshold_result": "not_met",
+  "thresholds": {
+    "completion_rate": 0.75,
+    "max_subject_coverage_gap_points": 10,
+    "supported_common_domains": 8,
+    "supported_common_validation_hidden_cases": 18
+  },
+  "totals": {
+    "completed": 30,
+    "failed": 0,
+    "planned": 360,
+    "timeout": 0,
+    "unsupported": 330
+  }
+}

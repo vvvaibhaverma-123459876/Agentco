@@ -1,0 +1,1031 @@
+{
+  "matrix_hash": "3ff78ed74acf0ad0f96f8d35b44fd3c883ebc8be8dbdff7ad875ea64d1fe67ba",
+  "records": [
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "reasoning-validation-01",
+      "domain": "reasoning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "reasoning-validation-01",
+      "domain": "reasoning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "reasoning-validation-01",
+      "domain": "reasoning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "reasoning-hidden-01",
+      "domain": "reasoning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "reasoning-hidden-01",
+      "domain": "reasoning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "reasoning-hidden-01",
+      "domain": "reasoning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "software_engineering-validation-01",
+      "domain": "software_engineering",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "software_engineering-validation-01",
+      "domain": "software_engineering",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "software_engineering-validation-01",
+      "domain": "software_engineering",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "software_engineering-hidden-01",
+      "domain": "software_engineering",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "software_engineering-hidden-01",
+      "domain": "software_engineering",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "software_engineering-hidden-01",
+      "domain": "software_engineering",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "data_analysis-validation-01",
+      "domain": "data_analysis",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "data_analysis-validation-01",
+      "domain": "data_analysis",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "data_analysis-validation-01",
+      "domain": "data_analysis",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "data_analysis-hidden-01",
+      "domain": "data_analysis",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "data_analysis-hidden-01",
+      "domain": "data_analysis",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "data_analysis-hidden-01",
+      "domain": "data_analysis",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "planning-validation-01",
+      "domain": "planning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "planning-validation-01",
+      "domain": "planning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "planning-validation-01",
+      "domain": "planning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "planning-hidden-01",
+      "domain": "planning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "planning-hidden-01",
+      "domain": "planning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "planning-hidden-01",
+      "domain": "planning",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "tool_use-validation-01",
+      "domain": "tool_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "tool_use-validation-01",
+      "domain": "tool_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "tool_use-validation-01",
+      "domain": "tool_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "tool_use-hidden-01",
+      "domain": "tool_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "tool_use-hidden-01",
+      "domain": "tool_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "tool_use-hidden-01",
+      "domain": "tool_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "evidence_evaluation-validation-01",
+      "domain": "evidence_evaluation",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "evidence_evaluation-validation-01",
+      "domain": "evidence_evaluation",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "evidence_evaluation-validation-01",
+      "domain": "evidence_evaluation",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "evidence_evaluation-hidden-01",
+      "domain": "evidence_evaluation",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "evidence_evaluation-hidden-01",
+      "domain": "evidence_evaluation",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "evidence_evaluation-hidden-01",
+      "domain": "evidence_evaluation",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "durable_calibration_adapter",
+      "case_id": "calibration-validation-01",
+      "domain": "calibration",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [
+        "request_hash_echoed_as_prediction_id",
+        "process evidence"
+      ],
+      "input_translation": "prompt/seed/request hash translated to calibration Task payload",
+      "selected_interface": "scripts.execute_durable_task:calibration",
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "all subjects expose provider-free durable calibration logic",
+      "support_status": "supported_common"
+    },
+    {
+      "adapter": "durable_calibration_adapter",
+      "case_id": "calibration-validation-01",
+      "domain": "calibration",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [
+        "request_hash_echoed_as_prediction_id",
+        "process evidence"
+      ],
+      "input_translation": "prompt/seed/request hash translated to calibration Task payload",
+      "selected_interface": "scripts.execute_durable_task:calibration",
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "all subjects expose provider-free durable calibration logic",
+      "support_status": "supported_common"
+    },
+    {
+      "adapter": "durable_calibration_adapter",
+      "case_id": "calibration-validation-01",
+      "domain": "calibration",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [
+        "request_hash_echoed_as_prediction_id",
+        "process evidence"
+      ],
+      "input_translation": "prompt/seed/request hash translated to calibration Task payload",
+      "selected_interface": "scripts.execute_durable_task:calibration",
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "all subjects expose provider-free durable calibration logic",
+      "support_status": "supported_common"
+    },
+    {
+      "adapter": "durable_calibration_adapter",
+      "case_id": "calibration-hidden-01",
+      "domain": "calibration",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [
+        "request_hash_echoed_as_prediction_id",
+        "process evidence"
+      ],
+      "input_translation": "prompt/seed/request hash translated to calibration Task payload",
+      "selected_interface": "scripts.execute_durable_task:calibration",
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "all subjects expose provider-free durable calibration logic",
+      "support_status": "supported_common"
+    },
+    {
+      "adapter": "durable_calibration_adapter",
+      "case_id": "calibration-hidden-01",
+      "domain": "calibration",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [
+        "request_hash_echoed_as_prediction_id",
+        "process evidence"
+      ],
+      "input_translation": "prompt/seed/request hash translated to calibration Task payload",
+      "selected_interface": "scripts.execute_durable_task:calibration",
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "all subjects expose provider-free durable calibration logic",
+      "support_status": "supported_common"
+    },
+    {
+      "adapter": "durable_calibration_adapter",
+      "case_id": "calibration-hidden-01",
+      "domain": "calibration",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [
+        "request_hash_echoed_as_prediction_id",
+        "process evidence"
+      ],
+      "input_translation": "prompt/seed/request hash translated to calibration Task payload",
+      "selected_interface": "scripts.execute_durable_task:calibration",
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "all subjects expose provider-free durable calibration logic",
+      "support_status": "supported_common"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "memory_use-validation-01",
+      "domain": "memory_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "memory_use-validation-01",
+      "domain": "memory_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "memory_use-validation-01",
+      "domain": "memory_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "memory_use-hidden-01",
+      "domain": "memory_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "memory_use-hidden-01",
+      "domain": "memory_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "memory_use-hidden-01",
+      "domain": "memory_use",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "governance_authorization-validation-01",
+      "domain": "governance_authorization",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "governance_authorization-validation-01",
+      "domain": "governance_authorization",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "governance_authorization-validation-01",
+      "domain": "governance_authorization",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "governance_authorization-hidden-01",
+      "domain": "governance_authorization",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "governance_authorization-hidden-01",
+      "domain": "governance_authorization",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "governance_authorization-hidden-01",
+      "domain": "governance_authorization",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "resource_budgeting-validation-01",
+      "domain": "resource_budgeting",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "resource_budgeting-validation-01",
+      "domain": "resource_budgeting",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "resource_budgeting-validation-01",
+      "domain": "resource_budgeting",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "resource_budgeting-hidden-01",
+      "domain": "resource_budgeting",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "resource_budgeting-hidden-01",
+      "domain": "resource_budgeting",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "resource_budgeting-hidden-01",
+      "domain": "resource_budgeting",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "failure_recovery-validation-01",
+      "domain": "failure_recovery",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "failure_recovery-validation-01",
+      "domain": "failure_recovery",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "failure_recovery-validation-01",
+      "domain": "failure_recovery",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "failure_recovery-hidden-01",
+      "domain": "failure_recovery",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "failure_recovery-hidden-01",
+      "domain": "failure_recovery",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "failure_recovery-hidden-01",
+      "domain": "failure_recovery",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "cross_domain_transfer-validation-01",
+      "domain": "cross_domain_transfer",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "cross_domain_transfer-validation-01",
+      "domain": "cross_domain_transfer",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "cross_domain_transfer-validation-01",
+      "domain": "cross_domain_transfer",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "cross_domain_transfer-hidden-01",
+      "domain": "cross_domain_transfer",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "cross_domain_transfer-hidden-01",
+      "domain": "cross_domain_transfer",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    },
+    {
+      "adapter": "unsupported_adapter",
+      "case_id": "cross_domain_transfer-hidden-01",
+      "domain": "cross_domain_transfer",
+      "environment_requirements": [
+        "python3.13"
+      ],
+      "expected_runtime_evidence": [],
+      "input_translation": null,
+      "selected_interface": null,
+      "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+      "support_rationale": "no common existing subject-native interface consumes this domain without live providers",
+      "support_status": "unsupported_incompatible_contract"
+    }
+  ]
+}
