@@ -8,13 +8,18 @@ Subjects:
 
 ## Common Interfaces
 
-Two provider-free interfaces are semantically common across A, B and C:
+One provider-free benchmark interface and one provider-free storage primitive
+are semantically common across A, B and C:
 
 - `durable-calibration-task`: runtime primitive. The subject calculates Brier score from adapter-supplied confidence and outcome.
-- `durable-record-observation-task`: storage/retrieval primitive. The subject records and returns an observation payload.
+- `durable-record-observation-task`: storage-write primitive. The subject records and returns a supplied observation payload.
 
-Neither is a broad reasoning, planning, governance, memory, recovery, software
-engineering, data-analysis or civilization capability task.
+The durable observation operation is not common support for the
+`evidence_evaluation` benchmark domain. It does not evaluate conflicting
+evidence, determine truth, accept or reject evidence, or produce confidence.
+
+Neither operation is a broad reasoning, planning, governance, memory, recovery,
+software engineering, data-analysis or civilization capability task.
 
 ## Rejected Candidates
 
@@ -24,5 +29,5 @@ engineering, data-analysis or civilization capability task.
 
 ## Conclusion
 
-V2 can expand beyond the calibration utility only to a second runtime primitive.
+V2 can expand beyond the calibration utility only to a second storage primitive.
 The broad capability threshold remains unmet.

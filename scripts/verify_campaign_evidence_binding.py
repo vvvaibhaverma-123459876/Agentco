@@ -13,6 +13,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CAMPAIGN = ROOT / "artifacts" / "cross-version" / "subject-native-cross-version-v2"
+PAYLOAD_MANIFEST = "INTERNAL_PAYLOAD_MANIFEST.json"
 
 
 def canonical_json(data: Any) -> str:
@@ -32,10 +33,28 @@ def git(*args: str) -> str:
 
 
 def payload_manifest_hash(campaign_dir: Path) -> str:
+    manifest_path = campaign_dir / PAYLOAD_MANIFEST
+    if manifest_path.exists():
+        manifest = load_json(manifest_path)
+        return reconstruct_payload_hash(campaign_dir, manifest)
     files = []
     for path in sorted((campaign_dir / "runs").glob("**/*.json")) + sorted((campaign_dir / "comparisons").glob("**/*.json")):
-        files.append({"path": str(path.relative_to(campaign_dir)), "sha256": sha256_file(path)})
+        files.append({"path": str(path.relative_to(campaign_dir)), "sha256": sha256_file(path), "size_bytes": path.stat().st_size})
     return sha256_text(canonical_json(files))
+
+
+def reconstruct_payload_hash(campaign_dir: Path, manifest: dict[str, Any]) -> str:
+    records = []
+    for item in manifest.get("included_relative_paths", []):
+        relative = item.get("path")
+        if not relative:
+            continue
+        path = campaign_dir / relative
+        if not path.exists():
+            records.append({"path": relative, "sha256": "MISSING", "size_bytes": -1})
+            continue
+        records.append({"path": relative, "sha256": sha256_file(path), "size_bytes": path.stat().st_size})
+    return sha256_text(canonical_json(records))
 
 
 def load_json(path: Path) -> dict[str, Any]:
@@ -50,6 +69,14 @@ def validate(campaign_dir: Path = DEFAULT_CAMPAIGN, expected_head: str | None = 
     if not manifest_path.exists():
         return ["MISSING_CONTROL_MANIFEST"]
     manifest = load_json(manifest_path)
+    payload_path = campaign_dir / PAYLOAD_MANIFEST
+    payload_manifest = load_json(payload_path) if payload_path.exists() else None
+    if payload_manifest is None:
+        errors.append("MISSING_INTERNAL_PAYLOAD_MANIFEST")
+    elif payload_manifest.get("aggregate_payload_hash") != reconstruct_payload_hash(campaign_dir, payload_manifest):
+        errors.append("INTERNAL_PAYLOAD_MANIFEST_HASH_MISMATCH")
+    elif manifest.get("internal_payload_manifest_hash") != payload_manifest.get("aggregate_payload_hash"):
+        errors.append("CONTROL_PAYLOAD_HASH_MISMATCH")
     freeze_sha = manifest.get("adapter_freeze_sha")
     if not freeze_sha:
         errors.append("MISSING_ADAPTER_FREEZE_SHA")

@@ -68,7 +68,7 @@ An internal payload hash must not be reported as a GitHub artifact archive diges
 The three-version interface audit found five candidate interfaces:
 
 - `durable-calibration-task`: common `runtime_primitive`
-- `durable-record-observation-task`: common `storage_retrieval`
+- `durable-record-observation-task`: common `storage_write` primitive associated with evidence-shaped input, not `evidence_evaluation` benchmark support
 - LLM review/decision path: rejected, live provider required
 - backend route task path: rejected, no semantically equivalent bootstrap/auth contract across A/B/C
 - civilization runtime path: rejected, absent from Version A
@@ -87,7 +87,7 @@ Campaign: `subject-native-cross-version-v2`
 - timeout executions: `0`
 - unsupported executions: `300`
 - completed runtime primitive executions: `30`
-- completed storage/retrieval executions: `30`
+- completed storage-write executions: `30`
 - completed capability-task executions: `0`
 
 The local V2 campaign completed the available common primitive and storage paths, but it did not satisfy broad capability thresholds.
@@ -96,8 +96,8 @@ The local V2 campaign completed the available common primitive and storage paths
 
 The predefined thresholds remain unmet:
 
-- required common domains: `8 of 12`; observed `2`
-- required validation/hidden common cases: `18 of 24`; observed `4`
+- required common benchmark capability domains: `8 of 12`; observed `0`
+- required validation/hidden common benchmark capability cases: `18 of 24`; observed `0`
 - required common capability-task domains: `4`; observed `0`
 - required common-core completion: unmet for broad capability evidence
 

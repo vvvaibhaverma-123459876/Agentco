@@ -1,6 +1,6 @@
 # Subject-Native Cross-Version V2 Results
 
-Campaign: `subject-native-cross-version-v2`
+Campaign: `subject-native-cross-version-v2-closure`
 
 ## Totals
 
@@ -10,4 +10,4 @@ Campaign: `subject-native-cross-version-v2`
 - Timeout executions: 0
 - Unsupported executions: 300
 
-Minimum validity thresholds were not met. Completed operations are compatibility primitives/controls, not broad capability tasks.
+Minimum validity thresholds were not met. Completed operations are primitive compatibility checks, not broad capability tasks.

@@ -3,6 +3,7 @@ from pathlib import Path
 
 from scripts import (
     calculate_longitudinal_milestones,
+    run_subject_native_cross_version_campaign,
     verify_cross_version_campaign,
     verify_cross_version_harness_independence,
     verify_campaign_evidence_binding,
@@ -122,7 +123,13 @@ def subject_native_campaign_fixture(path: Path) -> Path:
                         "stdout_hash": "a" * 64,
                         "stderr_hash": "b" * 64,
                     } if completed else None,
-                    "response": {"confidence": 0.5 if completed else None},
+                    "response": {
+                        "confidence": 0.5 if completed else None,
+                        "evidence_refs": [
+                            f"process://{meta['opaque_label']}/{run_id}/123",
+                            f"request://{meta['opaque_label']}/{run_id}/{request_hash}",
+                        ] if completed else [],
+                    },
                 }
             )
         run = {
@@ -137,15 +144,17 @@ def subject_native_campaign_fixture(path: Path) -> Path:
 
 def subject_native_v2_campaign_fixture(path: Path) -> Path:
     subject_native_campaign_fixture(path)
+    current_head = verify_campaign_evidence_binding.git("rev-parse", "HEAD")
+    freeze_tree = verify_campaign_evidence_binding.git("rev-parse", f"{BASELINE}^{{tree}}")
     manifest_path = path / "CONTROL_MANIFEST.json"
     manifest = json.loads(manifest_path.read_text())
     manifest.update(
         {
             "control_manifest_version": "subject-native-cross-version-campaign-v2",
-            "campaign_execution_sha": RECONCILED,
-            "workflow_head_sha": RECONCILED,
+            "campaign_execution_sha": current_head,
+            "workflow_head_sha": current_head,
             "adapter_freeze_sha": BASELINE,
-            "adapter_freeze_tree_hash": "dummy-tree",
+            "adapter_freeze_tree_hash": freeze_tree,
             "completed_count": 30,
             "failed_count": 0,
             "timeout_count": 0,
@@ -153,18 +162,38 @@ def subject_native_v2_campaign_fixture(path: Path) -> Path:
             "internal_payload_manifest_hash": "0" * 64,
         }
     )
+    for subject in manifest["subjects"].values():
+        subject["tree_hash"] = freeze_tree
     manifest_path.write_text(json.dumps(manifest))
     for run_path in (path / "runs").glob("subject-*.json"):
         run = json.loads(run_path.read_text())
+        run["tree_hash"] = freeze_tree
+        raw_dir = path / "runs" / run["opaque_subject"] / "raw"
+        raw_dir.mkdir(parents=True)
         for item in run["case_results"]:
+            item["run_id"] = f"{run['opaque_subject']}-{item['case_id']}"
             if item["status"] == "completed":
                 item["operation_classification"] = "runtime_primitive"
+                item["operation_name"] = "calibration_calculation"
                 item["answer_ownership"] = {
                     "owned_by_subject": True,
                     "classification": "runtime_primitive",
                     "evidence": ["subject function returned result", "request hash was echoed"],
                 }
+            (raw_dir / f"{item['run_id']}.json").write_text(json.dumps(item))
         run_path.write_text(json.dumps(run))
+    payload = run_subject_native_cross_version_campaign.write_internal_payload_manifest(
+        path,
+        {
+            "campaign_execution_sha": current_head,
+            "adapter_freeze_sha": BASELINE,
+            "evaluator_code_hash": "e" * 64,
+            "subject_shas": {"version-a": BASELINE, "version-b": RAW, "version-c": RECONCILED},
+        },
+    )
+    manifest = json.loads(manifest_path.read_text())
+    manifest["internal_payload_manifest_hash"] = payload["aggregate_payload_hash"]
+    manifest_path.write_text(json.dumps(manifest))
     return path
 
 
@@ -234,6 +263,91 @@ def test_evidence_binding_rejects_total_mismatch(tmp_path):
     manifest_path.write_text(json.dumps(manifest))
 
     assert "COMPLETED_TOTAL_MISMATCH" in verify_campaign_evidence_binding.validate(campaign_dir)
+
+
+def test_evidence_binding_accepts_reproducible_payload_manifest(tmp_path):
+    campaign_dir = subject_native_v2_campaign_fixture(tmp_path / "campaign")
+
+    assert verify_campaign_evidence_binding.validate(campaign_dir) == []
+
+
+def test_evidence_binding_rejects_payload_hash_mismatch(tmp_path):
+    campaign_dir = subject_native_v2_campaign_fixture(tmp_path / "campaign")
+    raw_path = next((campaign_dir / "runs" / "subject-aaaa" / "raw").glob("*.json"))
+    raw = json.loads(raw_path.read_text())
+    raw["tampered"] = True
+    raw_path.write_text(json.dumps(raw))
+
+    errors = verify_campaign_evidence_binding.validate(campaign_dir)
+
+    assert "INTERNAL_PAYLOAD_MANIFEST_HASH_MISMATCH" in errors
+    assert "INTERNAL_PAYLOAD_HASH_MISMATCH" in errors
+
+
+def test_storage_write_is_not_evidence_evaluation_capability(tmp_path):
+    campaign_dir = subject_native_v2_campaign_fixture(tmp_path / "campaign")
+    run_path = campaign_dir / "runs" / "subject-aaaa.json"
+    run = json.loads(run_path.read_text())
+    run["case_results"][0]["domain"] = "evidence_evaluation"
+    run["case_results"][0]["operation_classification"] = "storage_write"
+    run["case_results"][0]["operation_name"] = "durable_observation_recording"
+    run["case_results"][0]["response"] = {
+        "evidence_refs": ["request://subject-aaaa/run/request-hash", "process://subject-aaaa/run/123"],
+        "answer": {"kind": "observation_recorded", "observation_hash": "a" * 64},
+    }
+    run["case_results"][0]["score"] = {
+        "task_success": 1.0,
+        "correctness": None,
+        "capability_score": None,
+        "brier_score": None,
+    }
+    run_path.write_text(json.dumps(run))
+
+    assert verify_subject_answer_ownership.validate(campaign_dir) == []
+
+
+def test_storage_write_scoring_does_not_emit_capability_correctness():
+    score = run_subject_native_cross_version_campaign.score_storage_write(
+        "completed",
+        {
+            "answer": {"kind": "observation_recorded", "observation_hash": "a" * 64},
+            "evidence_refs": ["request://subject/run/request-hash", "process://subject/run/123"],
+            "budget_usage": {"within_budget": True},
+        },
+        {
+            "wall_clock_ms": 1.0,
+            "cpu_time_ms": 1.0,
+            "peak_rss_bytes": 2048,
+            "peak_rss_kb": 2.0,
+            "resource_measurement": {"measurement_method": "psutil_child_process_sampling"},
+        },
+        "request-hash",
+    )
+
+    assert score["write_acknowledged"] is True
+    assert score["request_hash_preserved"] is True
+    assert score["correctness"] is None
+    assert score["capability_score"] is None
+    assert score["brier_score"] is None
+
+
+def test_resource_measurement_uses_psutil_bytes():
+    score = run_subject_native_cross_version_campaign.resource_score(
+        {
+            "cpu_time_ms": 7.0,
+            "peak_rss_bytes": 4096,
+            "peak_rss_kb": 4.0,
+            "resource_measurement": {
+                "measurement_method": "psutil_child_process_sampling",
+                "measurement_platform": "linux",
+                "rss_unit": "bytes",
+            },
+        }
+    )
+
+    assert score["peak_rss_bytes"] == 4096
+    assert score["peak_rss_kb"] == 4.0
+    assert score["measurement"]["rss_unit"] == "bytes"
 
 
 def test_completed_subject_native_case_without_consumption_fails(tmp_path):

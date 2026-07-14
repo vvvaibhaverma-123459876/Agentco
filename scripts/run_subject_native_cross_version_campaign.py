@@ -14,7 +14,6 @@ import argparse
 import hashlib
 import json
 import os
-import resource
 import shutil
 import statistics
 import subprocess
@@ -23,6 +22,8 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+import psutil
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,11 +35,17 @@ EVALUATOR_VERSION = "longitudinal-evaluator-v1"
 SEEDS = [101, 202, 303, 404, 505]
 COMMON_CORE_DOMAINS = {"calibration"}
 SUPPORTED_TASK_BY_DOMAIN = {"calibration": "calibration"}
-V2_COMMON_CORE_DOMAINS = {"calibration", "evidence_evaluation"}
+V2_PRIMITIVE_OPERATION_DOMAINS = {"calibration", "evidence_evaluation"}
 OPERATION_CLASSIFICATIONS = {
     "calibration": "runtime_primitive",
-    "evidence_evaluation": "storage_retrieval",
+    "evidence_evaluation": "storage_write",
 }
+OPERATION_NAMES = {
+    "calibration": "calibration_calculation",
+    "evidence_evaluation": "durable_observation_recording",
+}
+PAYLOAD_MANIFEST_VERSION = "internal-payload-manifest-v1"
+RESOURCE_SAMPLING_INTERVAL_SECONDS = 0.01
 MIN_VALIDITY_THRESHOLDS = {
     "supported_common_domains": 8,
     "supported_common_validation_hidden_cases": 18,
@@ -86,7 +93,6 @@ def run_process(
     stdin: bytes | None = None,
 ) -> dict[str, Any]:
     start = time.time()
-    usage_before = resource.getrusage(resource.RUSAGE_CHILDREN)
     process = subprocess.Popen(
         argv,
         cwd=cwd,
@@ -95,15 +101,48 @@ def run_process(
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
     )
+    sampler = psutil.Process(process.pid)
+    peak_rss_bytes: int | None = None
+    cpu_user_seconds: float | None = None
+    cpu_system_seconds: float | None = None
     timed_out = False
+    stdout = b""
+    stderr = b""
     try:
-        stdout, stderr = process.communicate(input=stdin, timeout=timeout)
+        if stdin is not None and process.stdin is not None:
+            process.stdin.write(stdin)
+            process.stdin.close()
+            process.stdin = None
+        deadline = start + timeout
+        while True:
+            try:
+                mem = sampler.memory_info()
+                peak_rss_bytes = max(peak_rss_bytes or 0, int(mem.rss))
+                cpu_times = sampler.cpu_times()
+                cpu_user_seconds = float(cpu_times.user)
+                cpu_system_seconds = float(cpu_times.system)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, ProcessLookupError):
+                pass
+            if process.poll() is not None:
+                break
+            if time.time() > deadline:
+                timed_out = True
+                process.kill()
+                break
+            time.sleep(RESOURCE_SAMPLING_INTERVAL_SECONDS)
+        stdout, stderr = process.communicate()
     except subprocess.TimeoutExpired:
         timed_out = True
         process.kill()
         stdout, stderr = process.communicate()
-    usage_after = resource.getrusage(resource.RUSAGE_CHILDREN)
     completed = time.time()
+    cpu_user_ms = round((cpu_user_seconds or 0.0) * 1000, 3) if cpu_user_seconds is not None else None
+    cpu_system_ms = round((cpu_system_seconds or 0.0) * 1000, 3) if cpu_system_seconds is not None else None
+    cpu_total_ms = (
+        round((cpu_user_ms or 0.0) + (cpu_system_ms or 0.0), 3)
+        if cpu_user_ms is not None or cpu_system_ms is not None
+        else None
+    )
     return {
         "argv": argv,
         "cwd": str(cwd),
@@ -113,15 +152,19 @@ def run_process(
         "started_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(start)),
         "completed_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(completed)),
         "wall_clock_ms": round((completed - start) * 1000, 3),
-        "cpu_time_ms": round(
-            (
-                (usage_after.ru_utime + usage_after.ru_stime)
-                - (usage_before.ru_utime + usage_before.ru_stime)
-            )
-            * 1000,
-            3,
-        ),
-        "peak_rss_kb": usage_after.ru_maxrss,
+        "cpu_time_ms": cpu_total_ms,
+        "cpu_user_time_ms": cpu_user_ms,
+        "cpu_system_time_ms": cpu_system_ms,
+        "peak_rss_bytes": peak_rss_bytes,
+        "peak_rss_kb": round(peak_rss_bytes / 1024, 3) if peak_rss_bytes is not None else None,
+        "resource_measurement": {
+            "measurement_method": "psutil_child_process_sampling",
+            "measurement_platform": sys.platform,
+            "sampling_interval_seconds": RESOURCE_SAMPLING_INTERVAL_SECONDS,
+            "peak_rss_bytes_available": peak_rss_bytes is not None,
+            "cpu_times_available": cpu_total_ms is not None,
+            "rss_unit": "bytes",
+        },
         "stdout_hash": sha256_bytes(stdout),
         "stderr_hash": sha256_bytes(stderr),
         "stdout_path": None,
@@ -191,15 +234,26 @@ def subject_supports_record_observation(subject_dir: Path) -> bool:
 
 
 def is_v2_campaign(campaign_id: str) -> bool:
-    return campaign_id.endswith("-v2")
+    return campaign_id.endswith("-v2") or campaign_id.endswith("-v2-closure")
 
 
 def common_domains_for_campaign(campaign_id: str) -> set[str]:
-    return V2_COMMON_CORE_DOMAINS if is_v2_campaign(campaign_id) else COMMON_CORE_DOMAINS
+    # Common benchmark capability-task support is intentionally empty for V2:
+    # calibration and observation recording are primitive compatibility checks,
+    # not evidence of broad benchmark capability.
+    return set() if is_v2_campaign(campaign_id) else COMMON_CORE_DOMAINS
+
+
+def primitive_domains_for_campaign(campaign_id: str) -> set[str]:
+    return V2_PRIMITIVE_OPERATION_DOMAINS if is_v2_campaign(campaign_id) else set()
 
 
 def operation_classification(domain: str) -> str:
     return OPERATION_CLASSIFICATIONS.get(domain, "unsupported")
+
+
+def operation_name(domain: str) -> str:
+    return OPERATION_NAMES.get(domain, "unsupported")
 
 
 def subject_interface_inventory(subjects: list["Subject"], subject_dirs: dict[str, Path]) -> list[dict[str, Any]]:
@@ -244,8 +298,11 @@ def subject_interface_inventory(subjects: list["Subject"], subject_dirs: dict[st
                 "kafka_requirement": "none",
                 "tool_permissions": [],
                 "audit_evidence": "process evidence, request hash echoed inside observation",
-                "supported_benchmark_domains": ["evidence_evaluation"] if subject_supports_record_observation(subject_dir) else [],
-                "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+                "supported_benchmark_domains": [],
+                "supported_runtime_primitive_domains": ["evidence_shaped_storage_input"] if subject_supports_record_observation(subject_dir) else [],
+                "operation_classification": "storage_write",
+                "operation_name": "durable_observation_recording",
+                "limitations": "records supplied evidence-shaped payload as storage write; does not evaluate truth, accept/reject evidence, or choose a conclusion",
                 "executable": durable_path.exists() and subject_supports_record_observation(subject_dir),
             }
         )
@@ -348,6 +405,7 @@ def observation_payload(request: dict[str, Any], request_hash: str) -> dict[str,
             "domain": request["domain"],
             "seed": request["seed"],
             "source": "subject-native-cross-version-v2",
+            "operation_name": "durable_observation_recording",
         }
     }
 
@@ -388,7 +446,7 @@ def unsupported_record(
             "runtime_evidence_refs": [],
             "process": None,
             "measurements": [],
-            "score": score_response("unsupported", response, None),
+            "score": incomplete_score("unsupported", None),
             "operation_classification": "unsupported",
             "answer_ownership": {"owned_by_subject": False, "evidence": []},
         }
@@ -567,11 +625,16 @@ def invoke_calibration_case(opaque_label: str, subject_dir: Path, case: dict[str
                     "measurement_scope": "benchmark_task",
                     "wall_clock_ms": process["wall_clock_ms"],
                     "cpu_time_ms": process["cpu_time_ms"],
+                    "cpu_user_time_ms": process["cpu_user_time_ms"],
+                    "cpu_system_time_ms": process["cpu_system_time_ms"],
+                    "peak_rss_bytes": process["peak_rss_bytes"],
                     "peak_rss_kb": process["peak_rss_kb"],
+                    "resource_measurement": process["resource_measurement"],
                 }
             ],
-            "score": score_response(status, response, process),
+            "score": score_calibration_primitive(status, response, process),
             "operation_classification": operation_classification(case["input"]["domain"]),
+            "operation_name": operation_name(case["input"]["domain"]),
             "answer_ownership": {
                 "owned_by_subject": True,
                 "classification": operation_classification(case["input"]["domain"]),
@@ -609,7 +672,11 @@ def invoke_observation_case(opaque_label: str, subject_dir: Path, case: dict[str
         "run_id": run_id,
         "case_id": case["input"]["case_id"],
         "status": status,
-        "answer": {"kind": result.get("kind"), "observation_hash": sha256_text(canonical_json(result.get("observation")))} if result else None,
+        "answer": {
+            "kind": result.get("kind"),
+            "operation_name": "durable_observation_recording",
+            "observation_hash": sha256_text(canonical_json(result.get("observation"))),
+        } if result else None,
         "confidence": None,
         "evidence_refs": [
             f"process://{opaque_label}/{run_id}/{process['pid']}",
@@ -650,17 +717,22 @@ def invoke_observation_case(opaque_label: str, subject_dir: Path, case: dict[str
                     "measurement_scope": "benchmark_task",
                     "wall_clock_ms": process["wall_clock_ms"],
                     "cpu_time_ms": process["cpu_time_ms"],
+                    "cpu_user_time_ms": process["cpu_user_time_ms"],
+                    "cpu_system_time_ms": process["cpu_system_time_ms"],
+                    "peak_rss_bytes": process["peak_rss_bytes"],
                     "peak_rss_kb": process["peak_rss_kb"],
+                    "resource_measurement": process["resource_measurement"],
                 }
             ],
-            "score": score_response(status, response, process),
+            "score": score_storage_write(status, response, process, request_hash),
             "operation_classification": operation_classification(case["input"]["domain"]),
+            "operation_name": operation_name(case["input"]["domain"]),
             "answer_ownership": {
                 "owned_by_subject": True,
                 "classification": operation_classification(case["input"]["domain"]),
                 "evidence": [
                     "subject execute_task_logic returned observation_recorded",
-                    "adapter supplied observation payload; this is storage/retrieval primitive compatibility only",
+                    "adapter supplied observation payload; this is storage-write primitive compatibility only",
                 ],
             },
         }
@@ -669,33 +741,49 @@ def invoke_observation_case(opaque_label: str, subject_dir: Path, case: dict[str
     return record
 
 
-def score_response(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
+def resource_score(process: dict[str, Any] | None) -> dict[str, Any]:
+    return {
+        "cpu_time_ms": process.get("cpu_time_ms") if process else None,
+        "cpu_user_time_ms": process.get("cpu_user_time_ms") if process else None,
+        "cpu_system_time_ms": process.get("cpu_system_time_ms") if process else None,
+        "peak_rss_bytes": process.get("peak_rss_bytes") if process else None,
+        "peak_rss_kb": process.get("peak_rss_kb") if process else None,
+        "measurement": process.get("resource_measurement") if process else None,
+    }
+
+
+def incomplete_score(status: str, process: dict[str, Any] | None) -> dict[str, Any]:
+    return {
+        "task_success": 0.0,
+        "correctness": 0.0 if status in {"failed", "timeout"} else None,
+        "capability_score": None,
+        "evidence_quality": 0.0,
+        "brier_score": None,
+        "log_loss": None,
+        "expected_calibration_error": None,
+        "selective_risk": None,
+        "abstention_quality": None,
+        "authorization_compliance": None,
+        "budget_compliance": None,
+        "tool_reliability": None,
+        "memory_usefulness": None,
+        "failure_recovery": None,
+        "latency_ms": process["wall_clock_ms"] if process else None,
+        "resource_use": resource_score(process),
+    }
+
+
+def score_calibration_primitive(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
     if status != "completed":
-        return {
-            "task_success": 0.0,
-            "correctness": 0.0 if status in {"failed", "timeout"} else None,
-            "evidence_quality": 0.0,
-            "brier_score": None,
-            "log_loss": None,
-            "expected_calibration_error": None,
-            "selective_risk": None,
-            "abstention_quality": None,
-            "authorization_compliance": None,
-            "budget_compliance": None,
-            "tool_reliability": None,
-            "memory_usefulness": None,
-            "failure_recovery": None,
-            "latency_ms": process["wall_clock_ms"] if process else None,
-            "resource_use": {
-                "cpu_time_ms": process["cpu_time_ms"] if process else None,
-                "peak_rss_kb": process["peak_rss_kb"] if process else None,
-            },
-        }
+        return incomplete_score(status, process)
     answer = response.get("answer") or {}
     budget_usage = response.get("budget_usage") or {}
     return {
         "task_success": 1.0,
-        "correctness": 1.0 if answer.get("brier_score") is not None else 0.0,
+        "correctness": None,
+        "capability_score": None,
+        "numerical_result_available": answer.get("brier_score") is not None,
+        "formula_parity": answer.get("brier_score") is not None,
         "evidence_quality": 1.0 if len(response.get("evidence_refs", [])) >= 2 else 0.0,
         "brier_score": answer.get("brier_score"),
         "log_loss": None,
@@ -708,16 +796,62 @@ def score_response(status: str, response: dict[str, Any], process: dict[str, Any
         "memory_usefulness": None,
         "failure_recovery": None,
         "latency_ms": process["wall_clock_ms"] if process else None,
-        "resource_use": {
-            "cpu_time_ms": process["cpu_time_ms"] if process else None,
-            "peak_rss_kb": process["peak_rss_kb"] if process else None,
-        },
+        "resource_use": resource_score(process),
     }
+
+
+def score_storage_write(status: str, response: dict[str, Any], process: dict[str, Any] | None, request_hash: str) -> dict[str, Any]:
+    if status != "completed":
+        return incomplete_score(status, process)
+    answer = response.get("answer") or {}
+    refs = response.get("evidence_refs", [])
+    return {
+        "task_success": 1.0,
+        "correctness": None,
+        "capability_score": None,
+        "write_acknowledged": answer.get("kind") == "observation_recorded",
+        "request_hash_preserved": any(request_hash in str(ref) for ref in refs),
+        "payload_integrity": answer.get("observation_hash") is not None,
+        "recorded_output_hash": answer.get("observation_hash"),
+        "evidence_quality": 1.0 if len(refs) >= 2 else 0.0,
+        "brier_score": None,
+        "log_loss": None,
+        "expected_calibration_error": None,
+        "selective_risk": None,
+        "abstention_quality": None,
+        "authorization_compliance": None,
+        "budget_compliance": 1.0 if (response.get("budget_usage") or {}).get("within_budget") is True else 0.0,
+        "tool_reliability": None,
+        "memory_usefulness": None,
+        "failure_recovery": None,
+        "latency_ms": process["wall_clock_ms"] if process else None,
+        "resource_use": resource_score(process),
+    }
+
+
+def score_capability_task(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
+    return incomplete_score(status, process) if status != "completed" else {**incomplete_score(status, process), "task_success": 1.0}
+
+
+def score_governance_control(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
+    return incomplete_score(status, process)
+
+
+def score_resource_control(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
+    return incomplete_score(status, process)
+
+
+def score_memory_operation(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
+    return incomplete_score(status, process)
+
+
+def score_recovery_operation(status: str, response: dict[str, Any], process: dict[str, Any] | None) -> dict[str, Any]:
+    return incomplete_score(status, process)
 
 
 def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed: int, artifact_dir: Path, campaign_id: str) -> dict[str, Any]:
     domain = case["input"]["domain"]
-    if domain not in common_domains_for_campaign(campaign_id):
+    if domain not in common_domains_for_campaign(campaign_id) and domain not in primitive_domains_for_campaign(campaign_id):
         return unsupported_record(
             opaque_label,
             case,
@@ -736,8 +870,13 @@ def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed
             "subject does not expose provider-free durable calibration execution",
         )
     if domain == "calibration":
-        return invoke_calibration_case(opaque_label, subject_dir, case, seed, artifact_dir)
-    if domain == "evidence_evaluation" and not subject_supports_record_observation(subject_dir):
+        record = invoke_calibration_case(opaque_label, subject_dir, case, seed, artifact_dir)
+        if is_v2_campaign(campaign_id):
+            record["support_status"] = "primitive_compatibility"
+            record["support_rationale"] = "all subjects expose provider-free durable calibration logic; this is runtime primitive compatibility, not capability-task support"
+            write_json(artifact_dir / "raw" / f"{record['run_id']}.json", record)
+        return record
+    if domain == "evidence_evaluation" and domain in primitive_domains_for_campaign(campaign_id) and not subject_supports_record_observation(subject_dir):
         return unsupported_record(
             opaque_label,
             case,
@@ -746,8 +885,12 @@ def invoke_case(opaque_label: str, subject_dir: Path, case: dict[str, Any], seed
             "unsupported_missing_interface",
             "subject does not expose provider-free durable record_observation execution",
         )
-    if domain == "evidence_evaluation":
-        return invoke_observation_case(opaque_label, subject_dir, case, seed, artifact_dir)
+    if domain == "evidence_evaluation" and domain in primitive_domains_for_campaign(campaign_id):
+        record = invoke_observation_case(opaque_label, subject_dir, case, seed, artifact_dir)
+        record["support_status"] = "primitive_compatibility"
+        record["support_rationale"] = "all subjects expose provider-free durable record_observation logic; this is storage-write primitive compatibility, not evidence-evaluation capability support"
+        write_json(artifact_dir / "raw" / f"{record['run_id']}.json", record)
+        return record
     return unsupported_record(
         opaque_label,
         case,
@@ -777,12 +920,13 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         if item["score"].get("resource_use", {}).get("peak_rss_kb") is not None
     ]
     completed_scores = [item for item in case_results if item["status"] == "completed"]
-    completed_correctness = [item["score"]["correctness"] for item in completed_scores if item["score"].get("correctness") is not None]
     completed_brier = [item["score"]["brier_score"] for item in completed_scores if item["score"].get("brier_score") is not None]
     completed_budget = [item["score"]["budget_compliance"] for item in completed_scores if item["score"].get("budget_compliance") is not None]
     completed_capabilities = [item for item in completed_scores if item.get("operation_classification") == "capability_task"]
     completed_primitives = [item for item in completed_scores if item.get("operation_classification") == "runtime_primitive"]
-    completed_storage = [item for item in completed_scores if item.get("operation_classification") == "storage_retrieval"]
+    completed_storage = [item for item in completed_scores if item.get("operation_classification") == "storage_write"]
+    calibration_primitives = [item for item in completed_primitives if item.get("operation_name") == "calibration_calculation"]
+    storage_writes = [item for item in completed_storage if item.get("operation_name") == "durable_observation_recording"]
     return {
         "planned": len(case_results),
         "completed": statuses.count("completed"),
@@ -791,7 +935,6 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         "unsupported": statuses.count("unsupported"),
         "supported_common": sum(1 for item in case_results if item.get("support_status") == "supported_common"),
         "mean_task_success": statistics.mean(item["score"]["task_success"] for item in case_results),
-        "mean_correctness_completed_only": statistics.mean(completed_correctness) if completed_correctness else None,
         "mean_brier_score_completed_only": statistics.mean(completed_brier) if completed_brier else None,
         "mean_budget_compliance_completed_only": statistics.mean(completed_budget) if completed_budget else None,
         "mean_latency_ms": statistics.mean(latencies) if latencies else None,
@@ -799,7 +942,9 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         "max_peak_rss_kb": max(rss) if rss else None,
         "completed_capability_tasks": len(completed_capabilities),
         "completed_runtime_primitives": len(completed_primitives),
-        "completed_storage_retrieval": len(completed_storage),
+        "completed_storage_write": len(completed_storage),
+        "completed_calibration_primitives": len(calibration_primitives),
+        "completed_observation_recording": len(storage_writes),
         "measurable_capability": len(completed_capabilities) > 0,
     }
 
@@ -868,16 +1013,18 @@ def compatibility_matrix(cases: list[dict[str, Any]], subjects: list[Subject], c
     records: list[dict[str, Any]] = []
     for case in cases:
         status = "supported_common" if case["domain"] in common_domains_for_campaign(campaign_id) else "unsupported_incompatible_contract"
+        if case["domain"] in primitive_domains_for_campaign(campaign_id):
+            status = "primitive_compatibility"
         if case["domain"] == "calibration":
             selected_interface = "scripts.execute_durable_task:calibration"
             adapter = "durable_calibration_adapter"
             rationale = "all subjects expose provider-free durable calibration logic"
             translation = "prompt/seed/request hash translated to calibration Task payload"
             evidence = ["request_hash_echoed_as_prediction_id", "process evidence"]
-        elif case["domain"] == "evidence_evaluation" and status == "supported_common":
+        elif case["domain"] == "evidence_evaluation" and status == "primitive_compatibility":
             selected_interface = "scripts.execute_durable_task:record_observation"
             adapter = "durable_record_observation_adapter"
-            rationale = "all subjects expose provider-free durable record_observation logic"
+            rationale = "all subjects expose provider-free durable record_observation logic; this is storage-write primitive compatibility, not evidence-evaluation capability support"
             translation = "prompt/seed/request hash translated to record_observation Task payload"
             evidence = ["request_hash_echoed_inside_observation", "process evidence"]
         else:
@@ -892,13 +1039,14 @@ def compatibility_matrix(cases: list[dict[str, Any]], subjects: list[Subject], c
                     "case_id": case["input"]["case_id"],
                     "domain": case["domain"],
                     "subject_sha": subject.sha,
-                    "selected_interface": selected_interface if status == "supported_common" else None,
+                    "selected_interface": selected_interface if status in {"supported_common", "primitive_compatibility"} else None,
                     "adapter": adapter,
                     "support_status": status,
-                    "operation_classification": operation_classification(case["domain"]) if status == "supported_common" else "unsupported",
+                    "operation_name": operation_name(case["domain"]) if status in {"supported_common", "primitive_compatibility"} else "unsupported",
+                    "operation_classification": operation_classification(case["domain"]) if status in {"supported_common", "primitive_compatibility"} else "unsupported",
                     "support_rationale": rationale,
-                    "input_translation": translation if status == "supported_common" else None,
-                    "expected_runtime_evidence": evidence if status == "supported_common" else [],
+                    "input_translation": translation if status in {"supported_common", "primitive_compatibility"} else None,
+                    "expected_runtime_evidence": evidence if status in {"supported_common", "primitive_compatibility"} else [],
                     "environment_requirements": ["python3.13"],
                 }
             )
@@ -909,7 +1057,12 @@ def write_inventory_docs(records: list[dict[str, Any]]) -> None:
     write_json(DOCS / "SUBJECT_INTERFACE_INVENTORY.json", {"records": records})
     lines = ["# Subject Interface Inventory", ""]
     for record in records:
-        lines.append(f"- `{record['interface_id']}`: executable={record['executable']}; domains={record['supported_benchmark_domains']}; path `{record['path']}`")
+        primitive_domains = record.get("supported_runtime_primitive_domains", [])
+        lines.append(
+            f"- `{record['interface_id']}`: executable={record['executable']}; "
+            f"benchmark_domains={record['supported_benchmark_domains']}; "
+            f"primitive_domains={primitive_domains}; path `{record['path']}`"
+        )
     write_text(DOCS / "SUBJECT_INTERFACE_INVENTORY.md", "\n".join(lines) + "\n")
 
 
@@ -958,10 +1111,61 @@ def environment_hash() -> str:
 
 
 def payload_manifest_hash(campaign_dir: Path) -> str:
-    files = []
-    for path in sorted((campaign_dir / "runs").glob("**/*.json")) + sorted((campaign_dir / "comparisons").glob("**/*.json")):
-        files.append({"path": str(path.relative_to(campaign_dir)), "sha256": sha256_file(path)})
-    return sha256_text(canonical_json(files))
+    manifest_path = campaign_dir / "INTERNAL_PAYLOAD_MANIFEST.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text())
+        return str(manifest["aggregate_payload_hash"])
+    files = payload_included_files(campaign_dir)
+    return aggregate_payload_hash(files)
+
+
+def payload_included_files(campaign_dir: Path) -> list[dict[str, Any]]:
+    records = []
+    for root_name in ("runs", "comparisons"):
+        root = campaign_dir / root_name
+        if not root.exists():
+            continue
+        for path in sorted(root.glob("**/*.json")):
+            records.append(
+                {
+                    "path": str(path.relative_to(campaign_dir)),
+                    "sha256": sha256_file(path),
+                    "size_bytes": path.stat().st_size,
+                }
+            )
+    return records
+
+
+def aggregate_payload_hash(included_files: list[dict[str, Any]]) -> str:
+    material = [
+        {"path": item["path"], "sha256": item["sha256"], "size_bytes": item["size_bytes"]}
+        for item in included_files
+    ]
+    return sha256_text(canonical_json(material))
+
+
+def write_internal_payload_manifest(campaign_dir: Path, metadata: dict[str, Any]) -> dict[str, Any]:
+    included = payload_included_files(campaign_dir)
+    excluded = []
+    for path, reason in {
+        "CONTROL_MANIFEST.json": "control manifest contains internal_payload_manifest_hash and would create recursive hashing",
+        "INTERNAL_PAYLOAD_MANIFEST.json": "payload manifest aggregate hash field is intentionally non-recursive",
+    }.items():
+        if (campaign_dir / path).exists() or path == "INTERNAL_PAYLOAD_MANIFEST.json":
+            excluded.append({"path": path, "reason": reason})
+    payload = {
+        "canonicalization_version": PAYLOAD_MANIFEST_VERSION,
+        "included_relative_paths": included,
+        "excluded_paths": excluded,
+        "aggregate_payload_hash": aggregate_payload_hash(included),
+        "campaign_execution_sha": metadata["campaign_execution_sha"],
+        "adapter_freeze_sha": metadata.get("adapter_freeze_sha"),
+        "evaluator_hash": metadata["evaluator_code_hash"],
+        "subject_shas": metadata["subject_shas"],
+        "generation_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    write_json(campaign_dir / "INTERNAL_PAYLOAD_MANIFEST.json", payload)
+    return payload
 
 
 def freeze_manifest_path(campaign_id: str) -> Path:
@@ -1003,9 +1207,11 @@ def write_results_and_decision(
         "compatibility_matrix_hash": compatibility_hash,
         "thresholds": MIN_VALIDITY_THRESHOLDS,
         "threshold_result": "not_met",
-        "reason": "common subject-native support is limited to runtime primitives/storage operations, not broad capability tasks",
+        "reason": "common subject-native execution is limited to runtime primitive and storage-write primitive operations, not benchmark capability tasks",
         "totals": totals,
         "completed_by_operation_classification": completed_by_classification,
+        "common_benchmark_capability_domains": 0,
+        "primitive_compatibility_operations": ["calibration_calculation", "durable_observation_recording"] if is_v2_campaign(campaign_id) else ["calibration_calculation"],
         "subjects": {
             label: {
                 "sha": result["sha"],
@@ -1031,18 +1237,21 @@ def write_results_and_decision(
         f"- Timeout executions: {totals['timeout']}",
         f"- Unsupported executions: {totals['unsupported']}",
         "",
-        "Minimum validity thresholds were not met. Completed operations are compatibility primitives/controls, not broad capability tasks.",
+        "Minimum validity thresholds were not met. Completed operations are primitive compatibility checks, not broad capability tasks.",
     ]
     write_text(DOCS / f"{result_stem}_RESULTS.md", "\n".join(lines) + "\n")
     decision = {
         "campaign_id": campaign_id,
         "decision": "HOLD_FOR_MORE_EVIDENCE",
         "automatic_promotion": False,
+        "audit_pr_readiness": "READY_FOR_HUMAN_REVIEW" if campaign_id.endswith("-v2-closure") else "DRAFT_PENDING_CORRECTED_EVIDENCE",
+        "candidate_promotion_readiness": "BLOCKED_INSUFFICIENT_CAPABILITY_EVIDENCE",
         "external_approval": "PENDING_EXTERNAL_REVIEW",
         "promotion_blockers": [
             "minimum common-core domain threshold not met",
             "minimum common-core validation/hidden case threshold not met",
             "minimum common capability-task domain threshold not met",
+            "observation recording is storage-write primitive compatibility and does not satisfy evidence-evaluation capability support",
             "memory, governance, recovery and live-provider domains remain unsupported through common immutable interfaces",
         ],
         "critical_regressions": [],
@@ -1055,7 +1264,9 @@ def write_results_and_decision(
         ("# Subject-Native Cross-Version V2 Decision\n\n" if is_v2_campaign(campaign_id) else "# Subject-Native Cross-Version Decision\n\n")
         +
         "Decision: `HOLD_FOR_MORE_EVIDENCE`\n\n"
-        "External approval remains `PENDING_EXTERNAL_REVIEW`. No promotion, deployment, merge, or PR readiness action is authorized by this evidence.\n",
+        "Audit PR readiness: `READY_FOR_HUMAN_REVIEW` for Batch 07E evidence-semantics review.\n\n"
+        "Candidate promotion readiness: `BLOCKED_INSUFFICIENT_CAPABILITY_EVIDENCE`.\n\n"
+        "External approval remains `PENDING_EXTERNAL_REVIEW`. No promotion, deployment, automatic approval, or merge is authorized by this evidence.\n",
     )
 
 
@@ -1143,7 +1354,6 @@ def main() -> int:
         "b_vs_c": compare(by_public["version-b"], by_public["version-c"]),
     }
     write_json(campaign_dir / "comparisons" / "comparisons.json", comparisons)
-    internal_payload_hash = payload_manifest_hash(campaign_dir)
     sealed_mapping = {subject.opaque_label: {"public_label": subject.public_label, "sha": subject.sha} for subject in subjects}
     execution_sha = git("rev-parse", "HEAD")
     workflow_head_sha = os.getenv("EXPECTED_AUDIT_SHA") or execution_sha
@@ -1180,13 +1390,16 @@ def main() -> int:
             "domains": sorted(common_domains_for_campaign(args.campaign)),
             "supported_common_domains": len(common_domains_for_campaign(args.campaign)),
             "common_capability_task_domains": 0,
+            "common_benchmark_capability_domains": 0,
+            "primitive_compatibility_operations": sorted(operation_name(domain) for domain in primitive_domains_for_campaign(args.campaign)),
         },
         "common_core_domains": sorted(common_domains_for_campaign(args.campaign)),
+        "primitive_compatibility_domains": sorted(primitive_domains_for_campaign(args.campaign)),
         "minimum_validity_thresholds": MIN_VALIDITY_THRESHOLDS,
         "compatibility_matrix_hash": compatibility_hash,
         "adapter_bundle_hash": adapter_bundle_hash(),
-        "internal_payload_manifest_hash": internal_payload_hash,
-        "decision_reference": str(DOCS / (("SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json" if is_v2_campaign(args.campaign) else "SUBJECT_NATIVE_CROSS_VERSION_DECISION.json"))),
+        "internal_payload_manifest_hash": None,
+        "decision_reference": str(Path("docs/audit/current") / (("SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json" if is_v2_campaign(args.campaign) else "SUBJECT_NATIVE_CROSS_VERSION_DECISION.json"))),
         "thresholds_met": False,
         "blinding": {
             "blinding_seed_hash": sha256_text(blinding_seed),
@@ -1213,6 +1426,16 @@ def main() -> int:
     manifest["subjects_by_public"] = by_public
     write_results_and_decision(args.campaign, manifest, results_by_opaque, comparisons, compatibility_hash)
     manifest.pop("subjects_by_public")
+    payload_manifest = write_internal_payload_manifest(
+        campaign_dir,
+        {
+            "campaign_execution_sha": execution_sha,
+            "adapter_freeze_sha": manifest.get("adapter_freeze_sha"),
+            "evaluator_code_hash": manifest["evaluator_code_hash"],
+            "subject_shas": {subject.public_label: subject.sha for subject in subjects},
+        },
+    )
+    manifest["internal_payload_manifest_hash"] = payload_manifest["aggregate_payload_hash"]
     write_json(campaign_dir / "CONTROL_MANIFEST.json", manifest)
     print(
         canonical_json(

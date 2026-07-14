@@ -30,15 +30,18 @@
       "interface_id": "version-a:durable-record-observation-task",
       "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
       "kafka_requirement": "none",
-      "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+      "limitations": "records supplied evidence-shaped payload as storage write; does not evaluate truth, accept/reject evidence, or choose a conclusion",
+      "operation_classification": "storage_write",
+      "operation_name": "durable_observation_recording",
       "path": "scripts/execute_durable_task.py",
       "produced_output": "observation_recorded with supplied observation",
       "redis_requirement": "none",
       "runtime_type": "python_function_via_external_subprocess",
       "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
       "subject_sha": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
-      "supported_benchmark_domains": [
-        "evidence_evaluation"
+      "supported_benchmark_domains": [],
+      "supported_runtime_primitive_domains": [
+        "evidence_shaped_storage_input"
       ],
       "tool_permissions": []
     },
@@ -72,15 +75,18 @@
       "interface_id": "version-b:durable-record-observation-task",
       "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
       "kafka_requirement": "none",
-      "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+      "limitations": "records supplied evidence-shaped payload as storage write; does not evaluate truth, accept/reject evidence, or choose a conclusion",
+      "operation_classification": "storage_write",
+      "operation_name": "durable_observation_recording",
       "path": "scripts/execute_durable_task.py",
       "produced_output": "observation_recorded with supplied observation",
       "redis_requirement": "none",
       "runtime_type": "python_function_via_external_subprocess",
       "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
       "subject_sha": "651794a41513db1e40930f08c253ef261af7c1e7",
-      "supported_benchmark_domains": [
-        "evidence_evaluation"
+      "supported_benchmark_domains": [],
+      "supported_runtime_primitive_domains": [
+        "evidence_shaped_storage_input"
       ],
       "tool_permissions": []
     },
@@ -114,15 +120,18 @@
       "interface_id": "version-c:durable-record-observation-task",
       "invocation_command_or_http_contract": "stdin JSON envelope translated to subject Task(task_type='record_observation')",
       "kafka_requirement": "none",
-      "limitations": "records supplied evidence payload; does not evaluate truth or choose a conclusion",
+      "limitations": "records supplied evidence-shaped payload as storage write; does not evaluate truth, accept/reject evidence, or choose a conclusion",
+      "operation_classification": "storage_write",
+      "operation_name": "durable_observation_recording",
       "path": "scripts/execute_durable_task.py",
       "produced_output": "observation_recorded with supplied observation",
       "redis_requirement": "none",
       "runtime_type": "python_function_via_external_subprocess",
       "startup_command": "python3.13 -c <imports subject scripts.execute_durable_task>",
       "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
-      "supported_benchmark_domains": [
-        "evidence_evaluation"
+      "supported_benchmark_domains": [],
+      "supported_runtime_primitive_domains": [
+        "evidence_shaped_storage_input"
       ],
       "tool_permissions": []
     }

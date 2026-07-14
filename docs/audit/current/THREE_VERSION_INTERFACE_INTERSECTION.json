@@ -28,11 +28,11 @@
     },
     {
       "interface_id": "durable-record-observation-task",
-      "domain": "evidence_evaluation",
+      "domain": "evidence_shaped_storage_input",
       "a_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=record_observation)",
       "b_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=record_observation)",
       "c_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=record_observation)",
-      "semantic_equivalence": "equivalent echo/storage primitive for supplied observation payload",
+      "semantic_equivalence": "equivalent storage-write primitive for supplied observation payload",
       "input_contract": "observation object",
       "output_contract": "observation_recorded with observation",
       "provider_requirement": "none",
@@ -42,9 +42,12 @@
       "authentication_requirement": "none for direct subject function path",
       "runtime_evidence": "development process execution evidence",
       "development_case_result": "supported",
-      "common_core_eligibility": true,
-      "operation_classification": "storage_retrieval",
-      "rejection_rationale": null
+      "common_core_eligibility": false,
+      "primitive_compatibility_eligibility": true,
+      "operation_name": "durable_observation_recording",
+      "operation_classification": "storage_write",
+      "excluded_benchmark_domain": "evidence_evaluation",
+      "rejection_rationale": "not eligible for evidence_evaluation benchmark support because it stores supplied observations but does not evaluate conflicting evidence or produce a conclusion"
     },
     {
       "interface_id": "durable-llm-review-decision",
@@ -78,7 +81,8 @@
   ],
   "summary": {
     "candidate_interfaces_discovered": 5,
-    "common_interfaces": 2,
+    "common_interfaces": 1,
+    "primitive_compatibility_operations": 2,
     "common_capability_task_domains": 0,
     "common_control_domains": 0,
     "common_primitive_domains": 2,

@@ -1,6 +1,8 @@
 {
+  "audit_pr_readiness": "READY_FOR_HUMAN_REVIEW",
   "automatic_promotion": false,
-  "campaign_id": "subject-native-cross-version-v2",
+  "campaign_id": "subject-native-cross-version-v2-closure",
+  "candidate_promotion_readiness": "BLOCKED_INSUFFICIENT_CAPABILITY_EVIDENCE",
   "critical_regressions": [],
   "decision": "HOLD_FOR_MORE_EVIDENCE",
   "external_approval": "PENDING_EXTERNAL_REVIEW",
@@ -9,6 +11,7 @@
     "minimum common-core domain threshold not met",
     "minimum common-core validation/hidden case threshold not met",
     "minimum common capability-task domain threshold not met",
+    "observation recording is storage-write primitive compatibility and does not satisfy evidence-evaluation capability support",
     "memory, governance, recovery and live-provider domains remain unsupported through common immutable interfaces"
   ],
   "scheduled_observation_count": 0

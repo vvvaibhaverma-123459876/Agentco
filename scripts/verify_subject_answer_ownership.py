@@ -52,7 +52,8 @@ def validate(campaign_dir: Path = DEFAULT_CAMPAIGN) -> list[str]:
             response = item.get("response", {})
             if not response.get("evidence_refs"):
                 errors.append(f"COMPLETED_RESPONSE_MISSING_EVIDENCE_REFS:{public_label}:{case}")
-            if item.get("request_hash") and str(item.get("expected_output_hash", "")) in json.dumps(response):
+            expected_hash = item.get("expected_output_hash")
+            if item.get("request_hash") and expected_hash and str(expected_hash) in json.dumps(response):
                 errors.append(f"EXPECTED_HASH_LEAKED_TO_RESPONSE:{public_label}:{case}")
     return sorted(set(errors))
 
