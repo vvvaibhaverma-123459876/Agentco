@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-07-14T15:35:17.962779+00:00",
+  "commit": "df0d359328cfcafc212a1b5bad11ed49a8ce32f9",
+  "branch": "feature/civilization-layer",
+  "git_dirty": false,
+  "required": [
+    "129_",
+    "130_",
+    "131_",
+    "132_",
+    "133_",
+    "134_",
+    "135_",
+    "136_",
+    "137_",
+    "138_",
+    "139_",
+    "140_"
+  ],
+  "present": [
+    "129_",
+    "130_",
+    "131_",
+    "132_",
+    "133_",
+    "134_",
+    "135_",
+    "136_",
+    "137_",
+    "138_",
+    "139_",
+    "140_"
+  ],
+  "missing": [],
+  "note": "empty-database migration verified during the build; see plan doc."
+}

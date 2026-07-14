@@ -9,13 +9,13 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 |---|---|
 | Branch | `feature/civilization-layer` |
 | Base commit | `997e66ce700e0c93896f13f7d6f559d0a50b15dd` (GitHub main, PRs #21–#23 merged) |
-| Current phase | **C12 — civilization operating system** (integrated; full regression running); next: C13 operator plane |
-| Completion gate | `termination_predicate_met: false` — C0–C11 verified (49/64), C12 integrated |
-| Test results | C12 OS 5/5; latest full regression at C11: 112 suites passed / 3 skipped, 842 passed / 8 skipped / 5 todo |
+| Current phase | **COMPLETE** — C0–C15 all verified |
+| Completion gate | `termination_predicate_met: true` — 64/64 ledger items verified; reconciliation passed on HEAD |
+| Test results | Final full backend regression green; civilization suites 16 files; all 8 E2E scenarios A–H proven |
 | Migration state | 129–140 applied cleanly on the isolated empty-DB stack (verified from scratch) |
-| Git / PR | Branch `feature/civilization-layer` pushed to origin; **PR #26** open against `main` (C0–C11). Push is operator-authorized; keep fast-forwarding new phases. |
-| Known blockers | none |
-| Next executable action | commit C12; then C13 operator plane (backend APIs + frontend views), C14 reliability/security/deployment, C15 completion proof |
+| Git / PR | Branch `feature/civilization-layer` pushed to origin; **PR #26** open against `main`. Push is operator-authorized. |
+| Completion evidence | `reports/civilization_completion/latest/` (machine-generated, commit-bound); `make civilization-completion` reconciliation exit 0 |
+| Known blockers | none in scope. Hosted production certification (live SLO/DR/backup/incident evidence) is explicitly out of environment scope per the brief and not claimed. |
 
 ## Environment decisions (recorded)
 
@@ -40,10 +40,10 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 | C9 collective epistemics | **VERIFIED** | migration 137; provenance graph + transitive retraction; 4/4 tests |
 | C10 learning + safe evolution | **VERIFIED** | migration 138; failure→promote/rollback; scenario E; 6/6 tests |
 | C11 capability/domain expansion | **VERIFIED** | migration 139; gate + grant/restrict/revoke routing; scenario F; 4/4 tests |
-| C12 civilization operating system | INTEGRATED | migration 140; leader-elected continuous tick + routers + restart recovery; 5/5 tests; full regression running |
-| C13 operator plane | not started | |
-| C14 reliability/security/deployment | not started | |
-| C15 completion proof | not started | |
+| C12 civilization operating system | **VERIFIED** | migration 140; leader-elected continuous tick + routers + restart recovery; 5/5 tests |
+| C13 operator plane | **VERIFIED** | operator overview API + Next.js /civilization console (governed, no fake data); 2/2 + frontend build |
+| C14 reliability/security/deployment | **VERIFIED** | scheduler worker + Helm + metrics + adversarial suite; fake-success targets fixed; 12/12 tests |
+| C15 completion proof | **VERIFIED** | E2E scenarios A–H; completion evidence generator + reconciliation gate + CI workflow; predicate met |
 
 ## Foundation facts (from pre-build inspection, 2026-07-13)
 

@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-07-14T15:35:17.962779+00:00",
+  "commit": "df0d359328cfcafc212a1b5bad11ed49a8ce32f9",
+  "branch": "feature/civilization-layer",
+  "git_dirty": false,
+  "phases": {
+    "C0_canonical_runtime_freeze": "verified",
+    "C1_civilization_kernel": "verified",
+    "C2_citizenry": "verified",
+    "C3_societies_institutions": "verified",
+    "C4_coalitions": "verified",
+    "C5_missions": "verified",
+    "C6_economy": "verified",
+    "C7_governance": "verified",
+    "C8_judiciary": "verified",
+    "C9_epistemics": "verified",
+    "C10_learning": "verified",
+    "C11_expansion": "verified",
+    "C12_civilization_os": "verified",
+    "C13_operator_plane": "verified",
+    "C14_reliability_security_deployment": "verified",
+    "C15_completion_proof": "verified"
+  },
+  "rollups": {
+    "total_items": 64,
+    "verified": 64,
+    "integrated": 0,
+    "implemented": 0,
+    "in_progress": 0,
+    "not_started": 0,
+    "blocked": 0,
+    "last_recomputed": "2026-07-14"
+  },
+  "termination_predicate_met": true
+}

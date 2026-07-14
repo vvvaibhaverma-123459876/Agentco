@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-07-14T15:35:17.962779+00:00",
+  "commit": "df0d359328cfcafc212a1b5bad11ed49a8ce32f9",
+  "branch": "feature/civilization-layer",
+  "git_dirty": false,
+  "required_entry_points": [
+    "backend/src/services/civilization-kernel.service.ts",
+    "backend/src/services/citizenship.service.ts",
+    "backend/src/services/society.service.ts",
+    "backend/src/services/institution-governance.service.ts",
+    "backend/src/services/coalition.service.ts",
+    "backend/src/services/mission.service.ts",
+    "backend/src/services/treasury.service.ts",
+    "backend/src/services/governance.service.ts",
+    "backend/src/services/policy-enforcement.service.ts",
+    "backend/src/services/judiciary-case.service.ts",
+    "backend/src/services/collective-knowledge.service.ts",
+    "backend/src/services/safe-evolution.service.ts",
+    "backend/src/services/capability-expansion.service.ts",
+    "backend/src/services/civilization-os.service.ts",
+    "backend/src/services/civilization-operator.service.ts",
+    "backend/src/workers/civilization-scheduler-worker.ts"
+  ],
+  "missing": [],
+  "all_present": true
+}

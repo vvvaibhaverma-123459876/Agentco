@@ -8,7 +8,7 @@ meta:
   last_updated: '2026-07-14'
   base_commit: 997e66ce700e0c93896f13f7d6f559d0a50b15dd
   branch: feature/civilization-layer
-  termination_predicate_met: false
+  termination_predicate_met: true
   statuses: [not_started, in_progress, blocked, implemented, integrated, verified]
 phases:
   C0_canonical_runtime_freeze:
@@ -528,29 +528,39 @@ phases:
           - 'npx tsc --noEmit -> exit 0'
         notes: scheduler worker bounded tick, metrics-on-registry, deployment-wiring assertions, fake-success-target fix verification, projection-rebuild property. Full regression green 2026-07-14 — exit 0; 116 suites passed/3 skipped; 869 passed/8 skipped/5 todo.
   C15_completion_proof:
-    status: not_started
+    status: verified
     items:
       - id: C15.E2EScenarios
         layer: C15
-        status: not_started
+        status: verified
         depends_on: [C12.OSTests, C13.OperatorTests, C14.ReliabilityTests]
-        notes: scenarios A–H as executable suites.
+        test_artifacts: [backend/tests/civilization-e2e-scenarios.test.ts]
+        verification_commands:
+          - 'npx jest tests/civilization-e2e-scenarios.test.ts -> 4/4 passed (A/B/G/H)'
+        notes: Scenarios A (formation), B (cross-institution mission), G (restart/replay), H (emergency) proven end to end here; C (governance), D (judiciary), E (learning), F (expansion) proven in their phase suites. All 8 A-H covered.
       - id: C15.CompletionEvidence
         layer: C15
-        status: not_started
+        status: verified
         depends_on: [C15.E2EScenarios]
-        notes: reports/civilization_completion/latest/* generator (23 artifacts, machine-generated, commit-bound).
+        source_artifacts: [scripts/generate_civilization_completion.py]
+        verification_commands:
+          - 'python3 scripts/generate_civilization_completion.py -> writes reports/civilization_completion/latest/* and reconciliation'
+        notes: machine-generates completion_manifest, civilization_build_ledger, completion_reconciliation, migration_verification, component_reachability, deployment_smoke, per-scenario proof references, test_summary, and FINAL_CIVILIZATION_COMPLETION_REPORT.md — commit/branch/timestamp stamped; scenario evidence points to executable proofs (never fabricated traces).
       - id: C15.ReconciliationAndGate
         layer: C15
-        status: not_started
+        status: verified
         depends_on: [C15.CompletionEvidence]
-        notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
+        source_artifacts: [Makefile, .github/workflows/civilization-completion.yml]
+        verification_commands:
+          - 'make civilization-completion -> reconciliation_passed=true, exit 0'
+        notes: reconciliation asserts all ledger items verified, no missing migrations/entry-points/deployment-wiring, all scenarios have proofs, evidence commit = HEAD; Make target civilization-completion + CI workflow run the civilization suites and the reconciliation. termination_predicate_met set true only after reconciliation passes on HEAD.
+
 rollups:
   total_items: 64
-  verified: 61
+  verified: 64
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 3
+  not_started: 0
   blocked: 0
   last_recomputed: '2026-07-14'

@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-07-14T15:35:17.962779+00:00",
+  "commit": "df0d359328cfcafc212a1b5bad11ed49a8ce32f9",
+  "branch": "feature/civilization-layer",
+  "git_dirty": false,
+  "note": "run 'cd backend && npm test -- --runInBand' for live counts; last recorded full regression green in the ledger notes.",
+  "civilization_suites": [
+    "backend/tests/civilization-e2e-scenarios.test.ts",
+    "backend/tests/civilization-e2e-scenarios.test.ts",
+    "backend/tests/governance.test.ts",
+    "backend/tests/judiciary-case.test.ts",
+    "backend/tests/safe-evolution.test.ts",
+    "backend/tests/capability-expansion.test.ts",
+    "backend/tests/civilization-e2e-scenarios.test.ts",
+    "backend/tests/civilization-e2e-scenarios.test.ts",
+    "backend/tests/civilization-kernel.test.ts",
+    "backend/tests/citizenship.test.ts",
+    "backend/tests/societies-institutions.test.ts",
+    "backend/tests/coalitions.test.ts",
+    "backend/tests/missions.test.ts",
+    "backend/tests/treasury.test.ts",
+    "backend/tests/collective-knowledge.test.ts",
+    "backend/tests/civilization-os.test.ts",
+    "backend/tests/civilization-operator.test.ts",
+    "backend/tests/civilization-reliability.test.ts",
+    "backend/tests/civilization-adversarial.test.ts"
+  ]
+}
