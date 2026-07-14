@@ -1,0 +1,14 @@
+{
+  "frozen_versions_must_not_change_in_place": true,
+  "hidden_answer_candidate_readability": "prohibited",
+  "policy_version": "benchmark-governance-v1",
+  "required_amendment_fields": [
+    "new_version",
+    "justification",
+    "reviewer",
+    "approval",
+    "old_manifest_hash",
+    "new_manifest_hash",
+    "comparison_invalidation_statement"
+  ]
+}

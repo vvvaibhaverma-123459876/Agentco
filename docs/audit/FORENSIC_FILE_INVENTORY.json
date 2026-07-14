@@ -1,31 +1,31 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1673,
+  "tracked_file_count": 1737,
   "category_counts": {
-    "Database migration": 125,
-    "Deployment infrastructure": 27,
+    "Database migration": 126,
+    "Deployment infrastructure": 29,
     "Deprecated code": 48,
-    "Development tooling": 118,
-    "Documentation": 326,
+    "Development tooling": 127,
+    "Documentation": 371,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 262,
-    "Unknown purpose": 30
+    "Test infrastructure": 265,
+    "Unknown purpose": 34
   },
   "top_level_counts": {
-    "backend": 441,
-    "docs": 254,
+    "backend": 442,
+    "docs": 299,
     "evals": 180,
-    "scripts": 130,
+    "scripts": 139,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
+    "tests": 39,
     "frontend": 36,
-    "tests": 36,
     "reserve": 33,
     "calibration": 30,
     "infrastructure": 20,
@@ -36,10 +36,11 @@
     "learning": 13,
     "synthesis": 10,
     "ingestion": 9,
-    ".github": 5,
+    ".github": 7,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
+    "benchmarks": 2,
     "dashboard": 2,
     "data": 2,
     "foundry": 2,
@@ -48,6 +49,7 @@
     "memory_kernel": 2,
     "meta": 2,
     "provenance": 2,
+    "schemas": 2,
     "self_modification": 2,
     "simulation": 2,
     ".env.example": 1,
@@ -76,11 +78,11 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 542,
-    ".md": 381,
+    ".py": 554,
+    ".md": 410,
     ".ts": 290,
-    ".json": 135,
-    ".sql": 126,
+    ".json": 155,
+    ".sql": 127,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 21,
@@ -88,7 +90,7 @@
     ".tsx": 17,
     ".txt": 16,
     ".sh": 14,
-    ".yml": 9,
+    ".yml": 11,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
@@ -142,6 +144,18 @@
     },
     {
       "path": ".github/workflows/deploy.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/hosted-staging-audit.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/longitudinal-evidence.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -2805,6 +2819,12 @@
       "extension": ".sql"
     },
     {
+      "path": "backend/src/db/migrations/129_longitudinal_mission_evidence.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
       "path": "backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -4521,6 +4541,18 @@
       "extension": ".json"
     },
     {
+      "path": "benchmarks/README.md",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".md"
+    },
+    {
+      "path": "benchmarks/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
       "path": "calibration/BENCHMARK_ANALYSIS.md",
       "category": "Production runtime code",
       "top_level": "calibration",
@@ -5487,6 +5519,42 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BENCHMARK_REGISTRY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BENCHMARK_REGISTRY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/CI_BASELINE_RECONCILIATION.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -5500,6 +5568,18 @@
     },
     {
       "path": "docs/audit/current/CLAIM_EVIDENCE_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5541,7 +5621,121 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_IDENTITY_ACCESS_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_IDENTITY_ACCESS_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_LOAD_AUTOSCALING_VERIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_OBSERVABILITY_ALERT_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_OBSERVABILITY_ALERT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_COMPONENT_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_COMPONENT_LEDGER.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_EXECUTION_CONTRACT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_EXECUTION_CONTRACT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_TOPOLOGY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/HOSTED_STAGING_TOPOLOGY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/INITIAL_LONGITUDINAL_CAMPAIGN_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/INITIAL_LONGITUDINAL_CAMPAIGN_RESULTS.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5554,6 +5748,96 @@
     },
     {
       "path": "docs/audit/current/INTEGRATION_CONTRACT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LIVE_PROVIDER_VERIFICATION_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/LIVE_PROVIDER_VERIFICATION_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_CALIBRATION_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_CALIBRATION_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_COMPARISON_POLICY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_EVIDENCE_TIERS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_HISTORY_STORAGE_CONTRACT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_MERGE_ACTIVATION_PLAN.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_MILESTONE_POLICY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_MILESTONE_POLICY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_MISSION_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_MISSION_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_RUN_PROTOCOL.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/MISSION_CLAIM_DECOMPOSITION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/MISSION_CLAIM_DECOMPOSITION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -5590,6 +5874,24 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_04_DEPLOYMENT_OPERATIONAL_RESILIENCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_06A_LONGITUDINAL_REMOTE_CLOSURE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_06_LONGITUDINAL_MISSION_EVIDENCE_FOUNDATION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -8937,6 +9239,18 @@
       "extension": ".py"
     },
     {
+      "path": "schemas/longitudinal_history.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
+      "path": "schemas/longitudinal_run_manifest.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
       "path": "scripts/agentco_evolution_test.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -8944,6 +9258,12 @@
     },
     {
       "path": "scripts/agentco_integration_audit.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/aggregate_longitudinal_history.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9027,6 +9347,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/calculate_longitudinal_milestones.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/check_resolutions.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9034,6 +9360,12 @@
     },
     {
       "path": "scripts/civilization_free_run.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/compare_longitudinal_runs.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9141,10 +9473,22 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/hosted_staging_audit.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/hourly_codex_resume.sh",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/longitudinal_foundation.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/nse_canonical_trust_weighting_test.py",
@@ -9316,6 +9660,12 @@
     },
     {
       "path": "scripts/run_local_agent.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/run_longitudinal_campaign.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9603,6 +9953,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_benchmark_governance.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_civilization_vertical_slice.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9627,6 +9983,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_hosted_staging_budget.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_level3_architecture.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -9643,6 +10005,12 @@
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/verify_longitudinal_evidence.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/verify_make_targets.py",
@@ -10018,6 +10386,24 @@
     },
     {
       "path": "tests/test_gate_integrity_controls.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_hosted_staging_controls.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_longitudinal_foundation.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_longitudinal_remote_closure.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

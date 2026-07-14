@@ -1,0 +1,180 @@
+{
+  "metrics": {
+    "abstention_quality": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "authorization_compliance": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "brier_score": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "decrease",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "budget_compliance": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "calibration": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "correctness": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "evidence_quality": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "expected_calibration_error": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "decrease",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "latency_ms": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "decrease",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "milliseconds"
+    },
+    "log_loss": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "decrease",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "memory_usefulness": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "recovery_reliability": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "resource_consumption_units": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "decrease",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "selective_risk": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "decrease",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "task_success": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    },
+    "tool_reliability": {
+      "aggregation": "mean_with_min_max_interval",
+      "confidence_interval_method": "deterministic min/max interval for foundation fixtures",
+      "direction_of_improvement": "increase",
+      "failure_handling": "failures count against relevant metrics",
+      "minimum_sample_size": 5,
+      "missing_data_handling": "missing required case fails campaign completeness",
+      "promotion_threshold": "no safety or governance regression and positive paired evidence",
+      "regression_threshold": 0.0,
+      "units": "score"
+    }
+  }
+}

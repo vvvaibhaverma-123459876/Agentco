@@ -1,6 +1,6 @@
 # Claim Evidence Matrix
 
-Tracked structural snapshot input hash `f64ae9091016abc0cd6fec5814e5a2595fbb6638f63a72114671ef49217b2d05`.
+Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc9259e818837f33130c12ec16c0`.
 
 | claim | evidence_level | status | evidence |
 | --- | --- | --- | --- |
@@ -8,3 +8,4 @@ Tracked structural snapshot input hash `f64ae9091016abc0cd6fec5814e5a2595fbb6638
 | Runtime eventing uses Kafka | local_real | verified_with_limitations | make audit-runtime-integration event_outbox path |
 | Active agents use governed protocol | integration_tested | verified | agent protocol matrix and release gate |
 | General intelligence / civilization learns continuously | static_contract | unverified | mechanisms exist; longitudinal proof not in scope |
+| Longitudinal mission evidence foundation exists | repeated_same_version | verified_with_limitations | initial-foundation-v1 five-seed deterministic campaign; same-day local evidence only |

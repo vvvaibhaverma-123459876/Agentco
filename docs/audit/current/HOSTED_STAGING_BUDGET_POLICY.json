@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "status": "configured_blocked_until_hosted_account_bound",
+  "maximum_deployment_lifetime_hours": 8,
+  "maximum_expected_infrastructure_cost_usd": 75,
+  "maximum_hourly_infrastructure_cost_usd": 10,
+  "maximum_container_or_node_count": 6,
+  "maximum_database_size_gb": 20,
+  "maximum_storage_size_gb": 50,
+  "maximum_kafka_retention_hours": 24,
+  "maximum_log_retention_days": 7,
+  "maximum_llm_requests": 20,
+  "maximum_llm_tokens": 20000,
+  "maximum_provider_spend_usd": 5,
+  "maximum_load_test_requests": 2000,
+  "automatic_expiry_timestamp": "2026-07-21T00:00:00Z",
+  "cleanup_deadline": "2026-07-21T02:00:00Z",
+  "resource_tags": {
+    "project": "agentco",
+    "environment": "hosted-staging-audit",
+    "owner": "agentco-audit",
+    "managed_by": "iac",
+    "purpose": "batch-05-hosted-staging",
+    "production": "false"
+  },
+  "required_budget_checks": [
+    "policy_present",
+    "policy_unexpired",
+    "limits_present",
+    "cleanup_owner_present",
+    "cloud_billing_or_quota_check"
+  ],
+  "cost_observation_note": "Cloud billing data is delayed on most providers; observed cost artifacts must be labelled estimate unless provider returns finalized charges for the audit window."
+}

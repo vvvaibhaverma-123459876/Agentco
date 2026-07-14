@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "campaign_id": {
+      "type": "string"
+    },
+    "dirty_status": {
+      "enum": [
+        "clean",
+        "dirty"
+      ]
+    },
+    "provider_classification": {
+      "enum": [
+        "deterministic_fixture",
+        "simulated",
+        "local_model",
+        "local_real_service",
+        "live_external_provider",
+        "hosted_staging",
+        "production"
+      ]
+    },
+    "run_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "campaign_id",
+    "commit_sha",
+    "benchmark_registry_hash",
+    "seed",
+    "provider_classification",
+    "manifest_hash"
+  ],
+  "title": "AgentCo Longitudinal Run Manifest",
+  "type": "object"
+}

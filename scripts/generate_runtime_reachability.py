@@ -479,6 +479,19 @@ def main() -> int:
         {"claim": "Runtime eventing uses Kafka", "evidence_level": "local_real", "status": "verified_with_limitations", "evidence": "make audit-runtime-integration event_outbox path"},
         {"claim": "Active agents use governed protocol", "evidence_level": "integration_tested", "status": "verified", "evidence": "agent protocol matrix and release gate"},
         {"claim": "General intelligence / civilization learns continuously", "evidence_level": "static_contract", "status": "unverified", "evidence": "mechanisms exist; longitudinal proof not in scope"},
+        {
+            "claim": "Longitudinal mission evidence foundation exists",
+            "evidence_level": "repeated_same_version",
+            "status": "verified_with_limitations",
+            "evidence": "initial-foundation-v1 five-seed deterministic campaign; same-day local evidence only",
+            "repeated_same_version": True,
+            "cross_seed": True,
+            "cross_version": False,
+            "calendar_duration": "same_day",
+            "independent_review": False,
+            "hosted": False,
+            "production": False,
+        },
     ]
     write_json(OUT / "CLAIM_EVIDENCE_MATRIX.json", {"source_input_hash": snapshot, "claims": claims})
     write_markdown(OUT / "CLAIM_EVIDENCE_MATRIX.md", "Claim Evidence Matrix", claims, ["claim", "evidence_level", "status", "evidence"])

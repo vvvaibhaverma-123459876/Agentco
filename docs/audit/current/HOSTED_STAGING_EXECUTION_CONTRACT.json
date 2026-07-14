@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "execution_status": "BLOCKED",
+  "blocked_reason": "No hosted cloud CLI or IaC tool is installed in the current environment, and no hosted staging account/project, DNS zone, workload identity, state backend, or provider credentials have been bound.",
+  "selected_platform": {
+    "cloud_provider": "unselected_blocked",
+    "account_project_subscription": "unbound",
+    "region": "unbound",
+    "resource_namespace": "agentco-hosted-staging-${run_id}",
+    "iac_tool": "unbound",
+    "iac_tool_version": "unavailable",
+    "state_location": "unbound"
+  },
+  "required_services": {
+    "compute": "hosted Kubernetes or managed equivalent",
+    "container_registry": "hosted registry with immutable digest deployment",
+    "postgresql": "managed PostgreSQL",
+    "redis": "managed Redis",
+    "kafka": "managed Kafka or documented compatible broker",
+    "secret_manager": "hosted secret manager with workload identity",
+    "dns_provider": "dedicated staging DNS zone or delegated hostname",
+    "certificate_authority": "publicly trusted staging certificate issuer",
+    "object_storage": "private backup bucket/container",
+    "observability": "hosted logs, metrics, traces, dashboards",
+    "alert_receiver": "non-production external alert destination",
+    "llm_provider": "bounded live OpenAI-compatible endpoint"
+  },
+  "execution_prerequisites": [
+    "one supported cloud CLI authenticated to a dedicated staging account",
+    "one IaC tool installed and configured",
+    "remote or protected IaC state backend",
+    "DNS control for a non-production staging hostname",
+    "container registry write access",
+    "secret-manager write access",
+    "cloud billing/quota read access or explicit documented blocker",
+    "bounded live provider credentials",
+    "non-production alert destination"
+  ],
+  "budget_policy": "docs/audit/current/HOSTED_STAGING_BUDGET_POLICY.json",
+  "cleanup_ownership": {
+    "owner": "agentco-audit",
+    "expiry_required": true,
+    "destroy_command": "make hosted-staging-destroy"
+  },
+  "evidence_classification": "UNVERIFIED_EXTERNAL_DEPENDENCY"
+}

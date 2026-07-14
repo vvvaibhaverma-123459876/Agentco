@@ -1,0 +1,30 @@
+{
+  "eligible": [
+    "foundation"
+  ],
+  "foundation": {
+    "benchmark_governance_passes": true,
+    "comparison_recomputation_passes": true,
+    "evidence_storage_immutable": true,
+    "initial_five_seed_campaign_passes": true
+  },
+  "four_week": {
+    "eligible": false,
+    "reason": "requires at least four valid weekly observation windows"
+  },
+  "hosted": {
+    "eligible": false,
+    "reason": "Batch 05 hosted staging remains blocked"
+  },
+  "policy_version": "longitudinal-milestones-v1",
+  "time_blocked": [
+    "four_week",
+    "twelve_week",
+    "hosted",
+    "production"
+  ],
+  "twelve_week": {
+    "eligible": false,
+    "reason": "requires at least twelve valid weekly observation windows"
+  }
+}

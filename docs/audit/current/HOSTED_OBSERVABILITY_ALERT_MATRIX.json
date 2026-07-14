@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "alerts": [],
+  "blocker": "No hosted observability workspace or external staging alert receiver is bound."
+}

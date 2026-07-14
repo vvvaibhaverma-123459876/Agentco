@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "identities": [],
+  "blocker": "Hosted workload identities are unbound."
+}

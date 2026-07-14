@@ -1,0 +1,80 @@
+name: Hosted Staging Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: hosted-staging-audit
+  cancel-in-progress: false
+
+jobs:
+  hosted-staging:
+    name: Hosted staging audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    environment: hosted-staging-audit
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.sha }}
+
+      - name: Record expected audit commit
+        run: echo "EXPECTED_AUDIT_SHA=${{ github.sha }}" >> "$GITHUB_ENV"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: requirements/requirements.lock.txt
+
+      - name: Install Python dependencies
+        run: pip install -r requirements/requirements.lock.txt
+
+      - name: Budget and prerequisite precheck
+        run: python3.13 scripts/verify_hosted_staging_budget.py --check-prerequisites --json
+
+      - name: Hosted staging plan
+        run: make hosted-staging-plan
+
+      - name: Hosted staging apply
+        run: make hosted-staging-apply
+
+      - name: Hosted staging audit
+        run: make audit-hosted-staging
+
+      - name: Verify hosted staging evidence commit
+        run: |
+          python3.13 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          head = os.environ["EXPECTED_AUDIT_SHA"]
+          ledgers = sorted(Path("artifacts/hosted-staging").glob("*/EXECUTION_LEDGER.json"))
+          if not ledgers:
+              raise SystemExit("missing hosted staging execution ledger")
+          ledger = json.loads(ledgers[-1].read_text())
+          if ledger.get("commit") != head:
+              raise SystemExit(f"ledger commit {ledger.get('commit')} does not match workflow SHA {head}")
+          if ledger.get("final_verdict") != "PASS":
+              raise SystemExit(f"hosted staging audit verdict is {ledger.get('final_verdict')}")
+          PY
+
+      - name: Destroy hosted staging resources
+        if: always()
+        run: make hosted-staging-destroy
+
+      - name: Upload hosted staging audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hosted-staging-audit-${{ github.sha }}
+          path: artifacts/hosted-staging/**
+          if-no-files-found: warn

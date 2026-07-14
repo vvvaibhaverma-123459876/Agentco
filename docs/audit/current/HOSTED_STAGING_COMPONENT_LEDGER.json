@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "status": "BLOCKED",
+  "components": [],
+  "blocker": "Hosted resources have not been provisioned; component ledger requires real hosted resource identifiers."
+}
