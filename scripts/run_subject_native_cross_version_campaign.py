@@ -777,6 +777,9 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         if item["score"].get("resource_use", {}).get("peak_rss_kb") is not None
     ]
     completed_scores = [item for item in case_results if item["status"] == "completed"]
+    completed_correctness = [item["score"]["correctness"] for item in completed_scores if item["score"].get("correctness") is not None]
+    completed_brier = [item["score"]["brier_score"] for item in completed_scores if item["score"].get("brier_score") is not None]
+    completed_budget = [item["score"]["budget_compliance"] for item in completed_scores if item["score"].get("budget_compliance") is not None]
     completed_capabilities = [item for item in completed_scores if item.get("operation_classification") == "capability_task"]
     completed_primitives = [item for item in completed_scores if item.get("operation_classification") == "runtime_primitive"]
     completed_storage = [item for item in completed_scores if item.get("operation_classification") == "storage_retrieval"]
@@ -788,9 +791,9 @@ def aggregate(case_results: list[dict[str, Any]]) -> dict[str, Any]:
         "unsupported": statuses.count("unsupported"),
         "supported_common": sum(1 for item in case_results if item.get("support_status") == "supported_common"),
         "mean_task_success": statistics.mean(item["score"]["task_success"] for item in case_results),
-        "mean_correctness_completed_only": statistics.mean(item["score"]["correctness"] for item in completed_scores) if completed_scores else None,
-        "mean_brier_score_completed_only": statistics.mean(item["score"]["brier_score"] for item in completed_scores) if completed_scores else None,
-        "mean_budget_compliance_completed_only": statistics.mean(item["score"]["budget_compliance"] for item in completed_scores) if completed_scores else None,
+        "mean_correctness_completed_only": statistics.mean(completed_correctness) if completed_correctness else None,
+        "mean_brier_score_completed_only": statistics.mean(completed_brier) if completed_brier else None,
+        "mean_budget_compliance_completed_only": statistics.mean(completed_budget) if completed_budget else None,
         "mean_latency_ms": statistics.mean(latencies) if latencies else None,
         "mean_cpu_time_ms": statistics.mean(cpu) if cpu else None,
         "max_peak_rss_kb": max(rss) if rss else None,
