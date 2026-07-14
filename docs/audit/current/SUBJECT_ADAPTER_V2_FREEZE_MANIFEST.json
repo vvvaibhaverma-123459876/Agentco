@@ -1,0 +1,17 @@
+{
+  "adapter_bundle_hash": "8bd1e420ac81f34a70b9e27fd54bb27a93021ab7108ca9250d2b8f853dbe95cb",
+  "adapter_freeze_commit": "7dcc727fb3681d0130e6f8cd09a756d0861fa705",
+  "adapter_freeze_tree_hash": "225c4c38d35fc9d56f1ee239cacf32a130509801",
+  "benchmark_registry_hash": "3a1c54f4e54c3f2d7df0b0720dff5112d8179ae4f79fe7f95d2cd0bc2f322d1e",
+  "compatibility_matrix_hash": null,
+  "evaluator_version": "longitudinal-evaluator-v1",
+  "support_classifications_frozen": true,
+  "thresholds_frozen": {
+    "common_capability_task_domains": 4,
+    "completion_rate": 0.75,
+    "max_subject_coverage_gap_points": 10,
+    "supported_common_domains": 8,
+    "supported_common_validation_hidden_cases": 18
+  },
+  "validation_hidden_not_used_for_adapter_development": true
+}
