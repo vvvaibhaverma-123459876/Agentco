@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1729`
+- Tracked files: `1737`
 
 ## Category Counts
 
@@ -11,29 +11,29 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 126 |
 | Deployment infrastructure | 29 |
 | Deprecated code | 48 |
-| Development tooling | 124 |
-| Documentation | 368 |
+| Development tooling | 127 |
+| Documentation | 371 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 456 |
 | Prompt/template | 29 |
-| Test infrastructure | 264 |
-| Unknown purpose | 33 |
+| Test infrastructure | 265 |
+| Unknown purpose | 34 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 442 |
-| `docs` | 296 |
+| `docs` | 299 |
 | `evals` | 180 |
-| `scripts` | 136 |
+| `scripts` | 139 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `reports` | 48 |
-| `tests` | 38 |
+| `tests` | 39 |
 | `frontend` | 36 |
 | `reserve` | 33 |
 | `calibration` | 30 |
@@ -58,6 +58,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `memory_kernel` | 2 |
 | `meta` | 2 |
 | `provenance` | 2 |
+| `schemas` | 2 |
 | `self_modification` | 2 |
 | `simulation` | 2 |
 | `.env.example` | 1 |
@@ -84,7 +85,6 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `prompts` | 1 |
 | `pytest.ini` | 1 |
 | `pytest_skip_report_plugin.py` | 1 |
-| `schemas` | 1 |
 
 ## Full File Ledger
 
@@ -1037,6 +1037,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/LONGITUDINAL_CALIBRATION_REPORT.md` | Documentation |
 | `docs/audit/current/LONGITUDINAL_COMPARISON_POLICY.md` | Documentation |
 | `docs/audit/current/LONGITUDINAL_EVIDENCE_TIERS.md` | Documentation |
+| `docs/audit/current/LONGITUDINAL_HISTORY_STORAGE_CONTRACT.md` | Documentation |
+| `docs/audit/current/LONGITUDINAL_MERGE_ACTIVATION_PLAN.md` | Documentation |
 | `docs/audit/current/LONGITUDINAL_MILESTONE_POLICY.json` | Documentation |
 | `docs/audit/current/LONGITUDINAL_MILESTONE_POLICY.md` | Documentation |
 | `docs/audit/current/LONGITUDINAL_MISSION_FINDINGS.json` | Documentation |
@@ -1051,6 +1053,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_03_RUNTIME_ARCHITECTURE_INTEGRATION.md` | Documentation |
 | `docs/audit/current/REMEDIATION_04_DEPLOYMENT_OPERATIONAL_RESILIENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md` | Documentation |
+| `docs/audit/current/REMEDIATION_06A_LONGITUDINAL_REMOTE_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_06_LONGITUDINAL_MISSION_EVIDENCE_FOUNDATION.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
@@ -1609,9 +1612,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `runtime/tests/test_runtime_durable_governance_stores.py` | Test infrastructure |
 | `runtime/tests/test_spend_guardrail_ledger.py` | Test infrastructure |
 | `runtime/tool_registry/__init__.py` | Production runtime code |
+| `schemas/longitudinal_history.schema.json` | Unknown purpose |
 | `schemas/longitudinal_run_manifest.schema.json` | Unknown purpose |
 | `scripts/agentco_evolution_test.py` | Development tooling |
 | `scripts/agentco_integration_audit.py` | Development tooling |
+| `scripts/aggregate_longitudinal_history.py` | Development tooling |
 | `scripts/audit_clean_room.py` | Development tooling |
 | `scripts/audit_llm_integration.py` | Development tooling |
 | `scripts/audit_runtime_integration.py` | Development tooling |
@@ -1625,6 +1630,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/autonomy_smoke.py` | Development tooling |
 | `scripts/b2b_saas_agents.py` | Development tooling |
 | `scripts/build_ledger.py` | Development tooling |
+| `scripts/calculate_longitudinal_milestones.py` | Development tooling |
 | `scripts/check_resolutions.py` | Development tooling |
 | `scripts/civilization_free_run.py` | Development tooling |
 | `scripts/compare_longitudinal_runs.py` | Development tooling |
@@ -1734,6 +1740,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_level3_architecture.py` | Development tooling |
 | `scripts/verify_level3_db_evidence.py` | Development tooling |
 | `scripts/verify_level4_certification.sh` | Development tooling |
+| `scripts/verify_longitudinal_evidence.py` | Development tooling |
 | `scripts/verify_make_targets.py` | Development tooling |
 | `scripts/verify_memory_influence_live.py` | Development tooling |
 | `scripts/verify_migration_integrity.py` | Development tooling |
@@ -1799,6 +1806,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_gate_integrity_controls.py` | Test infrastructure |
 | `tests/test_hosted_staging_controls.py` | Test infrastructure |
 | `tests/test_longitudinal_foundation.py` | Test infrastructure |
+| `tests/test_longitudinal_remote_closure.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |

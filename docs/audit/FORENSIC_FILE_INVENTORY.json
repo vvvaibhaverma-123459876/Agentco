@@ -1,30 +1,30 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1729,
+  "tracked_file_count": 1737,
   "category_counts": {
     "Database migration": 126,
     "Deployment infrastructure": 29,
     "Deprecated code": 48,
-    "Development tooling": 124,
-    "Documentation": 368,
+    "Development tooling": 127,
+    "Documentation": 371,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 456,
     "Prompt/template": 29,
-    "Test infrastructure": 264,
-    "Unknown purpose": 33
+    "Test infrastructure": 265,
+    "Unknown purpose": 34
   },
   "top_level_counts": {
     "backend": 442,
-    "docs": 296,
+    "docs": 299,
     "evals": 180,
-    "scripts": 136,
+    "scripts": 139,
     "agents": 111,
     "audit_artifacts": 99,
     "runtime": 51,
     "archive": 48,
     "reports": 48,
-    "tests": 38,
+    "tests": 39,
     "frontend": 36,
     "reserve": 33,
     "calibration": 30,
@@ -49,6 +49,7 @@
     "memory_kernel": 2,
     "meta": 2,
     "provenance": 2,
+    "schemas": 2,
     "self_modification": 2,
     "simulation": 2,
     ".env.example": 1,
@@ -74,14 +75,13 @@
     "pg_test_isolation.py": 1,
     "prompts": 1,
     "pytest.ini": 1,
-    "pytest_skip_report_plugin.py": 1,
-    "schemas": 1
+    "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 550,
-    ".md": 407,
+    ".py": 554,
+    ".md": 410,
     ".ts": 290,
-    ".json": 154,
+    ".json": 155,
     ".sql": 127,
     ".jsonl": 40,
     ".csv": 38,
@@ -5789,6 +5789,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/LONGITUDINAL_HISTORY_STORAGE_CONTRACT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/LONGITUDINAL_MERGE_ACTIVATION_PLAN.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/LONGITUDINAL_MILESTONE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -5868,6 +5880,12 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_06A_LONGITUDINAL_REMOTE_CLOSURE.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -9221,6 +9239,12 @@
       "extension": ".py"
     },
     {
+      "path": "schemas/longitudinal_history.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
       "path": "schemas/longitudinal_run_manifest.schema.json",
       "category": "Unknown purpose",
       "top_level": "schemas",
@@ -9234,6 +9258,12 @@
     },
     {
       "path": "scripts/agentco_integration_audit.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/aggregate_longitudinal_history.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9312,6 +9342,12 @@
     },
     {
       "path": "scripts/build_ledger.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/calculate_longitudinal_milestones.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -9971,6 +10007,12 @@
       "extension": ".sh"
     },
     {
+      "path": "scripts/verify_longitudinal_evidence.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_make_targets.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10356,6 +10398,12 @@
     },
     {
       "path": "tests/test_longitudinal_foundation.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_longitudinal_remote_closure.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"
