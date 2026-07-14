@@ -5,6 +5,7 @@ from scripts import (
     calculate_longitudinal_milestones,
     verify_cross_version_campaign,
     verify_cross_version_harness_independence,
+    verify_subject_request_consumption,
     verify_migration_identity,
     verify_subject_runtime_evidence,
 )
@@ -62,6 +63,76 @@ def real_campaign_fixture(path: Path) -> Path:
     return path
 
 
+def subject_native_campaign_fixture(path: Path) -> Path:
+    path.mkdir()
+    (path / "runs").mkdir()
+    subjects = {
+        "version-a": {"sha": BASELINE, "opaque_label": "subject-aaaa"},
+        "version-b": {"sha": RAW, "opaque_label": "subject-bbbb"},
+        "version-c": {"sha": RECONCILED, "opaque_label": "subject-cccc"},
+    }
+    manifest = {
+        "control_manifest_version": "subject-native-cross-version-campaign-v1",
+        "methodology": "subject_native_existing_agentco_interfaces",
+        "planned_case_executions": 360,
+        "benchmark_registry_hash": "3a1c54f4e54c3f2d7df0b0720dff5112d8179ae4f79fe7f95d2cd0bc2f322d1e",
+        "evaluator_version": "longitudinal-evaluator-v1",
+        "hidden_answer_isolation": {"subject_readable_expected_outputs": False},
+        "blinding": {"mapping_hash": "abc", "sealed_mapping": {"subject-aaaa": {"public_label": "version-a"}}},
+        "subjects": subjects,
+        "comparisons": {
+            "a_vs_b": {"paired_case_count": 120},
+            "a_vs_c": {"paired_case_count": 120},
+            "b_vs_c": {"paired_case_count": 120},
+        },
+    }
+    (path / "CONTROL_MANIFEST.json").write_text(json.dumps(manifest))
+    for _public, meta in subjects.items():
+        cases = []
+        for index in range(120):
+            completed = index < 10
+            run_id = f"{meta['opaque_label']}-run-{index}"
+            request_hash = "c" * 64
+            status = "completed" if completed else "unsupported"
+            cases.append(
+                {
+                    "case_id": f"case-{index}",
+                    "domain": "calibration" if completed else "reasoning",
+                    "status": status,
+                    "support_status": "supported_common" if completed else "unsupported_incompatible_contract",
+                    "request_hash": request_hash,
+                    "response_hash": f"{index:064x}",
+                    "runtime_evidence_refs": [f"process://{meta['opaque_label']}/{run_id}/123", f"request://{meta['opaque_label']}/{run_id}/{request_hash}"] if completed else [],
+                    "request_consumption": {
+                        "consumed": completed,
+                        "evidence": [
+                            {"type": "request_hash_echoed_as_prediction_id", "request_hash": request_hash},
+                            {"type": "subject_runtime_function_executed", "executed_by": "scripts/execute_durable_task.py"},
+                        ] if completed else [],
+                    },
+                    "measurements": [{"measurement_scope": "benchmark_task", "wall_clock_ms": 1.0}] if completed else [],
+                    "process": {
+                        "argv": ["python3.13", "-c", "from scripts.execute_durable_task import execute_task_logic"],
+                        "pid": 123,
+                        "wall_clock_ms": 1.0,
+                        "cpu_time_ms": 1.0,
+                        "peak_rss_kb": 1000,
+                        "stdout_hash": "a" * 64,
+                        "stderr_hash": "b" * 64,
+                    } if completed else None,
+                    "response": {"confidence": 0.5 if completed else None},
+                }
+            )
+        run = {
+            "opaque_subject": meta["opaque_label"],
+            "sha": meta["sha"],
+            "run_ids": [f"{meta['opaque_label']}-seed-{seed}" for seed in [101, 202, 303, 404, 505]],
+            "case_results": cases,
+        }
+        (path / "runs" / f"{meta['opaque_label']}.json").write_text(json.dumps(run))
+    return path
+
+
 def test_migration_identity_ledger_accepts_contracts():
     ledger = verify_migration_identity.build_ledger()
 
@@ -86,6 +157,59 @@ def test_real_campaign_verifies_subject_shas_and_runtime_evidence(tmp_path):
 
     assert verify_cross_version_campaign.validate(campaign_dir, BASELINE, RAW, RECONCILED) == []
     assert verify_subject_runtime_evidence.validate(campaign_dir) == []
+
+
+def test_subject_native_campaign_requires_request_consumption(tmp_path):
+    campaign_dir = subject_native_campaign_fixture(tmp_path / "campaign")
+
+    assert verify_cross_version_campaign.validate(campaign_dir, BASELINE, RAW, RECONCILED) == []
+    assert verify_subject_runtime_evidence.validate(campaign_dir) == []
+    assert verify_subject_request_consumption.validate(campaign_dir) == []
+
+
+def test_completed_subject_native_case_without_consumption_fails(tmp_path):
+    campaign_dir = subject_native_campaign_fixture(tmp_path / "campaign")
+    run_path = campaign_dir / "runs" / "subject-aaaa.json"
+    run = json.loads(run_path.read_text())
+    run["case_results"][0]["request_consumption"] = {"consumed": False, "evidence": []}
+    run_path.write_text(json.dumps(run))
+
+    assert any(error.startswith("REQUEST_NOT_CONSUMED:version-a") for error in verify_cross_version_campaign.validate(campaign_dir, BASELINE, RAW, RECONCILED))
+    assert any(error.startswith("REQUEST_NOT_CONSUMED:version-a") for error in verify_subject_request_consumption.validate(campaign_dir))
+
+
+def test_help_command_cannot_be_counted_as_capability_task(tmp_path):
+    campaign_dir = subject_native_campaign_fixture(tmp_path / "campaign")
+    run_path = campaign_dir / "runs" / "subject-aaaa.json"
+    run = json.loads(run_path.read_text())
+    run["case_results"][0]["process"]["argv"] = ["python3.13", "scripts/verify_mission_progress.py", "--help"]
+    run_path.write_text(json.dumps(run))
+
+    errors = verify_subject_request_consumption.validate(campaign_dir)
+
+    assert any(error.startswith("HEALTH_OR_HELP_COMMAND_COUNTED_AS_TASK:version-a") for error in errors)
+    assert any(error.startswith("MISSION_PROGRESS_HELP_COUNTED_AS_TASK:version-a") for error in errors)
+
+
+def test_supported_common_case_cannot_disappear_as_unsupported(tmp_path):
+    campaign_dir = subject_native_campaign_fixture(tmp_path / "campaign")
+    run_path = campaign_dir / "runs" / "subject-aaaa.json"
+    run = json.loads(run_path.read_text())
+    run["case_results"][0]["status"] = "unsupported"
+    run_path.write_text(json.dumps(run))
+
+    assert any(error.startswith("COMMON_CORE_UNSUPPORTED:version-a") for error in verify_subject_request_consumption.validate(campaign_dir))
+
+
+def test_health_measurement_cannot_supply_capability_measurement(tmp_path):
+    campaign_dir = subject_native_campaign_fixture(tmp_path / "campaign")
+    run_path = campaign_dir / "runs" / "subject-aaaa.json"
+    run = json.loads(run_path.read_text())
+    run["case_results"][0]["measurements"] = [{"measurement_scope": "health", "wall_clock_ms": 1.0}]
+    run_path.write_text(json.dumps(run))
+
+    assert any(error.startswith("MISSING_BENCHMARK_TASK_MEASUREMENT:version-a") for error in verify_cross_version_campaign.validate(campaign_dir, BASELINE, RAW, RECONCILED))
+    assert any(error.startswith("MISSING_BENCHMARK_TASK_MEASUREMENT:version-a") for error in verify_subject_request_consumption.validate(campaign_dir))
 
 
 def test_synthetic_manifest_is_rejected(tmp_path):

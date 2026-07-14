@@ -22,9 +22,13 @@ def validate(campaign_dir: Path, baseline: str, raw: str, reconciled: str) -> li
     if not manifest_path.exists():
         return ["MISSING_CONTROL_MANIFEST"]
     manifest = load(manifest_path)
-    if manifest.get("control_manifest_version") != "real-cross-version-campaign-v1":
+    campaign_version = manifest.get("control_manifest_version")
+    if campaign_version not in {"real-cross-version-campaign-v1", "subject-native-cross-version-campaign-v1"}:
         errors.append("SYNTHETIC_OR_UNKNOWN_CAMPAIGN_MANIFEST")
-    if manifest.get("methodology") != "subject_process_invocation_no_synthetic_outputs":
+    if manifest.get("methodology") not in {
+        "subject_process_invocation_no_synthetic_outputs",
+        "subject_native_existing_agentco_interfaces",
+    }:
         errors.append("METHODOLOGY_NOT_REAL_SUBJECT_INVOCATION")
     if manifest.get("benchmark_registry_hash") != EXPECTED_REGISTRY_HASH:
         errors.append("BENCHMARK_HASH_MISMATCH")
@@ -59,15 +63,29 @@ def validate(campaign_dir: Path, baseline: str, raw: str, reconciled: str) -> li
             if status not in {"completed", "failed", "unsupported", "timeout"}:
                 errors.append(f"INVALID_CASE_STATUS:{public_label}:{item.get('case_id')}")
             refs = item.get("runtime_evidence_refs", [])
-            if not refs or not all(str(ref).startswith("process://") for ref in refs):
+            if status == "completed" and not refs:
+                errors.append(f"COMPLETED_MISSING_RUNTIME_EVIDENCE:{public_label}:{item.get('case_id')}")
+            if refs and not all(str(ref).startswith(("process://", "request://")) for ref in refs):
                 errors.append(f"UNRESOLVED_RUNTIME_EVIDENCE:{public_label}:{item.get('case_id')}")
-            process = item.get("process", {})
-            if not process.get("pid") or process.get("wall_clock_ms") is None:
-                errors.append(f"MISSING_PROCESS_MEASUREMENT:{public_label}:{item.get('case_id')}")
-            if process.get("stdout_hash") is None or process.get("stderr_hash") is None:
-                errors.append(f"MISSING_PROCESS_OUTPUT_HASH:{public_label}:{item.get('case_id')}")
+            process = item.get("process")
+            if status == "completed" and not process:
+                errors.append(f"COMPLETED_MISSING_PROCESS:{public_label}:{item.get('case_id')}")
+            if process:
+                if not process.get("pid") or process.get("wall_clock_ms") is None:
+                    errors.append(f"MISSING_PROCESS_MEASUREMENT:{public_label}:{item.get('case_id')}")
+                if process.get("stdout_hash") is None or process.get("stderr_hash") is None:
+                    errors.append(f"MISSING_PROCESS_OUTPUT_HASH:{public_label}:{item.get('case_id')}")
             if status == "completed" and item.get("response", {}).get("confidence") is None:
                 errors.append(f"COMPLETED_RESPONSE_MISSING_CONFIDENCE:{public_label}:{item.get('case_id')}")
+            if campaign_version == "subject-native-cross-version-campaign-v1" and status == "completed":
+                consumption = item.get("request_consumption", {})
+                if consumption.get("consumed") is not True:
+                    errors.append(f"REQUEST_NOT_CONSUMED:{public_label}:{item.get('case_id')}")
+                if len(consumption.get("evidence", [])) < 2:
+                    errors.append(f"INSUFFICIENT_REQUEST_CONSUMPTION_EVIDENCE:{public_label}:{item.get('case_id')}")
+                measurements = item.get("measurements", [])
+                if not any(measurement.get("measurement_scope") == "benchmark_task" for measurement in measurements):
+                    errors.append(f"MISSING_BENCHMARK_TASK_MEASUREMENT:{public_label}:{item.get('case_id')}")
     comparisons = manifest.get("comparisons", {})
     for key in ("a_vs_b", "a_vs_c", "b_vs_c"):
         if key not in comparisons:

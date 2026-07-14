@@ -22,12 +22,18 @@ def validate(campaign_dir: Path) -> list[str]:
             continue
         run = json.loads(run_path.read_text())
         for item in run.get("case_results", []):
+            status = item.get("status")
             for ref in item.get("runtime_evidence_refs", []):
-                if not str(ref).startswith(f"process://{opaque}/"):
+                if not str(ref).startswith((f"process://{opaque}/", f"request://{opaque}/")):
                     errors.append(f"UNRESOLVABLE_REF:{public_label}:{item.get('case_id')}:{ref}")
-            process = item.get("process", {})
-            if process.get("pid") is None or process.get("stdout_hash") is None or process.get("wall_clock_ms") is None:
+            process = item.get("process")
+            if status == "completed" and not process:
                 errors.append(f"MISSING_PROCESS_EVIDENCE:{public_label}:{item.get('case_id')}")
+                continue
+            if process and (process.get("pid") is None or process.get("stdout_hash") is None or process.get("wall_clock_ms") is None):
+                errors.append(f"MISSING_PROCESS_EVIDENCE:{public_label}:{item.get('case_id')}")
+            if status == "completed" and not item.get("runtime_evidence_refs"):
+                errors.append(f"COMPLETED_MISSING_RUNTIME_REFS:{public_label}:{item.get('case_id')}")
     return errors
 
 

@@ -10,7 +10,10 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-RUNNER = ROOT / "scripts" / "run_cross_version_campaign.py"
+RUNNERS = [
+    ROOT / "scripts" / "run_cross_version_campaign.py",
+    ROOT / "scripts" / "run_subject_native_cross_version_campaign.py",
+]
 FORBIDDEN_STRINGS = {
     "CIVILIZATION_BUILD_LEDGER.yaml",
     "has_civilization_layer",
@@ -53,7 +56,17 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
 
-def validate(path: Path = RUNNER) -> list[str]:
+def validate(path: Path | None = None) -> list[str]:
+    if path is not None:
+        return validate_one(path)
+    paths = RUNNERS
+    errors: list[str] = []
+    for target in paths:
+        errors.extend(f"{target.relative_to(ROOT)}:{error}" for error in validate_one(target))
+    return sorted(set(errors))
+
+
+def validate_one(path: Path) -> list[str]:
     tree = ast.parse(path.read_text())
     visitor = Visitor()
     visitor.visit(tree)

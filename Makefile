@@ -485,7 +485,7 @@ autonomy-open-world-5min:
 # runs migrations from zero, records command evidence, and cleans up all owned
 # resources. Live LLM/web suites are opt-in elsewhere.
 # ---------------------------------------------------------------------------
-.PHONY: verify-clean-room audit-clean-room cross-version-campaign real-cross-version-campaign
+.PHONY: verify-clean-room audit-clean-room cross-version-campaign real-cross-version-campaign subject-native-cross-version-campaign
 verify-clean-room: audit-clean-room
 
 audit-clean-room:
@@ -548,6 +548,24 @@ real-cross-version-campaign:
 		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
 		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}"
 	@$(PYTHON) scripts/verify_subject_runtime_evidence.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+
+subject-native-cross-version-campaign:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_subject_native_cross_version_campaign.py \
+		--baseline "$${BASELINE:?BASELINE is required}" \
+		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
+		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}" \
+		--campaign "$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_cross_version_campaign.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}" \
+		--baseline "$${BASELINE:?BASELINE is required}" \
+		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
+		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}"
+	@$(PYTHON) scripts/verify_subject_runtime_evidence.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_subject_request_consumption.py \
+		--check \
 		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
 
 .PHONY: longitudinal-learning
