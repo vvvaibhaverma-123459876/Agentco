@@ -208,27 +208,38 @@ phases:
           - 'npm test -- --runInBand -> exit 0: 105 suites passed/3 skipped; 728 passed/8 skipped/5 todo'
         notes: Full regression green 2026-07-14. Route wrapper now emits clean PublicHttpError validation/not-found responses and route-level lifecycle coverage proves plain JSON through Fastify.
   C5_missions:
-    status: not_started
+    status: verified
     items:
       - id: C5.MigrationMissions
         layer: C5
-        status: not_started
+        status: verified
         depends_on: [C1.MigrationCivilizationKernel]
-        notes: strategic_goals, missions, mission_plans, mission_dependencies (+acyclic check), workstreams, mission task/action linkage to agent_tasks/actions, evidence bundles, outcomes, attestations.
+        migration_artifacts: [backend/src/db/migrations/133_missions.sql]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 133_missions.sql, exit 0'
+        notes: strategic_goals, missions (17-state lifecycle), mission_dependencies (self-edge CHECK + recursive cycle guard), mission_state_transitions, workstreams (saga_id FK to saga_executions), mission_tasks (workflow_task_id FK to canonical workflow_tasks), mission_action_attempts, mission_evidence_bundle, mission_outcomes, mission_settlements, mission_attestations; guards + REVOKEs.
       - id: C5.MissionLifecycleService
         layer: C5
-        status: not_started
+        status: verified
         depends_on: [C5.MigrationMissions, C2.CitizenshipService]
-        notes: full lifecycle; completion blocked until required tasks+evidence+settlement+audit complete; attestation generator emits full bundle.
+        source_artifacts: [backend/src/services/mission.service.ts]
+        notes: full state machine (gated); completion refuses unless required workstreams complete + evidence linked + settlement recorded + audit rows exist + outcome recorded; completeMission writes SHA-256 attestation bundle (goal, task graph, actions, evidence ids, governance transitions, resource use, failures, compensations, outcome) in-transaction; high/critical missions auto-require_review.
       - id: C5.MissionSagaIntegration
         layer: C5
-        status: not_started
+        status: verified
         depends_on: [C5.MissionLifecycleService]
-        notes: workstreams execute via saga-coordinator + durable tasks; retries/attempts persisted; compensation for reversible actions.
+        notes: workstreams reference saga_executions (existing saga-coordinator); mission_tasks reference canonical workflow_tasks; action attempts persist retries (attempt_number) and compensation for reversible tasks (compensated flag + compensated attempt outcome). No parallel task engine introduced.
       - id: C5.MissionRoutesAndTests
         layer: C5
-        status: not_started
+        status: verified
         depends_on: [C5.MissionSagaIntegration]
+        source_artifacts: [backend/src/routes/mission.routes.ts]
+        test_artifacts: [backend/tests/missions.test.ts]
+        verification_commands:
+          - 'npx jest tests/missions.test.ts --runInBand --forceExit -> 6/6 passed'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'npx jest tests/route-auth-contract.test.ts -> passed (matrix 212->227)'
+        notes: 16 routes classified. Full regression green 2026-07-14 — exit 0; 106 suites passed/3 skipped; 750 passed/8 skipped/5 todo.
   C6_economy:
     status: not_started
     items:
@@ -438,10 +449,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 23
+  verified: 27
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 41
+  not_started: 37
   blocked: 0
   last_recomputed: '2026-07-14'
