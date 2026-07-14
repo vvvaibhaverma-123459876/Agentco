@@ -1,0 +1,72 @@
+name: Longitudinal Evidence
+
+on:
+  pull_request:
+    paths:
+      - "benchmarks/**"
+      - "schemas/longitudinal_run_manifest.schema.json"
+      - "scripts/longitudinal_foundation.py"
+      - "scripts/run_longitudinal_campaign.py"
+      - "scripts/verify_benchmark_governance.py"
+      - "scripts/compare_longitudinal_runs.py"
+      - "tests/test_longitudinal_foundation.py"
+      - "docs/audit/current/*LONGITUDINAL*"
+      - "docs/audit/current/BENCHMARK_*"
+      - ".github/workflows/longitudinal-evidence.yml"
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: "Campaign ID"
+        required: true
+        default: "initial-foundation-v1"
+  schedule:
+    - cron: "17 3 * * 1"
+
+concurrency:
+  group: longitudinal-evidence-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  longitudinal-evidence:
+    name: Local deterministic longitudinal evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: python3.13 -m pip install -r requirements.txt
+
+      - name: Validate benchmark governance
+        run: python3.13 scripts/verify_benchmark_governance.py --check
+
+      - name: Check longitudinal foundation snapshot
+        run: make audit-longitudinal-foundation
+
+      - name: Run bounded campaign on dispatch or schedule
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        run: make longitudinal-campaign CAMPAIGN="${{ github.event.inputs.campaign || 'initial-foundation-v1' }}"
+
+      - name: Verify generated campaign evidence
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        run: make audit-longitudinal-foundation
+
+      - name: Upload longitudinal artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: longitudinal-evidence-${{ github.sha }}
+          path: |
+            artifacts/longitudinal/**
+            docs/audit/current/INITIAL_LONGITUDINAL_CAMPAIGN_RESULTS.*

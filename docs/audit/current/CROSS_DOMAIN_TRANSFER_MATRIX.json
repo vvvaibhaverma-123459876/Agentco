@@ -1,0 +1,19 @@
+{
+  "candidate": "initial-foundation-v1-seed-101-candidate-evidence-conflict-fix",
+  "classification_note": "No development-only improvement is described as transfer.",
+  "domains": {
+    "calibration": "neutral",
+    "cross_domain_transfer": "neutral",
+    "data_analysis": "neutral",
+    "evidence_evaluation": "positive_transfer",
+    "failure_recovery": "neutral",
+    "governance_authorization": "neutral",
+    "memory_use": "neutral",
+    "planning": "neutral",
+    "reasoning": "neutral",
+    "resource_budgeting": "neutral",
+    "software_engineering": "neutral",
+    "tool_use": "neutral"
+  },
+  "intended_domain": "evidence_evaluation"
+}

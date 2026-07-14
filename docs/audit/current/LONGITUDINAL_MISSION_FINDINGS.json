@@ -1,0 +1,34 @@
+{
+  "findings": [
+    {
+      "benchmark": "initial-foundation-v1",
+      "evidence": "Same-day deterministic campaign only.",
+      "finding_id": "LMF-001",
+      "impact": "Temporal learning remains unproven.",
+      "mission_claim": "continuous learning",
+      "regression_test": "calendar milestone policy rejects premature eligibility.",
+      "remaining_risk": "Mission claims can be overstated if tier policy is ignored.",
+      "remediation": "Run scheduled campaigns over multiple weeks and releases.",
+      "reproduction": "Run make audit-longitudinal-foundation.",
+      "root_cause": "Calendar time has not elapsed.",
+      "run_ids": [],
+      "severity": "S3",
+      "status": "open_backlog"
+    },
+    {
+      "benchmark": "hosted-staging",
+      "evidence": "Batch 05 execution contract is BLOCKED.",
+      "finding_id": "LMF-002",
+      "impact": "Hosted longitudinal claims remain unverified.",
+      "mission_claim": "hosted longitudinal operation",
+      "regression_test": "hosted staging controls fail closed.",
+      "remaining_risk": "Local evidence may be mistaken for hosted evidence.",
+      "remediation": "Complete Batch 05 prerequisites and rerun hosted audit.",
+      "reproduction": "python3.13 scripts/verify_hosted_staging_budget.py --check-prerequisites --json",
+      "root_cause": "No hosted staging account, IaC tooling, DNS, or provider credentials.",
+      "run_ids": [],
+      "severity": "S3",
+      "status": "open_backlog"
+    }
+  ]
+}

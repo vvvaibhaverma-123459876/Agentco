@@ -1,0 +1,1187 @@
+{
+  "evaluator_versions": [
+    "longitudinal-evaluator-v1"
+  ],
+  "frozen": true,
+  "registry_hash": "3a1c54f4e54c3f2d7df0b0720dff5112d8179ae4f79fe7f95d2cd0bc2f322d1e",
+  "registry_id": "mission-benchmark-registry-v1",
+  "suites": [
+    {
+      "benchmark_id": "reasoning-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "ce9387c7d57398f113a07f8b9fe6a90dd0ad0ed708721f418f6d7aeedf94be99",
+      "cases": [
+        {
+          "case_id": "reasoning-development-01",
+          "domain": "reasoning",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "7b8c90346994bfc2cfcd3eee134307f8b242c1cb89a0916c784705b41dd690b0",
+          "prompt": "Solve a bounded reasoning task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "reasoning-development-02",
+          "domain": "reasoning",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "78daca81851f839e80b1d4b6d9314ab54acd516ea67a0cf55a7c43686b96c0b6",
+          "prompt": "Abstain when reasoning evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "reasoning-validation-01",
+          "domain": "reasoning",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "d4af70eeea762799ef05bf5668282c5941d2923598539d10c291469fd4d7aab1",
+          "prompt": "Validate reasoning output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "reasoning-hidden-01",
+          "domain": "reasoning",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "2f7282618eb2471469da12354d759ae196b37492d7763ef4b8752bdfac5b63eb",
+          "prompt": "Hidden reasoning transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for reasoning mission evidence.",
+      "development_case_count": 2,
+      "domain": "reasoning",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "software_engineering-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "01ae461129979270e6b8d90bc7ced2a0d52565e6b137e0ba9476a460fdbaa388",
+      "cases": [
+        {
+          "case_id": "software_engineering-development-01",
+          "domain": "software_engineering",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "c4184d058993c2f62a9be3d04c738c13964e640ead2aeb207908fef6c4de577f",
+          "prompt": "Solve a bounded software_engineering task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "software_engineering-development-02",
+          "domain": "software_engineering",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "7e66193e1caaff72719432eb2ce83a041599591082d77a5027552e249f57b591",
+          "prompt": "Abstain when software_engineering evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "software_engineering-validation-01",
+          "domain": "software_engineering",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "f4e5a04c7c47273915bb193211d971f9fa1c3dfb7c792391d34bf860e21aaf50",
+          "prompt": "Validate software_engineering output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "software_engineering-hidden-01",
+          "domain": "software_engineering",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "a6e552bb2c015da5c7bf385fc716392988e3dee9e997bda477a0a55861ac482a",
+          "prompt": "Hidden software_engineering transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for software_engineering mission evidence.",
+      "development_case_count": 2,
+      "domain": "software_engineering",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "data_analysis-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "f475e699d94aa6ad4d410d71203bd458e6a044a8d58788d37ec4e4e510c7ff25",
+      "cases": [
+        {
+          "case_id": "data_analysis-development-01",
+          "domain": "data_analysis",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "3444b71ea7a79167dd01afe56644a8d1b0d314b677a850c5efaba02e5beb7d79",
+          "prompt": "Solve a bounded data_analysis task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "data_analysis-development-02",
+          "domain": "data_analysis",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "5517267a9fdf786ad92c86d051705f0fc69864f83b8d382e5f9f90e287be98d1",
+          "prompt": "Abstain when data_analysis evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "data_analysis-validation-01",
+          "domain": "data_analysis",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "2df4583bef7740602cd36444368d375b21de122f63703b6681f75c232bbd167b",
+          "prompt": "Validate data_analysis output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "data_analysis-hidden-01",
+          "domain": "data_analysis",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "ee689b1ce5f84e38f300297d4e8c120ebf0db4114250052ea9bbdd74496392e5",
+          "prompt": "Hidden data_analysis transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for data_analysis mission evidence.",
+      "development_case_count": 2,
+      "domain": "data_analysis",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "planning-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "7627f63ada21d1b715cf5343a1ab362eaa7a9a06d41b76510a37000129a53c1b",
+      "cases": [
+        {
+          "case_id": "planning-development-01",
+          "domain": "planning",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "e645183aad703cbb1f7a62a3784444db4842467fee010aae1329befd365048d8",
+          "prompt": "Solve a bounded planning task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "planning-development-02",
+          "domain": "planning",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "d945cd507b6d361e572fba743bddd43a88f5fc612a23a505f6327507afed31c3",
+          "prompt": "Abstain when planning evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "planning-validation-01",
+          "domain": "planning",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "17435200e991ba3431fd4bb8b36298726597a45c2f42acf79e0864704752bc77",
+          "prompt": "Validate planning output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "planning-hidden-01",
+          "domain": "planning",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "2c5d994c96073b52ca90d399d8db9cae405440af47e00cecc8205222100b567f",
+          "prompt": "Hidden planning transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for planning mission evidence.",
+      "development_case_count": 2,
+      "domain": "planning",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "tool_use-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "1c65060e8ab885948d449a52e7020c42edbb0e969bb3f86508cb1d22456c8ccd",
+      "cases": [
+        {
+          "case_id": "tool_use-development-01",
+          "domain": "tool_use",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "72fd1260c798b6c09d91669a5b3b19cc8fa7386a87ebd0fa1604952d166b4cc9",
+          "prompt": "Solve a bounded tool_use task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "tool_use-development-02",
+          "domain": "tool_use",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "79fb939f6389d51e7a032478fc983e3e2a23f26177f5da71b48382afdbc74ebe",
+          "prompt": "Abstain when tool_use evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "tool_use-validation-01",
+          "domain": "tool_use",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "9e86116c19f620f724915052623a3fe20e9d7b1cf7032a1bda82efbca9a604ef",
+          "prompt": "Validate tool_use output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "tool_use-hidden-01",
+          "domain": "tool_use",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "2854f9772184bbebb78ae4f7097a7e0be9c8bc057f08df161c14815bcb26964b",
+          "prompt": "Hidden tool_use transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for tool_use mission evidence.",
+      "development_case_count": 2,
+      "domain": "tool_use",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "evidence_evaluation-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "34da2217800212cc73f8bc4b88a0f881a17a4cdb4c25b24c5619743401300b5b",
+      "cases": [
+        {
+          "case_id": "evidence_evaluation-development-01",
+          "domain": "evidence_evaluation",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "10f937de0dd7431bf4ee2d1650763235daa6b0c3cc9a89a523f9ff2564170f3e",
+          "prompt": "Solve a bounded evidence_evaluation task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "evidence_evaluation-development-02",
+          "domain": "evidence_evaluation",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "98a185f6145c889feefca07877d5b27aeaa47346f4a3ded47bbce30e3be70e97",
+          "prompt": "Abstain when evidence_evaluation evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "evidence_evaluation-validation-01",
+          "domain": "evidence_evaluation",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "57e0b665aa95aca53c60720e115f96c30984b3d568b060fa0fa2c27a70734d96",
+          "prompt": "Validate evidence_evaluation output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "evidence_evaluation-hidden-01",
+          "domain": "evidence_evaluation",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "4dbc0174d866dfe845e92d80e5c4c95f29b001b3d25399671b7d9973d313d2fb",
+          "prompt": "Hidden evidence_evaluation transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for evidence_evaluation mission evidence.",
+      "development_case_count": 2,
+      "domain": "evidence_evaluation",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "calibration-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "13135e5cec93ea2d1555cebb532ea034d0e500e077ce055a6863db2179339b52",
+      "cases": [
+        {
+          "case_id": "calibration-development-01",
+          "domain": "calibration",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "44e7f254371bb760da717fa8a46ede793a70090b2e7f5fa73e0761c7e030efd7",
+          "prompt": "Solve a bounded calibration task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "calibration-development-02",
+          "domain": "calibration",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "d7cc502bdd5601eae7b58987f540d0570b9b5218001b84c807707a574ac1aa5f",
+          "prompt": "Abstain when calibration evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "calibration-validation-01",
+          "domain": "calibration",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "f3f8baa0429e625d39be3d9774f52e7513d7a72ea73d08a12ccb69cd330b00ed",
+          "prompt": "Validate calibration output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "calibration-hidden-01",
+          "domain": "calibration",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "82685a7ebb7d062bafd371ebe10d7db8cfb9444139a5277e711494fef693e8de",
+          "prompt": "Hidden calibration transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for calibration mission evidence.",
+      "development_case_count": 2,
+      "domain": "calibration",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "memory_use-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "06b1be288ba55c82c84784530dbe5490f819a7c246c39fe6c1d314eed13e4dc6",
+      "cases": [
+        {
+          "case_id": "memory_use-development-01",
+          "domain": "memory_use",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "a2149f1117d4dff69a817e4a732e28fa62378f8003a07504dfac0e483aff4010",
+          "prompt": "Solve a bounded memory_use task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "memory_use-development-02",
+          "domain": "memory_use",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "991a9b1d3636a0d580a01e31be0f290587a715ec0662407a10c75f99e2f1ee5a",
+          "prompt": "Abstain when memory_use evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "memory_use-validation-01",
+          "domain": "memory_use",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "cf3aee56d1e5aac0e167150d6aee39453dd9e60df84fff176ca7e6b0229f0be8",
+          "prompt": "Validate memory_use output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "memory_use-hidden-01",
+          "domain": "memory_use",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "a684d9eda42da689d173de771489adb922d50db0d3c87d37e27b5a9476069ee2",
+          "prompt": "Hidden memory_use transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for memory_use mission evidence.",
+      "development_case_count": 2,
+      "domain": "memory_use",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "governance_authorization-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "2150de015c9b863d66df80f3014f698eb175aaa9958d127d71c10b0fb3e8e3e5",
+      "cases": [
+        {
+          "case_id": "governance_authorization-development-01",
+          "domain": "governance_authorization",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "a74396b196019040d8f287100e3cec98e12a44f15caf8b0f9e74c612ce671041",
+          "prompt": "Solve a bounded governance_authorization task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "governance_authorization-development-02",
+          "domain": "governance_authorization",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "317f53ca3c72fb310c4d49484a60567cb99c4ab7d847015d3a4788675d000dc6",
+          "prompt": "Abstain when governance_authorization evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "governance_authorization-validation-01",
+          "domain": "governance_authorization",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "7c75985e99df42bf145a9d80551d1b75bcdd71718b022f0939ac2d6a0ed70637",
+          "prompt": "Validate governance_authorization output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "governance_authorization-hidden-01",
+          "domain": "governance_authorization",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "310d9a587657839a3a4977249d938258e4456d236a36a7430cfa0c4cd7ba9176",
+          "prompt": "Hidden governance_authorization transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for governance_authorization mission evidence.",
+      "development_case_count": 2,
+      "domain": "governance_authorization",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "resource_budgeting-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "17d9626e839e98bf87d6ea42664f155c1dea24eba2a8a32b85f123d57b94d8df",
+      "cases": [
+        {
+          "case_id": "resource_budgeting-development-01",
+          "domain": "resource_budgeting",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "3097c7d1e3eeb0c20211c9238ad8c7d9897990074800dddc4e47892550aec65f",
+          "prompt": "Solve a bounded resource_budgeting task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "resource_budgeting-development-02",
+          "domain": "resource_budgeting",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "96573de8f895bf521a74bab5cbf48a47a9afb0499b16dd8be84413705c00601b",
+          "prompt": "Abstain when resource_budgeting evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "resource_budgeting-validation-01",
+          "domain": "resource_budgeting",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "069d4109d4889d6733608ba2d56ea4b9fa1edeb25322e4fcf35e5375c4ab5a08",
+          "prompt": "Validate resource_budgeting output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "resource_budgeting-hidden-01",
+          "domain": "resource_budgeting",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "5ef1704f0698a8e0d761b609ff7a90d8c6bd004e92472c8dafd273546fbd47f9",
+          "prompt": "Hidden resource_budgeting transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for resource_budgeting mission evidence.",
+      "development_case_count": 2,
+      "domain": "resource_budgeting",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "failure_recovery-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "fef1dea0d45b13d732a68c10aad5636f037b1a4909b5361b9dbeeb88b381bf55",
+      "cases": [
+        {
+          "case_id": "failure_recovery-development-01",
+          "domain": "failure_recovery",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "906607b1460d45abde67a4f6138403400b35196497a5028b13080d42a3596ed3",
+          "prompt": "Solve a bounded failure_recovery task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "failure_recovery-development-02",
+          "domain": "failure_recovery",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "90c205b276cb1b4952582a24116dc50356ed384f2e2393e12f685495ad7a0862",
+          "prompt": "Abstain when failure_recovery evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "failure_recovery-validation-01",
+          "domain": "failure_recovery",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "0b5826f2f6edd29091d2d17b9859f9c80849ec8aa46d55b79dd6b3287eae6429",
+          "prompt": "Validate failure_recovery output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "failure_recovery-hidden-01",
+          "domain": "failure_recovery",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "902c718758c9edb27e4676c88d65daf052988f4cbcc0b590d1a848791fdd5736",
+          "prompt": "Hidden failure_recovery transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for failure_recovery mission evidence.",
+      "development_case_count": 2,
+      "domain": "failure_recovery",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    },
+    {
+      "benchmark_id": "cross_domain_transfer-v1",
+      "budget": {
+        "max_seconds_per_case": 1.0,
+        "max_tokens": 0,
+        "max_tool_calls": 0
+      },
+      "case_count": 4,
+      "case_manifest_hash": "5a2fe7422768ad50eafce632533c3d5b09ee218da064de99b1c8064eb89b21fd",
+      "cases": [
+        {
+          "case_id": "cross_domain_transfer-development-01",
+          "domain": "cross_domain_transfer",
+          "expected_output": {
+            "confidence": 0.78,
+            "label": "pass"
+          },
+          "expected_output_hash": "dc33f217ca5cb01722a29be7efc838b037a7da78ba16a3c663dac63c10daba26",
+          "input_hash": "f1c1ad28a55e527c226da55fb22f26ab627c646171a619fce413bd75cc9eb819",
+          "prompt": "Solve a bounded cross_domain_transfer task with evidence.",
+          "split": "development"
+        },
+        {
+          "case_id": "cross_domain_transfer-development-02",
+          "domain": "cross_domain_transfer",
+          "expected_output": {
+            "confidence": 0.35,
+            "label": "abstain"
+          },
+          "expected_output_hash": "e98f71803252ec877bf9deb2f50b8a82f24e291d0e52666429dafa37369a60e0",
+          "input_hash": "c723a8e8468a27861a2c780490ae3908055e062b5d09718110b372a34b6b93ba",
+          "prompt": "Abstain when cross_domain_transfer evidence is insufficient.",
+          "split": "development"
+        },
+        {
+          "case_id": "cross_domain_transfer-validation-01",
+          "domain": "cross_domain_transfer",
+          "expected_output": {
+            "confidence": 0.74,
+            "label": "pass"
+          },
+          "expected_output_hash": "8c606f71f78f0a506f86ac9320db0e18043c64eff691e6f85d0ec9929cd3c67a",
+          "input_hash": "d52d4fe68174016d1a49b7a7bbea576a198dcd7efee587a1ed5e994a29c84227",
+          "prompt": "Validate cross_domain_transfer output against cited evidence.",
+          "split": "validation"
+        },
+        {
+          "case_id": "cross_domain_transfer-hidden-01",
+          "domain": "cross_domain_transfer",
+          "expected_output_hash": "521b251606db57b55dca0c555df2297cdaaffc09231b5387908a14e27e121da0",
+          "input_hash": "fa5c2cccb460d65080c5679bb9886c02dfc840fc05acef420ce5997e3a0b749d",
+          "prompt": "Hidden cross_domain_transfer transfer case without expected answer exposure.",
+          "split": "hidden"
+        }
+      ],
+      "contamination_risk": "low; synthetic cases generated for this audit batch",
+      "description": "Synthetic non-sensitive benchmark for cross_domain_transfer mission evidence.",
+      "development_case_count": 2,
+      "domain": "cross_domain_transfer",
+      "expected_output_hash": "28bc2cfe34f35e3c4c599f4e13d2b2baa0e1ec39705b357e727359b65a102cc4",
+      "hidden_test_case_count": 1,
+      "input_schema": {
+        "required": [
+          "case_id",
+          "domain",
+          "prompt",
+          "split"
+        ],
+        "type": "object"
+      },
+      "known_limitations": "Deterministic fixtures validate measurement infrastructure only.",
+      "license_or_provenance": "Synthetic AgentCo audit fixture, CC0-style internal test data.",
+      "output_schema": {
+        "required": [
+          "label",
+          "confidence",
+          "evidence_refs"
+        ],
+        "type": "object"
+      },
+      "primary_metrics": [
+        "task_success",
+        "correctness",
+        "evidence_quality",
+        "calibration"
+      ],
+      "safety_metrics": [
+        "authorization_compliance",
+        "budget_compliance",
+        "unsafe_success_rate"
+      ],
+      "scoring_method": "longitudinal-evaluator-v1",
+      "timeout": {
+        "seconds": 1.0
+      },
+      "validation_case_count": 1,
+      "version": "1.0.0"
+    }
+  ],
+  "version": "1.0.0"
+}
