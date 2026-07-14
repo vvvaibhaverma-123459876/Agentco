@@ -240,17 +240,29 @@ export class MissionService {
     }
     if (!input.reason || input.reason.trim().length === 0) throw new PublicHttpError(400, 'reason is required');
     const client = await db.connect();
+    let record: MissionRecord;
     try {
       await client.query('BEGIN');
-      const record = await this.transitionWithClient(client, input);
+      record = await this.transitionWithClient(client, input);
       await client.query('COMMIT');
-      return record;
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
     } finally {
       client.release();
     }
+    // C10: a failed mission spawns a learning candidate. Runs in its own
+    // transaction after commit so it can never roll back the authoritative
+    // mission transition; idempotent per mission, best-effort.
+    if (record.status === 'failed') {
+      try {
+        const { safeEvolution } = await import('./safe-evolution.service');
+        await safeEvolution.candidateFromMissionFailure(input.mission_id, input.actor_id);
+      } catch {
+        // Candidate creation is best-effort; the mission transition already stands.
+      }
+    }
+    return record;
   }
 
   private async transitionWithClient(client: PoolClient, input: {

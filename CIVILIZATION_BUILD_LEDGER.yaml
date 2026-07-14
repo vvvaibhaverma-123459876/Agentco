@@ -368,27 +368,39 @@ phases:
           - 'route sensitivity matrix 266->271'
         notes: New tests cover transitive retraction, immutability, trust-context views, self-edge rejection. Pre-existing epistemic gates remain covered by claim-grounding/source-independence/evidence-kernel suites (unsupported->verified memory blocked, same-source resolution rejected, fixture evidence blocked) — all still green in full regression. 5 routes classified. Full regression green 2026-07-14 — exit 0; 110 suites passed/3 skipped; 813 passed/8 skipped/5 todo.
   C10_learning:
-    status: not_started
+    status: verified
     items:
       - id: C10.IndependentEvaluator
         layer: C10
-        status: not_started
+        status: verified
         depends_on: [C0.CanonicalPathSelection]
-        notes: evaluator ≠ proposer enforced; held-out benchmark cases.
+        migration_artifacts: [backend/src/db/migrations/138_safe_evolution.sql]
+        source_artifacts: [backend/src/services/safe-evolution.service.ts]
+        verification_commands:
+          - 'npm run db:migrate -> [apply] 138_safe_evolution.sql, exit 0'
+        notes: civ_learning_candidates (13-state lifecycle gated), failure_analyses, deterministic regression cases (metric_floor/safety_invariant/held_out/calibration_non_regression), evaluations (evaluator <> proposer enforced; all cases + safety/calibration/evidence non-regression required to pass), canary runs, improvement lineage. Independent evaluation is DB+service enforced.
       - id: C10.CanaryAndRollback
         layer: C10
-        status: not_started
+        status: verified
         depends_on: [C10.IndependentEvaluator]
-        notes: canary runs, promotion decisions, executable + tested rollback, post-promotion monitoring.
+        notes: startCanary/reportCanary — a breach forces rollback and blocks promotion; promote requires a clean canary; Tier-1 auto-promotes, Tier-2/3 require a human approver distinct from the proposer; rollback records lineage and terminates the candidate; every promote/rollback preserves versioned lineage.
       - id: C10.FailureToCandidate
         layer: C10
-        status: not_started
+        status: verified
         depends_on: [C5.MissionLifecycleService]
-        notes: task/mission failure auto-creates learning candidate with failure analysis (E2E scenario E precondition).
+        source_artifacts: [backend/src/services/mission.service.ts]
+        notes: mission.transitionMission fires candidateFromMissionFailure after a failed transition commits (own transaction, best-effort, idempotent per mission) — a failed mission auto-creates a task_failure/planning candidate.
       - id: C10.LearningTests
         layer: C10
-        status: not_started
+        status: verified
         depends_on: [C10.CanaryAndRollback, C10.FailureToCandidate]
+        source_artifacts: [backend/src/routes/safe-evolution.routes.ts]
+        test_artifacts: [backend/tests/safe-evolution.test.ts]
+        verification_commands:
+          - 'npx jest tests/safe-evolution.test.ts --runInBand --forceExit -> 6/6 passed (incl. SCENARIO E)'
+          - 'npx tsc --noEmit -> exit 0'
+          - 'route sensitivity matrix 271->282'
+        notes: 11 routes classified. Scenario E full loop proven. Full regression green 2026-07-14 — exit 0; 111 suites passed/3 skipped; 830 passed/8 skipped/5 todo.
   C11_expansion:
     status: not_started
     items:
@@ -492,10 +504,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 42
+  verified: 46
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 22
+  not_started: 18
   blocked: 0
   last_recomputed: '2026-07-14'

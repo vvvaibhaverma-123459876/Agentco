@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 102 |
-| AUTH-WRITE | 165 |
-| TOTAL | 271 |
+| AUTH-READ | 103 |
+| AUTH-WRITE | 175 |
+| TOTAL | 282 |
 
 ## Matrix
 
@@ -182,6 +182,17 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/knowledge/retract` | POST | Collective knowledge provenance/retraction/view state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/knowledge/retractions/:retractionId` | GET/HEAD | Collective knowledge provenance/retraction/view state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/knowledge/status/:type/:id` | GET/HEAD | Collective knowledge provenance/retraction/view state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/learning/canaries/:canaryId/report` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId` | GET/HEAD | Learning candidate/evaluation/canary/promotion state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/learning/candidates/:candidateId/canary` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/evaluate` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/failure-analysis` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/promote` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/regressions` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/retain` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/rollback` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/learning/candidates/:candidateId/sandbox` | POST | Learning candidate/evaluation/canary/promotion state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/mission-tasks/:taskId/attempts` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions/:missionId` | GET/HEAD | Mission/goal/workstream/task/attestation state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
