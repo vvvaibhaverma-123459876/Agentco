@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1856,
+  "tracked_file_count": 1857,
   "category_counts": {
     "Database migration": 137,
     "Deployment infrastructure": 30,
     "Deprecated code": 48,
     "Development tooling": 137,
-    "Documentation": 419,
+    "Documentation": 420,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 480,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 488,
-    "docs": 347,
+    "docs": 348,
     "evals": 180,
     "scripts": 149,
     "agents": 111,
@@ -81,7 +81,7 @@
   },
   "extension_counts": {
     ".py": 574,
-    ".md": 435,
+    ".md": 436,
     ".ts": 325,
     ".json": 181,
     ".sql": 138,
@@ -6410,6 +6410,12 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_07D_EVIDENCE_BINDING_AND_V2.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
