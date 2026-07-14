@@ -463,22 +463,31 @@ phases:
           - 'route sensitivity matrix 290->297'
         notes: 7 routes classified. Restart-safe routing, monotonic ticks, kill-switch stop/resume, pause/drain, status projection all proven. Full regression green 2026-07-14 — exit 0; 113 suites passed/3 skipped; 854 passed/8 skipped/5 todo.
   C13_operator_plane:
-    status: not_started
+    status: verified
     items:
       - id: C13.OperatorAPIs
         layer: C13
-        status: not_started
+        status: verified
         depends_on: [C12.RoutersAndLoop]
-        notes: governed backend APIs for every §6 view; protected actions require auth; pagination/filtering.
+        source_artifacts: [backend/src/services/civilization-operator.service.ts, backend/src/routes/civilization-operator.routes.ts]
+        notes: /api/civilization/operator/overview composes kernel root + society topology + OS status projection + open work (missions/disputes/proposals/candidates/expansions) + recent civilization events + recent ticks into one governed read model. Every prior C1-C12 view already has governed GET APIs (kernel/societies/citizens/coalitions/missions/governance/judiciary/knowledge/learning/expansion/os); all protected by the global API-key preHandler and classified in the route sensitivity matrix.
       - id: C13.OperatorFrontend
         layer: C13
-        status: not_started
+        status: verified
         depends_on: [C13.OperatorAPIs]
-        notes: Next.js operator views; no fake data; confirmation+reason for destructive/emergency ops; correlation-ID links.
+        source_artifacts: [frontend/src/app/civilization/page.tsx]
+        notes: Next.js /civilization operator console — fetches the governed overview through the existing server-side API proxy (service key injected server-side; no NEXT_PUBLIC key, no fabricated data); stat tiles, society topology, coordinator ticks, open missions, recent activity; "Run coordinator tick" and "Engage kill switch" actions; the kill switch requires an explicit confirmation + reason and is applied through an authorized governance emergency power.
       - id: C13.OperatorTests
         layer: C13
-        status: not_started
+        status: verified
         depends_on: [C13.OperatorFrontend]
+        test_artifacts: [backend/tests/civilization-operator.test.ts]
+        verification_commands:
+          - 'npx jest tests/civilization-operator.test.ts --runInBand --forceExit -> 2/2 passed'
+          - 'frontend: ./node_modules/.bin/tsc --noEmit -> exit 0'
+          - 'frontend: NEXT_TELEMETRY_DISABLED=1 npm run build -> exit 0 (/civilization route compiled)'
+          - 'route sensitivity matrix 297->298'
+        notes: Full backend regression green 2026-07-14 — exit 0; 114 suites passed/3 skipped; 857 passed/8 skipped/5 todo. Frontend tsc + next build clean.
   C14_reliability_security_deployment:
     status: not_started
     items:
@@ -526,10 +535,10 @@ phases:
         notes: automated reconciliation checker; release-gate gains civilization completion verifier step; termination predicate set only on full green.
 rollups:
   total_items: 64
-  verified: 53
+  verified: 56
   integrated: 0
   implemented: 0
   in_progress: 0
-  not_started: 11
+  not_started: 8
   blocked: 0
   last_recomputed: '2026-07-14'

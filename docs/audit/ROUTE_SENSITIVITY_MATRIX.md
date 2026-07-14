@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 108 |
+| AUTH-READ | 109 |
 | AUTH-WRITE | 185 |
-| TOTAL | 297 |
+| TOTAL | 298 |
 
 ## Matrix
 
@@ -214,6 +214,7 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/missions/:missionId/settlement` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions/:missionId/transition` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions/:missionId/workstreams` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/operator/overview` | GET/HEAD | Civilization operator overview projection | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/os/mode` | POST | Civilization OS scheduler/tick/status projection state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/os/recover` | GET/HEAD | Civilization OS scheduler/tick/status projection state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/os/start` | POST | Civilization OS scheduler/tick/status projection state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
