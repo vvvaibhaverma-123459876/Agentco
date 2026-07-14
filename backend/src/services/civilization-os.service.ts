@@ -159,10 +159,11 @@ export class CivilizationOsService {
       );
       let routed = 0;
       for (const mission of pending.rows) {
-        // Route to a mandatory institution (the Task-owning Production side):
-        // pick an active institution deterministically. Real routing refines
-        // this per domain in later work; the point is a single idempotent
-        // assignment that a re-tick will not repeat.
+        // Deterministic institution assignment (first active institution by
+        // creation order). Domain-aware routing is enforced separately by the
+        // C11 capability-expansion routing check at grant time; this step only
+        // makes a single idempotent lead-institution assignment that a re-tick
+        // will not repeat.
         const institution = await client.query<{ id: string }>(
           `SELECT i.id FROM institutions i
             WHERE i.entity_type = 'institution' AND i.status = 'active'

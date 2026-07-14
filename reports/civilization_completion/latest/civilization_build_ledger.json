@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-14T15:36:43.728155+00:00",
-  "commit": "4bcca9461bf91b0ed9cf3d454fd842800c496738",
+  "generated_at": "2026-07-14T15:48:15.499891+00:00",
+  "commit": "6182ac79cf5fdcfda5d8defdd919ac230d51808b",
   "branch": "feature/civilization-layer",
-  "git_dirty": false,
+  "git_dirty": true,
   "items": [
     {
       "phase": "C0_canonical_runtime_freeze",
@@ -804,7 +804,7 @@
         "C11.ExpansionGateCompletion",
         "C6.EconomyEnforcement"
       ],
-      "notes": "one integrated tick \u2014 WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions with FOR UPDATE SKIP LOCKED, assign lead institution idempotently), EmergencyController (kernel + governance emergency expiry sweep), reservation expiry, GeneralityReporter + LoopSupervisor status projection across all C1-C11 layers."
+      "notes": "the continuous tick actively DRIVES WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions FOR UPDATE SKIP LOCKED, idempotent lead-institution assignment), EmergencyController (kernel + governance emergency expiry sweep), and reservation expiry; the judiciary/coalition/learning/expansion/knowledge layers are reachable via governed HTTP routes and OBSERVED in the LoopSupervisor/GeneralityReporter status projection, but are not yet orchestrated as work inside the tick loop. Full coordinator-driven reachability of every registered service (brief A.6/B.8) is an OUTSTANDING gate."
     },
     {
       "phase": "C12_civilization_os",

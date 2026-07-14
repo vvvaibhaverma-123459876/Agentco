@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-14T15:36:43.728155+00:00",
-  "commit": "4bcca9461bf91b0ed9cf3d454fd842800c496738",
+  "generated_at": "2026-07-14T15:48:15.499891+00:00",
+  "commit": "6182ac79cf5fdcfda5d8defdd919ac230d51808b",
   "branch": "feature/civilization-layer",
-  "git_dirty": false,
+  "git_dirty": true,
   "note": "run 'cd backend && npm test -- --runInBand' for live counts; last recorded full regression green in the ledger notes.",
   "civilization_suites": [
     "backend/tests/civilization-e2e-scenarios.test.ts",

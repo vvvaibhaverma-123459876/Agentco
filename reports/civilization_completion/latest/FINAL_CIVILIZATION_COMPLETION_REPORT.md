@@ -1,9 +1,9 @@
 # Final Civilization Completion Report
 
-- Generated: 2026-07-14T15:36:43.728155+00:00
-- Commit: `4bcca9461bf91b0ed9cf3d454fd842800c496738`
+- Generated: 2026-07-14T15:48:15.499891+00:00
+- Commit: `6182ac79cf5fdcfda5d8defdd919ac230d51808b`
 - Branch: `feature/civilization-layer`
-- Git dirty at generation: False
+- Git dirty at generation: True
 - Reconciliation passed: **True**
 
 ## Ledger rollup

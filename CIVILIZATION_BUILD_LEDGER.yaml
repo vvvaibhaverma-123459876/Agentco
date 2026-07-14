@@ -8,7 +8,7 @@ meta:
   last_updated: '2026-07-14'
   base_commit: 997e66ce700e0c93896f13f7d6f559d0a50b15dd
   branch: feature/civilization-layer
-  termination_predicate_met: true
+  termination_predicate_met: false
   statuses: [not_started, in_progress, blocked, implemented, integrated, verified]
 phases:
   C0_canonical_runtime_freeze:
@@ -445,7 +445,7 @@ phases:
         layer: C12
         status: verified
         depends_on: [C12.SchedulerDaemon, C5.MissionSagaIntegration, C4.CoalitionLifecycleService, C7.PolicyRuntimeEnforcement, C8.JudiciaryLifecycleCompletion, C10.FailureToCandidate, C11.ExpansionGateCompletion, C6.EconomyEnforcement]
-        notes: one integrated tick — WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions with FOR UPDATE SKIP LOCKED, assign lead institution idempotently), EmergencyController (kernel + governance emergency expiry sweep), reservation expiry, GeneralityReporter + LoopSupervisor status projection across all C1-C11 layers.
+        notes: the continuous tick actively DRIVES WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions FOR UPDATE SKIP LOCKED, idempotent lead-institution assignment), EmergencyController (kernel + governance emergency expiry sweep), and reservation expiry; the judiciary/coalition/learning/expansion/knowledge layers are reachable via governed HTTP routes and OBSERVED in the LoopSupervisor/GeneralityReporter status projection, but are not yet orchestrated as work inside the tick loop. Full coordinator-driven reachability of every registered service (brief A.6/B.8) is an OUTSTANDING gate.
       - id: C12.RestartRecovery
         layer: C12
         status: verified

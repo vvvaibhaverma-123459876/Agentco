@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-14T15:36:43.728155+00:00",
-  "commit": "4bcca9461bf91b0ed9cf3d454fd842800c496738",
+  "generated_at": "2026-07-14T15:48:15.499891+00:00",
+  "commit": "6182ac79cf5fdcfda5d8defdd919ac230d51808b",
   "branch": "feature/civilization-layer",
-  "git_dirty": false,
+  "git_dirty": true,
   "ledger_total_items": 64,
   "verified_items": 64,
   "unverified_items": 0,
@@ -12,7 +12,7 @@
   "missing_required_entry_points": [],
   "missing_deployment_wiring": [],
   "missing_scenario_proofs": {},
-  "completion_evidence_commit": "4bcca9461bf91b0ed9cf3d454fd842800c496738",
+  "completion_evidence_commit": "6182ac79cf5fdcfda5d8defdd919ac230d51808b",
   "checks": {
     "all_ledger_items_verified": true,
     "no_missing_migrations": true,
