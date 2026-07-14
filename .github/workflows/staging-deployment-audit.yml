@@ -44,6 +44,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Record expected audit commit
+        run: echo "EXPECTED_AUDIT_SHA=${{ github.event.pull_request.head.sha || github.sha }}" >> "$GITHUB_ENV"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -84,7 +87,7 @@ jobs:
           import os
           from pathlib import Path
 
-          head = os.environ["GITHUB_SHA"]
+          head = os.environ["EXPECTED_AUDIT_SHA"]
           ledgers = sorted(Path("artifacts/staging-deployment").glob("*/EXECUTION_LEDGER.json"))
           if not ledgers:
               raise SystemExit("missing staging deployment execution ledger")
@@ -101,6 +104,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: staging-deployment-audit-${{ github.sha }}
+          name: staging-deployment-audit-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/staging-deployment/**
           if-no-files-found: error

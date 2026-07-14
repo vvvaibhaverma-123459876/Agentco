@@ -46,6 +46,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Record expected audit commit
+        run: echo "EXPECTED_AUDIT_SHA=${{ github.event.pull_request.head.sha || github.sha }}" >> "$GITHUB_ENV"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -68,10 +71,30 @@ jobs:
       - name: Run isolated runtime integration audit
         run: make audit-runtime-integration
 
+      - name: Verify runtime integration evidence commit
+        run: |
+          python3.13 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          head = os.environ["EXPECTED_AUDIT_SHA"]
+          ledgers = sorted(Path("artifacts/runtime-integration").glob("*/EXECUTION_LEDGER.json"))
+          if not ledgers:
+              raise SystemExit("missing runtime integration execution ledger")
+          ledger = json.loads(ledgers[-1].read_text())
+          if ledger.get("commit") != head:
+              raise SystemExit(f"ledger commit {ledger.get('commit')} does not match expected audit SHA {head}")
+          if ledger.get("final_verdict") != "PASS":
+              raise SystemExit(f"runtime integration verdict is {ledger.get('final_verdict')}")
+          if not ledger.get("cleanup", {}).get("success"):
+              raise SystemExit("runtime integration cleanup did not verify success")
+          PY
+
       - name: Upload runtime integration artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: runtime-integration-${{ github.sha }}
+          name: runtime-integration-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/runtime-integration/**
           if-no-files-found: error

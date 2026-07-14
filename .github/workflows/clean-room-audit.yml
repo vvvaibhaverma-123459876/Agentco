@@ -42,6 +42,9 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Record expected audit commit
+        run: echo "EXPECTED_AUDIT_SHA=${{ github.event.pull_request.head.sha || github.sha }}" >> "$GITHUB_ENV"
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -64,10 +67,30 @@ jobs:
       - name: Run isolated clean-room audit
         run: make audit-clean-room
 
+      - name: Verify clean-room audit evidence commit
+        run: |
+          python3.13 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          head = os.environ["EXPECTED_AUDIT_SHA"]
+          ledgers = sorted(Path("artifacts/audit").glob("*/EXECUTION_LEDGER.json"))
+          if not ledgers:
+              raise SystemExit("missing clean-room execution ledger")
+          ledger = json.loads(ledgers[-1].read_text())
+          if ledger.get("commit") != head:
+              raise SystemExit(f"ledger commit {ledger.get('commit')} does not match expected audit SHA {head}")
+          if ledger.get("final_verdict") != "PASS":
+              raise SystemExit(f"clean-room audit verdict is {ledger.get('final_verdict')}")
+          if not ledger.get("cleanup", {}).get("success"):
+              raise SystemExit("clean-room cleanup did not verify success")
+          PY
+
       - name: Upload clean-room audit artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: clean-room-audit-${{ github.sha }}
+          name: clean-room-audit-${{ github.event.pull_request.head.sha || github.sha }}
           path: artifacts/audit/
           if-no-files-found: warn
