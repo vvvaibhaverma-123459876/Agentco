@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentCo Longitudinal History",
+  "type": "object",
+  "required": [
+    "history_version",
+    "campaign_series",
+    "previous_aggregate_hash",
+    "current_aggregate_hash",
+    "observation_windows",
+    "attempts",
+    "failed_attempts",
+    "successful_attempts",
+    "milestone_eligibility"
+  ],
+  "properties": {
+    "history_version": {
+      "const": "longitudinal-history-v1"
+    },
+    "campaign_series": {
+      "type": "string"
+    },
+    "previous_aggregate_hash": {
+      "type": ["string", "null"]
+    },
+    "current_aggregate_hash": {
+      "type": "string"
+    },
+    "observation_windows": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^\\d{4}-W\\d{2}$"
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["attempt_id", "observation_id", "observation_kind", "status", "commit_sha"],
+        "properties": {
+          "attempt_id": {"type": "string"},
+          "observation_id": {"type": "string"},
+          "observation_kind": {"enum": ["scheduled", "manual", "pull_request_protocol", "protocol"]},
+          "status": {"enum": ["success", "failed"]},
+          "commit_sha": {"type": "string"}
+        }
+      }
+    }
+  }
+}

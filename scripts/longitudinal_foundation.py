@@ -14,6 +14,7 @@ import json
 import math
 import os
 import platform
+import re
 import statistics
 import subprocess
 import sys
@@ -29,9 +30,11 @@ DOCS = ROOT / "docs" / "audit" / "current"
 SCHEMAS = ROOT / "schemas"
 ARTIFACTS = ROOT / "artifacts" / "longitudinal"
 CAMPAIGN_ID = "initial-foundation-v1"
+CAMPAIGN_SERIES = "weekly-foundation-v1"
 EVALUATOR_VERSION = "longitudinal-evaluator-v1"
 REGISTRY_VERSION = "mission-benchmark-registry-v1"
 SEEDS = [101, 202, 303, 404, 505]
+OBSERVATION_ID_RE = re.compile(r"^(weekly-foundation-v1-\d{4}-W\d{2}-[0-9a-f]{12}|manual-\d{8}T\d{6}Z-[0-9a-f]{12}-\d+)$")
 DOMAINS = [
     "reasoning",
     "software_engineering",
@@ -383,9 +386,9 @@ def comparison(baseline: dict[str, Any], candidate: dict[str, Any]) -> dict[str,
     }
 
 
-def campaign_results(registry: dict[str, Any]) -> dict[str, Any]:
-    runs = [run_single(seed, registry, CAMPAIGN_ID) for seed in SEEDS]
-    candidate = run_single(SEEDS[0], registry, CAMPAIGN_ID, candidate="candidate-evidence-conflict-fix")
+def campaign_results(registry: dict[str, Any], campaign_id: str = CAMPAIGN_ID) -> dict[str, Any]:
+    runs = [run_single(seed, registry, campaign_id) for seed in SEEDS]
+    candidate = run_single(SEEDS[0], registry, campaign_id, candidate="candidate-evidence-conflict-fix")
     rejected = {
         "proposal_id": "proposal-unsafe-budget-shortcut",
         "decision": "rejected",
@@ -403,7 +406,7 @@ def campaign_results(registry: dict[str, Any]) -> dict[str, Any]:
         for metric in CAPABILITY_METRICS
     }
     return {
-        "campaign_id": CAMPAIGN_ID,
+        "campaign_id": campaign_id,
         "evidence_classification": "L4_repeated_same_version",
         "longitudinal_claim_limit": "Same-day same-version runs do not establish temporal learning.",
         "registry_hash": registry["registry_hash"],
@@ -722,7 +725,7 @@ def write_schema() -> None:
 
 
 def write_artifacts(results: dict[str, Any]) -> None:
-    campaign_dir = ARTIFACTS / CAMPAIGN_ID
+    campaign_dir = ARTIFACTS / results["campaign_id"]
     for run in results["runs"]:
         run_dir = campaign_dir / run["run_id"]
         write_json(run_dir / "RUN_MANIFEST.json", run["manifest"])
@@ -748,14 +751,23 @@ def generate_all() -> dict[str, Any]:
     return results
 
 
+def validate_campaign_execution_id(campaign: str) -> list[str]:
+    if campaign == CAMPAIGN_ID:
+        return []
+    if OBSERVATION_ID_RE.match(campaign):
+        return []
+    return [f"invalid recurring campaign/observation id: {campaign}"]
+
+
 def run_campaign_artifact(campaign: str) -> dict[str, Any]:
-    if campaign != CAMPAIGN_ID:
-        raise SystemExit(f"unknown campaign: {campaign}")
+    errors = validate_campaign_execution_id(campaign)
+    if errors:
+        raise SystemExit("\n".join(errors))
     registry = json.loads((BENCHMARKS / "registry.json").read_text())
     errors = validate_registry(registry)
     if errors:
         raise SystemExit("\n".join(errors))
-    results = campaign_results(registry)
+    results = campaign_results(registry, campaign)
     recompute_errors = recompute_campaign(results)
     if recompute_errors:
         raise SystemExit("\n".join(recompute_errors))

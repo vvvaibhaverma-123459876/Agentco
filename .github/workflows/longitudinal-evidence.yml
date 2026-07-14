@@ -8,17 +8,22 @@ on:
       - "scripts/longitudinal_foundation.py"
       - "scripts/run_longitudinal_campaign.py"
       - "scripts/verify_benchmark_governance.py"
+      - "scripts/verify_longitudinal_evidence.py"
+      - "scripts/aggregate_longitudinal_history.py"
+      - "scripts/calculate_longitudinal_milestones.py"
       - "scripts/compare_longitudinal_runs.py"
       - "tests/test_longitudinal_foundation.py"
+      - "tests/test_longitudinal_remote_closure.py"
       - "docs/audit/current/*LONGITUDINAL*"
       - "docs/audit/current/BENCHMARK_*"
+      - "schemas/longitudinal_history.schema.json"
       - ".github/workflows/longitudinal-evidence.yml"
   workflow_dispatch:
     inputs:
-      campaign:
-        description: "Campaign ID"
+      campaign_series:
+        description: "Campaign series"
         required: true
-        default: "initial-foundation-v1"
+        default: "weekly-foundation-v1"
   schedule:
     - cron: "17 3 * * 1"
 
@@ -28,45 +33,101 @@ concurrency:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
-  longitudinal-evidence:
-    name: Local deterministic longitudinal evidence
+  longitudinal-protocol-validation:
+    name: Longitudinal protocol validation
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Checkout exact commit
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: requirements/requirements.lock.txt
 
       - name: Install Python dependencies
-        run: python3.13 -m pip install -r requirements.txt
+        run: python3.13 -m pip install -r requirements/requirements.lock.txt
+
+      - name: Prepare workflow context
+        run: >-
+          python3.13 scripts/verify_longitudinal_evidence.py prepare-context
+          --expected-sha "$EXPECTED_AUDIT_SHA"
+          --event-name "${{ github.event_name }}"
+          --github-run-id "${{ github.run_id }}"
+          --github-run-attempt "${{ github.run_attempt }}"
+          --campaign-series "${{ github.event.inputs.campaign_series || 'weekly-foundation-v1' }}"
+          --output artifacts/longitudinal/workflow-context.json
 
       - name: Validate benchmark governance
         run: python3.13 scripts/verify_benchmark_governance.py --check
 
+      - name: Run longitudinal evidence integrity tests
+        run: python3.13 -m pytest tests/test_longitudinal_foundation.py tests/test_longitudinal_remote_closure.py -q
+
       - name: Check longitudinal foundation snapshot
         run: make audit-longitudinal-foundation
 
+      - name: Validate protocol artifact
+        run: >-
+          python3.13 scripts/verify_longitudinal_evidence.py protocol
+          --expected-sha "$EXPECTED_AUDIT_SHA"
+          --context artifacts/longitudinal/workflow-context.json
+          --output artifacts/longitudinal/protocol-validation.json
+
       - name: Run bounded campaign on dispatch or schedule
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-        run: make longitudinal-campaign CAMPAIGN="${{ github.event.inputs.campaign || 'initial-foundation-v1' }}"
+        run: |
+          OBSERVATION_ID=$(python3.13 scripts/verify_longitudinal_evidence.py observation-id --context artifacts/longitudinal/workflow-context.json)
+          make longitudinal-campaign CAMPAIGN="$OBSERVATION_ID"
 
       - name: Verify generated campaign evidence
         if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
-        run: make audit-longitudinal-foundation
+        run: |
+          OBSERVATION_ID=$(python3.13 scripts/verify_longitudinal_evidence.py observation-id --context artifacts/longitudinal/workflow-context.json)
+          python3.13 scripts/verify_longitudinal_evidence.py campaign \
+            --expected-sha "$EXPECTED_AUDIT_SHA" \
+            --context artifacts/longitudinal/workflow-context.json \
+            --campaign-results "artifacts/longitudinal/$OBSERVATION_ID/CAMPAIGN_RESULTS.json" \
+            --output artifacts/longitudinal/campaign-verification.json
+
+      - name: Aggregate longitudinal history
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+        run: >-
+          python3.13 scripts/aggregate_longitudinal_history.py
+          --context artifacts/longitudinal/workflow-context.json
+          --status success
+          --output artifacts/longitudinal/history/longitudinal-history.json
+
+      - name: Record failure manifest
+        if: failure()
+        run: >-
+          python3.13 scripts/verify_longitudinal_evidence.py failure
+          --expected-sha "$EXPECTED_AUDIT_SHA"
+          --event-name "${{ github.event_name }}"
+          --github-run-id "${{ github.run_id }}"
+          --github-run-attempt "${{ github.run_attempt }}"
+          --context artifacts/longitudinal/workflow-context.json
+          --failure-stage workflow
+          --exit-code 1
+          --output artifacts/longitudinal/failure-manifest.json
 
       - name: Upload longitudinal artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: longitudinal-evidence-${{ github.sha }}
+          name: longitudinal-evidence-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             artifacts/longitudinal/**
             docs/audit/current/INITIAL_LONGITUDINAL_CAMPAIGN_RESULTS.*
+          retention-days: 120
