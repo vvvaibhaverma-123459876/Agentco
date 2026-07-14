@@ -17,6 +17,7 @@ import { getSpecialistRole, isValidSpecialistRole } from '../types/specialist-ro
 import { ActionSpec, ActionResult } from '../types/action.types';
 import { metricsService } from './autonomy-metrics.service';
 import { structuredLogger } from './structured-logger.service';
+import { citizenshipService } from './citizenship.service';
 
 export interface SpecialistBudget {
   tokens: number;
@@ -174,6 +175,20 @@ export class TeamActivationService {
       return null;
     }
 
+    // Citizenship gate (C2): specialist roles run as service citizens; a
+    // suspended specialist citizen cannot spawn. Preserves this method's
+    // null-on-refusal contract while recording the block.
+    try {
+      await citizenshipService.assertProtectedExecutionAllowed({
+        specialist_role: request.role,
+        risk_level: 'low',
+      });
+    } catch (error: any) {
+      console.error(`[TeamActivation] citizenship gate blocked specialist ${request.role}: ${error?.message ?? error}`);
+      metricsService.recordSpecialistSpawn(request.role, false);
+      return null;
+    }
+
     // Check parent goal depth limit (max depth 2)
     const parentDepth = await this.getGoalDepth(request.parentGoalId);
     if (parentDepth >= 2) {
@@ -190,7 +205,17 @@ export class TeamActivationService {
 
     // Create specialist instance
     const specialistId = uuidv4();
-    const budget = request.customBudget || roleSpec.defaultBudgets;
+    // Trust-linked budgets (C2): low or force-downgraded trust constrains the
+    // specialist's budget; unknown trust keeps the requested budget.
+    const baseBudget = request.customBudget || roleSpec.defaultBudgets;
+    const budgetMultiplier = await citizenshipService.budgetMultiplierFor({
+      specialist_role: request.role,
+    });
+    const budget = budgetMultiplier >= 1.0 ? baseBudget : {
+      tokens: Math.max(100, Math.floor(baseBudget.tokens * budgetMultiplier)),
+      iterations: Math.max(1, Math.floor(baseBudget.iterations * budgetMultiplier)),
+      seconds: Math.max(10, Math.floor(baseBudget.seconds * budgetMultiplier)),
+    };
     const portNumber = await this.findAvailablePort();
     const httpEndpoint = `http://127.0.0.1:${portNumber}`;
 

@@ -5,6 +5,13 @@ import { eventBus } from './event-bus.service';
 import { llmProvider } from './llm-provider.service';
 import { provenance } from './provenance.service';
 import { assertAgentCanRunTask, ensureAgentRegistryActors } from '../agent-registry';
+import { citizenshipService, RiskLevel } from './citizenship.service';
+
+/** Task-type risk used by the citizenship gate; decisions carry more weight. */
+function riskForTaskType(taskType: string): RiskLevel {
+  if (taskType === 'decision' || taskType === 'review') return 'medium';
+  return 'low';
+}
 
 function isProductionLike(): boolean {
   return process.env.AGENTCO_ENV === 'production' || process.env.AGENTCO_ENV === 'staging' || process.env.NODE_ENV === 'production';
@@ -32,6 +39,12 @@ export class DurableExecutionService {
   async enqueue(agent_id: string, task_type: string, payload: Record<string, unknown>): Promise<WorkflowTask> {
     await ensureAgentRegistryActors();
     assertAgentCanRunTask(agent_id, task_type);
+    // Citizenship gate (C2): suspended/expelled/restricted citizens cannot
+    // enqueue protected work. Registry agents auto-enroll on first use.
+    await citizenshipService.assertProtectedExecutionAllowed({
+      agent_key: agent_id,
+      risk_level: riskForTaskType(task_type),
+    });
     const rows = await query<WorkflowTask>(
       `INSERT INTO workflow_tasks (agent_id, task_type, payload, status)
        VALUES ($1,$2,$3,'queued') RETURNING *`,
@@ -55,6 +68,12 @@ export class DurableExecutionService {
     try {
       await ensureAgentRegistryActors();
       assertAgentCanRunTask(task.agent_id, task.task_type);
+      // Citizenship gate (C2): re-checked at run time so a suspension issued
+      // after enqueue still blocks execution immediately.
+      await citizenshipService.assertProtectedExecutionAllowed({
+        agent_key: task.agent_id,
+        risk_level: riskForTaskType(task.task_type),
+      });
       const result = await this.dispatch(task);
       const confidence_score = 0.8;
       const risk_level = 'low' as const;

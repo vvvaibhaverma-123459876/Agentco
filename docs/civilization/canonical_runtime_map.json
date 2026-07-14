@@ -1,0 +1,43 @@
+{
+  "generated": "2026-07-13",
+  "base_commit": "997e66ce700e0c93896f13f7d6f559d0a50b15dd",
+  "phase": "C0",
+  "canonical_paths": {
+    "identity": { "service": "backend/src/services/identity-authority.service.ts", "state": ["actors", "agent_identities", "service_identities", "actor_key_ring"], "routes": ["/identity/actors", "/identity/keys"] },
+    "authorization": { "service": "backend/src/services/identity-authority.service.ts", "state": ["role_assignments", "actor_permissions", "authority_decision_chains"], "routes": ["/identity/verify", "/identity/roles/assign"] },
+    "resource_accounting": { "service": "backend/src/services/resource-ledger.service.ts", "state": ["civilization_resource_accounts", "civilization_resource_transactions"], "routes": ["/resources/*"] },
+    "events": { "services": ["backend/src/services/event-log.service.ts", "backend/src/services/event-bus.service.ts"], "state": ["event_log", "event_outbox", "event_history", "event_bus_outbox"], "relay": "backend/src/workers/outbox-worker.ts" },
+    "audit": { "service": "backend/src/services/audit-log.service.ts", "state": ["decision_log"] },
+    "evidence": { "service": "backend/src/services/evidence-registry.service.ts", "state": ["autonomy_evidence"] },
+    "claims": { "services": ["backend/src/services/action-executor.service.ts", "backend/src/services/claim-grounding.service.ts"], "state": ["autonomy_claims"] },
+    "predictions": { "service": "backend/src/services/resolution-service.service.ts", "state": ["prediction_ledger"] },
+    "resolution": { "service": "backend/src/services/resolution-service.service.ts", "db_role": "resolution_service" },
+    "calibration_trust": { "services": ["calibration/ (python scoring)", "backend/src/services/persistent-trust-scorer.service.ts"], "state": ["trust_scores", "trust_reputation_ledger"] },
+    "memory": { "services": ["backend/src/services/memory-promotion-pipeline.service.ts", "backend/src/services/memory-retrieval.service.ts"], "state": ["agent_memories"] },
+    "citizens": { "services": ["backend/src/agent-registry.ts", "backend/src/services/citizenship.service.ts (C2)"], "live_runtimes": ["runtime/base_agent/base_agent_v2.py", "agents/autonomy/* via TeamActivationService spawn"], "state": ["actors", "agent_identities", "citizens (C2)"] },
+    "institutions": { "service": "backend/src/services/institutions.service.ts", "state": ["institutions", "departments"] },
+    "missions": { "status": "new_in_C5", "layered_on": ["goal-hierarchy.service.ts", "durable-execution.service.ts", "saga-coordinator.service.ts"] },
+    "governance": { "services": ["calibration-constitution.service.ts", "protected-surface-validator.service.ts", "risk-tier-classifier.service.ts", "kill-switch.service.ts"], "extended_in": "C7" },
+    "judiciary": { "service": "backend/src/services/judiciary.service.ts", "extended_in": "C8" },
+    "learning": { "services": ["learner.service.ts", "regression-test-generator.service.ts", "skill-library.service.ts", "candidate-evaluation.service.ts", "autonomous-promotion.service.ts"], "sandbox": "selfcoding/ (python sealed resolver)", "extended_in": "C10" },
+    "expansion": { "services": ["domain-registry.service.ts", "capability-expansion-gate.service.ts", "proof-of-competence.service.ts", "generality-metric-tracker.service.ts"], "extended_in": "C11" },
+    "civilization_kernel": { "service": "backend/src/services/civilization-kernel.service.ts (C1)", "state": ["civilizations", "civilization_versions", "civilization_charters", "civilization_jurisdictions", "civilization_protected_invariants", "civilization_emergency_states", "civilization_state_transitions", "civilization_objectives"], "routes": ["/api/civilization/kernel/*"] },
+    "coordination": { "services": ["civilization-runtime.service.ts", "civilization-scheduler.service.ts"], "extended_in": "C12" }
+  },
+  "duplicate_dispositions": [
+    { "id": "D1", "path": "civilization/ (python stack)", "decision": "legacy_quarantined_do_not_extend", "isolation": "pg_test_isolation.py sibling _pyciv databases" },
+    { "id": "D2", "path": "event_outbox + event_bus_outbox", "decision": "keep_both_documented_split_single_relay", "prior_finding": "RTI-002" },
+    { "id": "D3", "path": "governance-rbac.service.ts vs identity-authority.service.ts", "decision": "boundary_documented_autonomy_vs_civilization" },
+    { "id": "D4", "path": "dashboard/src", "decision": "legacy_archive_candidate_C13" },
+    { "id": "D5", "path": "*.disabled routes and unsupported_migrations", "decision": "remain_disabled_build_fresh_migrations" },
+    { "id": "D6", "path": "archive/agents_v1", "decision": "already_archived" },
+    { "id": "D7", "path": "runtime/base_agent/spend_ledger.py", "decision": "accepted_exception_governed_direct_db_adapter_revisit_C6" },
+    { "id": "D8", "path": "memory_kernel/", "decision": "legacy_do_not_extend" },
+    { "id": "D9", "path": "Makefile echo-only + broken targets", "decision": "fix_in_C14" },
+    { "id": "D10", "path": "frontend hand-written API client", "decision": "align_in_C13" }
+  ],
+  "evidence": {
+    "reachability": "docs/audit/current/RUNTIME_REACHABILITY.md (snapshot f64ae909…) + make audit-runtime-integration exit 0 on 2026-07-13",
+    "env_baseline": "empty-DB migrate 117 files exit 0; tsc clean; jest 101 suites passed / 3 skipped, 643 tests passed / 8 skipped / 5 todo (isolated stack pg:5544 kafka:9192 redis:6399)"
+  }
+}
