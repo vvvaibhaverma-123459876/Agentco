@@ -6,14 +6,17 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Any
 
-from agentco_capability.runtime import execute_capability_request
-
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from agentco_capability.runtime import execute_capability_request  # noqa: E402
+
 ARTIFACT = ROOT / "artifacts" / "capability-runtime" / "governed-capability-genesis-v1"
 DOCS = ROOT / "docs" / "audit" / "current"
 DOMAINS = [
