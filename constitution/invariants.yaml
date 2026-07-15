@@ -1457,3 +1457,47 @@ invariants:
     statement: Every operator page declares which governed endpoint sources each value, so a fabricated value would fail a view-contract check.
     tier: regulation
     status: planned
+  - id: V24-INV-001
+    statement: Interactions are routed by calibration history, so the most-calibrated capability is preferred.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/services/calibration-aware-routing.service.ts
+  - id: V24-INV-002
+    statement: Interaction reasoning is produced through the planner/ensemble path, not ad hoc, so multi-agent collaboration is a first-class interaction.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/services/autonomy-action-planner.service.ts
+      - backend/src/services/multi-agent-ensemble.service.ts
+  - id: V24-INV-003
+    statement: An assertion made in an interaction must be grounded in registered evidence (the knowledge-system contract applies to responses).
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/tests/planner-claim-bias.test.ts
+  - id: V24-INV-004
+    statement: Interaction modes (chat, planning, execution, negotiation, governance, teaching, explanation, simulation, supervision, inspection, collaboration) are first-class and mode-agnostic routing selects among them.
+    tier: regulation
+    status: planned
+  - id: V24-INV-005
+    statement: Conversation/chat is one mode, not the architectural center — no capability is reachable only via chat.
+    tier: regulation
+    status: planned
+  - id: V24-INV-006
+    statement: Every interaction response carries a calibrated confidence derived from trust.
+    tier: regulation
+    status: planned
+  - id: V24-INV-007
+    statement: Every interaction records its reasoning and the constraints it passed.
+    tier: regulation
+    status: planned
+  - id: V24-INV-008
+    statement: Interaction feedback (was the response useful/correct?) feeds back into trust and learning as resolved outcomes.
+    tier: regulation
+    status: planned
+  - id: V24-INV-009
+    statement: A teaching/explanation mode can render the why of any decision to a human at an appropriate level of detail.
+    tier: regulation
+    status: planned
