@@ -1030,3 +1030,63 @@ invariants:
     statement: Institutions can branch, merge, split, undergo succession, and federate under governance.
     tier: statute
     status: planned
+  - id: V5-INV-001
+    statement: A citizen is a typed participant with a lifecycle status, and status changes only along the defined lifecycle.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/130_citizenship.sql
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-002
+    statement: A citizen's autonomy envelope gates protected execution — an action above the citizen's permitted risk level is refused.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-003
+    statement: The protected-execution gate is wired into durable execution and specialist spawn, so envelope limits bind real work.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/durable-execution.service.ts
+      - backend/src/services/team-activation.service.ts
+      - backend/src/services/citizenship.service.ts
+  - id: V5-INV-004
+    statement: Sanctions restrict a citizen's standing and are liftable, and their imposition is a recorded act (invoked by the judiciary).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-005
+    statement: Role eligibility gates which roles a citizen may hold, optionally scoped to an institution or domain.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-006
+    statement: A citizen's budget multiplier is derived from standing/trust, not chosen freely, so participation scales with earned trust.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-007
+    statement: A society has an active charter and a jurisdiction that is a subset of the civilization's.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+      - backend/tests/societies-institutions.test.ts
+  - id: V5-INV-008
+    statement: Population demographics (counts by status/type/society) are derivable as governed metrics.
+    tier: statute
+    status: planned
+  - id: V5-INV-009
+    statement: A citizen may migrate between societies under a governed process, with membership history preserved.
+    tier: statute
+    status: planned
