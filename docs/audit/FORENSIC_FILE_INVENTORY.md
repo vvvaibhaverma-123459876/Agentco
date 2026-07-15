@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1827`
+- Tracked files: `1862`
 
 ## Category Counts
 
@@ -18,7 +18,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Production runtime code | 487 |
 | Prompt/template | 29 |
 | Test infrastructure | 281 |
-| Unknown purpose | 40 |
+| Unknown purpose | 75 |
 
 ## Top-Level Counts
 
@@ -33,6 +33,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
+| `constitution` | 40 |
 | `tests` | 39 |
 | `frontend` | 37 |
 | `reserve` | 33 |
@@ -46,7 +47,6 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `.github` | 9 |
 | `ingestion` | 9 |
-| `constitution` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -941,10 +941,45 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `civilization/services/structured_logger.py` | Production runtime code |
 | `conftest.py` | Unknown purpose |
 | `constitution/CONVENTIONS.md` | Unknown purpose |
+| `constitution/GENERALIZATION_REPORT.md` | Unknown purpose |
 | `constitution/INDEX.md` | Unknown purpose |
 | `constitution/TEMPLATE.md` | Unknown purpose |
 | `constitution/invariants.yaml` | Unknown purpose |
 | `constitution/volumes/VOL-00-vision.md` | Unknown purpose |
+| `constitution/volumes/VOL-01-constitutional-core.md` | Unknown purpose |
+| `constitution/volumes/VOL-02-civilization-kernel.md` | Unknown purpose |
+| `constitution/volumes/VOL-03-runtime-operating-system.md` | Unknown purpose |
+| `constitution/volumes/VOL-04-identity-and-authority.md` | Unknown purpose |
+| `constitution/volumes/VOL-05-civilization-society.md` | Unknown purpose |
+| `constitution/volumes/VOL-06-institutions.md` | Unknown purpose |
+| `constitution/volumes/VOL-07-civilization-economy.md` | Unknown purpose |
+| `constitution/volumes/VOL-08-missions.md` | Unknown purpose |
+| `constitution/volumes/VOL-09-knowledge-system.md` | Unknown purpose |
+| `constitution/volumes/VOL-10-reasoning-engine.md` | Unknown purpose |
+| `constitution/volumes/VOL-11-trust-and-calibration.md` | Unknown purpose |
+| `constitution/volumes/VOL-12-governance.md` | Unknown purpose |
+| `constitution/volumes/VOL-13-judiciary.md` | Unknown purpose |
+| `constitution/volumes/VOL-14-learning-engine.md` | Unknown purpose |
+| `constitution/volumes/VOL-15-capability-expansion.md` | Unknown purpose |
+| `constitution/volumes/VOL-16-autonomous-evolution.md` | Unknown purpose |
+| `constitution/volumes/VOL-17-self-inspection.md` | Unknown purpose |
+| `constitution/volumes/VOL-18-civilization-self-model.md` | Unknown purpose |
+| `constitution/volumes/VOL-19-structural-evolution-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-20-knowledge-discovery-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-21-reality-models.md` | Unknown purpose |
+| `constitution/volumes/VOL-22-hypothesis-generation-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-23-constraint-engine.md` | Unknown purpose |
+| `constitution/volumes/VOL-24-interaction-intelligence.md` | Unknown purpose |
+| `constitution/volumes/VOL-25-capability-evolution-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-26-multi-agent-civilization.md` | Unknown purpose |
+| `constitution/volumes/VOL-27-operator-control-plane.md` | Unknown purpose |
+| `constitution/volumes/VOL-28-operator-experience.md` | Unknown purpose |
+| `constitution/volumes/VOL-29-infrastructure.md` | Unknown purpose |
+| `constitution/volumes/VOL-30-verification.md` | Unknown purpose |
+| `constitution/volumes/VOL-31-civilization-evolution.md` | Unknown purpose |
+| `constitution/volumes/VOL-32-security-and-threat-model.md` | Unknown purpose |
+| `constitution/volumes/VOL-33-model-governance.md` | Unknown purpose |
+| `constitution/volumes/VOL-34-civilization-memory.md` | Unknown purpose |
 | `dashboard/src/app/calibration/page.tsx` | Production runtime code |
 | `dashboard/src/types/calibration.ts` | Production runtime code |
 | `data/external/bike_sharing/bike_sharing_dataset.zip` | Generated artifact |
