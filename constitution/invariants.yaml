@@ -1090,3 +1090,57 @@ invariants:
     statement: A citizen may migrate between societies under a governed process, with membership history preserved.
     tier: statute
     status: planned
+  - id: V17-INV-001
+    statement: The README implementation-status block is generated from the ledger and is re-checkable, not hand-edited.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_status.py
+      - README.md
+  - id: V17-INV-002
+    statement: A tracked-file forensic inventory is generated and re-checkable in CI.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_forensic_inventory.py
+      - docs/audit/FORENSIC_FILE_INVENTORY.json
+  - id: V17-INV-003
+    statement: Gate integrity is inspected and fails closed on fake-success or bypass patterns.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/verify_gate_integrity.py
+  - id: V17-INV-004
+    statement: Static runtime reachability is generated conservatively so unreachable or newly-added services are visible.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_runtime_reachability.py
+  - id: V17-INV-005
+    statement: Runtime health is inspectable via a doctor with explicit modes (offline, local-native, production).
+    tier: statute
+    status: enforced
+    enforcement:
+      - runtime/orchestration/doctor.py
+  - id: V17-INV-006
+    statement: Integration is audited in a clean room and against the running runtime, producing evidence artifacts.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/audit_clean_room.py
+      - scripts/audit_runtime_integration.py
+  - id: V17-INV-007
+    statement: The constitution itself is inspected for drift on every push (headers, enforcement paths, domain neutrality).
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
+      - .github/workflows/constitution.yml
+  - id: V17-INV-008
+    statement: Inspection findings (capability gaps, incomplete systems, drift) are emitted as a structured, governed backlog rather than prose reports.
+    tier: statute
+    status: planned
+  - id: V17-INV-009
+    statement: Every generated inspection artifact is enforced current by a --check gate in CI, so no inspector output can go stale unnoticed.
+    tier: statute
+    status: planned
