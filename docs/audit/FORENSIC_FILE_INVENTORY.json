@@ -1,37 +1,37 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1953,
+  "tracked_file_count": 1969,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 142,
-    "Documentation": 432,
+    "Documentation": 435,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
     "Prompt/template": 29,
-    "Test infrastructure": 292,
-    "Unknown purpose": 80
+    "Test infrastructure": 297,
+    "Unknown purpose": 88
   },
   "top_level_counts": {
     "backend": 505,
-    "docs": 359,
+    "docs": 362,
     "evals": 180,
     "scripts": 154,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
+    "tests": 54,
     "runtime": 51,
-    "tests": 49,
     "archive": 48,
     "frontend": 37,
     "reserve": 33,
     "calibration": 30,
+    "benchmarks": 24,
     "infrastructure": 21,
     "results": 20,
     "selfcoding": 17,
-    "benchmarks": 16,
     "civilization": 15,
     "autonomy": 13,
     "learning": 13,
@@ -82,10 +82,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 597,
-    ".md": 450,
+    ".py": 602,
+    ".md": 451,
     ".ts": 340,
-    ".json": 217,
+    ".json": 227,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -5085,6 +5085,42 @@
       "extension": ".json"
     },
     {
+      "path": "benchmarks/capability_genesis_v4/development/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/fixtures/fixtures.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/hidden/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/rubrics/rubrics.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/validation/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
       "path": "benchmarks/capability_protocol_baseline_v1/cases/cases.json",
       "category": "Unknown purpose",
       "top_level": "benchmarks",
@@ -5092,6 +5128,18 @@
     },
     {
       "path": "benchmarks/capability_protocol_baseline_v1/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v2/cases/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v2/registry.json",
       "category": "Unknown purpose",
       "top_level": "benchmarks",
       "extension": ".json"
@@ -6439,6 +6487,24 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md",
@@ -11583,6 +11649,18 @@
       "extension": ".py"
     },
     {
+      "path": "tests/test_capability_anti_hardcoding.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_freeze_integrity.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
       "path": "tests/test_capability_genesis_v2.py",
       "category": "Test infrastructure",
       "top_level": "tests",
@@ -11590,6 +11668,12 @@
     },
     {
       "path": "tests/test_capability_genesis_v3.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_genesis_v4.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"
@@ -11710,6 +11794,18 @@
     },
     {
       "path": "tests/test_protocol_baseline.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_baseline_v2.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_control_execution.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

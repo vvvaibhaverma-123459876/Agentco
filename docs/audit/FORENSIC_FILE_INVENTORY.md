@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1953`
+- Tracked files: `1969`
 
 ## Category Counts
 
@@ -12,35 +12,35 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 142 |
-| Documentation | 432 |
+| Documentation | 435 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 292 |
-| Unknown purpose | 80 |
+| Test infrastructure | 297 |
+| Unknown purpose | 88 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 359 |
+| `docs` | 362 |
 | `evals` | 180 |
 | `scripts` | 154 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
+| `tests` | 54 |
 | `runtime` | 51 |
-| `tests` | 49 |
 | `archive` | 48 |
 | `frontend` | 37 |
 | `reserve` | 33 |
 | `calibration` | 30 |
+| `benchmarks` | 24 |
 | `infrastructure` | 21 |
 | `results` | 20 |
 | `selfcoding` | 17 |
-| `benchmarks` | 16 |
 | `civilization` | 15 |
 | `autonomy` | 13 |
 | `learning` | 13 |
@@ -923,8 +923,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `benchmarks/capability_genesis_v3/registry.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v3/rubrics/rubrics.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v3/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/validation/cases.json` | Unknown purpose |
 | `benchmarks/capability_protocol_baseline_v1/cases/cases.json` | Unknown purpose |
 | `benchmarks/capability_protocol_baseline_v1/registry.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v2/cases/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v2/registry.json` | Unknown purpose |
 | `benchmarks/registry.json` | Unknown purpose |
 | `calibration/BENCHMARK_ANALYSIS.md` | Production runtime code |
 | `calibration/__init__.py` | Production runtime code |
@@ -1149,6 +1157,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
@@ -2006,8 +2017,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/integration/test_web_scraper_hardened.py` | Test infrastructure |
 | `tests/test_build_ledger.py` | Test infrastructure |
 | `tests/test_capability_anti_gaming.py` | Test infrastructure |
+| `tests/test_capability_anti_hardcoding.py` | Test infrastructure |
+| `tests/test_capability_freeze_integrity.py` | Test infrastructure |
 | `tests/test_capability_genesis_v2.py` | Test infrastructure |
 | `tests/test_capability_genesis_v3.py` | Test infrastructure |
+| `tests/test_capability_genesis_v4.py` | Test infrastructure |
 | `tests/test_capability_provider_adapters.py` | Test infrastructure |
 | `tests/test_capability_runtime.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
@@ -2028,6 +2042,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_protocol_baseline.py` | Test infrastructure |
+| `tests/test_protocol_baseline_v2.py` | Test infrastructure |
+| `tests/test_protocol_control_execution.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
 | `tests/test_software_capability_workspace.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
