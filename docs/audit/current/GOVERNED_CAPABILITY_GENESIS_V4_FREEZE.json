@@ -1,0 +1,327 @@
+{
+  "acceptance_campaigns": {
+    "protocol": "governed-capability-protocol-baseline-v2",
+    "real_capability": "governed-capability-genesis-v4"
+  },
+  "bundle_hashes": {
+    "acceptance_thresholds": "62eb93b2e7fe0b2876040da59c86a38a39fa05def518db92c7d57f655fad895f",
+    "artifact_verifier": "df891808e06ef6a81d7275a08e0250dc96d28555c71d5c5e19c47dc5d338d8ac",
+    "data_workspace": "99518e54ef2767ef523113d72b866b7813e459553f8f83a61ce665f7b54dbeb0",
+    "dependency_locks": "ec339bad55934dac8e52fc50248d47521f056303aae495deae6911218dc52e74",
+    "environment_contract": "0c96e717a763a995c7d9e44803d5ff9133f6c466a37ec1ce22ffd870b23c0271",
+    "evaluator_runner": "083265bc4b7b104496d32477234285e5f0f3b47cced5f4d9b384ca2eb3c7f0d9",
+    "fixtures": "08de1da476193bc6f402e75d11649ee7007edd1eff3f6e1ff6b95ecd9ed7d467",
+    "freeze_verifier": "a24d9ca2d18ee4f2779d878b372adf09ada5d173bc341a321bf4333d991243db",
+    "protocol_benchmark": "1c05b3c6b22e124302448ca0997504d7abf52801f9255316f3e8a42e7838c408",
+    "provider_metadata": "515dd724b8683b0bd6a89d463c7dba56d0e182c4bf015c5a98db33ab629ed3d5",
+    "providers": "515dd724b8683b0bd6a89d463c7dba56d0e182c4bf015c5a98db33ab629ed3d5",
+    "real_benchmark": "1927bb0c3be31637104e6f5afc38617ded970e6529f16e36cccfc2ca48c955b9",
+    "rubrics": "0b8e2e40411edd587d7192e160c430c6cf426944c11ae24af4f655c0c5802d5b",
+    "runtime": "806628df71738941c4f55e1dc86fac34a334773d0e4374cceaa2c737a47a43e0",
+    "schemas": "55ba69dd1936d9b227c7e76c8cf6c1703974d8a7464289615e1ac28237a6418a",
+    "scorers": "9f06131308d35e60d85c90587128e798f8c7d5a237ab30173a6965a9276335a6",
+    "software_workspace": "86d7f2d66aa6ac0468c669bfb729b71d0956e421d1968c20806e807614888479",
+    "tests": "01b2b6ff550d4118e36cd60c7984547d728e8da869aaf6d16df4ff0dec5e1a4f",
+    "tools": "3e351d93d082e6f9b436e0b8a449832943b49fe8e0edd2249638d5089b00b1c2",
+    "workflow_execution_logic": "ec29949d433d2cde94f2dd6bbc47453673ad585e6f0943356fb03688a0c38099"
+  },
+  "created_at": "2026-07-15T00:00:00Z",
+  "freeze_attestation_content_hash": "acef17db8bae20dd686d91bf3c248147b10ee11588716062619fbd1fad092dd2",
+  "freeze_attestation_logical_hash": "b45660723b8c8950440e69c90635f5e61a1142aaeb2dda6d359b18686cadfd7f",
+  "freeze_attestation_sha": "4159fd5cc81efac807162984f75ec982a602aaf0",
+  "freeze_candidate_sha": "4159fd5cc81efac807162984f75ec982a602aaf0",
+  "freeze_candidate_tree_hash": "8b02540c5f93bc29e151036a83aa2412b4a106c7",
+  "frozen_directories": [
+    "benchmarks/capability_protocol_baseline_v2",
+    "benchmarks/capability_genesis_v4"
+  ],
+  "frozen_files": [
+    {
+      "blob_sha_at_candidate": "50bd4691aa8e27c206b93b3045172b87bec99adc",
+      "bundle": "workflow_execution_logic",
+      "path": ".github/workflows/capability-runtime-audit.yml",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "7a30778a885f174f6f3bbce1c81415576e57f155622377e0ee5a42c819cc5d12",
+      "size_bytes_at_candidate": 4990
+    },
+    {
+      "blob_sha_at_candidate": "103788547b5d4be84a620d792bc229458cd36fd4",
+      "bundle": "workflow_execution_logic",
+      "path": "Makefile",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "facca848c036b79ba5fa59c7cdf69b609a935b9e6b743fb04e0dcfad0fdb0b59",
+      "size_bytes_at_candidate": 35102
+    },
+    {
+      "blob_sha_at_candidate": "c243ea436aa3409b8675c913ca1dd39af248d1ca",
+      "bundle": "runtime",
+      "path": "agentco_capability/evidence.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "57b9e98a53d0a0df51ac19e7441303cc47fddc05a5e4684532589b270d13c76f",
+      "size_bytes_at_candidate": 3877
+    },
+    {
+      "blob_sha_at_candidate": "893223deeeecda893f39dafa60d37f6ea3a652e5",
+      "bundle": "runtime",
+      "path": "agentco_capability/models.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "bc27dcde01e0221d1ff6b51cb2a391359a1237d17f774c6c61ddd2485452a987",
+      "size_bytes_at_candidate": 4051
+    },
+    {
+      "blob_sha_at_candidate": "73ef3fe9182afa46d03940805e31e1670dcf44b9",
+      "bundle": "providers",
+      "path": "agentco_capability/providers.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "89f17387d3be936fcccac30833899be1858794c0852a0112deecddbb52d3c5e0",
+      "size_bytes_at_candidate": 17782
+    },
+    {
+      "blob_sha_at_candidate": "28983c6c35b30470b11c0798f7e5d485e009463b",
+      "bundle": "runtime",
+      "path": "agentco_capability/runtime.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "e0fa11857d1a7e3f2c42b6016bf449197e746c5d08f53e1560f3fccba2c8075d",
+      "size_bytes_at_candidate": 10376
+    },
+    {
+      "blob_sha_at_candidate": "29829a40962c5d879884edb6264e07d750846dc7",
+      "bundle": "scorers",
+      "path": "agentco_capability/scoring.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "5036a80085c1f99b6d8fda2c12949c5e8448b0f646e9e990d1bc5b95fcb758cb",
+      "size_bytes_at_candidate": 13783
+    },
+    {
+      "blob_sha_at_candidate": "0f81431c444664dac70db0ce57d68218c5acc613",
+      "bundle": "runtime",
+      "path": "agentco_capability/storage.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "e9d800bf1356efbc912f07311d429db9bcea5f1133537d6a2102f0761df5e685",
+      "size_bytes_at_candidate": 3654
+    },
+    {
+      "blob_sha_at_candidate": "d6e2f1befd01af21d8732b37636e087bffd98c1e",
+      "bundle": "tools",
+      "path": "agentco_capability/tools.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "92a57f9d1943d02335cc35242c84caaa2374526b182bf3cc43ace75e026c1877",
+      "size_bytes_at_candidate": 5550
+    },
+    {
+      "blob_sha_at_candidate": "2b96464d0c04a351fdf4fbaf602487db3ddcbe41",
+      "bundle": "dependency_locks",
+      "path": "backend/package-lock.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "cb933b984a47a3a7349c22d24445f9a09fe763cc635edef5affc16cdb007b11d",
+      "size_bytes_at_candidate": 224603
+    },
+    {
+      "blob_sha_at_candidate": "58dcfb535baf57523be815ed2d8a9819cb6f3ee5",
+      "bundle": "real_benchmark",
+      "path": "benchmarks/capability_genesis_v4/development/cases.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "ffc32bca78049b38aaa37887c00e74e98ea02afc77683256c6075bb1c65418ac",
+      "size_bytes_at_candidate": 16137
+    },
+    {
+      "blob_sha_at_candidate": "0007549f8eef348b3bc02b15dffc99bb4801442b",
+      "bundle": "real_benchmark",
+      "path": "benchmarks/capability_genesis_v4/fixtures/fixtures.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "03270adf0d89cb91975d8d204d3c7fc1216e251e5e684fe72b2ba27ac1bf53c4",
+      "size_bytes_at_candidate": 2134
+    },
+    {
+      "blob_sha_at_candidate": "f6d77561077dab219348c6884f4aef257b141590",
+      "bundle": "real_benchmark",
+      "path": "benchmarks/capability_genesis_v4/hidden/cases.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "2401c805c2f203a062925a72cd1b53af5eb740106caea3f2cf2b447632d25298",
+      "size_bytes_at_candidate": 10461
+    },
+    {
+      "blob_sha_at_candidate": "9a93b7869591ed477b74686791ba0d4b87ab17e4",
+      "bundle": "acceptance_thresholds",
+      "path": "benchmarks/capability_genesis_v4/registry.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "73213d87a61c0614ce811a0dfb2f77874ba7dbbf1e0f4bd73101eaedd0bb1e05",
+      "size_bytes_at_candidate": 1116
+    },
+    {
+      "blob_sha_at_candidate": "a303aabe1e2599ceb6bb73a8117530a36cba52aa",
+      "bundle": "real_benchmark",
+      "path": "benchmarks/capability_genesis_v4/rubrics/rubrics.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "bcd4209349ea3e061837aa746b98b439518995a9cb1abf6a4ab06f8747d723a6",
+      "size_bytes_at_candidate": 14523
+    },
+    {
+      "blob_sha_at_candidate": "7d8e015d3903f554dbb18361bb04efc741283513",
+      "bundle": "real_benchmark",
+      "path": "benchmarks/capability_genesis_v4/validation/cases.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "afef65132b70d204186fd6b2dd46cdb593d0012dc58a7add5bac9aff066f31bf",
+      "size_bytes_at_candidate": 10605
+    },
+    {
+      "blob_sha_at_candidate": "d1197008e2fb94435e4e29c57a1d4a2af42957cf",
+      "bundle": "protocol_benchmark",
+      "path": "benchmarks/capability_protocol_baseline_v2/cases/cases.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "5c45b27e6be174271404175f95b2f5e18abcfe96959ab9b6faf739b19a83e415",
+      "size_bytes_at_candidate": 17889
+    },
+    {
+      "blob_sha_at_candidate": "c3740c440d1dd22c032b601c4b16021321a14378",
+      "bundle": "acceptance_thresholds",
+      "path": "benchmarks/capability_protocol_baseline_v2/registry.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "6f12e98f4b8d0b0f4cc64f43ef59c5447ecf3c20d98c8c570636bce6e2375a58",
+      "size_bytes_at_candidate": 228
+    },
+    {
+      "blob_sha_at_candidate": "dff9790bfaf828df34d1fc22de0560ab713755d5",
+      "bundle": "dependency_locks",
+      "path": "frontend/package-lock.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "eb5399960faf48db9f2c13e696ffce19228983859bb34edffd9ef36224f62274",
+      "size_bytes_at_candidate": 270430
+    },
+    {
+      "blob_sha_at_candidate": "6b933daced53ab7b9eb936743859fe272349a3a5",
+      "bundle": "dependency_locks",
+      "path": "requirements/requirements.lock.txt",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "bf37c9f408c1bd2765c7a5dd8b7ab75ba648634680ebd755082ddd704b3ed90a",
+      "size_bytes_at_candidate": 6440
+    },
+    {
+      "blob_sha_at_candidate": "c05ae627311689781c3df294c97350001daa93d9",
+      "bundle": "schemas",
+      "path": "schemas/agentco_capability_request.schema.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "5aac862116bae5885ffe8d380c8dc50cd18fa538034be70aeda3985fa3863be3",
+      "size_bytes_at_candidate": 2206
+    },
+    {
+      "blob_sha_at_candidate": "9a3947306de65a9feed6324476471ce55975bb54",
+      "bundle": "schemas",
+      "path": "schemas/agentco_capability_response.schema.json",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "4240d365c4297c2481cacef498350605b78387205202cdcf006861075598ffb8",
+      "size_bytes_at_candidate": 1682
+    },
+    {
+      "blob_sha_at_candidate": "acd462e260f963b05b06ca5ecff6fd3e72def835",
+      "bundle": "evaluator_runner",
+      "path": "scripts/run_governed_capability_genesis.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "b94d749d341e6c7de3b693ddceadabfaec741e8ac226c0689bd94700d85ba2fc",
+      "size_bytes_at_candidate": 44138
+    },
+    {
+      "blob_sha_at_candidate": "7cc77456b2e87c1055292e7541c42cf485794331",
+      "bundle": "artifact_verifier",
+      "path": "scripts/verify_capability_genesis_artifact.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "4317cb74ac0f368c05e0ec333672f1f1f9d27d0e6d9e50e4dfc14067b8450ab6",
+      "size_bytes_at_candidate": 2207
+    },
+    {
+      "blob_sha_at_candidate": "c2da06c6193afbf45bc98ad9069eb548cadcfc2b",
+      "bundle": "freeze_verifier",
+      "path": "scripts/verify_capability_genesis_freeze.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "76beac64788fe99e8ff614cbfce8d668ceb4d40d1afdb561ff82a0c158df5d20",
+      "size_bytes_at_candidate": 7353
+    },
+    {
+      "blob_sha_at_candidate": "3e0685779cfae543d77749a87c4fc18990fc18b7",
+      "bundle": "tests",
+      "path": "tests/test_capability_anti_hardcoding.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "e8e95d47feba847da7a0e56e2c11722799028ab511e7f964d31ac0c8fe2c5c53",
+      "size_bytes_at_candidate": 736
+    },
+    {
+      "blob_sha_at_candidate": "2555096b8761b8eae2862230ded761fe0b8832b0",
+      "bundle": "tests",
+      "path": "tests/test_capability_freeze_integrity.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "8e28e6f2c232981553ad5b029a65a790b9a1d0364fc015aec57af497ab4f9ee6",
+      "size_bytes_at_candidate": 1155
+    },
+    {
+      "blob_sha_at_candidate": "21548b2b525ceeac591b650d05e510d2ecb0ae45",
+      "bundle": "tests",
+      "path": "tests/test_capability_genesis_v4.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "79b340a4873bc5ea108faa782f26245b01c17a10e71fbb7ef0165c22749532f5",
+      "size_bytes_at_candidate": 1178
+    },
+    {
+      "blob_sha_at_candidate": "a42ea5bc8574bc429a8f18f3ace082d66f7e3c53",
+      "bundle": "tests",
+      "path": "tests/test_capability_provider_adapters.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "e062ca1b4c9595be783f54b03dfbb89e523fc956147de0ce421eb1ba15664a6d",
+      "size_bytes_at_candidate": 7691
+    },
+    {
+      "blob_sha_at_candidate": "70648db6e3d2379ba74baa2c8d17cb4e8269c504",
+      "bundle": "tests",
+      "path": "tests/test_capability_runtime.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "6ef70f5a17a687b3e713e2e9defbe6dda3c2824ff5a9e7a8aec87110786b8764",
+      "size_bytes_at_candidate": 8248
+    },
+    {
+      "blob_sha_at_candidate": "166f312bfff117126009d4284908f052fe6c41cf",
+      "bundle": "data_workspace",
+      "path": "tests/test_data_capability_workspace.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "eeb694ec909d2e8a32404bbac6549740e4151325267730479ed604a1bf207c7b",
+      "size_bytes_at_candidate": 931
+    },
+    {
+      "blob_sha_at_candidate": "9563286f724f102d85db62ae382b15967d0507fa",
+      "bundle": "scorers",
+      "path": "tests/test_domain_scorers.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "1c5092926d042ff0a9c3bdec342ba4659914ac84fac12e6b82d4b26ba88e2c4d",
+      "size_bytes_at_candidate": 1626
+    },
+    {
+      "blob_sha_at_candidate": "7e03590204d3b72801a3236bf4f4ad5379ba4654",
+      "bundle": "tests",
+      "path": "tests/test_protocol_baseline_v2.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "bce5d7607ccff2398030fa762fd570a8b443cbb2214760a558c52886e12367a4",
+      "size_bytes_at_candidate": 1301
+    },
+    {
+      "blob_sha_at_candidate": "ffeaea255cc5aed22bfee46f62ac1374c8394349",
+      "bundle": "tests",
+      "path": "tests/test_protocol_control_execution.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "20a8c0a77a83949c00f0fdba822631acfabb32a85929acf6c18967872c02a3b6",
+      "size_bytes_at_candidate": 2080
+    },
+    {
+      "blob_sha_at_candidate": "81815f92d82c144d9d16167a2e3de09347560487",
+      "bundle": "software_workspace",
+      "path": "tests/test_software_capability_workspace.py",
+      "required_at_final_head": true,
+      "sha256_at_candidate": "d33eab621694a66cdbd0a18cd9ff7409e4078de067328d3264d555baf0fa3f06",
+      "size_bytes_at_candidate": 1258
+    }
+  ],
+  "hash_definitions": {
+    "freeze_attestation_content_hash": "sha256 of canonical attestation excluding freeze_attestation_content_hash to avoid self-reference",
+    "freeze_attestation_logical_hash": "sha256 of canonical attestation excluding freeze_attestation_content_hash and freeze_attestation_logical_hash"
+  },
+  "protocol_campaign_id": "governed-capability-protocol-baseline-v2",
+  "real_capability_campaign_id": "governed-capability-genesis-v4",
+  "schema_version": "governed-capability-genesis-v4-freeze-v1"
+}
