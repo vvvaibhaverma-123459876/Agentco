@@ -1,14 +1,14 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1876,
+  "tracked_file_count": 1880,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 31,
     "Deprecated code": 48,
     "Development tooling": 138,
-    "Documentation": 422,
+    "Documentation": 424,
     "Experimental code": 151,
-    "Generated artifact": 101,
+    "Generated artifact": 103,
     "Production runtime code": 483,
     "Prompt/template": 29,
     "Test infrastructure": 279,
@@ -21,9 +21,9 @@
     "scripts": 150,
     "agents": 111,
     "audit_artifacts": 99,
+    "reports": 52,
     "runtime": 51,
     "archive": 48,
-    "reports": 48,
     "tests": 41,
     "frontend": 36,
     "reserve": 33,
@@ -82,9 +82,9 @@
   },
   "extension_counts": {
     ".py": 583,
-    ".md": 438,
+    ".md": 440,
     ".ts": 329,
-    ".json": 183,
+    ".json": 185,
     ".sql": 139,
     ".jsonl": 40,
     ".csv": 38,
@@ -9312,6 +9312,30 @@
       "category": "Generated artifact",
       "top_level": "reports",
       "extension": ".json"
+    },
+    {
+      "path": "reports/system_run/latest/score_validation.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/system_run/latest/score_validation.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/system_run/latest/score_validation.md",
+      "category": "Documentation",
+      "top_level": "reports",
+      "extension": ".md"
+    },
+    {
+      "path": "reports/system_run/latest/score_validation.md",
+      "category": "Documentation",
+      "top_level": "reports",
+      "extension": ".md"
     },
     {
       "path": "reports/system_run/latest/score_validation.md",
