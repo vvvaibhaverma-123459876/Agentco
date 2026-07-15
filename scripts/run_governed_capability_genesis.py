@@ -416,6 +416,9 @@ def main() -> int:
     parser.add_argument("--mode", choices=["protocol-baseline-v1", "real-capability-genesis-v3", "protocol-reference", "real-capability-provider"], default=None)
     parser.add_argument("--provider", default=None)
     args = parser.parse_args()
+    if args.mode in {"real-capability-genesis-v3", "real-capability-provider"} or args.campaign == "governed-capability-genesis-v3":
+        provider = args.provider or os.getenv("AGENTCO_REAL_CAPABILITY_PROVIDER", "openai_compatible")
+        return run_real_capability(provider)
     if args.campaign == "governed-capability-protocol-baseline-v1" or args.mode in {None, "protocol-baseline-v1", "protocol-reference"}:
         return run_protocol_baseline()
     provider = args.provider or os.getenv("AGENTCO_REAL_CAPABILITY_PROVIDER", "openai_compatible")

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
+
+import scripts.run_governed_capability_genesis as genesis
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,3 +46,14 @@ def test_thresholds_require_real_capability_domains():
     registry = json.loads((BENCH / "registry.json").read_text())
     assert registry["minimum_acceptance"]["capability_task_domains"] >= 4
     assert registry["minimum_acceptance"]["validation_hidden_executed_scorable_cases"] >= 18
+
+
+def test_real_mode_takes_precedence_over_default_campaign(monkeypatch):
+    calls = []
+
+    monkeypatch.setattr(sys, "argv", ["run_governed_capability_genesis.py", "--mode", "real-capability-genesis-v3"])
+    monkeypatch.setattr(genesis, "run_protocol_baseline", lambda: calls.append("protocol") or 0)
+    monkeypatch.setattr(genesis, "run_real_capability", lambda provider: calls.append(("real", provider)) or 0)
+
+    assert genesis.main() == 0
+    assert calls == [("real", "openai_compatible")]
