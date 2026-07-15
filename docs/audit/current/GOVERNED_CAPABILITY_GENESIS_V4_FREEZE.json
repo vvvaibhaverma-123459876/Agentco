@@ -5,7 +5,7 @@
   },
   "bundle_hashes": {
     "acceptance_thresholds": "62eb93b2e7fe0b2876040da59c86a38a39fa05def518db92c7d57f655fad895f",
-    "artifact_verifier": "df891808e06ef6a81d7275a08e0250dc96d28555c71d5c5e19c47dc5d338d8ac",
+    "artifact_verifier": "25481e9e04e434c1ef95d0e5bdc08b883a7b9cb3bcf8e142810f7838a4a6ee47",
     "data_workspace": "99518e54ef2767ef523113d72b866b7813e459553f8f83a61ce665f7b54dbeb0",
     "dependency_locks": "ec339bad55934dac8e52fc50248d47521f056303aae495deae6911218dc52e74",
     "environment_contract": "0c96e717a763a995c7d9e44803d5ff9133f6c466a37ec1ce22ffd870b23c0271",
@@ -26,11 +26,12 @@
     "workflow_execution_logic": "ec29949d433d2cde94f2dd6bbc47453673ad585e6f0943356fb03688a0c38099"
   },
   "created_at": "2026-07-15T00:00:00Z",
-  "freeze_attestation_content_hash": "5d17bc1b30b1e534ef33d5a013a8be1d2e75b7da483c9d5d072bd6eaee06d08e",
-  "freeze_attestation_logical_hash": "e11d84737512cabf8f4ef734636d42b636669612a8e6656d805db83233207599",
-  "freeze_attestation_sha": "4592c53326e3385911be7677e59222c42ab475e6",
-  "freeze_candidate_sha": "4159fd5cc81efac807162984f75ec982a602aaf0",
-  "freeze_candidate_tree_hash": "8b02540c5f93bc29e151036a83aa2412b4a106c7",
+  "freeze_attestation_content_hash": "980786af904706f325df9964b8d027db007501a5d8209098dee943a0082fa363",
+  "freeze_attestation_logical_hash": "b10462699235c429d2a655f76c5796b772b251fa75a8af5ce88ebfdc7e385d4f",
+  "freeze_attestation_sha": "abe923a8ff0dee257b108c957f2d10ecdf788037",
+  "freeze_candidate_sha": "abe923a8ff0dee257b108c957f2d10ecdf788037",
+  "freeze_candidate_tree_hash": "5110cd730b75475233c84f99a437c3134a235d27",
+  "freeze_schema_version": "governed-capability-genesis-v4-freeze-v1",
   "frozen_directories": [
     "benchmarks/capability_protocol_baseline_v2",
     "benchmarks/capability_genesis_v4"
@@ -221,12 +222,12 @@
       "size_bytes_at_candidate": 44138
     },
     {
-      "blob_sha_at_candidate": "7cc77456b2e87c1055292e7541c42cf485794331",
+      "blob_sha_at_candidate": "6930bd020d6b4e59be5580f33d3824af7299ce78",
       "bundle": "artifact_verifier",
       "path": "scripts/verify_capability_genesis_artifact.py",
       "required_at_final_head": true,
-      "sha256_at_candidate": "4317cb74ac0f368c05e0ec333672f1f1f9d27d0e6d9e50e4dfc14067b8450ab6",
-      "size_bytes_at_candidate": 2207
+      "sha256_at_candidate": "b1f7ad467f14248b42240ee9386be0ba7f722f86e84477e1e924e1d385ad6bad",
+      "size_bytes_at_candidate": 2398
     },
     {
       "blob_sha_at_candidate": "c2da06c6193afbf45bc98ad9069eb548cadcfc2b",
@@ -322,6 +323,5 @@
     "freeze_attestation_logical_hash": "sha256 of canonical attestation excluding freeze_attestation_content_hash and freeze_attestation_logical_hash"
   },
   "protocol_campaign_id": "governed-capability-protocol-baseline-v2",
-  "real_capability_campaign_id": "governed-capability-genesis-v4",
-  "schema_version": "governed-capability-genesis-v4-freeze-v1"
+  "real_capability_campaign_id": "governed-capability-genesis-v4"
 }
