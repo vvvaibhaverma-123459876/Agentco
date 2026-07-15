@@ -6,7 +6,7 @@ import time
 from typing import Any
 
 from .models import CapabilityRequest, PROTOCOL_VERSION
-from .providers import ProviderError, provider_from_policy
+from .providers import ProviderConfigurationError, ProviderError, ProviderResponseError, provider_from_policy
 from .storage import cancel_stored_attempt, read_attempt, write_attempt
 
 
@@ -168,9 +168,37 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
             "audit_references": [],
         }
     except ProviderError as exc:
+        message = str(exc)
+        status = "failed"
+        category = "provider_error"
+        retryable = False
+        if isinstance(exc, ProviderConfigurationError):
+            category = "provider_configuration"
+            status = "unsupported"
+            if message.lower().startswith("unknown provider:"):
+                category = "unsupported"
+        if isinstance(exc, ProviderResponseError):
+            category = "provider_response"
+            retryable = True
+            lowered = message.lower()
+            if "malformed json" in lowered:
+                category = "malformed_response"
+            elif "timed out" in lowered:
+                category = "timeout"
+                status = "timed_out"
+            elif "exceeded size limit" in lowered:
+                category = "response_size_rejection"
+            elif "transport error" in lowered:
+                category = "transport_failure"
+            elif "retryable_http_429" in lowered:
+                category = "rate_limited"
+            elif "retryable_http_500" in lowered:
+                category = "provider_server_error"
+            elif "non_retryable_http_400" in lowered:
+                category = "provider_client_error"
         response = {
             **base,
-            "status": "unsupported",
+            "status": status,
             "answer": None,
             "structured_output": {},
             "confidence": None,
@@ -184,8 +212,8 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
             "provider_usage": {},
             "request_metadata": {},
             "resource_usage": {"measurement_method": "process_wall_clock_only"},
-            "failure": _failure("unsupported", str(exc)),
-            "recovery": {"retryable": False, "terminal": True},
+            "failure": {**_failure(category, message), "category": category},
+            "recovery": {"retryable": retryable, "terminal": True},
             "audit_references": [],
         }
     except Exception as exc:

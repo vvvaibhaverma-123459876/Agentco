@@ -19,11 +19,11 @@ on:
       mode:
         description: "Capability audit mode"
         required: true
-        default: "protocol-baseline-v1"
+        default: "protocol-baseline-v2"
         type: choice
         options:
-          - protocol-baseline-v1
-          - real-capability-genesis-v3
+          - protocol-baseline-v2
+          - real-capability-genesis-v4
       provider:
         description: "Optional provider id for real-capability-provider mode"
         required: false
@@ -44,7 +44,7 @@ jobs:
     env:
       EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       GENESIS_MODE: ${{ github.event.inputs.mode || 'protocol-reference' }}
-      CAPABILITY_MODE: ${{ github.event.inputs.mode || 'protocol-baseline-v1' }}
+      CAPABILITY_MODE: ${{ github.event.inputs.mode || 'protocol-baseline-v2' }}
       GENESIS_PROVIDER: ${{ github.event.inputs.provider || '' }}
     steps:
       - name: Checkout exact head
@@ -97,16 +97,16 @@ jobs:
           import os
           from pathlib import Path
           mode = os.environ["CAPABILITY_MODE"]
-          if mode == "protocol-baseline-v1":
-              manifest_path = Path("artifacts/capability-runtime/governed-capability-protocol-baseline-v1/PROTOCOL_BASELINE_MANIFEST.json")
+          if mode == "protocol-baseline-v2":
+              manifest_path = Path("artifacts/capability-runtime/governed-capability-protocol-baseline-v2/PROTOCOL_BASELINE_MANIFEST.json")
           else:
-              manifest_path = Path("artifacts/capability-runtime/governed-capability-genesis-v3/GENESIS_V3_MANIFEST.json")
+              manifest_path = Path("artifacts/capability-runtime/governed-capability-genesis-v4/GENESIS_V4_MANIFEST.json")
           manifest = json.loads(manifest_path.read_text())
           if manifest["campaign_execution_sha"] != os.environ["EXPECTED_AUDIT_SHA"]:
               raise SystemExit("genesis manifest SHA does not match workflow head")
-          if mode == "protocol-baseline-v1" and manifest["decision"] != "PROTOCOL_BASELINE_ACCEPTED":
+          if mode == "protocol-baseline-v2" and manifest["decision"] != "PROTOCOL_BASELINE_ACCEPTED":
               raise SystemExit("protocol baseline did not pass")
-          if mode == "real-capability-genesis-v3" and manifest["decision"] not in {"CAPABILITY_GENESIS_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}:
+          if mode == "real-capability-genesis-v4" and manifest["decision"] not in {"CAPABILITY_GENESIS_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}:
               raise SystemExit("real-capability genesis did not produce a valid decision")
           PY
           python3.13 scripts/verify_capability_genesis_artifact.py --check
@@ -120,6 +120,6 @@ jobs:
             artifacts/capability-runtime/**
             docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.*
             docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_*
-            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json
           if-no-files-found: warn
           retention-days: 120

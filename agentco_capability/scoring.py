@@ -156,8 +156,11 @@ def score_data_analysis(response: dict[str, Any], rubric: dict[str, Any]) -> dic
         return _not_capability("data_analysis", "protocol reference provider cannot analyze data")
     calculations = response.get("structured_output", {}).get("calculations") or {}
     expected = rubric.get("expected_calculations") or {}
-    if not expected:
-        return _base("data_analysis", 0.0, {"reason": "missing expected calculations"})
+    evaluator_verified = rubric.get("evaluator_verification", {}).get("reference_calculations_computed") is True
+    if not expected or not evaluator_verified:
+        result = _base("data_analysis", 0.0, {"reason": "data scoring requires evaluator-owned reference calculations"})
+        result["evaluator_owned_verification"] = False
+        return result
     correct = 0
     for key, value in expected.items():
         actual = calculations.get(key)
@@ -165,7 +168,9 @@ def score_data_analysis(response: dict[str, Any], rubric: dict[str, Any]) -> dic
             correct += 1
         elif actual == value:
             correct += 1
-    return _base("data_analysis", correct / len(expected), rubric)
+    result = _base("data_analysis", correct / len(expected), rubric)
+    result["evaluator_owned_verification"] = True
+    return result
 
 
 def score_software_engineering(response: dict[str, Any], rubric: dict[str, Any]) -> dict[str, Any]:
@@ -175,9 +180,18 @@ def score_software_engineering(response: dict[str, Any], rubric: dict[str, Any])
     patch = str(output.get("patch") or "")
     changed = bool(output.get("changed_files"))
     comment_only = patch.strip().startswith("#") or "pass" == patch.strip()
-    public_ok = output.get("public_tests_passed") is True
-    hidden_ok = output.get("hidden_tests_passed") is True
-    return _base("software_engineering", (0.25 if patch and not comment_only else 0) + (0.25 if changed else 0) + (0.25 if public_ok else 0) + (0.25 if hidden_ok else 0), rubric)
+    provider_declared = "public_tests_passed" in output or "hidden_tests_passed" in output or "workspace_isolated" in output
+    evaluator = rubric.get("evaluator_test_evidence") or {}
+    public_ok = evaluator.get("public_tests_passed") is True
+    hidden_ok = evaluator.get("hidden_tests_passed") is True
+    workspace_ok = evaluator.get("workspace_isolated") is True and evaluator.get("cleanup_passed") is True
+    if provider_declared or not evaluator:
+        result = _base("software_engineering", 0.0, {"reason": "software scoring requires evaluator-owned test evidence and rejects provider-declared test status"})
+        result["evaluator_owned_tests"] = False
+        return result
+    result = _base("software_engineering", (0.2 if patch and not comment_only else 0) + (0.2 if changed else 0) + (0.25 if public_ok else 0) + (0.25 if hidden_ok else 0) + (0.1 if workspace_ok else 0), rubric)
+    result["evaluator_owned_tests"] = public_ok and hidden_ok and workspace_ok
+    return result
 
 
 def score_cross_domain_synthesis(response: dict[str, Any], rubric: dict[str, Any]) -> dict[str, Any]:

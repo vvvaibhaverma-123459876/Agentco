@@ -18,7 +18,7 @@ def load(path: Path):
 
 
 def find_manifests(root: Path) -> list[Path]:
-    return list(root.glob("**/PROTOCOL_BASELINE_MANIFEST.json")) + list(root.glob("**/GENESIS_V3_MANIFEST.json"))
+    return list(root.glob("**/PROTOCOL_BASELINE_MANIFEST.json")) + list(root.glob("**/GENESIS_V3_MANIFEST.json")) + list(root.glob("**/GENESIS_V4_MANIFEST.json"))
 
 
 def verify_artifacts(root: Path) -> list[str]:

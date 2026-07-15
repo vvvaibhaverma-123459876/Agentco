@@ -410,4 +410,4 @@ def provider_from_policy(policy: dict[str, Any]) -> CapabilityProvider:
         return AnthropicCompatibleProvider()
     if provider == "generic_http":
         return GenericHTTPProvider()
-    raise ProviderError(f"unknown provider: {provider}")
+    raise ProviderConfigurationError(f"unknown provider: {provider}")
