@@ -254,12 +254,12 @@
     }
   ],
   "finding_completeness_ledger": {
-    "total_files_discovered": 1737,
-    "files_inventoried": 1737,
+    "total_files_discovered": 1827,
+    "files_inventoried": 1827,
     "files_line_audited": 0,
     "files_excluded": 0,
     "file_audit_note": "All tracked files are inventoried. Line-level review is intentionally not marked complete by this generated control ledger.",
-    "tests_discovered": 282,
+    "tests_discovered": 299,
     "workflows_discovered": 8,
     "workflows_tested_or_gated": 8,
     "integrations_discovered": 8,
