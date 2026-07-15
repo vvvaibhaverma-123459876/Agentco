@@ -583,3 +583,64 @@ invariants:
     statement: Sessions and interactive authentication for human operators are first-class, time-bounded, and revocable.
     tier: constitutional
     status: planned
+  - id: V7-INV-001
+    statement: A resource balance can never go negative — resources cannot be created from nothing.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/db/migrations/134_civilization_economy.sql
+  - id: V7-INV-002
+    statement: Every resource transaction has a positive amount and records the balance after it, giving a replayable ledger.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-003
+    statement: Reconciliation recomputes each account's balance from its signed transaction history (credit +, debit -, adjustment +) and reports any imbalance.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-004
+    statement: Spend is reserved before use and settled or released after; a two-phase reservation stands between request and debit.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/082_resource_reservations.sql
+      - backend/src/services/treasury.service.ts
+  - id: V7-INV-005
+    statement: Budgets are proposed and decided through a governed proposal path before allocation.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-006
+    statement: A judiciary penalty debits a real account balance, not a symbolic marker.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V7-INV-007
+    statement: Cost is attributed per scope and rolled up per mission, institution, or domain.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-008
+    statement: A resource-policy limit (max risk level, min trust factor) gates spend requests before they draw down a balance.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/134_civilization_economy.sql
+      - backend/src/services/treasury.service.ts
+  - id: V7-INV-009
+    statement: The two ledger generations are reconciled or unified so a single authoritative balance exists per scope and resource.
+    tier: statute
+    status: planned
