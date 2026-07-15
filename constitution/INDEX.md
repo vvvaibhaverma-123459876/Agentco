@@ -48,7 +48,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 18 | 6 | Institutions | statute | mixed | written | institution services + migrations (L9); emergent-institution lifecycle per GENERALIZATION_REPORT.md §11 |
 | 19 | 5 | Civilization Society | statute | mixed | written | citizen/role services (L7); citizenship built (mig 130) |
 | 20 | 17 | Self Inspection | statute | mixed | written | scripts/generate_status.py, doctor/audit scripts, BUILD_LEDGER.yaml |
-| 21 | 18 | Civilization Self Model | statute | prescriptive | not written | BUILD_LEDGER.yaml, backend/src/services/ inventory |
+| 21 | 18 | Civilization Self Model | statute | prescriptive | written | BUILD_LEDGER.yaml, backend/src/services/ inventory |
 | 22 | 34 | Civilization Memory | statute | mixed | not written | memory-promotion-pipeline.service.ts, memory-retrieval.service.ts, event_log + agent_memories migrations |
 | 23 | 30 | Verification | statute | descriptive | not written | backend/tests/, evals/, .github/workflows/ |
 | 24 | 29 | Infrastructure | regulation | mixed | not written | docker-compose*.yml, infrastructure/, helm chart |

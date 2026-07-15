@@ -1144,3 +1144,44 @@ invariants:
     statement: Every generated inspection artifact is enforced current by a --check gate in CI, so no inspector output can go stale unnoticed.
     tier: statute
     status: planned
+  - id: V18-INV-001
+    statement: A machine-readable component inventory of the system exists (the seed of the architecture graph).
+    tier: statute
+    status: enforced
+    enforcement:
+      - BUILD_LEDGER.yaml
+      - CIVILIZATION_BUILD_LEDGER.yaml
+  - id: V18-INV-002
+    statement: A conservative static dependency snapshot of entry points to services exists (the seed of the dependency graph).
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_runtime_reachability.py
+  - id: V18-INV-003
+    statement: The Self Model represents the architecture graph — services, modules, and their boundaries — as first-class queryable data.
+    tier: statute
+    status: planned
+  - id: V18-INV-004
+    statement: The Self Model represents the dependency graph and is kept current from the live system, not a manual snapshot.
+    tier: statute
+    status: planned
+  - id: V18-INV-005
+    statement: The Self Model represents the institution, capability, and topology graphs, sourced from their owning subsystems.
+    tier: statute
+    status: planned
+  - id: V18-INV-006
+    statement: The Self Model represents the evolution graph (version lineage and migrations) and the health graph (live operational signals).
+    tier: statute
+    status: planned
+  - id: V18-INV-007
+    statement: The Self Model is populated by Self Inspection and is provably current — a drift between model and reality fails a check.
+    tier: statute
+    status: planned
+  - id: V18-INV-008
+    statement: The Self Model is queryable by the operator and by Autonomous/Structural Evolution as the substrate for change decisions.
+    tier: statute
+    status: planned
+  - id: V18-INV-009
+    statement: The Self Model is strictly separated from Civilization Memory — structure-now versus history.
+    tier: statute
+    status: planned
