@@ -1559,3 +1559,50 @@ invariants:
     statement: Adversarial cooperation structures — red teams, blue teams, and war games — are first-class governed activities.
     tier: statute
     status: planned
+  - id: V25-INV-001
+    statement: An implemented capability is a versioned skill with regression coverage required before promotion.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/skill-library.service.ts
+      - backend/src/db/migrations/105_skill_library.sql
+  - id: V25-INV-002
+    statement: A capability is admitted only through the five-stage expansion gate with an independent competence proof (the evaluation/verification stages).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/src/services/proof-of-competence.service.ts
+  - id: V25-INV-003
+    statement: Promotion and rollback of a capability follow the learning engine's independent-evaluation and canary gates.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V25-INV-004
+    statement: Coding is treated as one capability instance, not privileged architecture — no service, route, or table is named for coding.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
+  - id: V25-INV-005
+    statement: The eleven-stage capability lifecycle is a single named contract that every capability provably traverses.
+    tier: statute
+    status: planned
+  - id: V25-INV-006
+    statement: The research and knowledge-acquisition stages have first-class records, so a capability's how-we-learned-it is auditable.
+    tier: statute
+    status: planned
+  - id: V25-INV-007
+    statement: Any capability can be developed through the framework without new architecture (a new capability = registry + lifecycle, not new code paths).
+    tier: statute
+    status: planned
+  - id: V25-INV-008
+    statement: Capability monitoring after promotion feeds automatic restriction or retirement on degradation.
+    tier: statute
+    status: planned
+  - id: V25-INV-009
+    statement: The coding instance (selfcoding/) is either promoted to a canonical capability under this framework or retired, resolving its quarantined status.
+    tier: statute
+    status: planned
