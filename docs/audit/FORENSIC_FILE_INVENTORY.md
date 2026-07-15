@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1945`
+- Tracked files: `1933`
 
 ## Category Counts
 
@@ -12,9 +12,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 140 |
-| Documentation | 439 |
+| Documentation | 429 |
 | Experimental code | 151 |
-| Generated artifact | 118 |
+| Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
 | Test infrastructure | 286 |
@@ -25,12 +25,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 364 |
+| `docs` | 356 |
 | `evals` | 180 |
 | `scripts` | 152 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `reports` | 68 |
+| `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `tests` | 43 |
@@ -1066,16 +1066,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/CONTROLLED_LEARNING_REPORT.json` | Documentation |
 | `docs/audit/EVALUATION_CALIBRATION_REPORT.json` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_REMEDIATION_STATUS_2026_07_12.md` | Documentation |
 | `docs/audit/PHASE10_NOTES.md` | Documentation |
@@ -1689,10 +1681,6 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports/system_run/latest/release_gate_verification.md` | Documentation |
 | `reports/system_run/latest/resolution_service_verification.json` | Generated artifact |
 | `reports/system_run/latest/score_validation.json` | Generated artifact |
-| `reports/system_run/latest/score_validation.json` | Generated artifact |
-| `reports/system_run/latest/score_validation.json` | Generated artifact |
-| `reports/system_run/latest/score_validation.md` | Documentation |
-| `reports/system_run/latest/score_validation.md` | Documentation |
 | `reports/system_run/latest/score_validation.md` | Documentation |
 | `requirements/README.md` | Development tooling |
 | `requirements/requirements-dev.txt` | Development tooling |

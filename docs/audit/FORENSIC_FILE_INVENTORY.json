@@ -1,14 +1,14 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1945,
+  "tracked_file_count": 1933,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 140,
-    "Documentation": 439,
+    "Documentation": 429,
     "Experimental code": 151,
-    "Generated artifact": 118,
+    "Generated artifact": 116,
     "Production runtime code": 490,
     "Prompt/template": 29,
     "Test infrastructure": 286,
@@ -16,12 +16,12 @@
   },
   "top_level_counts": {
     "backend": 505,
-    "docs": 364,
+    "docs": 356,
     "evals": 180,
     "scripts": 152,
     "agents": 111,
     "audit_artifacts": 99,
-    "reports": 68,
+    "reports": 64,
     "runtime": 51,
     "archive": 48,
     "tests": 43,
@@ -83,9 +83,9 @@
   },
   "extension_counts": {
     ".py": 588,
-    ".md": 455,
+    ".md": 449,
     ".ts": 340,
-    ".json": 213,
+    ".json": 207,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -5943,30 +5943,6 @@
       "extension": ".json"
     },
     {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
-    },
-    {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
-    },
-    {
       "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -5977,30 +5953,6 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
     },
     {
       "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
@@ -9679,30 +9631,6 @@
       "category": "Generated artifact",
       "top_level": "reports",
       "extension": ".json"
-    },
-    {
-      "path": "reports/system_run/latest/score_validation.json",
-      "category": "Generated artifact",
-      "top_level": "reports",
-      "extension": ".json"
-    },
-    {
-      "path": "reports/system_run/latest/score_validation.json",
-      "category": "Generated artifact",
-      "top_level": "reports",
-      "extension": ".json"
-    },
-    {
-      "path": "reports/system_run/latest/score_validation.md",
-      "category": "Documentation",
-      "top_level": "reports",
-      "extension": ".md"
-    },
-    {
-      "path": "reports/system_run/latest/score_validation.md",
-      "category": "Documentation",
-      "top_level": "reports",
-      "extension": ".md"
     },
     {
       "path": "reports/system_run/latest/score_validation.md",
