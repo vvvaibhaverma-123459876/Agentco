@@ -1185,3 +1185,59 @@ invariants:
     statement: The Self Model is strictly separated from Civilization Memory — structure-now versus history.
     tier: statute
     status: planned
+  - id: V34-INV-001
+    statement: The event history is an ordered, hash-chained spine whose rows reject UPDATE and DELETE at the database layer.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/080_event_log.sql
+      - backend/src/services/event-log.service.ts
+  - id: V34-INV-002
+    statement: Every event carries an actor, a correlation id, and a hash linking it to the prior event, so history is attributable and tamper-evident.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/080_event_log.sql
+  - id: V34-INV-003
+    statement: Agent memory and shared knowledge are durable stores readable and writable through a memory service, not ad hoc.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/memory-store.service.ts
+      - backend/src/db/migrations/002_agent_memory.sql
+      - backend/src/db/migrations/003_shared_knowledge.sql
+  - id: V34-INV-004
+    statement: Memory is retrievable for planning, and retrieval surfaces demotion warnings so weakened memory is flagged.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/memory-retrieval.service.ts
+      - backend/tests/memory-retrieval.test.ts
+  - id: V34-INV-005
+    statement: An agent's own self-memory is retrievable without dropping or mutating existing memory.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/114_self_memory_retrievable.sql
+      - backend/tests/self-memory-loop.test.ts
+  - id: V34-INV-006
+    statement: Artifact lineage is part of artifact identity — content dedup applies within a lineage class, not across, so real lineage is preserved.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/117_artifact_lineage_identity.sql
+  - id: V34-INV-007
+    statement: Improvement lineage links a promoted improvement to its originating failure and candidate.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/138_safe_evolution.sql
+      - backend/tests/civilization-learning-e2e.test.ts
+  - id: V34-INV-008
+    statement: Memory has a bounded forgetting/retention policy so low-value memory does not accumulate without limit.
+    tier: statute
+    status: planned
+  - id: V34-INV-009
+    statement: Long-term lineage is queryable end to end — any promoted memory can be traced to the events and evidence that produced it.
+    tier: statute
+    status: planned
