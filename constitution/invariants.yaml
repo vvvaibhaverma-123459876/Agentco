@@ -1354,3 +1354,59 @@ invariants:
     statement: Secrets are delivered from a managed secret store (Vault) in production rather than environment plaintext.
     tier: regulation
     status: planned
+  - id: V27-INV-001
+    statement: Protected high- or critical-risk actions are enqueued for human approval before they execute; unresolved requests do not proceed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/override-queue.service.ts
+      - backend/src/db/migrations/013_override_queue.sql
+  - id: V27-INV-002
+    statement: Each override request carries an approval SLA, and overdue requests are surfaced rather than silently expiring.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/override-queue.service.ts
+  - id: V27-INV-003
+    statement: The kill switch is governed — at most one is active per scope, and engaging it is an audited act.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/098_governance_kill_switch.sql
+      - backend/src/services/kill-switch.service.ts
+      - backend/tests/kill-switch.test.ts
+  - id: V27-INV-004
+    statement: Engaging the kill switch from the operator console requires a human-entered reason.
+    tier: statute
+    status: enforced
+    enforcement:
+      - frontend/src/app/civilization/page.tsx
+  - id: V27-INV-005
+    statement: The operator console shows only governed backend data — no fabricated or placeholder values.
+    tier: statute
+    status: enforced
+    enforcement:
+      - frontend/src/app/civilization/page.tsx
+      - backend/tests/civilization-operator.test.ts
+  - id: V27-INV-006
+    statement: Operator actions resolve authority through the identity/authority layer, so an operator acts under a recorded authority decision.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/override.routes.ts
+  - id: V27-INV-007
+    statement: An engaged kill switch actually halts governed run loops (the Emergency mode has effect, not just record).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/run-guard.service.ts
+      - backend/tests/main-loop-kill-switch.test.ts
+  - id: V27-INV-008
+    statement: The Operator Interface exposes its modes (Observe, Inspect, Chat, Preview, Execute, Govern, Emergency) as first-class, role-gated capabilities — superuser being one role among several.
+    tier: statute
+    status: planned
+  - id: V27-INV-009
+    statement: A Preview mode lets an operator dry-run a protected action and see its projected effect before executing.
+    tier: statute
+    status: planned
