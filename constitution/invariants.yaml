@@ -118,3 +118,62 @@ invariants:
     statement: Meta-governance may evolve the civilization's own constitutional processes, but human root authority and the protected-invariant mechanism remain outside the system's own amendment power.
     tier: constitutional
     status: aspirational
+  - id: V32-INV-001
+    statement: Every HTTP route is classified in the sensitivity matrix, and a contract test fails the build on unclassified or misclassified routes.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/tests/route-auth-contract.test.ts
+      - docs/audit/ROUTE_SENSITIVITY_MATRIX.md
+  - id: V32-INV-002
+    statement: A production-like start fails closed on missing or dev-default secrets in both the TypeScript and Python runtimes.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/security.ts
+      - backend/tests/security.test.ts
+      - agentco_security/env_guard.py
+  - id: V32-INV-003
+    statement: Every outbound web fetch validates scheme and target against private and metadata ranges — including hostnames that resolve to private addresses — and re-validates every redirect hop.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/adapters/url-safety.ts
+      - backend/tests/red-team-corpus.test.ts
+  - id: V32-INV-004
+    statement: Fetched web content enters model prompts only inside untrusted fences accompanied by a rule that fenced content is evidence, never instructions.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/adapters/url-safety.ts
+      - backend/src/services/autonomy-action-planner.service.ts
+      - backend/tests/prompt-injection-e2e.test.ts
+  - id: V32-INV-005
+    statement: Specialist HTTP activation is HMAC-authenticated, and production or staging refuses to sign with an unset or default shared secret.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/team-activation.service.ts
+      - backend/tests/team-activation.test.ts
+  - id: V32-INV-006
+    statement: Inter-service event envelopes are signed, and the signing keys are among the startup-guarded secrets.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/event-bus.service.ts
+      - backend/src/db/migrations/128_event_bus_outbox.sql
+      - agentco_security/env_guard.py
+  - id: V32-INV-007
+    statement: Continuous integration scans every push for committed secrets.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - .github/workflows/ci.yml
+  - id: V32-INV-008
+    statement: Dependency vulnerability audits run as a wired, fail-closed release gate rather than ad-hoc commands.
+    tier: constitutional
+    status: planned
+  - id: V32-INV-009
+    statement: The URL-safety adapter has a dedicated unit suite covering literal, DNS-resolved, redirect, and v4-mapped bypass attempts.
+    tier: constitutional
+    status: planned
