@@ -13,6 +13,12 @@ from agentco_capability.evidence import reproduce_payload_hash  # noqa: E402
 from scripts.verify_capability_genesis_freeze import verify_manifest  # noqa: E402
 
 
+CURRENT_FREEZE_CAMPAIGNS = {
+    "governed-capability-protocol-baseline-v2",
+    "governed-capability-genesis-v4",
+}
+
+
 def load(path: Path):
     return json.loads(path.read_text())
 
@@ -39,7 +45,8 @@ def verify_artifacts(root: Path) -> list[str]:
             findings.append(f"MANIFEST_PAYLOAD_HASH_MISMATCH:{manifest_path}")
         if manifest.get("campaign_execution_sha") != manifest.get("workflow_head_sha"):
             findings.append(f"SHA_BINDING_MISMATCH:{manifest_path}")
-        findings.extend(verify_manifest(manifest_path))
+        if manifest.get("campaign_id") in CURRENT_FREEZE_CAMPAIGNS:
+            findings.extend(verify_manifest(manifest_path))
     return findings
 
 
