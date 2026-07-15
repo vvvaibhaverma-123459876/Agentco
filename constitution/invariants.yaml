@@ -1,0 +1,62 @@
+# AgentCo Architecture Constitution — invariant registry
+# Governed by constitution/CONVENTIONS.md; validated by
+# scripts/constitution/check_constitution.py on every push/PR.
+#
+# Example entry:
+#   - id: V9-INV-004                     # V<volume>-INV-<3 digits>; never renumbered, never reused
+#     statement: Claims promoted to memory retain provenance links to their evidence rows.
+#     tier: statute                      # constitutional | statute | regulation | article | charter
+#     status: enforced                   # enforced | planned | aspirational
+#     enforcement:                       # REQUIRED when status: enforced — repo paths (or path::test name)
+#       - backend/src/services/claim-grounding.service.ts
+#       - backend/tests/claim-grounding.test.ts
+#
+invariants:
+  - id: V0-INV-001
+    statement: Every constitution volume conforms to TEMPLATE.md's sections and its header agrees with INDEX.md, checked automatically on every push and pull request.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
+      - .github/workflows/constitution.yml
+  - id: V0-INV-002
+    statement: An invariant may carry status "enforced" only if it cites at least one enforcement path that exists in the repository.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
+  - id: V0-INV-003
+    statement: Civilization completion status is machine-derived from CIVILIZATION_BUILD_LEDGER.yaml and the generated report states the termination predicate explicitly instead of asserting completion in prose.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - scripts/generate_civilization_completion.py
+      - .github/workflows/civilization-completion.yml
+      - docs/civilization/OUTSTANDING_GATES.md
+  - id: V0-INV-004
+    statement: Human authority is root — a governed kill switch and an emergency-power path exist and are exercised by tests.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/kill-switch.service.ts
+      - backend/src/services/governance.service.ts
+      - backend/tests/civilization-e2e-scenarios.test.ts
+  - id: V0-INV-005
+    statement: Civilization state changes append to tamper-evident logs, and kernel history plus decision-log tables reject in-place mutation at the database layer.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/src/db/migrations/014_decision_log_immutability_triggers.sql
+  - id: V0-INV-006
+    statement: Every human-readable status surface is generated from a ledger rather than hand-edited, so no two status documents can disagree.
+    tier: constitutional
+    status: planned
+  - id: V0-INV-007
+    statement: A completion predicate may be set true only after the repository's canonical release gates have run green against the built code.
+    tier: constitutional
+    status: planned
+  - id: V0-INV-008
+    statement: AgentCo evolves its own architecture, institutions, and capabilities over time while preserving constitutional continuity, auditability, and human oversight.
+    tier: constitutional
+    status: aspirational

@@ -21,7 +21,8 @@
     "agentco:db-table-usage": "ts-node src/cli/db-table-usage.ts",
     "autonomy": "ts-node src/cli/autonomy.ts",
     "agentco:supervised-runtime": "ts-node src/cli/supervised-runtime.ts",
-    "agentco:outbox-worker": "ts-node src/workers/outbox-worker.ts"
+    "agentco:outbox-worker": "ts-node src/workers/outbox-worker.ts",
+    "agentco:civilization-scheduler": "ts-node src/workers/civilization-scheduler-worker.ts"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.0",

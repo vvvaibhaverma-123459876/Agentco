@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-07-15T03:09:17.031166+00:00",
+  "commit": "246f46fc12dbb55a2c79dda0686fd0aa65552c18",
+  "branch": "feature/civilization-layer",
+  "git_dirty": false,
+  "required_deployment_artifacts": [
+    "infrastructure/kubernetes/helm/agentco/templates/civilization-scheduler-deployment.yaml",
+    "frontend/src/app/civilization/page.tsx"
+  ],
+  "missing": [],
+  "helm_scheduler_command": "node dist/workers/civilization-scheduler-worker.js",
+  "note": "deployment contract is production-grade; hosted production certification requires a live cluster (out of scope)."
+}

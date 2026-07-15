@@ -1,0 +1,10 @@
+{
+  "generated_at": "2026-07-15T03:09:17.031166+00:00",
+  "commit": "246f46fc12dbb55a2c79dda0686fd0aa65552c18",
+  "branch": "feature/civilization-layer",
+  "git_dirty": false,
+  "scenario": "H_emergency_state",
+  "proof_suite": "backend/tests/civilization-e2e-scenarios.test.ts",
+  "proof_present": true,
+  "kind": "executable_proof_reference"
+}

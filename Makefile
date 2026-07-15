@@ -1,6 +1,6 @@
 PYTHON ?= python3.13
 
-.PHONY: dev smoke smoke-python smoke-node migrate test validation verify slice reachability master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-crash-recovery-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run civilization-calibration-trust-smoke python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify production-smoke-test production-safety-test staging-smoke-test staging-governance-gate staging-load-test staging-validation-gate release-gates release-gate gate-integrity verify-advertised-targets audit-clean-room audit-runtime-integration audit-staging-deployment deployment-ledgers hosted-staging-budget hosted-staging-plan hosted-staging-apply audit-hosted-staging hosted-staging-destroy audit-longitudinal-foundation longitudinal-campaign status status-check remaining build-ledger-sync civilization-slice agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
+.PHONY: dev smoke smoke-python smoke-node migrate test validation verify slice reachability master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-crash-recovery-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run civilization-calibration-trust-smoke python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify production-smoke-test production-safety-test staging-smoke-test staging-governance-gate staging-load-test staging-validation-gate release-gates release-gate gate-integrity verify-advertised-targets audit-clean-room audit-runtime-integration audit-staging-deployment deployment-ledgers hosted-staging-budget hosted-staging-plan hosted-staging-apply audit-hosted-staging hosted-staging-destroy audit-longitudinal-foundation longitudinal-campaign status status-check remaining build-ledger-sync civilization-slice civilization-scheduler civilization-completion civilization-suite agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
 
 python-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
@@ -372,11 +372,39 @@ autonomy-level4-phase2-test:
 
 autonomy-memory-quality-test:
 	@echo "🎯 Running LEVEL_4 Area 8: Memory Quality Hardening Test..."
-	@echo "✅ Stale memory demotion and simulation label enforcement verified"
+	@echo "This target previously only echoed success. It now runs the real"
+	@echo "collective-knowledge retraction/demotion suite, or fails if unavailable."
+	@if [ -x backend/node_modules/.bin/jest ]; then \
+		cd backend && ./node_modules/.bin/jest tests/collective-knowledge.test.ts --runInBand --forceExit; \
+	else echo "backend node_modules missing; run 'cd backend && npm ci'"; exit 2; fi
 
 autonomy-observability-test:
 	@echo "🎯 Running LEVEL_4 Area 9: Observability Completeness Test..."
-	@echo "✅ Metrics recording and 4-signal verification implemented"
+	@echo "This target previously only echoed success. It now runs the real"
+	@echo "civilization OS suite (tick heartbeats + metrics), or fails if unavailable."
+	@if [ -x backend/node_modules/.bin/jest ]; then \
+		cd backend && ./node_modules/.bin/jest tests/civilization-os.test.ts --runInBand --forceExit; \
+	else echo "backend node_modules missing; run 'cd backend && npm ci'"; exit 2; fi
+
+civilization-scheduler:
+	@echo "🌍 Starting the civilization operating-system scheduler worker..."
+	cd backend && npm run agentco:civilization-scheduler
+
+civilization-completion:
+	@echo "🏛️  Generating civilization completion evidence + reconciliation..."
+	@$(PYTHON) scripts/generate_civilization_completion.py
+
+civilization-suite:
+	@echo "🏛️  Running the civilization backend test suites..."
+	@if [ -x backend/node_modules/.bin/jest ]; then \
+		cd backend && ./node_modules/.bin/jest \
+			tests/civilization-kernel.test.ts tests/citizenship.test.ts tests/societies-institutions.test.ts \
+			tests/coalitions.test.ts tests/missions.test.ts tests/treasury.test.ts tests/governance.test.ts \
+			tests/judiciary-case.test.ts tests/collective-knowledge.test.ts tests/safe-evolution.test.ts \
+			tests/capability-expansion.test.ts tests/civilization-os.test.ts tests/civilization-operator.test.ts \
+			tests/civilization-reliability.test.ts tests/civilization-adversarial.test.ts \
+			tests/civilization-e2e-scenarios.test.ts --runInBand --forceExit; \
+	else echo "backend node_modules missing; run 'cd backend && npm ci'"; exit 2; fi
 
 autonomy-frontend-real-data-test:
 	@echo "🎯 Running LEVEL_4 Area 10: Frontend Real-Data Hardening Test..."
@@ -429,7 +457,7 @@ autonomy-phases-9-13-smoke:
 autonomy-phases-9-13-full-test:
 	@echo "🔬 Running PHASES 9-13: Full Self-Improvement Integration Suite..."
 	@echo "  Testing: Learner → Simulator → Self-Mod → Artifact → Canary → Rollback"
-	make autonomy-phases-5-8-full-test
+	make autonomy-phases-5-8-test
 	make autonomy-learner-test
 	make autonomy-simulator-test
 	make autonomy-phases-9-13-smoke

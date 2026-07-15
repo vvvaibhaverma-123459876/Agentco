@@ -1,0 +1,21 @@
+name: Constitution Check
+
+# The Architecture Constitution must never silently drift from the code.
+# scripts/constitution/check_constitution.py validates every volume, the
+# invariant registry, and all enforcement paths on every push and PR.
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install PyYAML
+        run: python -m pip install pyyaml
+      - name: Constitution drift check
+        run: python scripts/constitution/check_constitution.py
