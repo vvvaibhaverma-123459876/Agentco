@@ -60,7 +60,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 30 | 16 | Autonomous Evolution | statute | prescriptive | written | goal-formation tick in supervised runtime; six-loop decomposition per GENERALIZATION_REPORT.md §8 |
 | 31 | 19 | Structural Evolution Framework | statute | prescriptive | written | skill-canary.service.ts (promotion pattern to reuse) |
 | 32 | 20 | Knowledge Discovery Framework | charter | aspirational | written | evals/ |
-| 33 | 21 | Reality Models | charter | aspirational | not written | (none) |
+| 33 | 21 | Reality Models | charter | aspirational | written | (none) |
 | 34 | 22 | Hypothesis Generation Framework | charter | aspirational | not written | (none) |
 | 35 | 31 | Civilization Evolution | charter | aspirational | not written | BUILD_LEDGER.yaml |
 
