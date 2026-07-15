@@ -234,3 +234,60 @@ invariants:
     statement: Memory has a bounded forgetting policy so unbounded low-value knowledge does not accumulate.
     tier: statute
     status: planned
+  - id: V11-INV-001
+    statement: A prediction's resolution date must be after its registration, and its post-hoc flag must match whether it was created after the outcome became knowable — enforced at the database.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql
+      - backend/tests/calibration-registration-invariants.test.ts
+  - id: V11-INV-002
+    statement: Ground truth for a resolution must be external — a prediction cannot be resolved from the system's own internal tokens.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql
+      - backend/src/services/independent-resolver.service.ts
+  - id: V11-INV-003
+    statement: Resolution of the write-once prediction columns is firewalled to the dedicated resolution_service database role, not the producing service.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/016_resolution_service_role.sql
+      - backend/src/db/migrations/011_prediction_ledger.sql
+  - id: V11-INV-004
+    statement: Trust is computed only from resolved, non-post-hoc predictions using proper scoring rules (Brier / log score).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - backend/tests/trust-impact-real-metrics.test.ts
+  - id: V11-INV-005
+    statement: Trust is force-downgraded when the resolved sample is below five or the mean Brier score exceeds 0.25.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - backend/tests/trust-impact-real-metrics.test.ts
+  - id: V11-INV-006
+    statement: Trust is scoped per subject, domain, claim type, and time horizon — not a single global scalar.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - backend/src/db/migrations/009_trust_scores.sql
+  - id: V11-INV-007
+    statement: A prediction's registered probability is derived from the subject's prior calibration history, not chosen freely at resolution time.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/falsifiable-prediction.service.ts
+      - backend/tests/falsifiable-calibration-e2e.test.ts
+  - id: V11-INV-008
+    statement: Trust-policy changes are themselves canaried and governed before taking effect (calibration governs its own changes).
+    tier: statute
+    status: planned
+  - id: V11-INV-009
+    statement: Calibration drift is monitored continuously and raises a governed alert when a subject's ECE degrades beyond threshold.
+    tier: statute
+    status: planned
