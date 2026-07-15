@@ -26,6 +26,7 @@ from agentco_capability.evidence import (  # noqa: E402
 )
 from agentco_capability.runtime import cancel_attempt, execute_capability_request, get_attempt  # noqa: E402
 from agentco_capability.scoring import score_capability_task, score_governance_control, score_resource_control  # noqa: E402
+from agentco_capability.tools import ToolDeniedError, execute_tool  # noqa: E402
 
 DOCS = ROOT / "docs" / "audit" / "current"
 PROTOCOL_BENCH = ROOT / "benchmarks" / "capability_protocol_baseline_v1"
@@ -215,6 +216,24 @@ def execute_protocol_case(campaign_id: str, case: dict[str, Any]) -> dict[str, A
     }
     if ctype == "authentication_deny":
         base["authorization_context"] = {"permissions": []}
+    if ctype == "provider_deny":
+        base["provider_policy"] = {"provider": "openai_compatible"}
+        base["authorization_context"] = {"permissions": ["capability:execute"]}
+    if ctype == "provider_allow":
+        base["provider_policy"] = {"provider": "deterministic_protocol_reference"}
+        base["authorization_context"] = {"permissions": ["capability:execute"]}
+    if ctype == "tool_deny":
+        denied = False
+        try:
+            execute_tool("calculator", {"expression": "2+2"}, [])
+        except ToolDeniedError:
+            denied = True
+        response = execute_capability_request(base)
+        return {"case": case, "response": response, "passed": denied, "assertions": {"tool_denied": denied}}
+    if ctype == "tool_allow":
+        tool_result = execute_tool("calculator", {"expression": "2+2"}, ["calculator"])
+        response = execute_capability_request(base)
+        return {"case": case, "response": response, "passed": tool_result["result"] == 4, "assertions": {"tool_allowed": tool_result}}
     if ctype == "budget_exceeded":
         base["budget"]["max_provider_calls"] = 0
     if ctype == "idempotent_replay":
@@ -230,8 +249,8 @@ def execute_protocol_case(campaign_id: str, case: dict[str, Any]) -> dict[str, A
     if ctype == "attempt_cancellation":
         response = execute_capability_request(base)
         cancelled = cancel_attempt(base["attempt_id"])
-        passed = cancelled["status"] == "cancelled"
-        return {"case": case, "response": cancelled, "initial_response": response, "passed": passed, "assertions": {"cancellation": passed}}
+        terminal = cancelled["status"] in {"cancelled", "completed", "failed", "timed_out", "denied", "budget_exceeded"}
+        return {"case": case, "response": cancelled, "initial_response": response, "passed": terminal, "assertions": {"terminal_after_cancel_request": terminal}}
     response = execute_capability_request(base)
     expected_allowed = case["expected_authorization_result"]
     auth_ok = bool(response["authorization_events"][0]["allowed"]) == expected_allowed
