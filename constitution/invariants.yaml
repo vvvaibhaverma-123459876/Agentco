@@ -875,3 +875,47 @@ invariants:
     statement: The kernel protected-invariant registry is reconciled with the document-level invariant registry (constitution/invariants.yaml).
     tier: constitutional
     status: planned
+  - id: V10-INV-001
+    statement: Every decision is recorded in the append-only, hash-chained decision log.
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/004_decision_log.sql
+      - backend/src/db/migrations/014_decision_log_immutability_triggers.sql
+  - id: V10-INV-002
+    statement: Every recorded decision carries a calibrated confidence score in [0,1], not a bare yes/no.
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/004_decision_log.sql
+  - id: V10-INV-003
+    statement: Dissent from a decision is recordable and preserved where the layer supports it (judiciary today).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V10-INV-004
+    statement: Every governed decision records the assumptions it relied on, as structured data.
+    tier: article
+    status: planned
+  - id: V10-INV-005
+    statement: Every governed decision records the alternatives considered and why they were rejected.
+    tier: article
+    status: planned
+  - id: V10-INV-006
+    statement: Every governed decision records an expected outcome that can be resolved and scored (linking the decision to Trust).
+    tier: article
+    status: planned
+  - id: V10-INV-007
+    statement: Dissent is recordable at every decision-making layer, not only in the judiciary and coalitions.
+    tier: article
+    status: planned
+  - id: V10-INV-008
+    statement: A reasoning record is linked to the evidence and predictions it rests on, so the why is grounded, not narrated.
+    tier: article
+    status: planned
+  - id: V10-INV-009
+    statement: The reasoning record is queryable — a Reasoning Explorer can reconstruct why any decision was made.
+    tier: article
+    status: planned
