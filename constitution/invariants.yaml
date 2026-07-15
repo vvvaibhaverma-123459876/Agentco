@@ -1241,3 +1241,60 @@ invariants:
     statement: Long-term lineage is queryable end to end — any promoted memory can be traced to the events and evidence that produced it.
     tier: statute
     status: planned
+  - id: V30-INV-001
+    statement: The authoritative release gate is a fail-closed multi-step sequence, not a single command; any step failing fails the gate.
+    tier: statute
+    status: enforced
+    enforcement:
+      - Makefile
+  - id: V30-INV-002
+    statement: The release gate refuses fake-success and bypass patterns before running tests (gate integrity runs first).
+    tier: statute
+    status: enforced
+    enforcement:
+      - Makefile
+      - scripts/verify_gate_integrity.py
+  - id: V30-INV-003
+    statement: Every route is classified and a contract test fails the build on an unclassified route.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/route-auth-contract.test.ts
+      - docs/audit/ROUTE_SENSITIVITY_MATRIX.md
+  - id: V30-INV-004
+    statement: The decision-log hash chain is verified as part of the gate, detecting tampering.
+    tier: statute
+    status: enforced
+    enforcement:
+      - Makefile
+      - backend/src/db/migrations/012_decision_log_chain.sql
+  - id: V30-INV-005
+    statement: Adversarial and restart/replay behaviour is tested, not only happy paths.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/civilization-adversarial.test.ts
+      - backend/tests/red-team-corpus.test.ts
+  - id: V30-INV-006
+    statement: Completion is machine-derived from ledger evidence and states its predicate explicitly, never asserted in prose.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_civilization_completion.py
+      - .github/workflows/civilization-completion.yml
+  - id: V30-INV-007
+    statement: CI runs the constitution, civilization-completion, and integration audit workflows on push.
+    tier: statute
+    status: enforced
+    enforcement:
+      - .github/workflows/constitution.yml
+      - .github/workflows/civilization-completion.yml
+      - .github/workflows/runtime-integration-audit.yml
+  - id: V30-INV-008
+    statement: The release gate runs green against the built civilization code before any completion predicate is set true.
+    tier: statute
+    status: planned
+  - id: V30-INV-009
+    statement: Test coverage of enforced invariants is measured, so a constitutional enforced claim without a covering test is detected.
+    tier: statute
+    status: planned
