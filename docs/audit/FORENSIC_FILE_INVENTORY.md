@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1880`
+- Tracked files: `1876`
 
 ## Category Counts
 
@@ -12,9 +12,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 31 |
 | Deprecated code | 48 |
 | Development tooling | 138 |
-| Documentation | 424 |
+| Documentation | 422 |
 | Experimental code | 151 |
-| Generated artifact | 103 |
+| Generated artifact | 101 |
 | Production runtime code | 483 |
 | Prompt/template | 29 |
 | Test infrastructure | 279 |
@@ -30,9 +30,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts` | 150 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `reports` | 52 |
 | `runtime` | 51 |
 | `archive` | 48 |
+| `reports` | 48 |
 | `tests` | 41 |
 | `frontend` | 36 |
 | `reserve` | 33 |
@@ -1627,10 +1627,6 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports/system_run/latest/release_gate_verification.md` | Documentation |
 | `reports/system_run/latest/resolution_service_verification.json` | Generated artifact |
 | `reports/system_run/latest/score_validation.json` | Generated artifact |
-| `reports/system_run/latest/score_validation.json` | Generated artifact |
-| `reports/system_run/latest/score_validation.json` | Generated artifact |
-| `reports/system_run/latest/score_validation.md` | Documentation |
-| `reports/system_run/latest/score_validation.md` | Documentation |
 | `reports/system_run/latest/score_validation.md` | Documentation |
 | `requirements/README.md` | Development tooling |
 | `requirements/requirements-dev.txt` | Development tooling |
