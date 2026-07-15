@@ -1,6 +1,6 @@
 # Runtime Component Ledger
 
-Tracked structural snapshot input hash `4623bd6eb0c258f37ed21a46abee92f83e7aa5899c66c089e02ad0fdd39afbc6`.
+Tracked structural snapshot input hash `4081c14cc8daae52047676eede664b0c3904972036964ccd2ad3c6f888540334`.
 
 | component_id | path | classification | authoritative_status | process_type | entrypoint | external_dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -58,6 +58,8 @@ Tracked structural snapshot input hash `4623bd6eb0c258f37ed21a46abee92f83e7aa589
 | backend-src-routes-citizenship-routes-ts | backend/src/routes/citizenship.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-civilization-governance-routes-ts | backend/src/routes/civilization-governance.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-civilization-kernel-routes-ts | backend/src/routes/civilization-kernel.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-civilization-operator-routes-ts | backend/src/routes/civilization-operator.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-civilization-os-routes-ts | backend/src/routes/civilization-os.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-coalition-routes-ts | backend/src/routes/coalition.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-collective-knowledge-routes-ts | backend/src/routes/collective-knowledge.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-credential-routes-ts | backend/src/routes/credential.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
@@ -103,6 +105,9 @@ Tracked structural snapshot input hash `4623bd6eb0c258f37ed21a46abee92f83e7aa589
 | backend-src-services-citizenship-service-ts | backend/src/services/citizenship.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-kernel-service-ts | backend/src/services/civilization-kernel.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-live-flow-service-ts | backend/src/services/civilization-live-flow.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-civilization-metrics-service-ts | backend/src/services/civilization-metrics.service.ts | runtime_support | support | service | None | [] |
+| backend-src-services-civilization-operator-service-ts | backend/src/services/civilization-operator.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-civilization-os-service-ts | backend/src/services/civilization-os.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-runtime-service-ts | backend/src/services/civilization-runtime.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-civilization-scheduler-service-ts | backend/src/services/civilization-scheduler.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-civilization-service-ts | backend/src/services/civilization.service.ts | runtime_support | support | service | None | [] |
@@ -220,6 +225,7 @@ Tracked structural snapshot input hash `4623bd6eb0c258f37ed21a46abee92f83e7aa589
 | backend-src-types-action-types-ts | backend/src/types/action.types.ts | runtime_support | support | library | None | [] |
 | backend-src-types-capability-types-ts | backend/src/types/capability.types.ts | runtime_support | support | library | None | [] |
 | backend-src-types-specialist-roles-ts | backend/src/types/specialist-roles.ts | runtime_support | support | library | None | ['LLM provider'] |
+| backend-src-workers-civilization-scheduler-worker-ts | backend/src/workers/civilization-scheduler-worker.ts | runtime_support | support | library | None | [] |
 | backend-src-workers-outbox-worker-ts | backend/src/workers/outbox-worker.ts | authoritative_runtime | authoritative | worker | npm run agentco:outbox-worker | ['Kafka'] |
 | backend-src-workers-task-worker-ts | backend/src/workers/task-worker.ts | runtime_support | support | library | None | [] |
 | evals-enterprise-vendor-risk-init-py | evals/enterprise_vendor_risk/__init__.py | runtime_support | benchmark_support | evaluation_support | None | [] |

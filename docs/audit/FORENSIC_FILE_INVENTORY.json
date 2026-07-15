@@ -1,22 +1,22 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1918,
+  "tracked_file_count": 1930,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 140,
-    "Documentation": 426,
+    "Documentation": 429,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
     "Prompt/template": 29,
-    "Test infrastructure": 284,
-    "Unknown purpose": 61
+    "Test infrastructure": 286,
+    "Unknown purpose": 68
   },
   "top_level_counts": {
     "backend": 505,
-    "docs": 353,
+    "docs": 356,
     "evals": 180,
     "scripts": 152,
     "agents": 111,
@@ -24,7 +24,7 @@
     "reports": 64,
     "runtime": 51,
     "archive": 48,
-    "tests": 41,
+    "tests": 43,
     "frontend": 37,
     "reserve": 33,
     "calibration": 30,
@@ -38,13 +38,13 @@
     "synthesis": 10,
     "cross_version_adapters": 9,
     "ingestion": 9,
-    "agentco_capability": 7,
+    "agentco_capability": 8,
+    "benchmarks": 8,
     "schemas": 7,
     "constitution": 5,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
-    "benchmarks": 2,
     "dashboard": 2,
     "data": 2,
     "foundry": 2,
@@ -82,10 +82,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 585,
-    ".md": 445,
+    ".py": 588,
+    ".md": 446,
     ".ts": 340,
-    ".json": 199,
+    ".json": 207,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -310,6 +310,12 @@
     },
     {
       "path": "agentco_capability/runtime.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/scoring.py",
       "category": "Unknown purpose",
       "top_level": "agentco_capability",
       "extension": ".py"
@@ -5001,6 +5007,42 @@
       "extension": ".md"
     },
     {
+      "path": "benchmarks/capability_genesis_v2/development/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/fixtures/fixtures.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/hidden/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/rubrics/rubrics.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/validation/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
       "path": "benchmarks/registry.json",
       "category": "Unknown purpose",
       "top_level": "benchmarks",
@@ -6286,6 +6328,24 @@
     },
     {
       "path": "docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_FREEZE.json",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
@@ -11410,6 +11470,18 @@
     },
     {
       "path": "tests/test_build_ledger.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_genesis_v2.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_provider_adapters.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

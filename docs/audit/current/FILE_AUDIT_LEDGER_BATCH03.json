@@ -1,5 +1,5 @@
 {
-  "active_runtime_files_reviewed": 62,
+  "active_runtime_files_reviewed": 64,
   "note": "Batch 03 reviews active runtime scope only; this is not a full repository line audit.",
   "reviewed_files": [
     "agents/autonomy/__init__.py",
@@ -56,6 +56,8 @@
     "backend/src/routes/citizenship.routes.ts",
     "backend/src/routes/civilization-governance.routes.ts",
     "backend/src/routes/civilization-kernel.routes.ts",
+    "backend/src/routes/civilization-operator.routes.ts",
+    "backend/src/routes/civilization-os.routes.ts",
     "backend/src/routes/coalition.routes.ts",
     "backend/src/routes/collective-knowledge.routes.ts",
     "backend/src/routes/credential.routes.ts",
@@ -101,6 +103,9 @@
     "backend/src/services/citizenship.service.ts",
     "backend/src/services/civilization-kernel.service.ts",
     "backend/src/services/civilization-live-flow.service.ts",
+    "backend/src/services/civilization-metrics.service.ts",
+    "backend/src/services/civilization-operator.service.ts",
+    "backend/src/services/civilization-os.service.ts",
     "backend/src/services/civilization-runtime.service.ts",
     "backend/src/services/civilization-scheduler.service.ts",
     "backend/src/services/civilization.service.ts",
@@ -218,6 +223,7 @@
     "backend/src/types/action.types.ts",
     "backend/src/types/capability.types.ts",
     "backend/src/types/specialist-roles.ts",
+    "backend/src/workers/civilization-scheduler-worker.ts",
     "backend/src/workers/outbox-worker.ts",
     "backend/src/workers/task-worker.ts",
     "evals/enterprise_vendor_risk/__init__.py",
@@ -289,5 +295,5 @@
     "runtime/tests/test_spend_guardrail_ledger.py",
     "runtime/tool_registry/__init__.py"
   ],
-  "source_input_hash": "4623bd6eb0c258f37ed21a46abee92f83e7aa5899c66c089e02ad0fdd39afbc6"
+  "source_input_hash": "4081c14cc8daae52047676eede664b0c3904972036964ccd2ad3c6f888540334"
 }

@@ -32,12 +32,12 @@ Repository purpose: AgentCo exists to evolve into progressively more general int
 
 | Metric | Value |
 |---|---:|
-| total_files_discovered | 1918 |
-| files_inventoried | 1918 |
+| total_files_discovered | 1930 |
+| files_inventoried | 1930 |
 | files_line_audited | 0 |
 | files_excluded | 0 |
 | file_audit_note | All tracked files are inventoried. Line-level review is intentionally not marked complete by this generated control ledger. |
-| tests_discovered | 302 |
+| tests_discovered | 304 |
 | workflows_discovered | 8 |
 | workflows_tested_or_gated | 8 |
 | integrations_discovered | 8 |

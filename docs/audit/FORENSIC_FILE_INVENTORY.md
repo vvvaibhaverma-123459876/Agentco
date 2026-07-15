@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1918`
+- Tracked files: `1930`
 
 ## Category Counts
 
@@ -12,20 +12,20 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 140 |
-| Documentation | 426 |
+| Documentation | 429 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 284 |
-| Unknown purpose | 61 |
+| Test infrastructure | 286 |
+| Unknown purpose | 68 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 353 |
+| `docs` | 356 |
 | `evals` | 180 |
 | `scripts` | 152 |
 | `agents` | 111 |
@@ -33,7 +33,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
-| `tests` | 41 |
+| `tests` | 43 |
 | `frontend` | 37 |
 | `reserve` | 33 |
 | `calibration` | 30 |
@@ -47,13 +47,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `agentco_capability` | 7 |
+| `agentco_capability` | 8 |
+| `benchmarks` | 8 |
 | `schemas` | 7 |
 | `constitution` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
-| `benchmarks` | 2 |
 | `dashboard` | 2 |
 | `data` | 2 |
 | `foundry` | 2 |
@@ -128,6 +128,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `agentco_capability/models.py` | Unknown purpose |
 | `agentco_capability/providers.py` | Unknown purpose |
 | `agentco_capability/runtime.py` | Unknown purpose |
+| `agentco_capability/scoring.py` | Unknown purpose |
 | `agentco_capability/storage.py` | Unknown purpose |
 | `agentco_capability/tools.py` | Unknown purpose |
 | `agentco_security/__init__.py` | Production runtime code |
@@ -909,6 +910,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/working-eyes.test.ts` | Test infrastructure |
 | `backend/tsconfig.json` | Development tooling |
 | `benchmarks/README.md` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/validation/cases.json` | Unknown purpose |
 | `benchmarks/registry.json` | Unknown purpose |
 | `calibration/BENCHMARK_ANALYSIS.md` | Production runtime code |
 | `calibration/__init__.py` | Production runtime code |
@@ -1124,6 +1131,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.md` | Documentation |
 | `docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json` | Documentation |
 | `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_FREEZE.json` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
@@ -1978,6 +1988,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/integration/test_resolution_service_role_migration.py` | Test infrastructure |
 | `tests/integration/test_web_scraper_hardened.py` | Test infrastructure |
 | `tests/test_build_ledger.py` | Test infrastructure |
+| `tests/test_capability_genesis_v2.py` | Test infrastructure |
+| `tests/test_capability_provider_adapters.py` | Test infrastructure |
 | `tests/test_capability_runtime.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
 | `tests/test_civilization_vertical_slice.py` | Test infrastructure |
