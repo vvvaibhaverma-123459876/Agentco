@@ -36,6 +36,16 @@ DOC_STATUS = {"not written", "in progress", "written"}
 INV_ID = re.compile(r"^V(\d+)-INV-(\d{3})$")
 INV_MENTION = re.compile(r"\bV(\d+)-INV-(\d{3})\b")
 
+# Domain Neutrality (V0-INV-009): no top-level architectural component may be
+# named for a specific knowledge domain or profession. Domain expertise emerges
+# through the capability/domain/institution/knowledge-discovery frameworks.
+DOMAIN_LEXICON = [
+    "coding", "coder", "physics", "physicist", "chemistry", "chemist",
+    "biology", "biologist", "finance", "financial", "mathematics", "medicine",
+    "medical", "robotics", "law", "lawyer", "science", "scientific",
+]
+DOMAIN_TERM = re.compile(r"\b(" + "|".join(DOMAIN_LEXICON) + r")\b", re.IGNORECASE)
+
 SECTIONS = [
     "## 1. Header",
     "## 2. Purpose",
@@ -88,6 +98,12 @@ def parse_index() -> dict[int, dict[str, str]]:
             err(f"INDEX.md: volume {vol} has invalid epistemic status '{cells[4]}'")
         if cells[5] not in DOC_STATUS:
             err(f"INDEX.md: volume {vol} has invalid doc status '{cells[5]}'")
+        m = DOMAIN_TERM.search(cells[2])
+        if m:
+            err(
+                f"INDEX.md: volume {vol} name '{cells[2]}' violates Domain Neutrality "
+                f"(V0-INV-009) — domain-specific term '{m.group(1)}'"
+            )
     if not rows:
         err("INDEX.md: no volume table rows found")
     return rows

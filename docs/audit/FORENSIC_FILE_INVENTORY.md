@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1930`
+- Tracked files: `1945`
 
 ## Category Counts
 
@@ -12,25 +12,25 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 140 |
-| Documentation | 429 |
+| Documentation | 439 |
 | Experimental code | 151 |
-| Generated artifact | 116 |
+| Generated artifact | 118 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
 | Test infrastructure | 286 |
-| Unknown purpose | 68 |
+| Unknown purpose | 71 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 356 |
+| `docs` | 364 |
 | `evals` | 180 |
 | `scripts` | 152 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `reports` | 64 |
+| `reports` | 68 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `tests` | 43 |
@@ -49,8 +49,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `ingestion` | 9 |
 | `agentco_capability` | 8 |
 | `benchmarks` | 8 |
+| `constitution` | 8 |
 | `schemas` | 7 |
-| `constitution` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -964,10 +964,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `civilization/services/structured_logger.py` | Production runtime code |
 | `conftest.py` | Unknown purpose |
 | `constitution/CONVENTIONS.md` | Unknown purpose |
+| `constitution/GENERALIZATION_REPORT.md` | Unknown purpose |
 | `constitution/INDEX.md` | Unknown purpose |
 | `constitution/TEMPLATE.md` | Unknown purpose |
 | `constitution/invariants.yaml` | Unknown purpose |
 | `constitution/volumes/VOL-00-vision.md` | Unknown purpose |
+| `constitution/volumes/VOL-01-constitutional-core.md` | Unknown purpose |
+| `constitution/volumes/VOL-32-security-and-threat-model.md` | Unknown purpose |
 | `cross_version_adapters/__init__.py` | Unknown purpose |
 | `cross_version_adapters/backend_runtime_adapter.py` | Unknown purpose |
 | `cross_version_adapters/base.py` | Unknown purpose |
@@ -1063,8 +1066,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/CONTROLLED_LEARNING_REPORT.json` | Documentation |
 | `docs/audit/EVALUATION_CALIBRATION_REPORT.json` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_REMEDIATION_STATUS_2026_07_12.md` | Documentation |
 | `docs/audit/PHASE10_NOTES.md` | Documentation |
@@ -1678,6 +1689,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports/system_run/latest/release_gate_verification.md` | Documentation |
 | `reports/system_run/latest/resolution_service_verification.json` | Generated artifact |
 | `reports/system_run/latest/score_validation.json` | Generated artifact |
+| `reports/system_run/latest/score_validation.json` | Generated artifact |
+| `reports/system_run/latest/score_validation.json` | Generated artifact |
+| `reports/system_run/latest/score_validation.md` | Documentation |
+| `reports/system_run/latest/score_validation.md` | Documentation |
 | `reports/system_run/latest/score_validation.md` | Documentation |
 | `requirements/README.md` | Development tooling |
 | `requirements/requirements-dev.txt` | Development tooling |

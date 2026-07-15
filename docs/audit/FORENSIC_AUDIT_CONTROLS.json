@@ -254,8 +254,8 @@
     }
   ],
   "finding_completeness_ledger": {
-    "total_files_discovered": 1930,
-    "files_inventoried": 1930,
+    "total_files_discovered": 1945,
+    "files_inventoried": 1945,
     "files_line_audited": 0,
     "files_excluded": 0,
     "file_audit_note": "All tracked files are inventoried. Line-level review is intentionally not marked complete by this generated control ledger.",
