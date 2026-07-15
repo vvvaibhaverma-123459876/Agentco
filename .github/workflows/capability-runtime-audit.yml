@@ -15,6 +15,19 @@ on:
       - "backend/tests/capability-runtime.test.ts"
       - "Makefile"
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "Genesis V2 mode"
+        required: true
+        default: "protocol-reference"
+        type: choice
+        options:
+          - protocol-reference
+          - real-capability-provider
+      provider:
+        description: "Optional provider id for real-capability-provider mode"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -30,6 +43,8 @@ jobs:
     timeout-minutes: 45
     env:
       EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      GENESIS_MODE: ${{ github.event.inputs.mode || 'protocol-reference' }}
+      GENESIS_PROVIDER: ${{ github.event.inputs.provider || '' }}
     steps:
       - name: Checkout exact head
         uses: actions/checkout@v4
@@ -62,8 +77,13 @@ jobs:
       - name: Backend build
         run: cd backend && npm run build
 
-      - name: Capability genesis campaign
-        run: make governed-capability-genesis
+      - name: Capability genesis V2 campaign
+        run: |
+          if [ -n "$GENESIS_PROVIDER" ]; then
+            python3.13 scripts/run_governed_capability_genesis.py --mode "$GENESIS_MODE" --provider "$GENESIS_PROVIDER"
+          else
+            python3.13 scripts/run_governed_capability_genesis.py --mode "$GENESIS_MODE"
+          fi
 
       - name: Verify genesis commit binding
         run: |
@@ -71,9 +91,15 @@ jobs:
           import json
           import os
           from pathlib import Path
-          manifest = json.loads(Path("artifacts/capability-runtime/governed-capability-genesis-v1/GENESIS_MANIFEST.json").read_text())
+          mode = os.environ["GENESIS_MODE"]
+          manifest_path = Path("artifacts/capability-runtime") / f"governed-capability-genesis-v2-{mode}" / "GENESIS_V2_MANIFEST.json"
+          manifest = json.loads(manifest_path.read_text())
           if manifest["campaign_execution_sha"] != os.environ["EXPECTED_AUDIT_SHA"]:
               raise SystemExit("genesis manifest SHA does not match workflow head")
+          if mode == "protocol-reference" and manifest["decision"] != "PROTOCOL_BASELINE_ACCEPTED":
+              raise SystemExit("protocol-reference genesis did not pass")
+          if mode == "real-capability-provider" and manifest["decision"] not in {"CAPABILITY_GENESIS_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}:
+              raise SystemExit("real-capability-provider genesis did not produce a valid decision")
           PY
 
       - name: Upload capability runtime artifacts
@@ -83,6 +109,7 @@ jobs:
           name: capability-runtime-${{ github.event.pull_request.head.sha || github.sha }}
           path: |
             artifacts/capability-runtime/**
-            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_RESULTS.*
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.*
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_*
           if-no-files-found: warn
           retention-days: 120
