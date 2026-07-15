@@ -1,37 +1,39 @@
 # Runtime Reachability
 
-Tracked structural snapshot input hash `6b793e0c16f912a6342d70fdd1602cefc18d7c3cc687981eeca8225d66bc78b7`.
+Tracked structural snapshot input hash `6b771fc38fb382b88877f86b65e3f71e580313204ce010a0aef62c6cb5f6ec6d`.
 
 | entry_point | registration_location | first_handler | status | runtime_trace |
 | --- | --- | --- | --- | --- |
-| Fastify route module websocket | backend/src/server.ts:58 | websocket | verified_static_registration | make audit-runtime-integration |
-| Fastify route module agentRoutes | backend/src/server.ts:116 | agentRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module overrideRoutes | backend/src/server.ts:117 | overrideRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module auditRoutes | backend/src/server.ts:118 | auditRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module credentialRoutes | backend/src/server.ts:119 | credentialRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module learningRoutes | backend/src/server.ts:120 | learningRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module autonomyTaskRoutes | backend/src/server.ts:121 | autonomyTaskRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module autonomyOrchestratorRoutes | backend/src/server.ts:122 | autonomyOrchestratorRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module autonomyDashboardRoutes | backend/src/server.ts:123 | autonomyDashboardRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module civilizationGovernanceRoutes | backend/src/server.ts:124 | civilizationGovernanceRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module civilizationKernelRoutes | backend/src/server.ts:125 | civilizationKernelRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module citizenshipRoutes | backend/src/server.ts:126 | citizenshipRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module societyRoutes | backend/src/server.ts:127 | societyRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module coalitionRoutes | backend/src/server.ts:128 | coalitionRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module missionRoutes | backend/src/server.ts:129 | missionRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module treasuryRoutes | backend/src/server.ts:130 | treasuryRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module governanceProposalRoutes | backend/src/server.ts:131 | governanceProposalRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module judiciaryCaseRoutes | backend/src/server.ts:132 | judiciaryCaseRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module collectiveKnowledgeRoutes | backend/src/server.ts:133 | collectiveKnowledgeRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module safeEvolutionRoutes | backend/src/server.ts:134 | safeEvolutionRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module capabilityExpansionRoutes | backend/src/server.ts:135 | capabilityExpansionRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module governanceRoutes | backend/src/server.ts:136 | governanceRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module institutionWorkAssignmentRoutes | backend/src/server.ts:137 | institutionWorkAssignmentRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module goalHierarchyRoutes | backend/src/server.ts:138 | goalHierarchyRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module phase3HardeningRoutes | backend/src/server.ts:139 | phase3HardeningRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module identityRoutes | backend/src/server.ts:140 | identityRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module resourceLedgerRoutes | backend/src/server.ts:141 | resourceLedgerRoutes | verified_static_registration | make audit-runtime-integration |
-| Fastify route module systemRoutes | backend/src/server.ts:142 | systemRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module websocket | backend/src/server.ts:60 | websocket | verified_static_registration | make audit-runtime-integration |
+| Fastify route module agentRoutes | backend/src/server.ts:118 | agentRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module overrideRoutes | backend/src/server.ts:119 | overrideRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module auditRoutes | backend/src/server.ts:120 | auditRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module credentialRoutes | backend/src/server.ts:121 | credentialRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module learningRoutes | backend/src/server.ts:122 | learningRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module autonomyTaskRoutes | backend/src/server.ts:123 | autonomyTaskRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module autonomyOrchestratorRoutes | backend/src/server.ts:124 | autonomyOrchestratorRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module autonomyDashboardRoutes | backend/src/server.ts:125 | autonomyDashboardRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module civilizationGovernanceRoutes | backend/src/server.ts:126 | civilizationGovernanceRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module civilizationKernelRoutes | backend/src/server.ts:127 | civilizationKernelRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module citizenshipRoutes | backend/src/server.ts:128 | citizenshipRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module societyRoutes | backend/src/server.ts:129 | societyRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module coalitionRoutes | backend/src/server.ts:130 | coalitionRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module missionRoutes | backend/src/server.ts:131 | missionRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module treasuryRoutes | backend/src/server.ts:132 | treasuryRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module governanceProposalRoutes | backend/src/server.ts:133 | governanceProposalRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module judiciaryCaseRoutes | backend/src/server.ts:134 | judiciaryCaseRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module collectiveKnowledgeRoutes | backend/src/server.ts:135 | collectiveKnowledgeRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module safeEvolutionRoutes | backend/src/server.ts:136 | safeEvolutionRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module capabilityExpansionRoutes | backend/src/server.ts:137 | capabilityExpansionRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module civilizationOsRoutes | backend/src/server.ts:138 | civilizationOsRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module civilizationOperatorRoutes | backend/src/server.ts:139 | civilizationOperatorRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module governanceRoutes | backend/src/server.ts:140 | governanceRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module institutionWorkAssignmentRoutes | backend/src/server.ts:141 | institutionWorkAssignmentRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module goalHierarchyRoutes | backend/src/server.ts:142 | goalHierarchyRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module phase3HardeningRoutes | backend/src/server.ts:143 | phase3HardeningRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module identityRoutes | backend/src/server.ts:144 | identityRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module resourceLedgerRoutes | backend/src/server.ts:145 | resourceLedgerRoutes | verified_static_registration | make audit-runtime-integration |
+| Fastify route module systemRoutes | backend/src/server.ts:146 | systemRoutes | verified_static_registration | make audit-runtime-integration |
 | GET /api/agents | backend/src/routes/agents.routes.ts:14 | backend/src/routes/agents.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | GET /api/agents/tasks | backend/src/routes/agents.routes.ts:143 | backend/src/routes/agents.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | GET /api/audit | backend/src/routes/audit.routes.ts:5 | backend/src/routes/audit.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
@@ -112,6 +114,14 @@ Tracked structural snapshot input hash `6b793e0c16f912a6342d70fdd1602cefc18d7c3c
 | POST /api/civilization/kernel/:civilizationId/objectives | backend/src/routes/civilization-kernel.routes.ts:151 | backend/src/routes/civilization-kernel.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | POST /api/civilization/kernel/objectives/:objectiveId/status | backend/src/routes/civilization-kernel.routes.ts:167 | backend/src/routes/civilization-kernel.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | GET /api/civilization/kernel/:civilizationId/objectives | backend/src/routes/civilization-kernel.routes.ts:182 | backend/src/routes/civilization-kernel.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| GET /api/civilization/operator/overview | backend/src/routes/civilization-operator.routes.ts:7 | backend/src/routes/civilization-operator.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| POST /api/civilization/os/tick | backend/src/routes/civilization-os.routes.ts:15 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| GET /api/civilization/os/status | backend/src/routes/civilization-os.routes.ts:19 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| GET /api/civilization/os/ticks | backend/src/routes/civilization-os.routes.ts:23 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| GET /api/civilization/os/recover | backend/src/routes/civilization-os.routes.ts:30 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| POST /api/civilization/os/start | backend/src/routes/civilization-os.routes.ts:34 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| POST /api/civilization/os/stop | backend/src/routes/civilization-os.routes.ts:41 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
+| POST /api/civilization/os/mode | backend/src/routes/civilization-os.routes.ts:48 | backend/src/routes/civilization-os.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | POST /api/civilization/coalitions | backend/src/routes/coalition.routes.ts:15 | backend/src/routes/coalition.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | GET /api/civilization/coalitions/:coalitionId | backend/src/routes/coalition.routes.ts:25 | backend/src/routes/coalition.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
 | POST /api/civilization/coalitions/:coalitionId/negotiate | backend/src/routes/coalition.routes.ts:34 | backend/src/routes/coalition.routes.ts | verified_static_route | make audit-runtime-integration for health/agents/outbox paths |
