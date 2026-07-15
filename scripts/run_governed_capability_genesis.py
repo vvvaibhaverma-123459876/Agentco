@@ -120,6 +120,15 @@ def score_case(case: dict[str, Any], response: dict[str, Any], mode: str) -> dic
     }
 
 
+def contains_evaluator_only_key(value: Any) -> bool:
+    forbidden = {"expected", "expected_answer", "expected_hash", "rubric", "rubric_hash", "scoring_threshold"}
+    if isinstance(value, dict):
+        return any(str(key).lower() in forbidden or contains_evaluator_only_key(item) for key, item in value.items())
+    if isinstance(value, list):
+        return any(contains_evaluator_only_key(item) for item in value)
+    return False
+
+
 def write_payload_manifest(artifact: Path, files: list[Path], head: str, campaign_id: str, extra: dict[str, Any]) -> str:
     rows = [
         {"path": str(path.relative_to(artifact)), "sha256": file_hash(path), "size_bytes": path.stat().st_size}
@@ -183,7 +192,7 @@ def run_v2(mode: str, provider: str) -> int:
     unsupported = [item for item in results if item["response"]["status"] == "unsupported"]
     timeouts = [item for item in results if item["response"]["status"] == "timed_out"]
     capability_domains = sorted({item["case"]["domain"] for item in completed if mode == "real-capability-provider"})
-    hidden_leakage = any("expected" in json.dumps(item["request"]).lower() or "rubric" in json.dumps(item["request"]).lower() for item in results)
+    hidden_leakage = any(contains_evaluator_only_key(item["request"]) for item in results)
 
     if mode == "protocol-reference":
         decision = "PROTOCOL_BASELINE_ACCEPTED" if len(completed) == len(cases) and not hidden_leakage else "PROTOCOL_BASELINE_REJECTED"
