@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-14T15:48:15.499891+00:00",
-  "commit": "6182ac79cf5fdcfda5d8defdd919ac230d51808b",
+  "generated_at": "2026-07-15T03:09:17.031166+00:00",
+  "commit": "246f46fc12dbb55a2c79dda0686fd0aa65552c18",
   "branch": "feature/civilization-layer",
-  "git_dirty": true,
+  "git_dirty": false,
   "scenario": "D_judiciary_and_appeal",
   "proof_suite": "backend/tests/judiciary-case.test.ts",
   "proof_present": true,

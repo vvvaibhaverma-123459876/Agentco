@@ -1,10 +1,11 @@
 # Final Civilization Completion Report
 
-- Generated: 2026-07-14T15:48:15.499891+00:00
-- Commit: `6182ac79cf5fdcfda5d8defdd919ac230d51808b`
+- Generated: 2026-07-15T03:09:17.031166+00:00
+- Commit: `246f46fc12dbb55a2c79dda0686fd0aa65552c18`
 - Branch: `feature/civilization-layer`
-- Git dirty at generation: True
-- Reconciliation passed: **True**
+- Git dirty at generation: False
+- Reconciliation passed: **True** (structural evidence checks listed below)
+- Termination predicate met: **False** — canonical release gates outstanding; see `docs/civilization/OUTSTANDING_GATES.md`
 
 ## Ledger rollup
 - Total items: 64
@@ -35,3 +36,10 @@ means the implementation and deployment contract are production quality. Hosted
 production certification (continuous SLOs, DR, backups, incident response,
 long-running operational evidence) requires an actual live deployment and is
 intentionally NOT claimed by this report.
+
+## Outstanding gates
+The brief's canonical release gates have not all been executed against the
+built code (release-gate, post-build runtime reachability, full-tree
+anti-stub sweep, full coordinator-driven reachability of every registered
+service). Until they run green, the correct status is 'implemented; gates
+outstanding', not 'complete'. Details: `docs/civilization/OUTSTANDING_GATES.md`.
