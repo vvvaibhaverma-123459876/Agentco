@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1933`
+- Tracked files: `1953`
 
 ## Category Counts
 
@@ -11,44 +11,44 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 139 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 140 |
-| Documentation | 429 |
+| Development tooling | 142 |
+| Documentation | 432 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 286 |
-| Unknown purpose | 71 |
+| Test infrastructure | 292 |
+| Unknown purpose | 80 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 356 |
+| `docs` | 359 |
 | `evals` | 180 |
-| `scripts` | 152 |
+| `scripts` | 154 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
 | `runtime` | 51 |
+| `tests` | 49 |
 | `archive` | 48 |
-| `tests` | 43 |
 | `frontend` | 37 |
 | `reserve` | 33 |
 | `calibration` | 30 |
 | `infrastructure` | 21 |
 | `results` | 20 |
 | `selfcoding` | 17 |
+| `benchmarks` | 16 |
 | `civilization` | 15 |
 | `autonomy` | 13 |
 | `learning` | 13 |
 | `.github` | 11 |
 | `synthesis` | 10 |
+| `agentco_capability` | 9 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `agentco_capability` | 8 |
-| `benchmarks` | 8 |
 | `constitution` | 8 |
 | `schemas` | 7 |
 | `requirements` | 4 |
@@ -125,6 +125,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `SYSTEM_CIVILIZATION.md` | Unknown purpose |
 | `agentco_capability/__init__.py` | Unknown purpose |
 | `agentco_capability/__main__.py` | Unknown purpose |
+| `agentco_capability/evidence.py` | Unknown purpose |
 | `agentco_capability/models.py` | Unknown purpose |
 | `agentco_capability/providers.py` | Unknown purpose |
 | `agentco_capability/runtime.py` | Unknown purpose |
@@ -916,6 +917,14 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `benchmarks/capability_genesis_v2/registry.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v2/rubrics/rubrics.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v2/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v1/cases/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v1/registry.json` | Unknown purpose |
 | `benchmarks/registry.json` | Unknown purpose |
 | `calibration/BENCHMARK_ANALYSIS.md` | Production runtime code |
 | `calibration/__init__.py` | Production runtime code |
@@ -1137,6 +1146,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
@@ -1922,6 +1934,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
 | `scripts/verify_benchmark_governance.py` | Development tooling |
 | `scripts/verify_campaign_evidence_binding.py` | Development tooling |
+| `scripts/verify_capability_genesis_artifact.py` | Development tooling |
+| `scripts/verify_capability_genesis_freeze.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_cross_version_campaign.py` | Development tooling |
 | `scripts/verify_cross_version_harness_independence.py` | Development tooling |
@@ -1991,7 +2005,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/integration/test_resolution_service_role_migration.py` | Test infrastructure |
 | `tests/integration/test_web_scraper_hardened.py` | Test infrastructure |
 | `tests/test_build_ledger.py` | Test infrastructure |
+| `tests/test_capability_anti_gaming.py` | Test infrastructure |
 | `tests/test_capability_genesis_v2.py` | Test infrastructure |
+| `tests/test_capability_genesis_v3.py` | Test infrastructure |
 | `tests/test_capability_provider_adapters.py` | Test infrastructure |
 | `tests/test_capability_runtime.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
@@ -1999,7 +2015,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_clean_room_evidence_controls.py` | Test infrastructure |
 | `tests/test_compose_bind_sources.py` | Test infrastructure |
 | `tests/test_cross_version_campaign.py` | Test infrastructure |
+| `tests/test_data_capability_workspace.py` | Test infrastructure |
 | `tests/test_db_client_runtime_config.py` | Test infrastructure |
+| `tests/test_domain_scorers.py` | Test infrastructure |
 | `tests/test_durable_runtime_cleanup.py` | Test infrastructure |
 | `tests/test_execute_durable_task.py` | Test infrastructure |
 | `tests/test_forensic_inventory.py` | Test infrastructure |
@@ -2009,7 +2027,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_longitudinal_remote_closure.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
+| `tests/test_protocol_baseline.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
+| `tests/test_software_capability_workspace.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
 | `tests/test_specialist_isolation_verification.py` | Test infrastructure |
 | `tests/test_staging_deployment_controls.py` | Test infrastructure |

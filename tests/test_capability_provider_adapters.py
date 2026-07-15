@@ -1,60 +1,39 @@
 from __future__ import annotations
 
 import json
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
+import agentco_capability.providers as providers
 from agentco_capability.runtime import execute_capability_request
 
 
-class ProviderHandler(BaseHTTPRequestHandler):
-    seen: list[dict] = []
-    failures_before_success: int = 0
+class FakeTransport:
+    def __init__(self, failures_before_success: int = 0):
+        self.seen: list[dict] = []
+        self.failures_before_success = failures_before_success
 
-    def do_POST(self):  # noqa: N802
-        length = int(self.headers.get("content-length", "0"))
-        payload = json.loads(self.rfile.read(length).decode())
-        ProviderHandler.seen.append({"path": self.path, "payload": payload, "authorization": self.headers.get("authorization")})
-        if ProviderHandler.failures_before_success > 0:
-            ProviderHandler.failures_before_success -= 1
-            self.send_response(429)
-            self.end_headers()
-            return
-        if self.path.endswith("/chat/completions"):
-            body = {
+    def __call__(self, url, payload, headers, timeout, max_bytes):
+        self.seen.append({"url": url, "payload": payload, "headers": headers, "timeout": timeout, "max_bytes": max_bytes})
+        if self.failures_before_success > 0:
+            self.failures_before_success -= 1
+            raise providers.ProviderResponseError("retryable_http_429")
+        if url.endswith("/chat/completions"):
+            return {
                 "id": "openai-local-response",
                 "model": "local-openai-model",
                 "choices": [{"message": {"content": "provider answer"}, "finish_reason": "stop"}],
                 "usage": {"prompt_tokens": 3, "completion_tokens": 2, "total_tokens": 5},
+                "_agentco_latency_ms": 1.0,
             }
-        elif self.path.endswith("/v1/messages"):
-            body = {
+        if url.endswith("/v1/messages"):
+            return {
                 "id": "anthropic-local-response",
                 "model": "local-anthropic-model",
                 "content": [{"type": "text", "text": "anthropic answer"}],
                 "usage": {"input_tokens": 3, "output_tokens": 2},
                 "stop_reason": "end_turn",
+                "_agentco_latency_ms": 1.0,
             }
-        else:
-            body = {"id": "generic-local-response", "answer": {"text": "generic answer"}, "usage": {"requests": 1}}
-        raw = json.dumps(body).encode()
-        self.send_response(200)
-        self.send_header("content-type", "application/json")
-        self.send_header("content-length", str(len(raw)))
-        self.end_headers()
-        self.wfile.write(raw)
-
-    def log_message(self, *_args):
-        return
-
-
-def start_server():
-    ProviderHandler.seen = []
-    ProviderHandler.failures_before_success = 0
-    server = HTTPServer(("127.0.0.1", 0), ProviderHandler)
-    thread = threading.Thread(target=server.serve_forever, daemon=True)
-    thread.start()
-    return server
+        return {"id": "generic-local-response", "answer": {"text": "generic answer"}, "usage": {"requests": 1}, "_agentco_latency_ms": 1.0}
 
 
 def base_request(provider: str):
@@ -83,57 +62,57 @@ def test_openai_compatible_adapter_uses_configured_endpoint(monkeypatch, tmp_pat
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
     monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
-    server = start_server()
-    base_url = f"http://127.0.0.1:{server.server_port}/v1"
+    fake = FakeTransport()
+    monkeypatch.setattr(providers, "_post_json_once", fake)
+    base_url = "http://127.0.0.1:12345/v1"
     monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
     monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
     monkeypatch.setenv("OPENAI_BASE_URL", base_url)
     monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "127.0.0.1")
 
     response = execute_capability_request(base_request("openai_compatible"))
-    server.shutdown()
 
     assert response["status"] == "completed"
     assert response["answer"] == "provider answer"
     assert response["provider_usage"]["total_tokens"] == 5
     assert response["structured_output"]["finish_reason"] == "stop"
     assert response["request_metadata"]["headers"]["Authorization"] == "[REDACTED]"
-    assert "structured_input" in ProviderHandler.seen[-1]["payload"]["messages"][1]["content"]
+    assert "structured_input" in fake.seen[-1]["payload"]["messages"][1]["content"]
 
 
 def test_anthropic_compatible_adapter_uses_messages_contract(monkeypatch, tmp_path):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
     monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
-    server = start_server()
-    base_url = f"http://127.0.0.1:{server.server_port}"
+    fake = FakeTransport()
+    monkeypatch.setattr(providers, "_post_json_once", fake)
+    base_url = "http://127.0.0.1:12345"
     monkeypatch.setenv("ANTHROPIC_API_KEY", "secret-anthropic")
     monkeypatch.setenv("ANTHROPIC_MODEL", "local-anthropic-model")
     monkeypatch.setenv("ANTHROPIC_BASE_URL", base_url)
     monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "127.0.0.1")
 
     response = execute_capability_request(base_request("anthropic_compatible"))
-    server.shutdown()
 
     assert response["status"] == "completed"
     assert response["answer"] == "anthropic answer"
     assert response["provider_usage"]["output_tokens"] == 2
-    assert ProviderHandler.seen[-1]["path"] == "/v1/messages"
+    assert fake.seen[-1]["url"].endswith("/v1/messages")
 
 
 def test_generic_http_adapter_extracts_configured_answer(monkeypatch, tmp_path):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
     monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
-    server = start_server()
-    url = f"http://127.0.0.1:{server.server_port}/execute"
+    fake = FakeTransport()
+    monkeypatch.setattr(providers, "_post_json_once", fake)
+    url = "http://127.0.0.1:12345/execute"
     monkeypatch.setenv("AGENTCO_GENERIC_PROVIDER_URL", url)
     monkeypatch.setenv("AGENTCO_GENERIC_PROVIDER_TOKEN", "secret-generic")
     monkeypatch.setenv("AGENTCO_GENERIC_ANSWER_FIELD", "answer.text")
     monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "127.0.0.1")
 
     response = execute_capability_request(base_request("generic_http"))
-    server.shutdown()
 
     assert response["status"] == "completed"
     assert response["answer"] == "generic answer"
@@ -157,16 +136,15 @@ def test_openai_adapter_retries_429_then_succeeds(monkeypatch, tmp_path):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
     monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
-    server = start_server()
-    ProviderHandler.failures_before_success = 1
+    fake = FakeTransport(failures_before_success=1)
+    monkeypatch.setattr(providers, "_post_json_once", fake)
     monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
     monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
-    monkeypatch.setenv("OPENAI_BASE_URL", f"http://127.0.0.1:{server.server_port}/v1")
+    monkeypatch.setenv("OPENAI_BASE_URL", "http://127.0.0.1:12345/v1")
     monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "127.0.0.1")
     monkeypatch.setenv("OPENAI_MAX_RETRIES", "2")
 
     response = execute_capability_request(base_request("openai_compatible"))
-    server.shutdown()
 
     assert response["status"] == "completed"
     assert response["latency"]["retry_count"] == 1
