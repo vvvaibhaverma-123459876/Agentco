@@ -177,3 +177,60 @@ invariants:
     statement: The URL-safety adapter has a dedicated unit suite covering literal, DNS-resolved, redirect, and v4-mapped bypass attempts.
     tier: constitutional
     status: planned
+  - id: V9-INV-001
+    statement: A claim asserting support is rejected unless every cited source id is registered evidence.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/tests/claim-grounding.test.ts
+  - id: V9-INV-002
+    statement: A support snippet is rejected unless it is a token-subsequence of the registered evidence it cites (quoted support cannot be fabricated).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/tests/claim-grounding.test.ts
+  - id: V9-INV-003
+    statement: Registered evidence carries a content hash and canonical event provenance linking it to the event log and the registering actor.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/evidence-registry.service.ts
+      - backend/src/db/migrations/088_evidence_registry_events.sql
+  - id: V9-INV-004
+    statement: Knowledge is promoted to memory only from a resolved, non-post-hoc prediction that has a trust score — never from an unscored assertion.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/memory-promotion-pipeline.service.ts
+      - backend/tests/self-memory-loop.test.ts
+  - id: V9-INV-005
+    statement: Retracting a knowledge node propagates transitively to every dependent through the provenance graph, and every propagation effect only weakens knowledge (retract or demote).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/collective-knowledge.service.ts
+      - backend/src/db/migrations/137_collective_epistemics.sql
+      - backend/tests/collective-knowledge.test.ts
+  - id: V9-INV-006
+    statement: A recorded contradiction demotes the affected memory rather than silently overwriting it.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/118_contradictions_and_demotions.sql
+      - backend/src/services/collective-knowledge.service.ts
+  - id: V9-INV-007
+    statement: Planners cite grounded claims rather than ungrounded assertions when producing evidence-bearing actions.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/planner-claim-bias.test.ts
+  - id: V9-INV-008
+    statement: The three knowledge provenance registries (doc-level provenance, runtime provenance edges, contradiction records) are periodically reconciled so no dangling or orphaned provenance survives.
+    tier: statute
+    status: planned
+  - id: V9-INV-009
+    statement: Memory has a bounded forgetting policy so unbounded low-value knowledge does not accumulate.
+    tier: statute
+    status: planned
