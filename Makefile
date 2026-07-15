@@ -375,7 +375,7 @@ autonomy-memory-quality-test:
 	@echo "This target previously only echoed success. It now runs the real"
 	@echo "collective-knowledge retraction/demotion suite, or fails if unavailable."
 	@if [ -x backend/node_modules/.bin/jest ]; then \
-		cd backend && ./node_modules/.bin/jest tests/collective-knowledge.test.ts --runInBand --forceExit; \
+		cd backend && ./node_modules/.bin/jest tests/collective-knowledge.test.ts --runInBand; \
 	else echo "backend node_modules missing; run 'cd backend && npm ci'"; exit 2; fi
 
 autonomy-observability-test:
@@ -383,7 +383,7 @@ autonomy-observability-test:
 	@echo "This target previously only echoed success. It now runs the real"
 	@echo "civilization OS suite (tick heartbeats + metrics), or fails if unavailable."
 	@if [ -x backend/node_modules/.bin/jest ]; then \
-		cd backend && ./node_modules/.bin/jest tests/civilization-os.test.ts --runInBand --forceExit; \
+		cd backend && ./node_modules/.bin/jest tests/civilization-os.test.ts --runInBand; \
 	else echo "backend node_modules missing; run 'cd backend && npm ci'"; exit 2; fi
 
 civilization-scheduler:
@@ -403,7 +403,7 @@ civilization-suite:
 			tests/judiciary-case.test.ts tests/collective-knowledge.test.ts tests/safe-evolution.test.ts \
 			tests/capability-expansion.test.ts tests/civilization-os.test.ts tests/civilization-operator.test.ts \
 			tests/civilization-reliability.test.ts tests/civilization-adversarial.test.ts \
-			tests/civilization-e2e-scenarios.test.ts --runInBand --forceExit; \
+			tests/civilization-e2e-scenarios.test.ts --runInBand; \
 	else echo "backend node_modules missing; run 'cd backend && npm ci'"; exit 2; fi
 
 autonomy-frontend-real-data-test:
