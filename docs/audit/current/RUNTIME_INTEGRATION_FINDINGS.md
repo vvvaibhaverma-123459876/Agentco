@@ -1,6 +1,6 @@
 # Runtime Integration Findings
 
-Tracked structural snapshot input hash `b939546f73128bed0da96f74859eee503a95dc9259e818837f33130c12ec16c0`.
+Tracked structural snapshot input hash `c7391130da54363d6d96d66cabe06ea93566c158eb3e4c885e7466e2197e0620`.
 
 | finding_id | severity | component | workflow | status | remaining_risk |
 | --- | --- | --- | --- | --- | --- |
