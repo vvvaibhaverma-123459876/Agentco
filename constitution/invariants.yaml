@@ -976,3 +976,57 @@ invariants:
     statement: Ethical constraints (risk-tier gating, required human approval) are uniformly applied across actuators, not per-service ad hoc.
     tier: article
     status: planned
+  - id: V6-INV-001
+    statement: An institution has at most one active charter, and charter/mandate/power/limit grant rows are append-only in their immutable columns.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-002
+    statement: An institution's jurisdiction grant must be a subset of the civilization's jurisdiction — a composite foreign key makes granting an un-held key impossible.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-003
+    statement: Institutions declare mandates, powers, and limits, and a limit constrains what the institution may do.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-004
+    statement: Inter-institution contracts advance only along their lifecycle (draft to active to superseded).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+  - id: V6-INV-005
+    statement: The ten mandatory institutions are function-fundamental, not domain-specific, satisfying Domain Neutrality.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - scripts/constitution/check_constitution.py
+  - id: V6-INV-006
+    statement: Mandatory-institution seeding is idempotent — re-running does not duplicate institutions.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-007
+    statement: An institution emerges from a justified capability gap through a temporary program before becoming permanent (creation to evaluation to permanent or archived).
+    tier: statute
+    status: planned
+  - id: V6-INV-008
+    statement: Every permanent institution is periodically re-justified, and one that is no longer justified is retired (no permanence without ongoing justification).
+    tier: statute
+    status: planned
+  - id: V6-INV-009
+    statement: Institutions can branch, merge, split, undergo succession, and federate under governance.
+    tier: statute
+    status: planned
