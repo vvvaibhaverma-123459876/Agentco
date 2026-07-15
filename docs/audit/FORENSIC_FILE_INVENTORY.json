@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1884,
+  "tracked_file_count": 1876,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 31,
     "Deprecated code": 48,
     "Development tooling": 138,
-    "Documentation": 430,
+    "Documentation": 422,
     "Experimental code": 151,
     "Generated artifact": 101,
     "Production runtime code": 483,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 493,
-    "docs": 358,
+    "docs": 350,
     "evals": 180,
     "scripts": 150,
     "agents": 111,
@@ -82,9 +82,9 @@
   },
   "extension_counts": {
     ".py": 583,
-    ".md": 442,
+    ".md": 438,
     ".ts": 329,
-    ".json": 187,
+    ".json": 183,
     ".sql": 139,
     ".jsonl": 40,
     ".csv": 38,
@@ -5768,30 +5768,6 @@
       "extension": ".json"
     },
     {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
-    },
-    {
-      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
-    },
-    {
       "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -5802,30 +5778,6 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.json",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".json"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
-    },
-    {
-      "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
-      "category": "Documentation",
-      "top_level": "docs",
-      "extension": ".md"
     },
     {
       "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",

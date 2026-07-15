@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1884`
+- Tracked files: `1876`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 31 |
 | Deprecated code | 48 |
 | Development tooling | 138 |
-| Documentation | 430 |
+| Documentation | 422 |
 | Experimental code | 151 |
 | Generated artifact | 101 |
 | Production runtime code | 483 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 493 |
-| `docs` | 358 |
+| `docs` | 350 |
 | `evals` | 180 |
 | `scripts` | 150 |
 | `agents` | 111 |
@@ -1036,16 +1036,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/CONTROLLED_LEARNING_REPORT.json` | Documentation |
 | `docs/audit/EVALUATION_CALIBRATION_REPORT.json` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
-| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
-| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_REMEDIATION_STATUS_2026_07_12.md` | Documentation |
 | `docs/audit/PHASE10_NOTES.md` | Documentation |
