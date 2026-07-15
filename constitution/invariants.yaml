@@ -759,3 +759,63 @@ invariants:
     statement: Per-model calibration is tracked so trust is scoped by model, and a model whose calibration degrades is flagged.
     tier: statute
     status: planned
+  - id: V3-INV-001
+    statement: Only one scheduler ticks at a time via a Postgres advisory lock, and re-running a tick never duplicates work — even across restarts.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-scheduler.service.ts
+      - backend/src/services/civilization-os.service.ts
+      - backend/tests/civilization-scheduler.test.ts
+  - id: V3-INV-002
+    statement: A durable task is claimed exactly once (a single status transition to running) before it is dispatched.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/durable-execution.service.ts
+      - backend/tests/durable-execution-real-tasks.test.ts
+  - id: V3-INV-003
+    statement: Events are published through a transactional outbox written in the same transaction as the state change, so no state change is silently unpublished.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/transactional-outbox.service.ts
+      - backend/src/db/migrations/083_transactional_outbox.sql
+      - backend/tests/outbox-worker.test.ts
+  - id: V3-INV-004
+    statement: Outbox relay sources work with FOR UPDATE SKIP LOCKED and retries failed publications with bounded attempts and backoff.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/transactional-outbox.service.ts
+      - backend/tests/outbox-worker.test.ts
+  - id: V3-INV-005
+    statement: Every autonomous run stage consults the run guard and halts when the kill switch is engaged or a budget stop is reached.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/run-guard.service.ts
+      - backend/tests/main-loop-kill-switch.test.ts
+  - id: V3-INV-006
+    statement: The signed event-bus outbox is relayed alongside the event-log outbox, so cross-service events carry integrity.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/workers/outbox-worker.ts
+      - backend/src/db/migrations/128_event_bus_outbox.sql
+      - backend/tests/event-bus-outbox.test.ts
+  - id: V3-INV-007
+    statement: Task dispatch is idempotent under replay — a completed or in-flight task is not re-executed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/durable-execution.service.ts
+      - backend/tests/idempotency-store.test.ts
+  - id: V3-INV-008
+    statement: On restart, in-flight work is recovered or safely re-claimed rather than lost or double-run.
+    tier: statute
+    status: planned
+  - id: V3-INV-009
+    statement: A poison task that repeatedly fails is dead-lettered rather than retried unboundedly.
+    tier: statute
+    status: planned
