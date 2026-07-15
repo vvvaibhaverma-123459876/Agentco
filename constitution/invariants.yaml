@@ -525,3 +525,61 @@ invariants:
     statement: Precedent is consulted as a first-class input to rulings, not merely retrievable after the fact.
     tier: statute
     status: planned
+  - id: V4-INV-001
+    statement: Every actor has a typed identity, and there is at most one active actor per (type, name).
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-002
+    statement: A privileged act resolves against roles, permissions, and delegations, and the resulting authority decision is recorded as a chain.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/db/migrations/084_authority_chain.sql
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-003
+    statement: A delegation is scoped and may be time-bounded; authority resolution respects the delegation's scope.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-004
+    statement: Identity keys are registerable and revocable, and signature verification rejects signatures from a revoked or unregistered key.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-005
+    statement: Identity history is not deletable — the Identity Registry institution cannot delete identity history.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/src/db/migrations/079_identity_authority.sql
+  - id: V4-INV-006
+    statement: Authority verification is transactional — the decision and its recorded event commit together or not at all.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+  - id: V4-INV-007
+    statement: Calibration credentials are independently recomputable from public prediction-ledger rows without any signing secret.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/credential.service.ts
+      - reserve/credentials/proof_of_calibration.py
+  - id: V4-INV-008
+    statement: A delegation cannot exceed the granting actor's own authority (no privilege escalation through delegation).
+    tier: constitutional
+    status: planned
+  - id: V4-INV-009
+    statement: Sessions and interactive authentication for human operators are first-class, time-bounded, and revocable.
+    tier: constitutional
+    status: planned

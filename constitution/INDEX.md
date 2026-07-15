@@ -37,7 +37,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 7 | 14 | Learning Engine | statute | descriptive | written | skill-library.service.ts, skill-canary.service.ts, migrations 105/108, memory promotion pipeline |
 | 8 | 15 | Capability Expansion | statute | descriptive | written | capability-expansion-gate.service.ts, generality-metric-tracker, proof-of-competence, migrations 102/103/106/107 |
 | 9 | 13 | Judiciary | statute | descriptive | written | judiciary*.service.ts, migrations 109/136 |
-| 10 | 4 | Identity & Authority | constitutional | mixed | not written | backend/src (search "security"), credential.service.ts, reserve/, migration 052 |
+| 10 | 4 | Identity & Authority | constitutional | mixed | written | backend/src (search "security"), credential.service.ts, reserve/, migration 052 |
 | 11 | 7 | Civilization Economy | statute | mixed | not written | resource ledger + budget services, treasury routes, token budget in llm-provider.service.ts |
 | 12 | 12 | Governance | constitutional | mixed | not written | governance/constitution services + migrations |
 | 13 | 33 | Model Governance | statute | mixed | not written | llm-provider.service.ts, runtime/base_agent/provider_config.py |
