@@ -29,7 +29,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | Order | Vol | Name | Tier | Epistemic status | Doc status | Primary code to read |
 |---|---|---|---|---|---|---|
 | 1 | 0 | Vision | constitutional | mixed | written | README.md, BUILD_LEDGER.yaml |
-| 2 | 1 | Constitutional Core | constitutional | mixed | not written | decision_log migrations (hash chain), governance + judiciary services, backend/src (search "security") |
+| 2 | 1 | Constitutional Core | constitutional | mixed | written | decision_log migrations (hash chain), governance + judiciary services, backend/src (search "security") |
 | 3 | 32 | Security & Threat Model | constitutional | descriptive | not written | backend/src (search "url-safety", SSRF), autonomy-action-planner.service.ts (injection guard), team-activation.service.ts (HMAC), agentco_security/env_guard.py |
 | 4 | 9 | Knowledge System | statute | descriptive | not written | claim-grounding.service.ts, evidence registry services, memory-promotion + memory-retrieval services, autonomy_evidence/claims/agent_memories migrations |
 | 5 | 11 | Trust & Calibration | statute | descriptive | not written | persistent-trust-scorer.service.ts, falsifiable-prediction services, independent-resolver.service.ts, prediction_ledger migrations, reserve/ |

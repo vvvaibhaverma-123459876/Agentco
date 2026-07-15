@@ -66,3 +66,55 @@ invariants:
     status: enforced
     enforcement:
       - scripts/constitution/check_constitution.py
+  - id: V1-INV-001
+    statement: Every decision is recorded in an append-only, hash-chained decision log whose rows reject UPDATE and DELETE at the database layer.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/012_decision_log_chain.sql
+      - backend/src/db/migrations/014_decision_log_immutability_triggers.sql
+  - id: V1-INV-002
+    statement: Civilization identity and lifecycle state change only through explicit transaction-scoped authorization, and every transition appends to kernel history.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/tests/civilization-kernel.test.ts
+  - id: V1-INV-003
+    statement: The runtime constitution is versioned, content-hashed, and signed; its integrity is verifiable; and declared protected surfaces subject changes to immutability or vote requirements.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/027_calibration_constitution.sql
+      - backend/src/services/calibration-constitution.service.ts
+      - backend/tests/calibration-constitution.test.ts
+      - backend/tests/protected-surface-enforcer.test.ts
+  - id: V1-INV-004
+    statement: Emergency powers are time-bounded by schema constraint, their activation and revocation are governed recorded acts, and an activated kill switch stops governed run loops.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/135_governance.sql
+      - backend/src/services/kill-switch.service.ts
+      - backend/src/services/run-guard.service.ts
+      - backend/tests/civilization-e2e-scenarios.test.ts
+  - id: V1-INV-005
+    statement: An enacted statute changes runtime behaviour — policy enforcement is checked at execution time, not merely recorded.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/policy-enforcement.service.ts
+      - backend/tests/governance.test.ts
+  - id: V1-INV-006
+    statement: A change to a constitutional-tier volume without a recorded authorizing human fails CI (mechanical amendment gate).
+    tier: constitutional
+    status: planned
+  - id: V1-INV-007
+    statement: A statute that contradicts a protected invariant fails enactment, fail-closed (constitutionality validation at enactment time).
+    tier: constitutional
+    status: planned
+  - id: V1-INV-008
+    statement: Meta-governance may evolve the civilization's own constitutional processes, but human root authority and the protected-invariant mechanism remain outside the system's own amendment power.
+    tier: constitutional
+    status: aspirational
