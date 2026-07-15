@@ -129,6 +129,10 @@ def main() -> int:
     reconciliation["checks"] = checks
     passed = all(checks.values())
     reconciliation["reconciliation_passed"] = passed
+    predicate = bool(ledger.get("meta", {}).get("termination_predicate_met"))
+    reconciliation["termination_predicate_met"] = predicate
+    if not predicate:
+        reconciliation["outstanding_gates_doc"] = "docs/civilization/OUTSTANDING_GATES.md"
 
     os.makedirs(OUT_DIR, exist_ok=True)
     stamp = {"generated_at": now, "commit": head, "branch": branch, "git_dirty": dirty}
@@ -141,7 +145,7 @@ def main() -> int:
     write("completion_manifest.json", {
         "phases": {k: v["status"] for k, v in ledger["phases"].items()},
         "rollups": ledger.get("rollups", {}),
-        "termination_predicate_met": bool(ledger.get("meta", {}).get("termination_predicate_met")),
+        "termination_predicate_met": predicate,
     })
     write("civilization_build_ledger.json", {"items": items})
     write("migration_verification.json", {
@@ -184,7 +188,9 @@ def main() -> int:
         f"- Commit: `{head}`",
         f"- Branch: `{branch}`",
         f"- Git dirty at generation: {dirty}",
-        f"- Reconciliation passed: **{passed}**",
+        f"- Reconciliation passed: **{passed}** (structural evidence checks listed below)",
+        f"- Termination predicate met: **{predicate}**"
+        + ("" if predicate else " — canonical release gates outstanding; see `docs/civilization/OUTSTANDING_GATES.md`"),
         "",
         "## Ledger rollup",
         f"- Total items: {len(items)}",
@@ -211,10 +217,20 @@ def main() -> int:
         "long-running operational evidence) requires an actual live deployment and is",
         "intentionally NOT claimed by this report.",
     ]
+    if not predicate:
+        lines += [
+            "",
+            "## Outstanding gates",
+            "The brief's canonical release gates have not all been executed against the",
+            "built code (release-gate, post-build runtime reachability, full-tree",
+            "anti-stub sweep, full coordinator-driven reachability of every registered",
+            "service). Until they run green, the correct status is 'implemented; gates",
+            "outstanding', not 'complete'. Details: `docs/civilization/OUTSTANDING_GATES.md`.",
+        ]
     with open(os.path.join(OUT_DIR, "FINAL_CIVILIZATION_COMPLETION_REPORT.md"), "w") as f:
         f.write("\n".join(lines) + "\n")
 
-    print(f"[completion] reconciliation_passed={passed} verified={len(verified)}/{len(items)} commit={head[:12]}")
+    print(f"[completion] reconciliation_passed={passed} predicate={predicate} verified={len(verified)}/{len(items)} commit={head[:12]}")
     if not passed:
         print("[completion] FAILED checks:", [k for k, v in checks.items() if not v], file=sys.stderr)
         return 1

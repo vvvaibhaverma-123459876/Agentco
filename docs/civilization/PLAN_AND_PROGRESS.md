@@ -9,19 +9,19 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 |---|---|
 | Branch | `feature/civilization-layer` |
 | Base commit | `997e66ce700e0c93896f13f7d6f559d0a50b15dd` (GitHub main, PRs #21–#23 merged) |
-| Current phase | **COMPLETE** — C0–C15 all verified |
-| Completion gate | `termination_predicate_met: true` — 64/64 ledger items verified; reconciliation passed on HEAD |
-| Test results | Final full backend regression green; civilization suites 16 files; all 8 E2E scenarios A–H proven |
+| Current phase | C0–C15 **implemented and regression-verified**; canonical release gates **OUTSTANDING** (see below) |
+| Completion gate | `termination_predicate_met: false` — 64/64 ledger items verified against their focused suites + full regression, but the brief's canonical gates (`make release-gate`, post-build `make audit-runtime-integration`, full-tree anti-stub sweep, full coordinator-driven reachability) have not yet run against the built code. See [`OUTSTANDING_GATES.md`](OUTSTANDING_GATES.md). |
+| Test results | Final full backend regression green (117 suites / 873 tests); civilization suites 16 files; all 8 E2E scenarios A–H proven |
 | Migration state | 129–140 applied cleanly on the isolated empty-DB stack (verified from scratch) |
-| Git / PR | Branch `feature/civilization-layer` pushed to origin; **PR #26** open against `main`. Push is operator-authorized. |
-| Completion evidence | `reports/civilization_completion/latest/` (machine-generated, commit-bound); `make civilization-completion` reconciliation exit 0 |
-| Known blockers | none in scope. Hosted production certification (live SLO/DR/backup/incident evidence) is explicitly out of environment scope per the brief and not claimed. |
+| Git / PR | **PR #26 merged into `main`** by the operator at `651794a` (2026-07-14) while the branch was at C11 (`75406a5`); C12–C15, completion evidence, and the predicate walk-back were merged to `main` afterward. Operator directive: origin `main` must always be kept updated. |
+| Completion evidence | `reports/civilization_completion/latest/` (machine-generated, commit-bound); reconciliation = structural evidence checks, and the report now states the termination predicate explicitly |
+| Known blockers | Canonical release gates outstanding ([`OUTSTANDING_GATES.md`](OUTSTANDING_GATES.md)). Hosted production certification (live SLO/DR/backup/incident evidence) is explicitly out of environment scope per the brief and not claimed. Pre-existing on `main`: `Clean-Room Audit` and `CI` workflows were already failing at merge commit `651794a` (before C12–C15 landed). |
 
 ## Environment decisions (recorded)
 
 - Build runs in a dedicated clone at `/Users/Zet/agentco-build/Agentco`. The operator's live tree (`/Users/Zet/Agentco`) is never touched; their local-only commit `f1591df` (CI evidence binding) is noted for later merge if pushed.
 - All infra for this build is **isolated**: dedicated container names (`agentco-build-*`) and ports (Postgres 5544; Kafka 9192 when needed) so the operator's own `agentco-*` containers and volumes are never shared or disturbed. Rationale: backend tests mutate schema/data; sharing the operator's DB would corrupt their work.
-- Commits are checkpointed on the build branch; **no push** without explicit operator authorization (brief §17).
+- Commits are checkpointed on the build branch. Push was operator-authorized on 2026-07-14 ("create a PR and push"); on 2026-07-15 the operator further directed that origin `main` must always be kept updated.
 - GNU Make on this host is 3.81; Makefile changes must stay 3.81-compatible.
 
 ## Phase status
@@ -59,3 +59,7 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 - 2026-07-14 — C2 verified: migration 130 (citizens/sanctions/roles/envelopes/successions with guards; institutions.id is VARCHAR — FK matched), citizenship service, gate wired into durable-execution (enqueue+run) and team-activation spawn (with trust-linked budget scaling), 11 routes (matrix 171→182), 7/7 focused tests, full regression green.
 - 2026-07-14 — C3 verified: migration 131, society topology, mandatory institution seed, charter/mandate/power/limit/contract flows, route sensitivity matrix 182→200, 8/8 focused tests, route-auth 207/207, full regression green.
 - 2026-07-14 — C4 verified: migration 132, coalition lifecycle/negotiation/consensus/commitments/delegations/settlement/escalation, route sensitivity matrix 200→212, 7/7 focused tests, route-auth 219/219, TypeScript clean, full backend regression green (105 suites passed/3 skipped; 728 passed/8 skipped/5 todo).
+- 2026-07-14 — C5–C15 verified phase by phase (migrations 133–140; missions with gated completion, treasury/economy, governance with enforceable policy + emergency powers, judiciary whose enforcement mutates state, provenance graph with transitive retraction, learning/safe-evolution with canary rollback, capability expansion gate, leader-elected civilization OS tick, operator console, scheduler worker + Helm + metrics + adversarial suite, E2E scenarios A–H + completion evidence generator + CI workflow). Route matrix grew to 298 classified routes. Final full regression: 117 suites / 873 tests green; tsc clean; frontend build clean; npm audit 0; secret scan clean. Fixed pre-existing fake-success Make targets (D9).
+- 2026-07-14 — Operator merged **PR #26 into `main`** (`651794a`) while the branch was at C11; C12–C15 and later commits continued on the branch.
+- 2026-07-14 — **Adversarial self-review walk-back (integrity fix):** `termination_predicate_met` had been set `true` without running the repo's canonical gates against the built code — reverted to **false**; a B.2-banned marker in `civilization-os.service.ts` was removed; the C12 coordinator-reachability note was corrected (tick drives missions + sweeps, observes the rest; full coordinator-driven reachability outstanding); `docs/civilization/OUTSTANDING_GATES.md` added. Evidence generator now prints the predicate + outstanding gates in the FINAL report.
+- 2026-07-15 — Remaining branch commits (C12–C15, evidence, walk-back) merged to `main`; operator directive recorded that origin `main` stays continuously updated. New top-level task started: the 34-volume Architecture Constitution (`constitution/`).
