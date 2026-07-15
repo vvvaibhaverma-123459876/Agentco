@@ -8,10 +8,10 @@
   "dependency_lock_hash": "25d96beb11eaf98454e2f2014bb1a705922c77f66fad3894d67202947894ddb4",
   "environment_contract_hash": "1f077313d27f8dca7d6a276e9eb94db4f79cb7a163310b1c07c16089b45c15ad",
   "fixture_bundle_hash": "e5c0b13b3672ecbb898abe2e21f4264d3630e022f97b0a98a1197c67ffd8b09c",
-  "freeze_attestation_sha": "PENDING_COMMIT",
+  "freeze_attestation_sha": "aa1cd271a0e339925dd5e998fcfba961db72b87c",
   "freeze_candidate_sha": "2018c345b152e49581d54e1c2c00fffddf771aca",
   "freeze_candidate_tree_hash": "c662a80de32cb2b68640e87c60a024a90d011c50",
-  "freeze_manifest_hash": "6d54edb618832208ce28468fa733b9c838fbc517feb0cfce5f81677abd549a17",
+  "freeze_manifest_hash": "d93b0af5bd7665d6de84255cba074e8e82a5ee42fd32163c4a7ab6fa8ee07626",
   "freeze_schema_version": "governed-capability-genesis-v3-freeze-v1",
   "frozen_paths": [
     "agentco_capability/",
