@@ -1,0 +1,30 @@
+{
+  "campaign_id": "governed-capability-genesis-v1",
+  "campaign_methodology": "INVALID",
+  "previous_decision": "GENESIS_BASELINE_ACCEPTED",
+  "corrected_decision": "INVALID_CAMPAIGN",
+  "capability_baseline_accepted": false,
+  "promotion_implication": "none",
+  "finding": {
+    "finding_id": "GCR-001",
+    "severity": "S1",
+    "type": "evidence_integrity",
+    "status": "resolved_by_invalidation",
+    "summary": "Genesis v1 counted domain-shaped completed responses without evaluator-only hidden expectations or task-specific correctness scoring."
+  },
+  "reasons": [
+    "Validation and hidden cases were generated directly by the campaign runner.",
+    "Validation and hidden requests were duplicated or semantically identical.",
+    "No evaluator-only hidden expectations existed.",
+    "Completion status was treated as capability success.",
+    "No domain correctness scorer was applied.",
+    "The deterministic provider returned domain-shaped templates.",
+    "Software-engineering output was not validated through fixture tests.",
+    "Data-analysis output was not evaluated against expected calculations.",
+    "Reasoning output was not evaluated for correctness.",
+    "Planning output was not evaluated against task-specific requirements.",
+    "Provider-generated confidence was hash-derived rather than empirically calibrated.",
+    "The previous acceptance threshold counted domain labels rather than proven capabilities."
+  ],
+  "preservation": "Previous artifacts are retained as invalidated historical evidence and must not be used as a future comparison baseline."
+}

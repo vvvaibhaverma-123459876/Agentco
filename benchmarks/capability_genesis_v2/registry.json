@@ -1,0 +1,42 @@
+{
+  "benchmark_id": "capability-genesis-v2",
+  "version": "2.0.0",
+  "description": "Frozen governed capability genesis benchmark. Validation and hidden requests are file-backed and distinct; expected scoring data is evaluator-only.",
+  "domains": [
+    "reasoning",
+    "planning",
+    "evidence_evaluation",
+    "claim_grounding",
+    "structured_transformation",
+    "safe_tool_selection",
+    "data_analysis",
+    "software_engineering",
+    "cross_domain_synthesis"
+  ],
+  "case_counts": {
+    "development": 18,
+    "validation": 12,
+    "hidden": 12
+  },
+  "scorer_version": "capability-genesis-v2-scorers",
+  "minimum_acceptance": {
+    "supported_domains": 8,
+    "capability_task_domains": 4,
+    "validation_hidden_supported_cases": 18,
+    "supported_completion_ratio": 0.75,
+    "aggregate_correctness": 0.7,
+    "per_domain_correctness": 0.5
+  },
+  "hidden_answer_policy": {
+    "provider_visible_expected_outputs": false,
+    "provider_visible_rubrics": false,
+    "validation_hidden_prompts_distinct": true
+  },
+  "case_manifest_files": {
+    "development": "development/cases.json",
+    "validation": "validation/cases.json",
+    "hidden": "hidden/cases.json"
+  },
+  "rubric_manifest": "rubrics/rubrics.json",
+  "fixture_manifest": "fixtures/fixtures.json"
+}

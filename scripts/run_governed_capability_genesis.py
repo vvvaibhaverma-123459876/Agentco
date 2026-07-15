@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
-"""Run the first governed capability genesis baseline campaign."""
+"""Run governed capability genesis campaigns without synthetic capability claims."""
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
@@ -16,190 +18,231 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from agentco_capability.runtime import execute_capability_request  # noqa: E402
+from agentco_capability.scoring import score_capability_task, score_governance_control, score_resource_control  # noqa: E402
 
-ARTIFACT = ROOT / "artifacts" / "capability-runtime" / "governed-capability-genesis-v1"
+BENCHMARK = ROOT / "benchmarks" / "capability_genesis_v2"
 DOCS = ROOT / "docs" / "audit" / "current"
-DOMAINS = [
-    "reasoning",
-    "planning",
-    "evidence_evaluation",
-    "claim_grounding",
-    "structured_transformation",
-    "safe_tool_selection",
-    "data_analysis",
-    "software_engineering",
-    "cross_domain_synthesis",
-]
 
 
 def canonical_json(data: Any) -> str:
     return json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
 
 
-def sha256_text(text: str) -> str:
-    return hashlib.sha256(text.encode()).hexdigest()
+def sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def sha256_text(data: str) -> str:
+    return sha256_bytes(data.encode())
 
 
 def git(*args: str) -> str:
     return subprocess.check_output(["git", *args], cwd=ROOT, text=True).strip()
 
 
-def request_for(index: int, domain: str, split: str) -> dict[str, Any]:
-    base = {
-        "protocol_version": "agentco-capability-v1",
-        "request_id": f"genesis-{split}-{index}-{domain}",
-        "attempt_id": f"genesis-{split}-{index}-{domain}",
-        "actor": {"id": "governed-genesis-evaluator", "type": "test_identity"},
-        "tenant": "genesis-local",
-        "task_type": domain,
-        "prompt": f"Run a bounded {domain} capability task for genesis baseline.",
-        "structured_input": {
-            "claim": "AgentCo genesis request is bounded",
-            "evidence": [
-                {"id": "e-support", "stance": "support", "reliability": 0.9},
-                {"id": "e-weak", "stance": "contradict", "reliability": 0.2},
-            ],
-            "constraints": ["no live providers", "no production mutation"],
-            "data": {"b": 2, "a": 1},
-            "csv": "name,value\nalpha,2\nbeta,4\n",
-            "domains": ["planning", "evidence"],
-            "target_file": "solution.py",
-        },
-        "context": {"split": split},
-        "memory_policy": {
-            "enabled": True,
-            "memories": [{"id": "mem-verified", "verified": True, "content": "prefer governed answer", "relevance": 0.8}],
-        },
-        "tool_allowlist": ["json_transformer", "calculator", "fixture_sql", "fixture_reader", "fixture_test_runner"],
-        "provider_policy": {"provider": "deterministic_local_reference"},
-        "budget": {"max_wall_ms": 5000, "max_provider_calls": 1, "max_tool_calls": 5, "max_tokens": 1000},
-        "deadline": None,
-        "idempotency_key": f"genesis-{split}-{index}-{domain}",
-        "authorization_context": {"permissions": ["capability:execute"]},
-        "trace_context": {"trace_id": f"genesis-{split}-{index}-{domain}"},
-    }
-    return base
+def load_json(path: Path) -> Any:
+    return json.loads(path.read_text())
 
 
-def payload_hash(paths: list[Path]) -> str:
-    records = [
-        {"path": str(path.relative_to(ARTIFACT)), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(), "size_bytes": path.stat().st_size}
+def file_hash(path: Path) -> str:
+    return sha256_bytes(path.read_bytes())
+
+
+def aggregate_hash(paths: list[Path]) -> str:
+    rows = [
+        {"path": str(path.relative_to(ROOT)), "sha256": file_hash(path), "size_bytes": path.stat().st_size}
         for path in sorted(paths)
     ]
-    return sha256_text(canonical_json(records))
+    return sha256_text(canonical_json(rows))
 
 
-def payload_manifest(paths: list[Path], aggregate_hash: str, head: str, evaluator_hash: str) -> dict[str, Any]:
+def load_cases() -> list[dict[str, Any]]:
+    registry = load_json(BENCHMARK / "registry.json")
+    cases: list[dict[str, Any]] = []
+    for split in ("validation", "hidden"):
+        cases.extend(load_json(BENCHMARK / registry["case_manifest_files"][split]))
+    validation_prompts = {case["request"]["prompt"] for case in cases if case["split"] == "validation"}
+    hidden_prompts = {case["request"]["prompt"] for case in cases if case["split"] == "hidden"}
+    if validation_prompts & hidden_prompts:
+        raise SystemExit("validation and hidden prompts must be distinct")
+    return cases
+
+
+def request_for_case(case: dict[str, Any], provider: str, mode: str) -> dict[str, Any]:
+    raw = case["request"]
+    operation_classification = "protocol_control" if mode == "protocol-reference" else "capability_task"
     return {
-        "canonicalization_version": "capability-runtime-payload-v1",
-        "included_relative_paths": [
-            {
-                "path": str(path.relative_to(ARTIFACT)),
-                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                "size_bytes": path.stat().st_size,
-            }
-            for path in sorted(paths)
-        ],
-        "excluded_paths": [
-            {
-                "path": "GENESIS_MANIFEST.json",
-                "reason": "contains aggregate payload hash and would create a recursive hash dependency",
-            },
-            {
-                "path": "INTERNAL_PAYLOAD_MANIFEST.json",
-                "reason": "payload manifest aggregate hash is excluded from its own canonical payload",
-            },
-        ],
-        "aggregate_payload_hash": aggregate_hash,
-        "campaign_execution_sha": head,
         "protocol_version": "agentco-capability-v1",
-        "provider": "deterministic_local_reference",
-        "evaluator_hash": evaluator_hash,
-        "subject_shas": {"genesis_subject": head},
-        "generation_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "request_id": case["case_id"],
+        "attempt_id": f"{mode}-{case['case_id']}",
+        "actor": {"id": f"{mode}-evaluator", "type": "test_identity"},
+        "tenant": "capability-genesis-v2",
+        "task_type": case["domain"],
+        "prompt": raw["prompt"],
+        "structured_input": dict(raw.get("structured_input") or {}),
+        "context": {
+            "campaign": "governed-capability-genesis-v2",
+            "split": case["split"],
+            "operation_classification": operation_classification,
+        },
+        "memory_policy": {"enabled": False},
+        "tool_allowlist": ["json_transformer", "calculator", "fixture_reader", "fixture_sql", "fixture_test_runner"],
+        "provider_policy": {"provider": provider},
+        "budget": dict(case.get("budget") or {"max_wall_ms": 5000, "max_provider_calls": 1}),
+        "deadline": None,
+        "idempotency_key": f"{mode}-{case['case_id']}",
+        "authorization_context": {"permissions": ["capability:execute"] + (["provider:live"] if provider not in {"deterministic_protocol_reference", "mock_development"} else [])},
+        "trace_context": {"trace_id": f"{mode}-{case['case_id']}"},
     }
 
 
-def main() -> int:
+def score_case(case: dict[str, Any], response: dict[str, Any], mode: str) -> dict[str, Any]:
+    if mode == "protocol-reference":
+        return {
+            "case_id": case["case_id"],
+            "domain": case["domain"],
+            "operation_classification": "protocol_control",
+            "protocol_shape_valid": response["protocol_version"] == "agentco-capability-v1",
+            "completed_status_is_correctness": False,
+            "capability_score": None,
+            "correctness": None,
+            "governance": score_governance_control(response, {"allowed": True}),
+            "budget": score_resource_control(response, {}),
+        }
+    return {
+        "case_id": case["case_id"],
+        "domain": case["domain"],
+        "operation_classification": "capability_task",
+        "completed_status_is_correctness": False,
+        "capability": score_capability_task(response, {}),
+        "governance": score_governance_control(response, {"allowed": True}),
+        "budget": score_resource_control(response, {}),
+    }
+
+
+def write_payload_manifest(artifact: Path, files: list[Path], head: str, campaign_id: str, extra: dict[str, Any]) -> str:
+    rows = [
+        {"path": str(path.relative_to(artifact)), "sha256": file_hash(path), "size_bytes": path.stat().st_size}
+        for path in sorted(files)
+    ]
+    payload_hash = sha256_text(canonical_json(rows))
+    manifest = {
+        "canonicalization_version": "capability-genesis-v2-payload-v1",
+        "included_relative_paths": rows,
+        "excluded_paths": [
+            {"path": "INTERNAL_PAYLOAD_MANIFEST.json", "reason": "self-referential aggregate hash"},
+            {"path": "GENESIS_V2_MANIFEST.json", "reason": "contains aggregate payload hash"},
+        ],
+        "aggregate_payload_hash": payload_hash,
+        "campaign_execution_sha": head,
+        "campaign_id": campaign_id,
+        "generation_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        **extra,
+    }
+    (artifact / "INTERNAL_PAYLOAD_MANIFEST.json").write_text(canonical_json(manifest))
+    return payload_hash
+
+
+def run_v2(mode: str, provider: str) -> int:
     if git("status", "--porcelain"):
-        raise SystemExit("working tree must be clean before governed capability genesis")
-    if ARTIFACT.exists():
-        for path in sorted(ARTIFACT.glob("**/*"), reverse=True):
+        raise SystemExit("working tree must be clean before governed capability genesis v2")
+    head = git("rev-parse", "HEAD")
+    campaign_id = "governed-capability-genesis-v2"
+    artifact = ROOT / "artifacts" / "capability-runtime" / f"{campaign_id}-{mode}"
+    if artifact.exists():
+        for path in sorted(artifact.glob("**/*"), reverse=True):
             if path.is_file():
                 path.unlink()
             elif path.is_dir():
                 path.rmdir()
-    ARTIFACT.mkdir(parents=True, exist_ok=True)
-    head = git("rev-parse", "HEAD")
-    cases = []
-    for index in range(24):
-        split = "validation" if index < 12 else "hidden"
-        cases.append(request_for(index, DOMAINS[index % len(DOMAINS)], split))
+    (artifact / "results").mkdir(parents=True, exist_ok=True)
 
-    results = []
-    for item in cases:
-        response = execute_capability_request(item)
-        record = {"request": item, "response": response}
-        result_path = ARTIFACT / "results" / f"{item['attempt_id']}.json"
-        result_path.parent.mkdir(parents=True, exist_ok=True)
-        result_path.write_text(canonical_json(record))
+    registry = load_json(BENCHMARK / "registry.json")
+    cases = load_cases()
+    benchmark_files = [
+        BENCHMARK / "registry.json",
+        BENCHMARK / "validation" / "cases.json",
+        BENCHMARK / "hidden" / "cases.json",
+        BENCHMARK / "rubrics" / "rubrics.json",
+        BENCHMARK / "fixtures" / "fixtures.json",
+    ]
+    benchmark_hash = aggregate_hash(benchmark_files)
+    scorer_hash = file_hash(ROOT / "agentco_capability" / "scoring.py")
+    results: list[dict[str, Any]] = []
+
+    for case in cases:
+        request = request_for_case(case, provider, mode)
+        response = execute_capability_request(request)
+        score = score_case(case, response, mode)
+        record = {"case": case, "request": request, "response": response, "score": score}
+        (artifact / "results" / f"{case['case_id']}.json").write_text(canonical_json(record))
         results.append(record)
 
     completed = [item for item in results if item["response"]["status"] == "completed"]
-    unsupported = [item for item in results if item["response"]["status"] == "unsupported"]
     failed = [item for item in results if item["response"]["status"] == "failed"]
-    timeout = [item for item in results if item["response"]["status"] == "timed_out"]
-    domains = sorted({item["request"]["task_type"] for item in completed})
-    capability_domains = [domain for domain in domains if domain not in {"health_check"}]
-    decision = (
-        "GENESIS_BASELINE_ACCEPTED"
-        if len(domains) >= 8 and len(capability_domains) >= 4 and len(completed) >= 18 and not failed and not timeout
-        else "HOLD_FOR_MORE_EVIDENCE"
+    unsupported = [item for item in results if item["response"]["status"] == "unsupported"]
+    timeouts = [item for item in results if item["response"]["status"] == "timed_out"]
+    capability_domains = sorted({item["case"]["domain"] for item in completed if mode == "real-capability-provider"})
+    hidden_leakage = any("expected" in json.dumps(item["request"]).lower() or "rubric" in json.dumps(item["request"]).lower() for item in results)
+
+    if mode == "protocol-reference":
+        decision = "PROTOCOL_BASELINE_ACCEPTED" if len(completed) == len(cases) and not hidden_leakage else "PROTOCOL_BASELINE_REJECTED"
+        capability_decision = "not_applicable_protocol_only"
+    else:
+        decision = "HOLD_FOR_MORE_EVIDENCE"
+        capability_decision = "HOLD_FOR_MORE_EVIDENCE"
+        if completed and len(capability_domains) >= registry["minimum_acceptance"]["capability_task_domains"]:
+            decision = "HOLD_FOR_MORE_EVIDENCE"
+
+    result_files = list((artifact / "results").glob("*.json"))
+    payload_hash = write_payload_manifest(
+        artifact,
+        result_files,
+        head,
+        campaign_id,
+        {
+            "benchmark_registry_hash": benchmark_hash,
+            "scorer_hash": scorer_hash,
+            "provider": provider,
+            "mode": mode,
+        },
     )
-    result_files = list((ARTIFACT / "results").glob("*.json"))
-    internal_hash = payload_hash(result_files)
-    evaluator_hash = sha256_text("governed-capability-genesis-evaluator-v1")
     manifest = {
-        "campaign_id": "governed-capability-genesis-v1",
+        "campaign_id": campaign_id,
         "campaign_execution_sha": head,
-        "protocol_version": "agentco-capability-v1",
-        "provider": "deterministic_local_reference",
-        "benchmark_registry_hash": json.loads((ROOT / "benchmarks" / "registry.json").read_text()).get("registry_hash"),
-        "evaluator_hash": evaluator_hash,
+        "mode": mode,
+        "provider": provider,
+        "benchmark_registry_hash": benchmark_hash,
+        "scorer_hash": scorer_hash,
         "planned": len(cases),
         "completed": len(completed),
         "failed": len(failed),
-        "timeouts": len(timeout),
+        "timeouts": len(timeouts),
         "unsupported": len(unsupported),
-        "capability_domain_coverage": domains,
+        "supported_capability_domains": capability_domains,
+        "hidden_leakage": hidden_leakage,
         "request_consumption": "verified_by_protocol_request_hash_and_response_hash",
-        "answer_ownership": "subject_runtime_provider_generated",
-        "runtime_evidence": "attempt_response_audit_references_present",
+        "answer_ownership": "protocol_reference_only" if mode == "protocol-reference" else "provider_generated_when_completed",
         "decision": decision,
-        "internal_payload_manifest_hash": internal_hash,
+        "capability_decision": capability_decision,
+        "internal_payload_manifest_hash": payload_hash,
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     }
-    (ARTIFACT / "GENESIS_MANIFEST.json").write_text(canonical_json(manifest))
-    (ARTIFACT / "INTERNAL_PAYLOAD_MANIFEST.json").write_text(
-        canonical_json(payload_manifest(result_files, internal_hash, head, evaluator_hash))
-    )
+    (artifact / "GENESIS_V2_MANIFEST.json").write_text(canonical_json(manifest))
     DOCS.mkdir(parents=True, exist_ok=True)
-    (DOCS / "GOVERNED_CAPABILITY_GENESIS_RESULTS.json").write_text(canonical_json(manifest))
-    (DOCS / "GOVERNED_CAPABILITY_GENESIS_RESULTS.md").write_text(
-        "# Governed Capability Genesis Results\n\n"
-        f"- Campaign: `governed-capability-genesis-v1`\n"
-        f"- Commit: `{head}`\n"
-        f"- Planned: `{len(cases)}`\n"
-        f"- Completed: `{len(completed)}`\n"
-        f"- Failed: `{len(failed)}`\n"
-        f"- Timeouts: `{len(timeout)}`\n"
-        f"- Unsupported: `{len(unsupported)}`\n"
-        f"- Capability domains: `{len(domains)}`\n"
-        f"- Decision: `{decision}`\n"
-        "\nThis is a genesis baseline, not a promotion or improvement claim.\n"
-    )
-    print(canonical_json({"success": decision == "GENESIS_BASELINE_ACCEPTED", **manifest}))
-    return 0 if decision == "GENESIS_BASELINE_ACCEPTED" else 2
+    (DOCS / f"GOVERNED_CAPABILITY_GENESIS_V2_{mode.upper().replace('-', '_')}_RESULTS.json").write_text(canonical_json(manifest))
+    print(canonical_json({"success": decision in {"PROTOCOL_BASELINE_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}, **manifest}))
+    return 0 if decision in {"PROTOCOL_BASELINE_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"} else 2
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--campaign", default="governed-capability-genesis-v2")
+    parser.add_argument("--mode", choices=["protocol-reference", "real-capability-provider"], default="protocol-reference")
+    parser.add_argument("--provider", default=None)
+    args = parser.parse_args()
+    provider = args.provider or ("deterministic_protocol_reference" if args.mode == "protocol-reference" else os.getenv("AGENTCO_REAL_CAPABILITY_PROVIDER", "openai_compatible"))
+    return run_v2(args.mode, provider)
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ import jsonschema
 import pytest
 
 from agentco_capability.runtime import execute_capability_request
+from agentco_capability.scoring import score_capability_task, score_storage_write
 from agentco_capability.tools import ToolDeniedError, execute_tool
 
 
@@ -36,7 +37,7 @@ def request(task_type="reasoning", **overrides):
         "context": {},
         "memory_policy": {},
         "tool_allowlist": ["json_transformer"],
-        "provider_policy": {"provider": "deterministic_local_reference"},
+        "provider_policy": {"provider": "deterministic_protocol_reference"},
         "budget": {"max_wall_ms": 5000, "max_provider_calls": 1},
         "deadline": None,
         "idempotency_key": f"idem-{task_type}",
@@ -57,11 +58,11 @@ def test_request_and_response_match_schemas(test_env):
     jsonschema.validate(response, response_schema)
 
     assert response["status"] == "completed"
-    assert response["provider"] == "deterministic_local_reference"
-    assert response["structured_output"]["ordered_steps"]
+    assert response["provider"] == "deterministic_protocol_reference"
+    assert response["structured_output"]["protocol_validated"] is True
 
 
-def test_evidence_evaluation_is_real_conclusion_not_storage(test_env):
+def test_protocol_reference_does_not_claim_evidence_evaluation_capability(test_env):
     response = execute_capability_request(
         request(
             "evidence_evaluation",
@@ -76,9 +77,10 @@ def test_evidence_evaluation_is_real_conclusion_not_storage(test_env):
     )
 
     assert response["status"] == "completed"
-    assert response["answer"] == "supported"
-    assert response["structured_output"]["accepted_evidence"] == ["support-1"]
-    assert response["structured_output"]["rejected_evidence"] == ["weak-1"]
+    assert response["answer"] is None
+    assert response["provider"] == "deterministic_protocol_reference"
+    scored = score_capability_task(response, {"expected_answer": "supported"})
+    assert scored["scorable"] is False
 
 
 def test_authorization_denies_by_default(test_env):
@@ -187,6 +189,24 @@ def test_live_provider_is_opt_in_and_secret_backed(test_env, monkeypatch):
 
     assert response["status"] == "unsupported"
     assert response["failure"]["message"] == "OPENAI_API_KEY is required for openai_compatible provider"
+
+
+def test_storage_write_score_has_no_capability_correctness():
+    score = score_storage_write(
+        {
+            "status": "completed",
+            "structured_output": {
+                "request_hash": "a" * 64,
+                "payload_hash": "b" * 64,
+                "recorded_output_hash": "c" * 64,
+            },
+        },
+        {"payload_hash": "b" * 64},
+    )
+
+    assert score["operation_classification"] == "storage_operation"
+    assert score["correctness"] is None
+    assert score["capability_score"] is None
 
 
 def test_idempotent_retry_does_not_execute_second_attempt(test_env):

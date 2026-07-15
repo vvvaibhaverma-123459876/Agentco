@@ -1,6 +1,6 @@
 # Migration Identity Ledger
 
-- Migration count: `130`
+- Migration count: `131`
 - Directory: `backend/src/db/migrations`
 
 ## Reused Sequence Contracts
@@ -9,6 +9,7 @@
 - `58`: 058_adaptive_strategy.sql, 058_bounded_learning.sql — legacy_parallel_sequence_before Batch 02 controls; independent tables and stable lexicographic order
 - `59`: 059_calibration_framework.sql, 059_governance_reputation_integration.sql — legacy_parallel_sequence_before Batch 02 controls; independent tables and stable lexicographic order
 - `129`: 129_civilization_kernel.sql, 129_longitudinal_mission_evidence.sql — Batch 07 reconciliation contract: Version B preserved raw duplicate sequence; Version C treats full filename as stable ID, applies lexicographic order, and requires content-hash tracking
+- `140`: 140_civilization_os.sql, 140_governed_capability_runtime.sql — Batch 08A reconciliation contract: Batch 07 civilization OS and Batch 08 governed capability runtime are independent domains; full filename plus content hash is the stable identity and lexicographic ordering applies both guarded migrations
 
 ## Migrations
 
@@ -143,4 +144,5 @@
 | 137 | `137_collective_epistemics.sql` | `2e8f5b628748b851` | `6a0806dd45a0` |
 | 138 | `138_safe_evolution.sql` | `669cbeb3b1f2e5e4` | `4cea7ad642d0` |
 | 139 | `139_capability_expansion.sql` | `269da9571bc96d27` | `75406a50882a` |
+| 140 | `140_civilization_os.sql` | `a7d9cfbbdbc4c439` | `1a3dc570cd76` |
 | 140 | `140_governed_capability_runtime.sql` | `a0232191fa205f66` | `8c0e4e9874cf` |

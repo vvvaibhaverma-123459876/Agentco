@@ -1,218 +1,320 @@
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from dataclasses import dataclass
 from typing import Any
 
 from .models import CapabilityRequest
-from .tools import execute_tool, summarize_csv
 
 
 class ProviderError(RuntimeError):
     pass
 
 
+class ProviderConfigurationError(ProviderError):
+    pass
+
+
+class ProviderResponseError(ProviderError):
+    pass
+
+
+@dataclass(frozen=True)
+class ProviderMetadata:
+    provider_id: str
+    provider_class: str
+    supported_operations: list[str]
+    unsupported_operations: list[str]
+    capability_level: str
+    network_requirement: str
+    secret_requirement: str
+    intended_use: str
+    prohibited_claims: list[str]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "provider_id": self.provider_id,
+            "provider_class": self.provider_class,
+            "supported_operations": self.supported_operations,
+            "unsupported_operations": self.unsupported_operations,
+            "capability_level": self.capability_level,
+            "network_requirement": self.network_requirement,
+            "secret_requirement": self.secret_requirement,
+            "intended_use": self.intended_use,
+            "prohibited_claims": self.prohibited_claims,
+        }
+
+
 class CapabilityProvider:
     provider_type = "abstract"
+    metadata = ProviderMetadata(
+        provider_id="abstract",
+        provider_class="development_mock",
+        supported_operations=[],
+        unsupported_operations=["capability_task"],
+        capability_level="none",
+        network_requirement="none",
+        secret_requirement="none",
+        intended_use="base interface",
+        prohibited_claims=["capability evidence"],
+    )
 
     def execute(self, request: CapabilityRequest) -> dict[str, Any]:
         raise NotImplementedError
 
 
-def stable_confidence(request: CapabilityRequest) -> float:
-    digest = hashlib.sha256(json.dumps(request.to_dict(), sort_keys=True).encode()).hexdigest()
-    return round(0.55 + (int(digest[:4], 16) % 35) / 100, 3)
-
-
-class DeterministicLocalReferenceProvider(CapabilityProvider):
-    provider_type = "deterministic_local_reference"
+class DeterministicProtocolReferenceProvider(CapabilityProvider):
+    provider_type = "deterministic_protocol_reference"
+    metadata = ProviderMetadata(
+        provider_id="deterministic_protocol_reference",
+        provider_class="protocol_reference",
+        supported_operations=[
+            "protocol_validation",
+            "lifecycle_validation",
+            "authorization_validation",
+            "budget_validation",
+            "tool_boundary_validation",
+            "storage_validation",
+            "audit_validation",
+            "provider_contract_validation",
+        ],
+        unsupported_operations=[
+            "reasoning_capability",
+            "planning_capability",
+            "evidence_evaluation_capability",
+            "claim_grounding_capability",
+            "data_analysis_capability",
+            "software_engineering_capability",
+            "cross_domain_synthesis_capability",
+        ],
+        capability_level="protocol_only",
+        network_requirement="none",
+        secret_requirement="none",
+        intended_use="CI-safe protocol and control validation",
+        prohibited_claims=[
+            "general reasoning model",
+            "nine-domain AI capability provider",
+            "model calibration evidence",
+            "capability baseline",
+        ],
+    )
 
     def execute(self, request: CapabilityRequest) -> dict[str, Any]:
         started = time.time()
-        task = request.task_type
-        tool_calls: list[dict[str, Any]] = []
-        answer: Any
-        structured: dict[str, Any]
-        evidence = [{"type": "request_prompt_hash", "sha256": hashlib.sha256(request.prompt.encode()).hexdigest()}]
-
-        if task == "reasoning":
-            answer = self._reason(request.prompt)
-            structured = {"premises": self._sentences(request.prompt), "answer": answer}
-        elif task == "planning":
-            structured = self._plan(request)
-            answer = structured["summary"]
-        elif task == "evidence_evaluation":
-            structured = self._evaluate_evidence(request.structured_input)
-            answer = structured["conclusion"]
-        elif task == "claim_grounding":
-            structured = self._ground_claim(request.structured_input)
-            answer = structured["grounding_status"]
-        elif task == "structured_transformation":
-            transformed = execute_tool(
-                "json_transformer",
-                {"mode": "sort_keys", "data": request.structured_input.get("data", request.structured_input)},
-                request.tool_allowlist,
-            )
-            tool_calls.append({"tool": "json_transformer", "status": "completed"})
-            structured = transformed
-            answer = transformed["data"]
-        elif task == "safe_tool_selection":
-            structured = self._tool_decision(request)
-            answer = structured["decision"]
-        elif task == "data_analysis":
-            csv_text = str(request.structured_input.get("csv", ""))
-            structured = {"analysis": summarize_csv(csv_text)}
-            answer = structured["analysis"]
-        elif task == "software_engineering":
-            structured = self._software_patch(request)
-            answer = structured["patch"]
-        elif task == "cross_domain_synthesis":
-            structured = self._synthesis(request)
-            answer = structured["synthesis"]
-        else:
-            raise ProviderError(f"unsupported task_type: {task}")
-
-        latency_ms = round((time.time() - started) * 1000, 3)
+        if request.context.get("operation_classification") == "capability_task":
+            raise ProviderError("deterministic_protocol_reference does not perform capability tasks")
         return {
-            "answer": answer,
-            "structured_output": structured,
-            "confidence": stable_confidence(request),
-            "evidence": evidence,
-            "citations": [item.get("id") for item in request.structured_input.get("evidence", []) if isinstance(item, dict) and item.get("id")],
-            "tool_calls": tool_calls,
+            "answer": None,
+            "structured_output": {
+                "protocol_validated": True,
+                "request_id": request.request_id,
+                "task_type": request.task_type,
+                "provider_metadata": self.metadata.to_dict(),
+            },
+            "confidence": None,
+            "confidence_classification": "unavailable",
+            "evidence": [{"type": "protocol_reference", "request_id": request.request_id}],
+            "citations": [],
+            "tool_calls": [],
             "provider": self.provider_type,
-            "model": "agentco-deterministic-reference-v1",
-            "latency": {"provider_ms": latency_ms},
-        }
-
-    @staticmethod
-    def _sentences(text: str) -> list[str]:
-        return [part.strip() for part in text.replace("?", ".").split(".") if part.strip()]
-
-    def _reason(self, prompt: str) -> str:
-        sentences = self._sentences(prompt)
-        if any(word in prompt.lower() for word in ["not enough", "insufficient", "unknown"]):
-            return "abstain: insufficient information"
-        return f"deterministic conclusion from {len(sentences)} prompt statement(s)"
-
-    def _plan(self, request: CapabilityRequest) -> dict[str, Any]:
-        constraints = request.structured_input.get("constraints") or []
-        return {
-            "goal": request.prompt,
-            "assumptions": ["inputs are synthetic and non-sensitive"],
-            "constraints": constraints,
-            "ordered_steps": [
-                "validate request authority and budget",
-                "collect available context and evidence",
-                "execute allowed tools only when needed",
-                "verify output against success criteria",
-            ],
-            "dependencies": request.structured_input.get("dependencies") or [],
-            "risks": ["unsupported external boundary remains unavailable"],
-            "success_criteria": request.structured_input.get("success_criteria") or ["bounded auditable answer"],
-            "fallbacks": ["return compliant unsupported or failed status"],
-            "summary": "validated four-step governed plan",
-        }
-
-    def _evaluate_evidence(self, payload: dict[str, Any]) -> dict[str, Any]:
-        evidence = list(payload.get("evidence") or [])
-        accepted = []
-        rejected = []
-        support = 0.0
-        contradict = 0.0
-        for item in evidence:
-            if not isinstance(item, dict):
-                continue
-            reliability = float(item.get("reliability", 0.5))
-            stance = item.get("stance")
-            if reliability >= 0.6:
-                accepted.append(item.get("id"))
-            else:
-                rejected.append(item.get("id"))
-            if stance == "support":
-                support += reliability
-            elif stance == "contradict":
-                contradict += reliability
-        if support > contradict + 0.2:
-            conclusion = "supported"
-        elif contradict > support + 0.2:
-            conclusion = "contradicted"
-        else:
-            conclusion = "uncertain"
-        return {
-            "claim": payload.get("claim"),
-            "conclusion": conclusion,
-            "accepted_evidence": accepted,
-            "rejected_evidence": rejected,
-            "uncertainties": [] if conclusion != "uncertain" else ["support and contradiction are close"],
-            "contradictions": [item.get("id") for item in evidence if isinstance(item, dict) and item.get("stance") == "contradict"],
-        }
-
-    def _ground_claim(self, payload: dict[str, Any]) -> dict[str, Any]:
-        grounded = bool(payload.get("claim")) and bool(payload.get("evidence"))
-        return {
-            "grounding_status": "grounded" if grounded else "ungrounded",
-            "claim": payload.get("claim"),
-            "evidence_count": len(payload.get("evidence") or []),
-        }
-
-    def _tool_decision(self, request: CapabilityRequest) -> dict[str, Any]:
-        prompt = request.prompt.lower()
-        if "calculate" in prompt and "calculator" in request.tool_allowlist:
-            return {"decision": "use_tool", "tool": "calculator", "reason": "calculation requested and tool is allowlisted"}
-        return {"decision": "no_tool", "tool": None, "reason": "no allowlisted tool needed"}
-
-    def _software_patch(self, request: CapabilityRequest) -> dict[str, Any]:
-        target = request.structured_input.get("target_file", "solution.py")
-        instruction = request.prompt.strip().replace("\n", " ")
-        patch = f"--- a/{target}\n+++ b/{target}\n@@\n+# AgentCo deterministic patch plan: {instruction[:120]}\n"
-        return {"changed_files": [target], "patch": patch, "tests_to_run": request.structured_input.get("tests", [])}
-
-    def _synthesis(self, request: CapabilityRequest) -> dict[str, Any]:
-        domains = request.structured_input.get("domains") or []
-        return {
-            "domains": domains,
-            "synthesis": f"combined {len(domains)} domain(s) under governed deterministic policy",
+            "model": "agentco-deterministic-protocol-reference-v1",
+            "latency": {"provider_ms": round((time.time() - started) * 1000, 3)},
+            "usage": {},
         }
 
 
-class MockDevelopmentProvider(DeterministicLocalReferenceProvider):
+class MockDevelopmentProvider(DeterministicProtocolReferenceProvider):
     provider_type = "mock_development"
+    metadata = ProviderMetadata(
+        provider_id="mock_development",
+        provider_class="development_mock",
+        supported_operations=["development_contract_validation"],
+        unsupported_operations=["production_capability_evidence"],
+        capability_level="mock_only",
+        network_requirement="none",
+        secret_requirement="none",
+        intended_use="local development fixtures",
+        prohibited_claims=["production evidence", "capability baseline"],
+    )
+
+
+def _redacted_headers(raw: dict[str, str]) -> dict[str, str]:
+    redacted: dict[str, str] = {}
+    for key, value in raw.items():
+        lowered = key.lower()
+        redacted[key] = "[REDACTED]" if "authorization" in lowered or "key" in lowered or "token" in lowered else value
+    return redacted
+
+
+def _require_https_or_local(url: str) -> None:
+    if url.startswith("https://"):
+        return
+    if url.startswith("http://127.0.0.1") or url.startswith("http://localhost"):
+        return
+    raise ProviderConfigurationError("provider URL must use HTTPS outside explicit local development")
+
+
+def _check_host_allowlist(url: str, allowlist: list[str]) -> None:
+    if not allowlist:
+        raise ProviderConfigurationError("provider host allowlist is required")
+    host = urllib.parse.urlparse(url).hostname or ""
+    if host not in allowlist:
+        raise ProviderConfigurationError(f"provider host {host!r} is not allowlisted")
+
+
+def _post_json(url: str, payload: dict[str, Any], headers: dict[str, str], timeout: float, max_bytes: int) -> dict[str, Any]:
+    body = json.dumps(payload, sort_keys=True).encode()
+    request = urllib.request.Request(url, data=body, headers={**headers, "Content-Type": "application/json"}, method="POST")
+    started = time.time()
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            raw = response.read(max_bytes + 1)
+            if len(raw) > max_bytes:
+                raise ProviderResponseError("provider response exceeded size limit")
+            data = json.loads(raw.decode())
+            data["_agentco_http_status"] = response.status
+            data["_agentco_latency_ms"] = round((time.time() - started) * 1000, 3)
+            return data
+    except urllib.error.HTTPError as exc:
+        raise ProviderResponseError(f"provider HTTP error {exc.code}") from exc
+    except urllib.error.URLError as exc:
+        raise ProviderResponseError(f"provider transport error: {exc.reason}") from exc
+    except TimeoutError as exc:
+        raise ProviderResponseError("provider request timed out") from exc
+    except json.JSONDecodeError as exc:
+        raise ProviderResponseError("provider returned malformed JSON") from exc
 
 
 class OpenAICompatibleProvider(CapabilityProvider):
     provider_type = "openai_compatible"
 
     def execute(self, request: CapabilityRequest) -> dict[str, Any]:
-        if not os.getenv("OPENAI_API_KEY"):
-            raise ProviderError("OPENAI_API_KEY is required for openai_compatible provider")
-        raise ProviderError("live OpenAI-compatible execution is opt-in and not exercised by local genesis")
+        api_key = os.getenv("OPENAI_API_KEY")
+        base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        model = os.getenv("OPENAI_MODEL")
+        if not api_key:
+            raise ProviderConfigurationError("OPENAI_API_KEY is required for openai_compatible provider")
+        if not model:
+            raise ProviderConfigurationError("OPENAI_MODEL is required for openai_compatible provider")
+        _require_https_or_local(base_url)
+        _check_host_allowlist(base_url, os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(","))
+        url = base_url.rstrip("/") + "/chat/completions"
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": "Return concise JSON-compatible task output. Do not reveal secrets."},
+                {"role": "user", "content": request.prompt},
+            ],
+            "temperature": float(os.getenv("OPENAI_TEMPERATURE", "0")),
+            "max_tokens": int(request.budget.get("max_tokens", 512)),
+        }
+        headers = {"Authorization": f"Bearer {api_key}"}
+        if os.getenv("OPENAI_ORG_ID"):
+            headers["OpenAI-Organization"] = os.environ["OPENAI_ORG_ID"]
+        if os.getenv("OPENAI_PROJECT_ID"):
+            headers["OpenAI-Project"] = os.environ["OPENAI_PROJECT_ID"]
+        data = _post_json(url, payload, headers, float(os.getenv("OPENAI_TIMEOUT_SECONDS", "30")), 1_000_000)
+        choice = (data.get("choices") or [{}])[0]
+        message = choice.get("message") or {}
+        return {
+            "answer": message.get("content"),
+            "structured_output": {"raw_text": message.get("content"), "finish_reason": choice.get("finish_reason")},
+            "confidence": None,
+            "confidence_classification": "unavailable",
+            "evidence": [{"type": "provider_response", "provider_response_id": data.get("id")}],
+            "citations": [],
+            "tool_calls": [],
+            "provider": self.provider_type,
+            "model": data.get("model", model),
+            "latency": {"provider_ms": data.get("_agentco_latency_ms"), "retry_count": 0},
+            "usage": data.get("usage") or {},
+            "request_metadata": {"url": url, "headers": _redacted_headers(headers)},
+        }
 
 
 class AnthropicCompatibleProvider(CapabilityProvider):
     provider_type = "anthropic_compatible"
 
     def execute(self, request: CapabilityRequest) -> dict[str, Any]:
-        if not os.getenv("ANTHROPIC_API_KEY"):
-            raise ProviderError("ANTHROPIC_API_KEY is required for anthropic_compatible provider")
-        raise ProviderError("live Anthropic-compatible execution is opt-in and not exercised by local genesis")
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        base_url = os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com")
+        model = os.getenv("ANTHROPIC_MODEL")
+        if not api_key:
+            raise ProviderConfigurationError("ANTHROPIC_API_KEY is required for anthropic_compatible provider")
+        if not model:
+            raise ProviderConfigurationError("ANTHROPIC_MODEL is required for anthropic_compatible provider")
+        _require_https_or_local(base_url)
+        _check_host_allowlist(base_url, os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(","))
+        url = base_url.rstrip("/") + "/v1/messages"
+        headers = {"x-api-key": api_key, "anthropic-version": os.getenv("ANTHROPIC_VERSION", "2023-06-01")}
+        payload = {
+            "model": model,
+            "max_tokens": int(request.budget.get("max_tokens", 512)),
+            "messages": [{"role": "user", "content": request.prompt}],
+        }
+        data = _post_json(url, payload, headers, float(os.getenv("ANTHROPIC_TIMEOUT_SECONDS", "30")), 1_000_000)
+        text = "\n".join(part.get("text", "") for part in data.get("content", []) if isinstance(part, dict))
+        return {
+            "answer": text,
+            "structured_output": {"raw_text": text, "stop_reason": data.get("stop_reason")},
+            "confidence": None,
+            "confidence_classification": "unavailable",
+            "evidence": [{"type": "provider_response", "provider_response_id": data.get("id")}],
+            "citations": [],
+            "tool_calls": [],
+            "provider": self.provider_type,
+            "model": data.get("model", model),
+            "latency": {"provider_ms": data.get("_agentco_latency_ms"), "retry_count": 0},
+            "usage": data.get("usage") or {},
+            "request_metadata": {"url": url, "headers": _redacted_headers(headers)},
+        }
 
 
 class GenericHTTPProvider(CapabilityProvider):
     provider_type = "generic_http"
 
     def execute(self, request: CapabilityRequest) -> dict[str, Any]:
-        if not os.getenv("AGENTCO_GENERIC_PROVIDER_URL"):
-            raise ProviderError("AGENTCO_GENERIC_PROVIDER_URL is required for generic_http provider")
-        raise ProviderError("generic HTTP provider execution is opt-in and not exercised by local genesis")
+        url = os.getenv("AGENTCO_GENERIC_PROVIDER_URL")
+        token = os.getenv("AGENTCO_GENERIC_PROVIDER_TOKEN")
+        if not url:
+            raise ProviderConfigurationError("AGENTCO_GENERIC_PROVIDER_URL is required for generic_http provider")
+        _require_https_or_local(url)
+        _check_host_allowlist(url, os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(","))
+        headers = {"Authorization": f"Bearer {token}"} if token else {}
+        template = json.loads(os.getenv("AGENTCO_GENERIC_PROVIDER_TEMPLATE", "{}") or "{}")
+        payload = {**template, "prompt": request.prompt, "structured_input": request.structured_input}
+        data = _post_json(url, payload, headers, float(os.getenv("AGENTCO_GENERIC_TIMEOUT_SECONDS", "30")), 1_000_000)
+        answer_path = os.getenv("AGENTCO_GENERIC_ANSWER_FIELD", "answer")
+        answer = data
+        for part in answer_path.split("."):
+            answer = answer.get(part) if isinstance(answer, dict) else None
+        if answer is None:
+            raise ProviderResponseError("generic provider response missing configured answer field")
+        return {
+            "answer": answer,
+            "structured_output": {"raw_response": data},
+            "confidence": None,
+            "confidence_classification": "unavailable",
+            "evidence": [{"type": "provider_response", "provider_response_id": data.get("id")}],
+            "citations": [],
+            "tool_calls": [],
+            "provider": self.provider_type,
+            "model": data.get("model"),
+            "latency": {"provider_ms": data.get("_agentco_latency_ms"), "retry_count": 0},
+            "usage": data.get("usage") or {},
+            "request_metadata": {"url": url, "headers": _redacted_headers(headers)},
+        }
 
 
 def provider_from_policy(policy: dict[str, Any]) -> CapabilityProvider:
-    provider = policy.get("provider", "deterministic_local_reference")
-    if provider == "deterministic_local_reference":
-        return DeterministicLocalReferenceProvider()
+    provider = policy.get("provider", "deterministic_protocol_reference")
+    if provider in {"deterministic_protocol_reference", "deterministic_local_reference"}:
+        return DeterministicProtocolReferenceProvider()
     if provider == "mock_development":
         return MockDevelopmentProvider()
     if provider == "openai_compatible":
