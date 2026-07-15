@@ -26,9 +26,9 @@
     "workflow_execution_logic": "ec29949d433d2cde94f2dd6bbc47453673ad585e6f0943356fb03688a0c38099"
   },
   "created_at": "2026-07-15T00:00:00Z",
-  "freeze_attestation_content_hash": "acef17db8bae20dd686d91bf3c248147b10ee11588716062619fbd1fad092dd2",
-  "freeze_attestation_logical_hash": "b45660723b8c8950440e69c90635f5e61a1142aaeb2dda6d359b18686cadfd7f",
-  "freeze_attestation_sha": "4159fd5cc81efac807162984f75ec982a602aaf0",
+  "freeze_attestation_content_hash": "5d17bc1b30b1e534ef33d5a013a8be1d2e75b7da483c9d5d072bd6eaee06d08e",
+  "freeze_attestation_logical_hash": "e11d84737512cabf8f4ef734636d42b636669612a8e6656d805db83233207599",
+  "freeze_attestation_sha": "4592c53326e3385911be7677e59222c42ab475e6",
   "freeze_candidate_sha": "4159fd5cc81efac807162984f75ec982a602aaf0",
   "freeze_candidate_tree_hash": "8b02540c5f93bc29e151036a83aa2412b4a106c7",
   "frozen_directories": [
