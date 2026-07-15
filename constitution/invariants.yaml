@@ -466,3 +466,62 @@ invariants:
     statement: The research and knowledge-acquisition stages of the universal capability lifecycle have first-class records, not only the five admission stages.
     tier: statute
     status: planned
+  - id: V13-INV-001
+    statement: A judge or presiding actor cannot be the complainant or the respondent in the case they rule on.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-002
+    statement: An enforcement order mutates real runtime state — a resource penalty debits the treasury and a citizen sanction restricts the citizen — not merely a recorded verdict.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/services/treasury.service.ts
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-003
+    statement: An appeal is ruled on by an actor distinct from the trial judge.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-004
+    statement: A case advances only along its status machine, and transitions are recorded append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V13-INV-005
+    statement: A duplicate final ruling on the same case is blocked.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/136_judiciary.sql
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-006
+    statement: Dissent from a ruling is recordable and preserved, not suppressed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V13-INV-007
+    statement: Rulings can record precedent principles retrievable for later cases.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V13-INV-008
+    statement: An enforcement order that partially fails rolls back atomically, leaving no half-applied ruling.
+    tier: statute
+    status: planned
+  - id: V13-INV-009
+    statement: Precedent is consulted as a first-class input to rulings, not merely retrievable after the fact.
+    tier: statute
+    status: planned
