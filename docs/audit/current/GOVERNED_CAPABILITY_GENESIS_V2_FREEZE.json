@@ -1,0 +1,36 @@
+{
+  "freeze_sha": "952d055d0fadd9d668380dbee668147fc8e8c1b4",
+  "freeze_tree_hash": "c0b0034dcaf9ca3b2e4e14f7e96517d129304fc8",
+  "runtime_hash": "bfd7cf099cca1b30e5426975df74ae7be905314dc3f341d13e3010f3ee98993e",
+  "provider_bundle_hash": "489e5875429612fb8afd4fa34ad36bde246c9e1b37b773ee34404c767f3e8bf3",
+  "tool_bundle_hash": "cbd68c5ad311973c1637a3f45d5570c7b357c7babd629fd30131d9116ab06c12",
+  "benchmark_registry_hash": "c400acfa545cb0ee0150c233815bc49ffe2ccc45d93f1356739734cdb55b1931",
+  "scorer_hash": "46b8372d9e5de8333c8144a4b7f98762c10ff96607bf79ed1e8d971dddbe026a",
+  "rubric_aggregate_hash": "8493736473b9e77733d0c79fb21ebd83dd7704df664b2c14e85084991c640231",
+  "fixture_aggregate_hash": "ab5aab6a2df2f390d5ead15338ba80de534f0d8ef58493302db24bddbe86de99",
+  "environment_hash": "3fb20df4ebeef9551a4f86fdb35c14548bfe191025409091f64924eb50e457e1",
+  "environment": {
+    "python": "3.13.9",
+    "implementation": "CPython",
+    "platform": "macOS-26.2-arm64-arm-64bit-Mach-O"
+  },
+  "frozen_items": [
+    "runtime implementation",
+    "provider implementations",
+    "provider capability metadata",
+    "tool implementation",
+    "benchmark registry",
+    "case translation",
+    "scorers",
+    "rubrics",
+    "fixtures",
+    "environment contract"
+  ],
+  "post_freeze_rules": {
+    "validation_or_hidden_results_may_modify_runtime": false,
+    "validation_or_hidden_results_may_modify_provider_code": false,
+    "validation_or_hidden_results_may_modify_scoring": false,
+    "validation_or_hidden_results_may_modify_cases": false,
+    "new_campaign_required_for_frozen_change": true
+  }
+}
