@@ -1410,3 +1410,50 @@ invariants:
     statement: A Preview mode lets an operator dry-run a protected action and see its projected effect before executing.
     tier: statute
     status: planned
+  - id: V28-INV-001
+    statement: The browser never receives the backend API key; it is injected server-side by the proxy.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/api/[...path]/route.ts
+  - id: V28-INV-002
+    statement: The frontend reaches the backend only through the server-side proxy, so hop-by-hop headers are stripped and auth is centralized.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/api/[...path]/route.ts
+  - id: V28-INV-003
+    statement: The civilization operator console renders only governed backend data, never fabricated or placeholder values.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/civilization/page.tsx
+      - backend/tests/civilization-operator.test.ts
+  - id: V28-INV-004
+    statement: Operator pages exist for the civilization's principal subsystems (dashboard, governance, autonomy, audit, events, finance, incidents, performance, validation).
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app
+  - id: V28-INV-005
+    statement: A health route is exposed for the frontend independent of backend auth.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/api/health/route.ts
+  - id: V28-INV-006
+    statement: The architecture, institution, capability, and mission graphs are visualized from the Self Model as first-class explorers.
+    tier: regulation
+    status: planned
+  - id: V28-INV-007
+    statement: A reasoning explorer reconstructs why any decision was made (the reasoning obligation, surfaced).
+    tier: regulation
+    status: planned
+  - id: V28-INV-008
+    statement: A learning explorer shows the failure to candidate to promotion/rollback lineage visually.
+    tier: regulation
+    status: planned
+  - id: V28-INV-009
+    statement: Every operator page declares which governed endpoint sources each value, so a fabricated value would fail a view-contract check.
+    tier: regulation
+    status: planned

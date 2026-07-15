@@ -53,7 +53,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 23 | 30 | Verification | statute | descriptive | written | backend/tests/, evals/, .github/workflows/ |
 | 24 | 29 | Infrastructure | regulation | mixed | written | docker-compose*.yml, infrastructure/, helm chart |
 | 25 | 27 | Operator Control Plane | statute | mixed | written | override-queue.service.ts, kill-switch, frontend override page |
-| 26 | 28 | Operator Experience | regulation | mixed | not written | frontend/ pages |
+| 26 | 28 | Operator Experience | regulation | mixed | written | frontend/ pages |
 | 27 | 24 | Interaction Intelligence | regulation | prescriptive | not written | backend routes, autonomy-action-planner.service.ts |
 | 28 | 26 | Multi-Agent Civilization | statute | prescriptive | not written | team-activation.service.ts, specialist role registry (backend/src/types/specialist-roles.ts) |
 | 29 | 25 | Capability Evolution Framework | statute | prescriptive | not written | selfcoding/ (existing single-capability instance to generalize from), skill-library.service.ts |
