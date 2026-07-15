@@ -51,7 +51,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 21 | 18 | Civilization Self Model | statute | prescriptive | written | BUILD_LEDGER.yaml, backend/src/services/ inventory |
 | 22 | 34 | Civilization Memory | statute | mixed | written | memory-promotion-pipeline.service.ts, memory-retrieval.service.ts, event_log + agent_memories migrations |
 | 23 | 30 | Verification | statute | descriptive | written | backend/tests/, evals/, .github/workflows/ |
-| 24 | 29 | Infrastructure | regulation | mixed | not written | docker-compose*.yml, infrastructure/, helm chart |
+| 24 | 29 | Infrastructure | regulation | mixed | written | docker-compose*.yml, infrastructure/, helm chart |
 | 25 | 27 | Operator Control Plane | statute | mixed | not written | override-queue.service.ts, kill-switch, frontend override page |
 | 26 | 28 | Operator Experience | regulation | mixed | not written | frontend/ pages |
 | 27 | 24 | Interaction Intelligence | regulation | prescriptive | not written | backend routes, autonomy-action-planner.service.ts |

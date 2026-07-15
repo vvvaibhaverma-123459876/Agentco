@@ -1298,3 +1298,59 @@ invariants:
     statement: Test coverage of enforced invariants is measured, so a constitutional enforced claim without a covering test is detected.
     tier: statute
     status: planned
+  - id: V29-INV-001
+    statement: Migrations run as a dedicated job before the application serves traffic, so no instance serves against an un-migrated schema.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/migration-job.yaml
+      - backend/tests/helm-deployment-contract.test.ts
+  - id: V29-INV-002
+    statement: Backend and frontend workloads declare liveness and readiness probes, so an unhealthy instance is not sent traffic.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/deployment.yaml
+      - backend/src/server.ts
+  - id: V29-INV-003
+    statement: The outbox relay and civilization scheduler run as their own deployments, matching the runtime OS worker model.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/outbox-worker-deployment.yaml
+      - infrastructure/kubernetes/helm/agentco/templates/civilization-scheduler-deployment.yaml
+  - id: V29-INV-004
+    statement: The local stack provides the full dependency set (Postgres, Redis, Kafka, Vault, Prometheus, Grafana, OTel) so the system is runnable end to end locally.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - docker-compose.yml
+  - id: V29-INV-005
+    statement: The deployment exposes Prometheus metrics via the application /metrics endpoint.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/server.ts
+      - infrastructure/prometheus
+  - id: V29-INV-006
+    statement: Autoscaling and a pod disruption budget are defined so the backend scales and survives voluntary disruption.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/hpa.yaml
+      - infrastructure/kubernetes/helm/agentco/templates/pdb.yaml
+  - id: V29-INV-007
+    statement: A Docker startup verification exists that boots the full stack and checks each dependency.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - scripts/verify_docker_startup.py
+      - backend/tests/phase4-production-deployment.test.ts
+  - id: V29-INV-008
+    statement: Hosted production operation (continuous SLOs, DR, backups, incident response, long-running operational evidence) is certified against a live cluster.
+    tier: regulation
+    status: planned
+  - id: V29-INV-009
+    statement: Secrets are delivered from a managed secret store (Vault) in production rather than environment plaintext.
+    tier: regulation
+    status: planned
