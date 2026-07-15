@@ -71,7 +71,18 @@ jobs:
 
       - name: Capability runtime Python tests
         run: |
-          python3.13 -m pytest tests/test_capability_runtime.py tests/test_capability_provider_adapters.py tests/test_capability_genesis_v3.py tests/test_protocol_baseline.py -q
+          python3.13 -m pytest \
+            tests/test_protocol_baseline_v2.py \
+            tests/test_capability_genesis_v4.py \
+            tests/test_capability_freeze_integrity.py \
+            tests/test_protocol_control_execution.py \
+            tests/test_capability_anti_hardcoding.py \
+            tests/test_domain_scorers.py \
+            tests/test_software_capability_workspace.py \
+            tests/test_data_capability_workspace.py \
+            tests/test_capability_provider_adapters.py \
+            tests/test_capability_runtime.py \
+            -q
 
       - name: Capability freeze verifier
         run: python3.13 scripts/verify_capability_genesis_freeze.py --check
