@@ -132,8 +132,20 @@ green release-gate run (V30-INV-008), and an invariant-coverage measurement
    V1-INV-007). This is the constitutional loop's most important verification gap; the
    2026-07-14 walk-back showed why it matters.
 2. **`main` carries pre-existing gate debt.** Clean-room audit and CI are red on `main`
-   for score-validation/report-staleness reasons predating the constitution work; owning
-   and clearing this debt is this volume's live task (V0 open question 4).
+   (V0 open question 4). Diagnosed 2026-07-15: the fixable-cleanly failures were snapshot
+   staleness from adding tracked files — `verify_gate_integrity` (jest `--forceExit`),
+   the forensic inventory/audit-controls, and the `score-validation` input hash — all now
+   regenerated and green. The **remaining** blocker is release-gate step 12/12 ("clean
+   tree after gate"): the Python suite regenerates `docs/audit/current/*` runtime-
+   architecture snapshots (`RUNTIME_REACHABILITY`, `ACTUAL_RUNTIME_ARCHITECTURE`,
+   `RUNTIME_COMPONENT_LEDGER`, `CLAIM_EVIDENCE_MATRIX`, `INTEGRATION_CONTRACT_MATRIX`,
+   `RUNTIME_INTEGRATION_FINDINGS`) and they differ by **thousands of lines** — the
+   committed snapshots predate the entire C0–C15 layer, not merely the constitution files.
+   Regenerating them is a substantive, unverifiable change to the operator's audit
+   evidence (a ~3,800-line `RUNTIME_REACHABILITY` diff alone), so it was deliberately
+   **not** committed autonomously: blindly refreshing forensic evidence is the fake-green
+   this gate exists to catch. Clearing it needs an operator decision on whether those
+   snapshots should be refreshed to the current runtime and by whom.
 3. **No invariant-coverage metric.** The constitution now has 197 invariants, 143 marked
    enforced; nothing yet proves each enforced invariant has a covering test (V30-INV-009).
    A coverage report keyed by invariant id would close the loop between the constitution
