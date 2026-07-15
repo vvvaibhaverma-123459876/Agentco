@@ -62,7 +62,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 32 | 20 | Knowledge Discovery Framework | charter | aspirational | written | evals/ |
 | 33 | 21 | Reality Models | charter | aspirational | written | (none) |
 | 34 | 22 | Hypothesis Generation Framework | charter | aspirational | written | (none) |
-| 35 | 31 | Civilization Evolution | charter | aspirational | not written | BUILD_LEDGER.yaml |
+| 35 | 31 | Civilization Evolution | charter | aspirational | written | BUILD_LEDGER.yaml |
 
 ## Working agreement
 
