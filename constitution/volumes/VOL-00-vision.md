@@ -39,19 +39,30 @@ layers above it grant, and each layer's claims are audited by machinery it does 
 
 ```text
 Vision → Constitution → Civilization Kernel → Operating System
-      → Identity & Authority → Society → Institutions → Economy
+      → Identity & Authority → Society → Institutions (emergent) → Economy
       → Knowledge → Reasoning → Governance → Judiciary
-      → Learning → Capability Expansion → Autonomous Evolution
-      → Self Inspection → Self Model → Architecture Evolution
-      → Scientific Discovery → World Models → Imagination → Constraint Engine
-      → Response Intelligence → Coder Civilization → Multi-Agent Coordination
-      → Superuser Control Plane → Operator Plane → Infrastructure
+      → Learning → Capability Expansion → Autonomous Evolution (six loops)
+      → Self Inspection → Civilization Memory → Civilization Self Model
+      → Structural Evolution → Knowledge Discovery → Reality Models
+      → Hypothesis Generation → Constraint Engine
+      → Interaction Intelligence → Capability Evolution → Multi-Agent Coordination
+      → Operator Control Plane → Operator Plane → Infrastructure
       → Verification → Civilization Evolution
 ```
 
 Each arrow is a dependency, not decoration: governance (V12) can only bind citizens that
 identity (V4) can name; the judiciary (V13) can only sanction resources the economy (V7)
 accounts for; learning (V14) can only promote what verification (V30) has scored.
+
+Every layer names a **mechanism**, never a discipline (V0-INV-009, Domain Neutrality):
+no permanent architectural component exists solely for one knowledge domain or
+profession. Coding, physics, medicine, finance — any field, including ones that do not
+exist today — enter the civilization as *runtime entities* through the dynamic domain
+registry (`backend/src/db/migrations/102_domain_registry.sql`), the capability
+expansion gates (`backend/src/db/migrations/139_capability_expansion.sql`), emergent
+institutions (V6), and the Knowledge Discovery Framework (V20). Adding a new discipline
+must require no new architectural layer, no new runtime, and no constitutional
+redesign. Rationale and audit: `constitution/GENERALIZATION_REPORT.md`.
 
 ### Evolution philosophy
 
@@ -68,8 +79,9 @@ the architecture itself (V19) and to the constitution (V31): V0-INV-008.
 
 Success is layered, and each layer is machine-checkable before the next is claimed:
 
-1. **Constitutional success** — all ~34 volumes written and the drift checker green in
-   CI on every push (`scripts/constitution/check_constitution.py`): V0-INV-001.
+1. **Constitutional success** — every volume in `constitution/INDEX.md` (35 today)
+   written and the drift checker green in CI on every push
+   (`scripts/constitution/check_constitution.py`): V0-INV-001.
 2. **Verification success** — completion claims derived from ledgers, never prose;
    canonical release gates green against the built code before any completion predicate
    is set true: V0-INV-003, V0-INV-007.
@@ -127,6 +139,7 @@ Terms below are the repository's existing vocabulary and are binding for all vol
 | V0-INV-006 | Every human-readable status surface is generated from a ledger rather than hand-edited, so no two status documents can disagree. | planned | — |
 | V0-INV-007 | A completion predicate may be set true only after the repository's canonical release gates have run green against the built code. | planned | — |
 | V0-INV-008 | AgentCo evolves its own architecture, institutions, and capabilities over time while preserving constitutional continuity, auditability, and human oversight. | aspirational | — |
+| V0-INV-009 | No permanent architectural component may exist solely for a specific knowledge domain or profession — domain expertise emerges through the capability, domain, institution, and knowledge-discovery frameworks (Domain Neutrality). | enforced | `scripts/constitution/check_constitution.py` |
 
 ## 5. Interfaces
 
@@ -261,11 +274,21 @@ What exists in this repository today for each clause of the vision sentence:
    Volume 30's scope.
 5. **Python/TypeScript duplication.** The quarantined Python civilization stack and the
    dual outbox split are frozen decisions in `docs/civilization/CANONICAL_RUNTIME_MAP.md`
-   (D1, D2); whether quarantine becomes deletion is a Volume 19 (Architecture
-   Evolution) decision.
+   (D1, D2); whether quarantine becomes deletion is a Volume 19 (Structural Evolution
+   Framework) decision.
+6. **Predefined-versus-emergent seeds.** The ten mandatory institutions
+   (`backend/src/services/institution-governance.service.ts`) and the five-department
+   template (`backend/src/services/institutions.service.ts`) are function-named and
+   Domain-Neutrality-compliant, but permanent-by-seed: the ongoing-justification review
+   that the emergent-institution lifecycle requires does not exist yet. Likewise the
+   specialist role catalogue (`backend/src/types/specialist-roles.ts`) is a compile-time
+   constant rather than a registry, and the domain registry
+   (`backend/src/db/migrations/102_domain_registry.sql`) has no `retired` state.
+   Migration items: `constitution/GENERALIZATION_REPORT.md`.
 
 ## 11. Change log
 
 | Date | Change | Author / authorizing human | Rationale |
 |---|---|---|---|
 | 2026-07-15 | Volume written (constitution bootstrap). | Claude (build agent), directed by the operator's Architecture Constitution prompt kit | Establish the vision layer and the drift-checker discipline before any other volume. |
+| 2026-07-15 | Domain-neutrality generalization: layered diagram generalized (Coder Civilization → Capability Evolution, Scientific Discovery → Knowledge Discovery, World Models → Reality Models, Imagination → Hypothesis Generation, Response Intelligence → Interaction Intelligence, Architecture Evolution → Structural Evolution, Superuser → Operator Control Plane, Self Model split into Civilization Memory + Civilization Self Model); V0-INV-009 added and mechanically enforced; open question 6 added. | Operator (Constitutional Architecture Correction directive, 2026-07-15); applied by Claude | Examples must not ossify into permanent architecture; the civilization must accommodate disciplines that do not exist today without structural redesign. |

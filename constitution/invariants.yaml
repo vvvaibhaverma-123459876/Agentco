@@ -60,3 +60,9 @@ invariants:
     statement: AgentCo evolves its own architecture, institutions, and capabilities over time while preserving constitutional continuity, auditability, and human oversight.
     tier: constitutional
     status: aspirational
+  - id: V0-INV-009
+    statement: No permanent architectural component may exist solely for a specific knowledge domain or profession — domain expertise emerges through the capability, domain, institution, and knowledge-discovery frameworks (Domain Neutrality).
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
