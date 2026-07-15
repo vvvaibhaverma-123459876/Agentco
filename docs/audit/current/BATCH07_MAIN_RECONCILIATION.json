@@ -2,18 +2,39 @@
   "report_id": "batch07-main-reconciliation",
   "branch": "audit/remediation-07-cross-version-civilization-evaluation",
   "previous_batch07_head": "89c3ff3ecef5a7b3a41981348374930c4cc591f8",
-  "current_main_head": "bb23cd8a267e57c6955223a5d63fd3aac981846f",
-  "merge_base": "651794a41513db1e40930f08c253ef261af7c1e7",
-  "merge_commit": "43f443239342001b0045e0f472966793334d0482",
+  "current_main_head": "b3bd3dc17b20350d28385213d02a3010dd1fca1e",
+  "merge_base": "bb23cd8a267e57c6955223a5d63fd3aac981846f",
+  "merge_commit": "c18b2b9589abe33dfda95a9e4f01f98efc3519cc",
   "merge_strategy": "normal_merge_commit",
-  "conflict_files": [],
+  "prior_reconciliation": {
+    "previous_batch07_head": "89c3ff3ecef5a7b3a41981348374930c4cc591f8",
+    "main_head_merged": "bb23cd8a267e57c6955223a5d63fd3aac981846f",
+    "merge_base": "651794a41513db1e40930f08c253ef261af7c1e7",
+    "merge_commit": "43f443239342001b0045e0f472966793334d0482"
+  },
+  "conflict_files": [
+    "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
+    "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
+    "docs/audit/FORENSIC_FILE_INVENTORY.json",
+    "docs/audit/FORENSIC_FILE_INVENTORY.md"
+  ],
   "auto_merged_files": [
-    "Makefile"
+    "Makefile",
+    "constitution/GENERALIZATION_REPORT.md",
+    "constitution/INDEX.md",
+    "constitution/invariants.yaml",
+    "constitution/volumes/VOL-00-vision.md",
+    "constitution/volumes/VOL-01-constitutional-core.md",
+    "constitution/volumes/VOL-32-security-and-threat-model.md",
+    "reports/system_run/latest/gate_integrity.json",
+    "reports/system_run/latest/gate_integrity.md",
+    "scripts/constitution/check_constitution.py"
   ],
   "resolution_rationale": [
-    "Preserved current main runtime and civilization additions from bb23cd8a267e57c6955223a5d63fd3aac981846f.",
+    "Preserved current main constitution/runtime updates from b3bd3dc17b20350d28385213d02a3010dd1fca1e.",
     "Preserved Batch 07 evidence-integrity controls, invalidated campaign history, and Batch 07E primitive/capability separation.",
     "Preserved content-hash migration identity validation and current release-gate behavior.",
+    "Resolved generated forensic ledger conflicts by regenerating the ledgers from the merged tree rather than hand-selecting either stale side.",
     "Did not restore synthetic evaluator outputs or classify runtime primitives as capability tasks."
   ],
   "post_merge_required_actions": [
