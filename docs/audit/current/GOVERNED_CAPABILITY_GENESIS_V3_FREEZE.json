@@ -1,0 +1,42 @@
+{
+  "benchmark_case_bundle_hash": "59f2af3257eb4bc8c7a9640187bbb817b6c9030f26e84b0cc4cfe36d058ff5d9",
+  "benchmark_registry_file_hash": "e76ec9fb3850b6657986362afe6682cb238acff0e04ab5a8995cbc2d97c70017",
+  "campaign_ids": {
+    "protocol": "governed-capability-protocol-baseline-v1",
+    "real_capability": "governed-capability-genesis-v3"
+  },
+  "dependency_lock_hash": "25d96beb11eaf98454e2f2014bb1a705922c77f66fad3894d67202947894ddb4",
+  "environment_contract_hash": "1f077313d27f8dca7d6a276e9eb94db4f79cb7a163310b1c07c16089b45c15ad",
+  "fixture_bundle_hash": "e5c0b13b3672ecbb898abe2e21f4264d3630e022f97b0a98a1197c67ffd8b09c",
+  "freeze_attestation_sha": "PENDING_COMMIT",
+  "freeze_candidate_sha": "b450a799bdd877b92d9e06c401b3df3eec5d3ac1",
+  "freeze_candidate_tree_hash": "c59093f2b35234dc2d5864b8821aeb2d453a15d1",
+  "freeze_manifest_hash": "2bd10baa33483b38f924d8cf9a09a4207b780caef9848175e26edc1f91116cfa",
+  "freeze_schema_version": "governed-capability-genesis-v3-freeze-v1",
+  "frozen_paths": [
+    "agentco_capability/",
+    "benchmarks/capability_genesis_v3/",
+    "benchmarks/capability_protocol_baseline_v1/",
+    "scripts/run_governed_capability_genesis.py",
+    "scripts/verify_capability_genesis_freeze.py",
+    "scripts/verify_capability_genesis_artifact.py",
+    "requirements/requirements.lock.txt",
+    "backend/package-lock.json",
+    "frontend/package-lock.json"
+  ],
+  "provider_bundle_hash": "dad3aac72e2138d8dc8328b1621862eb7dc0943d82a5687752370f6bdd41899a",
+  "rubric_bundle_hash": "61794c4261b1c5b721b5b2b562c0c56793d06ebb324f543ef438846aea9e980f",
+  "runtime_bundle_hash": "2dfcf48530081adeb50a047bf6bb334a3ebf629c53b3b49f8b5e00dabf5fd87e",
+  "scorer_bundle_hash": "0fedb1cf1350874a8f1744500951d5eb310ceb54bb0ad03c7619fcb0e4d1ccfe",
+  "scorer_file_hash": "8fa56dcbbbdf880761455542ebda77576f5d47c725d5c7b4c74ec784c403a2bf",
+  "thresholds": {
+    "aggregate_correctness": 0.7,
+    "attempted_completion_ratio": 0.75,
+    "capability_task_domains": 4,
+    "per_domain_correctness": 0.5,
+    "supported_domains": 8,
+    "validation_hidden_executed_scorable_cases": 18
+  },
+  "tool_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
+  "workspace_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd"
+}
