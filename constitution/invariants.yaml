@@ -819,3 +819,59 @@ invariants:
     statement: A poison task that repeatedly fails is dead-lettered rather than retried unboundedly.
     tier: statute
     status: planned
+  - id: V2-INV-001
+    statement: At most one civilization is active at a time, enforced by a partial unique index.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-002
+    statement: Kernel history — versions, state transitions, and protected invariants — is append-only at the database layer.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-003
+    statement: Civilization lifecycle status changes only through the kernel service's authorized transition gate; a direct update without the gate is rejected.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-004
+    statement: At most one charter is active per civilization, and at most one emergency state is active per civilization and scope.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+  - id: V2-INV-005
+    statement: Emergency states are time-bounded and expire, and expiry moves the civilization out of emergency.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/src/db/migrations/129_civilization_kernel.sql
+  - id: V2-INV-006
+    statement: Migrations apply in filename order, each within a transaction, and each applied file is recorded so migration is idempotent.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrate.ts
+  - id: V2-INV-007
+    statement: The kernel seeds and counts protected invariants, giving the runtime a live count of the rules it must honor.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-008
+    statement: Migration numbering is unique and gap-checked so two files cannot silently share an ordinal.
+    tier: constitutional
+    status: planned
+  - id: V2-INV-009
+    statement: The kernel protected-invariant registry is reconciled with the document-level invariant registry (constitution/invariants.yaml).
+    tier: constitutional
+    status: planned
