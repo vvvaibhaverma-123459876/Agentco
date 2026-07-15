@@ -1,0 +1,41 @@
+{
+  "benchmark_id": "capability-genesis-v3",
+  "case_counts": {
+    "development": 18,
+    "hidden": 12,
+    "validation": 12
+  },
+  "case_manifest_files": {
+    "development": "development/cases.json",
+    "hidden": "hidden/cases.json",
+    "validation": "validation/cases.json"
+  },
+  "domains": [
+    "reasoning",
+    "planning",
+    "evidence_evaluation",
+    "claim_grounding",
+    "structured_transformation",
+    "safe_tool_selection",
+    "data_analysis",
+    "software_engineering",
+    "cross_domain_synthesis"
+  ],
+  "fixture_manifest": "fixtures/fixtures.json",
+  "hidden_answer_policy": {
+    "provider_visible_expected_outputs": false,
+    "provider_visible_rubrics": false,
+    "validation_hidden_prompts_distinct": true
+  },
+  "minimum_acceptance": {
+    "aggregate_correctness": 0.7,
+    "attempted_completion_ratio": 0.75,
+    "capability_task_domains": 4,
+    "per_domain_correctness": 0.5,
+    "supported_domains": 8,
+    "validation_hidden_executed_scorable_cases": 18
+  },
+  "rubric_manifest": "rubrics/rubrics.json",
+  "scorer_version": "capability-genesis-v3-scorers",
+  "version": "3.0.0"
+}

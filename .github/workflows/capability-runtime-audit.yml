@@ -17,13 +17,13 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Genesis V2 mode"
+        description: "Capability audit mode"
         required: true
-        default: "protocol-reference"
+        default: "protocol-baseline-v1"
         type: choice
         options:
-          - protocol-reference
-          - real-capability-provider
+          - protocol-baseline-v1
+          - real-capability-genesis-v3
       provider:
         description: "Optional provider id for real-capability-provider mode"
         required: false
@@ -44,6 +44,7 @@ jobs:
     env:
       EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       GENESIS_MODE: ${{ github.event.inputs.mode || 'protocol-reference' }}
+      CAPABILITY_MODE: ${{ github.event.inputs.mode || 'protocol-baseline-v1' }}
       GENESIS_PROVIDER: ${{ github.event.inputs.provider || '' }}
     steps:
       - name: Checkout exact head
@@ -69,7 +70,11 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "$EXPECTED_AUDIT_SHA"
 
       - name: Capability runtime Python tests
-        run: python3.13 -m pytest tests/test_capability_runtime.py -q
+        run: |
+          python3.13 -m pytest tests/test_capability_runtime.py tests/test_capability_provider_adapters.py tests/test_capability_genesis_v3.py tests/test_protocol_baseline.py -q
+
+      - name: Capability freeze verifier
+        run: python3.13 scripts/verify_capability_genesis_freeze.py --check
 
       - name: Capability runtime backend tests
         run: cd backend && npm test -- capability-runtime.test.ts --runInBand
@@ -77,12 +82,12 @@ jobs:
       - name: Backend build
         run: cd backend && npm run build
 
-      - name: Capability genesis V2 campaign
+      - name: Capability genesis campaign
         run: |
           if [ -n "$GENESIS_PROVIDER" ]; then
-            python3.13 scripts/run_governed_capability_genesis.py --mode "$GENESIS_MODE" --provider "$GENESIS_PROVIDER"
+            python3.13 scripts/run_governed_capability_genesis.py --mode "$CAPABILITY_MODE" --provider "$GENESIS_PROVIDER"
           else
-            python3.13 scripts/run_governed_capability_genesis.py --mode "$GENESIS_MODE"
+            python3.13 scripts/run_governed_capability_genesis.py --mode "$CAPABILITY_MODE"
           fi
 
       - name: Verify genesis commit binding
@@ -91,16 +96,20 @@ jobs:
           import json
           import os
           from pathlib import Path
-          mode = os.environ["GENESIS_MODE"]
-          manifest_path = Path("artifacts/capability-runtime") / f"governed-capability-genesis-v2-{mode}" / "GENESIS_V2_MANIFEST.json"
+          mode = os.environ["CAPABILITY_MODE"]
+          if mode == "protocol-baseline-v1":
+              manifest_path = Path("artifacts/capability-runtime/governed-capability-protocol-baseline-v1/PROTOCOL_BASELINE_MANIFEST.json")
+          else:
+              manifest_path = Path("artifacts/capability-runtime/governed-capability-genesis-v3/GENESIS_V3_MANIFEST.json")
           manifest = json.loads(manifest_path.read_text())
           if manifest["campaign_execution_sha"] != os.environ["EXPECTED_AUDIT_SHA"]:
               raise SystemExit("genesis manifest SHA does not match workflow head")
-          if mode == "protocol-reference" and manifest["decision"] != "PROTOCOL_BASELINE_ACCEPTED":
-              raise SystemExit("protocol-reference genesis did not pass")
-          if mode == "real-capability-provider" and manifest["decision"] not in {"CAPABILITY_GENESIS_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}:
-              raise SystemExit("real-capability-provider genesis did not produce a valid decision")
+          if mode == "protocol-baseline-v1" and manifest["decision"] != "PROTOCOL_BASELINE_ACCEPTED":
+              raise SystemExit("protocol baseline did not pass")
+          if mode == "real-capability-genesis-v3" and manifest["decision"] not in {"CAPABILITY_GENESIS_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}:
+              raise SystemExit("real-capability genesis did not produce a valid decision")
           PY
+          python3.13 scripts/verify_capability_genesis_artifact.py --check
 
       - name: Upload capability runtime artifacts
         if: always()
@@ -111,5 +120,6 @@ jobs:
             artifacts/capability-runtime/**
             docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.*
             docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_*
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json
           if-no-files-found: warn
           retention-days: 120

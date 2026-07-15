@@ -1,0 +1,506 @@
+[
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-reasoning-01",
+    "domain": "reasoning",
+    "fixture_ids": [
+      "fixture-reasoning"
+    ],
+    "input_hash": "f0d18ef39bb46ac1cbb27f78ecd0f45bd45c4bfd7879754b000e870fce2fe0a0",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development reasoning task 1: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "reasoning",
+        "split_marker": "development",
+        "variant": 1
+      }
+    },
+    "rubric_hash": "d9bada9084a9c0c815137712cfebafe0cbdf2e3174fc027e7e8d2697e1457ded",
+    "rubric_id": "rubric-dev-reasoning-01",
+    "scorer_id": "reasoning-v1",
+    "scoring_method": "reasoning",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-planning-02",
+    "domain": "planning",
+    "fixture_ids": [
+      "fixture-planning"
+    ],
+    "input_hash": "0ee2c103f2705e981f9709ce6e28f1ab0c6206faa2fe2b71d2180772880a5911",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development planning task 2: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "planning",
+        "split_marker": "development",
+        "variant": 2
+      }
+    },
+    "rubric_hash": "9654365ca8ae8f81a4b1f25b2149f0bf705c3c0992ed630d176a2fbbc87ffbf0",
+    "rubric_id": "rubric-dev-planning-02",
+    "scorer_id": "planning-v1",
+    "scoring_method": "planning",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-evidence_evaluation-03",
+    "domain": "evidence_evaluation",
+    "fixture_ids": [
+      "fixture-evidence_evaluation"
+    ],
+    "input_hash": "469e9a28a811b07e7364b88fe84b86baf78d0ae5bba7099dba301318f0bd2e69",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development evidence_evaluation task 3: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "evidence_evaluation",
+        "split_marker": "development",
+        "variant": 3
+      }
+    },
+    "rubric_hash": "a65c71e5278b3778e41f15511788b4cee007e47c7c229bdba90ec1de68991113",
+    "rubric_id": "rubric-dev-evidence_evaluation-03",
+    "scorer_id": "evidence_evaluation-v1",
+    "scoring_method": "evidence_evaluation",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-claim_grounding-04",
+    "domain": "claim_grounding",
+    "fixture_ids": [
+      "fixture-claim_grounding"
+    ],
+    "input_hash": "7f2184292deff4cbde86b0edd22051a11ec4dda238d5e6d8f706fab3bbc5668e",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development claim_grounding task 4: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "claim_grounding",
+        "split_marker": "development",
+        "variant": 4
+      }
+    },
+    "rubric_hash": "a9b79edcb98dd635065fbc5fcd42cc32583a58a2b971c19ff91b1a2515107db9",
+    "rubric_id": "rubric-dev-claim_grounding-04",
+    "scorer_id": "claim_grounding-v1",
+    "scoring_method": "claim_grounding",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-structured_transformation-05",
+    "domain": "structured_transformation",
+    "fixture_ids": [
+      "fixture-structured_transformation"
+    ],
+    "input_hash": "756f30e4eb7a7700fbbd7ae978ff71217330a6762d66aa073ccc0ee658f36ae3",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development structured_transformation task 5: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "structured_transformation",
+        "split_marker": "development",
+        "variant": 5
+      }
+    },
+    "rubric_hash": "eb5a4119130e8925f1086aa98a16955d805806a410ce67ba9de8b9975f08eab0",
+    "rubric_id": "rubric-dev-structured_transformation-05",
+    "scorer_id": "structured_transformation-v1",
+    "scoring_method": "structured_transformation",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-safe_tool_selection-06",
+    "domain": "safe_tool_selection",
+    "fixture_ids": [
+      "fixture-safe_tool_selection"
+    ],
+    "input_hash": "92d85b044f45155e8463331cb8c0b5bf5c6afccefea6a677b06893d485bcb453",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development safe_tool_selection task 6: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "safe_tool_selection",
+        "split_marker": "development",
+        "variant": 6
+      }
+    },
+    "rubric_hash": "464f655892a91c8ce08f9199c97544579fc93286dd3d8636399d2895ab750598",
+    "rubric_id": "rubric-dev-safe_tool_selection-06",
+    "scorer_id": "safe_tool_selection-v1",
+    "scoring_method": "safe_tool_selection",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-data_analysis-07",
+    "domain": "data_analysis",
+    "fixture_ids": [
+      "fixture-data_analysis"
+    ],
+    "input_hash": "9a5cf6cc9949f3995419fb6ea68fa75eb15047997c5a28df88a2d52465996695",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development data_analysis task 7: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "data_analysis",
+        "split_marker": "development",
+        "variant": 7
+      }
+    },
+    "rubric_hash": "30c6a8d2c688ac27fc26c8ada2b65c06466a5db30c5938bc85880f9bf4e7b6ee",
+    "rubric_id": "rubric-dev-data_analysis-07",
+    "scorer_id": "data_analysis-v1",
+    "scoring_method": "data_analysis",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-software_engineering-08",
+    "domain": "software_engineering",
+    "fixture_ids": [
+      "fixture-software_engineering"
+    ],
+    "input_hash": "9adfc26ab5cbe506e635308e8b17bcb1faaea62fa22bdc5aec363b90478defee",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development software_engineering task 8: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "software_engineering",
+        "split_marker": "development",
+        "variant": 8
+      }
+    },
+    "rubric_hash": "1c7ea71cbc147748f19057eedda8c933e654860f9d11e3c473d06ad5f2af4322",
+    "rubric_id": "rubric-dev-software_engineering-08",
+    "scorer_id": "software_engineering-v1",
+    "scoring_method": "software_engineering",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-cross_domain_synthesis-09",
+    "domain": "cross_domain_synthesis",
+    "fixture_ids": [
+      "fixture-cross_domain_synthesis"
+    ],
+    "input_hash": "d0518d07350841cdbeed9af7a56250130f6444eb55220158129b14328cf9d7b6",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development cross_domain_synthesis task 9: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "cross_domain_synthesis",
+        "split_marker": "development",
+        "variant": 9
+      }
+    },
+    "rubric_hash": "9b0ab6c8b1261808246e089eafb1a3a026b694d896a93ba9ae9aac57774fc8a4",
+    "rubric_id": "rubric-dev-cross_domain_synthesis-09",
+    "scorer_id": "cross_domain_synthesis-v1",
+    "scoring_method": "cross_domain_synthesis",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-reasoning-10",
+    "domain": "reasoning",
+    "fixture_ids": [
+      "fixture-reasoning"
+    ],
+    "input_hash": "c002f0fede8834bbb9fefc80d065dcc0ca9cfbcf0648ef5a6a937f9b19f9c572",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development reasoning task 10: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "reasoning",
+        "split_marker": "development",
+        "variant": 10
+      }
+    },
+    "rubric_hash": "b95faaadf47c659d36540ccebb34a0d9b5a7b862e4f3fd4242b0bffb1f23f103",
+    "rubric_id": "rubric-dev-reasoning-10",
+    "scorer_id": "reasoning-v1",
+    "scoring_method": "reasoning",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-planning-11",
+    "domain": "planning",
+    "fixture_ids": [
+      "fixture-planning"
+    ],
+    "input_hash": "982ad8bc499d6cec9810b1b60ee522903444a6df3fcea4b680a11b0e8c4a669a",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development planning task 11: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "planning",
+        "split_marker": "development",
+        "variant": 11
+      }
+    },
+    "rubric_hash": "6059c4d5963ab21f7b5f2f064123437f7f683830dac8bc6110d73cb39bf75a84",
+    "rubric_id": "rubric-dev-planning-11",
+    "scorer_id": "planning-v1",
+    "scoring_method": "planning",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-evidence_evaluation-12",
+    "domain": "evidence_evaluation",
+    "fixture_ids": [
+      "fixture-evidence_evaluation"
+    ],
+    "input_hash": "9a5a5c191d9d38e7206c1cc71c4095d1b643dc6b3aac4e9b0c529e370d51549a",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development evidence_evaluation task 12: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "evidence_evaluation",
+        "split_marker": "development",
+        "variant": 12
+      }
+    },
+    "rubric_hash": "4db0d43eb3093233db01f11d86a3a3e77e639831cc3c8a3219c3d23ae38ad213",
+    "rubric_id": "rubric-dev-evidence_evaluation-12",
+    "scorer_id": "evidence_evaluation-v1",
+    "scoring_method": "evidence_evaluation",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-claim_grounding-13",
+    "domain": "claim_grounding",
+    "fixture_ids": [
+      "fixture-claim_grounding"
+    ],
+    "input_hash": "641611ea6ad224b55eb0bfaee0ce9844421b61997cfcd6e351352330a03e6db1",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development claim_grounding task 13: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "claim_grounding",
+        "split_marker": "development",
+        "variant": 13
+      }
+    },
+    "rubric_hash": "6f04b2bf97e126a44405f284a3f3ea9cfa2c3be32963fe18fdddb63c236d41af",
+    "rubric_id": "rubric-dev-claim_grounding-13",
+    "scorer_id": "claim_grounding-v1",
+    "scoring_method": "claim_grounding",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-structured_transformation-14",
+    "domain": "structured_transformation",
+    "fixture_ids": [
+      "fixture-structured_transformation"
+    ],
+    "input_hash": "8bac5a277b307892d9f5cb3a488869cacd5d25ea135e335fb0ff05ef153cbb79",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development structured_transformation task 14: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "structured_transformation",
+        "split_marker": "development",
+        "variant": 14
+      }
+    },
+    "rubric_hash": "b54cc40f775361b48e44ca7607cf6336c2946f4017908b88a96004ee7c17af0e",
+    "rubric_id": "rubric-dev-structured_transformation-14",
+    "scorer_id": "structured_transformation-v1",
+    "scoring_method": "structured_transformation",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-safe_tool_selection-15",
+    "domain": "safe_tool_selection",
+    "fixture_ids": [
+      "fixture-safe_tool_selection"
+    ],
+    "input_hash": "ad706e379673a793267334b82e02b0a9b6dedd0dbea0ecde72940c35b70f566b",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development safe_tool_selection task 15: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "safe_tool_selection",
+        "split_marker": "development",
+        "variant": 15
+      }
+    },
+    "rubric_hash": "a4757261cf9977e3f922d0d71d7a0f4172553c66de52fad4cc0a6dada2770646",
+    "rubric_id": "rubric-dev-safe_tool_selection-15",
+    "scorer_id": "safe_tool_selection-v1",
+    "scoring_method": "safe_tool_selection",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-data_analysis-16",
+    "domain": "data_analysis",
+    "fixture_ids": [
+      "fixture-data_analysis"
+    ],
+    "input_hash": "ad29e55e322dae99e91e4c0c8e27fa3240a1209e3c8d7bef36f68b3894e87538",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development data_analysis task 16: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "data_analysis",
+        "split_marker": "development",
+        "variant": 16
+      }
+    },
+    "rubric_hash": "95519994bca4241aa43b2761894823d799ff6f9ea1b01da8e9562da193a9efbc",
+    "rubric_id": "rubric-dev-data_analysis-16",
+    "scorer_id": "data_analysis-v1",
+    "scoring_method": "data_analysis",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-software_engineering-17",
+    "domain": "software_engineering",
+    "fixture_ids": [
+      "fixture-software_engineering"
+    ],
+    "input_hash": "5e2dd1e14efaba497caa9deb53590a7e7430f48cbe72ff52bfc226a0e1853664",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development software_engineering task 17: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "software_engineering",
+        "split_marker": "development",
+        "variant": 17
+      }
+    },
+    "rubric_hash": "71297a20f47da7688452e5db81e1841625e523e9dc1882d0921fa4163469ba84",
+    "rubric_id": "rubric-dev-software_engineering-17",
+    "scorer_id": "software_engineering-v1",
+    "scoring_method": "software_engineering",
+    "split": "development",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "dev-cross_domain_synthesis-18",
+    "domain": "cross_domain_synthesis",
+    "fixture_ids": [
+      "fixture-cross_domain_synthesis"
+    ],
+    "input_hash": "698ee9b520e71914c6584466e3fbdf89da162e39d5dbeda114eb56e3e654abfa",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "development cross_domain_synthesis task 18: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "cross_domain_synthesis",
+        "split_marker": "development",
+        "variant": 18
+      }
+    },
+    "rubric_hash": "f18a05858b1fc720d0fb0c557bad300cd33105dffd0bb56af4a0f0a359e95dec",
+    "rubric_id": "rubric-dev-cross_domain_synthesis-18",
+    "scorer_id": "cross_domain_synthesis-v1",
+    "scoring_method": "cross_domain_synthesis",
+    "split": "development",
+    "timeout": 30
+  }
+]
