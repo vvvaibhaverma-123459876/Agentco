@@ -703,3 +703,59 @@ invariants:
     statement: Voting eligibility and quorum are enforced so a decision cannot be made by an unauthorized or sub-quorum vote.
     tier: constitutional
     status: planned
+  - id: V33-INV-001
+    statement: Model calls flow through a single governed provider service rather than ad-hoc SDK calls scattered across the codebase.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-002
+    statement: A production model call reserves token budget against the resource ledger and fails closed when the budget actor/account is not configured.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-003
+    statement: Output tokens are clamped to a configured maximum on every call.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-004
+    statement: Provider errors are retried only when classified retryable, up to a bounded retry count; cancellation is honored.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-005
+    statement: The model is selected by configuration precedence (request to default to tier default), so swapping a model requires no code change.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - runtime/base_agent/provider_config.py
+  - id: V33-INV-006
+    statement: A tier model clearly incompatible with the selected provider is rejected or overridden rather than sent blindly.
+    tier: statute
+    status: enforced
+    enforcement:
+      - runtime/base_agent/provider_config.py
+  - id: V33-INV-007
+    statement: The model that produced a result is recorded on the result, so outputs are attributable to a specific model.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-008
+    statement: Replacing or upgrading the default model is a governed change with a recorded rationale, not a silent environment edit.
+    tier: statute
+    status: planned
+  - id: V33-INV-009
+    statement: Per-model calibration is tracked so trust is scoped by model, and a model whose calibration degrades is flagged.
+    tier: statute
+    status: planned

@@ -40,7 +40,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 10 | 4 | Identity & Authority | constitutional | mixed | written | backend/src (search "security"), credential.service.ts, reserve/, migration 052 |
 | 11 | 7 | Civilization Economy | statute | mixed | written | resource ledger + budget services, treasury routes, token budget in llm-provider.service.ts |
 | 12 | 12 | Governance | constitutional | mixed | written | governance/constitution services + migrations |
-| 13 | 33 | Model Governance | statute | mixed | not written | llm-provider.service.ts, runtime/base_agent/provider_config.py |
+| 13 | 33 | Model Governance | statute | mixed | written | llm-provider.service.ts, runtime/base_agent/provider_config.py |
 | 14 | 3 | Runtime Operating System | statute | mixed | not written | supervised-runtime + free-run CLIs, outbox-worker, kill-switch services |
 | 15 | 2 | Civilization Kernel | constitutional | mixed | not written | backend/src/server.ts, migrate.ts, event_log/outbox, civilization-runtime.service.ts (migration 129) |
 | 16 | 10 | Reasoning Engine | article | prescriptive | not written | decision_log migrations, autonomy-action-planner.service.ts |
