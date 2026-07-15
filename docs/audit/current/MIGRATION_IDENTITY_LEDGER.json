@@ -218,7 +218,7 @@
     ]
   },
   "ledger_version": "migration-identity-ledger-v1",
-  "migration_count": 129,
+  "migration_count": 130,
   "migration_directory": "backend/src/db/migrations",
   "migrations": [
     {
@@ -2737,6 +2737,21 @@
       ],
       "sequence": 139,
       "stable_migration_id": "139_capability_expansion.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a7d9cfbbdbc4c439e05dec1bd8438031303651d1d8597856f72c50e3a2b79b02",
+      "filename": "140_civilization_os.sql",
+      "origin_commit": "1a3dc570cd76d0b1e6c83408ecaf9cbd3ebcc73e",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_os_ticks_number",
+        "civ_os_state",
+        "civ_os_ticks"
+      ],
+      "sequence": 140,
+      "stable_migration_id": "140_civilization_os.sql",
       "upgrade_prerequisites": []
     }
   ],
