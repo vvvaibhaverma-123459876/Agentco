@@ -291,3 +291,58 @@ invariants:
     statement: Calibration drift is monitored continuously and raises a governed alert when a subject's ECE degrades beyond threshold.
     tier: statute
     status: planned
+  - id: V8-INV-001
+    statement: A mission completes only when required workstreams are complete and evidence, settlement, audit records, and an outcome all exist; otherwise completion fails closed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/tests/missions.test.ts
+  - id: V8-INV-002
+    statement: A mission can be completed only from the evaluating state, and completion writes a mission attestation in the same transaction as the state transition.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/tests/missions.test.ts
+  - id: V8-INV-003
+    statement: Mission status changes only through the mission service's authorized transition path; direct database updates to status are rejected by trigger.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/133_missions.sql
+      - backend/tests/missions.test.ts
+  - id: V8-INV-004
+    statement: An archived mission is immutable, and mission identity columns cannot be altered after creation.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/133_missions.sql
+  - id: V8-INV-005
+    statement: Mission creation is checked against enforceable runtime policy before the mission exists.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/src/services/policy-enforcement.service.ts
+  - id: V8-INV-006
+    statement: Every mission state transition is appended to an append-only transition log.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/133_missions.sql
+  - id: V8-INV-007
+    statement: Executor actions that fetch the web pass the SSRF/URL-safety guard, and each action attempt is recorded whether it succeeds or fails.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/action-executor.service.ts
+      - backend/tests/action-loop.test.ts
+  - id: V8-INV-008
+    statement: A mission's resource reservations are settled or released on completion or abandonment, with no orphaned reservations.
+    tier: statute
+    status: planned
+  - id: V8-INV-009
+    statement: Every required workstream traces to at least one piece of grounded evidence, not merely to a completion flag.
+    tier: statute
+    status: planned
