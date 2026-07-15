@@ -55,7 +55,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 25 | 27 | Operator Control Plane | statute | mixed | written | override-queue.service.ts, kill-switch, frontend override page |
 | 26 | 28 | Operator Experience | regulation | mixed | written | frontend/ pages |
 | 27 | 24 | Interaction Intelligence | regulation | prescriptive | written | backend routes, autonomy-action-planner.service.ts |
-| 28 | 26 | Multi-Agent Civilization | statute | prescriptive | not written | team-activation.service.ts, specialist role registry (backend/src/types/specialist-roles.ts) |
+| 28 | 26 | Multi-Agent Civilization | statute | mixed | written | coalition.service.ts (mig 132), team-activation.service.ts, specialist role registry (backend/src/types/specialist-roles.ts) |
 | 29 | 25 | Capability Evolution Framework | statute | prescriptive | not written | selfcoding/ (existing single-capability instance to generalize from), skill-library.service.ts |
 | 30 | 16 | Autonomous Evolution | statute | prescriptive | not written | goal-formation tick in supervised runtime; six-loop decomposition per GENERALIZATION_REPORT.md §8 |
 | 31 | 19 | Structural Evolution Framework | statute | prescriptive | not written | skill-canary.service.ts (promotion pattern to reuse) |

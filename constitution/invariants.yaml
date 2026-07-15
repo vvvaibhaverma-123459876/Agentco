@@ -1501,3 +1501,61 @@ invariants:
     statement: A teaching/explanation mode can render the why of any decision to a human at an appropriate level of detail.
     tier: regulation
     status: planned
+  - id: V26-INV-001
+    statement: A coalition advances only along its lifecycle, and every transition is recorded append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/src/db/migrations/132_institution_coalitions.sql
+      - backend/tests/coalitions.test.ts
+  - id: V26-INV-002
+    statement: Negotiation proceeds in recorded rounds with recorded proposals, so a coalition's bargaining is auditable.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/tests/coalitions.test.ts
+  - id: V26-INV-003
+    statement: Consensus is a recorded result and dissent is recordable and preserved, so agreement never erases disagreement.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/src/db/migrations/132_institution_coalitions.sql
+  - id: V26-INV-004
+    statement: Coalition commitments and delegations are recorded obligations that bind the committing party.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/tests/coalitions.test.ts
+  - id: V26-INV-005
+    statement: A coalition can settle and can escalate to the judiciary, so disputes have a governed exit.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/src/services/judiciary-case.service.ts
+  - id: V26-INV-006
+    statement: Specialist activation authenticates via HMAC and enforces budget and the protected-execution gate, so spawned agents are bounded citizens.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/team-activation.service.ts
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/team-activation.test.ts
+  - id: V26-INV-007
+    statement: Specialist processes shut down gracefully, terminating their child processes on shutdown.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/team-activation.service.ts
+  - id: V26-INV-008
+    statement: Specialist roles are a runtime registry, not a compile-time constant, so a new role is added without a code change.
+    tier: statute
+    status: planned
+  - id: V26-INV-009
+    statement: Adversarial cooperation structures — red teams, blue teams, and war games — are first-class governed activities.
+    tier: statute
+    status: planned
