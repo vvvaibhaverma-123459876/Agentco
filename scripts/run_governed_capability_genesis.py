@@ -147,6 +147,7 @@ def run_protocol_baseline() -> int:
     campaign_id = "governed-capability-protocol-baseline-v1"
     artifact = ROOT / "artifacts" / "capability-runtime" / campaign_id
     reset_artifact(artifact)
+    os.environ["AGENTCO_CAPABILITY_STORE_DIR"] = str(artifact / "attempts")
     cases = load_json(PROTOCOL_BENCH / "cases" / "cases.json")
     results = []
     family_results: dict[str, bool] = {}
@@ -274,6 +275,7 @@ def run_real_capability(provider: str) -> int:
     campaign_id = "governed-capability-genesis-v3"
     artifact = ROOT / "artifacts" / "capability-runtime" / campaign_id
     reset_artifact(artifact)
+    os.environ["AGENTCO_CAPABILITY_STORE_DIR"] = str(artifact / "attempts")
     cases = []
     registry = load_json(GENESIS_BENCH / "registry.json")
     for split in ("validation", "hidden"):
