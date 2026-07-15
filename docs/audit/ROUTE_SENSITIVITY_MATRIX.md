@@ -15,9 +15,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 106 |
-| AUTH-WRITE | 184 |
-| TOTAL | 294 |
+| AUTH-READ | 110 |
+| AUTH-WRITE | 188 |
+| TOTAL | 302 |
 
 ## Matrix
 
@@ -218,6 +218,14 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/missions/:missionId/settlement` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions/:missionId/transition` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/missions/:missionId/workstreams` | POST | Mission/goal/workstream/task/attestation state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/operator/overview` | GET/HEAD | Civilization operator-plane/runtime status state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/os/mode` | POST | Civilization operating-system scheduler and mode state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/os/recover` | GET/HEAD | Civilization operating-system scheduler and recovery state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/os/start` | POST | Civilization operating-system scheduler and daemon state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/os/status` | GET/HEAD | Civilization operating-system scheduler and projection state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/os/stop` | POST | Civilization operating-system scheduler and daemon state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/os/tick` | POST | Civilization operating-system scheduler and tick state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
+| `/api/civilization/os/ticks` | GET/HEAD | Civilization operating-system scheduler and tick log state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/policies` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
 | `/api/civilization/policies/:policyId` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/policies/:policyId/approve` | POST | Civilization governance/runtime/reputation/work state | AUTH-WRITE | Mutates or triggers backend state; must require API key. |
