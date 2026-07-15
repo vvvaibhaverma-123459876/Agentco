@@ -1,22 +1,22 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1900,
+  "tracked_file_count": 1911,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 33,
     "Deprecated code": 48,
     "Development tooling": 139,
-    "Documentation": 425,
+    "Documentation": 433,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 487,
     "Prompt/template": 29,
     "Test infrastructure": 282,
-    "Unknown purpose": 52
+    "Unknown purpose": 55
   },
   "top_level_counts": {
     "backend": 500,
-    "docs": 352,
+    "docs": 360,
     "evals": 180,
     "scripts": 151,
     "agents": 111,
@@ -38,7 +38,7 @@
     "synthesis": 10,
     "cross_version_adapters": 9,
     "ingestion": 9,
-    "constitution": 5,
+    "constitution": 8,
     "schemas": 5,
     "requirements": 4,
     "validation": 4,
@@ -82,9 +82,9 @@
   },
   "extension_counts": {
     ".py": 576,
-    ".md": 444,
+    ".md": 451,
     ".ts": 336,
-    ".json": 197,
+    ".json": 201,
     ".sql": 139,
     ".jsonl": 40,
     ".csv": 38,
@@ -5210,6 +5210,12 @@
       "extension": ".md"
     },
     {
+      "path": "constitution/GENERALIZATION_REPORT.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
       "path": "constitution/INDEX.md",
       "category": "Unknown purpose",
       "top_level": "constitution",
@@ -5229,6 +5235,18 @@
     },
     {
       "path": "constitution/volumes/VOL-00-vision.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-01-constitutional-core.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-32-security-and-threat-model.md",
       "category": "Unknown purpose",
       "top_level": "constitution",
       "extension": ".md"
@@ -5804,6 +5822,30 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/FORENSIC_AUDIT_CONTROLS.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -5814,6 +5856,30 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/FORENSIC_FILE_INVENTORY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/FORENSIC_FILE_INVENTORY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/audit/FORENSIC_FILE_INVENTORY.md",

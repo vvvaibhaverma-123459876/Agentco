@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1900`
+- Tracked files: `1911`
 
 ## Category Counts
 
@@ -12,20 +12,20 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 33 |
 | Deprecated code | 48 |
 | Development tooling | 139 |
-| Documentation | 425 |
+| Documentation | 433 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 487 |
 | Prompt/template | 29 |
 | Test infrastructure | 282 |
-| Unknown purpose | 52 |
+| Unknown purpose | 55 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 500 |
-| `docs` | 352 |
+| `docs` | 360 |
 | `evals` | 180 |
 | `scripts` | 151 |
 | `agents` | 111 |
@@ -47,7 +47,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `constitution` | 5 |
+| `constitution` | 8 |
 | `schemas` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
@@ -943,10 +943,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `civilization/services/structured_logger.py` | Production runtime code |
 | `conftest.py` | Unknown purpose |
 | `constitution/CONVENTIONS.md` | Unknown purpose |
+| `constitution/GENERALIZATION_REPORT.md` | Unknown purpose |
 | `constitution/INDEX.md` | Unknown purpose |
 | `constitution/TEMPLATE.md` | Unknown purpose |
 | `constitution/invariants.yaml` | Unknown purpose |
 | `constitution/volumes/VOL-00-vision.md` | Unknown purpose |
+| `constitution/volumes/VOL-01-constitutional-core.md` | Unknown purpose |
+| `constitution/volumes/VOL-32-security-and-threat-model.md` | Unknown purpose |
 | `cross_version_adapters/__init__.py` | Unknown purpose |
 | `cross_version_adapters/backend_runtime_adapter.py` | Unknown purpose |
 | `cross_version_adapters/base.py` | Unknown purpose |
@@ -1042,8 +1045,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/CONTROLLED_LEARNING_REPORT.json` | Documentation |
 | `docs/audit/EVALUATION_CALIBRATION_REPORT.json` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.json` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
+| `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_AUDIT_CONTROLS.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
+| `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_REMEDIATION_STATUS_2026_07_12.md` | Documentation |
 | `docs/audit/PHASE10_NOTES.md` | Documentation |

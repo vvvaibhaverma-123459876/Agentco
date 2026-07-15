@@ -1,11 +1,21 @@
 {
-  "branch": "audit/remediation-01-gate-integrity",
-  "commit": "b3e6fa44a6075c44062374c0ce9be5edaa23483f",
+  "branch": "main",
+  "commit": "bb23cd8a267e57c6955223a5d63fd3aac981846f",
+  "exception_count": 10,
+  "exception_file": "docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json",
   "findings": [],
-  "generated_at": "2026-07-11T23:25:07Z",
+  "generated_at": "2026-07-15T04:03:01Z",
   "protected_files": [
     "Makefile",
-    "scripts/verify_release_gates.py"
+    "backend/Dockerfile",
+    "backend/jest.config.ts",
+    "backend/package.json",
+    "docker-compose.staging.yml",
+    "docker-compose.yml",
+    "frontend/Dockerfile",
+    "frontend/package.json",
+    "pytest.ini",
+    "scripts/constitution/check_constitution.py"
   ],
   "success": true,
   "working_tree": "dirty"
