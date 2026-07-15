@@ -1654,3 +1654,51 @@ invariants:
     statement: Each autonomous loop can be independently enabled, disabled, and rate-limited under governance.
     tier: statute
     status: planned
+  - id: V19-INV-001
+    statement: A self-modification candidate is validated before it can take effect, producing a recorded validation result.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/self-modification-validator.service.ts
+      - backend/src/db/migrations/097_self_modification_validation_compatibility.sql
+  - id: V19-INV-002
+    statement: A candidate that touches a protected surface is rejected or requires a constitution-level vote (structural changes cannot silently alter protected state).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/protected-surface-validator.service.ts
+      - backend/src/services/calibration-constitution.service.ts
+  - id: V19-INV-003
+    statement: Structural change reuses the learning engine's candidate to independent-evaluation to canary to promotion/rollback pattern rather than inventing an unsafe path.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/services/skill-canary.service.ts
+  - id: V19-INV-004
+    statement: Every structural change is recorded with lineage, so the system's structure has a version history.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/117_artifact_lineage_identity.sql
+      - backend/src/db/migrate.ts
+  - id: V19-INV-005
+    statement: Services can be replaced, merged, and split under the framework without violating constitutional continuity.
+    tier: statute
+    status: planned
+  - id: V19-INV-006
+    statement: Institutions, governance, economy, communication, deployment, memory organization, schedulers, and topology are evolvable structures under the same framework.
+    tier: statute
+    status: planned
+  - id: V19-INV-007
+    statement: A structural version graph records the lineage of every structural version and supports rollback to a prior structure.
+    tier: statute
+    status: planned
+  - id: V19-INV-008
+    statement: A migration engine applies validated structural changes transactionally, with rollback on failure.
+    tier: statute
+    status: planned
+  - id: V19-INV-009
+    statement: Structural evolution preserves constitutional continuity — a change cannot remove a protected invariant or human root authority.
+    tier: statute
+    status: planned
