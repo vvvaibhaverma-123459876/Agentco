@@ -407,3 +407,62 @@ invariants:
     statement: A promoted improvement whose post-promotion monitoring degrades is automatically demoted or rolled back without human intervention.
     tier: statute
     status: planned
+  - id: V15-INV-001
+    statement: An expansion proposal advances only by completing the five gate stages in order; an out-of-order stage is rejected.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-002
+    statement: A capability is granted only after all five stages pass and a proof of competence exists.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/src/services/capability-expansion-gate.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-003
+    statement: A proof of competence is minted against a specific skill version and is not producible by the proposing actor alone.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/proof-of-competence.service.ts
+      - backend/src/db/migrations/106_proof_of_competence.sql
+      - backend/tests/proof-of-competence.test.ts
+  - id: V15-INV-004
+    statement: Capability grants are revocable and restrictable, and revocation blocks new work immediately.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-005
+    statement: Exercising a capability asserts an active grant at execution time and fails closed when none exists.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-006
+    statement: The capability-expansion gate only routes work to a domain that is active in the domain registry and a skill that meets its calibration threshold.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion-gate.service.ts
+      - backend/tests/capability-expansion-gate.test.ts
+  - id: V15-INV-007
+    statement: Stage records and expansion decisions are append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/139_capability_expansion.sql
+      - backend/src/db/migrations/107_capability_expansion_gate.sql
+  - id: V15-INV-008
+    statement: A domain can be retired (not only suspended), releasing its grants, so no permanent domain persists without justification.
+    tier: statute
+    status: planned
+  - id: V15-INV-009
+    statement: The research and knowledge-acquisition stages of the universal capability lifecycle have first-class records, not only the five admission stages.
+    tier: statute
+    status: planned

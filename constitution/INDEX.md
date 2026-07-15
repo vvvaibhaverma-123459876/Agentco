@@ -35,7 +35,7 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 5 | 11 | Trust & Calibration | statute | descriptive | written | persistent-trust-scorer.service.ts, falsifiable-prediction services, independent-resolver.service.ts, prediction_ledger migrations, reserve/ |
 | 6 | 8 | Missions | statute | descriptive | written | goal-manager.service.ts, autonomy-orchestrator, autonomy-run, action-executor services |
 | 7 | 14 | Learning Engine | statute | descriptive | written | skill-library.service.ts, skill-canary.service.ts, migrations 105/108, memory promotion pipeline |
-| 8 | 15 | Capability Expansion | statute | descriptive | not written | capability-expansion-gate.service.ts, generality-metric-tracker, proof-of-competence, migrations 102/103/106/107 |
+| 8 | 15 | Capability Expansion | statute | descriptive | written | capability-expansion-gate.service.ts, generality-metric-tracker, proof-of-competence, migrations 102/103/106/107 |
 | 9 | 13 | Judiciary | statute | descriptive | not written | judiciary*.service.ts, migrations 109/136 |
 | 10 | 4 | Identity & Authority | constitutional | mixed | not written | backend/src (search "security"), credential.service.ts, reserve/, migration 052 |
 | 11 | 7 | Civilization Economy | statute | mixed | not written | resource ledger + budget services, treasury routes, token budget in llm-provider.service.ts |
