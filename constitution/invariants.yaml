@@ -346,3 +346,64 @@ invariants:
     statement: Every required workstream traces to at least one piece of grounded evidence, not merely to a completion flag.
     tier: statute
     status: planned
+  - id: V14-INV-001
+    statement: A learning candidate cannot be evaluated by its proposer; independent evaluation is required and rejected otherwise.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V14-INV-002
+    statement: A candidate advances only along the defined status machine; transitions are recorded append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/db/migrations/138_safe_evolution.sql
+  - id: V14-INV-003
+    statement: A canary breach forces rollback rather than allowing promotion to stand.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/services/skill-canary.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V14-INV-004
+    statement: Higher-tier (Tier-2/3) candidates are not auto-promotable and require human approval.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V14-INV-005
+    statement: Promotion requires passing regression cases, not merely a successful trial.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/db/migrations/138_safe_evolution.sql
+  - id: V14-INV-006
+    statement: Promoted skills are versioned, and rollback restores a prior version rather than deleting history.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/db/migrations/105_skill_library.sql
+  - id: V14-INV-007
+    statement: Every promotion records improvement lineage linking the promoted artifact to its originating failure and candidate.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/138_safe_evolution.sql
+      - backend/tests/civilization-learning-e2e.test.ts
+  - id: V14-INV-008
+    statement: Learning executed autonomously (unattended) stays within the same evaluation and canary gates as attended learning.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/autonomous-promotion.test.ts
+      - backend/tests/bounded-learning-production-guard.test.ts
+  - id: V14-INV-009
+    statement: A promoted improvement whose post-promotion monitoring degrades is automatically demoted or rolled back without human intervention.
+    tier: statute
+    status: planned
