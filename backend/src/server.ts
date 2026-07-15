@@ -29,6 +29,8 @@ import { judiciaryCaseRoutes } from './routes/judiciary-case.routes';
 import { collectiveKnowledgeRoutes } from './routes/collective-knowledge.routes';
 import { safeEvolutionRoutes } from './routes/safe-evolution.routes';
 import { capabilityExpansionRoutes } from './routes/capability-expansion.routes';
+import { civilizationOsRoutes } from './routes/civilization-os.routes';
+import { civilizationOperatorRoutes } from './routes/civilization-operator.routes';
 import { governanceRoutes } from './routes/governance.routes';
 import { institutionWorkAssignmentRoutes } from './routes/institution-work-assignment.routes';
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
@@ -134,6 +136,8 @@ export async function build() {
   await app.register(collectiveKnowledgeRoutes);
   await app.register(safeEvolutionRoutes);
   await app.register(capabilityExpansionRoutes);
+  await app.register(civilizationOsRoutes);
+  await app.register(civilizationOperatorRoutes);
   await app.register(governanceRoutes);
   await app.register(institutionWorkAssignmentRoutes);
   await app.register(goalHierarchyRoutes);

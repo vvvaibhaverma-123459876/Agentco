@@ -84,6 +84,13 @@ backend:
     batchSize: "50"
     maxAttempts: "5"
 
+  # Civilization operating-system scheduler daemon (C12/C14). Leader election is
+  # a Postgres advisory lock, so one replica is sufficient and multiple are safe.
+  civilizationScheduler:
+    enabled: true
+    replicaCount: 1
+    pollMs: "5000"
+
   migrationJob:
     enabled: true
     # Migration credentials are intentionally separate from runtime credentials.

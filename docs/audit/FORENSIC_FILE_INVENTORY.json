@@ -1,45 +1,46 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1876,
+  "tracked_file_count": 1918,
   "category_counts": {
-    "Database migration": 138,
-    "Deployment infrastructure": 31,
+    "Database migration": 139,
+    "Deployment infrastructure": 34,
     "Deprecated code": 48,
-    "Development tooling": 138,
-    "Documentation": 422,
+    "Development tooling": 140,
+    "Documentation": 426,
     "Experimental code": 151,
-    "Generated artifact": 101,
-    "Production runtime code": 483,
+    "Generated artifact": 116,
+    "Production runtime code": 490,
     "Prompt/template": 29,
-    "Test infrastructure": 279,
-    "Unknown purpose": 56
+    "Test infrastructure": 284,
+    "Unknown purpose": 61
   },
   "top_level_counts": {
-    "backend": 493,
-    "docs": 350,
+    "backend": 505,
+    "docs": 353,
     "evals": 180,
-    "scripts": 150,
+    "scripts": 152,
     "agents": 111,
     "audit_artifacts": 99,
+    "reports": 64,
     "runtime": 51,
     "archive": 48,
-    "reports": 48,
     "tests": 41,
-    "frontend": 36,
+    "frontend": 37,
     "reserve": 33,
     "calibration": 30,
-    "infrastructure": 20,
+    "infrastructure": 21,
     "results": 20,
     "selfcoding": 17,
     "civilization": 15,
     "autonomy": 13,
     "learning": 13,
+    ".github": 11,
     "synthesis": 10,
-    ".github": 9,
     "cross_version_adapters": 9,
     "ingestion": 9,
     "agentco_capability": 7,
     "schemas": 7,
+    "constitution": 5,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -81,19 +82,19 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 583,
-    ".md": 438,
-    ".ts": 329,
-    ".json": 183,
-    ".sql": 139,
+    ".py": 585,
+    ".md": 445,
+    ".ts": 340,
+    ".json": 199,
+    ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
-    ".yaml": 22,
+    ".yaml": 24,
     ".disabled": 21,
-    ".tsx": 17,
+    ".tsx": 18,
     ".txt": 16,
+    ".yml": 15,
     ".sh": 14,
-    ".yml": 13,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
@@ -146,7 +147,19 @@
       "extension": ".yml"
     },
     {
+      "path": ".github/workflows/civilization-completion.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
       "path": ".github/workflows/clean-room-audit.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/constitution.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -2954,6 +2967,12 @@
       "extension": ".sql"
     },
     {
+      "path": "backend/src/db/migrations/140_civilization_os.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
       "path": "backend/src/db/migrations/140_governed_capability_runtime.sql",
       "category": "Database migration",
       "top_level": "backend",
@@ -3165,6 +3184,18 @@
     },
     {
       "path": "backend/src/routes/civilization-kernel.routes.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/routes/civilization-operator.routes.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/routes/civilization-os.routes.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -3459,6 +3490,24 @@
     },
     {
       "path": "backend/src/services/civilization-live-flow.service.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/services/civilization-metrics.service.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/services/civilization-operator.service.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/services/civilization-os.service.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -4166,6 +4215,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/src/workers/civilization-scheduler-worker.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/src/workers/outbox-worker.ts",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -4304,7 +4359,19 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/civilization-adversarial.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/civilization-aware-rag.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/civilization-e2e-scenarios.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -4340,7 +4407,25 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/civilization-operator.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/civilization-os.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/civilization-real-routing.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/civilization-reliability.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -5198,6 +5283,36 @@
       "extension": ".py"
     },
     {
+      "path": "constitution/CONVENTIONS.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/INDEX.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/TEMPLATE.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/invariants.yaml",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".yaml"
+    },
+    {
+      "path": "constitution/volumes/VOL-00-vision.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
       "path": "cross_version_adapters/__init__.py",
       "category": "Unknown purpose",
       "top_level": "cross_version_adapters",
@@ -5966,6 +6081,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/BATCH07_MAIN_RECONCILIATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BATCH07_MAIN_RECONCILIATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6657,6 +6784,12 @@
     },
     {
       "path": "docs/civilization/CANONICAL_RUNTIME_MAP.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/civilization/OUTSTANDING_GATES.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -8564,6 +8697,12 @@
       "extension": ".tsx"
     },
     {
+      "path": "frontend/src/app/civilization/page.tsx",
+      "category": "Production runtime code",
+      "top_level": "frontend",
+      "extension": ".tsx"
+    },
+    {
       "path": "frontend/src/app/config/page.tsx",
       "category": "Production runtime code",
       "top_level": "frontend",
@@ -8736,6 +8875,12 @@
       "category": "Deployment infrastructure",
       "top_level": "infrastructure",
       "extension": ".tpl"
+    },
+    {
+      "path": "infrastructure/kubernetes/helm/agentco/templates/civilization-scheduler-deployment.yaml",
+      "category": "Deployment infrastructure",
+      "top_level": "infrastructure",
+      "extension": ".yaml"
     },
     {
       "path": "infrastructure/kubernetes/helm/agentco/templates/deployment.yaml",
@@ -9030,6 +9175,102 @@
       "category": "Unknown purpose",
       "top_level": "pytest_skip_report_plugin.py",
       "extension": ".py"
+    },
+    {
+      "path": "reports/civilization_completion/latest/FINAL_CIVILIZATION_COMPLETION_REPORT.md",
+      "category": "Documentation",
+      "top_level": "reports",
+      "extension": ".md"
+    },
+    {
+      "path": "reports/civilization_completion/latest/civilization_build_ledger.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/completion_manifest.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/completion_reconciliation.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/component_reachability.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/deployment_smoke.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/migration_verification.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_A_civilization_formation.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_B_cross_institution_mission.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_C_governance_changes_behaviour.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_D_judiciary_and_appeal.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_E_learning_and_promotion.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_F_domain_expansion.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_G_restart_and_replay.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/scenario_H_emergency_state.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
+    },
+    {
+      "path": "reports/civilization_completion/latest/test_summary.json",
+      "category": "Generated artifact",
+      "top_level": "reports",
+      "extension": ".json"
     },
     {
       "path": "reports/system_run/latest/AGENTCO_POST_FIX_VERIFICATION_REPORT.md",
@@ -10154,6 +10395,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/constitution/check_constitution.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/demo_business_bikeshare_calibration.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10191,6 +10438,12 @@
     },
     {
       "path": "scripts/generate_agent_conformance_matrix.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/generate_civilization_completion.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"

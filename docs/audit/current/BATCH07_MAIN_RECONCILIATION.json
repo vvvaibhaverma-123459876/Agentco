@@ -1,0 +1,24 @@
+{
+  "report_id": "batch07-main-reconciliation",
+  "branch": "audit/remediation-07-cross-version-civilization-evaluation",
+  "previous_batch07_head": "89c3ff3ecef5a7b3a41981348374930c4cc591f8",
+  "current_main_head": "bb23cd8a267e57c6955223a5d63fd3aac981846f",
+  "merge_base": "651794a41513db1e40930f08c253ef261af7c1e7",
+  "merge_commit": "43f443239342001b0045e0f472966793334d0482",
+  "merge_strategy": "normal_merge_commit",
+  "conflict_files": [],
+  "auto_merged_files": [
+    "Makefile"
+  ],
+  "resolution_rationale": [
+    "Preserved current main runtime and civilization additions from bb23cd8a267e57c6955223a5d63fd3aac981846f.",
+    "Preserved Batch 07 evidence-integrity controls, invalidated campaign history, and Batch 07E primitive/capability separation.",
+    "Preserved content-hash migration identity validation and current release-gate behavior.",
+    "Did not restore synthetic evaluator outputs or classify runtime primitives as capability tasks."
+  ],
+  "post_merge_required_actions": [
+    "Regenerate subject-native-cross-version-v2-closure at the post-merge head.",
+    "Run required local verification gates.",
+    "Push the reconciled branch and verify PR #27 is mergeable."
+  ]
+}
