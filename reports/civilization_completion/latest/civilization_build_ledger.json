@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-15T03:09:17.031166+00:00",
-  "commit": "246f46fc12dbb55a2c79dda0686fd0aa65552c18",
-  "branch": "feature/civilization-layer",
-  "git_dirty": false,
+  "generated_at": "2026-07-16T02:14:09.668572+00:00",
+  "commit": "8d38f6ec85d5ea14f19fe57004697151a6c5c8c0",
+  "branch": "main",
+  "git_dirty": true,
   "items": [
     {
       "phase": "C0_canonical_runtime_freeze",
@@ -804,7 +804,7 @@
         "C11.ExpansionGateCompletion",
         "C6.EconomyEnforcement"
       ],
-      "notes": "the continuous tick actively DRIVES WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions FOR UPDATE SKIP LOCKED, idempotent lead-institution assignment), EmergencyController (kernel + governance emergency expiry sweep), and reservation expiry; the judiciary/coalition/learning/expansion/knowledge layers are reachable via governed HTTP routes and OBSERVED in the LoopSupervisor/GeneralityReporter status projection, but are not yet orchestrated as work inside the tick loop. Full coordinator-driven reachability of every registered service (brief A.6/B.8) is an OUTSTANDING gate."
+      "notes": "the continuous tick actively DRIVES WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions FOR UPDATE SKIP LOCKED, idempotent lead-institution assignment), EmergencyController (kernel + governance emergency expiry sweep), reservation expiry, AND (2026-07-16) a LayerOrchestrator that drives the judiciary/coalition/learning/expansion/knowledge layers as real work inside the loop \u2014 routeEscalationsToJudiciary (open coalition escalations targeting judiciary become cases, keyed by source_dispute_id for crash-safe idempotence), retireMonitoredCandidates (post-promotion monitored candidates retained after a window via the safe-evolution status machine), domainRegistry.suspendBelowThreshold (active domains below their trust threshold suspended), collectiveKnowledge.sweepDanglingProvenance (claims standing on already-retracted provenance are weakened). Every step idempotent and per-layer error-isolated; counts recorded in the tick status.orchestrated projection. Proven by backend/tests/civilization-os-orchestration.test.ts (4 tests incl. re-tick idempotence). Full coordinator-driven reachability (brief A.6/B.8) now met."
     },
     {
       "phase": "C12_civilization_os",

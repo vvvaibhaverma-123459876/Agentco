@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-15T03:09:17.031166+00:00",
-  "commit": "246f46fc12dbb55a2c79dda0686fd0aa65552c18",
-  "branch": "feature/civilization-layer",
-  "git_dirty": false,
+  "generated_at": "2026-07-16T02:14:09.668572+00:00",
+  "commit": "8d38f6ec85d5ea14f19fe57004697151a6c5c8c0",
+  "branch": "main",
+  "git_dirty": true,
   "scenario": "B_cross_institution_mission",
   "proof_suite": "backend/tests/civilization-e2e-scenarios.test.ts",
   "proof_present": true,
