@@ -82,6 +82,9 @@ def exists(rel: str) -> bool:
 
 
 def main() -> int:
+    # --check verifies the reconciliation passes without writing any files, so it
+    # is safe to run inside the release gate's clean-tree window (condition 52).
+    check_only = "--check" in sys.argv
     now = datetime.now(timezone.utc).isoformat()
     head = git("rev-parse", "HEAD")
     branch = git("rev-parse", "--abbrev-ref", "HEAD")
@@ -133,6 +136,13 @@ def main() -> int:
     reconciliation["termination_predicate_met"] = predicate
     if not predicate:
         reconciliation["outstanding_gates_doc"] = "docs/civilization/OUTSTANDING_GATES.md"
+
+    if check_only:
+        print(f"[completion] check-only: reconciliation_passed={passed} predicate={predicate} "
+              f"verified={len(verified)}/{len(items)} commit={head[:12]}")
+        if not passed:
+            print("[completion] FAILED checks:", [k for k, v in checks.items() if not v], file=sys.stderr)
+        return 0 if passed else 2
 
     os.makedirs(OUT_DIR, exist_ok=True)
     stamp = {"generated_at": now, "commit": head, "branch": branch, "git_dirty": dirty}
