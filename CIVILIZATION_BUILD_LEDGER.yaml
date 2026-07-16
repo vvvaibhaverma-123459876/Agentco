@@ -5,10 +5,18 @@ meta:
   schema_version: 1
   generated_by: claude-fable-5-build-session
   created: '2026-07-13'
-  last_updated: '2026-07-14'
+  last_updated: '2026-07-16'
   base_commit: 997e66ce700e0c93896f13f7d6f559d0a50b15dd
-  branch: feature/civilization-layer
-  termination_predicate_met: false
+  branch: main
+  termination_predicate_met: true
+  # Set true 2026-07-16 after the deliberate 57-condition evidence walk
+  # (docs/civilization/COMPLETION_PREDICATE_WALK.md): all 57 conditions carry
+  # direct executable evidence, the four canonical gates are green
+  # (docs/civilization/OUTSTANDING_GATES.md), make release-gate passes 12/12
+  # including the completion verifier, and make civilization-completion
+  # reconciliation passes on this HEAD (condition 57). Hosted-production
+  # certification remains out of environment scope and is not part of the 57.
+  predicate_evidence: docs/civilization/COMPLETION_PREDICATE_WALK.md
   statuses: [not_started, in_progress, blocked, implemented, integrated, verified]
 phases:
   C0_canonical_runtime_freeze:

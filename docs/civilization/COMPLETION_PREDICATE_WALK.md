@@ -52,13 +52,13 @@ Legend: ✅ direct executable evidence · ◐ satisfied by architecture/design (
 | 37 | Python specialists only through governed adapters | ✅ | `team-activation.service.ts` (HMAC), `team-activation.test.ts` |
 | 38 | frontend contains no fake production data | ✅ | `civilization-operator.test.ts`; governed proxy (V28) |
 | 39 | every protected API enforces identity/authority/scope | ✅ | `route-auth-contract.test.ts` (298 classified routes) |
-| 40 | cross-civilization and cross-society access blocked | ◐/✅ | cross-society: `civilization-adversarial.test.ts` (society jurisdiction ⊄ civilization → blocked). Cross-civilization: satisfied by the `uq_civilizations_single_active` singleton invariant (no second active civilization can exist to cross to) + `civilization_id` scoping on every table. No negative test because the design precludes a second active civilization. |
+| 40 | cross-civilization and cross-society access blocked | ✅ | `civilization-cross-boundary-isolation.test.ts`: a second (forming) civilization row coexists under the *partial* `uq_civilizations_single_active` index; a projection scoped to civ A excludes civ B's data and vice versa (no `civilization_id` bleed); and a society jurisdiction the civilization never held is rejected by the composite FK. Also `civilization-adversarial.test.ts` (society jurisdiction ⊄ civilization). |
 | 41 | no runtime stub/simulated/hardcoded success remains | ✅ | full-tree B.2 sweep clean (4 benign hits, classified in OUTSTANDING_GATES.md) |
 | 42 | empty-database migration passes | ✅ | `make release-gate` step 3 (empty → full migrate, green) |
-| 43 | upgrade migration passes | ✅ | `scripts/verify_migrations_native.py` (existing-schema acceptance); idempotent `db:migrate` (skips applied) |
+| 43 | upgrade migration passes | ✅ | `scripts/verify_migrations_native.py` executed 2026-07-16: `{core_schema_status: real, postgres_connectivity: real, success: true}`; idempotent `db:migrate` (skips applied) |
 | 44 | runtime roles cannot perform schema administration | ✅ | `scripts/setup_release_gate_role.sql` (DML-only grants, no DDL); release-gate step 3a |
 | 45 | backend/frontend/workers/infrastructure build successfully | ✅ | release-gate steps 5, 11; `helm-deployment-contract.test.ts` |
-| 46 | local production-like stack starts where environment permits | ✅ | `scripts/verify_docker_startup.py`; `phase4-production-deployment.test.ts` |
+| 46 | local production-like stack starts where environment permits | ✅ | `scripts/verify_docker_startup.py` executed 2026-07-16: `{status: passed, success: true}`; `phase4-production-deployment.test.ts` |
 | 47 | health/readiness probes target real endpoints | ✅ | `helm-deployment-contract.test.ts`; `/health` in `server.ts` |
 | 48 | observability and alert configuration validate | ✅ | docker-compose config; `infrastructure/prometheus` |
 | 49 | security AND dependency checks pass | ✅ | secret-scan (`ci.yml`); `npm audit --audit-level=high` backend + frontend (0 vulns) wired into release-gate step 11a |
@@ -73,11 +73,16 @@ Legend: ✅ direct executable evidence · ◐ satisfied by architecture/design (
 
 ## Verdict
 
-**56 of 57 conditions carry direct executable evidence; condition 40's cross-civilization
-clause is satisfied by the singleton-civilization architecture rather than a negative
-test** (its cross-society clause is test-proven). Every canonical gate is green. On this
-basis `termination_predicate_met` is defensibly true — but the flip is recorded as a
-deliberate, evidence-backed decision here, with the one architectural caveat stated
-plainly, not buried. Hosted-production certification (continuous SLO/DR/backup/incident
-evidence) remains explicitly out of environment scope and is not part of these 57
-conditions.
+**All 57 conditions carry direct executable evidence.** Condition 40 — the one that
+initially rested on architectural inference — was converted to a checked fact after a
+review flagged the rationalization: because `uq_civilizations_single_active` is a *partial*
+index, a second civilization row is constructible, so
+`civilization-cross-boundary-isolation.test.ts` was written to prove the isolation holds
+(it passed — no leak, no isolation bug). Conditions 43 and 46 were likewise *executed*
+this session rather than inferred from script existence. Every canonical gate is green
+(`make release-gate` 12/12 including the completion verifier and dependency audit; full
+regression; CI's six workflows). On this basis `termination_predicate_met` is set true —
+an evidence-backed decision, bound to the final HEAD, with reconciliation re-run so
+condition 57 holds on that commit. Hosted-production certification (continuous
+SLO/DR/backup/incident evidence) remains explicitly out of environment scope and is not
+part of these 57 conditions.
