@@ -9,8 +9,8 @@ Machine-readable state: [`CIVILIZATION_BUILD_LEDGER.yaml`](../../CIVILIZATION_BU
 |---|---|
 | Branch | `feature/civilization-layer` |
 | Base commit | `997e66ce700e0c93896f13f7d6f559d0a50b15dd` (GitHub main, PRs #21–#23 merged) |
-| Current phase | C0–C15 **implemented and regression-verified**; canonical gates **3 of 4 cleared with evidence** (2026-07-15) |
-| Completion gate | `termination_predicate_met: false` — solely on the coordinator-reachability condition. Cleared 2026-07-15: `make release-gate` **green** (all 12 steps, exit 0, local isolated stack at `b1470c0`); post-build `make audit-runtime-integration` **green** in CI repeatedly; full-tree B.2 anti-stub sweep **clean** (4 benign hits). Remaining: the C12 tick must orchestrate every registered service as work, not merely observe it. See [`OUTSTANDING_GATES.md`](OUTSTANDING_GATES.md). |
+| Current phase | **COMPLETE** — C0–C15 implemented, all four canonical gates green, 57-condition predicate walk done (2026-07-16) |
+| Completion gate | `termination_predicate_met: **true**` — set 2026-07-16 after the deliberate 57-condition evidence walk ([`COMPLETION_PREDICATE_WALK.md`](COMPLETION_PREDICATE_WALK.md)): all 57 brief §14 conditions carry direct executable evidence, `make release-gate` passes 12/12 (now including the completion verifier [11b] and dependency audit [11a]), full regression 119 suites / 880 tests green, reconciliation passes. The C12 LayerOrchestrator drives every registered service as work (coordinator reachability). Hosted-production certification remains explicitly out of environment scope. See [`OUTSTANDING_GATES.md`](OUTSTANDING_GATES.md). |
 | Test results | Final full backend regression green (117 suites / 873 tests); civilization suites 16 files; all 8 E2E scenarios A–H proven |
 | Migration state | 129–140 applied cleanly on the isolated empty-DB stack (verified from scratch) |
 | Git / PR | **PR #26 merged into `main`** by the operator at `651794a` (2026-07-14) while the branch was at C11 (`75406a5`); C12–C15, completion evidence, and the predicate walk-back were merged to `main` afterward. Operator directive: origin `main` must always be kept updated. |
