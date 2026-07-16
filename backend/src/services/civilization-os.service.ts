@@ -6,18 +6,23 @@ import { civilizationKernel } from './civilization-kernel.service';
 import { governanceService } from './governance.service';
 import { killSwitchService } from './kill-switch.service';
 import { civilizationMetrics } from './civilization-metrics.service';
+import { judiciaryCaseService } from './judiciary-case.service';
+import { safeEvolution } from './safe-evolution.service';
+import { domainRegistry } from './domain-registry.service';
+import { collectiveKnowledge } from './collective-knowledge.service';
 import { PublicHttpError } from '../http-errors';
 
 /**
  * Civilization operating system (build phase C12).
  *
  * The continuous coordinator that integrates every prior layer into one tick
- * loop: source work -> route to institutions -> enforce governance -> sweep
- * emergencies/reservations -> update the civilization status projection. Leader
- * election uses a Postgres advisory lock so only one active scheduler ticks at
- * a time, even across restarts, and re-running a tick never duplicates work
- * (sourcing is idempotent — it only assigns missions that lack a lead
- * institution). The kill switch and pause/drain controls gate protected work.
+ * loop: source work -> route to institutions -> orchestrate the judiciary,
+ * learning, expansion, and knowledge layers as real work -> enforce
+ * governance -> sweep emergencies/reservations -> update the civilization
+ * status projection. Leader election uses a Postgres advisory lock so only one
+ * active scheduler ticks at a time, even across restarts, and re-running a
+ * tick never duplicates work (every sourcing and orchestration step is
+ * idempotent). The kill switch and pause/drain controls gate protected work.
  */
 
 const OS_ADVISORY_LOCK_KEY = 918_273_645; // stable arbitrary key for the civilization scheduler leader lock
@@ -117,6 +122,7 @@ export class CivilizationOsService {
         const sourceNew = mode === 'running';
 
         const routed = sourceNew ? await this.workSourcerAndRouter(root.id) : { sourced: 0, routed: 0 };
+        const orchestrated = sourceNew ? await this.layerOrchestrator() : null;
         const emergencies = await this.emergencyController();
         const reservations = await this.expireReservations();
         const status = await this.statusProjection(root.id);
@@ -124,7 +130,8 @@ export class CivilizationOsService {
         return this.recordTick(root.id, {
           was_leader: true, mode,
           work_sourced: routed.sourced, work_routed: routed.routed,
-          emergencies_expired: emergencies, reservations_expired: reservations, status,
+          emergencies_expired: emergencies, reservations_expired: reservations,
+          status: orchestrated ? { ...status, orchestrated } : status,
         });
       } finally {
         await client.query(`SELECT pg_advisory_unlock($1)`, [OS_ADVISORY_LOCK_KEY]);
@@ -133,6 +140,138 @@ export class CivilizationOsService {
     } catch (error) {
       try { client.release(); } catch { /* already released */ }
       throw error;
+    }
+  }
+
+  /**
+   * LayerOrchestrator (brief A.6/B.8): the coordinator drives the judiciary,
+   * learning, expansion, and knowledge layers as real work inside the tick —
+   * not merely as a status observation. Every step is idempotent, so re-ticks
+   * and restart recovery never duplicate effects, and a failing layer is
+   * recorded in the tick status without blocking the other layers.
+   */
+  private async layerOrchestrator(): Promise<Record<string, unknown>> {
+    const counts = {
+      escalations_routed: 0,
+      candidates_retained: 0,
+      domains_suspended: 0,
+      provenance_reconciled: 0,
+    };
+    const errors: string[] = [];
+    try {
+      counts.escalations_routed = await this.routeEscalationsToJudiciary();
+    } catch (error) {
+      errors.push(`judiciary_routing: ${(error as Error).message}`);
+    }
+    try {
+      counts.candidates_retained = await this.retireMonitoredCandidates();
+    } catch (error) {
+      errors.push(`learning_retention: ${(error as Error).message}`);
+    }
+    try {
+      counts.domains_suspended = await domainRegistry.suspendBelowThreshold();
+    } catch (error) {
+      errors.push(`expansion_suspension: ${(error as Error).message}`);
+    }
+    try {
+      counts.provenance_reconciled = await collectiveKnowledge.sweepDanglingProvenance();
+    } catch (error) {
+      errors.push(`knowledge_reconciliation: ${(error as Error).message}`);
+    }
+    return errors.length > 0 ? { ...counts, errors } : { ...counts };
+  }
+
+  /**
+   * Coalition -> judiciary intake: route open escalations that target the
+   * judiciary into real cases. Crash-safe idempotence: the case is keyed by
+   * source_dispute_id = escalation id, so a tick interrupted after opening the
+   * case but before marking the escalation routed never opens a duplicate.
+   */
+  private async routeEscalationsToJudiciary(): Promise<number> {
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const pending = await client.query<{
+        id: string;
+        coalition_id: string;
+        escalation_type: 'deadlock' | 'commitment_breach';
+        reason: string;
+        created_by_actor_id: string;
+      }>(
+        `SELECT id, coalition_id, escalation_type, reason, created_by_actor_id
+           FROM coalition_escalations
+          WHERE status = 'open' AND target = 'judiciary'
+          ORDER BY created_at
+          LIMIT 10
+          FOR UPDATE SKIP LOCKED`
+      );
+      let routed = 0;
+      for (const row of pending.rows) {
+        const existing = await client.query(
+          `SELECT id FROM judiciary_cases WHERE source_dispute_id = $1 LIMIT 1`,
+          [row.id]
+        );
+        if ((existing.rowCount ?? 0) === 0) {
+          await judiciaryCaseService.openCase({
+            dispute_type: row.escalation_type === 'commitment_breach' ? 'contract_breach' : 'jurisdiction_conflict',
+            title: `Coalition escalation: ${row.escalation_type}`,
+            complainant_actor_id: row.created_by_actor_id,
+            respondent_scope_type: 'coalition',
+            respondent_scope_id: row.coalition_id,
+            source_dispute_id: row.id,
+            body: { reason: row.reason, routed_by: 'civilization-os' },
+          });
+        }
+        await client.query(
+          `UPDATE coalition_escalations SET status = 'routed', routed_at = now() WHERE id = $1`,
+          [row.id]
+        );
+        routed++;
+      }
+      await client.query('COMMIT');
+      return routed;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Post-promotion monitoring closeout: candidates that have stayed in
+   * 'monitored' beyond the configured window without a rollback are retained
+   * through the safe-evolution status machine. Window in minutes via
+   * CIV_OS_RETAIN_AFTER_MINUTES (default 15).
+   */
+  private async retireMonitoredCandidates(): Promise<number> {
+    const windowMinutes = Math.max(0, Number(process.env.CIV_OS_RETAIN_AFTER_MINUTES ?? '15'));
+    const due = await db.query<{ id: string }>(
+      `SELECT c.id
+         FROM civ_learning_candidates c
+        WHERE c.status = 'monitored'
+          AND (SELECT max(t.created_at) FROM civ_candidate_transitions t
+                WHERE t.candidate_id = c.id AND t.to_status = 'monitored')
+              <= now() - make_interval(mins => $1)
+        ORDER BY c.id
+        LIMIT 10`,
+      [windowMinutes]
+    );
+    let retained = 0;
+    const actor = await this.orchestratorActor();
+    for (const row of due.rows) {
+      await safeEvolution.retain({ candidate_id: row.id, actor_id: actor });
+      retained++;
+    }
+    return retained;
+  }
+
+  private async orchestratorActor(): Promise<string> {
+    const client = await db.connect();
+    try {
+      return await this.serviceActor(client);
+    } finally {
+      client.release();
     }
   }
 

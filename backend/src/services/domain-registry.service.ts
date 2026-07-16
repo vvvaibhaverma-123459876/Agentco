@@ -247,6 +247,42 @@ export class DomainRegistryService {
     return trust.rows[0];
   }
 
+  /**
+   * Enforcement sweep: suspend every active domain whose latest trust factor
+   * has fallen below its declared required threshold. Idempotent — a suspended
+   * domain matches no row on re-run. Driven by the civilization OS tick (C12).
+   */
+  async suspendBelowThreshold(actorId?: string): Promise<number> {
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const suspended = await client.query<{ id: string; domain_key: string }>(
+        `UPDATE domain_registry
+            SET status = 'suspended', updated_at = now()
+          WHERE status = 'active' AND latest_trust_factor < required_trust_threshold
+          RETURNING id, domain_key`
+      );
+      const actor = actorId ?? (await this.ensureServiceActor(client));
+      for (const row of suspended.rows) {
+        await eventLog.appendWithClient(client, {
+          event_type: 'domain.suspended_below_threshold',
+          actor_id: actor,
+          object_type: 'domain_registry',
+          object_id: row.id,
+          correlation_id: crypto.randomUUID(),
+          payload: { domain_key: row.domain_key },
+        });
+      }
+      await client.query('COMMIT');
+      return suspended.rowCount ?? 0;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   private async ensureServiceActor(client: PoolClient): Promise<string> {
     const name = 'agentco-domain-registry';
     const actor = await client.query<{ id: string }>(

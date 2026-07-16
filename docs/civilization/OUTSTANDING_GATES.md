@@ -32,22 +32,34 @@ audit + secret scan clean). That is real, durable work.
    `placeholders` variable for SQL `$1,$2,…` parameters in
    `institution-governance.service.ts`. Zero genuine stub or deferral markers.
 
-## Remaining gaps (why the predicate is still `false`)
+4. **Coordinator-driven reachability — ✅ IMPLEMENTED + tested (2026-07-16).** The C12 OS
+   tick now runs a **LayerOrchestrator** that drives the previously-only-observed layers as
+   real work inside the loop: coalition escalations targeting the judiciary become cases
+   (`routeEscalationsToJudiciary`, idempotent via `source_dispute_id`); post-promotion
+   monitored learning candidates are retained through the safe-evolution status machine
+   after a window (`retireMonitoredCandidates`); active domains below their trust threshold
+   are suspended (`domainRegistry.suspendBelowThreshold`); and claims standing on
+   already-retracted provenance are weakened (`collectiveKnowledge.sweepDanglingProvenance`).
+   Every step is idempotent and per-layer error-isolated, with counts in the tick's
+   `status.orchestrated` projection. Proven by `backend/tests/civilization-os-orchestration.test.ts`
+   (4 tests, each asserting a real effect **and** re-tick idempotence) plus the full
+   civilization suite green.
 
-- **Coordinator-driven reachability is partial.** The C12 OS tick actively drives
-  mission routing + emergency/reservation sweeps and *observes* every other layer in its
-  status projection, but does not yet orchestrate judiciary/coalition/learning/expansion/
-  knowledge as work inside the tick loop. The brief (A.6/B.8) makes full
-  coordinator-driven reachability a release condition. This is now the **only**
-  unresolved brief gate.
+## Remaining gap (why the predicate is still `false`)
+
 - **Hosted production certification** (live SLO/DR/backup/incident evidence) is out of
   environment scope and is not claimed (this was always excluded, not a regression).
+- **Predicate flip pending fresh reconciliation.** All four brief gates now have executable
+  evidence, but `termination_predicate_met` is deliberately **not** flipped in the same
+  breath as writing the orchestrator: the flip must be driven by a fresh `make release-gate`
+  + `make civilization-completion` reconciliation against this new HEAD, not asserted. That
+  re-run is the next step; until it is green the predicate stays `false`.
 
 ## Disposition
 
 This document exists so the ledger's honesty is not left to a self-authored
-reconciliation script. Three of the four outstanding items are now closed with
-executable evidence (local gate log, CI run IDs, sweep results above);
-`termination_predicate_met` remains **false** solely on the coordinator-reachability
-condition. When the tick loop orchestrates every registered service as work — not
-merely observes it — the predicate can be revisited honestly.
+reconciliation script. All four brief gates are now closed with executable evidence
+(release-gate log, CI run IDs, B.2 sweep, and the orchestration suite).
+`termination_predicate_met` stays **false** by deliberate discipline: the flip is gated on
+a fresh `make release-gate` + `make civilization-completion` run against this new HEAD — the
+same discipline that produced the 2026-07-14 walk-back — not on this document's say-so.
