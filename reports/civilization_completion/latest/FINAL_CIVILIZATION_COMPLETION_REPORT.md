@@ -1,11 +1,11 @@
 # Final Civilization Completion Report
 
-- Generated: 2026-07-16T02:14:09.668572+00:00
-- Commit: `8d38f6ec85d5ea14f19fe57004697151a6c5c8c0`
+- Generated: 2026-07-16T03:42:05.478600+00:00
+- Commit: `297f4403944ed8bcd5d039b8627db6251af8488a`
 - Branch: `main`
 - Git dirty at generation: True
 - Reconciliation passed: **True** (structural evidence checks listed below)
-- Termination predicate met: **False** — see `docs/civilization/OUTSTANDING_GATES.md` for the current gate status and the remaining condition on the flip
+- Termination predicate met: **True**
 
 ## Ledger rollup
 - Total items: 64
@@ -36,12 +36,3 @@ means the implementation and deployment contract are production quality. Hosted
 production certification (continuous SLOs, DR, backups, incident response,
 long-running operational evidence) requires an actual live deployment and is
 intentionally NOT claimed by this report.
-
-## Gate status
-The brief's four canonical gates (release-gate, post-build runtime
-reachability, full-tree anti-stub sweep, and full coordinator-driven
-reachability) have each been executed with recorded evidence — see
-`docs/civilization/OUTSTANDING_GATES.md`. `termination_predicate_met` is
-held false by discipline until a deliberate walk of the brief's full
-completion predicate is recorded against this HEAD; it is not asserted from
-this generator. Hosted-production certification remains out of scope.

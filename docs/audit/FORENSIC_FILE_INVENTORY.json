@@ -1,22 +1,22 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1863,
+  "tracked_file_count": 1865,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 32,
     "Deprecated code": 48,
     "Development tooling": 129,
-    "Documentation": 376,
+    "Documentation": 377,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 487,
     "Prompt/template": 29,
-    "Test infrastructure": 282,
+    "Test infrastructure": 283,
     "Unknown purpose": 75
   },
   "top_level_counts": {
-    "backend": 501,
-    "docs": 303,
+    "backend": 502,
+    "docs": 304,
     "evals": 180,
     "scripts": 141,
     "agents": 111,
@@ -81,8 +81,8 @@
   },
   "extension_counts": {
     ".py": 556,
-    ".md": 453,
-    ".ts": 337,
+    ".md": 454,
+    ".ts": 338,
     ".json": 171,
     ".sql": 139,
     ".jsonl": 40,
@@ -4285,6 +4285,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/civilization-cross-boundary-isolation.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/civilization-e2e-scenarios.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
@@ -6560,6 +6566,12 @@
     },
     {
       "path": "docs/civilization/CANONICAL_RUNTIME_MAP.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/civilization/COMPLETION_PREDICATE_WALK.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"

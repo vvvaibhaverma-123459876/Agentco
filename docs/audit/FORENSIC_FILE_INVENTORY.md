@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1863`
+- Tracked files: `1865`
 
 ## Category Counts
 
@@ -12,20 +12,20 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 32 |
 | Deprecated code | 48 |
 | Development tooling | 129 |
-| Documentation | 376 |
+| Documentation | 377 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 487 |
 | Prompt/template | 29 |
-| Test infrastructure | 282 |
+| Test infrastructure | 283 |
 | Unknown purpose | 75 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 501 |
-| `docs` | 303 |
+| `backend` | 502 |
+| `docs` | 304 |
 | `evals` | 180 |
 | `scripts` | 141 |
 | `agents` | 111 |
@@ -788,6 +788,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/citizenship.test.ts` | Test infrastructure |
 | `backend/tests/civilization-adversarial.test.ts` | Test infrastructure |
 | `backend/tests/civilization-aware-rag.test.ts` | Test infrastructure |
+| `backend/tests/civilization-cross-boundary-isolation.test.ts` | Test infrastructure |
 | `backend/tests/civilization-e2e-scenarios.test.ts` | Test infrastructure |
 | `backend/tests/civilization-kernel.test.ts` | Test infrastructure |
 | `backend/tests/civilization-learning-backbone-e2e.test.ts` | Test infrastructure |
@@ -1168,6 +1169,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
+| `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
 | `docs/civilization/PLAN_AND_PROGRESS.md` | Documentation |
 | `docs/civilization/canonical_runtime_map.json` | Documentation |
