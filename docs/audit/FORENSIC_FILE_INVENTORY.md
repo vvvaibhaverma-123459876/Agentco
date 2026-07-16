@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1862`
+- Tracked files: `1863`
 
 ## Category Counts
 
@@ -17,14 +17,14 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Generated artifact | 116 |
 | Production runtime code | 487 |
 | Prompt/template | 29 |
-| Test infrastructure | 281 |
+| Test infrastructure | 282 |
 | Unknown purpose | 75 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 500 |
+| `backend` | 501 |
 | `docs` | 303 |
 | `evals` | 180 |
 | `scripts` | 141 |
@@ -795,6 +795,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/civilization-learning-e2e.test.ts` | Test infrastructure |
 | `backend/tests/civilization-live-flow-e2e.test.ts` | Test infrastructure |
 | `backend/tests/civilization-operator.test.ts` | Test infrastructure |
+| `backend/tests/civilization-os-orchestration.test.ts` | Test infrastructure |
 | `backend/tests/civilization-os.test.ts` | Test infrastructure |
 | `backend/tests/civilization-real-routing.test.ts` | Test infrastructure |
 | `backend/tests/civilization-reliability.test.ts` | Test infrastructure |

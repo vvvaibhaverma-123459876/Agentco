@@ -1,6 +1,6 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1862,
+  "tracked_file_count": 1863,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 32,
@@ -11,11 +11,11 @@
     "Generated artifact": 116,
     "Production runtime code": 487,
     "Prompt/template": 29,
-    "Test infrastructure": 281,
+    "Test infrastructure": 282,
     "Unknown purpose": 75
   },
   "top_level_counts": {
-    "backend": 500,
+    "backend": 501,
     "docs": 303,
     "evals": 180,
     "scripts": 141,
@@ -82,7 +82,7 @@
   "extension_counts": {
     ".py": 556,
     ".md": 453,
-    ".ts": 336,
+    ".ts": 337,
     ".json": 171,
     ".sql": 139,
     ".jsonl": 40,
@@ -4322,6 +4322,12 @@
     },
     {
       "path": "backend/tests/civilization-operator.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/civilization-os-orchestration.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
