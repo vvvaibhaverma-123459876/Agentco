@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { judiciaryCaseService } from '../services/judiciary-case.service';
 import { PublicHttpError, publicMessageForError, statusCodeForError } from '../http-errors';
+import { requirePrincipal } from '../auth/principal-context';
 
 /** Civilization judiciary routes (build phase C8). */
 export async function judiciaryCaseRoutes(fastify: FastifyInstance): Promise<void> {
@@ -12,13 +13,14 @@ export async function judiciaryCaseRoutes(fastify: FastifyInstance): Promise<voi
     }
   };
 
-  fastify.post('/api/civilization/judiciary/cases', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/judiciary/cases', { config: requirePrincipal('judiciary.case.open') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.dispute_type || !b.title || !b.complainant_actor_id || !b.respondent_scope_type || !b.respondent_scope_id) {
-        throw new PublicHttpError(400, 'dispute_type, title, complainant_actor_id, respondent_scope_type, respondent_scope_id are required');
+      if (!b.dispute_type || !b.title || !b.respondent_scope_type || !b.respondent_scope_id) {
+        throw new PublicHttpError(400, 'dispute_type, title, respondent_scope_type, respondent_scope_id are required');
       }
-      return judiciaryCaseService.openCase(b);
+      // AUD-004 (cond 16): the complainant is the AUTHENTICATED principal, never a body field.
+      return judiciaryCaseService.openCase({ ...b, complainant_actor_id: req.principal!.actorId });
     }, 201)
   );
 
@@ -69,12 +71,13 @@ export async function judiciaryCaseRoutes(fastify: FastifyInstance): Promise<voi
     }, 201)
   );
 
-  fastify.post('/api/civilization/judiciary/cases/:caseId/ruling', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/judiciary/cases/:caseId/ruling', { config: requirePrincipal('judiciary.ruling.issue') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { caseId } = req.params as { caseId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.ruling_actor_id || !b.outcome || !b.rationale) throw new PublicHttpError(400, 'ruling_actor_id, outcome, rationale are required');
-      return judiciaryCaseService.issueRuling({ case_id: caseId, ...b });
+      if (!b.outcome || !b.rationale) throw new PublicHttpError(400, 'outcome, rationale are required');
+      // AUD-004 (cond 16): the ruling judge is the AUTHENTICATED principal, never a body field.
+      return judiciaryCaseService.issueRuling({ case_id: caseId, ...b, ruling_actor_id: req.principal!.actorId });
     }, 201)
   );
 
@@ -107,12 +110,13 @@ export async function judiciaryCaseRoutes(fastify: FastifyInstance): Promise<voi
     }, 201)
   );
 
-  fastify.post('/api/civilization/judiciary/cases/:caseId/appeal/ruling', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/judiciary/cases/:caseId/appeal/ruling', { config: requirePrincipal('judiciary.appeal.decide') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { caseId } = req.params as { caseId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.appellate_actor_id || !b.outcome || !b.rationale) throw new PublicHttpError(400, 'appellate_actor_id, outcome, rationale are required');
-      return judiciaryCaseService.ruleOnAppeal({ case_id: caseId, ...b });
+      if (!b.outcome || !b.rationale) throw new PublicHttpError(400, 'outcome, rationale are required');
+      // AUD-004 (cond 16): the appellate authority is the AUTHENTICATED principal, never a body field.
+      return judiciaryCaseService.ruleOnAppeal({ case_id: caseId, ...b, appellate_actor_id: req.principal!.actorId });
     }, 201)
   );
 

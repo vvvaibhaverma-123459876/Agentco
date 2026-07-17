@@ -4,7 +4,7 @@ import ts from 'typescript';
 import { build } from '../src/server';
 import { rateLimiterService } from '../src/services/rate-limiter.service';
 
-type Classification = 'PUBLIC' | 'AUTH-READ' | 'AUTH-WRITE';
+type Classification = 'PUBLIC' | 'AUTH-READ' | 'AUTH-WRITE' | 'AUTH-PRINCIPAL';
 
 interface RouteRow {
   route: string;
@@ -26,7 +26,7 @@ function matrixRows(): RouteRow[] {
   );
   const rows: RouteRow[] = [];
   for (const line of matrix.split(/\r?\n/)) {
-    const match = line.match(/^\| `([^`]+)` \| ([^|]+) \| [^|]+ \| (PUBLIC|AUTH-READ|AUTH-WRITE) \|/);
+    const match = line.match(/^\| `([^`]+)` \| ([^|]+) \| [^|]+ \| (PUBLIC|AUTH-READ|AUTH-WRITE|AUTH-PRINCIPAL) \|/);
     if (!match) continue;
     rows.push({
       route: match[1],
@@ -145,7 +145,16 @@ describe('route auth sensitivity matrix', () => {
       headers: { 'x-api-key': API_KEY },
       payload: row.method === 'GET' ? undefined : {},
     });
-    expect(authenticated.statusCode).not.toBe(401);
+    if (row.classification === 'AUTH-PRINCIPAL') {
+      // AUD-004: the shared API key alone is INSUFFICIENT. A key-only request must be rejected
+      // (>=400) — either 401 "authenticated principal required", or a 400 from UUID path-param
+      // validation that runs before the principal hook on sample (non-UUID) ids. The precise
+      // 401-principal-enforcement proof is in principal-boundary.test.ts / condition-16-25 tests.
+      expect(authenticated.statusCode).toBeGreaterThanOrEqual(400);
+      expect(authenticated.statusCode).toBeLessThan(500);
+    } else {
+      expect(authenticated.statusCode).not.toBe(401);
+    }
   });
 
   test('unclassified routes default to protected', async () => {

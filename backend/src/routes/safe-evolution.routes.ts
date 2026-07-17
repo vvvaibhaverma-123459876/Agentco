@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { safeEvolution } from '../services/safe-evolution.service';
 import { PublicHttpError, publicMessageForError, statusCodeForError } from '../http-errors';
+import { requirePrincipal } from '../auth/principal-context';
 
 /** Learning / safe-evolution routes (build phase C10). */
 export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<void> {
@@ -60,13 +61,14 @@ export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<voi
     })
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/evaluate', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/evaluate', { config: requirePrincipal('evolution.evaluate') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.evaluator_actor_id || typeof b.cases_passed !== 'number') throw new PublicHttpError(400, 'evaluator_actor_id and cases_passed are required');
+      if (typeof b.cases_passed !== 'number') throw new PublicHttpError(400, 'cases_passed is required');
+      // AUD-004 (cond 25): the evaluator is the AUTHENTICATED principal, never a body field.
       return safeEvolution.evaluate({
-        candidate_id: candidateId, evaluator_actor_id: b.evaluator_actor_id, cases_passed: b.cases_passed,
+        candidate_id: candidateId, evaluator_actor_id: req.principal!.actorId, cases_passed: b.cases_passed,
         safety_non_regression: b.safety_non_regression ?? false,
         calibration_non_regression: b.calibration_non_regression ?? false,
         evidence_non_regression: b.evidence_non_regression ?? false, detail: b.detail,
@@ -92,12 +94,13 @@ export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<voi
     })
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/promote', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/promote', { config: requirePrincipal('evolution.approve') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.actor_id || !b.artifact_hash) throw new PublicHttpError(400, 'actor_id and artifact_hash are required');
-      return safeEvolution.promote({ candidate_id: candidateId, ...b });
+      if (!b.artifact_hash) throw new PublicHttpError(400, 'artifact_hash is required');
+      // AUD-004 (cond 25): the approver is the AUTHENTICATED principal, never a body field.
+      return safeEvolution.promote({ candidate_id: candidateId, ...b, actor_id: req.principal!.actorId });
     })
   );
 
