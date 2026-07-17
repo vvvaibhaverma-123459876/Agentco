@@ -129,6 +129,7 @@ def logical_hash(data: dict[str, Any], field: str) -> str:
 
 
 def write_manifest(candidate: str) -> None:
+    candidate = git("rev-parse", candidate)
     rows = inventory(candidate)
     by_bundle: dict[str, list[Path]] = {}
     for row in rows:
@@ -155,6 +156,7 @@ def write_manifest(candidate: str) -> None:
 
 
 def write_binding(manifest_commit: str) -> None:
+    manifest_commit = git("rev-parse", manifest_commit)
     manifest_bytes = git_bytes(manifest_commit, str(MANIFEST_PATH.relative_to(ROOT)))
     data: dict[str, Any] = {
         "freeze_schema_version": "governed-capability-genesis-v5-freeze-binding-v1",
