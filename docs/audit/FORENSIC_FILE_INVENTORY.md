@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1903`
+- Tracked files: `1938`
 
 ## Category Counts
 
@@ -12,20 +12,20 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 33 |
 | Deprecated code | 48 |
 | Development tooling | 139 |
-| Documentation | 425 |
+| Documentation | 426 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 487 |
 | Prompt/template | 29 |
-| Test infrastructure | 282 |
-| Unknown purpose | 55 |
+| Test infrastructure | 284 |
+| Unknown purpose | 87 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 500 |
-| `docs` | 352 |
+| `backend` | 502 |
+| `docs` | 353 |
 | `evals` | 180 |
 | `scripts` | 151 |
 | `agents` | 111 |
@@ -33,6 +33,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
+| `constitution` | 40 |
 | `tests` | 40 |
 | `frontend` | 37 |
 | `reserve` | 33 |
@@ -47,7 +48,6 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `constitution` | 8 |
 | `schemas` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
@@ -790,6 +790,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/citizenship.test.ts` | Test infrastructure |
 | `backend/tests/civilization-adversarial.test.ts` | Test infrastructure |
 | `backend/tests/civilization-aware-rag.test.ts` | Test infrastructure |
+| `backend/tests/civilization-cross-boundary-isolation.test.ts` | Test infrastructure |
 | `backend/tests/civilization-e2e-scenarios.test.ts` | Test infrastructure |
 | `backend/tests/civilization-kernel.test.ts` | Test infrastructure |
 | `backend/tests/civilization-learning-backbone-e2e.test.ts` | Test infrastructure |
@@ -797,6 +798,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/civilization-learning-e2e.test.ts` | Test infrastructure |
 | `backend/tests/civilization-live-flow-e2e.test.ts` | Test infrastructure |
 | `backend/tests/civilization-operator.test.ts` | Test infrastructure |
+| `backend/tests/civilization-os-orchestration.test.ts` | Test infrastructure |
 | `backend/tests/civilization-os.test.ts` | Test infrastructure |
 | `backend/tests/civilization-real-routing.test.ts` | Test infrastructure |
 | `backend/tests/civilization-reliability.test.ts` | Test infrastructure |
@@ -949,7 +951,39 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `constitution/invariants.yaml` | Unknown purpose |
 | `constitution/volumes/VOL-00-vision.md` | Unknown purpose |
 | `constitution/volumes/VOL-01-constitutional-core.md` | Unknown purpose |
+| `constitution/volumes/VOL-02-civilization-kernel.md` | Unknown purpose |
+| `constitution/volumes/VOL-03-runtime-operating-system.md` | Unknown purpose |
+| `constitution/volumes/VOL-04-identity-and-authority.md` | Unknown purpose |
+| `constitution/volumes/VOL-05-civilization-society.md` | Unknown purpose |
+| `constitution/volumes/VOL-06-institutions.md` | Unknown purpose |
+| `constitution/volumes/VOL-07-civilization-economy.md` | Unknown purpose |
+| `constitution/volumes/VOL-08-missions.md` | Unknown purpose |
+| `constitution/volumes/VOL-09-knowledge-system.md` | Unknown purpose |
+| `constitution/volumes/VOL-10-reasoning-engine.md` | Unknown purpose |
+| `constitution/volumes/VOL-11-trust-and-calibration.md` | Unknown purpose |
+| `constitution/volumes/VOL-12-governance.md` | Unknown purpose |
+| `constitution/volumes/VOL-13-judiciary.md` | Unknown purpose |
+| `constitution/volumes/VOL-14-learning-engine.md` | Unknown purpose |
+| `constitution/volumes/VOL-15-capability-expansion.md` | Unknown purpose |
+| `constitution/volumes/VOL-16-autonomous-evolution.md` | Unknown purpose |
+| `constitution/volumes/VOL-17-self-inspection.md` | Unknown purpose |
+| `constitution/volumes/VOL-18-civilization-self-model.md` | Unknown purpose |
+| `constitution/volumes/VOL-19-structural-evolution-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-20-knowledge-discovery-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-21-reality-models.md` | Unknown purpose |
+| `constitution/volumes/VOL-22-hypothesis-generation-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-23-constraint-engine.md` | Unknown purpose |
+| `constitution/volumes/VOL-24-interaction-intelligence.md` | Unknown purpose |
+| `constitution/volumes/VOL-25-capability-evolution-framework.md` | Unknown purpose |
+| `constitution/volumes/VOL-26-multi-agent-civilization.md` | Unknown purpose |
+| `constitution/volumes/VOL-27-operator-control-plane.md` | Unknown purpose |
+| `constitution/volumes/VOL-28-operator-experience.md` | Unknown purpose |
+| `constitution/volumes/VOL-29-infrastructure.md` | Unknown purpose |
+| `constitution/volumes/VOL-30-verification.md` | Unknown purpose |
+| `constitution/volumes/VOL-31-civilization-evolution.md` | Unknown purpose |
 | `constitution/volumes/VOL-32-security-and-threat-model.md` | Unknown purpose |
+| `constitution/volumes/VOL-33-model-governance.md` | Unknown purpose |
+| `constitution/volumes/VOL-34-civilization-memory.md` | Unknown purpose |
 | `cross_version_adapters/__init__.py` | Unknown purpose |
 | `cross_version_adapters/backend_runtime_adapter.py` | Unknown purpose |
 | `cross_version_adapters/base.py` | Unknown purpose |
@@ -1195,6 +1229,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json` | Documentation |
 | `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
+| `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
 | `docs/civilization/PLAN_AND_PROGRESS.md` | Documentation |
 | `docs/civilization/canonical_runtime_map.json` | Documentation |

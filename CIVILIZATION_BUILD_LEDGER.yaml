@@ -5,10 +5,18 @@ meta:
   schema_version: 1
   generated_by: claude-fable-5-build-session
   created: '2026-07-13'
-  last_updated: '2026-07-14'
+  last_updated: '2026-07-16'
   base_commit: 997e66ce700e0c93896f13f7d6f559d0a50b15dd
-  branch: feature/civilization-layer
-  termination_predicate_met: false
+  branch: main
+  termination_predicate_met: true
+  # Set true 2026-07-16 after the deliberate 57-condition evidence walk
+  # (docs/civilization/COMPLETION_PREDICATE_WALK.md): all 57 conditions carry
+  # direct executable evidence, the four canonical gates are green
+  # (docs/civilization/OUTSTANDING_GATES.md), make release-gate passes 12/12
+  # including the completion verifier, and make civilization-completion
+  # reconciliation passes on this HEAD (condition 57). Hosted-production
+  # certification remains out of environment scope and is not part of the 57.
+  predicate_evidence: docs/civilization/COMPLETION_PREDICATE_WALK.md
   statuses: [not_started, in_progress, blocked, implemented, integrated, verified]
 phases:
   C0_canonical_runtime_freeze:
@@ -445,7 +453,7 @@ phases:
         layer: C12
         status: verified
         depends_on: [C12.SchedulerDaemon, C5.MissionSagaIntegration, C4.CoalitionLifecycleService, C7.PolicyRuntimeEnforcement, C8.JudiciaryLifecycleCompletion, C10.FailureToCandidate, C11.ExpansionGateCompletion, C6.EconomyEnforcement]
-        notes: the continuous tick actively DRIVES WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions FOR UPDATE SKIP LOCKED, idempotent lead-institution assignment), EmergencyController (kernel + governance emergency expiry sweep), and reservation expiry; the judiciary/coalition/learning/expansion/knowledge layers are reachable via governed HTTP routes and OBSERVED in the LoopSupervisor/GeneralityReporter status projection, but are not yet orchestrated as work inside the tick loop. Full coordinator-driven reachability of every registered service (brief A.6/B.8) is an OUTSTANDING gate.
+        notes: the continuous tick actively DRIVES WorkSourcer + InstitutionRouter + MissionCoordinator (source planned/funded missions FOR UPDATE SKIP LOCKED, idempotent lead-institution assignment), EmergencyController (kernel + governance emergency expiry sweep), reservation expiry, AND (2026-07-16) a LayerOrchestrator that drives the judiciary/coalition/learning/expansion/knowledge layers as real work inside the loop — routeEscalationsToJudiciary (open coalition escalations targeting judiciary become cases, keyed by source_dispute_id for crash-safe idempotence), retireMonitoredCandidates (post-promotion monitored candidates retained after a window via the safe-evolution status machine), domainRegistry.suspendBelowThreshold (active domains below their trust threshold suspended), collectiveKnowledge.sweepDanglingProvenance (claims standing on already-retracted provenance are weakened). Every step idempotent and per-layer error-isolated; counts recorded in the tick status.orchestrated projection. Proven by backend/tests/civilization-os-orchestration.test.ts (4 tests incl. re-tick idempotence). Full coordinator-driven reachability (brief A.6/B.8) now met.
       - id: C12.RestartRecovery
         layer: C12
         status: verified

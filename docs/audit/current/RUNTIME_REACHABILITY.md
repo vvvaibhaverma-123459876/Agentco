@@ -1,6 +1,6 @@
 # Runtime Reachability
 
-Tracked structural snapshot input hash `6b771fc38fb382b88877f86b65e3f71e580313204ce010a0aef62c6cb5f6ec6d`.
+Tracked structural snapshot input hash `eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70`.
 
 | entry_point | registration_location | first_handler | status | runtime_trace |
 | --- | --- | --- | --- | --- |

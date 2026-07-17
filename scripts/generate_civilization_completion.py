@@ -82,6 +82,9 @@ def exists(rel: str) -> bool:
 
 
 def main() -> int:
+    # --check verifies the reconciliation passes without writing any files, so it
+    # is safe to run inside the release gate's clean-tree window (condition 52).
+    check_only = "--check" in sys.argv
     now = datetime.now(timezone.utc).isoformat()
     head = git("rev-parse", "HEAD")
     branch = git("rev-parse", "--abbrev-ref", "HEAD")
@@ -133,6 +136,13 @@ def main() -> int:
     reconciliation["termination_predicate_met"] = predicate
     if not predicate:
         reconciliation["outstanding_gates_doc"] = "docs/civilization/OUTSTANDING_GATES.md"
+
+    if check_only:
+        print(f"[completion] check-only: reconciliation_passed={passed} predicate={predicate} "
+              f"verified={len(verified)}/{len(items)} commit={head[:12]}")
+        if not passed:
+            print("[completion] FAILED checks:", [k for k, v in checks.items() if not v], file=sys.stderr)
+        return 0 if passed else 2
 
     os.makedirs(OUT_DIR, exist_ok=True)
     stamp = {"generated_at": now, "commit": head, "branch": branch, "git_dirty": dirty}
@@ -190,7 +200,7 @@ def main() -> int:
         f"- Git dirty at generation: {dirty}",
         f"- Reconciliation passed: **{passed}** (structural evidence checks listed below)",
         f"- Termination predicate met: **{predicate}**"
-        + ("" if predicate else " — canonical release gates outstanding; see `docs/civilization/OUTSTANDING_GATES.md`"),
+        + ("" if predicate else " — see `docs/civilization/OUTSTANDING_GATES.md` for the current gate status and the remaining condition on the flip"),
         "",
         "## Ledger rollup",
         f"- Total items: {len(items)}",
@@ -220,12 +230,14 @@ def main() -> int:
     if not predicate:
         lines += [
             "",
-            "## Outstanding gates",
-            "The brief's canonical release gates have not all been executed against the",
-            "built code (release-gate, post-build runtime reachability, full-tree",
-            "anti-stub sweep, full coordinator-driven reachability of every registered",
-            "service). Until they run green, the correct status is 'implemented; gates",
-            "outstanding', not 'complete'. Details: `docs/civilization/OUTSTANDING_GATES.md`.",
+            "## Gate status",
+            "The brief's four canonical gates (release-gate, post-build runtime",
+            "reachability, full-tree anti-stub sweep, and full coordinator-driven",
+            "reachability) have each been executed with recorded evidence — see",
+            "`docs/civilization/OUTSTANDING_GATES.md`. `termination_predicate_met` is",
+            "held false by discipline until a deliberate walk of the brief's full",
+            "completion predicate is recorded against this HEAD; it is not asserted from",
+            "this generator. Hosted-production certification remains out of scope.",
         ]
     with open(os.path.join(OUT_DIR, "FINAL_CIVILIZATION_COMPLETION_REPORT.md"), "w") as f:
         f.write("\n".join(lines) + "\n")

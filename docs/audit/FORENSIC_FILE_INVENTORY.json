@@ -1,22 +1,22 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1903,
+  "tracked_file_count": 1938,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 33,
     "Deprecated code": 48,
     "Development tooling": 139,
-    "Documentation": 425,
+    "Documentation": 426,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 487,
     "Prompt/template": 29,
-    "Test infrastructure": 282,
-    "Unknown purpose": 55
+    "Test infrastructure": 284,
+    "Unknown purpose": 87
   },
   "top_level_counts": {
-    "backend": 500,
-    "docs": 352,
+    "backend": 502,
+    "docs": 353,
     "evals": 180,
     "scripts": 151,
     "agents": 111,
@@ -24,6 +24,7 @@
     "reports": 64,
     "runtime": 51,
     "archive": 48,
+    "constitution": 40,
     "tests": 40,
     "frontend": 37,
     "reserve": 33,
@@ -38,7 +39,6 @@
     "synthesis": 10,
     "cross_version_adapters": 9,
     "ingestion": 9,
-    "constitution": 8,
     "schemas": 5,
     "requirements": 4,
     "validation": 4,
@@ -82,8 +82,8 @@
   },
   "extension_counts": {
     ".py": 576,
-    ".md": 447,
-    ".ts": 336,
+    ".md": 480,
+    ".ts": 338,
     ".json": 197,
     ".sql": 139,
     ".jsonl": 40,
@@ -4292,6 +4292,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/civilization-cross-boundary-isolation.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/civilization-e2e-scenarios.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
@@ -4329,6 +4335,12 @@
     },
     {
       "path": "backend/tests/civilization-operator.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/civilization-os-orchestration.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -5246,7 +5258,199 @@
       "extension": ".md"
     },
     {
+      "path": "constitution/volumes/VOL-02-civilization-kernel.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-03-runtime-operating-system.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-04-identity-and-authority.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-05-civilization-society.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-06-institutions.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-07-civilization-economy.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-08-missions.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-09-knowledge-system.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-10-reasoning-engine.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-11-trust-and-calibration.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-12-governance.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-13-judiciary.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-14-learning-engine.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-15-capability-expansion.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-16-autonomous-evolution.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-17-self-inspection.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-18-civilization-self-model.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-19-structural-evolution-framework.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-20-knowledge-discovery-framework.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-21-reality-models.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-22-hypothesis-generation-framework.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-23-constraint-engine.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-24-interaction-intelligence.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-25-capability-evolution-framework.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-26-multi-agent-civilization.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-27-operator-control-plane.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-28-operator-experience.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-29-infrastructure.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-30-verification.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-31-civilization-evolution.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
       "path": "constitution/volumes/VOL-32-security-and-threat-model.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-33-model-governance.md",
+      "category": "Unknown purpose",
+      "top_level": "constitution",
+      "extension": ".md"
+    },
+    {
+      "path": "constitution/volumes/VOL-34-civilization-memory.md",
       "category": "Unknown purpose",
       "top_level": "constitution",
       "extension": ".md"
@@ -6717,6 +6921,12 @@
     },
     {
       "path": "docs/civilization/CANONICAL_RUNTIME_MAP.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/civilization/COMPLETION_PREDICATE_WALK.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"

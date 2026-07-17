@@ -204,6 +204,54 @@ export class CollectiveKnowledgeService {
     return Number(r.rows[0].count) > 0;
   }
 
+  /**
+   * Reconciliation sweep: find provenance edges whose source claim is already
+   * retracted while the dependent claim is still standing (possible if a crash
+   * interrupted propagation or an edge was linked after the retraction), and
+   * apply the missing weakening. Propagation only ever weakens; the propagation
+   * row is attributed to the original retraction at one depth deeper. Idempotent
+   * — a reconciled claim matches no row on re-run. Driven by the OS tick (C12).
+   */
+  async sweepDanglingProvenance(limit = 25): Promise<number> {
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      const dangling = await client.query<{ to_id: string; retraction_id: string; depth: number }>(
+        `SELECT DISTINCT e.to_id, rp.retraction_id, rp.depth
+           FROM knowledge_provenance_edges e
+           JOIN retraction_propagations rp
+             ON rp.affected_type = 'claim' AND rp.affected_id::text = e.from_id::text AND rp.effect = 'claim_retracted'
+           JOIN autonomy_claims c ON c.claim_id::text = e.to_id::text AND c.status <> 'retracted'
+          WHERE e.from_type = 'claim' AND e.to_type = 'claim'
+          LIMIT $1`,
+        [limit]
+      );
+      let reconciled = 0;
+      for (const row of dangling.rows) {
+        const updated = await client.query(
+          `UPDATE autonomy_claims SET status = 'retracted' WHERE claim_id::text = $1 AND status <> 'retracted'`,
+          [row.to_id]
+        );
+        await client.query(
+          `INSERT INTO retraction_propagations (retraction_id, affected_type, affected_id, effect, depth)
+           SELECT $1, 'claim', $2, 'claim_retracted', $3
+            WHERE NOT EXISTS (
+              SELECT 1 FROM retraction_propagations
+               WHERE retraction_id = $1 AND affected_type = 'claim' AND affected_id = $2)`,
+          [row.retraction_id, row.to_id, row.depth + 1]
+        );
+        if ((updated.rowCount ?? 0) > 0) reconciled++;
+      }
+      await client.query('COMMIT');
+      return reconciled;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+
   async getRetraction(retractionId: string): Promise<{ subject: string; reason: string; propagations: Array<{ affected_type: string; affected_id: string; effect: string; depth: number }> } | null> {
     const r = await db.query<{ subject_type: string; subject_id: string; reason: string }>(
       `SELECT subject_type, subject_id, reason FROM knowledge_retractions WHERE id = $1`, [retractionId]
