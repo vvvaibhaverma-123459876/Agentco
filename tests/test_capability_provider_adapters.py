@@ -207,6 +207,50 @@ def test_allowlisted_hostname_resolving_to_private_address_fails_closed(monkeypa
     assert "forbidden address" in response["failure"]["message"]
 
 
+def test_forbidden_ipv6_and_unspecified_addresses_fail_closed(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
+    monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://api.example.test/v1")
+    monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "api.example.test")
+
+    for index, address in enumerate(["::1", "fc00::1", "fe80::1", "::", "ff02::1"]):
+        monkeypatch.setattr(providers, "_resolve_provider_addresses", lambda host, port, addr=address: [addr])
+        request = base_request("openai_compatible")
+        request["request_id"] = f"req-openai-ipv6-{index}"
+        request["attempt_id"] = f"attempt-openai-ipv6-{index}"
+        request["idempotency_key"] = f"idem-openai-ipv6-{index}"
+
+        response = execute_capability_request(request)
+
+        assert response["status"] == "unsupported"
+        assert "forbidden address" in response["failure"]["message"]
+
+
+def test_alternative_ip_representations_fail_closed_after_resolution(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
+    monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
+
+    for index, host in enumerate(["2130706433", "0x7f000001", "017700000001"]):
+        monkeypatch.setenv("OPENAI_BASE_URL", f"https://{host}/v1")
+        monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", host)
+        monkeypatch.setattr(providers, "_resolve_provider_addresses", lambda resolved_host, port: ["127.0.0.1"])
+        request = base_request("openai_compatible")
+        request["request_id"] = f"req-openai-alt-ip-{index}"
+        request["attempt_id"] = f"attempt-openai-alt-ip-{index}"
+        request["idempotency_key"] = f"idem-openai-alt-ip-{index}"
+
+        response = execute_capability_request(request)
+
+        assert response["status"] == "unsupported"
+        assert "forbidden address" in response["failure"]["message"]
+
+
 def test_dns_rebinding_between_validation_and_attempt_fails_closed(monkeypatch, tmp_path):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
@@ -255,32 +299,41 @@ def test_malformed_url_userinfo_and_non_https_fail_closed(monkeypatch, tmp_path)
 
 def test_provider_redirects_are_blocked_without_forwarding_credentials(monkeypatch):
     class RedirectingOpener:
-        def __init__(self):
+        def __init__(self, location):
+            self.location = location
             self.seen_headers = None
+            self.calls = 0
 
         def open(self, request, timeout):
+            self.calls += 1
             self.seen_headers = dict(request.header_items())
             raise urllib.error.HTTPError(
                 request.full_url,
                 302,
                 "provider redirect blocked",
-                {"Location": "http://127.0.0.1/private"},
+                {"Location": self.location},
                 None,
             )
 
-    opener = RedirectingOpener()
-    monkeypatch.setattr(urllib.request, "build_opener", lambda *handlers: opener)
+    for location in [
+        "http://127.0.0.1/private",
+        "https://10.0.0.5/private",
+        "https://not-allowlisted.example/private",
+    ]:
+        opener = RedirectingOpener(location)
+        monkeypatch.setattr(urllib.request, "build_opener", lambda *handlers, op=opener: op)
 
-    try:
-        providers._post_json_once(
-            "https://api.example.test/v1",
-            {"request": "payload"},
-            {"Authorization": "Bearer secret-canary"},
-            timeout=1,
-            max_bytes=1024,
-        )
-    except providers.ProviderResponseError as exc:
-        assert "non_retryable_http_302" in str(exc)
-    else:
-        raise AssertionError("redirect was not blocked")
-    assert opener.seen_headers["Authorization"] == "Bearer secret-canary"
+        try:
+            providers._post_json_once(
+                "https://api.example.test/v1",
+                {"request": "payload"},
+                {"Authorization": "Bearer secret-canary"},
+                timeout=1,
+                max_bytes=1024,
+            )
+        except providers.ProviderResponseError as exc:
+            assert "non_retryable_http_302" in str(exc)
+        else:
+            raise AssertionError("redirect was not blocked")
+        assert opener.calls == 1
+        assert opener.seen_headers["Authorization"] == "Bearer secret-canary"
