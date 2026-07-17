@@ -2,39 +2,39 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1865`
+- Tracked files: `1940`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
 | Database migration | 138 |
-| Deployment infrastructure | 32 |
+| Deployment infrastructure | 33 |
 | Deprecated code | 48 |
-| Development tooling | 129 |
-| Documentation | 377 |
+| Development tooling | 139 |
+| Documentation | 428 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 487 |
 | Prompt/template | 29 |
-| Test infrastructure | 283 |
-| Unknown purpose | 75 |
+| Test infrastructure | 284 |
+| Unknown purpose | 87 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 502 |
-| `docs` | 304 |
+| `docs` | 355 |
 | `evals` | 180 |
-| `scripts` | 141 |
+| `scripts` | 151 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `constitution` | 40 |
-| `tests` | 39 |
+| `tests` | 40 |
 | `frontend` | 37 |
 | `reserve` | 33 |
 | `calibration` | 30 |
@@ -44,9 +44,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `civilization` | 15 |
 | `autonomy` | 13 |
 | `learning` | 13 |
+| `.github` | 10 |
 | `synthesis` | 10 |
-| `.github` | 9 |
+| `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
+| `schemas` | 5 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -59,7 +61,6 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `memory_kernel` | 2 |
 | `meta` | 2 |
 | `provenance` | 2 |
-| `schemas` | 2 |
 | `self_modification` | 2 |
 | `simulation` | 2 |
 | `.env.example` | 1 |
@@ -100,6 +101,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.github/workflows/civilization-completion.yml` | Deployment infrastructure |
 | `.github/workflows/clean-room-audit.yml` | Deployment infrastructure |
 | `.github/workflows/constitution.yml` | Deployment infrastructure |
+| `.github/workflows/cross-version-evaluation.yml` | Deployment infrastructure |
 | `.github/workflows/deploy.yml` | Deployment infrastructure |
 | `.github/workflows/hosted-staging-audit.yml` | Deployment infrastructure |
 | `.github/workflows/longitudinal-evidence.yml` | Deployment infrastructure |
@@ -982,6 +984,15 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `constitution/volumes/VOL-32-security-and-threat-model.md` | Unknown purpose |
 | `constitution/volumes/VOL-33-model-governance.md` | Unknown purpose |
 | `constitution/volumes/VOL-34-civilization-memory.md` | Unknown purpose |
+| `cross_version_adapters/__init__.py` | Unknown purpose |
+| `cross_version_adapters/backend_runtime_adapter.py` | Unknown purpose |
+| `cross_version_adapters/base.py` | Unknown purpose |
+| `cross_version_adapters/data_analysis_adapter.py` | Unknown purpose |
+| `cross_version_adapters/governance_adapter.py` | Unknown purpose |
+| `cross_version_adapters/memory_adapter.py` | Unknown purpose |
+| `cross_version_adapters/python_agent_adapter.py` | Unknown purpose |
+| `cross_version_adapters/recovery_adapter.py` | Unknown purpose |
+| `cross_version_adapters/unsupported_adapter.py` | Unknown purpose |
 | `dashboard/src/app/calibration/page.tsx` | Production runtime code |
 | `dashboard/src/types/calibration.ts` | Production runtime code |
 | `data/external/bike_sharing/bike_sharing_dataset.zip` | Generated artifact |
@@ -1092,22 +1103,45 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/ACTUAL_DEPLOYMENT_TOPOLOGY.md` | Documentation |
 | `docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.json` | Documentation |
 | `docs/audit/current/ACTUAL_RUNTIME_ARCHITECTURE.md` | Documentation |
+| `docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.json` | Documentation |
+| `docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.md` | Documentation |
 | `docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md` | Documentation |
 | `docs/audit/current/BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/BASELINE_COMMAND_RESULTS.json` | Documentation |
 | `docs/audit/current/BASELINE_EXECUTION_REPORT.md` | Documentation |
 | `docs/audit/current/BASELINE_FINDINGS.json` | Documentation |
+| `docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.json` | Documentation |
+| `docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.md` | Documentation |
+| `docs/audit/current/BATCH07_MAIN_RECONCILIATION.json` | Documentation |
+| `docs/audit/current/BATCH07_MAIN_RECONCILIATION.md` | Documentation |
+| `docs/audit/current/BATCH_07_POST_CONFLICT_REPROOF.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.md` | Documentation |
 | `docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.json` | Documentation |
 | `docs/audit/current/CAPABILITY_VECTOR_SPECIFICATION.md` | Documentation |
+| `docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.json` | Documentation |
+| `docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.md` | Documentation |
+| `docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.json` | Documentation |
+| `docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.md` | Documentation |
 | `docs/audit/current/CI_BASELINE_RECONCILIATION.md` | Documentation |
 | `docs/audit/current/CLAIM_EVIDENCE_MATRIX.json` | Documentation |
 | `docs/audit/current/CLAIM_EVIDENCE_MATRIX.md` | Documentation |
 | `docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.json` | Documentation |
 | `docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_DECISION.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_DECISION.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_FINDINGS.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_FINDINGS.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_HEALTH_MATRIX.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_HEALTH_MATRIX.md` | Documentation |
+| `docs/audit/current/CROSS_VERSION_PROMOTION_POLICY.json` | Documentation |
+| `docs/audit/current/CROSS_VERSION_PROMOTION_POLICY.md` | Documentation |
 | `docs/audit/current/DEPLOYMENT_COMPONENT_LEDGER.json` | Documentation |
 | `docs/audit/current/DEPLOYMENT_COMPONENT_LEDGER.md` | Documentation |
 | `docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.json` | Documentation |
@@ -1149,10 +1183,18 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/LONGITUDINAL_MISSION_FINDINGS.json` | Documentation |
 | `docs/audit/current/LONGITUDINAL_MISSION_FINDINGS.md` | Documentation |
 | `docs/audit/current/LONGITUDINAL_RUN_PROTOCOL.md` | Documentation |
+| `docs/audit/current/MAINLINE_RECONCILIATION_FINDINGS.json` | Documentation |
+| `docs/audit/current/MAINLINE_RECONCILIATION_FINDINGS.md` | Documentation |
+| `docs/audit/current/MIGRATION_IDENTITY_LEDGER.json` | Documentation |
+| `docs/audit/current/MIGRATION_IDENTITY_LEDGER.md` | Documentation |
 | `docs/audit/current/MISSION_CLAIM_DECOMPOSITION.json` | Documentation |
 | `docs/audit/current/MISSION_CLAIM_DECOMPOSITION.md` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
+| `docs/audit/current/PR27_CONFLICT_RESOLUTION.md` | Documentation |
+| `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
+| `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
+| `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_03_RUNTIME_ARCHITECTURE_INTEGRATION.md` | Documentation |
@@ -1160,6 +1202,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_05_HOSTED_STAGING_LIVE_PROVIDERS.md` | Documentation |
 | `docs/audit/current/REMEDIATION_06A_LONGITUDINAL_REMOTE_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_06_LONGITUDINAL_MISSION_EVIDENCE_FOUNDATION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07D_EVIDENCE_BINDING_AND_V2.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07E_FINAL_EVIDENCE_SEMANTIC_CLOSURE.md` | Documentation |
+| `docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.md` | Documentation |
@@ -1167,7 +1214,22 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
+| `docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json` | Documentation |
+| `docs/audit/current/SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json` | Documentation |
+| `docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md` | Documentation |
+| `docs/audit/current/SUBJECT_INTERFACE_INVENTORY.json` | Documentation |
+| `docs/audit/current/SUBJECT_INTERFACE_INVENTORY.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.md` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.json` | Documentation |
+| `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
+| `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json` | Documentation |
+| `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
@@ -1740,8 +1802,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `runtime/tests/test_runtime_durable_governance_stores.py` | Test infrastructure |
 | `runtime/tests/test_spend_guardrail_ledger.py` | Test infrastructure |
 | `runtime/tool_registry/__init__.py` | Production runtime code |
+| `schemas/cross_version_campaign.schema.json` | Unknown purpose |
 | `schemas/longitudinal_history.schema.json` | Unknown purpose |
 | `schemas/longitudinal_run_manifest.schema.json` | Unknown purpose |
+| `schemas/subject_benchmark_request.schema.json` | Unknown purpose |
+| `schemas/subject_benchmark_response.schema.json` | Unknown purpose |
 | `scripts/agentco_evolution_test.py` | Development tooling |
 | `scripts/agentco_integration_audit.py` | Development tooling |
 | `scripts/aggregate_longitudinal_history.py` | Development tooling |
@@ -1761,6 +1826,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/calculate_longitudinal_milestones.py` | Development tooling |
 | `scripts/check_resolutions.py` | Development tooling |
 | `scripts/civilization_free_run.py` | Development tooling |
+| `scripts/compare_cross_version_campaign.py` | Development tooling |
 | `scripts/compare_longitudinal_runs.py` | Development tooling |
 | `scripts/complete_autonomy_test.py` | Development tooling |
 | `scripts/complex_multidomain_run.py` | Development tooling |
@@ -1800,6 +1866,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_b2b_saas_four_arm_experiment.py` | Development tooling |
 | `scripts/run_b2b_saas_simulation.py` | Development tooling |
 | `scripts/run_b2b_saas_soft_weighting.py` | Development tooling |
+| `scripts/run_cross_version_campaign.py` | Development tooling |
 | `scripts/run_diagnostic_weighting_tests.py` | Development tooling |
 | `scripts/run_first_real_prediction.py` | Development tooling |
 | `scripts/run_fitness_subscription_simulation.py` | Development tooling |
@@ -1817,6 +1884,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_pawdent_business_simulation.py` | Development tooling |
 | `scripts/run_real_world_validation.py` | Development tooling |
 | `scripts/run_staging_validation_gate.sh` | Development tooling |
+| `scripts/run_subject_native_cross_version_campaign.py` | Development tooling |
 | `scripts/scan_committed_secrets.py` | Development tooling |
 | `scripts/setup_release_gate_role.sql` | Development tooling |
 | `scripts/smoke_frontend_auth.sh` | Development tooling |
@@ -1862,7 +1930,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_agentco_goal_run.py` | Development tooling |
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
 | `scripts/verify_benchmark_governance.py` | Development tooling |
+| `scripts/verify_campaign_evidence_binding.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
+| `scripts/verify_cross_version_campaign.py` | Development tooling |
+| `scripts/verify_cross_version_harness_independence.py` | Development tooling |
 | `scripts/verify_docker_startup.py` | Development tooling |
 | `scripts/verify_execution_ledger.py` | Development tooling |
 | `scripts/verify_gate_integrity.py` | Development tooling |
@@ -1873,6 +1944,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_longitudinal_evidence.py` | Development tooling |
 | `scripts/verify_make_targets.py` | Development tooling |
 | `scripts/verify_memory_influence_live.py` | Development tooling |
+| `scripts/verify_migration_identity.py` | Development tooling |
 | `scripts/verify_migration_integrity.py` | Development tooling |
 | `scripts/verify_migrations_native.py` | Development tooling |
 | `scripts/verify_mission_progress.py` | Development tooling |
@@ -1881,6 +1953,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_pytest_skips.py` | Development tooling |
 | `scripts/verify_release_gates.py` | Development tooling |
 | `scripts/verify_resolution_service.py` | Development tooling |
+| `scripts/verify_subject_answer_ownership.py` | Development tooling |
+| `scripts/verify_subject_request_consumption.py` | Development tooling |
+| `scripts/verify_subject_runtime_evidence.py` | Development tooling |
 | `scripts/wait_for_postgres.sh` | Development tooling |
 | `scripts/web_scraper_free.py` | Development tooling |
 | `self_modification/__init__.py` | Production runtime code |
@@ -1929,6 +2004,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_civilization_vertical_slice.py` | Test infrastructure |
 | `tests/test_clean_room_evidence_controls.py` | Test infrastructure |
 | `tests/test_compose_bind_sources.py` | Test infrastructure |
+| `tests/test_cross_version_campaign.py` | Test infrastructure |
 | `tests/test_db_client_runtime_config.py` | Test infrastructure |
 | `tests/test_durable_runtime_cleanup.py` | Test infrastructure |
 | `tests/test_execute_durable_task.py` | Test infrastructure |

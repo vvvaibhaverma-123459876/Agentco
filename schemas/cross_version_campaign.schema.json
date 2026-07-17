@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentCo Cross-Version Campaign Manifest",
+  "type": "object",
+  "required": [
+    "campaign_id",
+    "control_manifest_version",
+    "methodology",
+    "benchmark_registry_hash",
+    "evaluator_version",
+    "planned_case_executions",
+    "blinding",
+    "subjects",
+    "comparisons"
+  ],
+  "properties": {
+    "campaign_id": { "type": "string" },
+    "control_manifest_version": {
+      "enum": [
+        "real-cross-version-campaign-v1",
+        "subject-native-cross-version-campaign-v1",
+        "subject-native-cross-version-campaign-v2"
+      ]
+    },
+    "methodology": {
+      "enum": [
+        "subject_process_invocation_no_synthetic_outputs",
+        "subject_native_existing_agentco_interfaces"
+      ]
+    },
+    "benchmark_registry_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "evaluator_version": { "type": "string" },
+    "evaluator_code_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "planned_case_executions": { "type": "integer", "minimum": 1 },
+    "blinding": {
+      "type": "object",
+      "required": ["mapping_hash", "sealed_mapping", "unblinding_timestamp"]
+    },
+    "seeds": {
+      "type": "array",
+      "items": { "type": "integer" },
+      "minItems": 1
+    },
+    "subjects": {
+      "type": "object",
+      "required": ["version-a", "version-b", "version-c"]
+    },
+    "comparisons": {
+      "type": "object",
+      "required": ["a_vs_b", "a_vs_c", "b_vs_c"]
+    },
+    "common_core_domains": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "health_metrics_excluded_from_capability": { "type": "boolean" },
+    "thresholds_met": { "type": "boolean" },
+    "compatibility_matrix_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "adapter_bundle_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    ,
+    "campaign_execution_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "workflow_head_sha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "adapter_freeze_sha": { "type": ["string", "null"] },
+    "adapter_freeze_tree_hash": { "type": ["string", "null"] },
+    "internal_payload_manifest_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "completed_count": { "type": "integer", "minimum": 0 },
+    "failed_count": { "type": "integer", "minimum": 0 },
+    "timeout_count": { "type": "integer", "minimum": 0 },
+    "unsupported_count": { "type": "integer", "minimum": 0 }
+  }
+}

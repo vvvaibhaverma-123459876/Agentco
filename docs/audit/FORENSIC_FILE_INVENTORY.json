@@ -1,31 +1,31 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1865,
+  "tracked_file_count": 1940,
   "category_counts": {
     "Database migration": 138,
-    "Deployment infrastructure": 32,
+    "Deployment infrastructure": 33,
     "Deprecated code": 48,
-    "Development tooling": 129,
-    "Documentation": 377,
+    "Development tooling": 139,
+    "Documentation": 428,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 487,
     "Prompt/template": 29,
-    "Test infrastructure": 283,
-    "Unknown purpose": 75
+    "Test infrastructure": 284,
+    "Unknown purpose": 87
   },
   "top_level_counts": {
     "backend": 502,
-    "docs": 304,
+    "docs": 355,
     "evals": 180,
-    "scripts": 141,
+    "scripts": 151,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
     "runtime": 51,
     "archive": 48,
     "constitution": 40,
-    "tests": 39,
+    "tests": 40,
     "frontend": 37,
     "reserve": 33,
     "calibration": 30,
@@ -35,9 +35,11 @@
     "civilization": 15,
     "autonomy": 13,
     "learning": 13,
+    ".github": 10,
     "synthesis": 10,
-    ".github": 9,
+    "cross_version_adapters": 9,
     "ingestion": 9,
+    "schemas": 5,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -50,7 +52,6 @@
     "memory_kernel": 2,
     "meta": 2,
     "provenance": 2,
-    "schemas": 2,
     "self_modification": 2,
     "simulation": 2,
     ".env.example": 1,
@@ -80,10 +81,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 556,
-    ".md": 454,
+    ".py": 576,
+    ".md": 482,
     ".ts": 338,
-    ".json": 171,
+    ".json": 197,
     ".sql": 139,
     ".jsonl": 40,
     ".csv": 38,
@@ -91,8 +92,8 @@
     ".disabled": 21,
     ".tsx": 18,
     ".txt": 16,
+    ".yml": 14,
     ".sh": 14,
-    ".yml": 13,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
@@ -152,6 +153,12 @@
     },
     {
       "path": ".github/workflows/constitution.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
+    },
+    {
+      "path": ".github/workflows/cross-version-evaluation.yml",
       "category": "Deployment infrastructure",
       "top_level": ".github",
       "extension": ".yml"
@@ -5449,6 +5456,60 @@
       "extension": ".md"
     },
     {
+      "path": "cross_version_adapters/__init__.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/backend_runtime_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/base.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/data_analysis_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/governance_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/memory_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/python_agent_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/recovery_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
+      "path": "cross_version_adapters/unsupported_adapter.py",
+      "category": "Unknown purpose",
+      "top_level": "cross_version_adapters",
+      "extension": ".py"
+    },
+    {
       "path": "dashboard/src/app/calibration/page.tsx",
       "category": "Production runtime code",
       "top_level": "dashboard",
@@ -6109,6 +6170,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/ADAPTER_DEVELOPMENT_V2_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/AUTHORITATIVE_IMPLEMENTATIONS.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -6137,6 +6210,36 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH07_MAIN_RECONCILIATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/BATCH07_MAIN_RECONCILIATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH_07_POST_CONFLICT_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
@@ -6175,6 +6278,30 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CAPABILITY_VS_PRIMITIVE_CLASSIFICATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CIVILIZATION_CLAIM_VERIFICATION_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/CI_BASELINE_RECONCILIATION.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -6200,6 +6327,78 @@
     },
     {
       "path": "docs/audit/current/CROSS_DOMAIN_TRANSFER_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_ADAPTER_COMPATIBILITY_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_ANCESTRY_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_HEALTH_MATRIX.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_HEALTH_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_PROMOTION_POLICY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/CROSS_VERSION_PROMOTION_POLICY.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -6451,6 +6650,30 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/MAINLINE_RECONCILIATION_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/MAINLINE_RECONCILIATION_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/MIGRATION_IDENTITY_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/MIGRATION_IDENTITY_LEDGER.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/MISSION_CLAIM_DECOMPOSITION.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6473,6 +6696,30 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PR27_CONFLICT_RESOLUTION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REAL_CROSS_VERSION_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/REAL_CROSS_VERSION_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
     },
     {
       "path": "docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md",
@@ -6512,6 +6759,36 @@
     },
     {
       "path": "docs/audit/current/REMEDIATION_06_LONGITUDINAL_MISSION_EVIDENCE_FOUNDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_07B_REAL_CROSS_VERSION_EVALUATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_07C_SUBJECT_NATIVE_CROSS_VERSION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_07D_EVIDENCE_BINDING_AND_V2.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_07E_FINAL_EVIDENCE_SEMANTIC_CLOSURE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -6559,10 +6836,100 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_INTERFACE_INVENTORY.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_INTERFACE_INVENTORY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_RESULTS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/TEST_SKIP_ALLOWLIST.json",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/civilization/CANONICAL_RUNTIME_MAP.md",
@@ -9997,6 +10364,12 @@
       "extension": ".py"
     },
     {
+      "path": "schemas/cross_version_campaign.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
       "path": "schemas/longitudinal_history.schema.json",
       "category": "Unknown purpose",
       "top_level": "schemas",
@@ -10004,6 +10377,18 @@
     },
     {
       "path": "schemas/longitudinal_run_manifest.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
+      "path": "schemas/subject_benchmark_request.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
+      "path": "schemas/subject_benchmark_response.schema.json",
       "category": "Unknown purpose",
       "top_level": "schemas",
       "extension": ".json"
@@ -10118,6 +10503,12 @@
     },
     {
       "path": "scripts/civilization_free_run.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/compare_cross_version_campaign.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -10357,6 +10748,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/run_cross_version_campaign.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/run_diagnostic_weighting_tests.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10457,6 +10854,12 @@
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/run_subject_native_cross_version_campaign.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/scan_committed_secrets.py",
@@ -10729,7 +11132,25 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_campaign_evidence_binding.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_civilization_vertical_slice.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_cross_version_campaign.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_cross_version_harness_independence.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -10795,6 +11216,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_migration_identity.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_migration_integrity.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -10838,6 +11265,24 @@
     },
     {
       "path": "scripts/verify_resolution_service.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_subject_answer_ownership.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_subject_request_consumption.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_subject_runtime_evidence.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -11126,6 +11571,12 @@
     },
     {
       "path": "tests/test_compose_bind_sources.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_cross_version_campaign.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

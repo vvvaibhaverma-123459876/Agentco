@@ -1,0 +1,22 @@
+{
+  "decision_version": "cross-version-decision-v2",
+  "campaign_id": "cross-version-civilization-v1",
+  "decision": "INVALID_COMPARISON",
+  "automatic_promotion": false,
+  "promotion_proposal_valid": false,
+  "requires_reexecution": true,
+  "invalidated_prior_decision": {
+    "decision": "PROMOTION_PROPOSAL",
+    "subject": "version-c",
+    "subject_sha": "81cd17431f826d9d3cda06b9127758751e44b798",
+    "rationale": [
+      "Version B was preserved as raw candidate and recorded with migration identity limitation.",
+      "Version C resolved the migration identity blocker before blind evaluation.",
+      "A versus C paired benchmark reported 120 cases with 5 improved, 0 regressed, 115 unchanged.",
+      "B versus C reported 120 cases with 5 improved, 0 regressed, 115 unchanged."
+    ]
+  },
+  "invalidation_reason": "The prior campaign generated subject outputs from evaluator-side deterministic rules instead of subject-native execution.",
+  "replacement_required": "real-cross-version-civilization-v1",
+  "self_approval": false
+}

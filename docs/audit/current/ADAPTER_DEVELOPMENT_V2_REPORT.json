@@ -1,0 +1,16 @@
+{
+  "campaign": "adapter-development-v2",
+  "status": "completed_before_validation_hidden_v2",
+  "development_cases_used": 24,
+  "successful_interfaces": [
+    "durable-calibration-task",
+    "durable-record-observation-task"
+  ],
+  "rejected_interfaces": [
+    "llm-backed review/decision paths require unavailable live provider credentials",
+    "backend HTTP route contracts are not equivalent across immutable A/B/C without additional bootstrap",
+    "civilization runtime paths are absent from Version A"
+  ],
+  "frozen_before_blind_execution": true,
+  "validation_hidden_used_for_adapter_development": false
+}
