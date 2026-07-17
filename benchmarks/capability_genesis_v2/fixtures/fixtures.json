@@ -1,0 +1,13 @@
+{
+  "fixture_version": "capability-genesis-v2-fixtures",
+  "software": {
+    "add_function": {"files": {"add.py": "def add(a, b):\n    return 0\n"}, "public_tests": "from add import add\n\ndef test_add():\n    assert add(2, 3) == 5\n"},
+    "multiply_function": {"files": {"multiply.py": "def multiply(a, b):\n    return 0\n"}, "public_tests": "from multiply import multiply\n\ndef test_multiply():\n    assert multiply(3, 4) == 12\n"},
+    "subtract_function": {"files": {"subtract.py": "def subtract(a, b):\n    return 0\n"}, "public_tests": "from subtract import subtract\n\ndef test_subtract():\n    assert subtract(9, 4) == 5\n"}
+  },
+  "data": {
+    "csv_sum": "name,value\nalpha,2\nbeta,4\n",
+    "csv_average": "name,value\nred,4\nblue,10\n",
+    "csv_hidden_sum": "day,value\nmon,1\ntue,5\n"
+  }
+}

@@ -218,7 +218,7 @@
     ]
   },
   "ledger_version": "migration-identity-ledger-v1",
-  "migration_count": 130,
+  "migration_count": 131,
   "migration_directory": "backend/src/db/migrations",
   "migrations": [
     {
@@ -2753,6 +2753,27 @@
       "sequence": 140,
       "stable_migration_id": "140_civilization_os.sql",
       "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a0232191fa205f66aaf1d446c75b157afd58ee5dcea5ece3416aa1d0b1363240",
+      "filename": "140_governed_capability_runtime.sql",
+      "origin_commit": "8c0e4e9874cfb7652989724123a6110ea5313369",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_capability_attempts_request_id",
+        "capability_attempts",
+        "capability_authorization_events",
+        "capability_budget_ledger",
+        "capability_memory_events",
+        "capability_provider_calls",
+        "capability_recovery_events",
+        "capability_result_artifacts",
+        "capability_tool_calls"
+      ],
+      "sequence": 140,
+      "stable_migration_id": "140_governed_capability_runtime.sql",
+      "upgrade_prerequisites": []
     }
   ],
   "reused_sequence_contracts": {
@@ -2761,6 +2782,13 @@
       "filenames": [
         "129_civilization_kernel.sql",
         "129_longitudinal_mission_evidence.sql"
+      ]
+    },
+    "140": {
+      "contract": "Batch 08A reconciliation contract: Batch 07 civilization OS and Batch 08 governed capability runtime are independent domains; full filename plus content hash is the stable identity and lexicographic ordering applies both guarded migrations",
+      "filenames": [
+        "140_civilization_os.sql",
+        "140_governed_capability_runtime.sql"
       ]
     },
     "51": {

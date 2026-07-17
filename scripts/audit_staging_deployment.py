@@ -1481,8 +1481,20 @@ spec:
             role_checks[f"{role}:{verb}:{resource}"] = res.stdout.strip()
         ctx.results["rbac"] = role_checks
 
-        net_positive = run(ctx, "network-positive-backend-postgres", ["kubectl", "-n", ctx.namespace, "exec", "deploy/agentco-backend", "--", "node", "-e", "require('net').connect(5432,'postgres').on('connect',()=>{console.log('ok');process.exit(0)}).on('error',e=>{console.error(e.message);process.exit(1)})"], allow_failure=True)
-        net_negative = run(ctx, "network-negative-frontend-postgres", ["kubectl", "-n", ctx.namespace, "exec", "deploy/agentco-frontend", "--", "node", "-e", "require('net').connect(5432,'postgres').on('connect',()=>{console.error('unexpected-connect');process.exit(2)}).on('error',()=>{console.log('denied');process.exit(0)})"], allow_failure=True)
+        positive_probe = (
+            "const s=require('net').connect(5432,'postgres');"
+            "const t=setTimeout(()=>{console.error('connect-timeout');s.destroy();process.exit(1)},5000);"
+            "s.on('connect',()=>{clearTimeout(t);console.log('ok');process.exit(0)});"
+            "s.on('error',e=>{clearTimeout(t);console.error(e.message);process.exit(1)});"
+        )
+        negative_probe = (
+            "const s=require('net').connect(5432,'postgres');"
+            "const t=setTimeout(()=>{console.log('denied');s.destroy();process.exit(0)},5000);"
+            "s.on('connect',()=>{clearTimeout(t);console.error('unexpected-connect');process.exit(2)});"
+            "s.on('error',()=>{clearTimeout(t);console.log('denied');process.exit(0)});"
+        )
+        net_positive = run(ctx, "network-positive-backend-postgres", ["kubectl", "-n", ctx.namespace, "exec", "deploy/agentco-backend", "--", "node", "-e", positive_probe], allow_failure=True)
+        net_negative = run(ctx, "network-negative-frontend-postgres", ["kubectl", "-n", ctx.namespace, "exec", "deploy/agentco-frontend", "--", "node", "-e", negative_probe], allow_failure=True)
         ctx.results["network_policy"] = {"backend_to_postgres_exit": net_positive.returncode, "frontend_to_postgres_exit": net_negative.returncode}
 
         alert_payload = json.dumps({"service": "agentco", "severity": "warning", "correlation_id": ctx.run_id, "alert": "staging-audit"})

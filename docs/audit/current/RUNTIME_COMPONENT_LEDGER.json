@@ -28,7 +28,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -66,7 +66,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -112,7 +112,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -167,7 +167,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -222,7 +222,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -273,7 +273,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"Comparative Analyst Specialist Agent\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -324,7 +324,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -377,7 +377,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -433,7 +433,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -486,7 +486,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -542,7 +542,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -601,7 +601,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -654,7 +654,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"Quality Auditor Specialist Agent\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -708,7 +708,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -763,7 +763,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -816,7 +816,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"Sentiment Analyzer Specialist Agent\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -867,7 +867,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -955,7 +955,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -1034,7 +1034,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -1089,7 +1089,7 @@
       "process_type": "python_specialist_agent",
       "purpose": "\"\"\"Temporal Analyst Specialist Agent\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -1153,7 +1153,7 @@
       "process_type": "library",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1208,7 +1208,7 @@
       "process_type": "library",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -1246,7 +1246,7 @@
       "process_type": "library",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1293,7 +1293,7 @@
       "process_type": "library",
       "purpose": "import { db } from './db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1347,7 +1347,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1400,7 +1400,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1468,7 +1468,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1528,7 +1528,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1584,7 +1584,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1633,7 +1633,7 @@
       "process_type": "library",
       "purpose": "import { durableExecution } from '../services/durable-execution.service';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -1676,7 +1676,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -1715,7 +1715,7 @@
       "process_type": "library",
       "purpose": "!/usr/bin/env ts-node",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -1751,7 +1751,7 @@
       "process_type": "library",
       "purpose": "\"\"\"Backend configuration.\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -1793,7 +1793,7 @@
       "process_type": "library",
       "purpose": "\"\"\"LLM Provider configuration - imports from runtime.\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1842,7 +1842,7 @@
       "process_type": "database_runtime",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -1890,7 +1890,7 @@
       "process_type": "database_runtime",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1945,7 +1945,7 @@
       "process_type": "database_runtime",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -1999,7 +1999,7 @@
       "process_type": "database_runtime",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -2063,7 +2063,7 @@
       "process_type": "database_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -2116,7 +2116,7 @@
       "process_type": "library",
       "purpose": "import { activeRuntimeMode, productionCapabilityContract } from './runtime-mode';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -2162,7 +2162,7 @@
       "process_type": "library",
       "purpose": "import { db } from './db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -2198,7 +2198,7 @@
       "process_type": "library",
       "purpose": "export class PublicHttpError extends Error {",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -2238,7 +2238,7 @@
       "process_type": "library",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -2285,7 +2285,7 @@
       "process_type": "library",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -2342,7 +2342,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2383,7 +2383,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2433,7 +2433,7 @@
       "process_type": "http_route_module",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2498,7 +2498,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2551,7 +2551,49 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
+      "runtime_evidence": [
+        "make audit-runtime-integration"
+      ],
+      "startup_command": null,
+      "state_read": [],
+      "state_written": [],
+      "tests": []
+    },
+    {
+      "audit_boundary": "not_applicable",
+      "authentication_boundary": "protected by backend preHandler unless route config public",
+      "authoritative_status": "authoritative",
+      "authorization_boundary": "not_observed",
+      "budget_boundary": "not_applicable",
+      "classification": "authoritative_runtime",
+      "component_id": "backend-src-routes-capabilities-routes-ts",
+      "configuration": [],
+      "database_tables": [],
+      "deployment_reference": [
+        "backend/Dockerfile",
+        "docker-compose.yml"
+      ],
+      "direct_callers": [],
+      "direct_dependencies": [
+        "../services/capability-runtime.service",
+        "../types/capability.types",
+        "fastify"
+      ],
+      "entrypoint": "backend/src/server.ts route registration",
+      "events_consumed": [],
+      "events_produced": [],
+      "external_dependencies": [],
+      "failure_behaviour": "throws or returns non-2xx; see runtime tests",
+      "idempotency_mechanism": "not_observed",
+      "known_findings": [],
+      "language": "typescript",
+      "name": "capabilities.routes",
+      "path": "backend/src/routes/capabilities.routes.ts",
+      "process_type": "http_route_module",
+      "purpose": "import { FastifyInstance } from 'fastify';",
+      "retry_behaviour": "bounded retry/outbox",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2593,7 +2635,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2635,7 +2677,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2684,7 +2726,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2726,7 +2768,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2768,7 +2810,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2810,7 +2852,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2852,7 +2894,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2894,7 +2936,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2935,7 +2977,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -2978,7 +3020,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3025,7 +3067,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3073,7 +3115,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3120,7 +3162,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3163,7 +3205,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3209,7 +3251,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3251,7 +3293,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3293,7 +3335,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3334,7 +3376,7 @@
       "process_type": "http_route_module",
       "purpose": "import type { FastifyRequest } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3378,7 +3420,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3423,7 +3465,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3465,7 +3507,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3508,7 +3550,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3560,7 +3602,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3606,7 +3648,7 @@
       "process_type": "http_route_module",
       "purpose": "import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3649,7 +3691,7 @@
       "process_type": "library",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -3691,7 +3733,7 @@
       "process_type": "library",
       "purpose": "import { isProductionEnv } from './security';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -3734,7 +3776,7 @@
       "process_type": "library",
       "purpose": "import type { FastifyReply, FastifyRequest } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -3773,6 +3815,7 @@
         "./routes/autonomy-dashboard.routes",
         "./routes/autonomy-orchestrator.routes",
         "./routes/autonomy-tasks.routes",
+        "./routes/capabilities.routes",
         "./routes/capability-expansion.routes",
         "./routes/citizenship.routes",
         "./routes/civilization-governance.routes",
@@ -3787,8 +3830,7 @@
         "./routes/governance.routes",
         "./routes/identity.routes",
         "./routes/institution-work-assignment.routes",
-        "./routes/judiciary-case.routes",
-        "./routes/mission.routes"
+        "./routes/judiciary-case.routes"
       ],
       "entrypoint": "node dist/server.js",
       "events_consumed": [],
@@ -3803,7 +3845,7 @@
       "process_type": "backend_http_server",
       "purpose": "import dotenv from 'dotenv';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -3875,7 +3917,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -3950,7 +3992,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4012,7 +4054,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4072,7 +4114,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4141,7 +4183,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4215,7 +4257,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4266,7 +4308,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4366,7 +4408,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4484,7 +4526,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4541,7 +4583,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4606,7 +4648,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4684,7 +4726,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4752,7 +4794,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4813,7 +4855,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4884,7 +4926,7 @@
       "process_type": "service",
       "purpose": "import { createHash } from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -4955,7 +4997,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5019,7 +5061,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5082,7 +5124,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5154,7 +5196,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5173,6 +5215,46 @@
         "expansion_proposals",
         "expansion_stage_records"
       ],
+      "tests": []
+    },
+    {
+      "audit_boundary": "not_applicable",
+      "authentication_boundary": "not_applicable",
+      "authoritative_status": "support",
+      "authorization_boundary": "route auth/RBAC/tool allowlist where invoked",
+      "budget_boundary": "resource-ledger/runtime spend controls",
+      "classification": "runtime_support",
+      "component_id": "backend-src-services-capability-runtime-service-ts",
+      "configuration": [],
+      "database_tables": [],
+      "deployment_reference": [
+        "backend/Dockerfile",
+        "docker-compose.yml"
+      ],
+      "direct_callers": [],
+      "direct_dependencies": [
+        "../http-errors",
+        "../types/capability.types",
+        "crypto"
+      ],
+      "entrypoint": null,
+      "events_consumed": [],
+      "events_produced": [],
+      "external_dependencies": [],
+      "failure_behaviour": "throws or returns non-2xx; see runtime tests",
+      "idempotency_mechanism": "idempotency key/ON CONFLICT",
+      "known_findings": [],
+      "language": "typescript",
+      "name": "capability-runtime.service",
+      "path": "backend/src/services/capability-runtime.service.ts",
+      "process_type": "service",
+      "purpose": "import crypto from 'crypto';",
+      "retry_behaviour": "bounded retry/outbox",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
+      "runtime_evidence": [],
+      "startup_command": null,
+      "state_read": [],
+      "state_written": [],
       "tests": []
     },
     {
@@ -5240,7 +5322,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5340,7 +5422,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5429,7 +5511,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5491,7 +5573,7 @@
       "process_type": "service",
       "purpose": "import * as prometheus from 'prom-client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5546,7 +5628,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5639,7 +5721,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5730,7 +5812,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5783,7 +5865,7 @@
       "process_type": "service",
       "purpose": "import {",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -5832,7 +5914,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5900,7 +5982,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -5964,7 +6046,7 @@
       "process_type": "service",
       "purpose": "import { EvidenceRecord, evidenceRegistry } from './evidence-registry.service';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -6012,7 +6094,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6096,7 +6178,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6189,7 +6271,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6252,7 +6334,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6305,7 +6387,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6363,7 +6445,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6422,7 +6504,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6486,7 +6568,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6543,7 +6625,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6610,7 +6692,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6662,7 +6744,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6722,7 +6804,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -6774,7 +6856,7 @@
       "process_type": "service",
       "purpose": "import { pool } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6853,7 +6935,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6909,7 +6991,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -6965,7 +7047,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7027,7 +7109,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7093,7 +7175,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7156,7 +7238,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7218,7 +7300,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7286,7 +7368,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7362,7 +7444,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7424,7 +7506,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7478,7 +7560,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7540,7 +7622,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7619,7 +7701,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7691,7 +7773,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7749,7 +7831,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7807,7 +7889,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7868,7 +7950,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -7952,7 +8034,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8008,7 +8090,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -8052,7 +8134,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8123,7 +8205,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8192,7 +8274,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8264,7 +8346,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8321,7 +8403,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8386,7 +8468,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8457,7 +8539,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8529,7 +8611,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8602,7 +8684,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8664,7 +8746,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8716,7 +8798,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8767,7 +8849,7 @@
       "process_type": "service",
       "purpose": "import { PoolClient } from 'pg';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8814,7 +8896,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8883,7 +8965,7 @@
       "process_type": "service",
       "purpose": "import { pool } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -8956,7 +9038,7 @@
       "process_type": "service",
       "purpose": "import { FastifyInstance } from 'fastify';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9027,7 +9109,7 @@
       "process_type": "service",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9092,7 +9174,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -9141,7 +9223,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9218,7 +9300,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9272,7 +9354,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -9322,7 +9404,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9377,7 +9459,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9436,7 +9518,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9482,7 +9564,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -9555,7 +9637,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9635,7 +9717,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9702,7 +9784,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9764,7 +9846,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -9811,7 +9893,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9865,7 +9947,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9922,7 +10004,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -9983,7 +10065,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10046,7 +10128,7 @@
       "process_type": "service",
       "purpose": "import { pool } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10109,7 +10191,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10163,7 +10245,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10213,7 +10295,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10259,7 +10341,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10307,7 +10389,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10351,7 +10433,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -10398,7 +10480,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10455,7 +10537,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10515,7 +10597,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10591,7 +10673,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10672,7 +10754,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10731,7 +10813,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10786,7 +10868,7 @@
       "process_type": "service",
       "purpose": "import { pool } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10836,7 +10918,7 @@
       "process_type": "service",
       "purpose": "import { calibrationConstitutionService } from './calibration-constitution.service';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -10883,7 +10965,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -10938,7 +11020,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -11004,7 +11086,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11068,7 +11150,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11132,7 +11214,7 @@
       "process_type": "service",
       "purpose": "import { PoolClient } from 'pg';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11187,7 +11269,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11240,7 +11322,7 @@
       "process_type": "service",
       "purpose": "import { pool } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11302,7 +11384,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11369,7 +11451,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11436,7 +11518,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11499,7 +11581,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11559,7 +11641,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11638,7 +11720,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11705,7 +11787,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11756,7 +11838,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -11807,7 +11889,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11872,7 +11954,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11916,7 +11998,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -11968,7 +12050,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12046,7 +12128,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12113,7 +12195,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12178,7 +12260,7 @@
       "process_type": "service",
       "purpose": "import { PoolClient } from 'pg';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12254,7 +12336,7 @@
       "process_type": "service",
       "purpose": "import crypto from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12326,7 +12408,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12385,7 +12467,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12448,7 +12530,7 @@
       "process_type": "service",
       "purpose": "import { createHash } from 'crypto';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12512,7 +12594,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12561,7 +12643,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12609,7 +12691,7 @@
       "process_type": "service",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12657,7 +12739,7 @@
       "process_type": "service",
       "purpose": "import { db } from '../db/client';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12699,7 +12781,43 @@
       "process_type": "library",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
+      "runtime_evidence": [],
+      "startup_command": null,
+      "state_read": [],
+      "state_written": [],
+      "tests": []
+    },
+    {
+      "audit_boundary": "not_applicable",
+      "authentication_boundary": "not_applicable",
+      "authoritative_status": "support",
+      "authorization_boundary": "route auth/RBAC/tool allowlist where invoked",
+      "budget_boundary": "resource-ledger/runtime spend controls",
+      "classification": "runtime_support",
+      "component_id": "backend-src-types-capability-types-ts",
+      "configuration": [],
+      "database_tables": [],
+      "deployment_reference": [
+        "backend/Dockerfile",
+        "docker-compose.yml"
+      ],
+      "direct_callers": [],
+      "direct_dependencies": [],
+      "entrypoint": null,
+      "events_consumed": [],
+      "events_produced": [],
+      "external_dependencies": [],
+      "failure_behaviour": "not_observed",
+      "idempotency_mechanism": "idempotency key/ON CONFLICT",
+      "known_findings": [],
+      "language": "typescript",
+      "name": "capability.types",
+      "path": "backend/src/types/capability.types.ts",
+      "process_type": "library",
+      "purpose": "export const AGENTCO_CAPABILITY_PROTOCOL_VERSION = 'agentco-capability-v1' as const;",
+      "retry_behaviour": "bounded retry/outbox",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -12743,7 +12861,7 @@
       "process_type": "library",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -12793,7 +12911,7 @@
       "process_type": "library",
       "purpose": "import { civilizationOs, TickResult } from '../services/civilization-os.service';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -12841,7 +12959,7 @@
       "process_type": "worker",
       "purpose": "import { disconnectProducer, getProducer } from '../db/kafka';",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -12892,7 +13010,7 @@
       "process_type": "library",
       "purpose": "import { spawn } from 'child_process';",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -12925,7 +13043,7 @@
       "process_type": "evaluation_support",
       "purpose": "Enterprise Vendor Risk Triage Benchmark",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -12958,7 +13076,7 @@
       "process_type": "evaluation_support",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -13001,7 +13119,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13055,7 +13173,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13107,7 +13225,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13154,7 +13272,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13202,7 +13320,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13262,7 +13380,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13318,7 +13436,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13369,7 +13487,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13423,7 +13541,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13475,7 +13593,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13532,7 +13650,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13581,7 +13699,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13628,7 +13746,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13684,7 +13802,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13748,7 +13866,7 @@
       "process_type": "evaluation_support",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13799,7 +13917,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13851,7 +13969,7 @@
       "process_type": "python_research_module",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -13896,7 +14014,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -13945,7 +14063,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14003,7 +14121,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14046,7 +14164,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -14097,7 +14215,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14148,7 +14266,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -14197,7 +14315,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14244,7 +14362,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -14288,7 +14406,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14327,7 +14445,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -14373,7 +14491,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14422,7 +14540,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -14455,7 +14573,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -14494,7 +14612,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14546,7 +14664,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14616,7 +14734,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14717,7 +14835,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -14798,7 +14916,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14852,7 +14970,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14915,7 +15033,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -14978,7 +15096,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15057,7 +15175,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15132,7 +15250,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15177,7 +15295,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -15221,7 +15339,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15269,7 +15387,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"Phase 11 controlled learning and rollback runtime.\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -15337,7 +15455,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -15399,7 +15517,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -15457,7 +15575,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -15502,7 +15620,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -15547,7 +15665,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15595,7 +15713,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"Phase 10 deterministic evaluation and calibration runtime.\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15641,7 +15759,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15710,7 +15828,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15773,7 +15891,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15832,7 +15950,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15888,7 +16006,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -15934,7 +16052,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"Explicit fallback adapter metadata for AgentCo runtime checks.\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -15967,7 +16085,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -16002,7 +16120,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from .modes import RUNTIME_MODES, choose_runtime_mode, classify_mode",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -16062,7 +16180,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16117,7 +16235,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16173,7 +16291,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16212,7 +16330,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -16254,7 +16372,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from runtime.orchestration.doctor import Check, build_report, check_production_secret_posture",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16304,7 +16422,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "import json",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16343,7 +16461,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"Bounded self-improvement experiment controls.\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16406,7 +16524,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16467,7 +16585,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16525,7 +16643,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16570,7 +16688,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -16611,7 +16729,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16667,7 +16785,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16729,7 +16847,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16789,7 +16907,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16845,7 +16963,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -16902,7 +17020,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [
         "make audit-runtime-integration"
       ],
@@ -16962,7 +17080,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17016,7 +17134,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "\"\"\"",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17081,7 +17199,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "from __future__ import annotations",
       "retry_behaviour": "bounded retry/outbox",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17145,7 +17263,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "import os",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17188,7 +17306,7 @@
       "process_type": "python_governance_runtime",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17225,7 +17343,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17258,7 +17376,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17303,7 +17421,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17346,7 +17464,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17379,7 +17497,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17426,7 +17544,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17473,7 +17591,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17517,7 +17635,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17556,7 +17674,7 @@
       "process_type": "python_research_module",
       "purpose": "runtime file",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [],
@@ -17605,7 +17723,7 @@
       "process_type": "python_research_module",
       "purpose": "\"\"\"",
       "retry_behaviour": "not_observed",
-      "review_commit": "tracked_structural_snapshot:eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70",
+      "review_commit": "tracked_structural_snapshot:128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f",
       "runtime_evidence": [],
       "startup_command": null,
       "state_read": [
@@ -17629,5 +17747,5 @@
       "tests": []
     }
   ],
-  "source_input_hash": "eee049cc55f6767eaf8f51ec8cafbb6b8e622d03aacd14c3ffd56ace86daca70"
+  "source_input_hash": "128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f"
 }

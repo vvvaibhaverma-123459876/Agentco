@@ -1,0 +1,338 @@
+[
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-reasoning-01",
+    "domain": "reasoning",
+    "fixture_ids": [
+      "fixture-reasoning"
+    ],
+    "input_hash": "ea63e5680f984ead222da0486be6f17fcd3a70936fe6de7ccc54286b16296414",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden reasoning task 1: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "reasoning",
+        "split_marker": "hidden",
+        "variant": 1
+      }
+    },
+    "rubric_hash": "d4bc34c14c3583178961f75118c873c446131e5571d32eb3cd9283d6c40c42e9",
+    "rubric_id": "rubric-hid-reasoning-01",
+    "scorer_id": "reasoning-v1",
+    "scoring_method": "reasoning",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-planning-02",
+    "domain": "planning",
+    "fixture_ids": [
+      "fixture-planning"
+    ],
+    "input_hash": "e8cb7a208addde3d136cb05fd2d13f80830f6793144163e85331faf191719148",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden planning task 2: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "planning",
+        "split_marker": "hidden",
+        "variant": 2
+      }
+    },
+    "rubric_hash": "3422b2748f92131d509589ee2dbd0a68db5ffeabc0e1d1ef7d20c96b9ea38b44",
+    "rubric_id": "rubric-hid-planning-02",
+    "scorer_id": "planning-v1",
+    "scoring_method": "planning",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-evidence_evaluation-03",
+    "domain": "evidence_evaluation",
+    "fixture_ids": [
+      "fixture-evidence_evaluation"
+    ],
+    "input_hash": "4b7467d31fb746bc256b5f484356aa2c78bb0298a28834a9aded94a9a806ebf6",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden evidence_evaluation task 3: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "evidence_evaluation",
+        "split_marker": "hidden",
+        "variant": 3
+      }
+    },
+    "rubric_hash": "e47301a5df21874a95aaa80964eea162ea58af20ef24e6370d579f116f670780",
+    "rubric_id": "rubric-hid-evidence_evaluation-03",
+    "scorer_id": "evidence_evaluation-v1",
+    "scoring_method": "evidence_evaluation",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-claim_grounding-04",
+    "domain": "claim_grounding",
+    "fixture_ids": [
+      "fixture-claim_grounding"
+    ],
+    "input_hash": "8c6fa0ce7096903d45d03c840529c78930d4158759eda21432f5c5b130e5a19b",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden claim_grounding task 4: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "claim_grounding",
+        "split_marker": "hidden",
+        "variant": 4
+      }
+    },
+    "rubric_hash": "2014742fb1322b48ba05c131bff31d6f32111569f2d6a6ac72182b993ba2cb87",
+    "rubric_id": "rubric-hid-claim_grounding-04",
+    "scorer_id": "claim_grounding-v1",
+    "scoring_method": "claim_grounding",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-structured_transformation-05",
+    "domain": "structured_transformation",
+    "fixture_ids": [
+      "fixture-structured_transformation"
+    ],
+    "input_hash": "e4b295fb8ba5bc8513cfc0f7e1d9490e2aa12ec3aaca8cde98957776f3d75653",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden structured_transformation task 5: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "structured_transformation",
+        "split_marker": "hidden",
+        "variant": 5
+      }
+    },
+    "rubric_hash": "467dce04a446c03c0e7e2ab2dc0db33e38bd861775cba492f4588643287e2cb7",
+    "rubric_id": "rubric-hid-structured_transformation-05",
+    "scorer_id": "structured_transformation-v1",
+    "scoring_method": "structured_transformation",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-safe_tool_selection-06",
+    "domain": "safe_tool_selection",
+    "fixture_ids": [
+      "fixture-safe_tool_selection"
+    ],
+    "input_hash": "84898c718e76d91c8d111ab0344b75aa24921e12a4c2e6d6cdcfac6cc99ae26e",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden safe_tool_selection task 6: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "safe_tool_selection",
+        "split_marker": "hidden",
+        "variant": 6
+      }
+    },
+    "rubric_hash": "a95a83bc97eced915c412279dc9b923cc49ecdd6e4b1b7a37bafd49dfd14e20a",
+    "rubric_id": "rubric-hid-safe_tool_selection-06",
+    "scorer_id": "safe_tool_selection-v1",
+    "scoring_method": "safe_tool_selection",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-data_analysis-07",
+    "domain": "data_analysis",
+    "fixture_ids": [
+      "fixture-data_analysis"
+    ],
+    "input_hash": "cb0f7223971b985364959c4830c4391a4724b46ec395a127efc606b464e849d8",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden data_analysis task 7: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "data_analysis",
+        "split_marker": "hidden",
+        "variant": 7
+      }
+    },
+    "rubric_hash": "4748d3875be60c08ea553fcb0a8120d9d5f5c242cfe0eb4b9a27b43a7017d267",
+    "rubric_id": "rubric-hid-data_analysis-07",
+    "scorer_id": "data_analysis-v1",
+    "scoring_method": "data_analysis",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-software_engineering-08",
+    "domain": "software_engineering",
+    "fixture_ids": [
+      "fixture-software_engineering"
+    ],
+    "input_hash": "d44888c999bcddfe026751f870e01c495e5d32d2a022192bba02f373636631cc",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden software_engineering task 8: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "software_engineering",
+        "split_marker": "hidden",
+        "variant": 8
+      }
+    },
+    "rubric_hash": "0382daba986811b3c67e31c2b26737551b47c4b311e2bfd1d41cf71da4e2458c",
+    "rubric_id": "rubric-hid-software_engineering-08",
+    "scorer_id": "software_engineering-v1",
+    "scoring_method": "software_engineering",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-cross_domain_synthesis-09",
+    "domain": "cross_domain_synthesis",
+    "fixture_ids": [
+      "fixture-cross_domain_synthesis"
+    ],
+    "input_hash": "b964561e03b42889ec281c217721a20f56ec861031c77527367a8c809baed3c9",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden cross_domain_synthesis task 9: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "cross_domain_synthesis",
+        "split_marker": "hidden",
+        "variant": 9
+      }
+    },
+    "rubric_hash": "416e43b619ea8dc2b995f8ddf02a7509be237bc7816463ac29bb886d3e6064f4",
+    "rubric_id": "rubric-hid-cross_domain_synthesis-09",
+    "scorer_id": "cross_domain_synthesis-v1",
+    "scoring_method": "cross_domain_synthesis",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-reasoning-10",
+    "domain": "reasoning",
+    "fixture_ids": [
+      "fixture-reasoning"
+    ],
+    "input_hash": "c4712dadef6278dbb04703f8a312f34c5243a115dea1d7fa13b24cb3294ba327",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden reasoning task 10: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "reasoning",
+        "split_marker": "hidden",
+        "variant": 10
+      }
+    },
+    "rubric_hash": "198a5ac3e2830174956581fb72ac6b8a6df1eddb849aa1bb55c761fc0deae96f",
+    "rubric_id": "rubric-hid-reasoning-10",
+    "scorer_id": "reasoning-v1",
+    "scoring_method": "reasoning",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-planning-11",
+    "domain": "planning",
+    "fixture_ids": [
+      "fixture-planning"
+    ],
+    "input_hash": "6a95cfed3cb3dc40aa3be710bcbc2a6b97cddb0930e0f8e88924f9860f94b096",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden planning task 11: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "planning",
+        "split_marker": "hidden",
+        "variant": 11
+      }
+    },
+    "rubric_hash": "f90a3123ec0b821dc13765923c85117779ff07dbdb0b01a41919284dc09ea05d",
+    "rubric_id": "rubric-hid-planning-11",
+    "scorer_id": "planning-v1",
+    "scoring_method": "planning",
+    "split": "hidden",
+    "timeout": 30
+  },
+  {
+    "budget": {
+      "max_provider_calls": 1,
+      "max_tokens": 512,
+      "max_wall_ms": 5000
+    },
+    "case_id": "hid-evidence_evaluation-12",
+    "domain": "evidence_evaluation",
+    "fixture_ids": [
+      "fixture-evidence_evaluation"
+    ],
+    "input_hash": "541befe45a468931b8217bcf252496fe123aa48a4b5050f28604b58bf07bc912",
+    "maximum_score": 1,
+    "request": {
+      "prompt": "hidden evidence_evaluation task 12: produce structured output for evaluator scoring.",
+      "structured_input": {
+        "domain": "evidence_evaluation",
+        "split_marker": "hidden",
+        "variant": 12
+      }
+    },
+    "rubric_hash": "9e4ac247c817aa8ae5cb99016a8122c853b968705deb53654058c8ee1c43e0d5",
+    "rubric_id": "rubric-hid-evidence_evaluation-12",
+    "scorer_id": "evidence_evaluation-v1",
+    "scoring_method": "evidence_evaluation",
+    "split": "hidden",
+    "timeout": 30
+  }
+]

@@ -1,33 +1,34 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1940,
+  "tracked_file_count": 2043,
   "category_counts": {
-    "Database migration": 138,
-    "Deployment infrastructure": 33,
+    "Database migration": 139,
+    "Deployment infrastructure": 34,
     "Deprecated code": 48,
-    "Development tooling": 139,
-    "Documentation": 428,
+    "Development tooling": 143,
+    "Documentation": 458,
     "Experimental code": 151,
     "Generated artifact": 116,
-    "Production runtime code": 487,
+    "Production runtime code": 490,
     "Prompt/template": 29,
-    "Test infrastructure": 284,
-    "Unknown purpose": 87
+    "Test infrastructure": 307,
+    "Unknown purpose": 128
   },
   "top_level_counts": {
-    "backend": 502,
-    "docs": 355,
+    "backend": 507,
+    "docs": 385,
     "evals": 180,
-    "scripts": 151,
+    "scripts": 155,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
+    "tests": 62,
     "runtime": 51,
     "archive": 48,
     "constitution": 40,
-    "tests": 40,
     "frontend": 37,
     "reserve": 33,
+    "benchmarks": 32,
     "calibration": 30,
     "infrastructure": 21,
     "results": 20,
@@ -35,15 +36,15 @@
     "civilization": 15,
     "autonomy": 13,
     "learning": 13,
-    ".github": 10,
+    ".github": 11,
     "synthesis": 10,
+    "agentco_capability": 9,
     "cross_version_adapters": 9,
     "ingestion": 9,
-    "schemas": 5,
+    "schemas": 7,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
-    "benchmarks": 2,
     "dashboard": 2,
     "data": 2,
     "foundry": 2,
@@ -81,18 +82,18 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 576,
-    ".md": 482,
-    ".ts": 338,
-    ".json": 197,
-    ".sql": 139,
+    ".py": 611,
+    ".md": 500,
+    ".ts": 342,
+    ".json": 241,
+    ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 24,
     ".disabled": 21,
     ".tsx": 18,
     ".txt": 16,
-    ".yml": 14,
+    ".yml": 15,
     ".sh": 14,
     "(none)": 8,
     ".example": 3,
@@ -132,6 +133,12 @@
       "category": "Development tooling",
       "top_level": ".env.staging.example",
       "extension": ".example"
+    },
+    {
+      "path": ".github/workflows/capability-runtime-audit.yml",
+      "category": "Deployment infrastructure",
+      "top_level": ".github",
+      "extension": ".yml"
     },
     {
       "path": ".github/workflows/ci.yml",
@@ -276,6 +283,60 @@
       "category": "Unknown purpose",
       "top_level": "SYSTEM_CIVILIZATION.md",
       "extension": ".md"
+    },
+    {
+      "path": "agentco_capability/__init__.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/__main__.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/evidence.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/models.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/providers.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/runtime.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/scoring.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/storage.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
+    },
+    {
+      "path": "agentco_capability/tools.py",
+      "category": "Unknown purpose",
+      "top_level": "agentco_capability",
+      "extension": ".py"
     },
     {
       "path": "agentco_security/__init__.py",
@@ -2924,6 +2985,12 @@
       "extension": ".sql"
     },
     {
+      "path": "backend/src/db/migrations/140_governed_capability_runtime.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
       "path": "backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -3099,6 +3166,12 @@
     },
     {
       "path": "backend/src/routes/autonomy-tasks.routes.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/routes/capabilities.routes.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -3405,6 +3478,12 @@
     },
     {
       "path": "backend/src/services/capability-expansion.service.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/services/capability-runtime.service.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -4136,6 +4215,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/src/types/capability.types.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/src/types/specialist-roles.ts",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -4269,6 +4354,12 @@
     },
     {
       "path": "backend/tests/capability-expansion.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/capability-runtime.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -4932,6 +5023,186 @@
       "category": "Unknown purpose",
       "top_level": "benchmarks",
       "extension": ".md"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/development/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/fixtures/fixtures.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/hidden/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/rubrics/rubrics.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v2/validation/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v3/development/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v3/fixtures/fixtures.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v3/hidden/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v3/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v3/rubrics/rubrics.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v3/validation/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/development/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/fixtures/fixtures.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/hidden/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/rubrics/rubrics.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v4/validation/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v5/development/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v5/fixtures/fixtures.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v5/hidden/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v5/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v5/rubrics/rubrics.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_genesis_v5/validation/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v1/cases/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v1/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v2/cases/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v2/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v3/cases/cases.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
+    },
+    {
+      "path": "benchmarks/capability_protocol_baseline_v3/registry.json",
+      "category": "Unknown purpose",
+      "top_level": "benchmarks",
+      "extension": ".json"
     },
     {
       "path": "benchmarks/registry.json",
@@ -6242,6 +6513,30 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/BATCH_08D_CORRECTED_EVIDENCE_RECORD.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH_08E_INDEPENDENT_AUDIT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH_08F_INTEGRATION_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH_08G_FINAL_ACCEPTANCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6438,6 +6733,120 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GCR_004_AND_V2_INVALIDATION_AUDIT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GENESIS_V5_HOLD_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_FREEZE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_BINDING.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_REAL_PROVIDER_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V3_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
     },
     {
       "path": "docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md",
@@ -6704,6 +7113,36 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/PR28_RESTACK_MAP.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROTOCOL_V3_HASH_RECONCILIATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROTOCOL_V3_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROVIDER_DESTINATION_SECURITY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROVIDER_TRUST_BOUNDARY_AUDIT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/REAL_CROSS_VERSION_DECISION.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6794,6 +7233,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/REMEDIATION_08_GOVERNED_CAPABILITY_RUNTIME.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/ROLLBACK_VERIFICATION.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -6831,6 +7276,12 @@
     },
     {
       "path": "docs/audit/current/RUNTIME_REACHABILITY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/STACKED_PR_INTEGRATION_PLAN.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -10364,6 +10815,18 @@
       "extension": ".py"
     },
     {
+      "path": "schemas/agentco_capability_request.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
+      "path": "schemas/agentco_capability_response.schema.json",
+      "category": "Unknown purpose",
+      "top_level": "schemas",
+      "extension": ".json"
+    },
+    {
       "path": "schemas/cross_version_campaign.schema.json",
       "category": "Unknown purpose",
       "top_level": "schemas",
@@ -10539,6 +11002,12 @@
     },
     {
       "path": "scripts/constitution/check_constitution.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/create_capability_genesis_freeze.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -10776,6 +11245,12 @@
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"
+    },
+    {
+      "path": "scripts/run_governed_capability_genesis.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
     },
     {
       "path": "scripts/run_integrated_learning_5min.py",
@@ -11133,6 +11608,18 @@
     },
     {
       "path": "scripts/verify_campaign_evidence_binding.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_capability_genesis_artifact.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_capability_genesis_freeze.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
@@ -11552,6 +12039,72 @@
       "extension": ".py"
     },
     {
+      "path": "tests/test_capability_anti_gaming.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_anti_hardcoding.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_freeze_binding.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_freeze_integrity.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_genesis_v2.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_genesis_v3.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_genesis_v4.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_genesis_v5.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_preflight.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_provider_adapters.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_capability_runtime.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
       "path": "tests/test_civilization_free_run_positive_path.py",
       "category": "Test infrastructure",
       "top_level": "tests",
@@ -11582,7 +12135,19 @@
       "extension": ".py"
     },
     {
+      "path": "tests/test_data_capability_workspace.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
       "path": "tests/test_db_client_runtime_config.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_domain_scorers.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"
@@ -11642,7 +12207,61 @@
       "extension": ".py"
     },
     {
+      "path": "tests/test_protocol_baseline.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_baseline_v2.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_baseline_v3.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_budget_settlement.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_control_execution.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_persistence_reinitialization.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_schema_validation.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_protocol_secret_redaction.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
       "path": "tests/test_runtime_integration_controls.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_software_capability_workspace.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

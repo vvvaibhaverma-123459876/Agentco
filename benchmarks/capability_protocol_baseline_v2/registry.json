@@ -1,0 +1,8 @@
+{
+  "acceptance": "all_control_families_pass",
+  "benchmark_id": "capability-protocol-baseline-v2",
+  "case_count": 24,
+  "case_manifest": "cases/cases.json",
+  "expected_assertions_evaluator_only": true,
+  "version": "2.0.0"
+}

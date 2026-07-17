@@ -2,41 +2,42 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1940`
+- Tracked files: `2043`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
-| Database migration | 138 |
-| Deployment infrastructure | 33 |
+| Database migration | 139 |
+| Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 139 |
-| Documentation | 428 |
+| Development tooling | 143 |
+| Documentation | 458 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
-| Production runtime code | 487 |
+| Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 284 |
-| Unknown purpose | 87 |
+| Test infrastructure | 307 |
+| Unknown purpose | 128 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 502 |
-| `docs` | 355 |
+| `backend` | 507 |
+| `docs` | 385 |
 | `evals` | 180 |
-| `scripts` | 151 |
+| `scripts` | 155 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
+| `tests` | 62 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `constitution` | 40 |
-| `tests` | 40 |
 | `frontend` | 37 |
 | `reserve` | 33 |
+| `benchmarks` | 32 |
 | `calibration` | 30 |
 | `infrastructure` | 21 |
 | `results` | 20 |
@@ -44,15 +45,15 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `civilization` | 15 |
 | `autonomy` | 13 |
 | `learning` | 13 |
-| `.github` | 10 |
+| `.github` | 11 |
 | `synthesis` | 10 |
+| `agentco_capability` | 9 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `schemas` | 5 |
+| `schemas` | 7 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
-| `benchmarks` | 2 |
 | `dashboard` | 2 |
 | `data` | 2 |
 | `foundry` | 2 |
@@ -97,6 +98,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.env.level3.test` | Development tooling |
 | `.env.production.example` | Development tooling |
 | `.env.staging.example` | Development tooling |
+| `.github/workflows/capability-runtime-audit.yml` | Deployment infrastructure |
 | `.github/workflows/ci.yml` | Deployment infrastructure |
 | `.github/workflows/civilization-completion.yml` | Deployment infrastructure |
 | `.github/workflows/clean-room-audit.yml` | Deployment infrastructure |
@@ -121,6 +123,15 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `SETUP_WINDOWS.md` | Unknown purpose |
 | `SYSTEM.md` | Unknown purpose |
 | `SYSTEM_CIVILIZATION.md` | Unknown purpose |
+| `agentco_capability/__init__.py` | Unknown purpose |
+| `agentco_capability/__main__.py` | Unknown purpose |
+| `agentco_capability/evidence.py` | Unknown purpose |
+| `agentco_capability/models.py` | Unknown purpose |
+| `agentco_capability/providers.py` | Unknown purpose |
+| `agentco_capability/runtime.py` | Unknown purpose |
+| `agentco_capability/scoring.py` | Unknown purpose |
+| `agentco_capability/storage.py` | Unknown purpose |
+| `agentco_capability/tools.py` | Unknown purpose |
 | `agentco_security/__init__.py` | Production runtime code |
 | `agentco_security/env_guard.py` | Production runtime code |
 | `agents/__init__.py` | Production runtime code |
@@ -562,6 +573,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/db/migrations/138_safe_evolution.sql` | Database migration |
 | `backend/src/db/migrations/139_capability_expansion.sql` | Database migration |
 | `backend/src/db/migrations/140_civilization_os.sql` | Database migration |
+| `backend/src/db/migrations/140_governed_capability_runtime.sql` | Database migration |
 | `backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql` | Production runtime code |
 | `backend/src/db/run_migrations.py` | Production runtime code |
 | `backend/src/db/unsupported_migrations/020_evaluation_manifests.sql.disabled` | Production runtime code |
@@ -592,6 +604,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/routes/autonomy-dashboard.routes.ts` | Production runtime code |
 | `backend/src/routes/autonomy-orchestrator.routes.ts` | Production runtime code |
 | `backend/src/routes/autonomy-tasks.routes.ts` | Production runtime code |
+| `backend/src/routes/capabilities.routes.ts` | Production runtime code |
 | `backend/src/routes/capability-expansion.routes.ts` | Production runtime code |
 | `backend/src/routes/citizenship.routes.ts` | Production runtime code |
 | `backend/src/routes/civilization-governance.routes.ts` | Production runtime code |
@@ -643,6 +656,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/services/candidate-evaluation.service.ts` | Production runtime code |
 | `backend/src/services/capability-expansion-gate.service.ts` | Production runtime code |
 | `backend/src/services/capability-expansion.service.ts` | Production runtime code |
+| `backend/src/services/capability-runtime.service.ts` | Production runtime code |
 | `backend/src/services/citizenship.service.ts` | Production runtime code |
 | `backend/src/services/civilization-kernel.service.ts` | Production runtime code |
 | `backend/src/services/civilization-live-flow.service.ts` | Production runtime code |
@@ -764,6 +778,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/services/trustworthiness.service.ts` | Production runtime code |
 | `backend/src/services/worker-coordinator.service.ts` | Production runtime code |
 | `backend/src/types/action.types.ts` | Production runtime code |
+| `backend/src/types/capability.types.ts` | Production runtime code |
 | `backend/src/types/specialist-roles.ts` | Production runtime code |
 | `backend/src/workers/civilization-scheduler-worker.ts` | Production runtime code |
 | `backend/src/workers/outbox-worker.ts` | Production runtime code |
@@ -787,6 +802,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/calibration-registration-invariants.test.ts` | Test infrastructure |
 | `backend/tests/capability-expansion-gate.test.ts` | Test infrastructure |
 | `backend/tests/capability-expansion.test.ts` | Test infrastructure |
+| `backend/tests/capability-runtime.test.ts` | Test infrastructure |
 | `backend/tests/citizenship.test.ts` | Test infrastructure |
 | `backend/tests/civilization-adversarial.test.ts` | Test infrastructure |
 | `backend/tests/civilization-aware-rag.test.ts` | Test infrastructure |
@@ -897,6 +913,36 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/working-eyes.test.ts` | Test infrastructure |
 | `backend/tsconfig.json` | Development tooling |
 | `benchmarks/README.md` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v2/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v3/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v4/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v1/cases/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v1/registry.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v2/cases/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v2/registry.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v3/cases/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v3/registry.json` | Unknown purpose |
 | `benchmarks/registry.json` | Unknown purpose |
 | `calibration/BENCHMARK_ANALYSIS.md` | Production runtime code |
 | `calibration/__init__.py` | Production runtime code |
@@ -1115,6 +1161,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BATCH07_MAIN_RECONCILIATION.json` | Documentation |
 | `docs/audit/current/BATCH07_MAIN_RECONCILIATION.md` | Documentation |
 | `docs/audit/current/BATCH_07_POST_CONFLICT_REPROOF.md` | Documentation |
+| `docs/audit/current/BATCH_08D_CORRECTED_EVIDENCE_RECORD.md` | Documentation |
+| `docs/audit/current/BATCH_08E_INDEPENDENT_AUDIT.md` | Documentation |
+| `docs/audit/current/BATCH_08F_INTEGRATION_REPORT.md` | Documentation |
+| `docs/audit/current/BATCH_08G_FINAL_ACCEPTANCE.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |
@@ -1148,6 +1198,25 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.md` | Documentation |
 | `docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json` | Documentation |
 | `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
+| `docs/audit/current/GCR_004_AND_V2_INVALIDATION_AUDIT.md` | Documentation |
+| `docs/audit/current/GENESIS_V5_HOLD_REPROOF.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_BINDING.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_MANIFEST.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_REAL_PROVIDER_RESULTS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V3_RESULTS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.md` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
@@ -1192,6 +1261,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
 | `docs/audit/current/PR27_CONFLICT_RESOLUTION.md` | Documentation |
+| `docs/audit/current/PR28_RESTACK_MAP.md` | Documentation |
+| `docs/audit/current/PROTOCOL_V3_HASH_RECONCILIATION.md` | Documentation |
+| `docs/audit/current/PROTOCOL_V3_REPROOF.md` | Documentation |
+| `docs/audit/current/PROVIDER_DESTINATION_SECURITY.md` | Documentation |
+| `docs/audit/current/PROVIDER_TRUST_BOUNDARY_AUDIT.md` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
@@ -1207,6 +1281,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REMEDIATION_07D_EVIDENCE_BINDING_AND_V2.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07E_FINAL_EVIDENCE_SEMANTIC_CLOSURE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_07_CROSS_VERSION_CIVILIZATION_EVALUATION.md` | Documentation |
+| `docs/audit/current/REMEDIATION_08_GOVERNED_CAPABILITY_RUNTIME.md` | Documentation |
 | `docs/audit/current/ROLLBACK_VERIFICATION.md` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.json` | Documentation |
 | `docs/audit/current/RUNTIME_COMPONENT_LEDGER.md` | Documentation |
@@ -1214,6 +1289,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
+| `docs/audit/current/STACKED_PR_INTEGRATION_PLAN.md` | Documentation |
 | `docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md` | Documentation |
@@ -1802,6 +1878,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `runtime/tests/test_runtime_durable_governance_stores.py` | Test infrastructure |
 | `runtime/tests/test_spend_guardrail_ledger.py` | Test infrastructure |
 | `runtime/tool_registry/__init__.py` | Production runtime code |
+| `schemas/agentco_capability_request.schema.json` | Unknown purpose |
+| `schemas/agentco_capability_response.schema.json` | Unknown purpose |
 | `schemas/cross_version_campaign.schema.json` | Unknown purpose |
 | `schemas/longitudinal_history.schema.json` | Unknown purpose |
 | `schemas/longitudinal_run_manifest.schema.json` | Unknown purpose |
@@ -1832,6 +1910,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/complex_multidomain_run.py` | Development tooling |
 | `scripts/comprehensive_system_diagnosis.py` | Development tooling |
 | `scripts/constitution/check_constitution.py` | Development tooling |
+| `scripts/create_capability_genesis_freeze.py` | Development tooling |
 | `scripts/demo_business_bikeshare_calibration.py` | Development tooling |
 | `scripts/demo_company_in_action.py` | Development tooling |
 | `scripts/demo_real_calibration.py` | Development tooling |
@@ -1871,6 +1950,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_first_real_prediction.py` | Development tooling |
 | `scripts/run_fitness_subscription_simulation.py` | Development tooling |
 | `scripts/run_full_autonomy_loop_with_specialists.sh` | Development tooling |
+| `scripts/run_governed_capability_genesis.py` | Development tooling |
 | `scripts/run_integrated_learning_5min.py` | Development tooling |
 | `scripts/run_learner.py` | Development tooling |
 | `scripts/run_level3_autonomy_smoke.py` | Development tooling |
@@ -1931,6 +2011,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
 | `scripts/verify_benchmark_governance.py` | Development tooling |
 | `scripts/verify_campaign_evidence_binding.py` | Development tooling |
+| `scripts/verify_capability_genesis_artifact.py` | Development tooling |
+| `scripts/verify_capability_genesis_freeze.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_cross_version_campaign.py` | Development tooling |
 | `scripts/verify_cross_version_harness_independence.py` | Development tooling |
@@ -2000,12 +2082,25 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/integration/test_resolution_service_role_migration.py` | Test infrastructure |
 | `tests/integration/test_web_scraper_hardened.py` | Test infrastructure |
 | `tests/test_build_ledger.py` | Test infrastructure |
+| `tests/test_capability_anti_gaming.py` | Test infrastructure |
+| `tests/test_capability_anti_hardcoding.py` | Test infrastructure |
+| `tests/test_capability_freeze_binding.py` | Test infrastructure |
+| `tests/test_capability_freeze_integrity.py` | Test infrastructure |
+| `tests/test_capability_genesis_v2.py` | Test infrastructure |
+| `tests/test_capability_genesis_v3.py` | Test infrastructure |
+| `tests/test_capability_genesis_v4.py` | Test infrastructure |
+| `tests/test_capability_genesis_v5.py` | Test infrastructure |
+| `tests/test_capability_preflight.py` | Test infrastructure |
+| `tests/test_capability_provider_adapters.py` | Test infrastructure |
+| `tests/test_capability_runtime.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
 | `tests/test_civilization_vertical_slice.py` | Test infrastructure |
 | `tests/test_clean_room_evidence_controls.py` | Test infrastructure |
 | `tests/test_compose_bind_sources.py` | Test infrastructure |
 | `tests/test_cross_version_campaign.py` | Test infrastructure |
+| `tests/test_data_capability_workspace.py` | Test infrastructure |
 | `tests/test_db_client_runtime_config.py` | Test infrastructure |
+| `tests/test_domain_scorers.py` | Test infrastructure |
 | `tests/test_durable_runtime_cleanup.py` | Test infrastructure |
 | `tests/test_execute_durable_task.py` | Test infrastructure |
 | `tests/test_forensic_inventory.py` | Test infrastructure |
@@ -2015,7 +2110,16 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_longitudinal_remote_closure.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
+| `tests/test_protocol_baseline.py` | Test infrastructure |
+| `tests/test_protocol_baseline_v2.py` | Test infrastructure |
+| `tests/test_protocol_baseline_v3.py` | Test infrastructure |
+| `tests/test_protocol_budget_settlement.py` | Test infrastructure |
+| `tests/test_protocol_control_execution.py` | Test infrastructure |
+| `tests/test_protocol_persistence_reinitialization.py` | Test infrastructure |
+| `tests/test_protocol_schema_validation.py` | Test infrastructure |
+| `tests/test_protocol_secret_redaction.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
+| `tests/test_software_capability_workspace.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
 | `tests/test_specialist_isolation_verification.py` | Test infrastructure |
 | `tests/test_staging_deployment_controls.py` | Test infrastructure |

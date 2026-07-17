@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentco.local/schemas/agentco_capability_response.schema.json",
+  "title": "AgentCo Capability Response",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "request_id",
+    "attempt_id",
+    "status",
+    "answer",
+    "structured_output",
+    "confidence",
+    "evidence",
+    "tool_calls",
+    "memory_events",
+    "authorization_events",
+    "budget_usage",
+    "latency",
+    "resource_usage",
+    "audit_references"
+  ],
+  "properties": {
+    "protocol_version": { "const": "agentco-capability-v1" },
+    "request_id": { "type": "string" },
+    "attempt_id": { "type": "string" },
+    "status": {
+      "enum": [
+        "completed",
+        "failed",
+        "timed_out",
+        "cancelled",
+        "denied",
+        "budget_exceeded",
+        "unsupported",
+        "partially_completed"
+      ]
+    },
+    "answer": {},
+    "structured_output": { "type": "object" },
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "evidence": { "type": "array" },
+    "citations": { "type": "array" },
+    "tool_calls": { "type": "array" },
+    "memory_events": { "type": "array" },
+    "authorization_events": { "type": "array" },
+    "budget_usage": { "type": "object" },
+    "provider": { "type": ["string", "null"] },
+    "model": { "type": ["string", "null"] },
+    "latency": { "type": "object" },
+    "resource_usage": { "type": "object" },
+    "failure": { "type": ["object", "null"] },
+    "recovery": { "type": "object" },
+    "audit_references": { "type": "array" },
+    "response_hash": { "type": "string" }
+  },
+  "additionalProperties": true
+}

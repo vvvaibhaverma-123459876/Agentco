@@ -7,7 +7,26 @@ import { eventLog } from '../src/services/event-log.service';
 import { hashChainAnchor } from '../src/services/hash-chain-anchor.service';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 
-async function applyMigrations() {
+const REQUIRED_TABLES = [
+  'decision_log',
+  'event_log',
+  'event_outbox',
+  'hash_chain_anchors',
+  'identity_actors',
+];
+
+async function requiredTablesPresent(): Promise<boolean> {
+  const result = await migrationDb.query<{ table_name: string; exists: string | null }>(
+    `SELECT table_name, to_regclass('public.' || table_name) AS exists
+       FROM unnest($1::text[]) AS table_name`,
+    [REQUIRED_TABLES]
+  );
+  return result.rows.every(row => row.exists !== null);
+}
+
+async function applyMigrationsIfNeeded() {
+  if (await requiredTablesPresent()) return;
+
   for (const name of [
     '004_decision_log.sql',
     '012_decision_log_chain.sql',
@@ -35,7 +54,7 @@ async function createActor(prefix: string) {
 
 describe('hash chain anchor', () => {
   beforeAll(async () => {
-    await applyMigrations();
+    await applyMigrationsIfNeeded();
     await migrationDb.query('TRUNCATE hash_chain_anchors, event_outbox, event_log, decision_log RESTART IDENTITY CASCADE');
   });
 

@@ -39,6 +39,10 @@ ALLOWED_REUSED_SEQUENCES = {
         "filenames": ["129_civilization_kernel.sql", "129_longitudinal_mission_evidence.sql"],
         "contract": "Batch 07 reconciliation contract: Version B preserved raw duplicate sequence; Version C treats full filename as stable ID, applies lexicographic order, and requires content-hash tracking",
     },
+    140: {
+        "filenames": ["140_civilization_os.sql", "140_governed_capability_runtime.sql"],
+        "contract": "Batch 08A reconciliation contract: Batch 07 civilization OS and Batch 08 governed capability runtime are independent domains; full filename plus content hash is the stable identity and lexicographic ordering applies both guarded migrations",
+    },
 }
 
 

@@ -1,0 +1,24 @@
+{
+  "classification": [
+    "valid protocol execution evidence",
+    "valid protocol/capability separation evidence",
+    "invalid frozen-campaign binding",
+    "incomplete protocol acceptance criteria",
+    "no real capability baseline"
+  ],
+  "component": "governed capability genesis v2",
+  "finding_id": "GCR-002",
+  "impact": "Genesis V2 cannot be used as a future capability baseline or frozen-campaign evidence.",
+  "issues": [
+    "freeze manifest was not executable-verified",
+    "benchmark hash terminology was ambiguous",
+    "scorer-file hash was reported as scorer-bundle hash",
+    "real capability scoring could receive empty rubric",
+    "domain correctness evidence was not valid",
+    "protocol baseline primarily accepted completed statuses"
+  ],
+  "previous_evidence_preserved": true,
+  "remediation": "Batch 08B introduces separate protocol baseline and real capability genesis v3 campaigns, explicit bundle hashes, two-commit freeze attestation, executable freeze verifier, evaluator-only rubrics and domain scorers.",
+  "severity": "S1",
+  "status": "open_corrected_by_v3_methodology"
+}
