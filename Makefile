@@ -176,6 +176,11 @@ release-gate:
 	cd frontend && ./node_modules/.bin/tsc --noEmit
 	@echo "== [11/12] frontend build =="
 	cd frontend && NEXT_TELEMETRY_DISABLED=1 npm run build
+	@echo "== [11a/12] dependency + security audit (completion condition 49) =="
+	cd backend && npm audit --audit-level=high
+	cd frontend && npm audit --audit-level=high
+	@echo "== [11b/12] civilization completion verifier (completion condition 52) =="
+	@$(PYTHON) scripts/generate_civilization_completion.py --check
 	@echo "== [12/12] clean tree after gate =="
 	@test -z "$$(git status --porcelain)" || (git status --short; echo "working tree dirty after release-gate"; exit 1)
 

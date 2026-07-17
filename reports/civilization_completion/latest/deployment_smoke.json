@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-07-15T03:09:17.031166+00:00",
-  "commit": "246f46fc12dbb55a2c79dda0686fd0aa65552c18",
-  "branch": "feature/civilization-layer",
-  "git_dirty": false,
+  "generated_at": "2026-07-16T03:42:05.478600+00:00",
+  "commit": "297f4403944ed8bcd5d039b8627db6251af8488a",
+  "branch": "main",
+  "git_dirty": true,
   "required_deployment_artifacts": [
     "infrastructure/kubernetes/helm/agentco/templates/civilization-scheduler-deployment.yaml",
     "frontend/src/app/civilization/page.tsx"

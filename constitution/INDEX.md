@@ -31,38 +31,38 @@ Note: backend migrations live at `backend/src/db/migrations/` (there is no
 | 1 | 0 | Vision | constitutional | mixed | written | README.md, BUILD_LEDGER.yaml |
 | 2 | 1 | Constitutional Core | constitutional | mixed | written | decision_log migrations (hash chain), governance + judiciary services, backend/src (search "security") |
 | 3 | 32 | Security & Threat Model | constitutional | descriptive | written | backend/src (search "url-safety", SSRF), autonomy-action-planner.service.ts (injection guard), team-activation.service.ts (HMAC), agentco_security/env_guard.py |
-| 4 | 9 | Knowledge System | statute | descriptive | not written | claim-grounding.service.ts, evidence registry services, memory-promotion + memory-retrieval services, autonomy_evidence/claims/agent_memories migrations |
-| 5 | 11 | Trust & Calibration | statute | descriptive | not written | persistent-trust-scorer.service.ts, falsifiable-prediction services, independent-resolver.service.ts, prediction_ledger migrations, reserve/ |
-| 6 | 8 | Missions | statute | descriptive | not written | goal-manager.service.ts, autonomy-orchestrator, autonomy-run, action-executor services |
-| 7 | 14 | Learning Engine | statute | descriptive | not written | skill-library.service.ts, skill-canary.service.ts, migrations 105/108, memory promotion pipeline |
-| 8 | 15 | Capability Expansion | statute | descriptive | not written | capability-expansion-gate.service.ts, generality-metric-tracker, proof-of-competence, migrations 102/103/106/107 |
-| 9 | 13 | Judiciary | statute | descriptive | not written | judiciary*.service.ts, migrations 109/136 |
-| 10 | 4 | Identity & Authority | constitutional | mixed | not written | backend/src (search "security"), credential.service.ts, reserve/, migration 052 |
-| 11 | 7 | Civilization Economy | statute | mixed | not written | resource ledger + budget services, treasury routes, token budget in llm-provider.service.ts |
-| 12 | 12 | Governance | constitutional | mixed | not written | governance/constitution services + migrations |
-| 13 | 33 | Model Governance | statute | mixed | not written | llm-provider.service.ts, runtime/base_agent/provider_config.py |
-| 14 | 3 | Runtime Operating System | statute | mixed | not written | supervised-runtime + free-run CLIs, outbox-worker, kill-switch services |
-| 15 | 2 | Civilization Kernel | constitutional | mixed | not written | backend/src/server.ts, migrate.ts, event_log/outbox, civilization-runtime.service.ts (migration 129) |
-| 16 | 10 | Reasoning Engine | article | prescriptive | not written | decision_log migrations, autonomy-action-planner.service.ts |
-| 17 | 23 | Constraint Engine | article | prescriptive | not written | budget services, url-safety, fail-closed guards |
-| 18 | 6 | Institutions | statute | mixed | not written | institution services + migrations (L9); emergent-institution lifecycle per GENERALIZATION_REPORT.md §11 |
-| 19 | 5 | Civilization Society | statute | prescriptive | not written | citizen/role services (L7) |
-| 20 | 17 | Self Inspection | statute | mixed | not written | scripts/generate_status.py, doctor/audit scripts, BUILD_LEDGER.yaml |
-| 21 | 18 | Civilization Self Model | statute | prescriptive | not written | BUILD_LEDGER.yaml, backend/src/services/ inventory |
-| 22 | 34 | Civilization Memory | statute | mixed | not written | memory-promotion-pipeline.service.ts, memory-retrieval.service.ts, event_log + agent_memories migrations |
-| 23 | 30 | Verification | statute | descriptive | not written | backend/tests/, evals/, .github/workflows/ |
-| 24 | 29 | Infrastructure | regulation | mixed | not written | docker-compose*.yml, infrastructure/, helm chart |
-| 25 | 27 | Operator Control Plane | statute | mixed | not written | override-queue.service.ts, kill-switch, frontend override page |
-| 26 | 28 | Operator Experience | regulation | mixed | not written | frontend/ pages |
-| 27 | 24 | Interaction Intelligence | regulation | prescriptive | not written | backend routes, autonomy-action-planner.service.ts |
-| 28 | 26 | Multi-Agent Civilization | statute | prescriptive | not written | team-activation.service.ts, specialist role registry (backend/src/types/specialist-roles.ts) |
-| 29 | 25 | Capability Evolution Framework | statute | prescriptive | not written | selfcoding/ (existing single-capability instance to generalize from), skill-library.service.ts |
-| 30 | 16 | Autonomous Evolution | statute | prescriptive | not written | goal-formation tick in supervised runtime; six-loop decomposition per GENERALIZATION_REPORT.md §8 |
-| 31 | 19 | Structural Evolution Framework | statute | prescriptive | not written | skill-canary.service.ts (promotion pattern to reuse) |
-| 32 | 20 | Knowledge Discovery Framework | charter | aspirational | not written | evals/ |
-| 33 | 21 | Reality Models | charter | aspirational | not written | (none) |
-| 34 | 22 | Hypothesis Generation Framework | charter | aspirational | not written | (none) |
-| 35 | 31 | Civilization Evolution | charter | aspirational | not written | BUILD_LEDGER.yaml |
+| 4 | 9 | Knowledge System | statute | descriptive | written | claim-grounding.service.ts, evidence registry services, memory-promotion + memory-retrieval services, autonomy_evidence/claims/agent_memories migrations |
+| 5 | 11 | Trust & Calibration | statute | descriptive | written | persistent-trust-scorer.service.ts, falsifiable-prediction services, independent-resolver.service.ts, prediction_ledger migrations, reserve/ |
+| 6 | 8 | Missions | statute | descriptive | written | goal-manager.service.ts, autonomy-orchestrator, autonomy-run, action-executor services |
+| 7 | 14 | Learning Engine | statute | descriptive | written | skill-library.service.ts, skill-canary.service.ts, migrations 105/108, memory promotion pipeline |
+| 8 | 15 | Capability Expansion | statute | descriptive | written | capability-expansion-gate.service.ts, generality-metric-tracker, proof-of-competence, migrations 102/103/106/107 |
+| 9 | 13 | Judiciary | statute | descriptive | written | judiciary*.service.ts, migrations 109/136 |
+| 10 | 4 | Identity & Authority | constitutional | mixed | written | backend/src (search "security"), credential.service.ts, reserve/, migration 052 |
+| 11 | 7 | Civilization Economy | statute | mixed | written | resource ledger + budget services, treasury routes, token budget in llm-provider.service.ts |
+| 12 | 12 | Governance | constitutional | mixed | written | governance/constitution services + migrations |
+| 13 | 33 | Model Governance | statute | mixed | written | llm-provider.service.ts, runtime/base_agent/provider_config.py |
+| 14 | 3 | Runtime Operating System | statute | mixed | written | supervised-runtime + free-run CLIs, outbox-worker, kill-switch services |
+| 15 | 2 | Civilization Kernel | constitutional | mixed | written | backend/src/server.ts, migrate.ts, event_log/outbox, civilization-runtime.service.ts (migration 129) |
+| 16 | 10 | Reasoning Engine | article | prescriptive | written | decision_log migrations, autonomy-action-planner.service.ts |
+| 17 | 23 | Constraint Engine | article | prescriptive | written | budget services, url-safety, fail-closed guards |
+| 18 | 6 | Institutions | statute | mixed | written | institution services + migrations (L9); emergent-institution lifecycle per GENERALIZATION_REPORT.md §11 |
+| 19 | 5 | Civilization Society | statute | mixed | written | citizen/role services (L7); citizenship built (mig 130) |
+| 20 | 17 | Self Inspection | statute | mixed | written | scripts/generate_status.py, doctor/audit scripts, BUILD_LEDGER.yaml |
+| 21 | 18 | Civilization Self Model | statute | prescriptive | written | BUILD_LEDGER.yaml, backend/src/services/ inventory |
+| 22 | 34 | Civilization Memory | statute | mixed | written | memory-promotion-pipeline.service.ts, memory-retrieval.service.ts, event_log + agent_memories migrations |
+| 23 | 30 | Verification | statute | descriptive | written | backend/tests/, evals/, .github/workflows/ |
+| 24 | 29 | Infrastructure | regulation | mixed | written | docker-compose*.yml, infrastructure/, helm chart |
+| 25 | 27 | Operator Control Plane | statute | mixed | written | override-queue.service.ts, kill-switch, frontend override page |
+| 26 | 28 | Operator Experience | regulation | mixed | written | frontend/ pages |
+| 27 | 24 | Interaction Intelligence | regulation | prescriptive | written | backend routes, autonomy-action-planner.service.ts |
+| 28 | 26 | Multi-Agent Civilization | statute | mixed | written | coalition.service.ts (mig 132), team-activation.service.ts, specialist role registry (backend/src/types/specialist-roles.ts) |
+| 29 | 25 | Capability Evolution Framework | statute | prescriptive | written | selfcoding/ (existing single-capability instance to generalize from), skill-library.service.ts |
+| 30 | 16 | Autonomous Evolution | statute | prescriptive | written | goal-formation tick in supervised runtime; six-loop decomposition per GENERALIZATION_REPORT.md §8 |
+| 31 | 19 | Structural Evolution Framework | statute | prescriptive | written | skill-canary.service.ts (promotion pattern to reuse) |
+| 32 | 20 | Knowledge Discovery Framework | charter | aspirational | written | evals/ |
+| 33 | 21 | Reality Models | charter | aspirational | written | (none) |
+| 34 | 22 | Hypothesis Generation Framework | charter | aspirational | written | (none) |
+| 35 | 31 | Civilization Evolution | charter | aspirational | written | BUILD_LEDGER.yaml |
 
 ## Working agreement
 

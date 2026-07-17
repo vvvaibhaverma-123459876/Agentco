@@ -177,3 +177,1528 @@ invariants:
     statement: The URL-safety adapter has a dedicated unit suite covering literal, DNS-resolved, redirect, and v4-mapped bypass attempts.
     tier: constitutional
     status: planned
+  - id: V9-INV-001
+    statement: A claim asserting support is rejected unless every cited source id is registered evidence.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/tests/claim-grounding.test.ts
+  - id: V9-INV-002
+    statement: A support snippet is rejected unless it is a token-subsequence of the registered evidence it cites (quoted support cannot be fabricated).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/tests/claim-grounding.test.ts
+  - id: V9-INV-003
+    statement: Registered evidence carries a content hash and canonical event provenance linking it to the event log and the registering actor.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/evidence-registry.service.ts
+      - backend/src/db/migrations/088_evidence_registry_events.sql
+  - id: V9-INV-004
+    statement: Knowledge is promoted to memory only from a resolved, non-post-hoc prediction that has a trust score — never from an unscored assertion.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/memory-promotion-pipeline.service.ts
+      - backend/tests/self-memory-loop.test.ts
+  - id: V9-INV-005
+    statement: Retracting a knowledge node propagates transitively to every dependent through the provenance graph, and every propagation effect only weakens knowledge (retract or demote).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/collective-knowledge.service.ts
+      - backend/src/db/migrations/137_collective_epistemics.sql
+      - backend/tests/collective-knowledge.test.ts
+  - id: V9-INV-006
+    statement: A recorded contradiction demotes the affected memory rather than silently overwriting it.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/118_contradictions_and_demotions.sql
+      - backend/src/services/collective-knowledge.service.ts
+  - id: V9-INV-007
+    statement: Planners cite grounded claims rather than ungrounded assertions when producing evidence-bearing actions.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/planner-claim-bias.test.ts
+  - id: V9-INV-008
+    statement: The three knowledge provenance registries (doc-level provenance, runtime provenance edges, contradiction records) are periodically reconciled so no dangling or orphaned provenance survives.
+    tier: statute
+    status: planned
+  - id: V9-INV-009
+    statement: Memory has a bounded forgetting policy so unbounded low-value knowledge does not accumulate.
+    tier: statute
+    status: planned
+  - id: V11-INV-001
+    statement: A prediction's resolution date must be after its registration, and its post-hoc flag must match whether it was created after the outcome became knowable — enforced at the database.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql
+      - backend/tests/calibration-registration-invariants.test.ts
+  - id: V11-INV-002
+    statement: Ground truth for a resolution must be external — a prediction cannot be resolved from the system's own internal tokens.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/120_prediction_ledger_registration_invariants.sql
+      - backend/src/services/independent-resolver.service.ts
+  - id: V11-INV-003
+    statement: Resolution of the write-once prediction columns is firewalled to the dedicated resolution_service database role, not the producing service.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/016_resolution_service_role.sql
+      - backend/src/db/migrations/011_prediction_ledger.sql
+  - id: V11-INV-004
+    statement: Trust is computed only from resolved, non-post-hoc predictions using proper scoring rules (Brier / log score).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - backend/tests/trust-impact-real-metrics.test.ts
+  - id: V11-INV-005
+    statement: Trust is force-downgraded when the resolved sample is below five or the mean Brier score exceeds 0.25.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - backend/tests/trust-impact-real-metrics.test.ts
+  - id: V11-INV-006
+    statement: Trust is scoped per subject, domain, claim type, and time horizon — not a single global scalar.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/persistent-trust-scorer.service.ts
+      - backend/src/db/migrations/009_trust_scores.sql
+  - id: V11-INV-007
+    statement: A prediction's registered probability is derived from the subject's prior calibration history, not chosen freely at resolution time.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/falsifiable-prediction.service.ts
+      - backend/tests/falsifiable-calibration-e2e.test.ts
+  - id: V11-INV-008
+    statement: Trust-policy changes are themselves canaried and governed before taking effect (calibration governs its own changes).
+    tier: statute
+    status: planned
+  - id: V11-INV-009
+    statement: Calibration drift is monitored continuously and raises a governed alert when a subject's ECE degrades beyond threshold.
+    tier: statute
+    status: planned
+  - id: V8-INV-001
+    statement: A mission completes only when required workstreams are complete and evidence, settlement, audit records, and an outcome all exist; otherwise completion fails closed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/tests/missions.test.ts
+  - id: V8-INV-002
+    statement: A mission can be completed only from the evaluating state, and completion writes a mission attestation in the same transaction as the state transition.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/tests/missions.test.ts
+  - id: V8-INV-003
+    statement: Mission status changes only through the mission service's authorized transition path; direct database updates to status are rejected by trigger.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/133_missions.sql
+      - backend/tests/missions.test.ts
+  - id: V8-INV-004
+    statement: An archived mission is immutable, and mission identity columns cannot be altered after creation.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/133_missions.sql
+  - id: V8-INV-005
+    statement: Mission creation is checked against enforceable runtime policy before the mission exists.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/src/services/policy-enforcement.service.ts
+  - id: V8-INV-006
+    statement: Every mission state transition is appended to an append-only transition log.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/133_missions.sql
+  - id: V8-INV-007
+    statement: Executor actions that fetch the web pass the SSRF/URL-safety guard, and each action attempt is recorded whether it succeeds or fails.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/action-executor.service.ts
+      - backend/tests/action-loop.test.ts
+  - id: V8-INV-008
+    statement: A mission's resource reservations are settled or released on completion or abandonment, with no orphaned reservations.
+    tier: statute
+    status: planned
+  - id: V8-INV-009
+    statement: Every required workstream traces to at least one piece of grounded evidence, not merely to a completion flag.
+    tier: statute
+    status: planned
+  - id: V14-INV-001
+    statement: A learning candidate cannot be evaluated by its proposer; independent evaluation is required and rejected otherwise.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V14-INV-002
+    statement: A candidate advances only along the defined status machine; transitions are recorded append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/db/migrations/138_safe_evolution.sql
+  - id: V14-INV-003
+    statement: A canary breach forces rollback rather than allowing promotion to stand.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/services/skill-canary.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V14-INV-004
+    statement: Higher-tier (Tier-2/3) candidates are not auto-promotable and require human approval.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V14-INV-005
+    statement: Promotion requires passing regression cases, not merely a successful trial.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/db/migrations/138_safe_evolution.sql
+  - id: V14-INV-006
+    statement: Promoted skills are versioned, and rollback restores a prior version rather than deleting history.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/db/migrations/105_skill_library.sql
+  - id: V14-INV-007
+    statement: Every promotion records improvement lineage linking the promoted artifact to its originating failure and candidate.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/138_safe_evolution.sql
+      - backend/tests/civilization-learning-e2e.test.ts
+  - id: V14-INV-008
+    statement: Learning executed autonomously (unattended) stays within the same evaluation and canary gates as attended learning.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/autonomous-promotion.test.ts
+      - backend/tests/bounded-learning-production-guard.test.ts
+  - id: V14-INV-009
+    statement: A promoted improvement whose post-promotion monitoring degrades is automatically demoted or rolled back without human intervention.
+    tier: statute
+    status: planned
+  - id: V15-INV-001
+    statement: An expansion proposal advances only by completing the five gate stages in order; an out-of-order stage is rejected.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-002
+    statement: A capability is granted only after all five stages pass and a proof of competence exists.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/src/services/capability-expansion-gate.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-003
+    statement: A proof of competence is minted against a specific skill version and is not producible by the proposing actor alone.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/proof-of-competence.service.ts
+      - backend/src/db/migrations/106_proof_of_competence.sql
+      - backend/tests/proof-of-competence.test.ts
+  - id: V15-INV-004
+    statement: Capability grants are revocable and restrictable, and revocation blocks new work immediately.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-005
+    statement: Exercising a capability asserts an active grant at execution time and fails closed when none exists.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V15-INV-006
+    statement: The capability-expansion gate only routes work to a domain that is active in the domain registry and a skill that meets its calibration threshold.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion-gate.service.ts
+      - backend/tests/capability-expansion-gate.test.ts
+  - id: V15-INV-007
+    statement: Stage records and expansion decisions are append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/139_capability_expansion.sql
+      - backend/src/db/migrations/107_capability_expansion_gate.sql
+  - id: V15-INV-008
+    statement: A domain can be retired (not only suspended), releasing its grants, so no permanent domain persists without justification.
+    tier: statute
+    status: planned
+  - id: V15-INV-009
+    statement: The research and knowledge-acquisition stages of the universal capability lifecycle have first-class records, not only the five admission stages.
+    tier: statute
+    status: planned
+  - id: V13-INV-001
+    statement: A judge or presiding actor cannot be the complainant or the respondent in the case they rule on.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-002
+    statement: An enforcement order mutates real runtime state — a resource penalty debits the treasury and a citizen sanction restricts the citizen — not merely a recorded verdict.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/services/treasury.service.ts
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-003
+    statement: An appeal is ruled on by an actor distinct from the trial judge.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-004
+    statement: A case advances only along its status machine, and transitions are recorded append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V13-INV-005
+    statement: A duplicate final ruling on the same case is blocked.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/136_judiciary.sql
+      - backend/tests/judiciary-case.test.ts
+  - id: V13-INV-006
+    statement: Dissent from a ruling is recordable and preserved, not suppressed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V13-INV-007
+    statement: Rulings can record precedent principles retrievable for later cases.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V13-INV-008
+    statement: An enforcement order that partially fails rolls back atomically, leaving no half-applied ruling.
+    tier: statute
+    status: planned
+  - id: V13-INV-009
+    statement: Precedent is consulted as a first-class input to rulings, not merely retrievable after the fact.
+    tier: statute
+    status: planned
+  - id: V4-INV-001
+    statement: Every actor has a typed identity, and there is at most one active actor per (type, name).
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/079_identity_authority.sql
+      - backend/src/services/identity-authority.service.ts
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-002
+    statement: A privileged act resolves against roles, permissions, and delegations, and the resulting authority decision is recorded as a chain.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/db/migrations/084_authority_chain.sql
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-003
+    statement: A delegation is scoped and may be time-bounded; authority resolution respects the delegation's scope.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-004
+    statement: Identity keys are registerable and revocable, and signature verification rejects signatures from a revoked or unregistered key.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/tests/identity-authority.test.ts
+  - id: V4-INV-005
+    statement: Identity history is not deletable — the Identity Registry institution cannot delete identity history.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/src/db/migrations/079_identity_authority.sql
+  - id: V4-INV-006
+    statement: Authority verification is transactional — the decision and its recorded event commit together or not at all.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+  - id: V4-INV-007
+    statement: Calibration credentials are independently recomputable from public prediction-ledger rows without any signing secret.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/credential.service.ts
+      - reserve/credentials/proof_of_calibration.py
+  - id: V4-INV-008
+    statement: A delegation cannot exceed the granting actor's own authority (no privilege escalation through delegation).
+    tier: constitutional
+    status: planned
+  - id: V4-INV-009
+    statement: Sessions and interactive authentication for human operators are first-class, time-bounded, and revocable.
+    tier: constitutional
+    status: planned
+  - id: V7-INV-001
+    statement: A resource balance can never go negative — resources cannot be created from nothing.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/db/migrations/134_civilization_economy.sql
+  - id: V7-INV-002
+    statement: Every resource transaction has a positive amount and records the balance after it, giving a replayable ledger.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-003
+    statement: Reconciliation recomputes each account's balance from its signed transaction history (credit +, debit -, adjustment +) and reports any imbalance.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-004
+    statement: Spend is reserved before use and settled or released after; a two-phase reservation stands between request and debit.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/082_resource_reservations.sql
+      - backend/src/services/treasury.service.ts
+  - id: V7-INV-005
+    statement: Budgets are proposed and decided through a governed proposal path before allocation.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-006
+    statement: A judiciary penalty debits a real account balance, not a symbolic marker.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/judiciary-case.test.ts
+  - id: V7-INV-007
+    statement: Cost is attributed per scope and rolled up per mission, institution, or domain.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/treasury.service.ts
+      - backend/tests/treasury.test.ts
+  - id: V7-INV-008
+    statement: A resource-policy limit (max risk level, min trust factor) gates spend requests before they draw down a balance.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/134_civilization_economy.sql
+      - backend/src/services/treasury.service.ts
+  - id: V7-INV-009
+    statement: The two ledger generations are reconciled or unified so a single authoritative balance exists per scope and resource.
+    tier: statute
+    status: planned
+  - id: V12-INV-001
+    statement: A proposal becomes an active runtime policy only after it is approved by a recorded vote.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/governance.service.ts
+      - backend/tests/governance.test.ts
+  - id: V12-INV-002
+    statement: An active runtime policy changes runtime behaviour — enforcement is checked at execution time, not merely recorded.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/policy-enforcement.service.ts
+      - backend/src/services/governance.service.ts
+      - backend/tests/governance.test.ts
+  - id: V12-INV-003
+    statement: A proposal advances only along its status machine, and every transition is recorded.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/governance.service.ts
+      - backend/src/db/migrations/135_governance.sql
+  - id: V12-INV-004
+    statement: Activating a new policy supersedes the prior policy for the same matched action rather than silently coexisting.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/governance.service.ts
+      - backend/src/db/migrations/135_governance.sql
+  - id: V12-INV-005
+    statement: An active policy can be rolled back, and rollback is a recorded governed act.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/governance.service.ts
+      - backend/tests/governance.test.ts
+  - id: V12-INV-006
+    statement: Emergency powers are time-bounded (ttl), their grant is recorded, and expiry is enforced.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/governance.service.ts
+      - backend/src/db/migrations/135_governance.sql
+  - id: V12-INV-007
+    statement: An emergency power may engage the kill switch, and doing so is an audited event.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/governance.service.ts
+      - backend/src/services/kill-switch.service.ts
+      - backend/tests/civilization-e2e-scenarios.test.ts
+  - id: V12-INV-008
+    statement: A proposal that would violate a protected invariant fails activation, fail-closed (constitutionality check at activation time).
+    tier: constitutional
+    status: planned
+  - id: V12-INV-009
+    statement: Voting eligibility and quorum are enforced so a decision cannot be made by an unauthorized or sub-quorum vote.
+    tier: constitutional
+    status: planned
+  - id: V33-INV-001
+    statement: Model calls flow through a single governed provider service rather than ad-hoc SDK calls scattered across the codebase.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-002
+    statement: A production model call reserves token budget against the resource ledger and fails closed when the budget actor/account is not configured.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-003
+    statement: Output tokens are clamped to a configured maximum on every call.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-004
+    statement: Provider errors are retried only when classified retryable, up to a bounded retry count; cancellation is honored.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-005
+    statement: The model is selected by configuration precedence (request to default to tier default), so swapping a model requires no code change.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - runtime/base_agent/provider_config.py
+  - id: V33-INV-006
+    statement: A tier model clearly incompatible with the selected provider is rejected or overridden rather than sent blindly.
+    tier: statute
+    status: enforced
+    enforcement:
+      - runtime/base_agent/provider_config.py
+  - id: V33-INV-007
+    statement: The model that produced a result is recorded on the result, so outputs are attributable to a specific model.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/llm-provider.service.ts
+      - backend/tests/llm-provider.test.ts
+  - id: V33-INV-008
+    statement: Replacing or upgrading the default model is a governed change with a recorded rationale, not a silent environment edit.
+    tier: statute
+    status: planned
+  - id: V33-INV-009
+    statement: Per-model calibration is tracked so trust is scoped by model, and a model whose calibration degrades is flagged.
+    tier: statute
+    status: planned
+  - id: V3-INV-001
+    statement: Only one scheduler ticks at a time via a Postgres advisory lock, and re-running a tick never duplicates work — even across restarts.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-scheduler.service.ts
+      - backend/src/services/civilization-os.service.ts
+      - backend/tests/civilization-scheduler.test.ts
+  - id: V3-INV-002
+    statement: A durable task is claimed exactly once (a single status transition to running) before it is dispatched.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/durable-execution.service.ts
+      - backend/tests/durable-execution-real-tasks.test.ts
+  - id: V3-INV-003
+    statement: Events are published through a transactional outbox written in the same transaction as the state change, so no state change is silently unpublished.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/transactional-outbox.service.ts
+      - backend/src/db/migrations/083_transactional_outbox.sql
+      - backend/tests/outbox-worker.test.ts
+  - id: V3-INV-004
+    statement: Outbox relay sources work with FOR UPDATE SKIP LOCKED and retries failed publications with bounded attempts and backoff.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/transactional-outbox.service.ts
+      - backend/tests/outbox-worker.test.ts
+  - id: V3-INV-005
+    statement: Every autonomous run stage consults the run guard and halts when the kill switch is engaged or a budget stop is reached.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/run-guard.service.ts
+      - backend/tests/main-loop-kill-switch.test.ts
+  - id: V3-INV-006
+    statement: The signed event-bus outbox is relayed alongside the event-log outbox, so cross-service events carry integrity.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/workers/outbox-worker.ts
+      - backend/src/db/migrations/128_event_bus_outbox.sql
+      - backend/tests/event-bus-outbox.test.ts
+  - id: V3-INV-007
+    statement: Task dispatch is idempotent under replay — a completed or in-flight task is not re-executed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/durable-execution.service.ts
+      - backend/tests/idempotency-store.test.ts
+  - id: V3-INV-008
+    statement: On restart, in-flight work is recovered or safely re-claimed rather than lost or double-run.
+    tier: statute
+    status: planned
+  - id: V3-INV-009
+    statement: A poison task that repeatedly fails is dead-lettered rather than retried unboundedly.
+    tier: statute
+    status: planned
+  - id: V2-INV-001
+    statement: At most one civilization is active at a time, enforced by a partial unique index.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-002
+    statement: Kernel history — versions, state transitions, and protected invariants — is append-only at the database layer.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-003
+    statement: Civilization lifecycle status changes only through the kernel service's authorized transition gate; a direct update without the gate is rejected.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/src/db/migrations/129_civilization_kernel.sql
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-004
+    statement: At most one charter is active per civilization, and at most one emergency state is active per civilization and scope.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/129_civilization_kernel.sql
+  - id: V2-INV-005
+    statement: Emergency states are time-bounded and expire, and expiry moves the civilization out of emergency.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/src/db/migrations/129_civilization_kernel.sql
+  - id: V2-INV-006
+    statement: Migrations apply in filename order, each within a transaction, and each applied file is recorded so migration is idempotent.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/db/migrate.ts
+  - id: V2-INV-007
+    statement: The kernel seeds and counts protected invariants, giving the runtime a live count of the rules it must honor.
+    tier: constitutional
+    status: enforced
+    enforcement:
+      - backend/src/services/civilization-kernel.service.ts
+      - backend/tests/civilization-kernel.test.ts
+  - id: V2-INV-008
+    statement: Migration numbering is unique and gap-checked so two files cannot silently share an ordinal.
+    tier: constitutional
+    status: planned
+  - id: V2-INV-009
+    statement: The kernel protected-invariant registry is reconciled with the document-level invariant registry (constitution/invariants.yaml).
+    tier: constitutional
+    status: planned
+  - id: V10-INV-001
+    statement: Every decision is recorded in the append-only, hash-chained decision log.
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/004_decision_log.sql
+      - backend/src/db/migrations/014_decision_log_immutability_triggers.sql
+  - id: V10-INV-002
+    statement: Every recorded decision carries a calibrated confidence score in [0,1], not a bare yes/no.
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/004_decision_log.sql
+  - id: V10-INV-003
+    statement: Dissent from a decision is recordable and preserved where the layer supports it (judiciary today).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/services/judiciary-case.service.ts
+      - backend/src/db/migrations/136_judiciary.sql
+  - id: V10-INV-004
+    statement: Every governed decision records the assumptions it relied on, as structured data.
+    tier: article
+    status: planned
+  - id: V10-INV-005
+    statement: Every governed decision records the alternatives considered and why they were rejected.
+    tier: article
+    status: planned
+  - id: V10-INV-006
+    statement: Every governed decision records an expected outcome that can be resolved and scored (linking the decision to Trust).
+    tier: article
+    status: planned
+  - id: V10-INV-007
+    statement: Dissent is recordable at every decision-making layer, not only in the judiciary and coalitions.
+    tier: article
+    status: planned
+  - id: V10-INV-008
+    statement: A reasoning record is linked to the evidence and predictions it rests on, so the why is grounded, not narrated.
+    tier: article
+    status: planned
+  - id: V10-INV-009
+    statement: The reasoning record is queryable — a Reasoning Explorer can reconstruct why any decision was made.
+    tier: article
+    status: planned
+  - id: V23-INV-001
+    statement: A web fetch that cannot pass the SSRF/URL-safety filter is denied, not attempted (computational constraint, fail closed).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/adapters/url-safety.ts
+      - backend/tests/red-team-corpus.test.ts
+  - id: V23-INV-002
+    statement: An action lacking an active runtime-policy allowance is blocked at execution (legal constraint).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/services/policy-enforcement.service.ts
+      - backend/tests/governance.test.ts
+  - id: V23-INV-003
+    statement: A spend that would drive a balance negative or exceed a resource policy is rejected (resource and economic constraints).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/081_resource_ledger.sql
+      - backend/src/services/treasury.service.ts
+  - id: V23-INV-004
+    statement: An action requiring a capability without an active grant fails closed (authority constraint).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/tests/capability-expansion.test.ts
+  - id: V23-INV-005
+    statement: When the kill switch is engaged, run stages halt (physical/stop constraint).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/services/run-guard.service.ts
+      - backend/tests/main-loop-kill-switch.test.ts
+  - id: V23-INV-006
+    statement: A state transition whose precondition is unmet is rejected (logical constraint).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/services/mission.service.ts
+      - backend/src/services/governance.service.ts
+  - id: V23-INV-007
+    statement: Time-bounded authorities (emergency powers, reservations) expire and are unusable past expiry (time constraint).
+    tier: article
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/135_governance.sql
+      - backend/src/services/civilization-kernel.service.ts
+  - id: V23-INV-008
+    statement: Every actuator declares the constraint classes it checks, and a contract test asserts no actuator executes without checking its binding constraints.
+    tier: article
+    status: planned
+  - id: V23-INV-009
+    statement: Ethical constraints (risk-tier gating, required human approval) are uniformly applied across actuators, not per-service ad hoc.
+    tier: article
+    status: planned
+  - id: V6-INV-001
+    statement: An institution has at most one active charter, and charter/mandate/power/limit grant rows are append-only in their immutable columns.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-002
+    statement: An institution's jurisdiction grant must be a subset of the civilization's jurisdiction — a composite foreign key makes granting an un-held key impossible.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-003
+    statement: Institutions declare mandates, powers, and limits, and a limit constrains what the institution may do.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-004
+    statement: Inter-institution contracts advance only along their lifecycle (draft to active to superseded).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+  - id: V6-INV-005
+    statement: The ten mandatory institutions are function-fundamental, not domain-specific, satisfying Domain Neutrality.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - scripts/constitution/check_constitution.py
+  - id: V6-INV-006
+    statement: Mandatory-institution seeding is idempotent — re-running does not duplicate institutions.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/institution-governance.service.ts
+      - backend/tests/societies-institutions.test.ts
+  - id: V6-INV-007
+    statement: An institution emerges from a justified capability gap through a temporary program before becoming permanent (creation to evaluation to permanent or archived).
+    tier: statute
+    status: planned
+  - id: V6-INV-008
+    statement: Every permanent institution is periodically re-justified, and one that is no longer justified is retired (no permanence without ongoing justification).
+    tier: statute
+    status: planned
+  - id: V6-INV-009
+    statement: Institutions can branch, merge, split, undergo succession, and federate under governance.
+    tier: statute
+    status: planned
+  - id: V5-INV-001
+    statement: A citizen is a typed participant with a lifecycle status, and status changes only along the defined lifecycle.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/130_citizenship.sql
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-002
+    statement: A citizen's autonomy envelope gates protected execution — an action above the citizen's permitted risk level is refused.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-003
+    statement: The protected-execution gate is wired into durable execution and specialist spawn, so envelope limits bind real work.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/durable-execution.service.ts
+      - backend/src/services/team-activation.service.ts
+      - backend/src/services/citizenship.service.ts
+  - id: V5-INV-004
+    statement: Sanctions restrict a citizen's standing and are liftable, and their imposition is a recorded act (invoked by the judiciary).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/src/services/judiciary-case.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-005
+    statement: Role eligibility gates which roles a citizen may hold, optionally scoped to an institution or domain.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-006
+    statement: A citizen's budget multiplier is derived from standing/trust, not chosen freely, so participation scales with earned trust.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/citizenship.test.ts
+  - id: V5-INV-007
+    statement: A society has an active charter and a jurisdiction that is a subset of the civilization's.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/131_societies_and_institution_charters.sql
+      - backend/tests/societies-institutions.test.ts
+  - id: V5-INV-008
+    statement: Population demographics (counts by status/type/society) are derivable as governed metrics.
+    tier: statute
+    status: planned
+  - id: V5-INV-009
+    statement: A citizen may migrate between societies under a governed process, with membership history preserved.
+    tier: statute
+    status: planned
+  - id: V17-INV-001
+    statement: The README implementation-status block is generated from the ledger and is re-checkable, not hand-edited.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_status.py
+      - README.md
+  - id: V17-INV-002
+    statement: A tracked-file forensic inventory is generated and re-checkable in CI.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_forensic_inventory.py
+      - docs/audit/FORENSIC_FILE_INVENTORY.json
+  - id: V17-INV-003
+    statement: Gate integrity is inspected and fails closed on fake-success or bypass patterns.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/verify_gate_integrity.py
+  - id: V17-INV-004
+    statement: Static runtime reachability is generated conservatively so unreachable or newly-added services are visible.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_runtime_reachability.py
+  - id: V17-INV-005
+    statement: Runtime health is inspectable via a doctor with explicit modes (offline, local-native, production).
+    tier: statute
+    status: enforced
+    enforcement:
+      - runtime/orchestration/doctor.py
+  - id: V17-INV-006
+    statement: Integration is audited in a clean room and against the running runtime, producing evidence artifacts.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/audit_clean_room.py
+      - scripts/audit_runtime_integration.py
+  - id: V17-INV-007
+    statement: The constitution itself is inspected for drift on every push (headers, enforcement paths, domain neutrality).
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
+      - .github/workflows/constitution.yml
+  - id: V17-INV-008
+    statement: Inspection findings (capability gaps, incomplete systems, drift) are emitted as a structured, governed backlog rather than prose reports.
+    tier: statute
+    status: planned
+  - id: V17-INV-009
+    statement: Every generated inspection artifact is enforced current by a --check gate in CI, so no inspector output can go stale unnoticed.
+    tier: statute
+    status: planned
+  - id: V18-INV-001
+    statement: A machine-readable component inventory of the system exists (the seed of the architecture graph).
+    tier: statute
+    status: enforced
+    enforcement:
+      - BUILD_LEDGER.yaml
+      - CIVILIZATION_BUILD_LEDGER.yaml
+  - id: V18-INV-002
+    statement: A conservative static dependency snapshot of entry points to services exists (the seed of the dependency graph).
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_runtime_reachability.py
+  - id: V18-INV-003
+    statement: The Self Model represents the architecture graph — services, modules, and their boundaries — as first-class queryable data.
+    tier: statute
+    status: planned
+  - id: V18-INV-004
+    statement: The Self Model represents the dependency graph and is kept current from the live system, not a manual snapshot.
+    tier: statute
+    status: planned
+  - id: V18-INV-005
+    statement: The Self Model represents the institution, capability, and topology graphs, sourced from their owning subsystems.
+    tier: statute
+    status: planned
+  - id: V18-INV-006
+    statement: The Self Model represents the evolution graph (version lineage and migrations) and the health graph (live operational signals).
+    tier: statute
+    status: planned
+  - id: V18-INV-007
+    statement: The Self Model is populated by Self Inspection and is provably current — a drift between model and reality fails a check.
+    tier: statute
+    status: planned
+  - id: V18-INV-008
+    statement: The Self Model is queryable by the operator and by Autonomous/Structural Evolution as the substrate for change decisions.
+    tier: statute
+    status: planned
+  - id: V18-INV-009
+    statement: The Self Model is strictly separated from Civilization Memory — structure-now versus history.
+    tier: statute
+    status: planned
+  - id: V34-INV-001
+    statement: The event history is an ordered, hash-chained spine whose rows reject UPDATE and DELETE at the database layer.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/080_event_log.sql
+      - backend/src/services/event-log.service.ts
+  - id: V34-INV-002
+    statement: Every event carries an actor, a correlation id, and a hash linking it to the prior event, so history is attributable and tamper-evident.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/080_event_log.sql
+  - id: V34-INV-003
+    statement: Agent memory and shared knowledge are durable stores readable and writable through a memory service, not ad hoc.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/memory-store.service.ts
+      - backend/src/db/migrations/002_agent_memory.sql
+      - backend/src/db/migrations/003_shared_knowledge.sql
+  - id: V34-INV-004
+    statement: Memory is retrievable for planning, and retrieval surfaces demotion warnings so weakened memory is flagged.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/memory-retrieval.service.ts
+      - backend/tests/memory-retrieval.test.ts
+  - id: V34-INV-005
+    statement: An agent's own self-memory is retrievable without dropping or mutating existing memory.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/114_self_memory_retrievable.sql
+      - backend/tests/self-memory-loop.test.ts
+  - id: V34-INV-006
+    statement: Artifact lineage is part of artifact identity — content dedup applies within a lineage class, not across, so real lineage is preserved.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/117_artifact_lineage_identity.sql
+  - id: V34-INV-007
+    statement: Improvement lineage links a promoted improvement to its originating failure and candidate.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/138_safe_evolution.sql
+      - backend/tests/civilization-learning-e2e.test.ts
+  - id: V34-INV-008
+    statement: Memory has a bounded forgetting/retention policy so low-value memory does not accumulate without limit.
+    tier: statute
+    status: planned
+  - id: V34-INV-009
+    statement: Long-term lineage is queryable end to end — any promoted memory can be traced to the events and evidence that produced it.
+    tier: statute
+    status: planned
+  - id: V30-INV-001
+    statement: The authoritative release gate is a fail-closed multi-step sequence, not a single command; any step failing fails the gate.
+    tier: statute
+    status: enforced
+    enforcement:
+      - Makefile
+  - id: V30-INV-002
+    statement: The release gate refuses fake-success and bypass patterns before running tests (gate integrity runs first).
+    tier: statute
+    status: enforced
+    enforcement:
+      - Makefile
+      - scripts/verify_gate_integrity.py
+  - id: V30-INV-003
+    statement: Every route is classified and a contract test fails the build on an unclassified route.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/route-auth-contract.test.ts
+      - docs/audit/ROUTE_SENSITIVITY_MATRIX.md
+  - id: V30-INV-004
+    statement: The decision-log hash chain is verified as part of the gate, detecting tampering.
+    tier: statute
+    status: enforced
+    enforcement:
+      - Makefile
+      - backend/src/db/migrations/012_decision_log_chain.sql
+  - id: V30-INV-005
+    statement: Adversarial and restart/replay behaviour is tested, not only happy paths.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/tests/civilization-adversarial.test.ts
+      - backend/tests/red-team-corpus.test.ts
+  - id: V30-INV-006
+    statement: Completion is machine-derived from ledger evidence and states its predicate explicitly, never asserted in prose.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/generate_civilization_completion.py
+      - .github/workflows/civilization-completion.yml
+  - id: V30-INV-007
+    statement: CI runs the constitution, civilization-completion, and integration audit workflows on push.
+    tier: statute
+    status: enforced
+    enforcement:
+      - .github/workflows/constitution.yml
+      - .github/workflows/civilization-completion.yml
+      - .github/workflows/runtime-integration-audit.yml
+  - id: V30-INV-008
+    statement: The release gate runs green against the built civilization code before any completion predicate is set true.
+    tier: statute
+    status: planned
+  - id: V30-INV-009
+    statement: Test coverage of enforced invariants is measured, so a constitutional enforced claim without a covering test is detected.
+    tier: statute
+    status: planned
+  - id: V29-INV-001
+    statement: Migrations run as a dedicated job before the application serves traffic, so no instance serves against an un-migrated schema.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/migration-job.yaml
+      - backend/tests/helm-deployment-contract.test.ts
+  - id: V29-INV-002
+    statement: Backend and frontend workloads declare liveness and readiness probes, so an unhealthy instance is not sent traffic.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/deployment.yaml
+      - backend/src/server.ts
+  - id: V29-INV-003
+    statement: The outbox relay and civilization scheduler run as their own deployments, matching the runtime OS worker model.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/outbox-worker-deployment.yaml
+      - infrastructure/kubernetes/helm/agentco/templates/civilization-scheduler-deployment.yaml
+  - id: V29-INV-004
+    statement: The local stack provides the full dependency set (Postgres, Redis, Kafka, Vault, Prometheus, Grafana, OTel) so the system is runnable end to end locally.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - docker-compose.yml
+  - id: V29-INV-005
+    statement: The deployment exposes Prometheus metrics via the application /metrics endpoint.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/server.ts
+      - infrastructure/prometheus
+  - id: V29-INV-006
+    statement: Autoscaling and a pod disruption budget are defined so the backend scales and survives voluntary disruption.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - infrastructure/kubernetes/helm/agentco/templates/hpa.yaml
+      - infrastructure/kubernetes/helm/agentco/templates/pdb.yaml
+  - id: V29-INV-007
+    statement: A Docker startup verification exists that boots the full stack and checks each dependency.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - scripts/verify_docker_startup.py
+      - backend/tests/phase4-production-deployment.test.ts
+  - id: V29-INV-008
+    statement: Hosted production operation (continuous SLOs, DR, backups, incident response, long-running operational evidence) is certified against a live cluster.
+    tier: regulation
+    status: planned
+  - id: V29-INV-009
+    statement: Secrets are delivered from a managed secret store (Vault) in production rather than environment plaintext.
+    tier: regulation
+    status: planned
+  - id: V27-INV-001
+    statement: Protected high- or critical-risk actions are enqueued for human approval before they execute; unresolved requests do not proceed.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/override-queue.service.ts
+      - backend/src/db/migrations/013_override_queue.sql
+  - id: V27-INV-002
+    statement: Each override request carries an approval SLA, and overdue requests are surfaced rather than silently expiring.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/override-queue.service.ts
+  - id: V27-INV-003
+    statement: The kill switch is governed — at most one is active per scope, and engaging it is an audited act.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/098_governance_kill_switch.sql
+      - backend/src/services/kill-switch.service.ts
+      - backend/tests/kill-switch.test.ts
+  - id: V27-INV-004
+    statement: Engaging the kill switch from the operator console requires a human-entered reason.
+    tier: statute
+    status: enforced
+    enforcement:
+      - frontend/src/app/civilization/page.tsx
+  - id: V27-INV-005
+    statement: The operator console shows only governed backend data — no fabricated or placeholder values.
+    tier: statute
+    status: enforced
+    enforcement:
+      - frontend/src/app/civilization/page.tsx
+      - backend/tests/civilization-operator.test.ts
+  - id: V27-INV-006
+    statement: Operator actions resolve authority through the identity/authority layer, so an operator acts under a recorded authority decision.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/identity-authority.service.ts
+      - backend/src/routes/override.routes.ts
+  - id: V27-INV-007
+    statement: An engaged kill switch actually halts governed run loops (the Emergency mode has effect, not just record).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/run-guard.service.ts
+      - backend/tests/main-loop-kill-switch.test.ts
+  - id: V27-INV-008
+    statement: The Operator Interface exposes its modes (Observe, Inspect, Chat, Preview, Execute, Govern, Emergency) as first-class, role-gated capabilities — superuser being one role among several.
+    tier: statute
+    status: planned
+  - id: V27-INV-009
+    statement: A Preview mode lets an operator dry-run a protected action and see its projected effect before executing.
+    tier: statute
+    status: planned
+  - id: V28-INV-001
+    statement: The browser never receives the backend API key; it is injected server-side by the proxy.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/api/[...path]/route.ts
+  - id: V28-INV-002
+    statement: The frontend reaches the backend only through the server-side proxy, so hop-by-hop headers are stripped and auth is centralized.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/api/[...path]/route.ts
+  - id: V28-INV-003
+    statement: The civilization operator console renders only governed backend data, never fabricated or placeholder values.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/civilization/page.tsx
+      - backend/tests/civilization-operator.test.ts
+  - id: V28-INV-004
+    statement: Operator pages exist for the civilization's principal subsystems (dashboard, governance, autonomy, audit, events, finance, incidents, performance, validation).
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app
+  - id: V28-INV-005
+    statement: A health route is exposed for the frontend independent of backend auth.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - frontend/src/app/api/health/route.ts
+  - id: V28-INV-006
+    statement: The architecture, institution, capability, and mission graphs are visualized from the Self Model as first-class explorers.
+    tier: regulation
+    status: planned
+  - id: V28-INV-007
+    statement: A reasoning explorer reconstructs why any decision was made (the reasoning obligation, surfaced).
+    tier: regulation
+    status: planned
+  - id: V28-INV-008
+    statement: A learning explorer shows the failure to candidate to promotion/rollback lineage visually.
+    tier: regulation
+    status: planned
+  - id: V28-INV-009
+    statement: Every operator page declares which governed endpoint sources each value, so a fabricated value would fail a view-contract check.
+    tier: regulation
+    status: planned
+  - id: V24-INV-001
+    statement: Interactions are routed by calibration history, so the most-calibrated capability is preferred.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/services/calibration-aware-routing.service.ts
+  - id: V24-INV-002
+    statement: Interaction reasoning is produced through the planner/ensemble path, not ad hoc, so multi-agent collaboration is a first-class interaction.
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/services/autonomy-action-planner.service.ts
+      - backend/src/services/multi-agent-ensemble.service.ts
+  - id: V24-INV-003
+    statement: An assertion made in an interaction must be grounded in registered evidence (the knowledge-system contract applies to responses).
+    tier: regulation
+    status: enforced
+    enforcement:
+      - backend/src/services/claim-grounding.service.ts
+      - backend/tests/planner-claim-bias.test.ts
+  - id: V24-INV-004
+    statement: Interaction modes (chat, planning, execution, negotiation, governance, teaching, explanation, simulation, supervision, inspection, collaboration) are first-class and mode-agnostic routing selects among them.
+    tier: regulation
+    status: planned
+  - id: V24-INV-005
+    statement: Conversation/chat is one mode, not the architectural center — no capability is reachable only via chat.
+    tier: regulation
+    status: planned
+  - id: V24-INV-006
+    statement: Every interaction response carries a calibrated confidence derived from trust.
+    tier: regulation
+    status: planned
+  - id: V24-INV-007
+    statement: Every interaction records its reasoning and the constraints it passed.
+    tier: regulation
+    status: planned
+  - id: V24-INV-008
+    statement: Interaction feedback (was the response useful/correct?) feeds back into trust and learning as resolved outcomes.
+    tier: regulation
+    status: planned
+  - id: V24-INV-009
+    statement: A teaching/explanation mode can render the why of any decision to a human at an appropriate level of detail.
+    tier: regulation
+    status: planned
+  - id: V26-INV-001
+    statement: A coalition advances only along its lifecycle, and every transition is recorded append-only.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/src/db/migrations/132_institution_coalitions.sql
+      - backend/tests/coalitions.test.ts
+  - id: V26-INV-002
+    statement: Negotiation proceeds in recorded rounds with recorded proposals, so a coalition's bargaining is auditable.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/tests/coalitions.test.ts
+  - id: V26-INV-003
+    statement: Consensus is a recorded result and dissent is recordable and preserved, so agreement never erases disagreement.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/src/db/migrations/132_institution_coalitions.sql
+  - id: V26-INV-004
+    statement: Coalition commitments and delegations are recorded obligations that bind the committing party.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/tests/coalitions.test.ts
+  - id: V26-INV-005
+    statement: A coalition can settle and can escalate to the judiciary, so disputes have a governed exit.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/coalition.service.ts
+      - backend/src/services/judiciary-case.service.ts
+  - id: V26-INV-006
+    statement: Specialist activation authenticates via HMAC and enforces budget and the protected-execution gate, so spawned agents are bounded citizens.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/team-activation.service.ts
+      - backend/src/services/citizenship.service.ts
+      - backend/tests/team-activation.test.ts
+  - id: V26-INV-007
+    statement: Specialist processes shut down gracefully, terminating their child processes on shutdown.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/team-activation.service.ts
+  - id: V26-INV-008
+    statement: Specialist roles are a runtime registry, not a compile-time constant, so a new role is added without a code change.
+    tier: statute
+    status: planned
+  - id: V26-INV-009
+    statement: Adversarial cooperation structures — red teams, blue teams, and war games — are first-class governed activities.
+    tier: statute
+    status: planned
+  - id: V25-INV-001
+    statement: An implemented capability is a versioned skill with regression coverage required before promotion.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/skill-library.service.ts
+      - backend/src/db/migrations/105_skill_library.sql
+  - id: V25-INV-002
+    statement: A capability is admitted only through the five-stage expansion gate with an independent competence proof (the evaluation/verification stages).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/capability-expansion.service.ts
+      - backend/src/services/proof-of-competence.service.ts
+  - id: V25-INV-003
+    statement: Promotion and rollback of a capability follow the learning engine's independent-evaluation and canary gates.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/safe-evolution.test.ts
+  - id: V25-INV-004
+    statement: Coding is treated as one capability instance, not privileged architecture — no service, route, or table is named for coding.
+    tier: statute
+    status: enforced
+    enforcement:
+      - scripts/constitution/check_constitution.py
+  - id: V25-INV-005
+    statement: The eleven-stage capability lifecycle is a single named contract that every capability provably traverses.
+    tier: statute
+    status: planned
+  - id: V25-INV-006
+    statement: The research and knowledge-acquisition stages have first-class records, so a capability's how-we-learned-it is auditable.
+    tier: statute
+    status: planned
+  - id: V25-INV-007
+    statement: Any capability can be developed through the framework without new architecture (a new capability = registry + lifecycle, not new code paths).
+    tier: statute
+    status: planned
+  - id: V25-INV-008
+    statement: Capability monitoring after promotion feeds automatic restriction or retirement on degradation.
+    tier: statute
+    status: planned
+  - id: V25-INV-009
+    statement: The coding instance (selfcoding/) is either promoted to a canonical capability under this framework or retired, resolving its quarantined status.
+    tier: statute
+    status: planned
+  - id: V16-INV-001
+    statement: Autonomous goal formation proposes only bounded goals, and goals are approved through a governed step before execution.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/goal-formation.service.ts
+      - backend/tests/bounded-goal-formation-e2e.test.ts
+  - id: V16-INV-002
+    statement: An autonomous run halts on the kill switch, budget exhaustion, a goal limit, or idle — it cannot run unbounded.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/supervised-free-run.service.ts
+      - backend/tests/goal-formation-supervised-free-run.test.ts
+  - id: V16-INV-003
+    statement: The supervised tick consults the run guard (kill switch + budgets) before doing work in each cycle.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/supervised-runtime.service.ts
+      - backend/src/services/run-guard.service.ts
+  - id: V16-INV-004
+    statement: Autonomous improvement runs the same independent-evaluation and canary gates as attended learning.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/tests/autonomous-promotion.test.ts
+  - id: V16-INV-005
+    statement: Autonomous Goal Generation is a distinct loop with its own responsibility and record.
+    tier: statute
+    status: planned
+  - id: V16-INV-006
+    statement: Autonomous Planning, Execution, and Improvement are distinct loops, not fused into one tick.
+    tier: statute
+    status: planned
+  - id: V16-INV-007
+    statement: Autonomous Research is a distinct loop that turns open questions into discovery work.
+    tier: statute
+    status: planned
+  - id: V16-INV-008
+    statement: Autonomous Scheduling is a distinct loop allocating work across the leader-elected tick.
+    tier: statute
+    status: planned
+  - id: V16-INV-009
+    statement: Each autonomous loop can be independently enabled, disabled, and rate-limited under governance.
+    tier: statute
+    status: planned
+  - id: V19-INV-001
+    statement: A self-modification candidate is validated before it can take effect, producing a recorded validation result.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/self-modification-validator.service.ts
+      - backend/src/db/migrations/097_self_modification_validation_compatibility.sql
+  - id: V19-INV-002
+    statement: A candidate that touches a protected surface is rejected or requires a constitution-level vote (structural changes cannot silently alter protected state).
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/protected-surface-validator.service.ts
+      - backend/src/services/calibration-constitution.service.ts
+  - id: V19-INV-003
+    statement: Structural change reuses the learning engine's candidate to independent-evaluation to canary to promotion/rollback pattern rather than inventing an unsafe path.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/services/safe-evolution.service.ts
+      - backend/src/services/skill-canary.service.ts
+  - id: V19-INV-004
+    statement: Every structural change is recorded with lineage, so the system's structure has a version history.
+    tier: statute
+    status: enforced
+    enforcement:
+      - backend/src/db/migrations/117_artifact_lineage_identity.sql
+      - backend/src/db/migrate.ts
+  - id: V19-INV-005
+    statement: Services can be replaced, merged, and split under the framework without violating constitutional continuity.
+    tier: statute
+    status: planned
+  - id: V19-INV-006
+    statement: Institutions, governance, economy, communication, deployment, memory organization, schedulers, and topology are evolvable structures under the same framework.
+    tier: statute
+    status: planned
+  - id: V19-INV-007
+    statement: A structural version graph records the lineage of every structural version and supports rollback to a prior structure.
+    tier: statute
+    status: planned
+  - id: V19-INV-008
+    statement: A migration engine applies validated structural changes transactionally, with rollback on failure.
+    tier: statute
+    status: planned
+  - id: V19-INV-009
+    statement: Structural evolution preserves constitutional continuity — a change cannot remove a protected invariant or human root authority.
+    tier: statute
+    status: planned
