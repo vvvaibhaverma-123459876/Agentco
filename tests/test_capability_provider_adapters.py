@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import urllib.error
+import urllib.request
 
 import agentco_capability.providers as providers
 from agentco_capability.runtime import execute_capability_request
@@ -58,6 +60,10 @@ def base_request(provider: str):
     }
 
 
+def allow_local_provider(monkeypatch):
+    monkeypatch.setenv("AGENTCO_PROVIDER_ALLOW_LOCAL_HTTP", "1")
+
+
 def test_openai_compatible_adapter_uses_configured_endpoint(monkeypatch, tmp_path):
     monkeypatch.delenv("DATABASE_URL", raising=False)
     monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
@@ -65,6 +71,7 @@ def test_openai_compatible_adapter_uses_configured_endpoint(monkeypatch, tmp_pat
     fake = FakeTransport()
     monkeypatch.setattr(providers, "_post_json_once", fake)
     base_url = "http://127.0.0.1:12345/v1"
+    allow_local_provider(monkeypatch)
     monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
     monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
     monkeypatch.setenv("OPENAI_BASE_URL", base_url)
@@ -87,6 +94,7 @@ def test_anthropic_compatible_adapter_uses_messages_contract(monkeypatch, tmp_pa
     fake = FakeTransport()
     monkeypatch.setattr(providers, "_post_json_once", fake)
     base_url = "http://127.0.0.1:12345"
+    allow_local_provider(monkeypatch)
     monkeypatch.setenv("ANTHROPIC_API_KEY", "secret-anthropic")
     monkeypatch.setenv("ANTHROPIC_MODEL", "local-anthropic-model")
     monkeypatch.setenv("ANTHROPIC_BASE_URL", base_url)
@@ -107,6 +115,7 @@ def test_generic_http_adapter_extracts_configured_answer(monkeypatch, tmp_path):
     fake = FakeTransport()
     monkeypatch.setattr(providers, "_post_json_once", fake)
     url = "http://127.0.0.1:12345/execute"
+    allow_local_provider(monkeypatch)
     monkeypatch.setenv("AGENTCO_GENERIC_PROVIDER_URL", url)
     monkeypatch.setenv("AGENTCO_GENERIC_PROVIDER_TOKEN", "secret-generic")
     monkeypatch.setenv("AGENTCO_GENERIC_ANSWER_FIELD", "answer.text")
@@ -138,6 +147,7 @@ def test_openai_adapter_retries_429_then_succeeds(monkeypatch, tmp_path):
     monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
     fake = FakeTransport(failures_before_success=1)
     monkeypatch.setattr(providers, "_post_json_once", fake)
+    allow_local_provider(monkeypatch)
     monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
     monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
     monkeypatch.setenv("OPENAI_BASE_URL", "http://127.0.0.1:12345/v1")
@@ -163,3 +173,114 @@ def test_non_allowlisted_host_fails_closed(monkeypatch, tmp_path):
 
     assert response["status"] == "unsupported"
     assert "not allowlisted" in response["failure"]["message"]
+
+
+def test_loopback_requires_explicit_local_development_opt_in(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
+    monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
+    monkeypatch.setenv("OPENAI_BASE_URL", "http://127.0.0.1:12345/v1")
+    monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "127.0.0.1")
+    monkeypatch.delenv("AGENTCO_PROVIDER_ALLOW_LOCAL_HTTP", raising=False)
+
+    response = execute_capability_request(base_request("openai_compatible"))
+
+    assert response["status"] == "unsupported"
+    assert "HTTPS outside explicit local development" in response["failure"]["message"]
+
+
+def test_allowlisted_hostname_resolving_to_private_address_fails_closed(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
+    monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://api.example.test/v1")
+    monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "api.example.test")
+    monkeypatch.setattr(providers, "_resolve_provider_addresses", lambda host, port: ["10.0.0.5"])
+
+    response = execute_capability_request(base_request("openai_compatible"))
+
+    assert response["status"] == "unsupported"
+    assert "forbidden address" in response["failure"]["message"]
+
+
+def test_dns_rebinding_between_validation_and_attempt_fails_closed(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
+    monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
+    monkeypatch.setenv("OPENAI_BASE_URL", "https://api.example.test/v1")
+    monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "api.example.test")
+    calls = {"count": 0}
+
+    def resolving_addresses(host, port):
+        calls["count"] += 1
+        return ["93.184.216.34"] if calls["count"] == 1 else ["127.0.0.1"]
+
+    monkeypatch.setattr(providers, "_resolve_provider_addresses", resolving_addresses)
+
+    response = execute_capability_request(base_request("openai_compatible"))
+
+    assert response["status"] == "unsupported"
+    assert "forbidden address" in response["failure"]["message"]
+    assert calls["count"] >= 2
+
+
+def test_malformed_url_userinfo_and_non_https_fail_closed(monkeypatch, tmp_path):
+    monkeypatch.delenv("DATABASE_URL", raising=False)
+    monkeypatch.delenv("AGENTCO_CAPABILITY_DATABASE_URL", raising=False)
+    monkeypatch.setenv("AGENTCO_CAPABILITY_STORE_DIR", str(tmp_path))
+    monkeypatch.setenv("OPENAI_API_KEY", "secret-openai")
+    monkeypatch.setenv("OPENAI_MODEL", "local-openai-model")
+    monkeypatch.setenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "api.example.test")
+
+    for index, (url, expected) in enumerate([
+        ("https://user:pass@api.example.test/v1", "user-info"),
+        ("ftp://api.example.test/v1", "scheme"),
+        ("http://api.example.test/v1", "HTTPS outside explicit local development"),
+    ]):
+        monkeypatch.setenv("OPENAI_BASE_URL", url)
+        request = base_request("openai_compatible")
+        request["request_id"] = f"req-openai-url-{index}"
+        request["attempt_id"] = f"attempt-openai-url-{index}"
+        request["idempotency_key"] = f"idem-openai-url-{index}"
+        response = execute_capability_request(request)
+        assert response["status"] == "unsupported"
+        assert expected in response["failure"]["message"]
+
+
+def test_provider_redirects_are_blocked_without_forwarding_credentials(monkeypatch):
+    class RedirectingOpener:
+        def __init__(self):
+            self.seen_headers = None
+
+        def open(self, request, timeout):
+            self.seen_headers = dict(request.header_items())
+            raise urllib.error.HTTPError(
+                request.full_url,
+                302,
+                "provider redirect blocked",
+                {"Location": "http://127.0.0.1/private"},
+                None,
+            )
+
+    opener = RedirectingOpener()
+    monkeypatch.setattr(urllib.request, "build_opener", lambda *handlers: opener)
+
+    try:
+        providers._post_json_once(
+            "https://api.example.test/v1",
+            {"request": "payload"},
+            {"Authorization": "Bearer secret-canary"},
+            timeout=1,
+            max_bytes=1024,
+        )
+    except providers.ProviderResponseError as exc:
+        assert "non_retryable_http_302" in str(exc)
+    else:
+        raise AssertionError("redirect was not blocked")
+    assert opener.seen_headers["Authorization"] == "Bearer secret-canary"

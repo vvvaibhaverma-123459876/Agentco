@@ -44,23 +44,23 @@
       "finding_id": "GCR-005",
       "severity": "S3",
       "component": "provider-trust-boundary",
-      "status": "open_backlog",
+      "status": "resolved_batch_08f",
       "summary": "Provider host allowlisting is hostname-string based and does not resolve DNS to block rebinding or private-range targets for non-local provider endpoints.",
-      "evidence": "agentco_capability/providers.py _check_host_allowlist and _require_https_or_local",
+      "evidence": "agentco_capability/providers.py _validate_provider_url, _resolve_provider_addresses, _reject_forbidden_ip and tests/test_capability_provider_adapters.py provider-boundary negative tests",
       "impact": "A future live-provider configuration could overtrust a hostname if DNS resolution changes after allowlist validation.",
       "remediation": "Resolve provider hostnames at execution time, reject private/link-local/loopback addresses except explicit local-development providers, and record resolved address evidence.",
-      "remaining_risk": "Does not invalidate Protocol V3 because Protocol V3 uses local mock endpoints and no live-provider capability evidence is claimed."
+      "remaining_risk": "Live-provider execution still requires explicit credentials and preflight; remediation blocks known hostname-only/private-range/rebinding boundary gaps before live execution."
     },
     {
       "finding_id": "GCR-006",
       "severity": "S3",
       "component": "provider-trust-boundary",
-      "status": "open_backlog",
+      "status": "resolved_batch_08f",
       "summary": "Provider HTTP transport uses urllib default redirect behavior without an explicit post-redirect host allowlist check.",
-      "evidence": "agentco_capability/providers.py _post_json_once",
+      "evidence": "agentco_capability/providers.py _NoRedirectHandler and tests/test_capability_provider_adapters.py redirect-blocking test",
       "impact": "A configured provider endpoint could redirect to a different host unless urllib behavior is constrained or revalidated.",
       "remediation": "Install a redirect handler that blocks redirects by default or revalidates scheme, host allowlist and resolved address on every redirect.",
-      "remaining_risk": "Does not invalidate Genesis V5 HOLD because no provider execution is attempted without credentials and model-access preflight."
+      "remaining_risk": "Redirects are blocked by default. If future redirect support is introduced, every hop must re-run scheme, host allowlist and resolved-address validation."
     }
   ]
 }

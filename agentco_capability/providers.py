@@ -4,6 +4,7 @@ import json
 import os
 import socket
 import time
+import ipaddress
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -156,21 +157,88 @@ def _redacted_headers(raw: dict[str, str]) -> dict[str, str]:
     return redacted
 
 
-def _require_https_or_local(url: str) -> None:
-    if url.startswith("https://"):
-        return
-    if url.startswith("http://127.0.0.1") or url.startswith("http://localhost"):
-        return
-    raise ProviderConfigurationError("provider URL must use HTTPS outside explicit local development")
+def _host_matches_allowlist(host: str, allowlist: list[str]) -> bool:
+    normalized_host = host.rstrip(".").lower()
+    for item in allowlist:
+        entry = item.strip().rstrip(".").lower()
+        if not entry:
+            continue
+        if entry.startswith("*.") and normalized_host.endswith(entry[1:]) and normalized_host != entry[2:]:
+            return True
+        if normalized_host == entry:
+            return True
+    return False
 
 
-def _check_host_allowlist(url: str, allowlist: list[str]) -> None:
+def _is_local_development_endpoint(parsed: urllib.parse.ParseResult) -> bool:
+    host = (parsed.hostname or "").lower()
+    return (
+        os.getenv("AGENTCO_PROVIDER_ALLOW_LOCAL_HTTP") == "1"
+        and parsed.scheme == "http"
+        and host in {"localhost", "127.0.0.1", "::1"}
+    )
+
+
+def _reject_forbidden_ip(host: str, address: str, *, allow_local_development: bool) -> None:
+    try:
+        ip = ipaddress.ip_address(address)
+    except ValueError as exc:
+        raise ProviderConfigurationError(f"provider DNS returned invalid address for {host!r}") from exc
+    if allow_local_development and ip.is_loopback:
+        return
+    if (
+        ip.is_loopback
+        or ip.is_private
+        or ip.is_link_local
+        or ip.is_multicast
+        or ip.is_reserved
+        or ip.is_unspecified
+    ):
+        raise ProviderConfigurationError(f"provider host {host!r} resolved to forbidden address {address}")
+
+
+def _resolve_provider_addresses(host: str, port: int) -> list[str]:
+    try:
+        infos = socket.getaddrinfo(host, port, type=socket.SOCK_STREAM)
+    except socket.gaierror as exc:
+        raise ProviderConfigurationError(f"provider host {host!r} could not be resolved") from exc
+    addresses = sorted({info[4][0] for info in infos})
+    if not addresses:
+        raise ProviderConfigurationError(f"provider host {host!r} resolved to no addresses")
+    return addresses
+
+
+def _validate_provider_url(url: str, allowlist: list[str]) -> dict[str, Any]:
+    parsed = urllib.parse.urlparse(url)
+    if parsed.username or parsed.password:
+        raise ProviderConfigurationError("provider URL must not include user-info credentials")
+    if not parsed.scheme or not parsed.netloc or not parsed.hostname:
+        raise ProviderConfigurationError("provider URL must include a valid scheme and authority")
+    if parsed.scheme not in {"https", "http"}:
+        raise ProviderConfigurationError("provider URL scheme is not approved")
+    allow_local_development = _is_local_development_endpoint(parsed)
+    if parsed.scheme != "https" and not allow_local_development:
+        raise ProviderConfigurationError("provider URL must use HTTPS outside explicit local development")
     allowlist = [item.strip() for item in allowlist if item and item.strip()]
     if not allowlist:
         raise ProviderConfigurationError("provider host allowlist is required")
-    host = urllib.parse.urlparse(url).hostname or ""
-    if host not in allowlist:
+    host = parsed.hostname or ""
+    if not _host_matches_allowlist(host, allowlist):
         raise ProviderConfigurationError(f"provider host {host!r} is not allowlisted")
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    addresses = _resolve_provider_addresses(host, port)
+    for address in addresses:
+        _reject_forbidden_ip(host, address, allow_local_development=allow_local_development)
+    return {"host": host, "port": port, "addresses": addresses, "scheme": parsed.scheme}
+
+
+def _check_host_allowlist(url: str, allowlist: list[str]) -> None:
+    _validate_provider_url(url, allowlist)
+
+
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # type: ignore[override]
+        raise urllib.error.HTTPError(req.full_url, code, "provider redirect blocked", headers, fp)
 
 
 def _classify_http_error(code: int) -> tuple[str, bool]:
@@ -182,9 +250,10 @@ def _classify_http_error(code: int) -> tuple[str, bool]:
 def _post_json_once(url: str, payload: dict[str, Any], headers: dict[str, str], timeout: float, max_bytes: int) -> dict[str, Any]:
     body = json.dumps(payload, sort_keys=True).encode()
     request = urllib.request.Request(url, data=body, headers={**headers, "Content-Type": "application/json"}, method="POST")
+    opener = urllib.request.build_opener(_NoRedirectHandler)
     started = time.time()
     try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        with opener.open(request, timeout=timeout) as response:
             raw = response.read(max_bytes + 1)
             if len(raw) > max_bytes:
                 raise ProviderResponseError("provider response exceeded size limit")
@@ -211,12 +280,15 @@ def _post_json(
     max_bytes: int,
     max_retries: int,
     backoff_seconds: float,
+    allowlist: list[str] | None = None,
 ) -> dict[str, Any]:
     attempts: list[dict[str, Any]] = []
     started_total = time.time()
     for attempt in range(max_retries + 1):
         started = time.time()
         try:
+            if allowlist is not None:
+                _validate_provider_url(url, allowlist)
             data = _post_json_once(url, payload, headers, timeout, max_bytes)
             data["_agentco_retry_count"] = attempt
             data["_agentco_attempts"] = attempts + [{"attempt": attempt + 1, "status": "success", "latency_ms": round((time.time() - started) * 1000, 3)}]
@@ -261,8 +333,8 @@ class OpenAICompatibleProvider(CapabilityProvider):
             raise ProviderConfigurationError("OPENAI_API_KEY is required for openai_compatible provider")
         if not model:
             raise ProviderConfigurationError("OPENAI_MODEL is required for openai_compatible provider")
-        _require_https_or_local(base_url)
-        _check_host_allowlist(base_url, os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(","))
+        allowlist = os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(",")
+        _validate_provider_url(base_url, allowlist)
         url = base_url.rstrip("/") + "/chat/completions"
         payload = {
             "model": model,
@@ -286,6 +358,7 @@ class OpenAICompatibleProvider(CapabilityProvider):
             int(os.getenv("AGENTCO_PROVIDER_RESPONSE_MAX_BYTES", "1000000")),
             int(os.getenv("OPENAI_MAX_RETRIES", "2")),
             float(os.getenv("OPENAI_RETRY_BACKOFF_SECONDS", "0.1")),
+            allowlist,
         )
         choice = (data.get("choices") or [{}])[0]
         message = choice.get("message") or {}
@@ -317,8 +390,8 @@ class AnthropicCompatibleProvider(CapabilityProvider):
             raise ProviderConfigurationError("ANTHROPIC_API_KEY is required for anthropic_compatible provider")
         if not model:
             raise ProviderConfigurationError("ANTHROPIC_MODEL is required for anthropic_compatible provider")
-        _require_https_or_local(base_url)
-        _check_host_allowlist(base_url, os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(","))
+        allowlist = os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(",")
+        _validate_provider_url(base_url, allowlist)
         url = base_url.rstrip("/") + "/v1/messages"
         headers = {"x-api-key": api_key, "anthropic-version": os.getenv("ANTHROPIC_VERSION", "2023-06-01")}
         payload = {
@@ -334,6 +407,7 @@ class AnthropicCompatibleProvider(CapabilityProvider):
             int(os.getenv("AGENTCO_PROVIDER_RESPONSE_MAX_BYTES", "1000000")),
             int(os.getenv("ANTHROPIC_MAX_RETRIES", "2")),
             float(os.getenv("ANTHROPIC_RETRY_BACKOFF_SECONDS", "0.1")),
+            allowlist,
         )
         text = "\n".join(part.get("text", "") for part in data.get("content", []) if isinstance(part, dict))
         _validate_structured_output(text)
@@ -361,8 +435,8 @@ class GenericHTTPProvider(CapabilityProvider):
         token = os.getenv("AGENTCO_GENERIC_PROVIDER_TOKEN")
         if not url:
             raise ProviderConfigurationError("AGENTCO_GENERIC_PROVIDER_URL is required for generic_http provider")
-        _require_https_or_local(url)
-        _check_host_allowlist(url, os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(","))
+        allowlist = os.getenv("AGENTCO_PROVIDER_HOST_ALLOWLIST", "").split(",")
+        _validate_provider_url(url, allowlist)
         headers = {"Authorization": f"Bearer {token}"} if token else {}
         template = json.loads(os.getenv("AGENTCO_GENERIC_PROVIDER_TEMPLATE", "{}") or "{}")
         payload = {**template, "request": json.loads(_structured_prompt(request))}
@@ -374,6 +448,7 @@ class GenericHTTPProvider(CapabilityProvider):
             int(os.getenv("AGENTCO_PROVIDER_RESPONSE_MAX_BYTES", "1000000")),
             int(os.getenv("AGENTCO_GENERIC_MAX_RETRIES", "2")),
             float(os.getenv("AGENTCO_GENERIC_RETRY_BACKOFF_SECONDS", "0.1")),
+            allowlist,
         )
         answer_path = os.getenv("AGENTCO_GENERIC_ANSWER_FIELD", "answer")
         answer = data

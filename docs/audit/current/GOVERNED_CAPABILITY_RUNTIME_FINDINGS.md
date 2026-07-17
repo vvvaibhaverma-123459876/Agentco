@@ -1,7 +1,6 @@
 # Governed Capability Runtime Findings
 
-Updated for Batch 08E against PR #28 SHA
-`89af203e24b6a9e4f5c1636cf5d5bd0c5513ba81`.
+Updated for Batch 08F after restacking PR #28 on merged Batch 07.
 
 ## Resolved Evidence-Integrity Findings
 
@@ -12,13 +11,13 @@ Updated for Batch 08E against PR #28 SHA
 | GCR-003 | S1 | resolved_invalidated | Protocol Baseline V1 acceptance withdrawn. |
 | GCR-004 | S1 | resolved_by_protocol_baseline_v3 | Protocol Baseline V2 acceptance withdrawn and replaced by Protocol V3 evidence. |
 
-## Open Non-Blocking Findings
+## Resolved Provider-Boundary Findings
 
 | Finding | Severity | Status | Summary |
 | --- | --- | --- | --- |
-| GCR-005 | S3 | open_backlog | Provider allowlist does not yet resolve DNS and reject private-range rebinding for non-local live providers. |
-| GCR-006 | S3 | open_backlog | Provider transport does not explicitly block or revalidate redirects to another host. |
+| GCR-005 | S3 | resolved_batch_08f | Provider URL validation now enforces approved schemes, explicit host allowlisting, DNS resolution, and forbidden-address rejection before provider execution and before each retry attempt. |
+| GCR-006 | S3 | resolved_batch_08f | Provider redirects are blocked by default through an explicit no-redirect handler. |
 
-These S3 findings block live-provider trust-boundary hardening, not Protocol V3
-readiness. Genesis V5 remains `HOLD_FOR_MORE_EVIDENCE` until real provider
-configuration and credentials are supplied and verified.
+Genesis V5 remains `HOLD_FOR_MORE_EVIDENCE` until real provider configuration
+and credentials are supplied and verified. The resolved provider-boundary
+findings do not create real-provider capability evidence.

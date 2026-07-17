@@ -475,10 +475,69 @@ def run_protocol_baseline() -> int:
     manifest["acceptance_predicate"]["artifact_verifier_passed"] = artifact_check["passed"]
     manifest["acceptance_failures"] = [key for key, value in manifest["acceptance_predicate"].items() if value is not True]
     manifest["decision"] = manifest["protocol_decision"] = "PROTOCOL_BASELINE_ACCEPTED" if all(manifest["acceptance_predicate"].values()) else "PROTOCOL_BASELINE_REJECTED"
+    manifest["semantic_protocol_hash"] = protocol_semantic_hash(manifest, results)
+    manifest["semantic_protocol_hash_excludes"] = [
+        "timestamps",
+        "workflow run IDs",
+        "temporary paths",
+        "host-specific metadata",
+        "full artifact byte ordering outside acceptance-relevant result fields",
+    ]
     write_json(artifact / "PROTOCOL_BASELINE_MANIFEST.json", manifest)
     write_json(DOCS / "GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V3_RESULTS.json", manifest)
     print(canonical_json({"success": manifest["decision"] == "PROTOCOL_BASELINE_ACCEPTED", **manifest}))
     return 0 if manifest["decision"] == "PROTOCOL_BASELINE_ACCEPTED" else 2
+
+
+def protocol_semantic_hash(manifest: dict[str, Any], results: list[dict[str, Any]]) -> str:
+    """Hash only stable, acceptance-relevant Protocol V3 semantics.
+
+    The full payload hash intentionally covers run-local artifact bytes. This
+    semantic hash excludes volatile evidence such as timestamps, temporary store
+    paths and workflow/run metadata, but keeps all case/assertion verdicts and
+    freeze binding fields that determine protocol acceptance.
+    """
+    semantic = {
+        "campaign_id": manifest["campaign_id"],
+        "protocol_version": "agentco-capability-v1",
+        "case_population": [
+            {"case_id": result["case_id"], "control_type": result["control_type"]}
+            for result in sorted(results, key=lambda item: item["case_id"])
+        ],
+        "assertion_population": [
+            {
+                "case_id": result["case_id"],
+                "assertions": [
+                    {"name": assertion["name"], "passed": assertion.get("passed") is True, "skipped": assertion.get("skipped") is True}
+                    for assertion in result["assertions"]
+                ],
+            }
+            for result in sorted(results, key=lambda item: item["case_id"])
+        ],
+        "schema_verdicts": {
+            "request_json_schema_validation_passed": manifest["acceptance_predicate"]["request_json_schema_validation_passed"],
+            "response_json_schema_validation_passed": manifest["acceptance_predicate"]["response_json_schema_validation_passed"],
+            "negative_schema_mutations_rejected": manifest["acceptance_predicate"]["negative_schema_mutations_rejected"],
+        },
+        "retry_verdict": manifest["acceptance_predicate"]["retry_accounting_passed"],
+        "timeout_settlement_verdict": manifest["acceptance_predicate"]["timeout_release_passed"],
+        "persistence_verdict": manifest["acceptance_predicate"]["persistence_reinitialization_passed"],
+        "corruption_rejection_verdict": manifest["control_family_results"].get("storage_persistence"),
+        "audit_reference_verdict": manifest["acceptance_predicate"]["audit_references_resolved"],
+        "no_fallback_verdict": manifest["acceptance_predicate"]["no_provider_fallback"],
+        "acceptance_predicate": manifest["acceptance_predicate"],
+        "final_decision": manifest["decision"],
+        "freeze_binding": {
+            "freeze_candidate_sha": manifest["freeze_candidate_sha"],
+            "freeze_candidate_tree_hash": manifest["freeze_candidate_tree_hash"],
+            "freeze_manifest_commit_sha": manifest["freeze_manifest_commit_sha"],
+            "freeze_binding_commit_sha": manifest["freeze_binding_commit_sha"],
+            "freeze_manifest_blob_sha": manifest["freeze_manifest_blob_sha"],
+            "freeze_manifest_sha256": manifest["freeze_manifest_sha256"],
+            "freeze_binding_logical_hash": manifest["freeze_binding_logical_hash"],
+        },
+    }
+    return hashlib.sha256(canonical_json(semantic).encode()).hexdigest()
 
 
 def execute_protocol_case(campaign_id: str, case: dict[str, Any]) -> dict[str, Any]:
