@@ -85,7 +85,8 @@ def payload_manifest(
     campaign_execution_sha: str,
     workflow_head_sha: str,
     campaign_id: str,
-    freeze_attestation_sha: str | None,
+    freeze_binding_commit_sha: str | None = None,
+    freeze_attestation_sha: str | None = None,
     hash_fields: dict[str, Any],
 ) -> tuple[dict[str, Any], str]:
     rows = [
@@ -106,6 +107,7 @@ def payload_manifest(
         "campaign_execution_sha": campaign_execution_sha,
         "workflow_head_sha": workflow_head_sha,
         "campaign_id": campaign_id,
+        "freeze_binding_commit_sha": freeze_binding_commit_sha,
         "freeze_attestation_sha": freeze_attestation_sha,
         "generation_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         **hash_fields,

@@ -18,5 +18,6 @@ def test_protocol_runner_has_no_named_control_hardcoded_passes():
 
 
 def test_pr_body_must_not_reference_stale_v2_acceptance_language():
-    invalidation = (ROOT / "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md").read_text()
+    invalidation = (ROOT / "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md").read_text()
+    assert "GCR-004" in invalidation
     assert "corrected to `INVALID_CAMPAIGN`" in invalidation

@@ -14,8 +14,8 @@ from scripts.verify_capability_genesis_freeze import verify_manifest  # noqa: E4
 
 
 CURRENT_FREEZE_CAMPAIGNS = {
-    "governed-capability-protocol-baseline-v2",
-    "governed-capability-genesis-v4",
+    "governed-capability-protocol-baseline-v3",
+    "governed-capability-genesis-v5",
 }
 
 
@@ -24,7 +24,12 @@ def load(path: Path):
 
 
 def find_manifests(root: Path) -> list[Path]:
-    return list(root.glob("**/PROTOCOL_BASELINE_MANIFEST.json")) + list(root.glob("**/GENESIS_V3_MANIFEST.json")) + list(root.glob("**/GENESIS_V4_MANIFEST.json"))
+    return (
+        list(root.glob("**/PROTOCOL_BASELINE_MANIFEST.json"))
+        + list(root.glob("**/GENESIS_V3_MANIFEST.json"))
+        + list(root.glob("**/GENESIS_V4_MANIFEST.json"))
+        + list(root.glob("**/GENESIS_V5_MANIFEST.json"))
+    )
 
 
 def verify_artifacts(root: Path) -> list[str]:

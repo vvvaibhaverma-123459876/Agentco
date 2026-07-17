@@ -1,0 +1,29 @@
+{
+  "finding": {
+    "category": "evidence-integrity",
+    "finding_id": "GCR-004",
+    "severity": "S1",
+    "status": "resolved_by_protocol_baseline_v3"
+  },
+  "invalidated_campaign": "governed-capability-protocol-baseline-v2",
+  "preserved_artifact_status": "preserved_unchanged",
+  "withdrawn_decision": "PROTOCOL_BASELINE_ACCEPTED",
+  "corrected_decision": "INVALID_CAMPAIGN",
+  "reasons": [
+    "recorded the candidate SHA as the attestation SHA",
+    "did not bind the campaign to the actual attestation commit",
+    "labelled a canonical logical hash as a file-content hash",
+    "did not include freeze or artifact verification in the acceptance predicate",
+    "checked schema-file existence rather than JSON Schema validity",
+    "did not recreate the persistent store",
+    "excluded raw header surfaces from secret-leak testing",
+    "labelled budget reservation as settlement",
+    "could treat an unverified provider as preflight-available"
+  ],
+  "replacement_campaigns": {
+    "protocol": "governed-capability-protocol-baseline-v3",
+    "real_capability": "governed-capability-genesis-v5"
+  },
+  "promotion_implication": "none",
+  "hosted_staging": "BLOCKED_UNVERIFIED"
+}

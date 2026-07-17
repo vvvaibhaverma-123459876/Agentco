@@ -34,8 +34,21 @@ def _budget_reservation(request: CapabilityRequest) -> dict[str, Any]:
     max_tool_calls = int(request.budget.get("max_tool_calls", len(request.tool_allowlist) or 0))
     max_provider_calls = int(request.budget.get("max_provider_calls", 1))
     max_tokens = int(request.budget.get("max_tokens", 2048))
+    reserved_amount = 1.0
     return {
         "reserved": True,
+        "settled": False,
+        "reservation_event": {
+            "event": "budget_reserved",
+            "reserved_amount": reserved_amount,
+            "unit": "provider_call",
+        },
+        "settlement_event": None,
+        "reserved_amount": reserved_amount,
+        "actual_amount": 0.0,
+        "released_amount": 0.0,
+        "final_budget_state": "reserved",
+        "unreleased_reservation": reserved_amount,
         "max_wall_ms": max_wall_ms,
         "max_tool_calls": max_tool_calls,
         "max_provider_calls": max_provider_calls,
@@ -44,6 +57,24 @@ def _budget_reservation(request: CapabilityRequest) -> dict[str, Any]:
         "tool_calls": 0,
         "within_budget": True,
     }
+
+
+def _settle_budget(budget: dict[str, Any], *, actual_amount: float, final_state: str) -> dict[str, Any]:
+    reserved = float(budget.get("reserved_amount", 0.0))
+    released = max(0.0, reserved - actual_amount)
+    budget["settled"] = True
+    budget["actual_amount"] = actual_amount
+    budget["released_amount"] = released
+    budget["unreleased_reservation"] = 0.0
+    budget["final_budget_state"] = final_state
+    budget["settlement_event"] = {
+        "event": "budget_settled",
+        "reserved_amount": reserved,
+        "actual_amount": actual_amount,
+        "released_amount": released,
+        "final_budget_state": final_state,
+    }
+    return budget
 
 
 def _memory_events(request: CapabilityRequest) -> list[dict[str, Any]]:
@@ -94,6 +125,7 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
     }
 
     if not authorization["allowed"]:
+        _settle_budget(budget, actual_amount=0.0, final_state="denied")
         response = {
             **base,
             "status": "denied",
@@ -117,6 +149,7 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
         return response
 
     if budget["max_provider_calls"] < 1:
+        _settle_budget(budget, actual_amount=0.0, final_state="budget_exceeded")
         response = {
             **base,
             "status": "budget_exceeded",
@@ -143,10 +176,10 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
         provider = provider_from_policy(request.provider_policy)
         provider_result = provider.execute(request)
         wall_ms = round((time.time() - started) * 1000, 3)
-        budget["settled"] = True
         budget["actual_wall_ms"] = wall_ms
         budget["within_budget"] = wall_ms <= budget["max_wall_ms"]
         status = "completed" if budget["within_budget"] else "budget_exceeded"
+        _settle_budget(budget, actual_amount=1.0, final_state=status)
         response = {
             **base,
             "status": status,
@@ -196,6 +229,7 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
                 category = "provider_server_error"
             elif "non_retryable_http_400" in lowered:
                 category = "provider_client_error"
+        _settle_budget(budget, actual_amount=0.0, final_state=status)
         response = {
             **base,
             "status": status,
@@ -217,6 +251,7 @@ def execute_capability_request(raw: dict[str, Any]) -> dict[str, Any]:
             "audit_references": [],
         }
     except Exception as exc:
+        _settle_budget(budget, actual_amount=0.0, final_state="failed")
         response = {
             **base,
             "status": "failed",

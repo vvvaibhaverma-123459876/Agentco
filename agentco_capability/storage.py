@@ -78,6 +78,14 @@ def read_attempt(attempt_id: str) -> dict[str, Any] | None:
     return json.loads(path.read_text())
 
 
+def read_attempt_from_store(attempt_id: str, store_dir: str | Path) -> dict[str, Any] | None:
+    safe = "".join(ch for ch in attempt_id if ch.isalnum() or ch in "-_")
+    path = Path(store_dir) / f"{safe}.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text())
+
+
 def cancel_stored_attempt(attempt_id: str) -> dict[str, Any]:
     existing = read_attempt(attempt_id)
     if not existing:
