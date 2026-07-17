@@ -1,0 +1,1451 @@
+{
+  "branch": "audit/remediation-09-real-provider-baseline-readiness",
+  "case_manifest": {
+    "case_count": 42,
+    "case_manifest_hash": "8f843e7cbca082d9e430fd8550ce5f84981d3df3ebee108c6779e44611a408c6",
+    "cases": [
+      {
+        "case_hash": "9f14d8b87b110048d3a258857c42b3d670e7fc728f0a4fe24e377fe350b8c191",
+        "case_id": "dev-claim_grounding-04",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "claim_grounding",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-claim_grounding-04",
+          "scorer_id": "claim_grounding-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "claim_grounding",
+        "external_data_policy": "none",
+        "input_hash": "ac897ec8cb875b25c729f5ed98d0c5fcbfccb7e666fa9ad3eb7984011a9f6a7e",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-claim_grounding-04",
+        "split": "development",
+        "task": "development claim_grounding task 4: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "4a92fcd6da1149f30d0df7f7bf54e8df7640a7fc067becf5838e449050133de3",
+        "case_id": "dev-claim_grounding-13",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "claim_grounding",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-claim_grounding-13",
+          "scorer_id": "claim_grounding-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "claim_grounding",
+        "external_data_policy": "none",
+        "input_hash": "b72d1009918b06444a6d26f0e9e762b878f444f71ba040612e2cddffc7e63b6f",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-claim_grounding-13",
+        "split": "development",
+        "task": "development claim_grounding task 13: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "d55fa67c11cda74209600a260861c39976cc204afe301238e6458eed2784c70d",
+        "case_id": "dev-cross_domain_synthesis-09",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "cross_domain_synthesis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-cross_domain_synthesis-09",
+          "scorer_id": "cross_domain_synthesis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "cross_domain_synthesis",
+        "external_data_policy": "none",
+        "input_hash": "020d72e879fbc14281cc3705cc1aad20f76e1d0613a34a8c6b74741524187949",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-cross_domain_synthesis-09",
+        "split": "development",
+        "task": "development cross_domain_synthesis task 9: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "4b9798f5ede82b69d09c8350dcb368a12ca41c3546bf9c262d08b88fef654a85",
+        "case_id": "dev-cross_domain_synthesis-18",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "cross_domain_synthesis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-cross_domain_synthesis-18",
+          "scorer_id": "cross_domain_synthesis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "cross_domain_synthesis",
+        "external_data_policy": "none",
+        "input_hash": "85a43e4774b977067c0503b7bf7b3e80194d2a0ca152a666db270bf725482c1f",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-cross_domain_synthesis-18",
+        "split": "development",
+        "task": "development cross_domain_synthesis task 18: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "86d75cb7e7ee1da07764009b4031ed3c24dc2814ee1437131f109bfacf57a98c",
+        "case_id": "dev-data_analysis-07",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "data_analysis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-data_analysis-07",
+          "scorer_id": "data_analysis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "data_analysis",
+        "external_data_policy": "none",
+        "input_hash": "ea8570646bcebd9ee60c6949e49f691b38268d42790e9b354dfcbe9274d3e5c0",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-data_analysis-07",
+        "split": "development",
+        "task": "development data_analysis task 7: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "74e24f911c60b8e1f467467171280a5c43d587a12cd1ec23eeea67e9aee69e02",
+        "case_id": "dev-data_analysis-16",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "data_analysis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-data_analysis-16",
+          "scorer_id": "data_analysis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "data_analysis",
+        "external_data_policy": "none",
+        "input_hash": "5a26afd496c44d8adbbd474172182415a23dc08a17ab011caa461c0e65765ab9",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-data_analysis-16",
+        "split": "development",
+        "task": "development data_analysis task 16: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "84ea530191712fa5ec652f08948c555cf90f25f70b39f973033453bbba9299f8",
+        "case_id": "dev-evidence_evaluation-03",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "evidence_evaluation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-evidence_evaluation-03",
+          "scorer_id": "evidence_evaluation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "evidence_evaluation",
+        "external_data_policy": "none",
+        "input_hash": "9fb768f97d90e6a94f3d5de9f730a3134f4e4359f5dbf63e8934142aa9cb57c3",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-evidence_evaluation-03",
+        "split": "development",
+        "task": "development evidence_evaluation task 3: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "983a41eebb8bfb83c269f35fde3157046ed0b38d5c9ebafa09c675841332a0cd",
+        "case_id": "dev-evidence_evaluation-12",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "evidence_evaluation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-evidence_evaluation-12",
+          "scorer_id": "evidence_evaluation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "evidence_evaluation",
+        "external_data_policy": "none",
+        "input_hash": "7e3cb951eb5ee94eb58bdc0eba54fe4dd84ce43ed8ae54e97612a22a1ff039be",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-evidence_evaluation-12",
+        "split": "development",
+        "task": "development evidence_evaluation task 12: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "ffd913d848fb8a1eb2c40992ff47dddebdc9f283b986551ca95dc66438a59b67",
+        "case_id": "dev-planning-02",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "planning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-planning-02",
+          "scorer_id": "planning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "planning",
+        "external_data_policy": "none",
+        "input_hash": "fecb50ddf65d21899344c891441d33f9b45c4af7b563eb97b10ec5843674e25f",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-planning-02",
+        "split": "development",
+        "task": "development planning task 2: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "dd54a4e9c5a55cdd70a9c7fbdad097a058296226001984aa3bf776fd58994503",
+        "case_id": "dev-planning-11",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "planning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-planning-11",
+          "scorer_id": "planning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "planning",
+        "external_data_policy": "none",
+        "input_hash": "e50b901d7400f854cb412cc451a7623dcc56be3a60e4fbdb5425879036dc67ab",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-planning-11",
+        "split": "development",
+        "task": "development planning task 11: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "d8cef9f2acd3556e9c559030c8bab9aee2adbe8d445b027a02d5ac4e3732741c",
+        "case_id": "dev-reasoning-01",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "reasoning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-reasoning-01",
+          "scorer_id": "reasoning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "reasoning",
+        "external_data_policy": "none",
+        "input_hash": "3665f7b0fbbe14d15b541eedbeba34fed52fb3e4b042c6e842cf2e7f53f0e388",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-reasoning-01",
+        "split": "development",
+        "task": "development reasoning task 1: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "fa0c68371b11ea0cb6181f96eb0fa233b86ed8bdc1380e2145ad71c4dd64c928",
+        "case_id": "dev-reasoning-10",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "reasoning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-reasoning-10",
+          "scorer_id": "reasoning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "reasoning",
+        "external_data_policy": "none",
+        "input_hash": "b92fd387016ff4d713d9697b9cf9cfdfcb7457ba523e7d30601e217b8e9b5b1b",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-reasoning-10",
+        "split": "development",
+        "task": "development reasoning task 10: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "b9ef1b15b67a62cd692306091e70ab91823fbd1436012d4d9752f4085ec4fec9",
+        "case_id": "dev-safe_tool_selection-06",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "safe_tool_selection",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-safe_tool_selection-06",
+          "scorer_id": "safe_tool_selection-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "safe_tool_selection",
+        "external_data_policy": "none",
+        "input_hash": "ad1a2855641622139f2e318fd029a071b30af9a29a0a64ddff93544da887c62b",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-safe_tool_selection-06",
+        "split": "development",
+        "task": "development safe_tool_selection task 6: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "9ea62ed36907203851798e9342a6fb9c7c99f57c75b9aed08c88fa748934b38c",
+        "case_id": "dev-safe_tool_selection-15",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "safe_tool_selection",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-safe_tool_selection-15",
+          "scorer_id": "safe_tool_selection-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "safe_tool_selection",
+        "external_data_policy": "none",
+        "input_hash": "7950a04fb6c07e0545b479996f4020afb1f623296dacd1fd7e907a36c4a37708",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-safe_tool_selection-15",
+        "split": "development",
+        "task": "development safe_tool_selection task 15: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "5723f2eca5473bcb536ec738d26f098c2ab626b9e04ba5f6a3a9efb428532de2",
+        "case_id": "dev-software_engineering-08",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "software_engineering",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-software_engineering-08",
+          "scorer_id": "software_engineering-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "software_engineering",
+        "external_data_policy": "none",
+        "input_hash": "4215ee328d3087261d9e9badd77ee8ff705288a25a3ea68f9f5cb14c34771e5a",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-software_engineering-08",
+        "split": "development",
+        "task": "development software_engineering task 8: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "193348e46f1119787e73b9fd2965538e49441da4650e2f8b86a75fe6eda80b0b",
+        "case_id": "dev-software_engineering-17",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "software_engineering",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-software_engineering-17",
+          "scorer_id": "software_engineering-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "software_engineering",
+        "external_data_policy": "none",
+        "input_hash": "c303d16bff81a8c63210228cafa0a6fd89d2c1d471df0b29ce797dc699e8c3a2",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-software_engineering-17",
+        "split": "development",
+        "task": "development software_engineering task 17: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "b5ea8afb01608cb3bceebed3290912c76d905a8c4d2279480c6d980991361a21",
+        "case_id": "dev-structured_transformation-05",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "structured_transformation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-structured_transformation-05",
+          "scorer_id": "structured_transformation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "structured_transformation",
+        "external_data_policy": "none",
+        "input_hash": "8386f190aa7953556ae2fde414fcd5ff914fa2e9030947db5e383aff6f464eb8",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-structured_transformation-05",
+        "split": "development",
+        "task": "development structured_transformation task 5: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "e602b5e7c8a8b578dea243f2ec5d0f1ea9820d8b20bbb505995e335f14784e72",
+        "case_id": "dev-structured_transformation-14",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "structured_transformation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-dev-structured_transformation-14",
+          "scorer_id": "structured_transformation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "structured_transformation",
+        "external_data_policy": "none",
+        "input_hash": "de40c124fa4abdb135e75a9f4ef8793fbb3b69a85e5d886623378e50430910a2",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-dev-structured_transformation-14",
+        "split": "development",
+        "task": "development structured_transformation task 14: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "bb030e2c3e1d641943d0079e314e23e2e072e2de2ea35428d252d4651008d520",
+        "case_id": "hid-claim_grounding-04",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "claim_grounding",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-claim_grounding-04",
+          "scorer_id": "claim_grounding-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "claim_grounding",
+        "external_data_policy": "none",
+        "input_hash": "09dfff5d8ea8f7d77a67957a2873e117c447522654e71750f551611f25f31d95",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-claim_grounding-04",
+        "split": "hidden",
+        "task": "hidden claim_grounding task 4: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "bfdc18c6ed1d318939c7ad83c61e799492e3fb0ffa91b9d978edc9199cc1328e",
+        "case_id": "hid-cross_domain_synthesis-09",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "cross_domain_synthesis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-cross_domain_synthesis-09",
+          "scorer_id": "cross_domain_synthesis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "cross_domain_synthesis",
+        "external_data_policy": "none",
+        "input_hash": "9ec0bc1562f4c508f5f3668edec4d19a60449e8d47237535051cb4e431116bf7",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-cross_domain_synthesis-09",
+        "split": "hidden",
+        "task": "hidden cross_domain_synthesis task 9: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "c03910c33e8ddc87e07a20bf22d77a441bad7ce8bb25202d3e0911663e22514e",
+        "case_id": "hid-data_analysis-07",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "data_analysis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-data_analysis-07",
+          "scorer_id": "data_analysis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "data_analysis",
+        "external_data_policy": "none",
+        "input_hash": "1346ac6568fb1335ac07bfeb67a67f75bce5e51b6095d71624622423e360a35e",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-data_analysis-07",
+        "split": "hidden",
+        "task": "hidden data_analysis task 7: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "ff9e0a530f0b7aa957f920ca5de83c714d5c7e8d2b0fb0a937cf7f7201b8511c",
+        "case_id": "hid-evidence_evaluation-03",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "evidence_evaluation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-evidence_evaluation-03",
+          "scorer_id": "evidence_evaluation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "evidence_evaluation",
+        "external_data_policy": "none",
+        "input_hash": "08aa8568c2a787ad857da5d6b1cd17c5d12b803cc6d7365a4591d8bdb23ae817",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-evidence_evaluation-03",
+        "split": "hidden",
+        "task": "hidden evidence_evaluation task 3: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "6e8d2cfcf2aa8b376aba87f56462440b45b8950fb460adec29d4df4c19a8a5da",
+        "case_id": "hid-evidence_evaluation-12",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "evidence_evaluation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-evidence_evaluation-12",
+          "scorer_id": "evidence_evaluation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "evidence_evaluation",
+        "external_data_policy": "none",
+        "input_hash": "b1970ce5f57a2d01404a982a52d6a77f0bd93ce9cfbef9d7d5dc271c713cef1a",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-evidence_evaluation-12",
+        "split": "hidden",
+        "task": "hidden evidence_evaluation task 12: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "030567b95601654fe1b7453857d4a866df182089bccbf3982c5b690c830f7d56",
+        "case_id": "hid-planning-02",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "planning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-planning-02",
+          "scorer_id": "planning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "planning",
+        "external_data_policy": "none",
+        "input_hash": "2efe92e509349b67bbe9e294efc5502d7c5925db594020a59239cb96af0d03a0",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-planning-02",
+        "split": "hidden",
+        "task": "hidden planning task 2: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "d511513e422bcccf38aef4061654e7345b27d4e96f6e7251165498eec5f0b496",
+        "case_id": "hid-planning-11",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "planning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-planning-11",
+          "scorer_id": "planning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "planning",
+        "external_data_policy": "none",
+        "input_hash": "ef9d5b9f769dced8706aa2928f421d450518367352bed5b7ad5eb36820ee728b",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-planning-11",
+        "split": "hidden",
+        "task": "hidden planning task 11: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "69442517c02042a58c1bd15fb8a79df07e189e5190feed5b4b45a1515f159826",
+        "case_id": "hid-reasoning-01",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "reasoning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-reasoning-01",
+          "scorer_id": "reasoning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "reasoning",
+        "external_data_policy": "none",
+        "input_hash": "32cd771cf0afbc88fcc2f8f57a995858d467ca698f2b76858c8d0cbe6ee74c20",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-reasoning-01",
+        "split": "hidden",
+        "task": "hidden reasoning task 1: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "ea37f0cc505ff512518896be25ae3f57d2a6bb51e772785123d1766bbf6fc26e",
+        "case_id": "hid-reasoning-10",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "reasoning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-reasoning-10",
+          "scorer_id": "reasoning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "reasoning",
+        "external_data_policy": "none",
+        "input_hash": "871ae431475382a08b5b93c3fbcef8f8013e9f677c2369a5526bd2cae852c434",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-reasoning-10",
+        "split": "hidden",
+        "task": "hidden reasoning task 10: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "cd396829fbc1a929279a32b880018e0d50dec5144e8641980ece194ebf21a1a6",
+        "case_id": "hid-safe_tool_selection-06",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "safe_tool_selection",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-safe_tool_selection-06",
+          "scorer_id": "safe_tool_selection-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "safe_tool_selection",
+        "external_data_policy": "none",
+        "input_hash": "91daf188e18cafd173d5238fa21e84f43399cdf24a92a6e5b579c5445a00e083",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-safe_tool_selection-06",
+        "split": "hidden",
+        "task": "hidden safe_tool_selection task 6: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "c4b4352e2ff323f7a6bc74cc290ec8d0751d4678f088594519428632c9ce5e64",
+        "case_id": "hid-software_engineering-08",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "software_engineering",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-software_engineering-08",
+          "scorer_id": "software_engineering-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "software_engineering",
+        "external_data_policy": "none",
+        "input_hash": "54bb23be1525d6c1b92662fa79dfc1e12848eabc6b71434ce7a5fa189226c78c",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-software_engineering-08",
+        "split": "hidden",
+        "task": "hidden software_engineering task 8: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "ee1a2fc066ab026af9233041c6c872c535a7b89fcc1cb79d9395a379e943bb88",
+        "case_id": "hid-structured_transformation-05",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "structured_transformation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-hid-structured_transformation-05",
+          "scorer_id": "structured_transformation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "structured_transformation",
+        "external_data_policy": "none",
+        "input_hash": "7657e786fb443b41a9f76c7c1b8da5493ca3fae6865969fa00d5940750f3e0e8",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-hid-structured_transformation-05",
+        "split": "hidden",
+        "task": "hidden structured_transformation task 5: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "1f2817b3bf59dcc8111e765fae7c2b4b0f64128b144f933f385bf64f8afebbfc",
+        "case_id": "val-claim_grounding-04",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "claim_grounding",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-claim_grounding-04",
+          "scorer_id": "claim_grounding-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "claim_grounding",
+        "external_data_policy": "none",
+        "input_hash": "2416ffd5b58f48749758c0524128367cbe973cf3f4080e1c695be844bb845a4e",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-claim_grounding-04",
+        "split": "validation",
+        "task": "validation claim_grounding task 4: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "51865b29a28563e4bf1da2f95de6af70c167ac7bce884680b591992d0fb55f29",
+        "case_id": "val-cross_domain_synthesis-09",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "cross_domain_synthesis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-cross_domain_synthesis-09",
+          "scorer_id": "cross_domain_synthesis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "cross_domain_synthesis",
+        "external_data_policy": "none",
+        "input_hash": "e442547434a5424785bea56234a502e9cfb6de36b4c813c79061dfe605002f87",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-cross_domain_synthesis-09",
+        "split": "validation",
+        "task": "validation cross_domain_synthesis task 9: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "7364cceb5060ed69a7b8ae057bd7b11524a668e8a633cb6cad77d65c6a5c9dc3",
+        "case_id": "val-data_analysis-07",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "data_analysis",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-data_analysis-07",
+          "scorer_id": "data_analysis-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "data_analysis",
+        "external_data_policy": "none",
+        "input_hash": "00f1c5de635f253b18426301c9ac546da8bc8fa7b08b6522f9973b56811e42ac",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-data_analysis-07",
+        "split": "validation",
+        "task": "validation data_analysis task 7: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "8cce0c00240ece57a49332a3dda4db9ce64b624a3c0499304f8be17644be5c37",
+        "case_id": "val-evidence_evaluation-03",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "evidence_evaluation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-evidence_evaluation-03",
+          "scorer_id": "evidence_evaluation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "evidence_evaluation",
+        "external_data_policy": "none",
+        "input_hash": "56be805bb1da90aa4d58953b96a1e89c28bdb6a9d91e8e87a5831998edd5d555",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-evidence_evaluation-03",
+        "split": "validation",
+        "task": "validation evidence_evaluation task 3: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "e551c9f288a7bdadef8bded403a12761e009d1119883677171d0d62458d40f29",
+        "case_id": "val-evidence_evaluation-12",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "evidence_evaluation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-evidence_evaluation-12",
+          "scorer_id": "evidence_evaluation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "evidence_evaluation",
+        "external_data_policy": "none",
+        "input_hash": "5b4506364705402d667c7fc4d5318032023b4e07180fe74133fbe6ea929805b1",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-evidence_evaluation-12",
+        "split": "validation",
+        "task": "validation evidence_evaluation task 12: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "88bd46d4d859a747219f7f5d527f78de134cb43d44e845f585f2caec1aaa4174",
+        "case_id": "val-planning-02",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "planning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-planning-02",
+          "scorer_id": "planning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "planning",
+        "external_data_policy": "none",
+        "input_hash": "04c0b3b549b720ca55344a69345387f7f7cdefa9ad7a4c1753eab61abb956458",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-planning-02",
+        "split": "validation",
+        "task": "validation planning task 2: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "a306f6d6714ed6e79c330c35460899e0ff36f61412754a20c9a4eb383b761f05",
+        "case_id": "val-planning-11",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "planning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-planning-11",
+          "scorer_id": "planning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "planning",
+        "external_data_policy": "none",
+        "input_hash": "e9e94a3bd57368872ada0dd99df12699ba33447d9787fbffe740cc97602b26fa",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-planning-11",
+        "split": "validation",
+        "task": "validation planning task 11: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "867e86038e3bf81ad32345b9b84fe4ba4829ae01ab7d2441e415cadcfa4d3bdc",
+        "case_id": "val-reasoning-01",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "reasoning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-reasoning-01",
+          "scorer_id": "reasoning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "reasoning",
+        "external_data_policy": "none",
+        "input_hash": "4b6e5b94f79a25cc05cd86c33809729e023cd81c606419aa5a69f6bd9759f6c9",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-reasoning-01",
+        "split": "validation",
+        "task": "validation reasoning task 1: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "01d1897cfc0a04437b5e845248a56657e616a558461efa3441db42fe5ba2378f",
+        "case_id": "val-reasoning-10",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "reasoning",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-reasoning-10",
+          "scorer_id": "reasoning-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "reasoning",
+        "external_data_policy": "none",
+        "input_hash": "9a7abcd15383e6cf2bfedcd0940a47099ba5d3446e14bf3b0c2b2527ce2b5f7f",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-reasoning-10",
+        "split": "validation",
+        "task": "validation reasoning task 10: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "ddfdeb6c3dad5f84e180a0f7eb7e9c14db2bfee6a8539855d541e920ea1d474f",
+        "case_id": "val-safe_tool_selection-06",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "safe_tool_selection",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-safe_tool_selection-06",
+          "scorer_id": "safe_tool_selection-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "safe_tool_selection",
+        "external_data_policy": "none",
+        "input_hash": "eaadf9256d4572eef272a86ba8edef60042305932cb66df0dde9f54be7de8c3a",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-safe_tool_selection-06",
+        "split": "validation",
+        "task": "validation safe_tool_selection task 6: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "ee75e6f79434949582ec37238a035c07326f8909dd98dc56196438f3ebdcd2ec",
+        "case_id": "val-software_engineering-08",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "software_engineering",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-software_engineering-08",
+          "scorer_id": "software_engineering-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "software_engineering",
+        "external_data_policy": "none",
+        "input_hash": "5f4eccfbf6faf195c0b5028a0536a01252a500cc87cef56b853808dcc44e05df",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-software_engineering-08",
+        "split": "validation",
+        "task": "validation software_engineering task 8: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      },
+      {
+        "case_hash": "1da063e4fe62b310da25d0be2b64d97353a913c0a3924a0f3fecec2db4fe272c",
+        "case_id": "val-structured_transformation-05",
+        "critical_failure_conditions": [
+          "hidden leakage",
+          "credential exposure",
+          "unauthorized tool use"
+        ],
+        "domain": "structured_transformation",
+        "evaluator_requirements": {
+          "rubric_id": "rubric-val-structured_transformation-05",
+          "scorer_id": "structured_transformation-v1"
+        },
+        "evidence_requirements": [
+          "provider_request_id",
+          "redacted_request",
+          "redacted_response",
+          "budget_settlement",
+          "evaluator_result"
+        ],
+        "expected_output_form": "structured_transformation",
+        "external_data_policy": "none",
+        "input_hash": "3d156bd034a14d6909cd215043128cd11c9383de92a162f1cf46b1c70ce805ab",
+        "maximum_tokens": 512,
+        "scoring_rubric": "rubric-val-structured_transformation-05",
+        "split": "validation",
+        "task": "validation structured_transformation task 5: produce structured output for evaluator scoring.",
+        "timeout": 30,
+        "tool_permissions": []
+      }
+    ],
+    "domains": [
+      "claim_grounding",
+      "cross_domain_synthesis",
+      "data_analysis",
+      "evidence_evaluation",
+      "planning",
+      "reasoning",
+      "safe_tool_selection",
+      "software_engineering",
+      "structured_transformation"
+    ],
+    "genesis_campaign_id": "governed-capability-genesis-v5",
+    "manifest_id": "capability-genesis-v5-case-manifest-real-provider-readiness-v1",
+    "protocol_identity": "governed-capability-protocol-baseline-v3",
+    "validation_errors": []
+  },
+  "dry_run_result": {
+    "capability_effect": "none",
+    "case_manifest_hash": "8f843e7cbca082d9e430fd8550ce5f84981d3df3ebee108c6779e44611a408c6",
+    "mock_or_deterministic_outputs_count_as_capability": false,
+    "mode": "dry_run",
+    "planned_cases": 24,
+    "provider_configuration_hash": "26fe138ee2c7b2c49af69251a0294c980698513b919b1378bbef9d6e0d86d25a",
+    "real_provider_execution": false,
+    "semantic_hash": "39d7c5b85443350803032ff87c4785998ab151cd460e3c2223167451298c8022",
+    "simulated_evidence_records": 24,
+    "simulated_reservations": 24,
+    "source_commit": "a8868f2599e57c6349746df9cbeee2521b55eed1",
+    "source_tree": "77c9cb9fe1e04141ad756325fb6bb69cbb4820f3"
+  },
+  "execution_evidence_example": {
+    "artifact_location": "artifacts/capability-runtime/governed-capability-genesis-v5",
+    "attempt_id": "example-attempt",
+    "audit_references": [],
+    "campaign_id": "governed-capability-genesis-v5",
+    "case_id": "example",
+    "cost": {},
+    "endpoint_identity": {
+      "hostname": "api.example.test",
+      "resolved_addresses": [
+        "203.0.113.10"
+      ]
+    },
+    "evaluator_result": null,
+    "latency_ms": 1000,
+    "model": "configured-model",
+    "provider": "openai_compatible",
+    "provider_request_id": null,
+    "redacted_request": {},
+    "redacted_response": {},
+    "request_timestamp": "2026-07-17T00:00:00Z",
+    "response_timestamp": "2026-07-17T00:00:01Z",
+    "retry_history": [],
+    "semantic_hash": "7d12b9782c58b600270f2d1f3f83957c1e9354b34e2e483840352cf45df63a24",
+    "source_commit": "a8868f2599e57c6349746df9cbeee2521b55eed1",
+    "source_tree": "77c9cb9fe1e04141ad756325fb6bb69cbb4820f3",
+    "terminal_status": "evidence_unavailable",
+    "timeout_history": [],
+    "token_usage": {}
+  },
+  "genesis_campaign_identity": "governed-capability-genesis-v5",
+  "governed_hold_result": {
+    "aggregate_correctness": null,
+    "campaign_id": "governed-capability-genesis-v5",
+    "capability_claims_permitted": false,
+    "completed_cases": 0,
+    "decision": "HOLD_FOR_MORE_EVIDENCE",
+    "evidence_unavailable_cases": 24,
+    "executed_cases": 0,
+    "execution_attempted": false,
+    "failed_cases": 0,
+    "planned_executions": 24,
+    "provider_configuration_hash": "26fe138ee2c7b2c49af69251a0294c980698513b919b1378bbef9d6e0d86d25a",
+    "provider_preflight": "invalid_configuration",
+    "supported_domains": [],
+    "timed_out_cases": 0
+  },
+  "hosted_staging": "UNVERIFIED",
+  "production_readiness": "UNVERIFIED",
+  "protocol_campaign_identity": "governed-capability-protocol-baseline-v3",
+  "provider_configuration_result": {
+    "configuration_hash": "26fe138ee2c7b2c49af69251a0294c980698513b919b1378bbef9d6e0d86d25a",
+    "endpoint_identity": {},
+    "failure_codes": [
+      "missing_model_identifier",
+      "missing_api_base_url",
+      "missing_credential_reference",
+      "missing_provider_host_allowlist",
+      "invalid_model_identifier"
+    ],
+    "failures": [
+      {
+        "code": "missing_model_identifier",
+        "message": "model_identifier is required"
+      },
+      {
+        "code": "missing_api_base_url",
+        "message": "api_base_url is required"
+      },
+      {
+        "code": "missing_credential_reference",
+        "message": "credential_reference is required"
+      },
+      {
+        "code": "missing_provider_host_allowlist",
+        "message": "provider host allowlist is required"
+      },
+      {
+        "code": "invalid_model_identifier",
+        "message": "model identifier must be a non-empty string"
+      }
+    ],
+    "secret_values_recorded": false,
+    "status": "invalid"
+  },
+  "provider_preflight_result": {
+    "TLS_policy_valid": false,
+    "configuration_hash": "26fe138ee2c7b2c49af69251a0294c980698513b919b1378bbef9d6e0d86d25a",
+    "configuration_present": false,
+    "credentials_present": false,
+    "endpoint_identity": {},
+    "endpoint_valid": true,
+    "execution_attempted": false,
+    "failure_codes": [
+      "missing_model_identifier",
+      "missing_api_base_url",
+      "missing_credential_reference",
+      "missing_provider_host_allowlist",
+      "invalid_model_identifier"
+    ],
+    "host_allowlisted": false,
+    "model_access_verified": "not_verified",
+    "model_call_allowed": false,
+    "model_configured": false,
+    "network_check_permitted": false,
+    "provider_name": "openai_compatible",
+    "provider_preflight": "invalid_configuration",
+    "provider_reachable": "not_verified"
+  },
+  "readiness_failures": [],
+  "real_capability_baseline": "NOT_ESTABLISHED",
+  "real_provider_campaign_readiness": "READY",
+  "real_provider_execution": "NOT_ATTEMPTED",
+  "report_hash": "13f9f943cbb1c364bdbcb3d66500ea56062aaad78313f9044b2f4a3e77f87a17",
+  "source_commit": "a8868f2599e57c6349746df9cbeee2521b55eed1",
+  "source_tree": "77c9cb9fe1e04141ad756325fb6bb69cbb4820f3",
+  "threshold_specification": {
+    "decisions": [
+      "REAL_CAPABILITY_BASELINE_ACCEPTED",
+      "REAL_CAPABILITY_BASELINE_REJECTED",
+      "HOLD_FOR_MORE_EVIDENCE",
+      "INVALID_CAMPAIGN"
+    ],
+    "hold_policy": "HOLD_FOR_MORE_EVIDENCE is neither success nor failure and cannot establish supported domains or aggregate correctness.",
+    "maximums": {
+      "critical_failure_rate": 0.0,
+      "timeout_rate": 0.1
+    },
+    "minimums": {
+      "aggregate_correctness": 0.7,
+      "capability_task_domains": 4,
+      "completed_cases": 18,
+      "cost_compliance_rate": 1.0,
+      "evaluator_coverage_rate": 1.0,
+      "evidence_completeness_rate": 1.0,
+      "executed_cases": 18,
+      "latency_compliance_rate": 0.95,
+      "per_domain_correctness": 0.6,
+      "schema_validity_rate": 1.0,
+      "supported_domains": 8
+    },
+    "status_classes": [
+      "case_completed",
+      "case_failed",
+      "case_timed_out",
+      "case_denied",
+      "evidence_unavailable",
+      "evaluator_unavailable",
+      "invalid_response",
+      "infrastructure_failure"
+    ]
+  },
+  "working_tree_clean": true
+}

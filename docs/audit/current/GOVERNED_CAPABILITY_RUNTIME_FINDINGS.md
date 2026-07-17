@@ -1,6 +1,6 @@
 # Governed Capability Runtime Findings
 
-Updated for Batch 08F after restacking PR #28 on merged Batch 07.
+Updated for Batch 09A after PR #28 merged into `main`.
 
 ## Resolved Evidence-Integrity Findings
 
@@ -21,3 +21,12 @@ Updated for Batch 08F after restacking PR #28 on merged Batch 07.
 Genesis V5 remains `HOLD_FOR_MORE_EVIDENCE` until real provider configuration
 and credentials are supplied and verified. The resolved provider-boundary
 findings do not create real-provider capability evidence.
+
+## Batch 09A Readiness Finding
+
+| Finding | Severity | Status | Summary |
+| --- | --- | --- | --- |
+| GCR-007 | S3 | resolved_batch_09a_readiness_contract | Added the real-provider readiness contract covering configuration, authorization, case manifest, thresholds, semantic hashes, preflight, dry-run, evidence capture and operator runbook. |
+
+Batch 09A readiness does not execute a provider call and does not establish a
+real capability baseline.
