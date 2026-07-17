@@ -22,21 +22,17 @@ The JSON Schemas are:
 - `schemas/agentco_capability_request.schema.json`
 - `schemas/agentco_capability_response.schema.json`
 
-## Implemented Domains
+## Provider Boundary
 
-The deterministic local reference provider supports provider-free execution for:
+The deterministic reference provider is classified as `deterministic_protocol_reference`.
+It supports protocol, lifecycle, authorization, budget, tool-boundary, storage,
+audit and provider-contract validation. It does not perform reasoning, planning,
+evidence evaluation, claim grounding, data analysis, software engineering or
+cross-domain synthesis as AI capability tasks.
 
-- reasoning
-- planning
-- evidence evaluation
-- claim grounding
-- structured transformation
-- safe tool selection
-- data analysis
-- software engineering
-- cross-domain synthesis
-
-This provider is deterministic, local, and benchmark-agnostic. It is suitable for CI and clean-room validation. It is not equivalent to a frontier model or live provider.
+The provider is deterministic, local and benchmark-agnostic. It is suitable for
+CI and clean-room protocol validation only. It is not equivalent to a frontier
+model or live provider, and it must not be used as a real capability baseline.
 
 ## Governance Controls
 
