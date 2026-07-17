@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2042`
+- Tracked files: `2043`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 143 |
-| Documentation | 457 |
+| Documentation | 458 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 384 |
+| `docs` | 385 |
 | `evals` | 180 |
 | `scripts` | 155 |
 | `agents` | 111 |
@@ -1164,6 +1164,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BATCH_08D_CORRECTED_EVIDENCE_RECORD.md` | Documentation |
 | `docs/audit/current/BATCH_08E_INDEPENDENT_AUDIT.md` | Documentation |
 | `docs/audit/current/BATCH_08F_INTEGRATION_REPORT.md` | Documentation |
+| `docs/audit/current/BATCH_08G_FINAL_ACCEPTANCE.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |

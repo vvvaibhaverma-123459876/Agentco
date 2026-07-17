@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2042,
+  "tracked_file_count": 2043,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 143,
-    "Documentation": 457,
+    "Documentation": 458,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 507,
-    "docs": 384,
+    "docs": 385,
     "evals": 180,
     "scripts": 155,
     "agents": 111,
@@ -83,7 +83,7 @@
   },
   "extension_counts": {
     ".py": 611,
-    ".md": 499,
+    ".md": 500,
     ".ts": 342,
     ".json": 241,
     ".sql": 140,
@@ -6526,6 +6526,12 @@
     },
     {
       "path": "docs/audit/current/BATCH_08F_INTEGRATION_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH_08G_FINAL_ACCEPTANCE.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
