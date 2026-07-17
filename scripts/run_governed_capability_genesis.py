@@ -301,6 +301,7 @@ def provider_env(url: str, *, timeout: str = "1", max_bytes: str = "1000000", re
         "AGENTCO_GENERIC_MAX_RETRIES",
         "AGENTCO_GENERIC_RETRY_BACKOFF_SECONDS",
         "AGENTCO_GENERIC_PROVIDER_TOKEN",
+        "AGENTCO_PROVIDER_ALLOW_LOCAL_HTTP",
     ]}
     os.environ["AGENTCO_GENERIC_PROVIDER_URL"] = url
     os.environ["AGENTCO_PROVIDER_HOST_ALLOWLIST"] = "127.0.0.1,localhost"
@@ -308,6 +309,7 @@ def provider_env(url: str, *, timeout: str = "1", max_bytes: str = "1000000", re
     os.environ["AGENTCO_PROVIDER_RESPONSE_MAX_BYTES"] = max_bytes
     os.environ["AGENTCO_GENERIC_MAX_RETRIES"] = retries
     os.environ["AGENTCO_GENERIC_RETRY_BACKOFF_SECONDS"] = "0.01"
+    os.environ["AGENTCO_PROVIDER_ALLOW_LOCAL_HTTP"] = "1"
     if token is not None:
         os.environ["AGENTCO_GENERIC_PROVIDER_TOKEN"] = token
     else:
