@@ -62,7 +62,7 @@ def files_under_git(commit: str, directory: str) -> set[str]:
 
 
 def binding_commit_from_history(head: str) -> str | None:
-    output = git("log", "--reverse", "--format=%H", head, "--", BINDING_REL)
+    output = git("log", "--format=%H", head, "--", BINDING_REL)
     commits = [line for line in output.splitlines() if line.strip()]
     return commits[0] if commits else None
 
