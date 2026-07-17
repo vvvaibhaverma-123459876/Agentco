@@ -65,7 +65,7 @@ def sha256(data: bytes) -> str:
 
 def git_files(commit: str, directory: str) -> list[str]:
     output = git("ls-tree", "-r", "--name-only", commit, directory)
-    return [line for line in output.splitlines() if line.strip()]
+    return [line for line in output.splitlines() if line.strip() and "__pycache__" not in line and not line.endswith(".pyc")]
 
 
 def inventory(candidate: str) -> list[dict[str, Any]]:

@@ -58,7 +58,7 @@ def changed_files(commit: str) -> list[str]:
 
 def files_under_git(commit: str, directory: str) -> set[str]:
     output = git("ls-tree", "-r", "--name-only", commit, directory)
-    return {line for line in output.splitlines() if line.strip()}
+    return {line for line in output.splitlines() if line.strip() and "__pycache__" not in line and not line.endswith(".pyc")}
 
 
 def binding_commit_from_history(head: str) -> str | None:
@@ -143,7 +143,11 @@ def verify_manifest(manifest_path: Path | None = None) -> list[str]:
 
     for directory in manifest.get("frozen_directories", []):
         candidate_files = files_under_git(candidate, directory)
-        final_files = {str(path.relative_to(ROOT)) for path in (ROOT / directory).rglob("*") if path.is_file()}
+        final_files = {
+            str(path.relative_to(ROOT))
+            for path in (ROOT / directory).rglob("*")
+            if path.is_file() and "__pycache__" not in str(path) and not path.name.endswith(".pyc")
+        }
         if candidate_files != final_files:
             findings.append(f"FROZEN_DIRECTORY_MEMBERSHIP_CHANGED:{directory}")
         for path in final_files:
