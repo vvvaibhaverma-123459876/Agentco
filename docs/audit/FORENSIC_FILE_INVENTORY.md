@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2043`
+- Tracked files: `2060`
 
 ## Category Counts
 
@@ -11,33 +11,33 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 139 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 143 |
-| Documentation | 458 |
+| Development tooling | 144 |
+| Documentation | 467 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 307 |
-| Unknown purpose | 128 |
+| Test infrastructure | 308 |
+| Unknown purpose | 134 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 385 |
+| `docs` | 394 |
 | `evals` | 180 |
-| `scripts` | 155 |
+| `scripts` | 156 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
-| `tests` | 62 |
+| `tests` | 63 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `constitution` | 40 |
 | `frontend` | 37 |
+| `benchmarks` | 33 |
 | `reserve` | 33 |
-| `benchmarks` | 32 |
 | `calibration` | 30 |
 | `infrastructure` | 21 |
 | `results` | 20 |
@@ -46,11 +46,11 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `autonomy` | 13 |
 | `learning` | 13 |
 | `.github` | 11 |
+| `schemas` | 11 |
+| `agentco_capability` | 10 |
 | `synthesis` | 10 |
-| `agentco_capability` | 9 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `schemas` | 7 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -128,6 +128,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `agentco_capability/evidence.py` | Unknown purpose |
 | `agentco_capability/models.py` | Unknown purpose |
 | `agentco_capability/providers.py` | Unknown purpose |
+| `agentco_capability/real_provider_readiness.py` | Unknown purpose |
 | `agentco_capability/runtime.py` | Unknown purpose |
 | `agentco_capability/scoring.py` | Unknown purpose |
 | `agentco_capability/storage.py` | Unknown purpose |
@@ -934,6 +935,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `benchmarks/capability_genesis_v5/development/cases.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v5/fixtures/fixtures.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v5/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/manifests/frozen_case_manifest.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v5/registry.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v5/rubrics/rubrics.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v5/validation/cases.json` | Unknown purpose |
@@ -1268,6 +1270,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/PROVIDER_TRUST_BOUNDARY_AUDIT.md` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
+| `docs/audit/current/REAL_PROVIDER_BASELINE_READINESS.json` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
@@ -1306,6 +1309,14 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json` | Documentation |
 | `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md` | Documentation |
+| `docs/capability/BATCH_09A_BASELINE.md` | Documentation |
+| `docs/capability/BATCH_09A_READINESS_REPORT.json` | Documentation |
+| `docs/capability/BATCH_09A_READINESS_REPORT.md` | Documentation |
+| `docs/capability/CAPABILITY_THRESHOLDS.md` | Documentation |
+| `docs/capability/EVALUATOR_INTEGRITY_PROTOCOL.md` | Documentation |
+| `docs/capability/REAL_PROVIDER_CAMPAIGN_AUTHORIZATION.md` | Documentation |
+| `docs/capability/REAL_PROVIDER_GENESIS_RUNBOOK.md` | Documentation |
+| `docs/capability/SEMANTIC_HASH_SPECIFICATION.md` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
@@ -1883,6 +1894,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `schemas/cross_version_campaign.schema.json` | Unknown purpose |
 | `schemas/longitudinal_history.schema.json` | Unknown purpose |
 | `schemas/longitudinal_run_manifest.schema.json` | Unknown purpose |
+| `schemas/real_provider_campaign_authorization.schema.json` | Unknown purpose |
+| `schemas/real_provider_config.schema.json` | Unknown purpose |
+| `schemas/real_provider_execution_evidence.schema.json` | Unknown purpose |
+| `schemas/real_provider_preflight.schema.json` | Unknown purpose |
 | `schemas/subject_benchmark_request.schema.json` | Unknown purpose |
 | `schemas/subject_benchmark_response.schema.json` | Unknown purpose |
 | `scripts/agentco_evolution_test.py` | Development tooling |
@@ -2033,6 +2048,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_openai_connectivity.py` | Development tooling |
 | `scripts/verify_production_posture.py` | Development tooling |
 | `scripts/verify_pytest_skips.py` | Development tooling |
+| `scripts/verify_real_provider_readiness.py` | Development tooling |
 | `scripts/verify_release_gates.py` | Development tooling |
 | `scripts/verify_resolution_service.py` | Development tooling |
 | `scripts/verify_subject_answer_ownership.py` | Development tooling |
@@ -2118,6 +2134,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_protocol_persistence_reinitialization.py` | Test infrastructure |
 | `tests/test_protocol_schema_validation.py` | Test infrastructure |
 | `tests/test_protocol_secret_redaction.py` | Test infrastructure |
+| `tests/test_real_provider_readiness.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
 | `tests/test_software_capability_workspace.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
