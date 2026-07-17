@@ -42,6 +42,7 @@ import { metricsService } from './services/autonomy-metrics.service';
 import { shutdownRuntimeResources } from './runtime/shutdown';
 import { publicMessageForError, statusCodeForError } from './http-errors';
 import { validateUuidPathParams } from './routes/param-validation';
+import { registerPrincipalResolution } from './auth/principal-context';
 import { dependencyHealthReport, processHealth } from './health';
 
 const PORT = parseInt(process.env.PORT ?? '3001');
@@ -93,6 +94,11 @@ export async function build() {
 
     validateUuidPathParams(request);
   });
+
+  // AUD-004: resolve an authenticated RequestPrincipal from signed requests (Ed25519 over the
+  // canonical string, via the existing actor key ring) and fail closed on routes that declare
+  // `config.principal.required`. Routes opt in (M3/M4); non-governed routes are unaffected.
+  registerPrincipalResolution(app);
 
   // Centralized error handler
   app.setErrorHandler(async (error: any, request, reply) => {

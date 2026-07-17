@@ -54,6 +54,27 @@ export function buildCanonicalString(
   return [method.toUpperCase(), path, bodyHash, timestamp, nonce].join('\n');
 }
 
+/**
+ * Deterministic JSON used for the body hash: object keys sorted recursively, no incidental
+ * whitespace. Client and server MUST use this same function so the signed body hash matches
+ * regardless of transport-level key ordering or whitespace.
+ */
+export function canonicalJson(value: unknown): string {
+  const seen = new WeakSet();
+  const norm = (v: unknown): unknown => {
+    if (v === null || typeof v !== 'object') return v;
+    if (seen.has(v as object)) throw new PrincipalAuthError('cyclic_body');
+    seen.add(v as object);
+    if (Array.isArray(v)) return v.map(norm);
+    const out: Record<string, unknown> = {};
+    for (const k of Object.keys(v as Record<string, unknown>).sort()) {
+      out[k] = norm((v as Record<string, unknown>)[k]);
+    }
+    return out;
+  };
+  return JSON.stringify(norm(value));
+}
+
 /** Pure Ed25519 verify; returns false (never throws) on any malformed input. */
 export function verifyEd25519(publicKeyPem: string, canonical: string, signatureB64: string): boolean {
   try {
