@@ -55,12 +55,13 @@ def write_attempt(response: dict[str, Any]) -> dict[str, Any]:
     else:
         path = _local_path(response["attempt_id"])
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(response, indent=2, sort_keys=True) + "\n")
         try:
             display_path = str(path.relative_to(ROOT))
         except ValueError:
             display_path = str(path)
         refs.append({"type": "local_json", "path": display_path})
+        stored = {**response, "audit_references": refs}
+        path.write_text(json.dumps(stored, indent=2, sort_keys=True) + "\n")
     return {"audit_references": refs}
 
 

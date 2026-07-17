@@ -136,7 +136,7 @@ def load_freeze() -> dict[str, Any]:
         raise SystemExit("missing GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_BINDING.json")
     binding = load_json(FREEZE_BINDING_DOC)
     manifest = json.loads(git("show", f"{binding['freeze_manifest_commit_sha']}:{FREEZE_MANIFEST_DOC.relative_to(ROOT)}"))
-    commits = git("log", "--reverse", "--format=%H", "--", str(FREEZE_BINDING_DOC.relative_to(ROOT))).splitlines()
+    commits = git("log", "--format=%H", "--", str(FREEZE_BINDING_DOC.relative_to(ROOT))).splitlines()
     if not commits:
         raise SystemExit("freeze binding commit could not be resolved")
     return {**manifest, **binding, "freeze_binding_commit_sha": commits[0]}
