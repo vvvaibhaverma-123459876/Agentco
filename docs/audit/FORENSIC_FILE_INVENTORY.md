@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1969`
+- Tracked files: `1990`
 
 ## Category Counts
 
@@ -11,33 +11,33 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 139 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 142 |
-| Documentation | 435 |
+| Development tooling | 143 |
+| Documentation | 439 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 297 |
-| Unknown purpose | 88 |
+| Test infrastructure | 305 |
+| Unknown purpose | 96 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 362 |
+| `docs` | 366 |
 | `evals` | 180 |
-| `scripts` | 154 |
+| `scripts` | 155 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
-| `tests` | 54 |
+| `tests` | 62 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `frontend` | 37 |
 | `reserve` | 33 |
+| `benchmarks` | 32 |
 | `calibration` | 30 |
-| `benchmarks` | 24 |
 | `infrastructure` | 21 |
 | `results` | 20 |
 | `selfcoding` | 17 |
@@ -929,10 +929,18 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `benchmarks/capability_genesis_v4/registry.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v4/rubrics/rubrics.json` | Unknown purpose |
 | `benchmarks/capability_genesis_v4/validation/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/development/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/fixtures/fixtures.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/hidden/cases.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/registry.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/rubrics/rubrics.json` | Unknown purpose |
+| `benchmarks/capability_genesis_v5/validation/cases.json` | Unknown purpose |
 | `benchmarks/capability_protocol_baseline_v1/cases/cases.json` | Unknown purpose |
 | `benchmarks/capability_protocol_baseline_v1/registry.json` | Unknown purpose |
 | `benchmarks/capability_protocol_baseline_v2/cases/cases.json` | Unknown purpose |
 | `benchmarks/capability_protocol_baseline_v2/registry.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v3/cases/cases.json` | Unknown purpose |
+| `benchmarks/capability_protocol_baseline_v3/registry.json` | Unknown purpose |
 | `benchmarks/registry.json` | Unknown purpose |
 | `calibration/BENCHMARK_ANALYSIS.md` | Production runtime code |
 | `calibration/__init__.py` | Production runtime code |
@@ -1158,8 +1166,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V3_FREEZE.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_BINDING.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
@@ -1845,6 +1857,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/complex_multidomain_run.py` | Development tooling |
 | `scripts/comprehensive_system_diagnosis.py` | Development tooling |
 | `scripts/constitution/check_constitution.py` | Development tooling |
+| `scripts/create_capability_genesis_freeze.py` | Development tooling |
 | `scripts/demo_business_bikeshare_calibration.py` | Development tooling |
 | `scripts/demo_company_in_action.py` | Development tooling |
 | `scripts/demo_real_calibration.py` | Development tooling |
@@ -2018,10 +2031,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_build_ledger.py` | Test infrastructure |
 | `tests/test_capability_anti_gaming.py` | Test infrastructure |
 | `tests/test_capability_anti_hardcoding.py` | Test infrastructure |
+| `tests/test_capability_freeze_binding.py` | Test infrastructure |
 | `tests/test_capability_freeze_integrity.py` | Test infrastructure |
 | `tests/test_capability_genesis_v2.py` | Test infrastructure |
 | `tests/test_capability_genesis_v3.py` | Test infrastructure |
 | `tests/test_capability_genesis_v4.py` | Test infrastructure |
+| `tests/test_capability_genesis_v5.py` | Test infrastructure |
+| `tests/test_capability_preflight.py` | Test infrastructure |
 | `tests/test_capability_provider_adapters.py` | Test infrastructure |
 | `tests/test_capability_runtime.py` | Test infrastructure |
 | `tests/test_civilization_free_run_positive_path.py` | Test infrastructure |
@@ -2043,7 +2059,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_protocol_baseline.py` | Test infrastructure |
 | `tests/test_protocol_baseline_v2.py` | Test infrastructure |
+| `tests/test_protocol_baseline_v3.py` | Test infrastructure |
+| `tests/test_protocol_budget_settlement.py` | Test infrastructure |
 | `tests/test_protocol_control_execution.py` | Test infrastructure |
+| `tests/test_protocol_persistence_reinitialization.py` | Test infrastructure |
+| `tests/test_protocol_schema_validation.py` | Test infrastructure |
+| `tests/test_protocol_secret_redaction.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
 | `tests/test_software_capability_workspace.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
