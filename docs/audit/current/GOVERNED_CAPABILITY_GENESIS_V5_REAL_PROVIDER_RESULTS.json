@@ -1,0 +1,126 @@
+{
+  "acceptance_evidence": {
+    "artifact_verification_evidence": {
+      "findings": [],
+      "passed": true
+    },
+    "evaluator_harness": {
+      "data": {
+        "capability_baseline_effect": "none",
+        "evaluator_harness_verified": true
+      },
+      "software": {
+        "capability_baseline_effect": "none",
+        "evaluator_harness_verified": true
+      }
+    },
+    "execution_attempted": false,
+    "freeze_verification_evidence": {
+      "findings": [],
+      "passed": true
+    },
+    "provider_preflight": {
+      "TLS_policy_valid": false,
+      "configuration_present": false,
+      "credentials_present": false,
+      "endpoint_valid": false,
+      "execution_attempted": false,
+      "host_allowlisted": false,
+      "missing": [
+        "OPENAI_API_KEY",
+        "OPENAI_MODEL",
+        "OPENAI_BASE_URL",
+        "AGENTCO_PROVIDER_HOST_ALLOWLIST"
+      ],
+      "model_access_verified": "not_verified",
+      "model_configured": false,
+      "network_check_permitted": false,
+      "provider_preflight": "unavailable",
+      "provider_reachable": "not_verified"
+    }
+  },
+  "acceptance_failures": [
+    "provider_preflight_passed",
+    "real_provider_execution_attempted",
+    "required_execution_count_passed",
+    "completion_ratio_passed",
+    "supported_domain_threshold_passed",
+    "capability_task_domain_threshold_passed",
+    "aggregate_correctness_passed",
+    "per_domain_threshold_passed",
+    "governance_controls_passed",
+    "budget_controls_passed",
+    "no_unresolved_s0_s1_finding",
+    "software_evaluator_tests_passed",
+    "data_evaluator_verification_passed",
+    "workspace_cleanup_passed"
+  ],
+  "acceptance_predicate": {
+    "aggregate_correctness_passed": false,
+    "artifact_verification_passed": true,
+    "budget_controls_passed": false,
+    "capability_task_domain_threshold_passed": false,
+    "completion_ratio_passed": false,
+    "data_evaluator_verification_passed": false,
+    "evaluator_only_rubric_isolation_passed": true,
+    "evaluator_owned_data_evidence": true,
+    "evaluator_owned_software_evidence": true,
+    "freeze_verification_passed": true,
+    "governance_controls_passed": false,
+    "hidden_isolation_passed": true,
+    "no_hidden_leakage": true,
+    "no_provider_fallback": true,
+    "no_unresolved_runtime_evidence_failure": true,
+    "no_unresolved_s0_s1_finding": false,
+    "per_domain_threshold_passed": false,
+    "provider_preflight_passed": false,
+    "real_provider_execution_attempted": false,
+    "required_execution_count_passed": false,
+    "software_evaluator_tests_passed": false,
+    "supported_domain_threshold_passed": false,
+    "valid_v5_freeze_binding": true,
+    "workspace_cleanup_passed": false
+  },
+  "aggregate_correctness": null,
+  "benchmark_case_bundle_hash": "486c4c9f220b66a65f77e26e7bd488bd2870dc1bf8de8e3098ab1a919fe31987",
+  "benchmark_registry_file_hash": "4eac0c4a0c3f844d15b2c5f3eb1cf443244d36e689248df23b9e1f6527482e56",
+  "calibration": {
+    "computed": false,
+    "reason": "provider unavailable"
+  },
+  "campaign_execution_sha": "b64d8932de89dcceff312313761d145870bd7ee5",
+  "campaign_id": "governed-capability-genesis-v5",
+  "completed_cases": 0,
+  "confidence_availability": "unavailable",
+  "decision": "HOLD_FOR_MORE_EVIDENCE",
+  "dependency_lock_hash": "25d96beb11eaf98454e2f2014bb1a705922c77f66fad3894d67202947894ddb4",
+  "environment_contract_hash": "1f077313d27f8dca7d6a276e9eb94db4f79cb7a163310b1c07c16089b45c15ad",
+  "evidence_unavailable_cases": 24,
+  "executed_cases": 0,
+  "execution_attempted": false,
+  "failed_cases": 0,
+  "fixture_bundle_hash": "8d46e10197b61b7662324efe5daf33a3fbd667ff2414dbd34474f127fd034176",
+  "freeze_binding_commit_sha": "af06c343f2f614eb6b0355d5b7a02a2f93837d02",
+  "freeze_binding_logical_hash": "4ca5aaffc64c5e447a550d5379c38107ef4d1971537668c2f093e8623cafa3c7",
+  "freeze_candidate_sha": "dfd36daf97133fec52dcd664c5dd8dca2d3bef00",
+  "freeze_candidate_tree_hash": "6a7d108d836557fe49c77511ca771710341e35c4",
+  "freeze_manifest_blob_sha": "22a60d1b0608e128ff6b00f951ef7160258fe7dc",
+  "freeze_manifest_commit_sha": "898bed576715b9d64274c03e85e0d5bc543ba8ef",
+  "freeze_manifest_sha256": "8cfde6e48bb6ed1b9a4648fa03265aec7a69f33660f343ba621a765b7e383a01",
+  "internal_payload_manifest_hash": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+  "per_domain_correctness": {},
+  "planned_cases": 24,
+  "provider": "openai_compatible",
+  "provider_bundle_hash": "ff839c2b8829150f881e1ce24e4c425f272fcfb2687afcb7f02945bd5f679561",
+  "provider_preflight": "unavailable",
+  "rubric_bundle_hash": "798099b9700f908dcbd7773c6fdbdb11752f83db859bbe5765a7a188183fef60",
+  "runtime_bundle_hash": "12393d164f759ea51f754ce8114ac92ce48aecdd24bf49b589fb54bd07012efc",
+  "scorer_bundle_hash": "2ff032675e729a1dc12fd81832a54f20feeae19a8c87d5308926830e4f881840",
+  "scorer_file_hash": "5036a80085c1f99b6d8fda2c12949c5e8448b0f646e9e990d1bc5b95fcb758cb",
+  "supported_capability_domains": [],
+  "timed_out_cases": 0,
+  "tool_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
+  "unsupported_cases": 0,
+  "workflow_head_sha": "b64d8932de89dcceff312313761d145870bd7ee5",
+  "workspace_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd"
+}
