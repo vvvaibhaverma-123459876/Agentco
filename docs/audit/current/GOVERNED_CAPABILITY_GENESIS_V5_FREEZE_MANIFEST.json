@@ -18,12 +18,12 @@
     "runtime": "a84c1d501aa92dbcacaa66d8f67930c8157474034850a81664b21decd5d9b4b3",
     "schemas": "84c37c771518bef01988cdb5cce5dcd5bfdae4cf92ec995a1803dedcd82412ea",
     "scorers": "2ff032675e729a1dc12fd81832a54f20feeae19a8c87d5308926830e4f881840",
-    "tests": "89f7611978eb4d350eb9ebb4657ff9556fa6a66246fa6479b422df918ab858d9",
+    "tests": "0f12f2de671740b087179eea09843208b07efff34475850a3a1b775365db57bc",
     "tools": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
     "workflow_execution_logic": "7bcb3e96f750c87fe3a1c8382fb9d977bf3e55263b0335da59ac9216c7450605"
   },
-  "freeze_candidate_sha": "dfd36daf97133fec52dcd664c5dd8dca2d3bef00",
-  "freeze_candidate_tree_hash": "6a7d108d836557fe49c77511ca771710341e35c4",
+  "freeze_candidate_sha": "6e1bf1483cd6f5cb20e0ffb61d6c538dd4b9b12f",
+  "freeze_candidate_tree_hash": "e94d5c0469024d8ff8d54c7d9ae3dda56dbde3c1",
   "freeze_schema_version": "governed-capability-genesis-v5-freeze-manifest-v1",
   "frozen_directories": [
     ".github/workflows",
@@ -402,12 +402,12 @@
       "size_bytes_at_candidate": 819
     },
     {
-      "blob_sha_at_candidate": "03406017644a9be4377dc8e8b7bd6a144f60fa53",
+      "blob_sha_at_candidate": "9d2bc762a03ea95da52a4c9252a33b6ca4154f16",
       "bundle": "tests",
       "path": "tests/test_capability_provider_adapters.py",
       "required_at_final_head": true,
-      "sha256_at_candidate": "91f9c5309d6c9a841a48bc06519eec69fa11e5783f22bc7c47d9e618331bdfb3",
-      "size_bytes_at_candidate": 13022
+      "sha256_at_candidate": "93eb5432d7bb50371aca2434458b90ad558045b4416e7e229bf60b23894c0df0",
+      "size_bytes_at_candidate": 15702
     },
     {
       "blob_sha_at_candidate": "70648db6e3d2379ba74baa2c8d17cb4e8269c504",
@@ -482,7 +482,7 @@
       "size_bytes_at_candidate": 1258
     }
   ],
-  "manifest_logical_hash": "7925a2eb36cd331cb31d3c98aefe53a9906f66da0ef25e0a6a60fdaa623cd1c0",
+  "manifest_logical_hash": "6cf45b6dbf1450fcd239554d7a8202b61fe29763ecd1e8ee4994a2fc55be4e58",
   "protocol_campaign_id": "governed-capability-protocol-baseline-v3",
   "real_capability_campaign_id": "governed-capability-genesis-v5"
 }
