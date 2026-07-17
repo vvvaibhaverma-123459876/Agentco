@@ -31,7 +31,7 @@
   "assertions_skipped": 0,
   "benchmark_case_bundle_hash": "048e4490976b44f14a9b628270022521318273097d9ee27b8bdd3f07da4102a4",
   "benchmark_registry_file_hash": "173d5f5121b8e089c9724f667b655c05f3555b147a175e9e3b6895a1f6009a87",
-  "campaign_execution_sha": "af06c343f2f614eb6b0355d5b7a02a2f93837d02",
+  "campaign_execution_sha": "6410661cb980829d678f27844ac32cdc5303f8e8",
   "campaign_id": "governed-capability-protocol-baseline-v3",
   "capability_decision": "not_applicable_protocol_only",
   "completed": 24,
@@ -66,19 +66,19 @@
   "environment_contract_hash": "1f077313d27f8dca7d6a276e9eb94db4f79cb7a163310b1c07c16089b45c15ad",
   "failed": 0,
   "fixture_bundle_hash": "not_applicable_protocol_controls",
-  "freeze_binding_commit_sha": "af06c343f2f614eb6b0355d5b7a02a2f93837d02",
-  "freeze_binding_logical_hash": "4ca5aaffc64c5e447a550d5379c38107ef4d1971537668c2f093e8623cafa3c7",
-  "freeze_candidate_sha": "dfd36daf97133fec52dcd664c5dd8dca2d3bef00",
-  "freeze_candidate_tree_hash": "6a7d108d836557fe49c77511ca771710341e35c4",
-  "freeze_manifest_blob_sha": "22a60d1b0608e128ff6b00f951ef7160258fe7dc",
-  "freeze_manifest_commit_sha": "898bed576715b9d64274c03e85e0d5bc543ba8ef",
-  "freeze_manifest_sha256": "8cfde6e48bb6ed1b9a4648fa03265aec7a69f33660f343ba621a765b7e383a01",
+  "freeze_binding_commit_sha": "6410661cb980829d678f27844ac32cdc5303f8e8",
+  "freeze_binding_logical_hash": "480f9ba362a1e2893298103dad8e21037279766909b64d85d2d73e2ed7882a79",
+  "freeze_candidate_sha": "6e1bf1483cd6f5cb20e0ffb61d6c538dd4b9b12f",
+  "freeze_candidate_tree_hash": "e94d5c0469024d8ff8d54c7d9ae3dda56dbde3c1",
+  "freeze_manifest_blob_sha": "18a1c1b7dd2e5f062efb480bc0575ff85b61bc4c",
+  "freeze_manifest_commit_sha": "9f2c11908a47cb48eb00de033a11d098dbdeff46",
+  "freeze_manifest_sha256": "93d3866845aae1c000f785e9a6c7476345228c526afc67ef9ad3d8511b130744",
   "freeze_verification_evidence": {
     "findings": [],
     "passed": true
   },
   "hidden_evaluator_data_reached_runtime": false,
-  "internal_payload_manifest_hash": "fd370f790b62c92fa079b44a9c66c48d9b0567cbf093a97d944459bc56f4670a",
+  "internal_payload_manifest_hash": "1aae37a37edfe11230c5b932fef70f6a90ef444736ae02ad3c5170df495626bb",
   "planned": 24,
   "protocol_decision": "PROTOCOL_BASELINE_ACCEPTED",
   "provider_bundle_hash": "ff839c2b8829150f881e1ce24e4c425f272fcfb2687afcb7f02945bd5f679561",
@@ -90,7 +90,7 @@
     "paths": [],
     "secret_canary_occurrences": 0
   },
-  "semantic_protocol_hash": "3579d7dc989762f405c9afd86e0369ddef88551b17ec2f310d9be629f94de6ce",
+  "semantic_protocol_hash": "84d5419bcaedcc269df96727557e3feedb3037388ae5433146833acfc1a6183d",
   "semantic_protocol_hash_excludes": [
     "timestamps",
     "workflow run IDs",
@@ -99,6 +99,6 @@
     "full artifact byte ordering outside acceptance-relevant result fields"
   ],
   "tool_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
-  "workflow_head_sha": "af06c343f2f614eb6b0355d5b7a02a2f93837d02",
+  "workflow_head_sha": "6410661cb980829d678f27844ac32cdc5303f8e8",
   "workspace_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd"
 }
