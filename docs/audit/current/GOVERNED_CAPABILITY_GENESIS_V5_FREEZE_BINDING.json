@@ -1,8 +1,8 @@
 {
-  "freeze_binding_logical_hash": "3fc8e6f3eaa2a6724e732215483cbdcf0127f812c1470e536af9e980987245b7",
-  "freeze_candidate_sha": "f88bb23965637dee60e7d1ab6d89b83cc33a97ee",
-  "freeze_manifest_blob_sha": "df612fcc1f85fd280679e7c65ee8e1cfb37e762d",
-  "freeze_manifest_commit_sha": "59e78cb7262dba453a1639ab564969e3e5b3591b",
-  "freeze_manifest_sha256": "cebb4802febbf7263caeb20395e1906e206b0948825c33577b083664ef91cbde",
+  "freeze_binding_logical_hash": "ffc835b9119ce5b21efc5d07ea2e7a765895e16485e303f01708589c4c3c7cec",
+  "freeze_candidate_sha": "HEAD",
+  "freeze_manifest_blob_sha": "19067293b11bc1ca39d5b37e72cd667dce2f9d3c",
+  "freeze_manifest_commit_sha": "HEAD",
+  "freeze_manifest_sha256": "3f653feadb84fad6dbbe0bbf6c8da1a34aa5689160223b7c9eeae77c12b53bdf",
   "freeze_schema_version": "governed-capability-genesis-v5-freeze-binding-v1"
 }
