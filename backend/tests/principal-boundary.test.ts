@@ -17,6 +17,10 @@ async function buildApp(): Promise<FastifyInstance> {
     principalActor: req.principal?.actorId,
     roles: req.principal?.roles,
   }));
+  // M3: route requiring an explicit credential-bound permission (RBAC over the authenticated principal)
+  app.post('/test/treasury-penalty', { config: requirePrincipal('treasury.penalty.impose') }, async (req) => ({
+    principalActor: req.principal?.actorId,
+  }));
   app.get('/test/open', async () => ({ ok: true }));
   await app.ready();
   return app;
@@ -102,5 +106,25 @@ describe('AUD-004 M2: principal boundary enforcement', () => {
   it('leaves non-governed routes unaffected (no signature required)', async () => {
     const res = await app.inject({ method: 'GET', url: '/test/open' });
     expect(res.statusCode).toBe(200);
+  });
+
+  describe('M3: credential-bound permission enforcement', () => {
+    it('allows a principal whose role grants the required permission (governor -> treasury.penalty.impose)', async () => {
+      const governor = await provisionSignedActor({ name: `m3-gov-${crypto.randomUUID()}`, roles: ['governor'] });
+      const res = await app.inject(
+        signedInject({ actorId: governor.actorId, privateKey: governor.privateKey, method: 'POST', url: '/test/treasury-penalty', body: { amount: 100 } })
+      );
+      expect(res.statusCode).toBe(200);
+      expect(res.json().principalActor).toBe(governor.actorId);
+    });
+
+    it('fails closed (403) for an authenticated principal lacking the permission (task_executor)', async () => {
+      const worker = await provisionSignedActor({ name: `m3-worker-${crypto.randomUUID()}`, roles: ['task_executor'] });
+      const res = await app.inject(
+        signedInject({ actorId: worker.actorId, privateKey: worker.privateKey, method: 'POST', url: '/test/treasury-penalty', body: { amount: 100 } })
+      );
+      expect(res.statusCode).toBe(403);
+      expect(res.json().permission).toBe('treasury.penalty.impose');
+    });
   });
 });

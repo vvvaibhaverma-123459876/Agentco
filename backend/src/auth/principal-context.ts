@@ -20,6 +20,7 @@ import {
   IdentityLookup,
 } from './request-principal';
 import { dbIdentityLookup } from './identity-lookup';
+import { identityAuthorityService } from '../services/identity-authority.service';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -33,9 +34,16 @@ declare module 'fastify' {
   }
 }
 
+/** Authorization decision over an AUTHENTICATED principal (reuses the existing RBAC). */
+export type Authorize = (actorId: string, permission: string) => Promise<{ allowed: boolean; reason: string }>;
+
+const defaultAuthorize: Authorize = (actorId, permission) =>
+  identityAuthorityService.verifyAuthority(actorId, permission).then((d) => ({ allowed: d.allowed, reason: d.reason }));
+
 export interface PrincipalDeps {
   lookup: IdentityLookup;
   replay: ReplayGuard;
+  authorize?: Authorize;
 }
 
 /** Process-wide replay guard (single instance; a DB-backed nonce store replaces it for multi-node). */
@@ -76,11 +84,20 @@ export function registerPrincipalResolution(
     }
 
     const cfg = request.routeOptions?.config?.principal;
-    if (cfg?.required && !request.principal) {
-      return reply.status(401).send({
-        error: 'authenticated principal required',
-        reason: request.principalError ?? 'missing_signature',
-      });
+    if (cfg?.required) {
+      if (!request.principal) {
+        return reply.status(401).send({
+          error: 'authenticated principal required',
+          reason: request.principalError ?? 'missing_signature',
+        });
+      }
+      if (cfg.permission) {
+        const authorize = deps.authorize ?? defaultAuthorize;
+        const decision = await authorize(request.principal.actorId, cfg.permission);
+        if (!decision.allowed) {
+          return reply.status(403).send({ error: 'forbidden', reason: decision.reason, permission: cfg.permission });
+        }
+      }
     }
   });
 }
