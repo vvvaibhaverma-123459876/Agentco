@@ -8,22 +8,22 @@
     "acceptance_thresholds": "0b3be2a3fc92e1230daaf6bc7bf624d8b26476ff0c5e83fa4571176bbf8650b1",
     "artifact_verifier": "31591cf893d7d0540b39c09e3f84f1efce6b485a9d84caf580c0674fc34fa487",
     "dependency_locks": "92693d0bb1a7f5b5b66dcd51eeb3bd2ac0dda1c5b5fc42c96aea682869212692",
-    "evaluator_runner": "d0487e473b818837f68bc0d0b0b695d9950b3820e610744debad5b28bdc4d66c",
+    "evaluator_runner": "98bf0c98f5d33730161f4f0fe51444b0697712f4f819283715a5129d50665e2d",
     "fixtures": "8d46e10197b61b7662324efe5daf33a3fbd667ff2414dbd34474f127fd034176",
     "freeze_verifier": "665eb11a579eaabef07d0f64a36a2ed9f24247419d1312a18cd6083f4d2a5c5b",
     "protocol_benchmark": "89500876ac723c84de3ce26d075331a721ff3f51b1e4620b4236494c98c7f1cf",
     "providers": "80941657af57c6b4a440d220756bd9b244fda822b88c51b42f5a9028e0de9600",
     "real_benchmark": "995afa0b1fecbed056c686c33a406d95ed21798b9ac05edc8f2b155f143a3b9c",
     "rubrics": "798099b9700f908dcbd7773c6fdbdb11752f83db859bbe5765a7a188183fef60",
-    "runtime": "ecdaca683d9a762fb40f73d9f630a4d66de26fc26f7a016cbd241f14a07478ee",
+    "runtime": "a84c1d501aa92dbcacaa66d8f67930c8157474034850a81664b21decd5d9b4b3",
     "schemas": "84c37c771518bef01988cdb5cce5dcd5bfdae4cf92ec995a1803dedcd82412ea",
     "scorers": "2ff032675e729a1dc12fd81832a54f20feeae19a8c87d5308926830e4f881840",
     "tests": "09ec2fe09f59bd9f7b95bfb0a3f2a184a9980dc5ecea7104168998ad995d74bb",
     "tools": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
     "workflow_execution_logic": "7bcb3e96f750c87fe3a1c8382fb9d977bf3e55263b0335da59ac9216c7450605"
   },
-  "freeze_candidate_sha": "2202bd72265f0c98ef1b793bea1b216f995fc7ae",
-  "freeze_candidate_tree_hash": "da790dadb6b6041631c537f335d5c01eee5ad8c8",
+  "freeze_candidate_sha": "f88bb23965637dee60e7d1ab6d89b83cc33a97ee",
+  "freeze_candidate_tree_hash": "7486641b0fe36fae86659415f495eba570959007",
   "freeze_schema_version": "governed-capability-genesis-v5-freeze-manifest-v1",
   "frozen_directories": [
     ".github/workflows",
@@ -186,12 +186,12 @@
       "size_bytes_at_candidate": 13783
     },
     {
-      "blob_sha_at_candidate": "acfaaaacefbd113238f8cbf6fcfeff6267113096",
+      "blob_sha_at_candidate": "0eff1fced477ccf21410b60e45e42f0608e69d5f",
       "bundle": "runtime",
       "path": "agentco_capability/storage.py",
       "required_at_final_head": true,
-      "sha256_at_candidate": "c5a494a60cab8d5868af3b5011ef9fd67e4df7076bb09c7d7bb578e448f2f3c1",
-      "size_bytes_at_candidate": 3954
+      "sha256_at_candidate": "23711d0fae0b7fe7d834e18754669ecd09f1bc7b05154cf2f54072e73d460a7b",
+      "size_bytes_at_candidate": 4008
     },
     {
       "blob_sha_at_candidate": "d6e2f1befd01af21d8732b37636e087bffd98c1e",
@@ -338,12 +338,12 @@
       "size_bytes_at_candidate": 7095
     },
     {
-      "blob_sha_at_candidate": "b0a54ce6260183c1cdc017f5d28cb7bd399e2c73",
+      "blob_sha_at_candidate": "cd7830eb9b66e550f82915acdb204af70c9a8984",
       "bundle": "evaluator_runner",
       "path": "scripts/run_governed_capability_genesis.py",
       "required_at_final_head": true,
-      "sha256_at_candidate": "5147f1779acde14af30b5e7a8d66bf26d5fb5f5542cf8459d4a8ea28168d0074",
-      "size_bytes_at_candidate": 55906
+      "sha256_at_candidate": "35d04008081ac02ed7ee7dfa22697fc36f2268976b9faf671ad35e5b74f460b1",
+      "size_bytes_at_candidate": 55893
     },
     {
       "blob_sha_at_candidate": "0bd8a1fa87af86c353c1cf357a78c2b49166bdcf",
@@ -482,7 +482,7 @@
       "size_bytes_at_candidate": 1258
     }
   ],
-  "manifest_logical_hash": "4ac76839dab1790e415039465a7faf19d0b9014b35add4c4add8d04702d80ed6",
+  "manifest_logical_hash": "c216cbd339fea60548d47b58e56c17842ef956e34b3c778abb0ee807748fcb01",
   "protocol_campaign_id": "governed-capability-protocol-baseline-v3",
   "real_capability_campaign_id": "governed-capability-genesis-v5"
 }
