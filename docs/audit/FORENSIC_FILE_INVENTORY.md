@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2036`
+- Tracked files: `2042`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 143 |
-| Documentation | 451 |
+| Documentation | 457 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 378 |
+| `docs` | 384 |
 | `evals` | 180 |
 | `scripts` | 155 |
 | `agents` | 111 |
@@ -1163,6 +1163,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BATCH_07_POST_CONFLICT_REPROOF.md` | Documentation |
 | `docs/audit/current/BATCH_08D_CORRECTED_EVIDENCE_RECORD.md` | Documentation |
 | `docs/audit/current/BATCH_08E_INDEPENDENT_AUDIT.md` | Documentation |
+| `docs/audit/current/BATCH_08F_INTEGRATION_REPORT.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |
@@ -1207,10 +1208,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V4_FREEZE.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_BINDING.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_MANIFEST.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_REAL_PROVIDER_RESULTS.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V3_RESULTS.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.md` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
@@ -1257,7 +1260,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
 | `docs/audit/current/PR27_CONFLICT_RESOLUTION.md` | Documentation |
+| `docs/audit/current/PR28_RESTACK_MAP.md` | Documentation |
+| `docs/audit/current/PROTOCOL_V3_HASH_RECONCILIATION.md` | Documentation |
 | `docs/audit/current/PROTOCOL_V3_REPROOF.md` | Documentation |
+| `docs/audit/current/PROVIDER_DESTINATION_SECURITY.md` | Documentation |
 | `docs/audit/current/PROVIDER_TRUST_BOUNDARY_AUDIT.md` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |

@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2036,
+  "tracked_file_count": 2042,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 143,
-    "Documentation": 451,
+    "Documentation": 457,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 507,
-    "docs": 378,
+    "docs": 384,
     "evals": 180,
     "scripts": 155,
     "agents": 111,
@@ -83,9 +83,9 @@
   },
   "extension_counts": {
     ".py": 611,
-    ".md": 495,
+    ".md": 499,
     ".ts": 342,
-    ".json": 239,
+    ".json": 241,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -6525,6 +6525,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/BATCH_08F_INTEGRATION_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6789,6 +6795,12 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_REAL_PROVIDER_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6811,6 +6823,12 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V3_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
     },
     {
       "path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
@@ -7089,7 +7107,25 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/PR28_RESTACK_MAP.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROTOCOL_V3_HASH_RECONCILIATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/PROTOCOL_V3_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROVIDER_DESTINATION_SECURITY.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
