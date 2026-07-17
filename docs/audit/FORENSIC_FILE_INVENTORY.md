@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1990`
+- Tracked files: `1999`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 143 |
-| Documentation | 439 |
+| Documentation | 448 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 505 |
-| `docs` | 366 |
+| `docs` | 375 |
 | `evals` | 180 |
 | `scripts` | 155 |
 | `agents` | 111 |
@@ -1126,6 +1126,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.md` | Documentation |
 | `docs/audit/current/BATCH07_MAIN_RECONCILIATION.json` | Documentation |
 | `docs/audit/current/BATCH07_MAIN_RECONCILIATION.md` | Documentation |
+| `docs/audit/current/BATCH_08D_CORRECTED_EVIDENCE_RECORD.md` | Documentation |
+| `docs/audit/current/BATCH_08E_INDEPENDENT_AUDIT.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |
@@ -1159,6 +1161,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/DEPLOYMENT_OPERATIONAL_FINDINGS.md` | Documentation |
 | `docs/audit/current/FILE_AUDIT_LEDGER_BATCH03.json` | Documentation |
 | `docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json` | Documentation |
+| `docs/audit/current/GCR_004_AND_V2_INVALIDATION_AUDIT.md` | Documentation |
+| `docs/audit/current/GENESIS_V5_HOLD_REPROOF.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_FREEZE.json` | Documentation |
@@ -1172,6 +1176,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.md` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.json` | Documentation |
 | `docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json` | Documentation |
+| `docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.md` | Documentation |
 | `docs/audit/current/HOSTED_BACKUP_RESTORE_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_DNS_TLS_VERIFICATION.md` | Documentation |
 | `docs/audit/current/HOSTED_ENVIRONMENT_GAP_ANALYSIS.md` | Documentation |
@@ -1215,6 +1221,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/MISSION_CLAIM_DECOMPOSITION.md` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
+| `docs/audit/current/PROTOCOL_V3_REPROOF.md` | Documentation |
+| `docs/audit/current/PROVIDER_TRUST_BOUNDARY_AUDIT.md` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
@@ -1238,6 +1246,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/RUNTIME_INTEGRATION_FINDINGS.md` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.json` | Documentation |
 | `docs/audit/current/RUNTIME_REACHABILITY.md` | Documentation |
+| `docs/audit/current/STACKED_PR_INTEGRATION_PLAN.md` | Documentation |
 | `docs/audit/current/SUBJECT_ADAPTER_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/SUBJECT_ADAPTER_V2_FREEZE_MANIFEST.json` | Documentation |
 | `docs/audit/current/SUBJECT_EXECUTION_PROTOCOL.md` | Documentation |

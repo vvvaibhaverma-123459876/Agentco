@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1990,
+  "tracked_file_count": 1999,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 143,
-    "Documentation": 439,
+    "Documentation": 448,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 505,
-    "docs": 366,
+    "docs": 375,
     "evals": 180,
     "scripts": 155,
     "agents": 111,
@@ -83,9 +83,9 @@
   },
   "extension_counts": {
     ".py": 611,
-    ".md": 452,
+    ".md": 460,
     ".ts": 340,
-    ".json": 238,
+    ".json": 239,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -6303,6 +6303,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/BATCH_08D_CORRECTED_EVIDENCE_RECORD.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/BATCH_08E_INDEPENDENT_AUDIT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6501,6 +6513,18 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/GCR_004_AND_V2_INVALIDATION_AUDIT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GENESIS_V5_HOLD_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6574,6 +6598,18 @@
     },
     {
       "path": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -6837,6 +6873,18 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/PROTOCOL_V3_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PROVIDER_TRUST_BOUNDARY_AUDIT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/REAL_CROSS_VERSION_DECISION.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6970,6 +7018,12 @@
     },
     {
       "path": "docs/audit/current/RUNTIME_REACHABILITY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/STACKED_PR_INTEGRATION_PLAN.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
