@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1938,
+  "tracked_file_count": 1940,
   "category_counts": {
     "Database migration": 138,
     "Deployment infrastructure": 33,
     "Deprecated code": 48,
     "Development tooling": 139,
-    "Documentation": 426,
+    "Documentation": 428,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 487,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 502,
-    "docs": 353,
+    "docs": 355,
     "evals": 180,
     "scripts": 151,
     "agents": 111,
@@ -82,7 +82,7 @@
   },
   "extension_counts": {
     ".py": 576,
-    ".md": 480,
+    ".md": 482,
     ".ts": 338,
     ".json": 197,
     ".sql": 139,
@@ -6236,6 +6236,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/current/BATCH_07_POST_CONFLICT_REPROOF.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -6687,6 +6693,12 @@
     },
     {
       "path": "docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/audit/current/PR27_CONFLICT_RESOLUTION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"

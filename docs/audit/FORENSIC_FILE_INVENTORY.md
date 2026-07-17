@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1938`
+- Tracked files: `1940`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 33 |
 | Deprecated code | 48 |
 | Development tooling | 139 |
-| Documentation | 426 |
+| Documentation | 428 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 487 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 502 |
-| `docs` | 353 |
+| `docs` | 355 |
 | `evals` | 180 |
 | `scripts` | 151 |
 | `agents` | 111 |
@@ -1114,6 +1114,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/BATCH07_EVIDENCE_INVALIDATION.md` | Documentation |
 | `docs/audit/current/BATCH07_MAIN_RECONCILIATION.json` | Documentation |
 | `docs/audit/current/BATCH07_MAIN_RECONCILIATION.md` | Documentation |
+| `docs/audit/current/BATCH_07_POST_CONFLICT_REPROOF.md` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.json` | Documentation |
 | `docs/audit/current/BENCHMARK_GOVERNANCE_POLICY.md` | Documentation |
 | `docs/audit/current/BENCHMARK_REGISTRY.json` | Documentation |
@@ -1190,6 +1191,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/MISSION_CLAIM_DECOMPOSITION.md` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.json` | Documentation |
 | `docs/audit/current/OBSERVABILITY_ALERT_MATRIX.md` | Documentation |
+| `docs/audit/current/PR27_CONFLICT_RESOLUTION.md` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
