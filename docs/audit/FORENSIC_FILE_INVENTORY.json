@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2060,
+  "tracked_file_count": 2065,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 144,
-    "Documentation": 467,
+    "Documentation": 472,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 507,
-    "docs": 394,
+    "docs": 399,
     "evals": 180,
     "scripts": 156,
     "agents": 111,
@@ -83,9 +83,9 @@
   },
   "extension_counts": {
     ".py": 614,
-    ".md": 507,
+    ".md": 511,
     ".ts": 342,
-    ".json": 248,
+    ".json": 249,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -7173,6 +7173,12 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -7414,6 +7420,30 @@
     },
     {
       "path": "docs/capability/BATCH_09A_READINESS_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/BATCH_09B_EXECUTION_BASELINE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/BATCH_09B_OPERATOR_INCIDENT_LOG.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/BATCH_09B_REAL_PROVIDER_BASELINE_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/BATCH_09B_REPOSITORY_INTEGRITY_ATTESTATION.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"

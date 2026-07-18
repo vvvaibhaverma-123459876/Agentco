@@ -1,8 +1,8 @@
 {
   "ledger_id": "governed-capability-runtime-findings",
-  "updated_for_batch": "09A",
-  "audited_pr": 28,
-  "audited_sha": "a8868f2599e57c6349746df9cbeee2521b55eed1",
+  "updated_for_batch": "09B",
+  "audited_pr": 29,
+  "audited_sha": "98eb1b9c04604e84770c7bdd286f9bbbfdbec663",
   "findings": [
     {
       "finding_id": "GCR-001",
@@ -72,6 +72,17 @@
       "impact": "A future real-provider campaign could be attempted with incomplete authorization, ambiguous provider identity, stale cases, or insufficient evidence binding.",
       "remediation": "Batch 09A adds fail-closed provider configuration validation, campaign authorization schema, frozen case manifest, evaluator protocol, threshold specification, semantic hash contract, dry-run/preflight modes and readiness gates.",
       "remaining_risk": "Real provider capability remains unverified until a separately authorized Batch 09B supplies credentials, passes preflight, executes the live campaign and produces scored evidence."
+    },
+    {
+      "finding_id": "GCR-008",
+      "severity": "S3",
+      "component": "real-provider-genesis-baseline",
+      "status": "open_hold_for_more_evidence",
+      "summary": "Batch 09B could not attempt the first real-provider baseline because no executable campaign authorization artifact exists and the active process environment lacks provider model, endpoint, credential reference and host allowlist configuration.",
+      "evidence": "docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json",
+      "impact": "No real-provider capability baseline, supported domains, aggregate correctness, capability improvement, hosted staging readiness or production readiness can be claimed.",
+      "remediation": "Provide a machine-verifiable authorization artifact bound to the exact source commit, source tree, provider, model, endpoint, case manifest and budgets; expose provider configuration through the approved environment or secret manager; then run a separately authorized real-provider campaign.",
+      "remaining_risk": "Until authorization and preflight pass, real-provider capability evidence remains unavailable."
     }
   ]
 }

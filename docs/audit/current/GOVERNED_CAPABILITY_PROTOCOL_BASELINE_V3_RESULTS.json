@@ -31,7 +31,7 @@
   "assertions_skipped": 0,
   "benchmark_case_bundle_hash": "048e4490976b44f14a9b628270022521318273097d9ee27b8bdd3f07da4102a4",
   "benchmark_registry_file_hash": "173d5f5121b8e089c9724f667b655c05f3555b147a175e9e3b6895a1f6009a87",
-  "campaign_execution_sha": "5e39b25120c8140a837597572c3030491ae44fe0",
+  "campaign_execution_sha": "d005bc888c64700a3dbd4e79a3fb43e1fc7b4407",
   "campaign_id": "governed-capability-protocol-baseline-v3",
   "capability_decision": "not_applicable_protocol_only",
   "completed": 24,
@@ -78,7 +78,7 @@
     "passed": true
   },
   "hidden_evaluator_data_reached_runtime": false,
-  "internal_payload_manifest_hash": "334294fcbcb695bad7359513994631ad212283070c515d15870e2a95e329d99d",
+  "internal_payload_manifest_hash": "161fbaadbbf1f6ae827bac0bf1ef3b986036a85d20675e455fa3d48c7183f9d8",
   "planned": 24,
   "protocol_decision": "PROTOCOL_BASELINE_ACCEPTED",
   "provider_bundle_hash": "ff839c2b8829150f881e1ce24e4c425f272fcfb2687afcb7f02945bd5f679561",
@@ -99,6 +99,6 @@
     "full artifact byte ordering outside acceptance-relevant result fields"
   ],
   "tool_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
-  "workflow_head_sha": "5e39b25120c8140a837597572c3030491ae44fe0",
+  "workflow_head_sha": "d005bc888c64700a3dbd4e79a3fb43e1fc7b4407",
   "workspace_bundle_hash": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd"
 }
