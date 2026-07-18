@@ -111,3 +111,28 @@
   - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on the two failed subsystems and linked open findings.
 - Next candidate item:
   - Work the non-provider/non-hosted parts of `capability_runtime_protocol`; leave real provider execution and hosted staging blocked until authorized evidence is available.
+
+## Iteration 6 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `4ae31cfb405ea59db296f14b0956506886bb12d9`
+- Selected item: improve the non-provider parts of the Genesis V7 real-provider runner that likely contributed to all 24 attempt-2 cases producing schema-invalid output.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - Increased `MAX_COMPLETION_TOKENS` from `256` to `1000`; conservative hard-cap estimate remains below USD 3.00 for the frozen 24 cases plus canary.
+  - Added domain-specific required JSON fields to provider-visible V7 requests.
+  - Added explicit JSON-only chat body construction that derives the model from authorization and does not request private chain-of-thought.
+  - Added explicit empty-content parse classification.
+  - Updated `GCR-010` remediation text to describe this prepared fix without closing the finding.
+  - Regenerated subsystem audit results and forensic ledgers.
+- Evidence:
+  - `python3.13 -m pytest tests/test_openai_genesis_v7_runner.py tests/test_capability_genesis_artifact_verifier.py tests/test_run_subsystem_audit_results.py tests/test_verify_subsystem_audit_results.py -q` -> `20 passed`
+  - `python3.13 -m py_compile scripts/run_openai_genesis_v7_baseline.py` -> passed
+  - Conservative cost check -> `max_completion_tokens=1000`, `conservative_campaign_max=0.789`, `hard_cap=3.0`.
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on `capability_runtime_protocol` and `infra_deployment`.
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-008`, `GCR-010`, `GCR-011` and `HST-001`.
+- Next candidate item:
+  - Prepare a new V7 campaign identity/freeze path for a future authorized rerun, or continue closing verifier gaps that do not require provider credentials or hosted infrastructure.

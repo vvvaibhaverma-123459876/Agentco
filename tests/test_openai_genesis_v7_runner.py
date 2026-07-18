@@ -53,6 +53,56 @@ def test_genesis_v7_model_and_endpoint_come_from_authorization(monkeypatch, tmp_
     assert config.authorization_input_hash == runner.hash_file(auth)
 
 
+def test_provider_visible_payload_declares_domain_required_fields():
+    payload = runner.provider_visible_payload(
+        {
+            "case_id": "case-1",
+            "domain": "planning",
+            "request": {"prompt": "Plan this.", "structured_input": {"goal": "x"}},
+        }
+    )
+
+    assert payload["output_contract"]["required_top_level_fields"] == [
+        "goal",
+        "assumptions",
+        "constraints",
+        "ordered_steps",
+        "dependencies",
+        "risks",
+        "success_criteria",
+        "fallbacks",
+    ]
+
+
+def test_chat_body_uses_authorized_model_and_explicit_json_contract(monkeypatch, tmp_path):
+    auth = tmp_path / "authorization.json"
+    _auth(auth, model="gpt-authorized")
+    monkeypatch.setenv(runner.AUTHORIZATION_ENV, str(auth))
+    config = runner.load_execution_config()
+    payload = runner.provider_visible_payload(
+        {
+            "case_id": "case-1",
+            "domain": "reasoning",
+            "request": {"prompt": "Answer.", "structured_input": {}},
+        }
+    )
+
+    body = runner.build_chat_body(config, payload, runner.MAX_COMPLETION_TOKENS)
+
+    assert body["model"] == "gpt-authorized"
+    assert body["response_format"] == {"type": "json_object"}
+    assert body["max_completion_tokens"] >= 1000
+    assert "final_answer" in body["messages"][1]["content"]
+    assert "Do not include private chain-of-thought" in body["messages"][0]["content"]
+
+
+def test_normalize_response_rejects_empty_provider_content():
+    parsed, error = runner.normalize_response(_provider_data(""))
+
+    assert parsed is None
+    assert error == "structured_parse_failed:empty_provider_content"
+
+
 def test_terminal_record_preserves_diagnosable_redacted_response(monkeypatch, tmp_path):
     auth = tmp_path / "authorization.json"
     _auth(auth)

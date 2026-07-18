@@ -54,6 +54,14 @@ Genesis V7 attempt 2 remains `HOLD_FOR_MORE_EVIDENCE` with `executed_cases = 24`
 no aggregate correctness. No fallback model or provider was used, and no
 capability baseline or capability improvement is claimed.
 
+Prepared remediation for the next authorized run: the V7 runner now derives the
+model from the source-bound authorization artifact, sends domain-specific
+required JSON fields in the provider-visible request, and uses a larger
+visible-output cap that still remains below the local USD 3.00 hard campaign
+limit under the conservative ledger estimate. This does not close GCR-010
+because no new authorized real-provider campaign has produced valid scored
+outputs.
+
 `scripts/verify_capability_genesis_artifact.py --check` now rejects this
 non-diagnosable V7 evidence shape and reports the shared provider-response hash
 across all 24 cases. A future real-provider run must preserve redacted response

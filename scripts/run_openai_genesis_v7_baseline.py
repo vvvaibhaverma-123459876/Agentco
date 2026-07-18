@@ -35,7 +35,7 @@ GENESIS_V6_ID = "governed-capability-genesis-v6-real-baseline"
 TOTAL_CAP_USD = 3.00
 CANARY_CAP_USD = 0.25
 BASELINE_CAP_USD = 2.75
-MAX_COMPLETION_TOKENS = 256
+MAX_COMPLETION_TOKENS = 1000
 MAX_CASES = 24
 MAX_RETRIES_PER_CASE = 1
 TIMEOUT_SECONDS = 45
@@ -232,8 +232,26 @@ def redacted_provider_response(provider_data: dict[str, Any] | None) -> dict[str
     return response
 
 
+DOMAIN_REQUIRED_FIELDS = {
+    "reasoning": ["final_answer", "supported_claims", "unsupported_claims", "evidence_refs"],
+    "planning": ["goal", "assumptions", "constraints", "ordered_steps", "dependencies", "risks", "success_criteria", "fallbacks"],
+    "evidence_evaluation": ["conclusion", "confidence", "accepted_evidence", "rejected_evidence", "uncertainties", "contradictions", "provenance_refs"],
+    "claim_grounding": ["claims", "evidence_refs", "unsupported_claims"],
+    "structured_transformation": ["result"],
+    "safe_tool_selection": ["result", "tool_calls", "evidence_refs"],
+    "data_analysis": ["findings", "calculations", "queries_or_operations", "evidence_refs"],
+    "software_engineering": ["patch", "changed_files", "tests_requested", "rationale_summary"],
+    "cross_domain_synthesis": ["findings", "supported_claims", "unsupported_claims", "evidence_refs"],
+}
+
+
+def required_fields_for_domain(domain: str) -> list[str]:
+    return DOMAIN_REQUIRED_FIELDS.get(domain, ["result"])
+
+
 def provider_visible_payload(case: dict[str, Any]) -> dict[str, Any]:
     request = case["request"]
+    required_fields = required_fields_for_domain(case["domain"])
     return {
         "campaign_id": CAMPAIGN_ID,
         "case_id": case["case_id"],
@@ -242,6 +260,7 @@ def provider_visible_payload(case: dict[str, Any]) -> dict[str, Any]:
         "structured_input": request.get("structured_input", {}),
         "output_contract": {
             "format": "JSON object",
+            "required_top_level_fields": required_fields,
             "allowed_top_level_fields": [
                 "final_answer",
                 "supported_claims",
@@ -271,8 +290,36 @@ def provider_visible_payload(case: dict[str, Any]) -> dict[str, Any]:
                 "changed_files",
                 "tests_requested",
                 "rationale_summary",
+                "tool_calls",
             ],
         },
+    }
+
+
+def build_chat_body(config: ExecutionConfig, payload: dict[str, Any], max_completion_tokens: int) -> dict[str, Any]:
+    required = payload.get("output_contract", {}).get("required_top_level_fields", [])
+    return {
+        "model": config.model,
+        "messages": [
+            {
+                "role": "system",
+                "content": (
+                    "You are executing an AgentCo governed capability benchmark. "
+                    "Return only one valid JSON object. Do not wrap it in markdown. "
+                    "Do not include private chain-of-thought. "
+                    "Populate every required top-level field with task-specific content."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    "Produce a JSON object for this request. Required top-level fields: "
+                    f"{', '.join(required)}.\nRequest JSON:\n{canonical(payload)}"
+                ),
+            },
+        ],
+        "response_format": {"type": "json_object"},
+        "max_completion_tokens": max_completion_tokens,
     }
 
 
@@ -280,21 +327,7 @@ def openai_chat(config: ExecutionConfig, payload: dict[str, Any], *, max_complet
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY missing")
-    body = {
-        "model": config.model,
-        "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "You are executing an AgentCo governed capability benchmark. "
-                    "Return only a JSON object. Do not include private chain-of-thought."
-                ),
-            },
-            {"role": "user", "content": canonical(payload)},
-        ],
-        "response_format": {"type": "json_object"},
-        "max_completion_tokens": max_completion_tokens,
-    }
+    body = build_chat_body(config, payload, max_completion_tokens)
     request = urllib.request.Request(
         config.base_url.rstrip("/") + "/chat/completions",
         data=json.dumps(body, sort_keys=True).encode(),
@@ -325,6 +358,8 @@ def normalize_response(provider_data: dict[str, Any]) -> tuple[dict[str, Any] | 
     try:
         choice = provider_data["choices"][0]
         content = choice["message"]["content"]
+        if not isinstance(content, str) or not content.strip():
+            return None, "structured_parse_failed:empty_provider_content"
         parsed = json.loads(content)
         if not isinstance(parsed, dict):
             return None, "structured_output_not_object"

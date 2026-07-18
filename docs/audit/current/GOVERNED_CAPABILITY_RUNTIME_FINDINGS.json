@@ -99,7 +99,7 @@
       "finding_id": "GCR-010",
       "impact": "No cases were completed or scored, no domains were supported, aggregate correctness is unavailable, and no real capability baseline can be claimed.",
       "remaining_risk": "Real-provider capability remains unestablished until valid, scorable provider outputs are produced and thresholds are evaluated.",
-      "remediation": "A future authorized campaign must use a source-bound request contract that elicits schema-valid provider outputs without exposing rubrics or expected answers, then rerun the frozen baseline under a new campaign identity.",
+      "remediation": "Prepared a source-bound request contract with domain-specific required JSON fields and a larger visible-output cap that remains under the local USD 3.00 hard cap. A future authorized campaign must rerun the frozen baseline under a new campaign identity and produce schema-valid, scorable outputs.",
       "severity": "S3",
       "status": "open_hold_for_more_evidence",
       "summary": "Genesis V7 attempt 2 established OpenAI gpt-5.6-luna reachability and model identity, but all 24 baseline cases produced schema-invalid structured outputs under the frozen evaluator contract."

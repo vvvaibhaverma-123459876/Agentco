@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2161`
+- Tracked files: `2165`
 
 ## Category Counts
 
@@ -11,13 +11,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 143 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 149 |
-| Documentation | 539 |
+| Development tooling | 150 |
+| Documentation | 541 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 319 |
+| Test infrastructure | 320 |
 | Unknown purpose | 140 |
 
 ## Top-Level Counts
@@ -25,12 +25,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 520 |
-| `docs` | 466 |
+| `docs` | 468 |
 | `evals` | 180 |
-| `scripts` | 161 |
+| `scripts` | 162 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `tests` | 68 |
+| `tests` | 69 |
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
@@ -1330,6 +1330,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_DECISION.md` | Documentation |
 | `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.json` | Documentation |
 | `docs/audit/current/SUBJECT_NATIVE_CROSS_VERSION_V2_RESULTS.md` | Documentation |
+| `docs/audit/current/SUBSYSTEM_AUDIT_RESULTS.json` | Documentation |
+| `docs/audit/current/SUBSYSTEM_AUDIT_RESULTS.md` | Documentation |
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.json` | Documentation |
 | `docs/audit/current/THREE_VERSION_INTERFACE_INTERSECTION.md` | Documentation |
@@ -2073,6 +2075,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_real_world_validation.py` | Development tooling |
 | `scripts/run_staging_validation_gate.sh` | Development tooling |
 | `scripts/run_subject_native_cross_version_campaign.py` | Development tooling |
+| `scripts/run_subsystem_audit_results.py` | Development tooling |
 | `scripts/scan_committed_secrets.py` | Development tooling |
 | `scripts/setup_release_gate_role.sql` | Development tooling |
 | `scripts/smoke_frontend_auth.sh` | Development tooling |
@@ -2235,6 +2238,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_protocol_schema_validation.py` | Test infrastructure |
 | `tests/test_protocol_secret_redaction.py` | Test infrastructure |
 | `tests/test_real_provider_readiness.py` | Test infrastructure |
+| `tests/test_run_subsystem_audit_results.py` | Test infrastructure |
 | `tests/test_runtime_integration_controls.py` | Test infrastructure |
 | `tests/test_software_capability_workspace.py` | Test infrastructure |
 | `tests/test_specialist_agent.py` | Test infrastructure |
