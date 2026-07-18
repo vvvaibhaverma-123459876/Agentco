@@ -1,27 +1,27 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2159,
+  "tracked_file_count": 2161,
   "category_counts": {
     "Database migration": 143,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
-    "Development tooling": 148,
+    "Development tooling": 149,
     "Documentation": 539,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 493,
     "Prompt/template": 29,
-    "Test infrastructure": 318,
+    "Test infrastructure": 319,
     "Unknown purpose": 140
   },
   "top_level_counts": {
     "backend": 520,
     "docs": 466,
     "evals": 180,
-    "scripts": 160,
+    "scripts": 161,
     "agents": 111,
     "audit_artifacts": 99,
-    "tests": 67,
+    "tests": 68,
     "reports": 64,
     "runtime": 51,
     "archive": 48,
@@ -83,7 +83,7 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 622,
+    ".py": 624,
     ".md": 524,
     ".ts": 351,
     ".json": 308,
@@ -12442,6 +12442,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_subsystem_audit_results.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/wait_for_postgres.sh",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -13031,6 +13037,12 @@
     },
     {
       "path": "tests/test_verify_release_gates.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_verify_subsystem_audit_results.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

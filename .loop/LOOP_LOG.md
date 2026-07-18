@@ -87,3 +87,27 @@
   - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure: `SUBSYSTEM_AUDIT_RESULTS_MISSING`.
 - Next candidate item:
   - Build the actual subsystem-audit runner/result producer, starting with small local deterministic audits rather than relying on external agent summaries.
+
+## Iteration 5 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `5c7adaefc863569197e93501def783fb1c14f067`
+- Selected item: produce the missing machine-readable subsystem audit artifact without relying on external agent summaries.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - Added `scripts/run_subsystem_audit_results.py`.
+  - Added `make subsystem-audit-results`.
+  - Added `tests/test_run_subsystem_audit_results.py`.
+  - Generated `docs/audit/current/SUBSYSTEM_AUDIT_RESULTS.json` and `.md`.
+  - Regenerated forensic inventory and audit-control ledgers.
+- Evidence:
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed and wrote subsystem results: `16 passed`, `2 failed`.
+  - Failed subsystems are `capability_runtime_protocol` (`GCR-008`, `GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+  - `python3.13 -m pytest tests/test_run_subsystem_audit_results.py tests/test_verify_subsystem_audit_results.py -q` -> `8 passed`
+  - `python3.13 -m py_compile scripts/run_subsystem_audit_results.py` -> passed
+  - `python3.13 scripts/verify_make_targets.py --check` -> `{"missing": 0, "success": true}`
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on the two failed subsystems and linked open findings.
+- Next candidate item:
+  - Work the non-provider/non-hosted parts of `capability_runtime_protocol`; leave real provider execution and hosted staging blocked until authorized evidence is available.

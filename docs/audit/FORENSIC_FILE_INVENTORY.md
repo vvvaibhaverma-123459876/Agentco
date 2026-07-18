@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2159`
+- Tracked files: `2161`
 
 ## Category Counts
 
@@ -11,13 +11,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 143 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 148 |
+| Development tooling | 149 |
 | Documentation | 539 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 318 |
+| Test infrastructure | 319 |
 | Unknown purpose | 140 |
 
 ## Top-Level Counts
@@ -27,10 +27,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend` | 520 |
 | `docs` | 466 |
 | `evals` | 180 |
-| `scripts` | 160 |
+| `scripts` | 161 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `tests` | 67 |
+| `tests` | 68 |
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
@@ -2150,6 +2150,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_subject_answer_ownership.py` | Development tooling |
 | `scripts/verify_subject_request_consumption.py` | Development tooling |
 | `scripts/verify_subject_runtime_evidence.py` | Development tooling |
+| `scripts/verify_subsystem_audit_results.py` | Development tooling |
 | `scripts/wait_for_postgres.sh` | Development tooling |
 | `scripts/web_scraper_free.py` | Development tooling |
 | `self_modification/__init__.py` | Production runtime code |
@@ -2249,6 +2250,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_verify_no_blocking_findings.py` | Test infrastructure |
 | `tests/test_verify_production_posture.py` | Test infrastructure |
 | `tests/test_verify_release_gates.py` | Test infrastructure |
+| `tests/test_verify_subsystem_audit_results.py` | Test infrastructure |
 | `tests/test_weighting_floor_fix.py` | Test infrastructure |
 | `validation/__init__.py` | Generated artifact |
 | `validation/reports/validation_report.json` | Generated artifact |
