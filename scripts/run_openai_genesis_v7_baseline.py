@@ -18,6 +18,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -31,9 +32,6 @@ PROTOCOL_ID = "governed-capability-protocol-baseline-v3"
 READINESS_ID = "real-provider-baseline-readiness"
 GENESIS_V5_ID = "governed-capability-genesis-v5"
 GENESIS_V6_ID = "governed-capability-genesis-v6-real-baseline"
-MODEL = "gpt-5.6-luna"
-BASE_URL = "https://api.openai.com/v1"
-HOST = "api.openai.com"
 TOTAL_CAP_USD = 3.00
 CANARY_CAP_USD = 0.25
 BASELINE_CAP_USD = 2.75
@@ -49,6 +47,17 @@ INPUT_USD_PER_1M = 5.00
 OUTPUT_USD_PER_1M = 30.00
 
 SECRET_PATTERNS = ("sk-", "Bearer ")
+AUTHORIZATION_ENV = "AGENTCO_GENESIS_V7_AUTHORIZATION"
+
+
+@dataclass(frozen=True)
+class ExecutionConfig:
+    provider: str
+    model: str
+    base_url: str
+    host: str
+    authorization_input_path: Path
+    authorization_input_hash: str
 
 
 def canonical(data: Any) -> str:
@@ -92,6 +101,42 @@ def load_rubrics() -> dict[str, dict[str, Any]]:
     return read_json(ROOT / "benchmarks" / "capability_genesis_v5" / "rubrics" / "rubrics.json")
 
 
+def load_execution_config() -> ExecutionConfig:
+    raw_path = os.getenv(AUTHORIZATION_ENV)
+    if not raw_path:
+        raise SystemExit(f"{AUTHORIZATION_ENV} must point at a source-bound authorization JSON file")
+    path = Path(raw_path).expanduser().resolve()
+    if not path.exists() or not path.is_file():
+        raise SystemExit(f"{AUTHORIZATION_ENV} does not reference an existing file")
+    data = read_json(path)
+    provider = data.get("provider")
+    model = data.get("model") or data.get("requested_model")
+    base_url = data.get("endpoint") or data.get("api_base_url")
+    host = data.get("allowed_hostname") or data.get("endpoint_hostname")
+    if provider != "OpenAI":
+        raise SystemExit("Genesis V7 OpenAI runner requires provider=OpenAI")
+    for field, value in {"model": model, "endpoint": base_url, "allowed_hostname": host}.items():
+        if not isinstance(value, str) or not value.strip():
+            raise SystemExit(f"authorization missing non-empty {field}")
+    parsed = urllib.parse.urlparse(base_url)
+    if parsed.scheme != "https" or parsed.hostname != host or parsed.username or parsed.password:
+        raise SystemExit("authorization endpoint, scheme, host or authority is invalid")
+    if data.get("fallback_provider_allowed") is not False or data.get("fallback_model_allowed") is not False:
+        raise SystemExit("authorization must prohibit provider and model fallback")
+    if int(data.get("maximum_cases", MAX_CASES)) != MAX_CASES:
+        raise SystemExit("authorization maximum_cases does not match frozen Genesis V7 plan")
+    if float(data.get("maximum_total_spend_usd", TOTAL_CAP_USD)) > TOTAL_CAP_USD:
+        raise SystemExit("authorization spend cap exceeds runner hard cap")
+    return ExecutionConfig(
+        provider=provider,
+        model=model.strip(),
+        base_url=base_url.rstrip("/"),
+        host=host.strip(),
+        authorization_input_path=path,
+        authorization_input_hash=hash_file(path),
+    )
+
+
 def hash_file(path: Path) -> str:
     return sha256_bytes(path.read_bytes())
 
@@ -104,11 +149,11 @@ def bundle_hash(paths: list[Path]) -> str:
     return sha256_text(canonical(payload))
 
 
-def validate_destination() -> dict[str, Any]:
-    parsed = urllib.parse.urlparse(BASE_URL)
-    if parsed.scheme != "https" or parsed.hostname != HOST or parsed.username or parsed.password:
+def validate_destination(config: ExecutionConfig) -> dict[str, Any]:
+    parsed = urllib.parse.urlparse(config.base_url)
+    if parsed.scheme != "https" or parsed.hostname != config.host or parsed.username or parsed.password:
         raise SystemExit("authorized OpenAI endpoint failed URL validation")
-    infos = socket.getaddrinfo(HOST, 443, type=socket.SOCK_STREAM)
+    infos = socket.getaddrinfo(config.host, 443, type=socket.SOCK_STREAM)
     addresses = sorted({info[4][0] for info in infos})
     if not addresses:
         raise SystemExit("authorized OpenAI host did not resolve")
@@ -135,6 +180,56 @@ def estimated_tokens(payload: dict[str, Any]) -> int:
 
 def redacted_request_hash(payload: dict[str, Any]) -> str:
     return sha256_text(canonical(payload))
+
+
+def redact_text(text: str | None) -> str | None:
+    if text is None:
+        return None
+    redacted = text
+    for pattern in SECRET_PATTERNS:
+        redacted = redacted.replace(pattern, "[REDACTED_SECRET_PREFIX]")
+    return redacted
+
+
+def first_choice(provider_data: dict[str, Any] | None) -> dict[str, Any]:
+    if not provider_data:
+        return {}
+    choices = provider_data.get("choices")
+    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
+        return {}
+    return choices[0]
+
+
+def parser_input(provider_data: dict[str, Any] | None) -> str | None:
+    choice = first_choice(provider_data)
+    message = choice.get("message")
+    if not isinstance(message, dict):
+        return None
+    content = message.get("content")
+    return content if isinstance(content, str) else None
+
+
+def finish_reason(provider_data: dict[str, Any] | None) -> str | None:
+    value = first_choice(provider_data).get("finish_reason")
+    return value if isinstance(value, str) else None
+
+
+def redacted_provider_response(provider_data: dict[str, Any] | None) -> dict[str, Any] | None:
+    if provider_data is None:
+        return None
+    response = copy.deepcopy(provider_data)
+    if response.get("id"):
+        response["id_hash"] = sha256_text(str(response["id"]))
+        response["id"] = "[REDACTED_PROVIDER_REQUEST_ID]"
+    choices = response.get("choices")
+    if isinstance(choices, list):
+        for choice in choices:
+            if not isinstance(choice, dict):
+                continue
+            message = choice.get("message")
+            if isinstance(message, dict) and isinstance(message.get("content"), str):
+                message["content"] = redact_text(message["content"])
+    return response
 
 
 def provider_visible_payload(case: dict[str, Any]) -> dict[str, Any]:
@@ -181,12 +276,12 @@ def provider_visible_payload(case: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def openai_chat(payload: dict[str, Any], *, max_completion_tokens: int, timeout: int) -> tuple[dict[str, Any], float]:
+def openai_chat(config: ExecutionConfig, payload: dict[str, Any], *, max_completion_tokens: int, timeout: int) -> tuple[dict[str, Any], float]:
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
         raise RuntimeError("OPENAI_API_KEY missing")
     body = {
-        "model": MODEL,
+        "model": config.model,
         "messages": [
             {
                 "role": "system",
@@ -201,7 +296,7 @@ def openai_chat(payload: dict[str, Any], *, max_completion_tokens: int, timeout:
         "max_completion_tokens": max_completion_tokens,
     }
     request = urllib.request.Request(
-        BASE_URL.rstrip("/") + "/chat/completions",
+        config.base_url.rstrip("/") + "/chat/completions",
         data=json.dumps(body, sort_keys=True).encode(),
         headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
         method="POST",
@@ -275,10 +370,11 @@ def recursive_secret_scan(paths: list[Path]) -> dict[str, Any]:
 def main() -> int:
     if git("status", "--short"):
         raise SystemExit("working tree must be clean before real-provider execution")
+    config = load_execution_config()
     source_commit = git("rev-parse", "HEAD")
     source_tree = git("rev-parse", "HEAD^{tree}")
     cases = load_cases()
-    destination = validate_destination()
+    destination = validate_destination(config)
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -292,10 +388,12 @@ def main() -> int:
         "source_tree": source_tree,
         "protocol_v3_campaign_identity": PROTOCOL_ID,
         "batch_09a_readiness_identity": READINESS_ID,
-        "provider": "OpenAI",
-        "model": MODEL,
-        "endpoint": BASE_URL,
-        "allowed_hostname": HOST,
+        "provider": config.provider,
+        "model": config.model,
+        "endpoint": config.base_url,
+        "allowed_hostname": config.host,
+        "authorization_input_path": str(config.authorization_input_path.relative_to(ROOT)) if config.authorization_input_path.is_relative_to(ROOT) else "[external_authorization_path]",
+        "authorization_input_hash": config.authorization_input_hash,
         "case_manifest_hash": case_manifest_hash,
         "evaluator_protocol_hash": evaluator_protocol_hash,
         "threshold_specification_hash": threshold_hash,
@@ -348,7 +446,7 @@ def main() -> int:
     canary_started = datetime.now(timezone.utc).isoformat()
     canary_report: dict[str, Any]
     try:
-        canary_data, canary_latency = openai_chat(canary_payload, max_completion_tokens=32, timeout=TIMEOUT_SECONDS)
+        canary_data, canary_latency = openai_chat(config, canary_payload, max_completion_tokens=32, timeout=TIMEOUT_SECONDS)
         canary_usage = canary_data.get("usage") or {}
         canary_input = int(canary_usage.get("prompt_tokens") or 0)
         canary_output = int(canary_usage.get("completion_tokens") or 0)
@@ -360,7 +458,7 @@ def main() -> int:
         canary_report = {
             "canary_execution_attempted": True,
             "credential_accepted": True,
-            "requested_model": MODEL,
+            "requested_model": config.model,
             "returned_model_identity": returned_model,
             "provider_request_id_captured": bool(canary_data.get("id")),
             "reservation": {"reserved_usd": canary_reserved, "consumed_usd": canary_cost, "released_usd": round(canary_reserved - canary_cost, 8), "unreleased_amount": 0},
@@ -370,17 +468,17 @@ def main() -> int:
             "started_at": canary_started,
             "completed_at": datetime.now(timezone.utc).isoformat(),
         }
-        if returned_model != MODEL:
+        if returned_model != config.model:
             canary_report["status"] = "failed"
             canary_report["failure_category"] = "model_identity_mismatch"
             write_json(EVIDENCE_DIR / "PROVIDER_CANARY_REPORT.json", canary_report)
-            return write_hold(source_commit, source_tree, authorization, destination, canary_report, actual_spend, total_input, total_cached, total_output)
+            return write_hold(config, source_commit, source_tree, authorization, destination, canary_report, actual_spend, total_input, total_cached, total_output)
         canary_report["status"] = "completed"
     except Exception as exc:  # noqa: BLE001
         canary_report = {
             "canary_execution_attempted": True,
             "credential_accepted": False,
-            "requested_model": MODEL,
+            "requested_model": config.model,
             "returned_model_identity": None,
             "status": "failed",
             "failure_category": str(exc).splitlines()[0][:120],
@@ -390,7 +488,7 @@ def main() -> int:
             "completed_at": datetime.now(timezone.utc).isoformat(),
         }
         write_json(EVIDENCE_DIR / "PROVIDER_CANARY_REPORT.json", canary_report)
-        return write_hold(source_commit, source_tree, authorization, destination, canary_report, actual_spend, total_input, total_cached, total_output)
+        return write_hold(config, source_commit, source_tree, authorization, destination, canary_report, actual_spend, total_input, total_cached, total_output)
     write_json(EVIDENCE_DIR / "PROVIDER_CANARY_REPORT.json", canary_report)
 
     records: list[dict[str, Any]] = []
@@ -399,14 +497,14 @@ def main() -> int:
         input_estimate = estimated_tokens(payload)
         reservation = estimate_cost(input_estimate, MAX_COMPLETION_TOKENS)
         if actual_spend + reservation > TOTAL_CAP_USD:
-            record = terminal_record(case, "EVIDENCE_UNAVAILABLE", "budget_guard_refused_start", payload, reservation, 0.0, 0.0, 0, 0, 0, None, None)
+            record = terminal_record(config, case, "EVIDENCE_UNAVAILABLE", "budget_guard_refused_start", payload, reservation, 0.0, 0.0, 0, 0, 0, None, None)
             records.append(record)
             write_json(EVIDENCE_DIR / f"CASE_{case['case_id']}.json", record)
             print(json.dumps({"case": index, "status": record["terminal_status"], "cumulative_tokens": total_input + total_output, "cumulative_spend_usd": actual_spend, "remaining_budget_usd": round(TOTAL_CAP_USD - actual_spend, 8)}, sort_keys=True))
             continue
         started = datetime.now(timezone.utc).isoformat()
         try:
-            provider_data, latency = openai_chat(payload, max_completion_tokens=MAX_COMPLETION_TOKENS, timeout=TIMEOUT_SECONDS)
+            provider_data, latency = openai_chat(config, payload, max_completion_tokens=MAX_COMPLETION_TOKENS, timeout=TIMEOUT_SECONDS)
             usage = provider_data.get("usage") or {}
             prompt_tokens = int(usage.get("prompt_tokens") or 0)
             cached_tokens = int((usage.get("prompt_tokens_details") or {}).get("cached_tokens") or 0)
@@ -418,20 +516,21 @@ def main() -> int:
             total_output += completion_tokens
             normalized, parse_error = normalize_response(provider_data)
             if parse_error:
-                record = terminal_record(case, "INVALID_RESPONSE", parse_error, payload, reservation, consumed, latency, prompt_tokens, cached_tokens, completion_tokens, provider_data, None, started)
+                record = terminal_record(config, case, "INVALID_RESPONSE", parse_error, payload, reservation, consumed, latency, prompt_tokens, cached_tokens, completion_tokens, provider_data, None, started)
             else:
                 score = score_case(case, normalized, provider_data)
-                record = terminal_record(case, "COMPLETED", None, payload, reservation, consumed, latency, prompt_tokens, cached_tokens, completion_tokens, provider_data, score, started, normalized)
+                record = terminal_record(config, case, "COMPLETED", None, payload, reservation, consumed, latency, prompt_tokens, cached_tokens, completion_tokens, provider_data, score, started, normalized)
         except Exception as exc:  # noqa: BLE001
-            record = terminal_record(case, "FAILED", str(exc).splitlines()[0][:120], payload, reservation, 0.0, 0.0, 0, 0, 0, None, None, started)
+            record = terminal_record(config, case, "FAILED", str(exc).splitlines()[0][:120], payload, reservation, 0.0, 0.0, 0, 0, 0, None, None, started)
         records.append(record)
         write_json(EVIDENCE_DIR / f"CASE_{case['case_id']}.json", record)
         print(json.dumps({"case": index, "status": record["terminal_status"], "cumulative_tokens": total_input + total_output, "cumulative_spend_usd": actual_spend, "remaining_budget_usd": round(TOTAL_CAP_USD - actual_spend, 8)}, sort_keys=True))
 
-    return write_final(source_commit, source_tree, authorization, destination, canary_report, records, actual_spend, total_input, total_cached, total_output)
+    return write_final(config, source_commit, source_tree, authorization, destination, canary_report, records, actual_spend, total_input, total_cached, total_output)
 
 
 def terminal_record(
+    config: ExecutionConfig,
     case: dict[str, Any],
     status: str,
     failure_category: str | None,
@@ -448,6 +547,9 @@ def terminal_record(
     normalized: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     released = round(max(0.0, reserved - consumed), 8)
+    redacted_response = redacted_provider_response(provider_data)
+    response_text = parser_input(provider_data)
+    provider_id = provider_data.get("id") if provider_data else None
     record = {
         "artifact_type": "genesis_v7_case_evidence",
         "campaign_id": CAMPAIGN_ID,
@@ -456,12 +558,17 @@ def terminal_record(
         "split": case["split"],
         "terminal_status": status,
         "failure_category": failure_category,
-        "provider": "OpenAI",
-        "requested_model": MODEL,
+        "provider": config.provider,
+        "requested_model": config.model,
         "returned_model_identity": provider_data.get("model") if provider_data else None,
-        "provider_request_id_captured": bool(provider_data and provider_data.get("id")),
+        "provider_request_id_captured": bool(provider_id),
+        "provider_request_id_hash": sha256_text(str(provider_id)) if provider_id else None,
         "redacted_request_hash": redacted_request_hash(payload),
-        "provider_response_hash": sha256_text(canonical({"id": bool(provider_data and provider_data.get("id")), "model": provider_data.get("model") if provider_data else None, "choices": provider_data.get("choices") if provider_data else None})),
+        "provider_response_hash": sha256_text(canonical(redacted_response)) if redacted_response is not None else None,
+        "redacted_provider_response": redacted_response,
+        "finish_reason": finish_reason(provider_data),
+        "parser_input_redacted": redact_text(response_text),
+        "parser_input_hash": sha256_text(response_text) if response_text is not None else None,
         "provider_visible_request": payload,
         "normalized_response": normalized,
         "usage": {
@@ -478,12 +585,19 @@ def terminal_record(
         "latency_ms": round(latency * 1000, 3),
         "retry_count": 0,
         "evaluator_result": score,
-        "evidence_complete": status == "COMPLETED" and provider_data is not None and score is not None,
+        "audit_references": [
+            {
+                "type": "local_evidence_artifact",
+                "path": str((EVIDENCE_DIR / f"CASE_{case['case_id']}.json").relative_to(ROOT)),
+                "resolver": "git-tracked-json-evidence",
+            }
+        ],
+        "evidence_complete": status == "COMPLETED" and provider_data is not None and score is not None and response_text is not None,
         "schema_valid": status == "COMPLETED",
         "started_at": started,
         "completed_at": datetime.now(timezone.utc).isoformat(),
     }
-    record["semantic_hash"] = sha256_text(canonical({key: record[key] for key in ["campaign_id", "case_id", "domain", "terminal_status", "failure_category", "requested_model", "returned_model_identity", "redacted_request_hash", "usage", "cost", "evaluator_result"]}))
+    record["semantic_hash"] = sha256_text(canonical({key: record[key] for key in ["campaign_id", "case_id", "domain", "terminal_status", "failure_category", "requested_model", "returned_model_identity", "redacted_request_hash", "provider_response_hash", "finish_reason", "parser_input_hash", "usage", "cost", "evaluator_result"]}))
     return record
 
 
@@ -538,8 +652,8 @@ def median(values: list[float]) -> float | None:
     return round((values[mid - 1] + values[mid]) / 2, 3)
 
 
-def write_hold(source_commit: str, source_tree: str, authorization: dict[str, Any], destination: dict[str, Any], canary_report: dict[str, Any], actual_spend: float, total_input: int, total_cached: int, total_output: int) -> int:
-    aggregate = base_aggregate(source_commit, source_tree, authorization, destination)
+def write_hold(config: ExecutionConfig, source_commit: str, source_tree: str, authorization: dict[str, Any], destination: dict[str, Any], canary_report: dict[str, Any], actual_spend: float, total_input: int, total_cached: int, total_output: int) -> int:
+    aggregate = base_aggregate(config, source_commit, source_tree, authorization, destination)
     aggregate.update(
         {
             "decision": "HOLD_FOR_MORE_EVIDENCE",
@@ -561,6 +675,7 @@ def write_hold(source_commit: str, source_tree: str, authorization: dict[str, An
 
 
 def write_final(
+    config: ExecutionConfig,
     source_commit: str,
     source_tree: str,
     authorization: dict[str, Any],
@@ -573,7 +688,7 @@ def write_final(
     total_output: int,
 ) -> int:
     rolled = aggregate_records(records)
-    aggregate = base_aggregate(source_commit, source_tree, authorization, destination)
+    aggregate = base_aggregate(config, source_commit, source_tree, authorization, destination)
     aggregate.update(
         {
             "decision": decide(records, rolled, actual_spend),
@@ -609,7 +724,7 @@ def write_final(
     return write_reports(aggregate, records, rolled["domain_report"])
 
 
-def base_aggregate(source_commit: str, source_tree: str, authorization: dict[str, Any], destination: dict[str, Any]) -> dict[str, Any]:
+def base_aggregate(config: ExecutionConfig, source_commit: str, source_tree: str, authorization: dict[str, Any], destination: dict[str, Any]) -> dict[str, Any]:
     return {
         "artifact_type": "real_provider_genesis_v7_aggregate",
         "campaign_id": CAMPAIGN_ID,
@@ -619,11 +734,12 @@ def base_aggregate(source_commit: str, source_tree: str, authorization: dict[str
         "batch_09a_readiness_identity": READINESS_ID,
         "genesis_v5_hold_identity": GENESIS_V5_ID,
         "genesis_v6_hold_identity": GENESIS_V6_ID,
-        "provider": "OpenAI",
-        "requested_model": MODEL,
-        "endpoint_hostname": HOST,
-        "provider_host_allowlist": [HOST],
+        "provider": config.provider,
+        "requested_model": config.model,
+        "endpoint_hostname": config.host,
+        "provider_host_allowlist": [config.host],
         "authorization_hash": authorization["authorization_hash"],
+        "authorization_input_hash": config.authorization_input_hash,
         "destination_validation": destination,
         "planned_cases": MAX_CASES,
         "account_balance": "not_queried",
@@ -652,6 +768,67 @@ def decide(records: list[dict[str, Any]], rolled: dict[str, Any], actual_spend: 
     ):
         return "REAL_CAPABILITY_BASELINE_ACCEPTED"
     return "REAL_CAPABILITY_BASELINE_REJECTED"
+
+
+def recompute_case_semantic_hash(record: dict[str, Any]) -> str:
+    fields = [
+        "campaign_id",
+        "case_id",
+        "domain",
+        "terminal_status",
+        "failure_category",
+        "requested_model",
+        "returned_model_identity",
+        "redacted_request_hash",
+        "provider_response_hash",
+        "finish_reason",
+        "parser_input_hash",
+        "usage",
+        "cost",
+        "evaluator_result",
+    ]
+    return sha256_text(canonical({key: record.get(key) for key in fields}))
+
+
+def clean_clone_verification_report(aggregate: dict[str, Any], records: list[dict[str, Any]]) -> dict[str, Any]:
+    recomputed_case_hashes = [
+        {
+            "case_id": record["case_id"],
+            "expected": record.get("semantic_hash"),
+            "actual": recompute_case_semantic_hash(record),
+        }
+        for record in records
+    ]
+    case_hashes_match = all(item["expected"] == item["actual"] for item in recomputed_case_hashes)
+    case_ids = [record["case_id"] for record in records]
+    totals_reconcile = len(records) == aggregate.get("executed_cases", len(records)) and len(case_ids) == len(set(case_ids))
+    diagnosable_provider_attempts = all(
+        record.get("terminal_status") in {"EVIDENCE_UNAVAILABLE", "FAILED"}
+        or (
+            record.get("provider_response_hash")
+            and record.get("redacted_provider_response") is not None
+            and record.get("provider_request_id_hash")
+            and record.get("finish_reason") is not None
+            and record.get("parser_input_hash")
+            and record.get("parser_input_redacted") is not None
+            and record.get("audit_references")
+        )
+        for record in records
+    )
+    recomputed_aggregate_hash = sha256_text(canonical({k: v for k, v in aggregate.items() if k not in {"generated_at", "semantic_hash"}}))
+    aggregate_hash_matches = recomputed_aggregate_hash == aggregate.get("semantic_hash")
+    passed = case_hashes_match and totals_reconcile and diagnosable_provider_attempts and aggregate_hash_matches
+    return {
+        "campaign_id": aggregate["campaign_id"],
+        "verification_result": "passed" if passed else "failed",
+        "decision_recomputable_without_provider_credentials": passed,
+        "case_hashes_match": case_hashes_match,
+        "aggregate_hash_matches": aggregate_hash_matches,
+        "terminal_totals_reconcile": totals_reconcile,
+        "diagnosable_provider_attempts": diagnosable_provider_attempts,
+        "recomputed_aggregate_semantic_hash": recomputed_aggregate_hash,
+        "case_semantic_hash_recomputation": recomputed_case_hashes,
+    }
 
 
 def write_reports(aggregate: dict[str, Any], records: list[dict[str, Any]], domain_report: dict[str, Any]) -> int:
@@ -696,11 +873,7 @@ def write_reports(aggregate: dict[str, Any], records: list[dict[str, Any]], doma
         "paid_evaluator_used": False,
         "provider_outputs_not_replaced_by_evaluator": True,
     })
-    write_json(EVIDENCE_DIR / "CLEAN_CLONE_VERIFICATION_REPORT.json", {
-        "campaign_id": CAMPAIGN_ID,
-        "verification_result": "not_run_local_artifact_recomputation_available",
-        "decision_recomputable_without_provider_credentials": True,
-    })
+    write_json(EVIDENCE_DIR / "CLEAN_CLONE_VERIFICATION_REPORT.json", clean_clone_verification_report(aggregate, records))
     scan = recursive_secret_scan([EVIDENCE_DIR])
     write_json(EVIDENCE_DIR / "SECRET_SCAN_RESULT.json", scan)
     write_json(EVIDENCE_DIR / "CREDENTIAL_REDACTION_ATTESTATION.json", {

@@ -1,6 +1,6 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2149,
+  "tracked_file_count": 2156,
   "category_counts": {
     "Database migration": 143,
     "Deployment infrastructure": 34,
@@ -11,8 +11,8 @@
     "Generated artifact": 116,
     "Production runtime code": 493,
     "Prompt/template": 29,
-    "Test infrastructure": 315,
-    "Unknown purpose": 134
+    "Test infrastructure": 316,
+    "Unknown purpose": 140
   },
   "top_level_counts": {
     "backend": 520,
@@ -21,8 +21,8 @@
     "scripts": 159,
     "agents": 111,
     "audit_artifacts": 99,
+    "tests": 65,
     "reports": 64,
-    "tests": 64,
     "runtime": 51,
     "archive": 48,
     "constitution": 40,
@@ -42,6 +42,7 @@
     "synthesis": 10,
     "cross_version_adapters": 9,
     "ingestion": 9,
+    ".loop": 6,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -82,8 +83,8 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 618,
-    ".md": 519,
+    ".py": 619,
+    ".md": 524,
     ".ts": 351,
     ".json": 308,
     ".sql": 144,
@@ -95,7 +96,7 @@
     ".txt": 16,
     ".yml": 15,
     ".sh": 14,
-    "(none)": 8,
+    "(none)": 9,
     ".example": 3,
     ".mjs": 2,
     ".test": 1,
@@ -204,6 +205,42 @@
       "path": ".gitignore",
       "category": "Development tooling",
       "top_level": ".gitignore",
+      "extension": "(none)"
+    },
+    {
+      "path": ".loop/BLOCKED.md",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
+      "extension": ".md"
+    },
+    {
+      "path": ".loop/DECISIONS.md",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
+      "extension": ".md"
+    },
+    {
+      "path": ".loop/FINAL_VERIFICATION.md",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
+      "extension": ".md"
+    },
+    {
+      "path": ".loop/LOOP_LOG.md",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
+      "extension": ".md"
+    },
+    {
+      "path": ".loop/STUCK.md",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
+      "extension": ".md"
+    },
+    {
+      "path": ".loop/status",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
       "extension": "(none)"
     },
     {
@@ -12826,6 +12863,12 @@
     },
     {
       "path": "tests/test_migration_naming_governance.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_openai_genesis_v7_runner.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

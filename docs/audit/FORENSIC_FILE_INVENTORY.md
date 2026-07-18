@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2149`
+- Tracked files: `2156`
 
 ## Category Counts
 
@@ -17,8 +17,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 315 |
-| Unknown purpose | 134 |
+| Test infrastructure | 316 |
+| Unknown purpose | 140 |
 
 ## Top-Level Counts
 
@@ -30,8 +30,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts` | 159 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
+| `tests` | 65 |
 | `reports` | 64 |
-| `tests` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `constitution` | 40 |
@@ -51,6 +51,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
+| `.loop` | 6 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -110,6 +111,12 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.github/workflows/runtime-integration-audit.yml` | Deployment infrastructure |
 | `.github/workflows/staging-deployment-audit.yml` | Deployment infrastructure |
 | `.gitignore` | Development tooling |
+| `.loop/BLOCKED.md` | Unknown purpose |
+| `.loop/DECISIONS.md` | Unknown purpose |
+| `.loop/FINAL_VERIFICATION.md` | Unknown purpose |
+| `.loop/LOOP_LOG.md` | Unknown purpose |
+| `.loop/STUCK.md` | Unknown purpose |
+| `.loop/status` | Unknown purpose |
 | `.python-version` | Development tooling |
 | `AGENTCO_AUDIT_EXECUTIVE_SUMMARY.md` | Unknown purpose |
 | `AGENTCO_REPO_AUDIT.md` | Unknown purpose |
@@ -2214,6 +2221,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_longitudinal_remote_closure.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
 | `tests/test_migration_naming_governance.py` | Test infrastructure |
+| `tests/test_openai_genesis_v7_runner.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_protocol_baseline.py` | Test infrastructure |
 | `tests/test_protocol_baseline_v2.py` | Test infrastructure |
