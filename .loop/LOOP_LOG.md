@@ -136,3 +136,17 @@
   - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-008`, `GCR-010`, `GCR-011` and `HST-001`.
 - Next candidate item:
   - Prepare a new V7 campaign identity/freeze path for a future authorized rerun, or continue closing verifier gaps that do not require provider credentials or hosted infrastructure.
+
+## Iteration 7 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `6eae2130e97d86b833f67ebef4d4794454832537`
+- Selected item: persist the user's loop-control instruction so restarted iterations continue while status remains `CONTINUE`.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - Added a loop continuation policy to `.loop/DECISIONS.md`.
+- Evidence:
+  - `cat .loop/status` -> `CONTINUE`
+  - `cat .loop/DECISIONS.md` -> continuation policy recorded.
+- Next candidate item:
+  - Continue with the highest-leverage non-human-blocked item, currently stale finding cleanup around `GCR-008` or further capability-runtime verifier strengthening.
