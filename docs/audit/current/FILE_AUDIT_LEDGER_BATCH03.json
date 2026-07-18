@@ -26,6 +26,9 @@
     "backend/src/adapters/url-safety.ts",
     "backend/src/adapters/web-adapter.ts",
     "backend/src/agent-registry.ts",
+    "backend/src/auth/identity-lookup.ts",
+    "backend/src/auth/principal-context.ts",
+    "backend/src/auth/request-principal.ts",
     "backend/src/cli/autonomy.ts",
     "backend/src/cli/db-table-usage.ts",
     "backend/src/cli/run-bounded-learning.ts",
@@ -292,5 +295,5 @@
     "runtime/tests/test_spend_guardrail_ledger.py",
     "runtime/tool_registry/__init__.py"
   ],
-  "source_input_hash": "32c97c005221bb1e56f64543b0cd497ccabebc7df8487d03bcc9be7d6ebf903d"
+  "source_input_hash": "b3bbdf8d18087f44c7bb7dc67efd1d1da0b64ba4f76449aeb8aa3ab1cec577d4"
 }

@@ -1,6 +1,6 @@
 # Runtime Component Ledger
 
-Tracked structural snapshot input hash `32c97c005221bb1e56f64543b0cd497ccabebc7df8487d03bcc9be7d6ebf903d`.
+Tracked structural snapshot input hash `b3bbdf8d18087f44c7bb7dc67efd1d1da0b64ba4f76449aeb8aa3ab1cec577d4`.
 
 | component_id | path | classification | authoritative_status | process_type | entrypoint | external_dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -28,6 +28,9 @@ Tracked structural snapshot input hash `32c97c005221bb1e56f64543b0cd497ccabebc7d
 | backend-src-adapters-url-safety-ts | backend/src/adapters/url-safety.ts | runtime_support | support | library | None | ['LLM provider'] |
 | backend-src-adapters-web-adapter-ts | backend/src/adapters/web-adapter.ts | runtime_support | support | library | None | [] |
 | backend-src-agent-registry-ts | backend/src/agent-registry.ts | runtime_support | support | library | None | ['PostgreSQL'] |
+| backend-src-auth-identity-lookup-ts | backend/src/auth/identity-lookup.ts | runtime_support | support | library | None | ['PostgreSQL'] |
+| backend-src-auth-principal-context-ts | backend/src/auth/principal-context.ts | runtime_support | support | library | None | [] |
+| backend-src-auth-request-principal-ts | backend/src/auth/request-principal.ts | runtime_support | support | library | None | [] |
 | backend-src-cli-autonomy-ts | backend/src/cli/autonomy.ts | runtime_support | support | library | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-cli-db-table-usage-ts | backend/src/cli/db-table-usage.ts | runtime_support | support | library | None | ['PostgreSQL'] |
 | backend-src-cli-run-bounded-learning-ts | backend/src/cli/run-bounded-learning.ts | runtime_support | support | library | None | ['LLM provider'] |
