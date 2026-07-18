@@ -838,7 +838,29 @@ def clean_clone_verification_report(aggregate: dict[str, Any], records: list[dic
     ]
     case_hashes_match = all(item["expected"] == item["actual"] for item in recomputed_case_hashes)
     case_ids = [record["case_id"] for record in records]
-    totals_reconcile = len(records) == aggregate.get("executed_cases", len(records)) and len(case_ids) == len(set(case_ids))
+    terminal_count_fields = {
+        "completed_cases": "COMPLETED",
+        "failed_cases": "FAILED",
+        "timed_out_cases": "TIMED_OUT",
+        "denied_cases": "DENIED",
+        "evidence_unavailable_cases": "EVIDENCE_UNAVAILABLE",
+        "evaluator_unavailable_cases": "EVALUATOR_UNAVAILABLE",
+        "invalid_response_cases": "INVALID_RESPONSE",
+        "infrastructure_failure_cases": "INFRASTRUCTURE_FAILURE",
+    }
+    terminal_count_recomputation = {
+        field: {
+            "expected": aggregate.get(field, 0),
+            "actual": sum(1 for record in records if record.get("terminal_status") == status),
+        }
+        for field, status in terminal_count_fields.items()
+    }
+    terminal_counts_match = all(row["expected"] == row["actual"] for row in terminal_count_recomputation.values())
+    totals_reconcile = (
+        len(records) == aggregate.get("executed_cases", len(records))
+        and len(case_ids) == len(set(case_ids))
+        and terminal_counts_match
+    )
     diagnosable_provider_attempts = all(
         record.get("terminal_status") in {"EVIDENCE_UNAVAILABLE", "FAILED"}
         or (
@@ -862,6 +884,7 @@ def clean_clone_verification_report(aggregate: dict[str, Any], records: list[dic
         "case_hashes_match": case_hashes_match,
         "aggregate_hash_matches": aggregate_hash_matches,
         "terminal_totals_reconcile": totals_reconcile,
+        "terminal_count_recomputation": terminal_count_recomputation,
         "diagnosable_provider_attempts": diagnosable_provider_attempts,
         "recomputed_aggregate_semantic_hash": recomputed_aggregate_hash,
         "case_semantic_hash_recomputation": recomputed_case_hashes,

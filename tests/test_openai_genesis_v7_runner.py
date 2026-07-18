@@ -193,6 +193,14 @@ def test_clean_clone_recomputation_passes_with_diagnosable_provider_evidence(mon
     aggregate = {
         "campaign_id": runner.CAMPAIGN_ID,
         "executed_cases": 1,
+        "completed_cases": 0,
+        "failed_cases": 0,
+        "timed_out_cases": 0,
+        "denied_cases": 0,
+        "evidence_unavailable_cases": 0,
+        "evaluator_unavailable_cases": 0,
+        "invalid_response_cases": 1,
+        "infrastructure_failure_cases": 0,
         "decision": "HOLD_FOR_MORE_EVIDENCE",
         "generated_at": "volatile",
     }
@@ -205,6 +213,47 @@ def test_clean_clone_recomputation_passes_with_diagnosable_provider_evidence(mon
     assert report["verification_result"] == "passed"
     assert report["case_hashes_match"] is True
     assert report["decision_recomputable_without_provider_credentials"] is True
+
+
+def test_clean_clone_recomputation_rejects_terminal_count_mismatch(monkeypatch, tmp_path):
+    auth = tmp_path / "authorization.json"
+    _auth(auth)
+    monkeypatch.setenv(runner.AUTHORIZATION_ENV, str(auth))
+    config = runner.load_execution_config()
+    record = runner.terminal_record(
+        config,
+        {"case_id": "case-1", "domain": "reasoning", "split": "validation"},
+        "INVALID_RESPONSE",
+        "structured_parse_failed:JSONDecodeError",
+        {"prompt": "answer"},
+        0.01,
+        0.002,
+        0.25,
+        10,
+        0,
+        4,
+        _provider_data('{"partial":'),
+        None,
+        "2026-07-19T00:00:00+00:00",
+    )
+    aggregate = {
+        "campaign_id": runner.CAMPAIGN_ID,
+        "executed_cases": 1,
+        "completed_cases": 1,
+        "invalid_response_cases": 0,
+        "decision": "HOLD_FOR_MORE_EVIDENCE",
+        "generated_at": "volatile",
+    }
+    aggregate["semantic_hash"] = runner.sha256_text(
+        runner.canonical({k: v for k, v in aggregate.items() if k not in {"generated_at", "semantic_hash"}})
+    )
+
+    report = runner.clean_clone_verification_report(aggregate, [record])
+
+    assert report["verification_result"] == "failed"
+    assert report["terminal_totals_reconcile"] is False
+    assert report["terminal_count_recomputation"]["completed_cases"] == {"expected": 1, "actual": 0}
+    assert report["terminal_count_recomputation"]["invalid_response_cases"] == {"expected": 0, "actual": 1}
 
 
 def test_write_reports_adds_reproducible_internal_payload_manifest(monkeypatch, tmp_path):

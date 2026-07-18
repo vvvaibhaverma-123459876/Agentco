@@ -189,3 +189,22 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue strengthening future V7 diagnosability and verifier coverage that does not require a new live-provider authorization.
+
+## Iteration 10 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `de0451d1a6704789050f7e41e945eb36ca391106`
+- Selected item: strengthen future Genesis V7 clean-clone recomputation so aggregate terminal counts cannot drift from case evidence.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - `clean_clone_verification_report()` now recomputes every terminal-state aggregate field from case records.
+  - A mismatch in completed, failed, timed-out, denied, evidence-unavailable, evaluator-unavailable, invalid-response, or infrastructure-failure counts now fails clean-clone verification.
+  - Added a negative test proving terminal-count drift is rejected.
+- Evidence:
+  - `python3.13 -m pytest tests/test_openai_genesis_v7_runner.py tests/test_capability_genesis_artifact_verifier.py -q` -> `14 passed`
+  - `python3.13 -m py_compile scripts/run_openai_genesis_v7_baseline.py` -> passed
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on historical frozen-file changes, missing historical V7 payload manifests, and non-diagnosable attempt-2 provider evidence.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue removing verifier gaps around real-provider evidence diagnosability, or move to hosted-staging prerequisite documentation until human infrastructure is supplied.
