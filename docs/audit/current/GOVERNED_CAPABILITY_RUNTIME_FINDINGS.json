@@ -1,8 +1,8 @@
 {
   "ledger_id": "governed-capability-runtime-findings",
-  "updated_for_batch": "08E",
+  "updated_for_batch": "09A",
   "audited_pr": 28,
-  "audited_sha": "89af203e24b6a9e4f5c1636cf5d5bd0c5513ba81",
+  "audited_sha": "a8868f2599e57c6349746df9cbeee2521b55eed1",
   "findings": [
     {
       "finding_id": "GCR-001",
@@ -61,6 +61,17 @@
       "impact": "A configured provider endpoint could redirect to a different host unless urllib behavior is constrained or revalidated.",
       "remediation": "Install a redirect handler that blocks redirects by default or revalidates scheme, host allowlist and resolved address on every redirect.",
       "remaining_risk": "Redirects are blocked by default. If future redirect support is introduced, every hop must re-run scheme, host allowlist and resolved-address validation."
+    },
+    {
+      "finding_id": "GCR-007",
+      "severity": "S3",
+      "component": "real-provider-baseline-readiness",
+      "status": "resolved_batch_09a_readiness_contract",
+      "summary": "Real-provider Genesis execution previously lacked a complete pre-execution readiness contract for configuration, authorization, case manifest, thresholds, semantic hashes and operator runbooks.",
+      "evidence": "docs/capability/BATCH_09A_READINESS_REPORT.json and scripts/verify_real_provider_readiness.py",
+      "impact": "A future real-provider campaign could be attempted with incomplete authorization, ambiguous provider identity, stale cases, or insufficient evidence binding.",
+      "remediation": "Batch 09A adds fail-closed provider configuration validation, campaign authorization schema, frozen case manifest, evaluator protocol, threshold specification, semantic hash contract, dry-run/preflight modes and readiness gates.",
+      "remaining_risk": "Real provider capability remains unverified until a separately authorized Batch 09B supplies credentials, passes preflight, executes the live campaign and produces scored evidence."
     }
   ]
 }

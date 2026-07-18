@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentco.local/schemas/real_provider_config.schema.json",
+  "title": "AgentCo Real Provider Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "provider_name",
+    "model_identifier",
+    "api_base_url",
+    "credential_reference",
+    "provider_host_allowlist",
+    "request_timeout_seconds",
+    "retry_limit",
+    "concurrency_limit",
+    "token_budget",
+    "monetary_budget_usd",
+    "campaign_execution_budget",
+    "dns_resolution_policy",
+    "redirect_policy",
+    "model_identity_verification_mode"
+  ],
+  "properties": {
+    "provider_name": {
+      "type": "string",
+      "enum": ["openai_compatible", "anthropic_compatible", "generic_http"]
+    },
+    "model_identifier": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "api_base_url": {
+      "type": ["string", "null"],
+      "minLength": 1
+    },
+    "credential_reference": {
+      "type": ["string", "null"],
+      "pattern": "^(env|secret|vault):[A-Z0-9_./:-]+$"
+    },
+    "provider_host_allowlist": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1},
+      "uniqueItems": true
+    },
+    "request_timeout_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 600},
+    "retry_limit": {"type": "integer", "minimum": 0, "maximum": 10},
+    "concurrency_limit": {"type": "integer", "minimum": 1, "maximum": 32},
+    "token_budget": {"type": "integer", "minimum": 1},
+    "monetary_budget_usd": {"type": "number", "minimum": 0},
+    "campaign_execution_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_calls", "max_retries_total"],
+      "properties": {
+        "max_calls": {"type": "integer", "minimum": 1},
+        "max_retries_total": {"type": "integer", "minimum": 0}
+      }
+    },
+    "dns_resolution_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolve_before_connect", "reject_forbidden_ranges", "fail_on_ambiguous_resolution"],
+      "properties": {
+        "resolve_before_connect": {"type": "boolean"},
+        "reject_forbidden_ranges": {"type": "boolean"},
+        "fail_on_ambiguous_resolution": {"type": "boolean"}
+      }
+    },
+    "redirect_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "max_redirects"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "max_redirects": {"type": "integer", "minimum": 0, "maximum": 5}
+      }
+    },
+    "model_identity_verification_mode": {
+      "type": "string",
+      "enum": ["strict_response_match_or_hold", "provider_metadata_required", "configured_identity_only_hold"]
+    },
+    "region_or_deployment": {"type": ["string", "null"]}
+  }
+}
