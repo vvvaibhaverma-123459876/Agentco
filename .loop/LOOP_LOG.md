@@ -150,3 +150,23 @@
   - `cat .loop/DECISIONS.md` -> continuation policy recorded.
 - Next candidate item:
   - Continue with the highest-leverage non-human-blocked item, currently stale finding cleanup around `GCR-008` or further capability-runtime verifier strengthening.
+
+## Iteration 8 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `893566cc46512c09fa1f79b7849a5de9c51576cf`
+- Selected item: remove stale current-blocker status from `GCR-008` without changing historical Genesis V6 HOLD evidence.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - Reclassified `GCR-008` from `open_hold_for_more_evidence` to `superseded_by_v7_attempt_2`.
+  - Preserved the Genesis V6 HOLD artifact and non-claims.
+  - Regenerated `SUBSYSTEM_AUDIT_RESULTS` so `capability_runtime_protocol` now links only the current open blockers `GCR-010` and `GCR-011`.
+- Evidence:
+  - `docs/audit/current/REAL_PROVIDER_GENESIS_V7_ATTEMPT_2_RESULTS.json` records `baseline_execution_attempted = true`, `executed_cases = 24`, `invalid_response_cases = 24`, and a source-bound authorization hash.
+  - `python3.13 -m pytest tests/test_verify_no_blocking_findings.py tests/test_run_subsystem_audit_results.py tests/test_verify_subsystem_audit_results.py -q` -> `11 passed`
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure only on `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Strengthen the future V7 runner/evidence path so a new authorized real-provider run can close `GCR-011`, or prepare hosted staging prerequisites until human infrastructure is available.

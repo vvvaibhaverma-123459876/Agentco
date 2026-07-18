@@ -35,11 +35,12 @@ real capability baseline.
 
 | Finding | Severity | Status | Summary |
 | --- | --- | --- | --- |
-| GCR-008 | S3 | open_hold_for_more_evidence | Batch 09B did not attempt real-provider execution because no executable campaign authorization artifact exists and the active process environment lacks provider model, endpoint, credential reference and host allowlist configuration. |
+| GCR-008 | S3 | superseded_by_v7_attempt_2 | Batch 09B did not attempt real-provider execution, but this historical blocker was superseded by Genesis V7 attempt 2, which had a source-bound authorization, passed canary, and executed all 24 provider cases before reaching current evidence blockers. |
 
 Genesis V6 remains `HOLD_FOR_MORE_EVIDENCE` with `execution_attempted = false`.
 No provider call occurred, no credentials were recorded, and no capability
-baseline or supported domains are claimed.
+baseline or supported domains are claimed. Current real-provider capability
+remains unestablished because `GCR-010` and `GCR-011` remain open.
 
 ## Batch 09C OpenAI Findings
 

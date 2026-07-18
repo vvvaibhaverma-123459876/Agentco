@@ -76,11 +76,11 @@
       "evidence": "docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json",
       "finding_id": "GCR-008",
       "impact": "No real-provider capability baseline, supported domains, aggregate correctness, capability improvement, hosted staging readiness or production readiness can be claimed.",
-      "remaining_risk": "Until authorization and preflight pass, real-provider capability evidence remains unavailable.",
-      "remediation": "Provide a machine-verifiable authorization artifact bound to the exact source commit, source tree, provider, model, endpoint, case manifest and budgets; expose provider configuration through the approved environment or secret manager; then run a separately authorized real-provider campaign.",
+      "remaining_risk": "The Batch 09B no-authorization blocker is superseded by later Genesis V7 attempt-2 evidence. Real-provider capability remains unestablished because GCR-010 and GCR-011 remain open.",
+      "remediation": "Preserve the Genesis V6 HOLD artifact as historical evidence. Use the later Genesis V7 attempt-2 evidence for current real-provider execution state, while leaving capability evidence blocked by invalid structured outputs and non-diagnosable provider-response records.",
       "severity": "S3",
-      "status": "open_hold_for_more_evidence",
-      "summary": "Batch 09B could not attempt the first real-provider baseline because no executable campaign authorization artifact exists and the active process environment lacks provider model, endpoint, credential reference and host allowlist configuration."
+      "status": "superseded_by_v7_attempt_2",
+      "summary": "Batch 09B could not attempt real-provider execution, but this historical blocker was superseded by Genesis V7 attempt 2, which had a source-bound authorization, passed canary, and executed all 24 provider cases before reaching current evidence blockers."
     },
     {
       "component": "openai-real-provider-genesis-v7",
