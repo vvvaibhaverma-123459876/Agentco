@@ -22,5 +22,6 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
   - `python3.13 -m pytest tests/test_openai_genesis_v7_runner.py tests/test_forensic_inventory.py -q` -> `7 passed`
   - `npm run agentco:score-validation -- --check` initially reported a stale generated report hash after the new commit; regenerated `reports/system_run/latest/score_validation.{json,md}` for commit `07a7ac8abcb628eea98eff519dd75a2c412fe4f0`.
+  - Final `make release-gate` on clean commit `e0983c56ca39f315da3e391ae2e32b07204872d4` -> passed.
 - Next candidate item:
   - Run broader cheap gates, then continue with audit-runner/subsystem audit failures or strengthen V7 artifact verifier to reject historical-style hash-only case evidence for any new accepted run.
