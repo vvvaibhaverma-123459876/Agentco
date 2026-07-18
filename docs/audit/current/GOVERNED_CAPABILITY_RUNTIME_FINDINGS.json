@@ -103,6 +103,17 @@
       "severity": "S3",
       "status": "open_hold_for_more_evidence",
       "summary": "Genesis V7 attempt 2 established OpenAI gpt-5.6-luna reachability and model identity, but all 24 baseline cases produced schema-invalid structured outputs under the frozen evaluator contract."
+    },
+    {
+      "component": "openai-real-provider-genesis-v7",
+      "evidence": "scripts/verify_capability_genesis_artifact.py --check",
+      "finding_id": "GCR-011",
+      "impact": "The committed Genesis V7 attempt-2 case records cannot be independently diagnosed because the artifacts preserve only response hashes and status metadata for provider outputs.",
+      "remaining_risk": "A future run must preserve redacted provider responses, finish reasons, provider request ID hashes, parser inputs, parser input hashes and audit references before any real capability baseline can be accepted or rejected.",
+      "remediation": "Strengthened the capability genesis artifact verifier to reject hash-only V7 provider evidence, missing V7 payload manifests and identical response-hash patterns across provider-attempted cases.",
+      "severity": "S2",
+      "status": "open_blocking",
+      "summary": "Genesis V7 attempt 2 case evidence is hash-only for provider responses: all 24 case records lack redacted response bodies, finish reasons, provider request ID hashes, parser inputs and audit references required for independent diagnosis."
     }
   ],
   "ledger_id": "governed-capability-runtime-findings",

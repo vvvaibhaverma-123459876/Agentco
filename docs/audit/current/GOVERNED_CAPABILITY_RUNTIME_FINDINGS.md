@@ -47,8 +47,16 @@ baseline or supported domains are claimed.
 | --- | --- | --- | --- |
 | GCR-009 | S3 | superseded_by_v7_attempt_2 | The original Batch 09C canary failed before baseline execution and remains preserved as historical evidence. |
 | GCR-010 | S3 | open_hold_for_more_evidence | Genesis V7 attempt 2 established OpenAI `gpt-5.6-luna` reachability and model identity, then executed all 24 frozen cases; all 24 terminal responses were schema-invalid under the frozen structured-output evaluator contract. |
+| GCR-011 | S2 | open_blocking | Genesis V7 attempt 2 case evidence is hash-only for provider responses: all 24 case records lack redacted response bodies, finish reasons, provider request ID hashes, parser inputs and audit references required for independent diagnosis. |
 
 Genesis V7 attempt 2 remains `HOLD_FOR_MORE_EVIDENCE` with `executed_cases = 24`,
 `completed_cases = 0`, `invalid_response_cases = 24`, no supported domains and
 no aggregate correctness. No fallback model or provider was used, and no
 capability baseline or capability improvement is claimed.
+
+`scripts/verify_capability_genesis_artifact.py --check` now rejects this
+non-diagnosable V7 evidence shape and reports the shared provider-response hash
+across all 24 cases. A future real-provider run must preserve redacted response
+content, provider request ID hash, finish reason, parser input, parser input
+hash and audit references before it can satisfy the real capability evidence
+predicate.

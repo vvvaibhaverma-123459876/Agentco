@@ -25,3 +25,25 @@
   - Final `make release-gate` on clean commit `e0983c56ca39f315da3e391ae2e32b07204872d4` -> passed.
 - Next candidate item:
   - Run broader cheap gates, then continue with audit-runner/subsystem audit failures or strengthen V7 artifact verifier to reject historical-style hash-only case evidence for any new accepted run.
+
+## Iteration 2 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `3393283c0830c61eec526e8d933a1a1be9f14f20`
+- Selected item: strengthen capability genesis artifact verification for DoD 3 evidence diagnosability.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - `scripts/verify_capability_genesis_artifact.py` now discovers Genesis V7 campaign manifests and verifies case-level real-provider evidence shape.
+  - The verifier now rejects provider-attempted V7 cases that only preserve response hashes and lack redacted provider response content, provider request ID hash, finish reason, parser input hash/redacted parser input and audit references.
+  - The verifier now continues inspecting a manifest even when `INTERNAL_PAYLOAD_MANIFEST.json` is missing, so payload-manifest failures cannot mask case-evidence failures.
+  - Added focused verifier regression tests in `tests/test_capability_genesis_artifact_verifier.py`.
+  - Recorded `GCR-011` as an open blocking finding for the committed Genesis V7 attempt-2 hash-only evidence.
+- Evidence:
+  - `python3.13 -m pytest tests/test_capability_genesis_artifact_verifier.py tests/test_openai_genesis_v7_runner.py -q` -> `9 passed`
+  - `python3.13 -m py_compile scripts/verify_capability_genesis_artifact.py` -> passed
+  - `python3.13 -m json.tool docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json` -> passed
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure, now reports stale freeze coverage for the modified verifier, missing V7 payload manifests, 24 non-diagnosable V7 provider evidence records and identical response hashes across all 24 provider-attempted cases.
+- Next candidate item:
+  - Continue with audit-runner/subsystem audit failures or implement a new freeze/evidence path for the strengthened verifier before any future real-provider rerun.
