@@ -1,6 +1,6 @@
 # Governed Capability Runtime Findings
 
-Updated for Batch 09A after PR #28 merged into `main`.
+Updated for Batch 09B after PR #29 merged into `main`.
 
 ## Resolved Evidence-Integrity Findings
 
@@ -30,3 +30,13 @@ findings do not create real-provider capability evidence.
 
 Batch 09A readiness does not execute a provider call and does not establish a
 real capability baseline.
+
+## Batch 09B Execution Finding
+
+| Finding | Severity | Status | Summary |
+| --- | --- | --- | --- |
+| GCR-008 | S3 | open_hold_for_more_evidence | Batch 09B did not attempt real-provider execution because no executable campaign authorization artifact exists and the active process environment lacks provider model, endpoint, credential reference and host allowlist configuration. |
+
+Genesis V6 remains `HOLD_FOR_MORE_EVIDENCE` with `execution_attempted = false`.
+No provider call occurred, no credentials were recorded, and no capability
+baseline or supported domains are claimed.
