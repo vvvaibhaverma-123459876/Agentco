@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2065`
+- Tracked files: `2068`
 
 ## Category Counts
 
@@ -11,13 +11,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 139 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 144 |
-| Documentation | 472 |
+| Development tooling | 145 |
+| Documentation | 473 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 308 |
+| Test infrastructure | 309 |
 | Unknown purpose | 134 |
 
 ## Top-Level Counts
@@ -25,13 +25,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 399 |
+| `docs` | 400 |
 | `evals` | 180 |
-| `scripts` | 156 |
+| `scripts` | 157 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
-| `tests` | 63 |
+| `tests` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
 | `constitution` | 40 |
@@ -1131,6 +1131,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_REMEDIATION_STATUS_2026_07_12.md` | Documentation |
+| `docs/audit/MIGRATION_GOVERNANCE.md` | Documentation |
 | `docs/audit/PHASE10_NOTES.md` | Documentation |
 | `docs/audit/PHASE11_NOTES.md` | Documentation |
 | `docs/audit/PHASE12_NOTES.md` | Documentation |
@@ -2048,6 +2049,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_memory_influence_live.py` | Development tooling |
 | `scripts/verify_migration_identity.py` | Development tooling |
 | `scripts/verify_migration_integrity.py` | Development tooling |
+| `scripts/verify_migration_naming.py` | Development tooling |
 | `scripts/verify_migrations_native.py` | Development tooling |
 | `scripts/verify_mission_progress.py` | Development tooling |
 | `scripts/verify_openai_connectivity.py` | Development tooling |
@@ -2130,6 +2132,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_longitudinal_foundation.py` | Test infrastructure |
 | `tests/test_longitudinal_remote_closure.py` | Test infrastructure |
 | `tests/test_migration_inventory.py` | Test infrastructure |
+| `tests/test_migration_naming_governance.py` | Test infrastructure |
 | `tests/test_pawdent_business_simulation.py` | Test infrastructure |
 | `tests/test_protocol_baseline.py` | Test infrastructure |
 | `tests/test_protocol_baseline_v2.py` | Test infrastructure |

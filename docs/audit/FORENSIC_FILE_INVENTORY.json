@@ -1,28 +1,28 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2065,
+  "tracked_file_count": 2068,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
-    "Development tooling": 144,
-    "Documentation": 472,
+    "Development tooling": 145,
+    "Documentation": 473,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
     "Prompt/template": 29,
-    "Test infrastructure": 308,
+    "Test infrastructure": 309,
     "Unknown purpose": 134
   },
   "top_level_counts": {
     "backend": 507,
-    "docs": 399,
+    "docs": 400,
     "evals": 180,
-    "scripts": 156,
+    "scripts": 157,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
-    "tests": 63,
+    "tests": 64,
     "runtime": 51,
     "archive": 48,
     "constitution": 40,
@@ -82,8 +82,8 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 614,
-    ".md": 511,
+    ".py": 616,
+    ".md": 512,
     ".ts": 342,
     ".json": 249,
     ".sql": 140,
@@ -6333,6 +6333,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/audit/MIGRATION_GOVERNANCE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/audit/PHASE10_NOTES.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -11835,6 +11841,12 @@
       "extension": ".py"
     },
     {
+      "path": "scripts/verify_migration_naming.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
       "path": "scripts/verify_migrations_native.py",
       "category": "Development tooling",
       "top_level": "scripts",
@@ -12322,6 +12334,12 @@
     },
     {
       "path": "tests/test_migration_inventory.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_migration_naming_governance.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"
