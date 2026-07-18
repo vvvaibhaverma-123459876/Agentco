@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2156`
+- Tracked files: `2159`
 
 ## Category Counts
 
@@ -11,13 +11,13 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 143 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 147 |
+| Development tooling | 148 |
 | Documentation | 539 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 316 |
+| Test infrastructure | 318 |
 | Unknown purpose | 140 |
 
 ## Top-Level Counts
@@ -27,10 +27,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend` | 520 |
 | `docs` | 466 |
 | `evals` | 180 |
-| `scripts` | 159 |
+| `scripts` | 160 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `tests` | 65 |
+| `tests` | 67 |
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
@@ -2140,6 +2140,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/verify_migration_naming.py` | Development tooling |
 | `scripts/verify_migrations_native.py` | Development tooling |
 | `scripts/verify_mission_progress.py` | Development tooling |
+| `scripts/verify_no_blocking_findings.py` | Development tooling |
 | `scripts/verify_openai_connectivity.py` | Development tooling |
 | `scripts/verify_production_posture.py` | Development tooling |
 | `scripts/verify_pytest_skips.py` | Development tooling |
@@ -2197,6 +2198,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_capability_anti_hardcoding.py` | Test infrastructure |
 | `tests/test_capability_freeze_binding.py` | Test infrastructure |
 | `tests/test_capability_freeze_integrity.py` | Test infrastructure |
+| `tests/test_capability_genesis_artifact_verifier.py` | Test infrastructure |
 | `tests/test_capability_genesis_v2.py` | Test infrastructure |
 | `tests/test_capability_genesis_v3.py` | Test infrastructure |
 | `tests/test_capability_genesis_v4.py` | Test infrastructure |
@@ -2244,6 +2246,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_verify_memory_influence_live.py` | Test infrastructure |
 | `tests/test_verify_migrations_native.py` | Test infrastructure |
 | `tests/test_verify_mission_progress.py` | Test infrastructure |
+| `tests/test_verify_no_blocking_findings.py` | Test infrastructure |
 | `tests/test_verify_production_posture.py` | Test infrastructure |
 | `tests/test_verify_release_gates.py` | Test infrastructure |
 | `tests/test_weighting_floor_fix.py` | Test infrastructure |

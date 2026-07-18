@@ -66,3 +66,24 @@
   - `make release-gate` after commit -> expected failure at step `0c/12` (`no-blocking-findings`) reporting `GCR-008`, `GCR-010`, `GCR-011` and `HST-001`.
 - Next candidate item:
   - Continue with audit-runner/subsystem audit discovery, then work remaining non-human-blocked verifier gaps.
+
+## Iteration 4 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `11e68c90370d16ec6b26aa72b6bc19445c756f43`
+- Selected item: define and enforce the machine-readable 18-subsystem audit evidence contract required by the loop DoD.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - Added `scripts/verify_subsystem_audit_results.py`.
+  - Added `tests/test_verify_subsystem_audit_results.py`.
+  - Added `make subsystem-audit-results-check` and wired it into `make release-gate` after the blocking-findings guard.
+  - Regenerated forensic inventory and audit-control ledgers for the new verifier and target.
+- Evidence:
+  - `python3.13 -m pytest tests/test_verify_subsystem_audit_results.py -q` -> `5 passed`
+  - `python3.13 -m py_compile scripts/verify_subsystem_audit_results.py` -> passed
+  - `python3.13 scripts/verify_make_targets.py --check` -> `{"missing": 0, "success": true}`
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure: `SUBSYSTEM_AUDIT_RESULTS_MISSING`.
+- Next candidate item:
+  - Build the actual subsystem-audit runner/result producer, starting with small local deterministic audits rather than relying on external agent summaries.
