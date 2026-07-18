@@ -47,3 +47,21 @@
   - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure, now reports stale freeze coverage for the modified verifier, missing V7 payload manifests, 24 non-diagnosable V7 provider evidence records and identical response hashes across all 24 provider-attempted cases.
 - Next candidate item:
   - Continue with audit-runner/subsystem audit failures or implement a new freeze/evidence path for the strengthened verifier before any future real-provider rerun.
+
+## Iteration 3 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `030527158dafd3516a467fafe4fd522106b2a9b0`
+- Selected item: make the loop DoD "zero blocking findings" condition executable instead of relying on manual ledger inspection.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - Added `scripts/verify_no_blocking_findings.py`, which scans `docs/audit/current/*.json` for `open_blocking` and `open_hold_for_more_evidence` findings.
+  - Added `tests/test_verify_no_blocking_findings.py`.
+  - Added `make no-blocking-findings` and wired it into `make release-gate` as step `0c`.
+- Evidence:
+  - `python3.13 -m pytest tests/test_verify_no_blocking_findings.py -q` -> `3 passed`
+  - `python3.13 -m py_compile scripts/verify_no_blocking_findings.py` -> passed
+  - `python3.13 scripts/verify_make_targets.py --check` -> `{"missing": 0, "success": true}`
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure reporting `GCR-008`, `GCR-010`, `GCR-011` and `HST-001`.
+- Next candidate item:
+  - Commit, run `make release-gate` on a clean tree to prove the canonical gate now fails at the open-finding guard, then continue with audit-runner/subsystem audit discovery.
