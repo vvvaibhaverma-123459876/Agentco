@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { treasuryService, ScopeType, EconomyResource } from '../services/treasury.service';
 import { PublicHttpError, publicMessageForError, statusCodeForError } from '../http-errors';
+import { requirePrincipal } from '../auth/principal-context';
 
 /** Civilization economy / treasury routes (build phase C6). */
 export async function treasuryRoutes(fastify: FastifyInstance): Promise<void> {
@@ -12,13 +13,14 @@ export async function treasuryRoutes(fastify: FastifyInstance): Promise<void> {
     }
   };
 
-  fastify.post('/api/civilization/treasury/accounts', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/accounts', { config: requirePrincipal('treasury.account.open') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.scope_type || !b.scope_id || !b.resource_type || !b.actor_id) {
-        throw new PublicHttpError(400, 'scope_type, scope_id, resource_type, actor_id are required');
+      if (!b.scope_type || !b.scope_id || !b.resource_type) {
+        throw new PublicHttpError(400, 'scope_type, scope_id, resource_type are required');
       }
-      return treasuryService.openAccount(b);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.openAccount({ ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
@@ -31,27 +33,29 @@ export async function treasuryRoutes(fastify: FastifyInstance): Promise<void> {
     })
   );
 
-  fastify.post('/api/civilization/treasury/fund', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/fund', { config: requirePrincipal('treasury.account.fund') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.scope_type || !b.scope_id || !b.resource_type || typeof b.amount !== 'number' || !b.actor_id) {
-        throw new PublicHttpError(400, 'scope_type, scope_id, resource_type, amount, actor_id are required');
+      if (!b.scope_type || !b.scope_id || !b.resource_type || typeof b.amount !== 'number') {
+        throw new PublicHttpError(400, 'scope_type, scope_id, resource_type, amount are required');
       }
-      return treasuryService.fund({ reason: b.reason ?? 'funding', ...b });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.fund({ reason: b.reason ?? 'funding', ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/treasury/policies', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/policies', { config: requirePrincipal('treasury.policy.set') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.policy_key || !b.resource_type || !b.actor_id) {
-        throw new PublicHttpError(400, 'policy_key, resource_type, actor_id are required');
+      if (!b.policy_key || !b.resource_type) {
+        throw new PublicHttpError(400, 'policy_key, resource_type are required');
       }
-      return treasuryService.setPolicy(b);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.setPolicy({ ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/treasury/evaluate', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/evaluate', { config: requirePrincipal('treasury.request.evaluate') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
       if (!b.scope_type || !b.scope_id || !b.resource_type || typeof b.amount !== 'number') {
@@ -61,51 +65,56 @@ export async function treasuryRoutes(fastify: FastifyInstance): Promise<void> {
     })
   );
 
-  fastify.post('/api/civilization/treasury/budgets', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/budgets', { config: requirePrincipal('treasury.budget.propose') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.from_scope || !b.to_scope || !b.resource_type || typeof b.amount !== 'number' || !b.actor_id) {
-        throw new PublicHttpError(400, 'from_scope, to_scope, resource_type, amount, actor_id are required');
+      if (!b.from_scope || !b.to_scope || !b.resource_type || typeof b.amount !== 'number') {
+        throw new PublicHttpError(400, 'from_scope, to_scope, resource_type, amount are required');
       }
-      return treasuryService.proposeBudget(b);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.proposeBudget({ ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/treasury/budgets/:proposalId/decide', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/budgets/:proposalId/decide', { config: requirePrincipal('treasury.budget.decide') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { proposalId } = req.params as { proposalId: string };
       const b = (req.body ?? {}) as any;
-      if (typeof b.approve !== 'boolean' || !b.actor_id) throw new PublicHttpError(400, 'approve (boolean) and actor_id are required');
-      return treasuryService.decideBudget({ proposal_id: proposalId, approve: b.approve, actor_id: b.actor_id });
+      if (typeof b.approve !== 'boolean') throw new PublicHttpError(400, 'approve (boolean) is required');
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.decideBudget({ proposal_id: proposalId, approve: b.approve, actor_id: req.principal!.actorId });
     })
   );
 
-  fastify.post('/api/civilization/treasury/budgets/:proposalId/allocate', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/budgets/:proposalId/allocate', { config: requirePrincipal('treasury.budget.allocate') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { proposalId } = req.params as { proposalId: string };
-      const b = (req.body ?? {}) as any;
-      if (!b.actor_id) throw new PublicHttpError(400, 'actor_id is required');
-      return treasuryService.allocateBudget({ proposal_id: proposalId, actor_id: b.actor_id });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.allocateBudget({ proposal_id: proposalId, actor_id: req.principal!.actorId });
     })
   );
 
-  fastify.post('/api/civilization/treasury/penalties', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/penalties', { config: requirePrincipal('treasury.penalty.impose') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.target_scope || !b.resource_type || typeof b.amount !== 'number' || !b.authority || !b.actor_id) {
-        throw new PublicHttpError(400, 'target_scope, resource_type, amount, authority, actor_id are required');
+      if (!b.target_scope || !b.resource_type || typeof b.amount !== 'number' || !b.authority) {
+        throw new PublicHttpError(400, 'target_scope, resource_type, amount, authority are required');
       }
-      return treasuryService.imposePenalty({ authorized_decision_ref: b.authorized_decision_ref ?? '', reason: b.reason ?? '', ...b });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field. (Residual: the
+      // 'authority' claim itself ('governance'|'judiciary') is still caller-asserted and not
+      // yet verified against the principal's actual role -- tracked as a follow-up, not fixed here.)
+      return treasuryService.imposePenalty({ authorized_decision_ref: b.authorized_decision_ref ?? '', reason: b.reason ?? '', ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/treasury/costs', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/costs', { config: requirePrincipal('treasury.cost.record') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.resource_type || typeof b.amount !== 'number' || !b.actor_id) {
-        throw new PublicHttpError(400, 'resource_type, amount, actor_id are required');
+      if (!b.resource_type || typeof b.amount !== 'number') {
+        throw new PublicHttpError(400, 'resource_type, amount are required');
       }
-      return treasuryService.recordCost(b);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.recordCost({ ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
@@ -118,11 +127,12 @@ export async function treasuryRoutes(fastify: FastifyInstance): Promise<void> {
     })
   );
 
-  fastify.post('/api/civilization/treasury/reconcile', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/treasury/reconcile', { config: requirePrincipal('treasury.reconcile') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.resource_type || !b.actor_id) throw new PublicHttpError(400, 'resource_type and actor_id are required');
-      return treasuryService.reconcile(b);
+      if (!b.resource_type) throw new PublicHttpError(400, 'resource_type is required');
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return treasuryService.reconcile({ ...b, actor_id: req.principal!.actorId });
     })
   );
 }

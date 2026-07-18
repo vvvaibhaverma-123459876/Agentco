@@ -77,6 +77,39 @@ def git(*args: str) -> str:
     return subprocess.run(["git", "-C", REPO, *args], capture_output=True, text=True).stdout.strip()
 
 
+def check_conditions_16_25() -> dict:
+    """AUD-004 M6: run the hardened structural+behavioral verifier for conditions 16/25.
+
+    Honesty note: this reports LOCAL machine-checkable verification. It is NOT the independent
+    substantive audit determination (see scripts/verify_aud004_conditions_16_25.py's own
+    docstring). A True result here means "the credential-bound enforcement this remediation
+    added is present, load-bearing (proven via control-removal tests during development), and
+    its negative tests currently pass" -- not "an independent auditor has confirmed conditions
+    16/25 are substantively satisfied." Those are recorded as SEPARATE fields, never collapsed.
+    """
+    verifier = os.path.join(REPO, "scripts", "verify_aud004_conditions_16_25.py")
+    if not os.path.exists(verifier):
+        return {"available": False, "reason": "verifier script not present at this commit"}
+    run_tests = os.environ.get("AUD004_VERIFY_RUN_TESTS", "1") != "0"
+    args = [sys.executable, verifier, "--json"]
+    if run_tests:
+        args.append("--run-tests")
+    try:
+        proc = subprocess.run(args, cwd=REPO, capture_output=True, text=True, timeout=240)
+    except Exception as e:  # noqa: BLE001 - report, don't crash the whole generator
+        return {"available": True, "ran": False, "error": str(e), "locally_verified": False}
+    try:
+        payload = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return {"available": True, "ran": True, "exit_code": proc.returncode, "parse_error": True,
+                "stdout_tail": proc.stdout[-2000:], "stderr_tail": proc.stderr[-2000:], "locally_verified": False}
+    locally_verified = proc.returncode == 0
+    return {
+        "available": True, "ran": True, "exit_code": proc.returncode,
+        "locally_verified": locally_verified, "ran_tests": run_tests, "detail": payload,
+    }
+
+
 def exists(rel: str) -> bool:
     return os.path.exists(os.path.join(REPO, rel))
 
@@ -109,6 +142,7 @@ def main() -> int:
     missing_entry_points = [p for p in REQUIRED_ENTRY_POINTS if not exists(p)]
     missing_deployment = [p for p in REQUIRED_DEPLOYMENT if not exists(p)]
     missing_scenario_proofs = {k: v for k, v in SCENARIO_PROOFS.items() if not exists(v)}
+    conditions_16_25 = check_conditions_16_25()
 
     reconciliation = {
         "ledger_total_items": len(items),
@@ -121,6 +155,7 @@ def main() -> int:
         "missing_deployment_wiring": missing_deployment,
         "missing_scenario_proofs": missing_scenario_proofs,
         "completion_evidence_commit": head,
+        "conditions_16_25_local_verification": conditions_16_25,
     }
     checks = {
         "all_ledger_items_verified": len(unverified) == 0,
@@ -128,6 +163,12 @@ def main() -> int:
         "no_missing_entry_points": len(missing_entry_points) == 0,
         "no_missing_deployment_wiring": len(missing_deployment) == 0,
         "all_scenarios_have_proofs": len(missing_scenario_proofs) == 0,
+        # AUD-004 M6: conditions 16/25 can no longer pass reconciliation on label-inequality
+        # evidence alone -- this requires the hardened verifier's structural+behavioral checks
+        # (credential-bound identity, DB backstops, negative tests actually passing) to hold.
+        # This is a LOCAL machine-checkable gate, NOT the independent substantive audit
+        # determination -- see conditions_16_25_local_verification.detail.note above.
+        "conditions_16_25_credential_bound_evidence": bool(conditions_16_25.get("locally_verified")),
     }
     reconciliation["checks"] = checks
     passed = all(checks.values())
@@ -140,6 +181,8 @@ def main() -> int:
     if check_only:
         print(f"[completion] check-only: reconciliation_passed={passed} predicate={predicate} "
               f"verified={len(verified)}/{len(items)} commit={head[:12]}")
+        print(f"[completion] conditions_16_25 locally_verified={conditions_16_25.get('locally_verified')} "
+              f"(machine-checkable evidence only -- NOT the independent substantive audit determination)")
         if not passed:
             print("[completion] FAILED checks:", [k for k, v in checks.items() if not v], file=sys.stderr)
         return 0 if passed else 2

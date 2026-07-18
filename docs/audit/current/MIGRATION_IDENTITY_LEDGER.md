@@ -1,6 +1,6 @@
 # Migration Identity Ledger
 
-- Migration count: `131`
+- Migration count: `135`
 - Directory: `backend/src/db/migrations`
 
 ## Reused Sequence Contracts
@@ -146,3 +146,7 @@
 | 139 | `139_capability_expansion.sql` | `269da9571bc96d27` | `75406a50882a` |
 | 140 | `140_civilization_os.sql` | `a7d9cfbbdbc4c439` | `1a3dc570cd76` |
 | 140 | `140_governed_capability_runtime.sql` | `a0232191fa205f66` | `8c0e4e9874cf` |
+| 141 | `141_aud004_principal_permissions.sql` | `3d94701ce1306835` | `811c538c2f7a` |
+| 142 | `142_aud004_independence_backstops.sql` | `252b984822062064` | `11db20d19806` |
+| 143 | `143_aud004_m3_breadth_permissions.sql` | `7e1b0bdc4caf268c` | `023614f2e5c0` |
+| 144 | `144_aud004_capability_runtime_permissions.sql` | `591077bc7b7d42e8` | `e724aa9cbbc7` |

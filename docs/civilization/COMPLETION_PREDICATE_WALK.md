@@ -11,6 +11,19 @@ coordinator-driven reachability (the C12 LayerOrchestrator + its suite).
 
 Legend: ✅ direct executable evidence · ◐ satisfied by architecture/design (noted).
 
+> **⚠️ 2026-07-18 UPDATE — rows 16 and 25 below are SUPERSEDED, not retracted.** An independent
+> audit (dated `agentco-repository-audit-2026-07-16`) found the evidence cited for these two
+> rows — label-inequality tests over caller-supplied actor strings — insufficient: a single
+> credential holder can satisfy string inequality by presenting two different `actor_id`
+> values. This is now AUD-004. Remediation branch
+> `audit/remediation-02-authenticated-principal-boundaries` adds credential-bound identity
+> (Ed25519-signed authenticated principals) and database-level independence backstops for both
+> conditions. See **`docs/civilization/CONDITIONS_16_25_EVIDENCE_MAP.md`** for the current
+> evidence and its explicit limits. This update does **not** change `termination_predicate_met`
+> and does **not** assert conditions 16/25 are independently, substantively satisfied — that
+> remains the independent re-audit's determination against the post-remediation commit. The
+> rest of this document (conditions 1–15, 17–24, 26–57) is unaffected and not revisited here.
+
 | # | Condition | Status | Evidence |
 |---|---|---|---|
 | 1 | durable civilization root owns runtime | ✅ | `civilization-kernel.test.ts`; singleton `uq_civilizations_single_active` (mig 129) |

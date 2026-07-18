@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { collectiveKnowledge, KnowledgeType } from '../services/collective-knowledge.service';
 import { PublicHttpError, publicMessageForError, statusCodeForError } from '../http-errors';
+import { requirePrincipal } from '../auth/principal-context';
 
 /** Collective epistemics routes (build phase C9). */
 export async function collectiveKnowledgeRoutes(fastify: FastifyInstance): Promise<void> {
@@ -12,23 +13,25 @@ export async function collectiveKnowledgeRoutes(fastify: FastifyInstance): Promi
     }
   };
 
-  fastify.post('/api/civilization/knowledge/provenance', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/knowledge/provenance', { config: requirePrincipal('knowledge.provenance.link') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.from_type || !b.from_id || !b.to_type || !b.to_id || !b.actor_id) {
-        throw new PublicHttpError(400, 'from_type, from_id, to_type, to_id, actor_id are required');
+      if (!b.from_type || !b.from_id || !b.to_type || !b.to_id) {
+        throw new PublicHttpError(400, 'from_type, from_id, to_type, to_id are required');
       }
-      return collectiveKnowledge.linkProvenance(b);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return collectiveKnowledge.linkProvenance({ ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/knowledge/retract', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/knowledge/retract', { config: requirePrincipal('knowledge.retraction.create') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.subject_type || !b.subject_id || !b.reason || !b.actor_id) {
-        throw new PublicHttpError(400, 'subject_type, subject_id, reason, actor_id are required');
+      if (!b.subject_type || !b.subject_id || !b.reason) {
+        throw new PublicHttpError(400, 'subject_type, subject_id, reason are required');
       }
-      return collectiveKnowledge.retract(b);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return collectiveKnowledge.retract({ ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 

@@ -2,16 +2,18 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { taskEngine, TaskCreationInput } from '../services/task-engine.service';
 import { trajectoryStore } from '../services/trajectory-store.service';
 import { observability } from '../services/observability.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/autonomy/tasks - Create new task
    */
-  fastify.post<{ Body: TaskCreationInput }>('/api/autonomy/tasks', async (request, reply) => {
+  fastify.post<{ Body: TaskCreationInput }>('/api/autonomy/tasks', { config: requirePrincipal('autonomy.task.create') }, async (request, reply) => {
     try {
+      // AUD-004: createdBy is the AUTHENTICATED principal, never a body field.
       const input: TaskCreationInput = {
         ...request.body,
-        createdBy: request.body.createdBy || 'system',
+        createdBy: request.principal!.actorId,
       };
 
       const task = await taskEngine.createTask(input);
@@ -73,7 +75,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/autonomy/tasks/:taskId/queue - Queue task
    */
-  fastify.post<{ Params: { taskId: string } }>('/api/autonomy/tasks/:taskId/queue', async (request, reply) => {
+  fastify.post<{ Params: { taskId: string } }>('/api/autonomy/tasks/:taskId/queue', { config: requirePrincipal('autonomy.task.queue') }, async (request, reply) => {
     try {
       await taskEngine.queueTask(request.params.taskId);
 
@@ -95,11 +97,12 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { taskId: string };
     Body: { workerId: string; leaseDurationSeconds?: number };
-  }>('/api/autonomy/tasks/:taskId/lease', async (request, reply) => {
+  }>('/api/autonomy/tasks/:taskId/lease', { config: requirePrincipal('autonomy.task.lease') }, async (request, reply) => {
     try {
+      // AUD-004: workerId is the AUTHENTICATED principal, never a body field.
       const leaseId = await taskEngine.leaseTask(
         request.params.taskId,
-        request.body.workerId,
+        request.principal!.actorId,
         request.body.leaseDurationSeconds || 300
       );
 
@@ -118,7 +121,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   /**
    * POST /api/autonomy/tasks/:taskId/start - Start executing
    */
-  fastify.post<{ Params: { taskId: string } }>('/api/autonomy/tasks/:taskId/start', async (request, reply) => {
+  fastify.post<{ Params: { taskId: string } }>('/api/autonomy/tasks/:taskId/start', { config: requirePrincipal('autonomy.task.start') }, async (request, reply) => {
     try {
       await taskEngine.startTask(request.params.taskId);
 
@@ -140,7 +143,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { taskId: string };
     Body: { result?: Record<string, any> };
-  }>('/api/autonomy/tasks/:taskId/complete', async (request, reply) => {
+  }>('/api/autonomy/tasks/:taskId/complete', { config: requirePrincipal('autonomy.task.complete') }, async (request, reply) => {
     try {
       await taskEngine.completeTask(request.params.taskId, request.body.result);
 
@@ -162,7 +165,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { taskId: string };
     Body: { error: string; errorStack?: string; shouldRetry?: boolean };
-  }>('/api/autonomy/tasks/:taskId/fail', async (request, reply) => {
+  }>('/api/autonomy/tasks/:taskId/fail', { config: requirePrincipal('autonomy.task.fail') }, async (request, reply) => {
     try {
       await taskEngine.failTask(
         request.params.taskId,
@@ -189,7 +192,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { taskId: string };
     Body: { reason?: string };
-  }>('/api/autonomy/tasks/:taskId/cancel', async (request, reply) => {
+  }>('/api/autonomy/tasks/:taskId/cancel', { config: requirePrincipal('autonomy.task.cancel') }, async (request, reply) => {
     try {
       await taskEngine.cancelTask(request.params.taskId, request.body.reason);
 
@@ -211,7 +214,7 @@ export async function autonomyTaskRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { taskId: string };
     Body: { stepName: string; stepIndex: number; state: Record<string, any> };
-  }>('/api/autonomy/tasks/:taskId/checkpoint', async (request, reply) => {
+  }>('/api/autonomy/tasks/:taskId/checkpoint', { config: requirePrincipal('autonomy.task.checkpoint') }, async (request, reply) => {
     try {
       await taskEngine.saveCheckpoint(
         request.params.taskId,

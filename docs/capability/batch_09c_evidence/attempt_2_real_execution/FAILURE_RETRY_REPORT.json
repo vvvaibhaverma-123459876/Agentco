@@ -1,0 +1,126 @@
+{
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "failures": [
+    {
+      "case_id": "val-reasoning-01",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-planning-02",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-evidence_evaluation-03",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-claim_grounding-04",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-structured_transformation-05",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-safe_tool_selection-06",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-data_analysis-07",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-software_engineering-08",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-cross_domain_synthesis-09",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-reasoning-10",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-planning-11",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "val-evidence_evaluation-12",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-reasoning-01",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-planning-02",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-evidence_evaluation-03",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-claim_grounding-04",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-structured_transformation-05",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-safe_tool_selection-06",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-data_analysis-07",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-software_engineering-08",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-cross_domain_synthesis-09",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-reasoning-10",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-planning-11",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    },
+    {
+      "case_id": "hid-evidence_evaluation-12",
+      "failure_category": "structured_parse_failed:JSONDecodeError",
+      "status": "INVALID_RESPONSE"
+    }
+  ],
+  "retry_count": 0
+}

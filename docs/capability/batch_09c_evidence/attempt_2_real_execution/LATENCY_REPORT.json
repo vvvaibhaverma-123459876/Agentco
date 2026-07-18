@@ -1,0 +1,104 @@
+{
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "case_latencies": [
+    {
+      "case_id": "val-reasoning-01",
+      "latency_ms": 2894.887
+    },
+    {
+      "case_id": "val-planning-02",
+      "latency_ms": 2675.838
+    },
+    {
+      "case_id": "val-evidence_evaluation-03",
+      "latency_ms": 2821.079
+    },
+    {
+      "case_id": "val-claim_grounding-04",
+      "latency_ms": 2717.065
+    },
+    {
+      "case_id": "val-structured_transformation-05",
+      "latency_ms": 2618.207
+    },
+    {
+      "case_id": "val-safe_tool_selection-06",
+      "latency_ms": 2636.621
+    },
+    {
+      "case_id": "val-data_analysis-07",
+      "latency_ms": 2615.945
+    },
+    {
+      "case_id": "val-software_engineering-08",
+      "latency_ms": 2504.602
+    },
+    {
+      "case_id": "val-cross_domain_synthesis-09",
+      "latency_ms": 2415.23
+    },
+    {
+      "case_id": "val-reasoning-10",
+      "latency_ms": 2416.774
+    },
+    {
+      "case_id": "val-planning-11",
+      "latency_ms": 2842.167
+    },
+    {
+      "case_id": "val-evidence_evaluation-12",
+      "latency_ms": 2914.365
+    },
+    {
+      "case_id": "hid-reasoning-01",
+      "latency_ms": 2472.04
+    },
+    {
+      "case_id": "hid-planning-02",
+      "latency_ms": 2478.637
+    },
+    {
+      "case_id": "hid-evidence_evaluation-03",
+      "latency_ms": 2652.473
+    },
+    {
+      "case_id": "hid-claim_grounding-04",
+      "latency_ms": 2347.101
+    },
+    {
+      "case_id": "hid-structured_transformation-05",
+      "latency_ms": 2824.32
+    },
+    {
+      "case_id": "hid-safe_tool_selection-06",
+      "latency_ms": 2570.265
+    },
+    {
+      "case_id": "hid-data_analysis-07",
+      "latency_ms": 2344.979
+    },
+    {
+      "case_id": "hid-software_engineering-08",
+      "latency_ms": 2496.339
+    },
+    {
+      "case_id": "hid-cross_domain_synthesis-09",
+      "latency_ms": 2401.655
+    },
+    {
+      "case_id": "hid-reasoning-10",
+      "latency_ms": 2394.851
+    },
+    {
+      "case_id": "hid-planning-11",
+      "latency_ms": 2793.459
+    },
+    {
+      "case_id": "hid-evidence_evaluation-12",
+      "latency_ms": 2353.708
+    }
+  ],
+  "max_latency_ms": 2914.365,
+  "median_latency_ms": 2593.105,
+  "min_latency_ms": 2344.979
+}

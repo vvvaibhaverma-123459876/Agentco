@@ -1,0 +1,10 @@
+{
+  "conservative_campaign_max_usd": 0.22675,
+  "hard_cap_usd": 3.0,
+  "input_usd_per_1m_tokens": 5.0,
+  "max_completion_tokens_per_request": 256,
+  "maximum_next_attempt_cost_usd": 0.00907,
+  "output_usd_per_1m_tokens": 30.0,
+  "pricing_policy": "local conservative ledger estimate",
+  "within_hard_cap": true
+}

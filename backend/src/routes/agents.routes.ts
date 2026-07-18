@@ -8,6 +8,7 @@ import { query } from '../db/client';
 import { requireApiKey } from '../security';
 import crypto from 'crypto';
 import { assertAgentCanRunTask, listAgentRegistryWithIdentities } from '../agent-registry';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function agentRoutes(fastify: FastifyInstance) {
   // ── GET /api/agents ──────────────────────────────────────────────────
@@ -61,7 +62,7 @@ export async function agentRoutes(fastify: FastifyInstance) {
   });
 
   // ── GET /api/agents/:id/heartbeat ────────────────────────────────────
-  fastify.get<{ Params: { id: string } }>('/api/agents/:id/heartbeat', { preHandler: requireApiKey }, async (req, reply) => {
+  fastify.get<{ Params: { id: string } }>('/api/agents/:id/heartbeat', { preHandler: requireApiKey, config: requirePrincipal('agent.heartbeat') }, async (req, reply) => {
     await memoryStore.updateHeartbeat(req.params.id);
     return reply.send({ ok: true });
   });
@@ -72,7 +73,7 @@ export async function agentRoutes(fastify: FastifyInstance) {
   fastify.post<{
     Params: { id: string };
     Body: { task_type: string; payload?: Record<string, unknown> };
-  }>('/api/agents/:id/dispatch', { preHandler: requireApiKey }, async (req, reply) => {
+  }>('/api/agents/:id/dispatch', { preHandler: requireApiKey, config: requirePrincipal('agent.dispatch') }, async (req, reply) => {
     const { id } = req.params;
     const agent = (await listAgentRegistryWithIdentities()).find(a => a.agentId === id);
     if (!agent) return reply.status(404).send({ error: 'Agent not found' });

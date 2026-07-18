@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { goalHierarchyService } from '../services/goal-hierarchy.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function goalHierarchyRoutes(
   fastify: FastifyInstance
@@ -8,7 +9,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/institutions/:institutionId/root-goal
    * Create root goal for institution (depth 0)
    */
-  fastify.post('/api/autonomy/institutions/:institutionId/root-goal', async (
+  fastify.post('/api/autonomy/institutions/:institutionId/root-goal', { config: requirePrincipal('autonomy.goal.create_root') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -32,7 +33,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/goals/:parentGoalId/sub-goals
    * Create sub-goal under parent goal (depth 1)
    */
-  fastify.post('/api/autonomy/goals/:parentGoalId/sub-goals', async (
+  fastify.post('/api/autonomy/goals/:parentGoalId/sub-goals', { config: requirePrincipal('autonomy.goal.create_sub') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -56,7 +57,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/goals/:parentSubGoalId/tasks
    * Create task goal under sub-goal (depth 2)
    */
-  fastify.post('/api/autonomy/goals/:parentSubGoalId/tasks', async (
+  fastify.post('/api/autonomy/goals/:parentSubGoalId/tasks', { config: requirePrincipal('autonomy.goal.create_task') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -99,7 +100,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/goals/:parentGoalId/rollup
    * Rollup results from completed child goals to parent
    */
-  fastify.post('/api/autonomy/goals/:parentGoalId/rollup', async (
+  fastify.post('/api/autonomy/goals/:parentGoalId/rollup', { config: requirePrincipal('autonomy.goal.rollup') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -122,7 +123,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/evidence/:sourceEvidenceId/deduplicate
    * Mark evidence as duplicate of canonical evidence
    */
-  fastify.post('/api/autonomy/evidence/:sourceEvidenceId/deduplicate', async (
+  fastify.post('/api/autonomy/evidence/:sourceEvidenceId/deduplicate', { config: requirePrincipal('autonomy.evidence.deduplicate') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -157,7 +158,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/evidence/:evidenceId/share
    * Share evidence across institutions
    */
-  fastify.post('/api/autonomy/evidence/:evidenceId/share', async (
+  fastify.post('/api/autonomy/evidence/:evidenceId/share', { config: requirePrincipal('autonomy.evidence.share') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -212,7 +213,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/specialist-teams/record-pattern
    * Record successful specialist team pattern
    */
-  fastify.post('/api/autonomy/specialist-teams/record-pattern', async (
+  fastify.post('/api/autonomy/specialist-teams/record-pattern', { config: requirePrincipal('autonomy.specialist_team.record_pattern') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -243,7 +244,7 @@ export async function goalHierarchyRoutes(
    * POST /api/autonomy/allocation/record-decision
    * Record specialist allocation decision for learning
    */
-  fastify.post('/api/autonomy/allocation/record-decision', async (
+  fastify.post('/api/autonomy/allocation/record-decision', { config: requirePrincipal('autonomy.allocation.record_decision') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {

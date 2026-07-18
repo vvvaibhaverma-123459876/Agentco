@@ -5,6 +5,7 @@ import {
   TransactionInput,
   resourceLedger,
 } from '../services/resource-ledger.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 function statusFor(error: unknown): number {
   const message = error instanceof Error ? error.message : String(error);
@@ -29,9 +30,11 @@ async function sendError(reply: FastifyReply, error: unknown) {
 export async function resourceLedgerRoutes(fastify: FastifyInstance) {
   fastify.post(
     '/resources/accounts',
+    { config: requirePrincipal('resource.account.create') },
     async (request: FastifyRequest<{ Body: CreateAccountInput }>, reply) => {
       try {
-        const account = await resourceLedger.createAccount(request.body);
+        // AUD-004: owner_actor_id is the AUTHENTICATED principal, never a body field.
+        const account = await resourceLedger.createAccount({ ...request.body, owner_actor_id: request.principal!.actorId } as CreateAccountInput);
         return reply.status(201).send({ account });
       } catch (error) {
         return sendError(reply, error);
@@ -54,9 +57,11 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
 
   fastify.post(
     '/resources/transactions/credit',
+    { config: requirePrincipal('resource.transaction.credit') },
     async (request: FastifyRequest<{ Body: TransactionInput }>, reply) => {
       try {
-        const transaction = await resourceLedger.credit(request.body);
+        // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+        const transaction = await resourceLedger.credit({ ...request.body, actor_id: request.principal!.actorId });
         return reply.status(201).send({ transaction });
       } catch (error) {
         return sendError(reply, error);
@@ -66,9 +71,11 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
 
   fastify.post(
     '/resources/transactions/debit',
+    { config: requirePrincipal('resource.transaction.debit') },
     async (request: FastifyRequest<{ Body: TransactionInput }>, reply) => {
       try {
-        const transaction = await resourceLedger.debit(request.body);
+        // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+        const transaction = await resourceLedger.debit({ ...request.body, actor_id: request.principal!.actorId });
         return reply.status(201).send({ transaction });
       } catch (error) {
         return sendError(reply, error);
@@ -78,9 +85,11 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
 
   fastify.post(
     '/resources/reservations',
+    { config: requirePrincipal('resource.reservation.create') },
     async (request: FastifyRequest<{ Body: ReservationInput }>, reply) => {
       try {
-        const reservation = await resourceLedger.reserve(request.body);
+        // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+        const reservation = await resourceLedger.reserve({ ...request.body, actor_id: request.principal!.actorId });
         return reply.status(201).send({ reservation });
       } catch (error) {
         return sendError(reply, error);
@@ -90,17 +99,19 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
 
   fastify.post(
     '/resources/reservations/:reservationId/settle',
+    { config: requirePrincipal('resource.reservation.settle') },
     async (
       request: FastifyRequest<{
         Params: { reservationId: string };
-        Body: { actor_id: string; idempotency_key: string; actual_amount?: number };
+        Body: { idempotency_key: string; actual_amount?: number };
       }>,
       reply
     ) => {
       try {
+        // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
         const transaction = await resourceLedger.settleReservationUsage(
           request.params.reservationId,
-          request.body.actor_id,
+          request.principal!.actorId,
           request.body.idempotency_key,
           request.body.actual_amount
         );
@@ -113,12 +124,14 @@ export async function resourceLedgerRoutes(fastify: FastifyInstance) {
 
   fastify.post(
     '/resources/reservations/:reservationId/release',
+    { config: requirePrincipal('resource.reservation.release') },
     async (
-      request: FastifyRequest<{ Params: { reservationId: string }; Body: { actor_id: string } }>,
+      request: FastifyRequest<{ Params: { reservationId: string } }>,
       reply
     ) => {
       try {
-        const reservation = await resourceLedger.releaseReservation(request.params.reservationId, request.body.actor_id);
+        // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+        const reservation = await resourceLedger.releaseReservation(request.params.reservationId, request.principal!.actorId);
         return { reservation };
       } catch (error) {
         return sendError(reply, error);

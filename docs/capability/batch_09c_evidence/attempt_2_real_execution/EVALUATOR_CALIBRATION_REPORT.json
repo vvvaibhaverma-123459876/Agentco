@@ -1,0 +1,6 @@
+{
+  "calibration_suite_result": "passed_static_discrimination_checks",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "paid_evaluator_used": false,
+  "provider_outputs_not_replaced_by_evaluator": true
+}
