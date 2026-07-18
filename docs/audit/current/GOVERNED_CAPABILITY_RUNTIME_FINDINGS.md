@@ -1,6 +1,6 @@
 # Governed Capability Runtime Findings
 
-Updated for Batch 09B after PR #29 merged into `main`.
+Updated for Batch 09C after PR #30 merged into `main`.
 
 ## Resolved Evidence-Integrity Findings
 
@@ -40,3 +40,15 @@ real capability baseline.
 Genesis V6 remains `HOLD_FOR_MORE_EVIDENCE` with `execution_attempted = false`.
 No provider call occurred, no credentials were recorded, and no capability
 baseline or supported domains are claimed.
+
+## Batch 09C OpenAI Findings
+
+| Finding | Severity | Status | Summary |
+| --- | --- | --- | --- |
+| GCR-009 | S3 | superseded_by_v7_attempt_2 | The original Batch 09C canary failed before baseline execution and remains preserved as historical evidence. |
+| GCR-010 | S3 | open_hold_for_more_evidence | Genesis V7 attempt 2 established OpenAI `gpt-5.6-luna` reachability and model identity, then executed all 24 frozen cases; all 24 terminal responses were schema-invalid under the frozen structured-output evaluator contract. |
+
+Genesis V7 attempt 2 remains `HOLD_FOR_MORE_EVIDENCE` with `executed_cases = 24`,
+`completed_cases = 0`, `invalid_response_cases = 24`, no supported domains and
+no aggregate correctness. No fallback model or provider was used, and no
+capability baseline or capability improvement is claimed.

@@ -1,0 +1,102 @@
+{
+  "aggregate_semantic_hash": "bf0fe05dbb4744ff726acd151dfecd34a67eac5d458c05c67db7d6a3029b7974",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "case_semantic_hashes": [
+    {
+      "case_id": "val-reasoning-01",
+      "semantic_hash": "1867922d6a59aeeb0be8c9dac265bef11c018eccf682b9adff079a2fca8588e0"
+    },
+    {
+      "case_id": "val-planning-02",
+      "semantic_hash": "e4b267ba8acc3e3a7c147fe64f93d953efadece71cf52a2b3de724119b8fbf70"
+    },
+    {
+      "case_id": "val-evidence_evaluation-03",
+      "semantic_hash": "4aab89d3b330c4296d7ac62cd4b149af4c781f67a52c4ea47281f7aa70bbb942"
+    },
+    {
+      "case_id": "val-claim_grounding-04",
+      "semantic_hash": "5468d31daffbac74226b1fe197d97e100c0e95bea487afa74d4b0f2dc06ab743"
+    },
+    {
+      "case_id": "val-structured_transformation-05",
+      "semantic_hash": "87db31fba66c5374b786560b8af2143fd1e0079ac28b1ef939a647d59630b713"
+    },
+    {
+      "case_id": "val-safe_tool_selection-06",
+      "semantic_hash": "3cebf747287a351997efc96e3db73a4c57c83d0eff0c7028967f89e1973adb6e"
+    },
+    {
+      "case_id": "val-data_analysis-07",
+      "semantic_hash": "bb50f87fda89bd6c31a74360cf713ffdff2b1143e342d552fe50c057b5250cca"
+    },
+    {
+      "case_id": "val-software_engineering-08",
+      "semantic_hash": "665ad638b0de18bbbc275720eb1bcffecaa58f96d4aa1de9cddac8947b87078b"
+    },
+    {
+      "case_id": "val-cross_domain_synthesis-09",
+      "semantic_hash": "5583ac2b2f333b7950a9ed9488747945a66f154e37238564f40dd35b49d144fc"
+    },
+    {
+      "case_id": "val-reasoning-10",
+      "semantic_hash": "8579213e5e007b50b77a9a2d660aef8ee8790af920c1f2f38bb3b87b5d88b3da"
+    },
+    {
+      "case_id": "val-planning-11",
+      "semantic_hash": "24a6c54fbf28040592ff5028c91f9617608e70feec4849f9be5db6712c5153cc"
+    },
+    {
+      "case_id": "val-evidence_evaluation-12",
+      "semantic_hash": "aac00adb7842b6cfac1099de841595402faf0e24fbe8c8f6673419fa940fc237"
+    },
+    {
+      "case_id": "hid-reasoning-01",
+      "semantic_hash": "67c7d8eb18ce62a57b5cf93ade00db5db25b10359261e62f6dea925f187be8cf"
+    },
+    {
+      "case_id": "hid-planning-02",
+      "semantic_hash": "4a15dbf10e558966baac147a34b5e002796272b4b5fb9cc4664fb56949f1ad2e"
+    },
+    {
+      "case_id": "hid-evidence_evaluation-03",
+      "semantic_hash": "d2d7f8002e4c5c371f8dff6c2aa5986c62de776fe5abe57ef139bf66b05b11ca"
+    },
+    {
+      "case_id": "hid-claim_grounding-04",
+      "semantic_hash": "ae8e65c44b6ec2ee5fda4d60472c488dda24fd159d506a9ca6f9944bf2b45ee0"
+    },
+    {
+      "case_id": "hid-structured_transformation-05",
+      "semantic_hash": "5e56d8ed59d0180375145f4fd58cf1b81181093951e8439c234c913cc3001798"
+    },
+    {
+      "case_id": "hid-safe_tool_selection-06",
+      "semantic_hash": "6b9c974807a6b943d5a594d76b270241130c5eb7795fd752fe8fad134c4bdc46"
+    },
+    {
+      "case_id": "hid-data_analysis-07",
+      "semantic_hash": "48295f54867d862eaff6c112a856e5a99d3d01087acb053716b1b632cefb7304"
+    },
+    {
+      "case_id": "hid-software_engineering-08",
+      "semantic_hash": "c400a7428fc6cdcb4f0b74b65d1be1461e0d0682813f5e9224a35e6e634f1f6e"
+    },
+    {
+      "case_id": "hid-cross_domain_synthesis-09",
+      "semantic_hash": "a9a94f2bb10792b2d62c4cf891d0af1284abf694f37c2bdd58da5bbc58010df1"
+    },
+    {
+      "case_id": "hid-reasoning-10",
+      "semantic_hash": "6895974a2c1ad1607ec059b83bf90e73807b00f67320c388c1ea20c869112e1c"
+    },
+    {
+      "case_id": "hid-planning-11",
+      "semantic_hash": "12e6ea1208bd2c5310a38266cb4f9355e9c09488f77d408bbdd6a140a5c79839"
+    },
+    {
+      "case_id": "hid-evidence_evaluation-12",
+      "semantic_hash": "2467e029a61a95ee43e0820995b15efd3c8208ce4524b271d43d349aeda11785"
+    }
+  ]
+}

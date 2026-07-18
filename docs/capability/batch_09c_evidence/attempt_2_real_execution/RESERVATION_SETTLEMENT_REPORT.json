@@ -1,0 +1,174 @@
+{
+  "all_terminal_attempts_settled": true,
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "case_settlements": [
+    {
+      "case_id": "val-reasoning-01",
+      "consumed_usd": 0.00874,
+      "released_usd": 0.00025,
+      "reserved_usd": 0.00899,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-planning-02",
+      "consumed_usd": 0.008725,
+      "released_usd": 0.00026,
+      "reserved_usd": 0.008985,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-evidence_evaluation-03",
+      "consumed_usd": 0.008775,
+      "released_usd": 0.000265,
+      "reserved_usd": 0.00904,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-claim_grounding-04",
+      "consumed_usd": 0.008765,
+      "released_usd": 0.000255,
+      "reserved_usd": 0.00902,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-structured_transformation-05",
+      "consumed_usd": 0.008765,
+      "released_usd": 0.000305,
+      "reserved_usd": 0.00907,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-safe_tool_selection-06",
+      "consumed_usd": 0.00876,
+      "released_usd": 0.00028,
+      "reserved_usd": 0.00904,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-data_analysis-07",
+      "consumed_usd": 0.00874,
+      "released_usd": 0.00027,
+      "reserved_usd": 0.00901,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-software_engineering-08",
+      "consumed_usd": 0.008765,
+      "released_usd": 0.00028,
+      "reserved_usd": 0.009045,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-cross_domain_synthesis-09",
+      "consumed_usd": 0.00878,
+      "released_usd": 0.000275,
+      "reserved_usd": 0.009055,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-reasoning-10",
+      "consumed_usd": 0.00874,
+      "released_usd": 0.00025,
+      "reserved_usd": 0.00899,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-planning-11",
+      "consumed_usd": 0.008725,
+      "released_usd": 0.00026,
+      "reserved_usd": 0.008985,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "val-evidence_evaluation-12",
+      "consumed_usd": 0.008775,
+      "released_usd": 0.000265,
+      "reserved_usd": 0.00904,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-reasoning-01",
+      "consumed_usd": 0.00874,
+      "released_usd": 0.00024,
+      "reserved_usd": 0.00898,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-planning-02",
+      "consumed_usd": 0.008725,
+      "released_usd": 0.00025,
+      "reserved_usd": 0.008975,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-evidence_evaluation-03",
+      "consumed_usd": 0.008775,
+      "released_usd": 0.000255,
+      "reserved_usd": 0.00903,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-claim_grounding-04",
+      "consumed_usd": 0.008765,
+      "released_usd": 0.000245,
+      "reserved_usd": 0.00901,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-structured_transformation-05",
+      "consumed_usd": 0.008765,
+      "released_usd": 0.000295,
+      "reserved_usd": 0.00906,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-safe_tool_selection-06",
+      "consumed_usd": 0.00876,
+      "released_usd": 0.00027,
+      "reserved_usd": 0.00903,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-data_analysis-07",
+      "consumed_usd": 0.00874,
+      "released_usd": 0.00026,
+      "reserved_usd": 0.009,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-software_engineering-08",
+      "consumed_usd": 0.008765,
+      "released_usd": 0.00027,
+      "reserved_usd": 0.009035,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-cross_domain_synthesis-09",
+      "consumed_usd": 0.00878,
+      "released_usd": 0.000265,
+      "reserved_usd": 0.009045,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-reasoning-10",
+      "consumed_usd": 0.00874,
+      "released_usd": 0.00024,
+      "reserved_usd": 0.00898,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-planning-11",
+      "consumed_usd": 0.008725,
+      "released_usd": 0.00025,
+      "reserved_usd": 0.008975,
+      "unreleased_amount": 0
+    },
+    {
+      "case_id": "hid-evidence_evaluation-12",
+      "consumed_usd": 0.008775,
+      "released_usd": 0.000255,
+      "reserved_usd": 0.00903,
+      "unreleased_amount": 0
+    }
+  ]
+}

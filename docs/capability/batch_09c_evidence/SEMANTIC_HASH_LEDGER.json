@@ -1,0 +1,28 @@
+{
+  "artifact_type": "semantic_hash_ledger",
+  "authorization_artifact_hash": "a5545e2d5062b5e23bfa02c23e753c647485ec7f00588d102f8c935889d1f678",
+  "baseline_hash": "6036e79be8ff0f8ca37ad76ed648a198b7064d6c1135d3bbd5f96c7e35a56f8f",
+  "batch_09a_readiness_identity": "real-provider-baseline-readiness",
+  "branch": "audit/remediation-09-openai-genesis-v7-baseline",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline",
+  "campaign_manifest_hash": "2f4eb22ffd95a196109594e430435444d3479e543df4ff64e174b12f755edec4",
+  "canary_report_hash": "240b7f76560096502b6a23e16cca9fe9c535ccf28c67da1bea2d6e5d44a90d46",
+  "cost_ledger_hash": "04767184bc8f0411dd36e30154fd3ccac739b5560a4ecb908a3e363fe37e5a59",
+  "endpoint": "https://api.openai.com/v1",
+  "endpoint_hostname": "api.openai.com",
+  "failure_retry_report_hash": "26e04912d2c2c811eefddd59766272b0dfc01cf1c5d7444932b0c817ef4fb5bc",
+  "generated_at": "2026-07-18T05:44:45Z",
+  "genesis_v5_hold_identity": "governed-capability-genesis-v5",
+  "genesis_v6_hold_identity": "governed-capability-genesis-v6-real-baseline",
+  "latency_report_hash": "78646c927e33a84488679d1629c77d43fa12508c45ee08f61218efe3167cffd3",
+  "pr30_merge_commit": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
+  "protocol_v3_campaign_identity": "governed-capability-protocol-baseline-v3",
+  "provider": "OpenAI",
+  "provider_host_allowlist": [
+    "api.openai.com"
+  ],
+  "requested_model": "gpt-5.6-luna",
+  "settlement_report_hash": "b2565fdecb1e590d78b16dacabec0aa88529ed39ffc78e339c81b99bd7fe234e",
+  "source_commit": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
+  "source_tree": "9f247133e3adb8ee4e8d1876660d27565a1a35d8"
+}

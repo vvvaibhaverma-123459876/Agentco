@@ -1,0 +1,22 @@
+{
+  "artifact_type": "evaluator_calibration_report",
+  "batch_09a_readiness_identity": "real-provider-baseline-readiness",
+  "branch": "audit/remediation-09-openai-genesis-v7-baseline",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline",
+  "capability_effect": "none",
+  "endpoint": "https://api.openai.com/v1",
+  "endpoint_hostname": "api.openai.com",
+  "generated_at": "2026-07-18T05:44:45Z",
+  "genesis_v5_hold_identity": "governed-capability-genesis-v5",
+  "genesis_v6_hold_identity": "governed-capability-genesis-v6-real-baseline",
+  "pr30_merge_commit": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
+  "protocol_v3_campaign_identity": "governed-capability-protocol-baseline-v3",
+  "provider": "OpenAI",
+  "provider_host_allowlist": [
+    "api.openai.com"
+  ],
+  "requested_model": "gpt-5.6-luna",
+  "source_commit": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
+  "source_tree": "9f247133e3adb8ee4e8d1876660d27565a1a35d8",
+  "status": "not_run_after_canary_failed"
+}

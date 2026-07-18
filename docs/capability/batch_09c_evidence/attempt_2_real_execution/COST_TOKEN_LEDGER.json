@@ -1,0 +1,9 @@
+{
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "pricing_policy": "local conservative ledger estimate",
+  "remaining_authorized_campaign_budget_usd": 2.78861,
+  "total_cached_input_tokens": 0,
+  "total_campaign_cost_usd": 0.21139,
+  "total_input_tokens": 5234,
+  "total_output_reasoning_tokens": 6174
+}
