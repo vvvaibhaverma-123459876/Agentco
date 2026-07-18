@@ -5,9 +5,15 @@ import { db } from '../src/db/client';
 import { migrationDb } from './support/migration-db';
 import { identityAuthorityService } from '../src/services/identity-authority.service';
 import { resourceLedger } from '../src/services/resource-ledger.service';
+import { provisionSignedActor, signHeaders } from './helpers/sign-request';
 
 function authHeaders(): Record<string, string> {
   return process.env.AGENTCO_API_KEY ? { 'x-api-key': process.env.AGENTCO_API_KEY } : {};
+}
+
+// AUD-004: these routes now require a signed, credential-bound principal.
+function signedHeaders(actor: { actorId: string; privateKey: import('crypto').KeyObject }, method: string, url: string, body?: unknown) {
+  return { ...authHeaders(), ...signHeaders({ actorId: actor.actorId, privateKey: actor.privateKey, method, url, body }) };
 }
 
 async function applyMigrations() {
@@ -112,32 +118,26 @@ describe('resource ledger', () => {
 
   test('resource ledger routes are reachable and backed by the same ledger', async () => {
     const app = await build();
-    const actor = await createActor('resource-route-service');
+    const actor = await provisionSignedActor({ name: `resource-route-service-${Date.now()}`, roles: ['civilization_operator'] });
 
+    const createUrl = '/resources/accounts';
+    const createBody = { resource_type: 'compute', unit: 'credits' };
     const create = await app.inject({
       method: 'POST',
-      url: '/resources/accounts',
-      headers: authHeaders(),
-      payload: {
-        owner_actor_id: actor.id,
-        resource_type: 'compute',
-        unit: 'credits',
-      },
+      url: createUrl,
+      headers: signedHeaders(actor, 'POST', createUrl, createBody),
+      payload: createBody,
     });
     expect(create.statusCode).toBe(201);
     const accountId = create.json().account.id;
 
+    const creditUrl = '/resources/transactions/credit';
+    const creditBody = { account_id: accountId, amount: 3, reason: 'route allocation', idempotency_key: `route-credit-${accountId}` };
     const credit = await app.inject({
       method: 'POST',
-      url: '/resources/transactions/credit',
-      headers: authHeaders(),
-      payload: {
-        account_id: accountId,
-        actor_id: actor.id,
-        amount: 3,
-        reason: 'route allocation',
-        idempotency_key: `route-credit-${accountId}`,
-      },
+      url: creditUrl,
+      headers: signedHeaders(actor, 'POST', creditUrl, creditBody),
+      payload: creditBody,
     });
     expect(credit.statusCode).toBe(201);
 
@@ -243,40 +243,39 @@ describe('resource ledger', () => {
 
   test('reservation routes are reachable and expired holds are released', async () => {
     const app = await build();
-    const actor = await createActor('resource-reservation-route-service');
+    const signer = await provisionSignedActor({ name: `resource-reservation-route-service-${Date.now()}`, roles: ['civilization_operator'] });
     const account = await resourceLedger.createAccount({
-      owner_actor_id: actor.id,
+      owner_actor_id: signer.actorId,
       resource_type: 'tool_calls',
       unit: 'calls',
     });
     await resourceLedger.credit({
       account_id: account.id,
-      actor_id: actor.id,
+      actor_id: signer.actorId,
       amount: 5,
       reason: 'route reservation funding',
       idempotency_key: `route-reservation-credit-${account.id}`,
     });
 
+    const reserveUrl = '/resources/reservations';
+    const reserveBody = {
+      account_id: account.id, amount: 2, reason: 'route reserve',
+      idempotency_key: `route-reservation-${account.id}`, expires_at: new Date(Date.now() + 60_000).toISOString(),
+    };
     const reserve = await app.inject({
       method: 'POST',
-      url: '/resources/reservations',
-      headers: authHeaders(),
-      payload: {
-        account_id: account.id,
-        actor_id: actor.id,
-        amount: 2,
-        reason: 'route reserve',
-        idempotency_key: `route-reservation-${account.id}`,
-        expires_at: new Date(Date.now() + 60_000).toISOString(),
-      },
+      url: reserveUrl,
+      headers: signedHeaders(signer, 'POST', reserveUrl, reserveBody),
+      payload: reserveBody,
     });
     expect(reserve.statusCode).toBe(201);
 
+    const releaseUrl = `/resources/reservations/${reserve.json().reservation.id}/release`;
     const release = await app.inject({
       method: 'POST',
-      url: `/resources/reservations/${reserve.json().reservation.id}/release`,
-      headers: authHeaders(),
-      payload: { actor_id: actor.id },
+      url: releaseUrl,
+      headers: signedHeaders(signer, 'POST', releaseUrl, {}),
+      payload: {},
     });
     expect(release.statusCode).toBe(200);
     expect(release.json().reservation.status).toBe('released');

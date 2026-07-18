@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { deadlockDetectorService } from '../services/deadlock-detector.service';
 import { reputationScaleService } from '../services/reputation-scale.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function phase3HardeningRoutes(
   fastify: FastifyInstance
@@ -9,24 +10,25 @@ export async function phase3HardeningRoutes(
    * POST /api/civilization/goals/:goalId/lock
    * Acquire exclusive execution lock on goal
    */
-  fastify.post('/api/civilization/goals/:goalId/lock', async (
+  fastify.post('/api/civilization/goals/:goalId/lock', { config: requirePrincipal('goal.lock.acquire') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
     try {
       const { goalId } = req.params as { goalId: string };
-      const { institution_id, acquired_by } = req.body as any;
+      const { institution_id } = req.body as any;
 
-      if (!institution_id || !acquired_by) {
+      if (!institution_id) {
         return reply.status(400).send({
-          error: 'institution_id and acquired_by are required',
+          error: 'institution_id is required',
         });
       }
 
+      // AUD-004: acquired_by is the AUTHENTICATED principal, never a body field.
       const lock = await deadlockDetectorService.acquireGoalLock(
         goalId,
         institution_id,
-        acquired_by
+        req.principal!.actorId
       );
 
       if (!lock) {
@@ -50,7 +52,7 @@ export async function phase3HardeningRoutes(
    * POST /api/civilization/goals/:goalId/unlock
    * Release execution lock
    */
-  fastify.post('/api/civilization/goals/:goalId/unlock', async (
+  fastify.post('/api/civilization/goals/:goalId/unlock', { config: requirePrincipal('goal.lock.release') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -102,7 +104,7 @@ export async function phase3HardeningRoutes(
    * POST /api/civilization/consistency-check
    * Run consistency verification on institution state
    */
-  fastify.post('/api/civilization/consistency-check', async (
+  fastify.post('/api/civilization/consistency-check', { config: requirePrincipal('civilization.consistency_check.run') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -298,6 +300,7 @@ export async function phase3HardeningRoutes(
    */
   fastify.post(
     '/api/civilization/batch-update-reputations',
+    { config: requirePrincipal('reputation.batch_update') },
     async (req: FastifyRequest, reply: FastifyReply) => {
       try {
         const { updates } = req.body as any;

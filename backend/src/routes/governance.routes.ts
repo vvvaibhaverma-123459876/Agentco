@@ -4,10 +4,14 @@ import { governanceRBACService } from '../services/governance-rbac.service';
 import { trustPolicyService } from '../services/trust-policy.service';
 import { trustReputationService } from '../services/trust-reputation.service';
 import { calibrationConstitutionService } from '../services/calibration-constitution.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 // RBAC Check Helper
+// AUD-004: actorId comes from the AUTHENTICATED principal (bound by requirePrincipal() on
+// every route that calls this), never from the spoofable x-actor-id header. The existing
+// governanceRBACService continues to make the authorization decision over that real identity.
 async function checkPermission(req: FastifyRequest, permission: string): Promise<boolean> {
-  const actorId = (req.headers['x-actor-id'] as string) || (req.headers['x-service-identity'] as string) || 'unknown';
+  const actorId = req.principal?.actorId ?? 'unknown';
   const traceId = (req.headers['x-trace-id'] as string) || (req.headers['trace-id'] as string);
 
   const hasPermission = await governanceRBACService.hasPermission(actorId, permission);
@@ -27,7 +31,7 @@ async function checkPermission(req: FastifyRequest, permission: string): Promise
 }
 
 async function checkLevel(req: FastifyRequest, minimumLevel: number): Promise<boolean> {
-  const actorId = (req.headers['x-actor-id'] as string) || (req.headers['x-service-identity'] as string) || 'unknown';
+  const actorId = req.principal?.actorId ?? 'unknown';
   const traceId = (req.headers['x-trace-id'] as string) || (req.headers['trace-id'] as string);
 
   const hasLevel = await governanceRBACService.checkPermissionLevel(actorId, minimumLevel);
@@ -54,7 +58,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * GET /api/governance/roles
    * List all governance roles
    */
-  fastify.get('/api/governance/roles', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/api/governance/roles', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkPermission(req, 'governance.view_policies'))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Insufficient permissions' });
@@ -76,7 +80,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * GET /api/governance/permissions
    * List all governance permissions
    */
-  fastify.get('/api/governance/permissions', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/api/governance/permissions', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkPermission(req, 'governance.view_policies'))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Insufficient permissions' });
@@ -98,7 +102,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * GET /api/governance/entities/:entityId/roles
    * Get roles for an entity
    */
-  fastify.get('/api/governance/entities/:entityId/roles', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/api/governance/entities/:entityId/roles', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkPermission(req, 'governance.view_policies'))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Insufficient permissions' });
@@ -122,7 +126,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * GET /api/governance/audit-trail
    * Get RBAC audit trail
    */
-  fastify.get('/api/governance/audit-trail', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/api/governance/audit-trail', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkPermission(req, 'governance.view_audit_trail'))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Insufficient permissions' });
@@ -151,7 +155,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * GET /api/governance/constitution
    * Get active constitution
    */
-  fastify.get('/api/governance/constitution', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.get('/api/governance/constitution', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkPermission(req, 'governance.view_constitution'))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Insufficient permissions' });
@@ -199,7 +203,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * POST /api/governance/roles/:entityId/assign
    * Assign role to entity (admin only)
    */
-  fastify.post('/api/governance/roles/:entityId/assign', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/governance/roles/:entityId/assign', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkLevel(req, 5))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Admin access required' });
@@ -207,7 +211,8 @@ export async function governanceRoutes(fastify: FastifyInstance) {
 
       const { entityId } = req.params as { entityId: string };
       const { role_name, entity_type } = req.body as { role_name: string; entity_type?: string };
-      const actorId = (req.headers['x-actor-id'] as string) || 'system';
+      // AUD-004: assigned_by is the AUTHENTICATED principal, never the x-actor-id header.
+      const actorId = req.principal!.actorId;
 
       if (!role_name) {
         return reply.status(400).send({ error: 'INVALID_INPUT', message: 'Missing role_name' });
@@ -235,7 +240,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * POST /api/governance/roles/:entityId/revoke
    * Revoke role from entity (admin only)
    */
-  fastify.post('/api/governance/roles/:entityId/revoke', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/governance/roles/:entityId/revoke', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkLevel(req, 5))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Admin access required' });
@@ -243,7 +248,8 @@ export async function governanceRoutes(fastify: FastifyInstance) {
 
       const { entityId } = req.params as { entityId: string };
       const { role_name } = req.body as { role_name: string };
-      const actorId = (req.headers['x-actor-id'] as string) || 'system';
+      // AUD-004: revoked_by is the AUTHENTICATED principal, never the x-actor-id header.
+      const actorId = req.principal!.actorId;
 
       if (!role_name) {
         return reply.status(400).send({ error: 'INVALID_INPUT', message: 'Missing role_name' });
@@ -267,7 +273,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * POST /api/governance/bootstrap
    * Initialize default roles (admin only)
    */
-  fastify.post('/api/governance/bootstrap', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/governance/bootstrap', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkLevel(req, 5))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Admin access required' });
@@ -293,7 +299,7 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * POST /api/governance/policies/:policyId/approve
    * Approve/reject/defer policy (approver+)
    */
-  fastify.post('/api/governance/policies/:policyId/approve', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/governance/policies/:policyId/approve', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkLevel(req, 4))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Approver access required' });
@@ -301,7 +307,8 @@ export async function governanceRoutes(fastify: FastifyInstance) {
 
       const { policyId } = req.params as { policyId: string };
       const { decision, reason } = req.body as { decision: string; reason?: string };
-      const actorId = (req.headers['x-actor-id'] as string) || 'unknown';
+      // AUD-004: the approver is the AUTHENTICATED principal, never the x-actor-id header.
+      const actorId = req.principal!.actorId;
       const traceId = (req.headers['x-trace-id'] as string);
 
       if (!['approved', 'rejected', 'deferred'].includes(decision)) {
@@ -342,14 +349,15 @@ export async function governanceRoutes(fastify: FastifyInstance) {
    * POST /api/governance/emergency-freeze
    * Manage emergency freeze (approver+)
    */
-  fastify.post('/api/governance/emergency-freeze', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/governance/emergency-freeze', { config: requirePrincipal() }, async (req: FastifyRequest, reply: FastifyReply) => {
     try {
       if (!(await checkLevel(req, 4))) {
         return reply.status(403).send({ error: 'PERMISSION_DENIED', message: 'Approver access required' });
       }
 
       const { action, reason } = req.body as { action: string; reason?: string };
-      const actorId = (req.headers['x-actor-id'] as string) || 'unknown';
+      // AUD-004: the actor is the AUTHENTICATED principal, never the x-actor-id header.
+      const actorId = req.principal!.actorId;
       const traceId = (req.headers['x-trace-id'] as string);
 
       if (!['activate', 'deactivate'].includes(action)) {

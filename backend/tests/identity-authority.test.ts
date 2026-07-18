@@ -4,9 +4,21 @@ import crypto from 'crypto';
 import { build } from '../src/server';
 import { db } from '../src/db/client';
 import { migrationDb } from './support/migration-db';
+import { provisionSignedActor, signHeaders } from './helpers/sign-request';
 
 function authHeaders(): Record<string, string> {
   return process.env.AGENTCO_API_KEY ? { 'x-api-key': process.env.AGENTCO_API_KEY } : {};
+}
+
+// AUD-004: role/permission/delegation/key-grant routes now require a signed, credential-bound
+// principal. One shared operator (holding civilization_operator, which migration 143 grants
+// identity.* permissions to) signs every such call in this file.
+let identityOperator: Awaited<ReturnType<typeof provisionSignedActor>>;
+function operatorHeaders(method: string, url: string, body?: unknown): Record<string, string> {
+  return {
+    ...authHeaders(),
+    ...signHeaders({ actorId: identityOperator.actorId, privateKey: identityOperator.privateKey, method, url, body }),
+  };
 }
 
 async function applyIdentityMigration() {
@@ -21,6 +33,9 @@ describe('identity authority routes', () => {
 
   beforeAll(async () => {
     await applyIdentityMigration();
+    // 'governor' additionally carries 'governance.approve', needed when this operator grants a
+    // delegation between two OTHER actors (grantedBy !== principal_actor_id requires it).
+    identityOperator = await provisionSignedActor({ name: `identity-test-operator-${Date.now()}`, roles: ['civilization_operator', 'governor'] });
   });
 
   afterEach(async () => {
@@ -120,15 +135,13 @@ describe('identity authority routes', () => {
     expect(denied.statusCode).toBe(403);
     expect(denied.json().allowed).toBe(false);
 
+    const grantUrl = '/identity/permissions/grant';
+    const grantBody = { actor_id: actorId, permission_name: 'task.execute', scope: '*' };
     const grant = await app.inject({
       method: 'POST',
-      url: '/identity/permissions/grant',
-      headers: authHeaders(),
-      payload: {
-        actor_id: actorId,
-        permission_name: 'task.execute',
-        scope: '*',
-      },
+      url: grantUrl,
+      headers: operatorHeaders('POST', grantUrl, grantBody),
+      payload: grantBody,
     });
     expect(grant.statusCode).toBe(201);
     expect(grant.json()).toHaveProperty('grant_id');
@@ -164,14 +177,13 @@ describe('identity authority routes', () => {
     expect(actorResponse.statusCode).toBe(201);
     const actorId = actorResponse.json().actor.id;
 
+    const roleUrl = '/identity/roles/assign';
+    const roleBody = { actor_id: actorId, role_name: 'auditor' };
     const roleResponse = await app.inject({
       method: 'POST',
-      url: '/identity/roles/assign',
-      headers: authHeaders(),
-      payload: {
-        actor_id: actorId,
-        role_name: 'auditor',
-      },
+      url: roleUrl,
+      headers: operatorHeaders('POST', roleUrl, roleBody),
+      payload: roleBody,
     });
 
     expect(roleResponse.statusCode).toBe(201);
@@ -190,13 +202,16 @@ describe('identity authority routes', () => {
     expect(event.rowCount).toBe(1);
     expect(event.rows[0].payload.assignment_id).toBe(roleResponse.json().assignment_id);
 
+    // AUD-004: the canonical event's actor_id is the AUTHENTICATED performer (the operator who
+    // signed the assign-role request), not the subject receiving the role -- correct attribution
+    // now that assigned_by can no longer silently default to the subject itself.
     const canonicalEvent = await db.query(
       `SELECT id
          FROM event_log
         WHERE id = $1
           AND event_type = 'role.assigned'
           AND actor_id = $2`,
-      [event.rows[0].event_id, actorId]
+      [event.rows[0].event_id, identityOperator.actorId]
     );
     expect(canonicalEvent.rowCount).toBe(1);
   });
@@ -217,14 +232,13 @@ describe('identity authority routes', () => {
     expect(actorResponse.statusCode).toBe(201);
     const actorId = actorResponse.json().actor.id;
 
+    const roleUrl2 = '/identity/roles/assign';
+    const roleBody2 = { actor_id: actorId, role_name: 'auditor' };
     const roleResponse = await app.inject({
       method: 'POST',
-      url: '/identity/roles/assign',
-      headers: authHeaders(),
-      payload: {
-        actor_id: actorId,
-        role_name: 'auditor',
-      },
+      url: roleUrl2,
+      headers: operatorHeaders('POST', roleUrl2, roleBody2),
+      payload: roleBody2,
     });
     expect(roleResponse.statusCode).toBe(201);
 
@@ -292,28 +306,23 @@ describe('identity authority routes', () => {
     const principalId = principalResponse.json().actor.id;
     const delegateId = delegateResponse.json().actor.id;
 
+    const principalGrantUrl = '/identity/permissions/grant';
+    const principalGrantBody = { actor_id: principalId, permission_name: 'task.execute', scope: '*' };
     const principalGrant = await app.inject({
       method: 'POST',
-      url: '/identity/permissions/grant',
-      headers: authHeaders(),
-      payload: {
-        actor_id: principalId,
-        permission_name: 'task.execute',
-        scope: '*',
-      },
+      url: principalGrantUrl,
+      headers: operatorHeaders('POST', principalGrantUrl, principalGrantBody),
+      payload: principalGrantBody,
     });
     expect(principalGrant.statusCode).toBe(201);
 
+    const delegationUrl = '/identity/delegations/grant';
+    const delegationBody = { principal_actor_id: principalId, delegate_actor_id: delegateId, permission_name: 'task.execute', scope: '*' };
     const delegation = await app.inject({
       method: 'POST',
-      url: '/identity/delegations/grant',
-      headers: authHeaders(),
-      payload: {
-        principal_actor_id: principalId,
-        delegate_actor_id: delegateId,
-        permission_name: 'task.execute',
-        scope: '*',
-      },
+      url: delegationUrl,
+      headers: operatorHeaders('POST', delegationUrl, delegationBody),
+      payload: delegationBody,
     });
     expect(delegation.statusCode).toBe(201);
     expect(delegation.json()).toHaveProperty('delegation_id');
@@ -403,28 +412,24 @@ describe('identity authority routes', () => {
     expect(actorResponse.statusCode).toBe(201);
     const actorId = actorResponse.json().actor.id;
 
+    const privateRejectedUrl = '/identity/keys';
+    const privateRejectedBody = { actor_id: actorId, key_purpose: 'identity', public_key_pem: privateKeyPem };
     const privateRejected = await app.inject({
       method: 'POST',
-      url: '/identity/keys',
-      headers: authHeaders(),
-      payload: {
-        actor_id: actorId,
-        key_purpose: 'identity',
-        public_key_pem: privateKeyPem,
-      },
+      url: privateRejectedUrl,
+      headers: operatorHeaders('POST', privateRejectedUrl, privateRejectedBody),
+      payload: privateRejectedBody,
     });
     expect(privateRejected.statusCode).toBe(400);
     expect(privateRejected.json().error).toMatch(/private key material is not accepted|Ed25519 public key/);
 
+    const registerUrl = '/identity/keys';
+    const registerBody = { actor_id: actorId, key_purpose: 'identity', public_key_pem: publicKeyPem };
     const registered = await app.inject({
       method: 'POST',
-      url: '/identity/keys',
-      headers: authHeaders(),
-      payload: {
-        actor_id: actorId,
-        key_purpose: 'identity',
-        public_key_pem: publicKeyPem,
-      },
+      url: registerUrl,
+      headers: operatorHeaders('POST', registerUrl, registerBody),
+      payload: registerBody,
     });
     expect(registered.statusCode).toBe(201);
     expect(registered.json().key.fingerprint_sha256).toMatch(/^[0-9a-f]{64}$/);
@@ -500,19 +505,23 @@ describe('identity authority routes', () => {
     expect(actorResponse.statusCode).toBe(201);
     const actorId = actorResponse.json().actor.id;
 
+    const firstRegisterUrl = '/identity/keys';
+    const firstRegisterBody = { actor_id: actorId, key_purpose: 'event_signing', public_key_pem: firstPublicPem };
     const firstRegistered = await app.inject({
       method: 'POST',
-      url: '/identity/keys',
-      headers: authHeaders(),
-      payload: { actor_id: actorId, key_purpose: 'event_signing', public_key_pem: firstPublicPem },
+      url: firstRegisterUrl,
+      headers: operatorHeaders('POST', firstRegisterUrl, firstRegisterBody),
+      payload: firstRegisterBody,
     });
     expect(firstRegistered.statusCode).toBe(201);
 
+    const rotateUrl = '/identity/keys';
+    const rotateBody = { actor_id: actorId, key_purpose: 'event_signing', public_key_pem: secondPublicPem };
     const rotated = await app.inject({
       method: 'POST',
-      url: '/identity/keys',
-      headers: authHeaders(),
-      payload: { actor_id: actorId, key_purpose: 'event_signing', public_key_pem: secondPublicPem },
+      url: rotateUrl,
+      headers: operatorHeaders('POST', rotateUrl, rotateBody),
+      payload: rotateBody,
     });
     expect(rotated.statusCode).toBe(201);
 
@@ -552,11 +561,12 @@ describe('identity authority routes', () => {
     });
     expect(newSignature.statusCode).toBe(200);
 
+    const revokeUrl = `/identity/keys/${rotated.json().key.id}/revoke`;
     const revoked = await app.inject({
       method: 'POST',
-      url: `/identity/keys/${rotated.json().key.id}/revoke`,
-      headers: authHeaders(),
-      payload: { revoked_by: actorId },
+      url: revokeUrl,
+      headers: operatorHeaders('POST', revokeUrl, {}),
+      payload: {},
     });
     expect(revoked.statusCode).toBe(200);
     expect(revoked.json().key.status).toBe('revoked');

@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { civilizationOs, OsMode } from '../services/civilization-os.service';
 import { PublicHttpError, publicMessageForError, statusCodeForError } from '../http-errors';
+import { requirePrincipal } from '../auth/principal-context';
 
 /** Civilization operating system routes (build phase C12). */
 export async function civilizationOsRoutes(fastify: FastifyInstance): Promise<void> {
@@ -12,7 +13,10 @@ export async function civilizationOsRoutes(fastify: FastifyInstance): Promise<vo
     }
   };
 
-  fastify.post('/api/civilization/os/tick', async (_req: FastifyRequest, reply: FastifyReply) =>
+  // Manual/debug trigger of a tick over HTTP. The production path is the scheduler worker
+  // calling civilizationOs.tick() directly in-process (civilization-scheduler-worker.ts),
+  // not this route; gate this administrative trigger with a real principal.
+  fastify.post('/api/civilization/os/tick', { config: requirePrincipal('civilization_os.tick.trigger') }, async (_req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => civilizationOs.tick())
   );
 
@@ -31,26 +35,29 @@ export async function civilizationOsRoutes(fastify: FastifyInstance): Promise<vo
     handle(reply, async () => civilizationOs.recoverAndReport())
   );
 
-  fastify.post('/api/civilization/os/start', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/os/start', { config: requirePrincipal('civilization_os.daemon.start') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      return civilizationOs.startDaemon(b.interval_ms ?? 60000, b.actor_id);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return civilizationOs.startDaemon(b.interval_ms ?? 60000, req.principal!.actorId);
     })
   );
 
-  fastify.post('/api/civilization/os/stop', async (req: FastifyRequest, reply: FastifyReply) =>
+  // AUD-004: this route can halt the entire civilization tick loop -- kill-switch-adjacent.
+  fastify.post('/api/civilization/os/stop', { config: requirePrincipal('civilization_os.daemon.stop') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
-      const b = (req.body ?? {}) as any;
-      return civilizationOs.stopDaemon(b.actor_id);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return civilizationOs.stopDaemon(req.principal!.actorId);
     })
   );
 
-  fastify.post('/api/civilization/os/mode', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/os/mode', { config: requirePrincipal('civilization_os.mode.set') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
       const mode = b.mode as OsMode;
       if (!['running', 'paused', 'drained', 'stopped'].includes(mode)) throw new PublicHttpError(400, 'mode must be running, paused, drained, or stopped');
-      await civilizationOs.setMode(mode, b.actor_id);
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      await civilizationOs.setMode(mode, req.principal!.actorId);
       return { mode };
     })
   );

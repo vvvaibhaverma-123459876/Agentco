@@ -13,13 +13,14 @@ export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<voi
     }
   };
 
-  fastify.post('/api/civilization/learning/candidates', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates', { config: requirePrincipal('evolution.candidate.propose') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.source || !b.learning_form || !b.title || !b.hypothesis || !b.proposer_actor_id) {
-        throw new PublicHttpError(400, 'source, learning_form, title, hypothesis, proposer_actor_id are required');
+      if (!b.source || !b.learning_form || !b.title || !b.hypothesis) {
+        throw new PublicHttpError(400, 'source, learning_form, title, hypothesis are required');
       }
-      return safeEvolution.createCandidate(b);
+      // AUD-004: proposer_actor_id is the AUTHENTICATED principal, never a body field.
+      return safeEvolution.createCandidate({ ...b, proposer_actor_id: req.principal!.actorId });
     }, 201)
   );
 
@@ -32,31 +33,30 @@ export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<voi
     })
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/failure-analysis', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/failure-analysis', { config: requirePrincipal('evolution.candidate.record_failure_analysis') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.failure_summary || !b.root_cause || !b.analysed_by_actor_id) throw new PublicHttpError(400, 'failure_summary, root_cause, analysed_by_actor_id are required');
-      await safeEvolution.recordFailureAnalysis({ candidate_id: candidateId, ...b });
+      if (!b.failure_summary || !b.root_cause) throw new PublicHttpError(400, 'failure_summary, root_cause are required');
+      // AUD-004: analysed_by_actor_id is the AUTHENTICATED principal, never a body field.
+      await safeEvolution.recordFailureAnalysis({ candidate_id: candidateId, ...b, analysed_by_actor_id: req.principal!.actorId });
       return { analysed: true };
     }, 201)
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/regressions', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/regressions', { config: requirePrincipal('evolution.candidate.generate_regressions') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
-      const b = (req.body ?? {}) as any;
-      if (!b.actor_id) throw new PublicHttpError(400, 'actor_id is required');
-      return safeEvolution.generateRegressions({ candidate_id: candidateId, actor_id: b.actor_id });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return safeEvolution.generateRegressions({ candidate_id: candidateId, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/sandbox', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/sandbox', { config: requirePrincipal('evolution.candidate.mark_sandboxed') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
-      const b = (req.body ?? {}) as any;
-      if (!b.actor_id) throw new PublicHttpError(400, 'actor_id is required');
-      await safeEvolution.markSandboxed({ candidate_id: candidateId, actor_id: b.actor_id });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      await safeEvolution.markSandboxed({ candidate_id: candidateId, actor_id: req.principal!.actorId });
       return { sandboxed: true };
     })
   );
@@ -76,21 +76,21 @@ export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<voi
     })
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/canary', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/canary', { config: requirePrincipal('evolution.canary.start') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
-      const b = (req.body ?? {}) as any;
-      if (!b.actor_id) throw new PublicHttpError(400, 'actor_id is required');
-      return safeEvolution.startCanary({ candidate_id: candidateId, actor_id: b.actor_id });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return safeEvolution.startCanary({ candidate_id: candidateId, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/learning/canaries/:canaryId/report', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/canaries/:canaryId/report', { config: requirePrincipal('evolution.canary.report') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { canaryId } = req.params as { canaryId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.actor_id || typeof b.clean !== 'boolean') throw new PublicHttpError(400, 'actor_id and clean (boolean) are required');
-      return safeEvolution.reportCanary({ canary_id: canaryId, ...b });
+      if (typeof b.clean !== 'boolean') throw new PublicHttpError(400, 'clean (boolean) is required');
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return safeEvolution.reportCanary({ canary_id: canaryId, ...b, actor_id: req.principal!.actorId });
     })
   );
 
@@ -104,21 +104,21 @@ export async function safeEvolutionRoutes(fastify: FastifyInstance): Promise<voi
     })
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/rollback', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/rollback', { config: requirePrincipal('evolution.candidate.rollback') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.actor_id || !b.reason) throw new PublicHttpError(400, 'actor_id and reason are required');
-      return safeEvolution.rollback({ candidate_id: candidateId, ...b });
+      if (!b.reason) throw new PublicHttpError(400, 'reason is required');
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      return safeEvolution.rollback({ candidate_id: candidateId, ...b, actor_id: req.principal!.actorId });
     })
   );
 
-  fastify.post('/api/civilization/learning/candidates/:candidateId/retain', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/learning/candidates/:candidateId/retain', { config: requirePrincipal('evolution.candidate.retain') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { candidateId } = req.params as { candidateId: string };
-      const b = (req.body ?? {}) as any;
-      if (!b.actor_id) throw new PublicHttpError(400, 'actor_id is required');
-      await safeEvolution.retain({ candidate_id: candidateId, actor_id: b.actor_id });
+      // AUD-004: actor_id is the AUTHENTICATED principal, never a body field.
+      await safeEvolution.retain({ candidate_id: candidateId, actor_id: req.principal!.actorId });
       return { retained: true };
     })
   );

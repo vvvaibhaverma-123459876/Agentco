@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { autonomyOrchestrator } from '../services/autonomy-orchestrator.service';
 import { db } from '../db/client';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
   /**
@@ -13,7 +14,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
    *
    * Returns the autonomy run with all IDs and status.
    */
-  fastify.post('/api/autonomy/run-level3-smoke', async (request: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/autonomy/run-level3-smoke', { config: requirePrincipal('autonomy.level3.execute') }, async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       console.log('[LEVEL_3] Starting controlled autonomy loop...');
 
@@ -86,6 +87,7 @@ export async function autonomyOrchestratorRoutes(fastify: FastifyInstance) {
    */
   fastify.post<{ Body: { goal?: string; maxIterations?: number; idempotencyKey?: string } }>(
     '/api/autonomy/action-loop',
+    { config: requirePrincipal('autonomy.action.execute') },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
         const body = (request.body as { goal?: string; maxIterations?: number; idempotencyKey?: string }) || {};
