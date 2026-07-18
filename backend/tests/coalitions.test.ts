@@ -9,6 +9,7 @@ import { identityAuthorityService } from '../src/services/identity-authority.ser
 import { civilizationKernel } from '../src/services/civilization-kernel.service';
 import { institutionsService } from '../src/services/institutions.service';
 import { coalitionService } from '../src/services/coalition.service';
+import { provisionSignedActor, signHeaders } from './helpers/sign-request';
 
 async function applyMigrations() {
   for (const file of [
@@ -35,6 +36,11 @@ async function makeInstitution(name: string): Promise<string> {
 
 function authHeaders() {
   return process.env.AGENTCO_API_KEY ? { 'x-api-key': process.env.AGENTCO_API_KEY } : {};
+}
+
+// AUD-004: privileged coalition routes now require a signed principal, not just the API key.
+function signed(actor: { actorId: string; privateKey: import('crypto').KeyObject }, method: string, url: string, body?: unknown) {
+  return { ...authHeaders(), ...signHeaders({ actorId: actor.actorId, privateKey: actor.privateKey, method, url, body }) };
 }
 
 describe('institution coalitions (C4)', () => {
@@ -225,10 +231,11 @@ describe('institution coalitions (C4)', () => {
   });
 
   test('routes return clean validation and not-found responses', async () => {
+    const operator = await provisionSignedActor({ name: `coal-validate-${crypto.randomUUID()}`, roles: ['civilization_operator'] });
     const badCreate = await app.inject({
       method: 'POST',
       url: '/api/civilization/coalitions',
-      headers: authHeaders(),
+      headers: signed(operator, 'POST', '/api/civilization/coalitions', {}),
       payload: {},
     });
     expect(badCreate.statusCode).toBe(400);
@@ -244,110 +251,88 @@ describe('institution coalitions (C4)', () => {
   });
 
   test('route-level lifecycle returns plain JSON through Fastify', async () => {
-    const operator = await registerActor('coal-route');
+    const operatorId = await registerActor('coal-route');
+    const operator = await provisionSignedActor({ name: `coal-route-signer-${crypto.randomUUID()}`, roles: ['civilization_operator'] });
     const instA = await makeInstitution('RouteAlpha');
     const instB = await makeInstitution('RouteBeta');
 
+    const createUrl = '/api/civilization/coalitions';
+    const createBody = {
+      name: `Route Pact ${Date.now()}`,
+      purpose: 'route-level lifecycle proof',
+      consensus_rule: 'unanimous',
+      member_institution_ids: [instA, instB],
+      created_by_actor_id: operatorId,
+    };
     const create = await app.inject({
-      method: 'POST',
-      url: '/api/civilization/coalitions',
-      headers: authHeaders(),
-      payload: {
-        name: `Route Pact ${Date.now()}`,
-        purpose: 'route-level lifecycle proof',
-        consensus_rule: 'unanimous',
-        member_institution_ids: [instA, instB],
-        created_by_actor_id: operator,
-      },
+      method: 'POST', url: createUrl, headers: signed(operator, 'POST', createUrl, createBody), payload: createBody,
     });
     expect(create.statusCode).toBe(201);
     const coalition = JSON.parse(create.body);
     expect(coalition.id).toBeTruthy();
     expect(coalition.status).toBe('proposed');
+    // AUD-004: the AUTHENTICATED signer is now the coalition creator, not the body's created_by_actor_id.
+    expect(coalition.created_by_actor_id).toBe(operator.actorId);
 
+    const negotiateUrl = `/api/civilization/coalitions/${coalition.id}/negotiate`;
     const negotiate = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/negotiate`,
-      headers: authHeaders(),
-      payload: { actor_id: operator },
+      method: 'POST', url: negotiateUrl, headers: signed(operator, 'POST', negotiateUrl, {}), payload: {},
     });
     expect(negotiate.statusCode).toBe(201);
     expect(JSON.parse(negotiate.body)).toEqual({ round_number: 1 });
 
+    const proposalUrl = `/api/civilization/coalitions/${coalition.id}/proposals`;
+    const proposalBody = { round_number: 1, institution_id: instA, proposal: { terms: 'route proof terms' } };
     const proposal = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/proposals`,
-      headers: authHeaders(),
-      payload: {
-        round_number: 1,
-        institution_id: instA,
-        actor_id: operator,
-        proposal: { terms: 'route proof terms' },
-      },
+      method: 'POST', url: proposalUrl, headers: signed(operator, 'POST', proposalUrl, proposalBody), payload: proposalBody,
     });
     expect(proposal.statusCode).toBe(201);
     expect(JSON.parse(proposal.body).id).toBeTruthy();
 
+    const consensusUrl = `/api/civilization/coalitions/${coalition.id}/consensus`;
+    const consensusBody = { round_number: 1, acceptances: [{ institution_id: instA }, { institution_id: instB }] };
     const consensus = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/consensus`,
-      headers: authHeaders(),
-      payload: {
-        round_number: 1,
-        actor_id: operator,
-        acceptances: [{ institution_id: instA }, { institution_id: instB }],
-      },
+      method: 'POST', url: consensusUrl, headers: signed(operator, 'POST', consensusUrl, consensusBody), payload: consensusBody,
     });
     expect(consensus.statusCode).toBe(200);
     expect(JSON.parse(consensus.body).outcome).toBe('approved');
 
     for (const institution_id of [instA, instB]) {
+      const commitUrl = `/api/civilization/coalitions/${coalition.id}/commitments`;
+      const commitBody = { institution_id, commitment: { route: true } };
       const commitment = await app.inject({
-        method: 'POST',
-        url: `/api/civilization/coalitions/${coalition.id}/commitments`,
-        headers: authHeaders(),
-        payload: { institution_id, actor_id: operator, commitment: { route: true } },
+        method: 'POST', url: commitUrl, headers: signed(operator, 'POST', commitUrl, commitBody), payload: commitBody,
       });
       expect(commitment.statusCode).toBe(201);
       expect(JSON.parse(commitment.body).id).toBeTruthy();
     }
 
+    const constituteUrl = `/api/civilization/coalitions/${coalition.id}/constitute`;
     const constituted = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/constitute`,
-      headers: authHeaders(),
-      payload: { actor_id: operator },
+      method: 'POST', url: constituteUrl, headers: signed(operator, 'POST', constituteUrl, {}), payload: {},
     });
     expect(constituted.statusCode).toBe(200);
     expect(JSON.parse(constituted.body).status).toBe('constituted');
 
+    const activateUrl = `/api/civilization/coalitions/${coalition.id}/activate`;
     const activated = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/activate`,
-      headers: authHeaders(),
-      payload: { actor_id: operator },
+      method: 'POST', url: activateUrl, headers: signed(operator, 'POST', activateUrl, {}), payload: {},
     });
     expect(activated.statusCode).toBe(200);
     expect(JSON.parse(activated.body).status).toBe('active');
 
+    const delegationUrl = `/api/civilization/coalitions/${coalition.id}/delegations`;
+    const delegationBody = { from_institution_id: instA, delegated_authority_key: 'route_sign_on_behalf' };
     const delegation = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/delegations`,
-      headers: authHeaders(),
-      payload: {
-        from_institution_id: instA,
-        delegated_authority_key: 'route_sign_on_behalf',
-        granted_by_actor_id: operator,
-      },
+      method: 'POST', url: delegationUrl, headers: signed(operator, 'POST', delegationUrl, delegationBody), payload: delegationBody,
     });
     expect(delegation.statusCode).toBe(201);
     expect(JSON.parse(delegation.body).id).toBeTruthy();
 
+    const settleUrl = `/api/civilization/coalitions/${coalition.id}/settle`;
+    const settleBody = { settlement: { route: 'complete' } };
     const settled = await app.inject({
-      method: 'POST',
-      url: `/api/civilization/coalitions/${coalition.id}/settle`,
-      headers: authHeaders(),
-      payload: { actor_id: operator, settlement: { route: 'complete' } },
+      method: 'POST', url: settleUrl, headers: signed(operator, 'POST', settleUrl, settleBody), payload: settleBody,
     });
     expect(settled.statusCode).toBe(200);
     expect(JSON.parse(settled.body).status).toBe('settled');

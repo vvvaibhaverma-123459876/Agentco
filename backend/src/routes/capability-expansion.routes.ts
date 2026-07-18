@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { capabilityExpansion } from '../services/capability-expansion.service';
 import { PublicHttpError, publicMessageForError, statusCodeForError } from '../http-errors';
+import { requirePrincipal } from '../auth/principal-context';
 
 /** Capability / domain expansion routes (build phase C11). */
 export async function capabilityExpansionRoutes(fastify: FastifyInstance): Promise<void> {
@@ -12,13 +13,14 @@ export async function capabilityExpansionRoutes(fastify: FastifyInstance): Promi
     }
   };
 
-  fastify.post('/api/civilization/expansion/proposals', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/expansion/proposals', { config: requirePrincipal('expansion.proposal.propose') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const b = (req.body ?? {}) as any;
-      if (!b.expansion_type || !b.domain_key || !b.title || !b.proposer_actor_id) {
-        throw new PublicHttpError(400, 'expansion_type, domain_key, title, proposer_actor_id are required');
+      if (!b.expansion_type || !b.domain_key || !b.title) {
+        throw new PublicHttpError(400, 'expansion_type, domain_key, title are required');
       }
-      return capabilityExpansion.propose(b);
+      // AUD-004: the proposer is the AUTHENTICATED principal, never a body field.
+      return capabilityExpansion.propose({ ...b, proposer_actor_id: req.principal!.actorId });
     }, 201)
   );
 
@@ -31,54 +33,58 @@ export async function capabilityExpansionRoutes(fastify: FastifyInstance): Promi
     })
   );
 
-  fastify.post('/api/civilization/expansion/proposals/:proposalId/stage', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/expansion/proposals/:proposalId/stage', { config: requirePrincipal('expansion.proposal.stage') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { proposalId } = req.params as { proposalId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.stage || typeof b.passed !== 'boolean' || !b.summary || !b.actor_id) {
-        throw new PublicHttpError(400, 'stage, passed (boolean), summary, actor_id are required');
+      if (!b.stage || typeof b.passed !== 'boolean' || !b.summary) {
+        throw new PublicHttpError(400, 'stage, passed (boolean), summary are required');
       }
-      await capabilityExpansion.recordStage({ proposal_id: proposalId, ...b });
+      // AUD-004: the recording actor is the AUTHENTICATED principal, never a body field.
+      await capabilityExpansion.recordStage({ proposal_id: proposalId, ...b, actor_id: req.principal!.actorId });
       return { recorded: true };
     }, 201)
   );
 
-  fastify.post('/api/civilization/expansion/proposals/:proposalId/approve', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/expansion/proposals/:proposalId/approve', { config: requirePrincipal('expansion.proposal.approve') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { proposalId } = req.params as { proposalId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.approver_actor_id) throw new PublicHttpError(400, 'approver_actor_id is required');
-      return capabilityExpansion.approve({ proposal_id: proposalId, approver_actor_id: b.approver_actor_id, restricted: b.restricted });
+      // AUD-004: the approver is the AUTHENTICATED principal, never a body field.
+      return capabilityExpansion.approve({ proposal_id: proposalId, approver_actor_id: req.principal!.actorId, restricted: b.restricted });
     })
   );
 
-  fastify.post('/api/civilization/expansion/proposals/:proposalId/grant', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/expansion/proposals/:proposalId/grant', { config: requirePrincipal('expansion.capability.grant') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { proposalId } = req.params as { proposalId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.capability_key || !b.domain_key || !b.grantee_scope_type || !b.grantee_scope_id || !b.actor_id) {
-        throw new PublicHttpError(400, 'capability_key, domain_key, grantee_scope_type, grantee_scope_id, actor_id are required');
+      if (!b.capability_key || !b.domain_key || !b.grantee_scope_type || !b.grantee_scope_id) {
+        throw new PublicHttpError(400, 'capability_key, domain_key, grantee_scope_type, grantee_scope_id are required');
       }
-      return capabilityExpansion.grantCapability({ proposal_id: proposalId, ...b });
+      // AUD-004: the granting actor is the AUTHENTICATED principal, never a body field.
+      return capabilityExpansion.grantCapability({ proposal_id: proposalId, ...b, actor_id: req.principal!.actorId });
     }, 201)
   );
 
-  fastify.post('/api/civilization/expansion/grants/:grantId/restrict', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/expansion/grants/:grantId/restrict', { config: requirePrincipal('expansion.capability.restrict') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { grantId } = req.params as { grantId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.actor_id || !b.reason) throw new PublicHttpError(400, 'actor_id and reason are required');
-      await capabilityExpansion.restrictCapability({ grant_id: grantId, restriction: b.restriction ?? {}, ...b });
+      if (!b.reason) throw new PublicHttpError(400, 'reason is required');
+      // AUD-004: the restricting actor is the AUTHENTICATED principal, never a body field.
+      await capabilityExpansion.restrictCapability({ grant_id: grantId, restriction: b.restriction ?? {}, ...b, actor_id: req.principal!.actorId });
       return { restricted: true };
     })
   );
 
-  fastify.post('/api/civilization/expansion/grants/:grantId/revoke', async (req: FastifyRequest, reply: FastifyReply) =>
+  fastify.post('/api/civilization/expansion/grants/:grantId/revoke', { config: requirePrincipal('expansion.capability.revoke') }, async (req: FastifyRequest, reply: FastifyReply) =>
     handle(reply, async () => {
       const { grantId } = req.params as { grantId: string };
       const b = (req.body ?? {}) as any;
-      if (!b.actor_id || !b.reason) throw new PublicHttpError(400, 'actor_id and reason are required');
-      await capabilityExpansion.revokeCapability({ grant_id: grantId, ...b });
+      if (!b.reason) throw new PublicHttpError(400, 'reason is required');
+      // AUD-004: the revoking actor is the AUTHENTICATED principal, never a body field.
+      await capabilityExpansion.revokeCapability({ grant_id: grantId, ...b, actor_id: req.principal!.actorId });
       return { revoked: true };
     })
   );

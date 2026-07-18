@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { institutionWorkAssignmentService } from '../services/institution-work-assignment.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function institutionWorkAssignmentRoutes(
   fastify: FastifyInstance
@@ -8,7 +9,7 @@ export async function institutionWorkAssignmentRoutes(
    * POST /api/autonomy/work-requests
    * Submit a work request from institution to autonomy system
    */
-  fastify.post('/api/autonomy/work-requests', async (
+  fastify.post('/api/autonomy/work-requests', { config: requirePrincipal('autonomy.work_request.submit') }, async (
     req: FastifyRequest,
     reply: FastifyReply
   ) => {
@@ -117,6 +118,7 @@ export async function institutionWorkAssignmentRoutes(
    */
   fastify.post(
     '/api/civilization/institutions/:institutionId/specialist-assignments',
+    { config: requirePrincipal('institution.specialist.assign') },
     async (req: FastifyRequest, reply: FastifyReply) => {
       try {
         const { institutionId } = req.params as { institutionId: string };

@@ -5,6 +5,7 @@ import {
 } from '../src/agent-registry';
 import { db } from '../src/db/client';
 import { build } from '../src/server';
+import { provisionSignedActor, signHeaders } from './helpers/sign-request';
 
 describe('agent runtime registry', () => {
   test('allows registered runnable agent task type', () => {
@@ -71,11 +72,18 @@ describe('agent runtime registry', () => {
   test('dispatch route rejects unsupported task before enqueue', async () => {
     process.env.AGENTCO_API_KEY = 'test-api-key';
     const app = await build();
+    // AUD-004: this route now requires a signed, credential-bound principal.
+    const operator = await provisionSignedActor({ name: `dispatch-reject-${Date.now()}`, roles: ['civilization_operator'] });
+    const url = '/api/agents/reviewer-agent/dispatch';
+    const payload = { task_type: 'unsupported_task', payload: {} };
     const response = await app.inject({
       method: 'POST',
-      url: '/api/agents/reviewer-agent/dispatch',
-      headers: { 'x-agentco-api-key': 'test-api-key', 'x-api-key': 'test-api-key' },
-      payload: { task_type: 'unsupported_task', payload: {} },
+      url,
+      headers: {
+        'x-agentco-api-key': 'test-api-key', 'x-api-key': 'test-api-key',
+        ...signHeaders({ actorId: operator.actorId, privateKey: operator.privateKey, method: 'POST', url, body: payload }),
+      },
+      payload,
     });
 
     expect(response.statusCode).toBe(422);

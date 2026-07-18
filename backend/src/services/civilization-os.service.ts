@@ -258,21 +258,18 @@ export class CivilizationOsService {
       [windowMinutes]
     );
     let retained = 0;
-    const actor = await this.orchestratorActor();
+    const client = await db.connect();
+    let actor: string;
+    try {
+      actor = await this.learningRetentionActor(client);
+    } finally {
+      client.release();
+    }
     for (const row of due.rows) {
       await safeEvolution.retain({ candidate_id: row.id, actor_id: actor });
       retained++;
     }
     return retained;
-  }
-
-  private async orchestratorActor(): Promise<string> {
-    const client = await db.connect();
-    try {
-      return await this.serviceActor(client);
-    } finally {
-      client.release();
-    }
   }
 
   /**
@@ -311,7 +308,7 @@ export class CivilizationOsService {
         if ((institution.rowCount ?? 0) === 0) continue;
         const event = await eventLog.appendWithClient(client, {
           event_type: 'civilization_os.mission_routed',
-          actor_id: await this.serviceActor(client),
+          actor_id: await this.workRouterActor(client),
           object_type: 'mission',
           object_id: mission.id,
           correlation_id: crypto.randomUUID(),
@@ -444,7 +441,7 @@ export class CivilizationOsService {
       const status = input.status ?? {};
       const event = await eventLog.appendWithClient(client, {
         event_type: 'civilization_os.tick',
-        actor_id: await this.serviceActor(client),
+        actor_id: await this.schedulerActor(client),
         object_type: 'civ_os_tick',
         object_id: crypto.randomUUID(),
         correlation_id: crypto.randomUUID(),
@@ -481,14 +478,46 @@ export class CivilizationOsService {
     }
   }
 
-  private async serviceActor(client: PoolClient): Promise<string> {
-    const r = await client.query<{ id: string }>(
+  /**
+   * AUD-004 M5: narrowly-scoped machine principals, one per autonomous sub-responsibility --
+   * NOT one universal service actor with implicit access to everything the orchestrator does.
+   * Each is a real `actors` row (service_identities scoped) so its writes are attributable and
+   * distinguishable in audit trails; none holds RBAC permissions beyond what its own scope
+   * lists (registerActor/service_identities alone grants no permission -- these actors are
+   * never assigned governor/task_executor or any human-facing role, so they cannot satisfy
+   * conditions 16/25 by relabeling: they simply never appear as evaluator/appellate authority).
+   */
+  private async scopedServiceActor(client: PoolClient, name: string, scopes: string[]): Promise<string> {
+    const actor = await client.query<{ id: string }>(
       `INSERT INTO actors (actor_type, name, metadata_json)
-       VALUES ('service','agentco-civilization-os','{}'::jsonb)
+       VALUES ('service',$1,$2::jsonb)
        ON CONFLICT (actor_type, name) WHERE status = 'active'
-       DO UPDATE SET updated_at = actors.updated_at RETURNING id`
+       DO UPDATE SET updated_at = actors.updated_at
+       RETURNING id`,
+      [name, JSON.stringify({ created_by: 'CivilizationOsService' })]
     );
-    return r.rows[0].id;
+    await client.query(
+      `INSERT INTO service_identities (actor_id, service_name, scopes)
+       VALUES ($1,$2,$3::jsonb)
+       ON CONFLICT (actor_id) DO NOTHING`,
+      [actor.rows[0].id, name, JSON.stringify(scopes)]
+    );
+    return actor.rows[0].id;
+  }
+
+  /** Scheduler/tick bookkeeping actor -- attributes tick heartbeat events only. */
+  private async schedulerActor(client: PoolClient): Promise<string> {
+    return this.scopedServiceActor(client, 'agentco-civilization-os-scheduler', ['civilization_os.tick.record']);
+  }
+
+  /** Work-sourcing/routing actor -- attributes mission lead-institution assignment only. */
+  private async workRouterActor(client: PoolClient): Promise<string> {
+    return this.scopedServiceActor(client, 'agentco-civilization-os-work-router', ['mission.lead_institution.assign']);
+  }
+
+  /** Learning-retention actor -- attributes post-promotion candidate retention only. */
+  private async learningRetentionActor(client: PoolClient): Promise<string> {
+    return this.scopedServiceActor(client, 'agentco-civilization-os-learning-retention', ['evolution.candidate.retain']);
   }
 }
 

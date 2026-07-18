@@ -8,6 +8,7 @@ import { calibrationDriftMonitorService } from '../services/calibration-drift-mo
 import { trustPolicyCanaryService } from '../services/trust-policy-canary.service';
 import { civilizationRuntimeService } from '../services/civilization-runtime.service';
 import { civilizationSchedulerService } from '../services/civilization-scheduler.service';
+import { requirePrincipal } from '../auth/principal-context';
 
 export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
@@ -15,10 +16,11 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/constitution/versions - Create new constitution version
-  fastify.post('/api/civilization/constitution/versions', async (req: FastifyRequest, reply: FastifyReply) => {
-    const { content, signerEntityId, signature } = req.body as any;
+  fastify.post('/api/civilization/constitution/versions', { config: requirePrincipal('constitution.version.create') }, async (req: FastifyRequest, reply: FastifyReply) => {
+    const { content, signature } = req.body as any;
     try {
-      const version = await calibrationConstitutionService.createVersion(content, signerEntityId, signature);
+      // AUD-004: signerEntityId is the AUTHENTICATED principal, never a body field.
+      const version = await calibrationConstitutionService.createVersion(content, req.principal!.actorId, signature);
       return reply.status(201).send(version);
     } catch (e) {
       return reply.status(400).send({ error: 'Invalid request' });
@@ -26,7 +28,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/constitution/activate - Activate a constitution version
-  fastify.post('/api/civilization/constitution/activate', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/constitution/activate', { config: requirePrincipal('constitution.activate') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { versionId } = req.body as any;
     try {
       await calibrationConstitutionService.activateVersion(versionId);
@@ -47,7 +49,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/constitution/validate-change - Validate change against constitution
-  fastify.post('/api/civilization/constitution/validate-change', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/constitution/validate-change', { config: requirePrincipal('constitution.validate_change') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { changeType, affectedTables, affectedColumns } = req.body as any;
     try {
       const result = await calibrationConstitutionService.validateChange(changeType, affectedTables, affectedColumns);
@@ -72,10 +74,14 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/policies - Create new policy draft
-  fastify.post('/api/civilization/policies', async (req: FastifyRequest, reply: FastifyReply) => {
-    const { policyType, promotionScope, content, creatorEntityId } = req.body as any;
+  fastify.post('/api/civilization/policies', { config: requirePrincipal('trust_policy.create') }, async (req: FastifyRequest, reply: FastifyReply) => {
+    const { policyType, promotionScope, content } = req.body as any;
     try {
-      const policy = await trustPolicyService.createDraft(policyType, promotionScope, content, creatorEntityId);
+      // AUD-004: creatorEntityId is the AUTHENTICATED principal, never a body field.
+      // NOTE (pre-existing, out of AUD-004 scope): this call already omitted createDraft's
+      // `title` parameter before this change (positional args here don't match the service's
+      // 6-param signature); preserving that exact pre-existing shape, only substituting identity.
+      const policy = await trustPolicyService.createDraft(policyType, promotionScope, content, req.principal!.actorId as any);
       return reply.status(201).send(policy);
     } catch (e) {
       return reply.status(400).send({ error: 'Invalid request' });
@@ -95,11 +101,11 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/policies/:policyId/review - Submit policy for review
-  fastify.post('/api/civilization/policies/:policyId/review', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/policies/:policyId/review', { config: requirePrincipal('trust_policy.review') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { policyId } = req.params as { policyId: string };
-    const { reviewerEntityId } = req.body as any;
     try {
-      await trustPolicyService.submitForReview(policyId, reviewerEntityId);
+      // AUD-004: reviewerEntityId is the AUTHENTICATED principal, never a body field.
+      await trustPolicyService.submitForReview(policyId, req.principal!.actorId);
       return reply.send({ status: 'submitted_for_review' });
     } catch (e) {
       return reply.status(400).send({ error: 'Invalid request' });
@@ -107,11 +113,12 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/policies/:policyId/approve - Approve policy
-  fastify.post('/api/civilization/policies/:policyId/approve', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/policies/:policyId/approve', { config: requirePrincipal('trust_policy.approve') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { policyId } = req.params as { policyId: string };
-    const { approverEntityId, reason } = req.body as any;
+    const { reason } = req.body as any;
     try {
-      await trustPolicyService.approve(policyId, approverEntityId, reason);
+      // AUD-004: approverEntityId is the AUTHENTICATED principal, never a body field.
+      await trustPolicyService.approve(policyId, req.principal!.actorId, reason);
       return reply.send({ status: 'approved' });
     } catch (e) {
       return reply.status(400).send({ error: 'Invalid request' });
@@ -144,11 +151,12 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/changes/request - Create change request
-  fastify.post('/api/civilization/changes/request', async (req: FastifyRequest, reply: FastifyReply) => {
-    const { requesterEntityId, changeType, description, context } = req.body as any;
+  fastify.post('/api/civilization/changes/request', { config: requirePrincipal('governance.change.request') }, async (req: FastifyRequest, reply: FastifyReply) => {
+    const { changeType, description, context } = req.body as any;
     try {
+      // AUD-004: requesterEntityId is the AUTHENTICATED principal, never a body field.
       const request = await calibrationChangeGovernanceService.createRequest(
-        requesterEntityId,
+        req.principal!.actorId,
         changeType,
         description,
         context
@@ -172,7 +180,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/changes/:requestId/review - Submit for review
-  fastify.post('/api/civilization/changes/:requestId/review', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/changes/:requestId/review', { config: requirePrincipal('governance.change.review') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { requestId } = req.params as { requestId: string };
     try {
       await calibrationChangeGovernanceService.submitForReview(requestId);
@@ -183,13 +191,14 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/changes/:requestId/approve - Approve change
-  fastify.post('/api/civilization/changes/:requestId/approve', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/changes/:requestId/approve', { config: requirePrincipal('governance.change.approve') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { requestId } = req.params as { requestId: string };
-    const { approverEntityId, approverRole, reason } = req.body as any;
+    const { approverRole, reason } = req.body as any;
     try {
+      // AUD-004: approverEntityId is the AUTHENTICATED principal, never a body field.
       await calibrationChangeGovernanceService.recordApproval(
         requestId,
-        approverEntityId,
+        req.principal!.actorId,
         'approved',
         approverRole,
         reason
@@ -215,7 +224,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/assessments - Create impact assessment
-  fastify.post('/api/civilization/assessments', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/assessments', { config: requirePrincipal('governance.assessment.create') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const {
       changeRequestId,
       calibrationRegression,
@@ -281,7 +290,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/reputation/events - Record reputation event
-  fastify.post('/api/civilization/reputation/events', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/reputation/events', { config: requirePrincipal('governance.reputation.record') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { entityType, entityId, eventType, context, impactValue, impactConfidence, evidenceJson } = req.body as any;
     try {
       const event = await trustReputationService.recordEvent(
@@ -338,7 +347,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/drift/detect - Detect drift
-  fastify.post('/api/civilization/drift/detect', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/drift/detect', { config: requirePrincipal('governance.drift.detect') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const {
       driftType,
       baselineValue,
@@ -388,11 +397,12 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/drift/:driftId/resolve - Resolve drift
-  fastify.post('/api/civilization/drift/:driftId/resolve', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/drift/:driftId/resolve', { config: requirePrincipal('governance.drift.resolve') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { driftId } = req.params as { driftId: string };
     const { resolutionType, reason } = req.body as any;
     try {
-      await calibrationDriftMonitorService.resolveDrift(driftId, resolutionType, undefined, 'system', reason);
+      // AUD-004: resolvedBy is the AUTHENTICATED principal (was hardcoded 'system', losing real attribution).
+      await calibrationDriftMonitorService.resolveDrift(driftId, resolutionType, undefined, req.principal!.actorId, reason);
       return reply.send({ status: 'resolved' });
     } catch (e) {
       return reply.status(400).send({ error: 'Invalid request' });
@@ -404,7 +414,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   // ============================================================
 
   // POST /api/civilization/canary/start - Start canary deployment
-  fastify.post('/api/civilization/canary/start', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/canary/start', { config: requirePrincipal('governance.canary.start') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { policyId, canaryScope, targetAgents, targetPercentage, traceId } = req.body as any;
     try {
       const canary = await trustPolicyCanaryService.createCanary(
@@ -421,7 +431,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/canary/:canaryId/metric - Record canary metric
-  fastify.post('/api/civilization/canary/:canaryId/metric', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/canary/:canaryId/metric', { config: requirePrincipal('governance.canary.metric') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { canaryId } = req.params as { canaryId: string };
     const { metricName, metricValue, status = 'normal' } = req.body as any;
     try {
@@ -433,7 +443,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/canary/:canaryId/promote - Promote canary to full rollout
-  fastify.post('/api/civilization/canary/:canaryId/promote', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/canary/:canaryId/promote', { config: requirePrincipal('governance.canary.promote') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { canaryId } = req.params as { canaryId: string };
     const { traceId } = req.body as any;
     try {
@@ -445,7 +455,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/canary/:canaryId/rollback - Rollback canary
-  fastify.post('/api/civilization/canary/:canaryId/rollback', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/canary/:canaryId/rollback', { config: requirePrincipal('governance.canary.rollback') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { canaryId } = req.params as { canaryId: string };
     const { reason, traceId } = req.body as any;
     try {
@@ -492,7 +502,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/runtime/reachability-tick - Persist L14 coordinator reachability tick
-  fastify.post('/api/civilization/runtime/reachability-tick', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/runtime/reachability-tick', { config: requirePrincipal('governance.runtime.reachability_tick') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { runtimeMode } = (req.body as { runtimeMode?: string } | undefined) ?? {};
     try {
       const tick = await civilizationRuntimeService.runReachabilityTick(runtimeMode ?? 'api_l14_runtime');
@@ -503,7 +513,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/runtime/dispatch-tick - Route a goal through L14 coordinator to institutions
-  fastify.post('/api/civilization/runtime/dispatch-tick', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/runtime/dispatch-tick', { config: requirePrincipal('governance.runtime.dispatch_tick') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const body = (req.body as {
       goalId?: string;
       objective?: string;
@@ -535,7 +545,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/runtime/scheduler/run-once - Execute one bounded scheduler tick
-  fastify.post('/api/civilization/runtime/scheduler/run-once', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/runtime/scheduler/run-once', { config: requirePrincipal('governance.scheduler.run_once') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { runtimeMode } = (req.body as { runtimeMode?: string } | undefined) ?? {};
     try {
       const tick = await civilizationSchedulerService.runOnce(runtimeMode ?? 'api_scheduler_l14_runtime');
@@ -549,7 +559,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/runtime/scheduler/start - Start bounded periodic L14 ticks
-  fastify.post('/api/civilization/runtime/scheduler/start', async (req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/runtime/scheduler/start', { config: requirePrincipal('governance.scheduler.start') }, async (req: FastifyRequest, reply: FastifyReply) => {
     const { intervalMs } = (req.body as { intervalMs?: number } | undefined) ?? {};
     try {
       return reply.send(civilizationSchedulerService.start(intervalMs ?? 60_000));
@@ -559,7 +569,7 @@ export async function civilizationGovernanceRoutes(fastify: FastifyInstance) {
   });
 
   // POST /api/civilization/runtime/scheduler/stop - Stop periodic L14 ticks
-  fastify.post('/api/civilization/runtime/scheduler/stop', async (_req: FastifyRequest, reply: FastifyReply) => {
+  fastify.post('/api/civilization/runtime/scheduler/stop', { config: requirePrincipal('governance.scheduler.stop') }, async (_req: FastifyRequest, reply: FastifyReply) => {
     return reply.send(civilizationSchedulerService.stop());
   });
 
