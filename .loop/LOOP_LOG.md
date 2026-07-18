@@ -63,5 +63,6 @@
   - `python3.13 -m py_compile scripts/verify_no_blocking_findings.py` -> passed
   - `python3.13 scripts/verify_make_targets.py --check` -> `{"missing": 0, "success": true}`
   - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure reporting `GCR-008`, `GCR-010`, `GCR-011` and `HST-001`.
+  - `make release-gate` after commit -> expected failure at step `0c/12` (`no-blocking-findings`) reporting `GCR-008`, `GCR-010`, `GCR-011` and `HST-001`.
 - Next candidate item:
-  - Commit, run `make release-gate` on a clean tree to prove the canonical gate now fails at the open-finding guard, then continue with audit-runner/subsystem audit discovery.
+  - Continue with audit-runner/subsystem audit discovery, then work remaining non-human-blocked verifier gaps.
