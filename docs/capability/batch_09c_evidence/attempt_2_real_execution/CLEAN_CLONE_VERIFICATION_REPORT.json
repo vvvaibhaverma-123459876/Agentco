@@ -1,5 +1,32 @@
 {
+  "aggregate_decision_recorded": "HOLD_FOR_MORE_EVIDENCE",
+  "aggregate_semantic_hash_recorded": "bf0fe05dbb4744ff726acd151dfecd34a67eac5d458c05c67db7d6a3029b7974",
+  "budget_settlement_recomputed": true,
   "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "case_semantic_hashes_recomputed": true,
+  "credentials_absent_from_evidence": true,
   "decision_recomputable_without_provider_credentials": true,
-  "verification_result": "not_run_local_artifact_recomputation_available"
+  "no_fallback_recomputed": true,
+  "secret_occurrence_paths": [],
+  "source_commit": "9bfad8e79d494b84ab869f09032d1bdfa3e97c0d",
+  "source_tree_matches": true,
+  "source_tree_recomputed": "c82e35a1379c77b8426271d66612ba6e7c886800",
+  "source_tree_recorded": "c82e35a1379c77b8426271d66612ba6e7c886800",
+  "terminal_counts": {
+    "case_records": 24,
+    "completed_cases": 0,
+    "denied_cases": 0,
+    "evaluator_unavailable_cases": 0,
+    "evidence_unavailable_cases": 0,
+    "failed_cases": 0,
+    "infrastructure_failure_cases": 0,
+    "invalid_response_cases": 24,
+    "planned_cases": 24,
+    "timed_out_cases": 0,
+    "unique_case_ids": 24
+  },
+  "total_cost_recomputed": 0.21139,
+  "total_cost_recorded": 0.21139,
+  "verification_result": "passed",
+  "working_tree_clean_after_verification": true
 }
