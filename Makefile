@@ -1,6 +1,6 @@
 PYTHON ?= python3.13
 
-.PHONY: dev smoke smoke-python smoke-node migrate test validation verify slice reachability master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-crash-recovery-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run civilization-calibration-trust-smoke python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify production-smoke-test production-safety-test staging-smoke-test staging-governance-gate staging-load-test staging-validation-gate release-gates release-gate gate-integrity verify-advertised-targets audit-clean-room audit-runtime-integration audit-staging-deployment deployment-ledgers hosted-staging-budget hosted-staging-plan hosted-staging-apply audit-hosted-staging hosted-staging-destroy audit-longitudinal-foundation longitudinal-campaign status status-check remaining build-ledger-sync civilization-slice civilization-scheduler civilization-completion civilization-suite agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
+.PHONY: dev smoke smoke-python smoke-node migrate test validation verify slice reachability master-gate db-tests load-test vendor-risk-smoke vendor-risk-full autonomy-migrate autonomy-smoke autonomy-eval autonomy-sim autonomy-learner autonomy-dashboard autonomy-security-test autonomy-full-test autonomy-level3-smoke autonomy-level3-test autonomy-level3-functional autonomy-idempotency-test autonomy-concurrency-test autonomy-eval-gate-test autonomy-rollback-test autonomy-crash-recovery-test autonomy-rbac-test autonomy-protected-surface-test autonomy-level4-phase2-test autonomy-memory-quality-test autonomy-observability-test autonomy-frontend-real-data-test autonomy-level4-phase3-test autonomy-level4-full-test autonomy-level4-certification autonomy-perception-test autonomy-goal-test autonomy-phases-5-8-smoke autonomy-phases-5-8-test autonomy-learner-test autonomy-simulator-test autonomy-phases-9-13-smoke autonomy-phases-9-13-full-test production-release-gate autonomy-civilization-learning-test autonomy-real-web-free-run civilization-calibration-trust-smoke python-check verify-migrations-native verify-resolution-service doctor doctor-offline doctor-production run-best-effort run-offline-fixture north-star-smoke live-cross-domain memory-influence-live mission-progress mission-progress-record mission-progress-record-real-world verify-system-offline verify-system-native production-posture docker-production-smoke docker-startup-verify production-smoke-test staging-smoke-test staging-governance-gate staging-load-test staging-validation-gate release-gates release-gate gate-integrity verify-advertised-targets audit-clean-room audit-runtime-integration audit-staging-deployment deployment-ledgers hosted-staging-budget hosted-staging-plan hosted-staging-apply audit-hosted-staging hosted-staging-destroy audit-longitudinal-foundation longitudinal-campaign governed-capability-genesis capability-protocol-baseline capability-protocol-baseline-v2 capability-protocol-baseline-v3 protocol-reference-genesis-v2 real-capability-genesis-v2 real-capability-genesis-v3 real-capability-genesis-v4 real-capability-genesis-v5 real-provider-baseline-readiness status status-check remaining build-ledger-sync civilization-slice civilization-scheduler civilization-completion civilization-suite agent-protocol-matrix agent-protocol-matrix-check evaluation-calibration-report evaluation-calibration-report-check controlled-learning-report controlled-learning-report-check self-improvement-report self-improvement-report-check
 
 python-check:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
@@ -153,6 +153,8 @@ release-gate:
 	@$(MAKE) self-improvement-report-check
 	@echo "== [1e/12] score validation check =="
 	cd backend && npm run agentco:score-validation -- --check
+	@echo "== [1f/12] real-provider baseline readiness check =="
+	@$(MAKE) real-provider-baseline-readiness
 	@echo "== [2/12] backend install =="
 	cd backend && npm ci
 	@echo "== [3/12] backend migrations =="
@@ -518,7 +520,7 @@ autonomy-open-world-5min:
 # runs migrations from zero, records command evidence, and cleans up all owned
 # resources. Live LLM/web suites are opt-in elsewhere.
 # ---------------------------------------------------------------------------
-.PHONY: verify-clean-room audit-clean-room
+.PHONY: verify-clean-room audit-clean-room cross-version-campaign real-cross-version-campaign subject-native-cross-version-campaign
 verify-clean-room: audit-clean-room
 
 audit-clean-room:
@@ -565,6 +567,87 @@ audit-longitudinal-foundation:
 longitudinal-campaign:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/run_longitudinal_campaign.py --campaign "$${CAMPAIGN:?CAMPAIGN is required}"
+
+governed-capability-genesis:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-protocol-baseline-v3 --mode protocol-baseline-v3
+
+capability-protocol-baseline:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-protocol-baseline-v3 --mode protocol-baseline-v3
+
+capability-protocol-baseline-v2:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-protocol-baseline-v2 --mode protocol-baseline-v2
+
+capability-protocol-baseline-v3:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-protocol-baseline-v3 --mode protocol-baseline-v3
+
+protocol-reference-genesis-v2:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-protocol-baseline-v3 --mode protocol-baseline-v3
+
+real-capability-genesis-v2:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-genesis-v4 --mode real-capability-genesis-v4
+
+real-capability-genesis-v3:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-genesis-v4 --mode real-capability-genesis-v4
+
+real-capability-genesis-v4:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-genesis-v4 --mode real-capability-genesis-v4
+
+real-capability-genesis-v5:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_governed_capability_genesis.py --campaign governed-capability-genesis-v5 --mode real-capability-genesis-v5
+
+real-provider-baseline-readiness:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_real_provider_readiness.py --check
+
+cross-version-campaign: real-cross-version-campaign
+
+real-cross-version-campaign:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_cross_version_campaign.py \
+		--baseline "$${BASELINE:?BASELINE is required}" \
+		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
+		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}" \
+		--campaign "$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_cross_version_campaign.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}" \
+		--baseline "$${BASELINE:?BASELINE is required}" \
+		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
+		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}"
+	@$(PYTHON) scripts/verify_subject_runtime_evidence.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+
+subject-native-cross-version-campaign:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/run_subject_native_cross_version_campaign.py \
+		--baseline "$${BASELINE:?BASELINE is required}" \
+		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
+		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}" \
+		--campaign "$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_cross_version_campaign.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}" \
+		--baseline "$${BASELINE:?BASELINE is required}" \
+		--raw-candidate "$${RAW_CANDIDATE:?RAW_CANDIDATE is required}" \
+		--reconciled-candidate "$${RECONCILED_CANDIDATE:?RECONCILED_CANDIDATE is required}"
+	@$(PYTHON) scripts/verify_subject_runtime_evidence.py \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_subject_request_consumption.py \
+		--check \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_subject_answer_ownership.py \
+		--check \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
+	@$(PYTHON) scripts/verify_campaign_evidence_binding.py \
+		--check \
+		--campaign-dir "artifacts/cross-version/$${CAMPAIGN:?CAMPAIGN is required}"
 
 .PHONY: longitudinal-learning
 longitudinal-learning:

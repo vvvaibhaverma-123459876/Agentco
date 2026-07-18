@@ -7,6 +7,7 @@ Generated from active Fastify route registrations in `backend/src/server.ts`, `b
 - `PUBLIC`: health probes only. Liveness exposes process state; readiness/detailed health expose sanitized dependency status without credentials, connection strings, stack traces, audit data, governance data, identity state, resource ledgers, or dashboard state.
 - `AUTH-READ`: reads application/system state and requires the configured API key when `AGENTCO_API_KEY` is set.
 - `AUTH-WRITE`: mutates state or starts work and requires the configured API key.
+- `AUTH-PRINCIPAL`: mutates or exposes privileged state and requires a signed, credential-bound `RequestPrincipal` (Ed25519 over the canonical request, resolved centrally at the HTTP boundary) in addition to the API key; `req.body`/`x-actor-id`/query-string actor claims are never trusted for permission or identity binding. Added by AUD-004 remediation (`docs/security/AUD-004-DESIGN.md`); supersedes `AUTH-WRITE`/`AUTH-READ` for every route gated with `requirePrincipal(...)`.
 
 Public browser access must not receive a privileged service API key. Browser dashboard requests go through the frontend server-side API proxy, which injects service credentials from server-only environment variables.
 
@@ -15,9 +16,10 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 109 |
-| AUTH-WRITE | 185 |
-| TOTAL | 298 |
+| AUTH-READ | 104 |
+| AUTH-WRITE | 13 |
+| AUTH-PRINCIPAL | 181 |
+| TOTAL | 302 |
 
 ## Matrix
 
@@ -31,6 +33,10 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/agents/tasks/:task_id` | GET/HEAD | Agent registry/task/dispatch state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/audit` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/audit/integrity` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/v1/capabilities/attempts/:attemptId` | GET/HEAD | Capability attempt lifecycle, audit and result state | AUTH-READ | Exposes non-liveness capability execution state; default stance is authenticated read. |
+| `/v1/capabilities/attempts/:attemptId/cancel` | POST | Capability attempt lifecycle and cancellation state | AUTH-WRITE | Mutates or terminates capability execution state; must require API key. |
+| `/v1/capabilities/execute` | POST | Capability execution request/result state | AUTH-WRITE | Starts governed capability work; must require API key. |
+| `/v1/capabilities/execute-async` | POST | Capability execution request/attempt state | AUTH-WRITE | Starts governed capability work; must require API key. |
 | `/api/autonomy/action-loop` | POST | Autonomy run/task/candidate/evidence/action state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
 | `/api/autonomy/actions` | GET/HEAD | Autonomy run/task/candidate/evidence/action state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/autonomy/allocation/record-decision` | POST | Autonomy run/task/candidate/evidence/action state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
@@ -214,14 +220,14 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/civilization/missions/:missionId/settlement` | POST | Mission/goal/workstream/task/attestation state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
 | `/api/civilization/missions/:missionId/transition` | POST | Mission/goal/workstream/task/attestation state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
 | `/api/civilization/missions/:missionId/workstreams` | POST | Mission/goal/workstream/task/attestation state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
-| `/api/civilization/operator/overview` | GET/HEAD | Civilization operator overview projection | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
-| `/api/civilization/os/mode` | POST | Civilization OS scheduler/tick/status projection state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
-| `/api/civilization/os/recover` | GET/HEAD | Civilization OS scheduler/tick/status projection state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
-| `/api/civilization/os/start` | POST | Civilization OS scheduler/tick/status projection state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
-| `/api/civilization/os/status` | GET/HEAD | Civilization OS scheduler/tick/status projection state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
-| `/api/civilization/os/stop` | POST | Civilization OS scheduler/tick/status projection state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
-| `/api/civilization/os/tick` | POST | Civilization OS scheduler/tick/status projection state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
-| `/api/civilization/os/ticks` | GET/HEAD | Civilization OS scheduler/tick/status projection state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/operator/overview` | GET/HEAD | Civilization operator-plane/runtime status state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/os/mode` | POST | Civilization operating-system scheduler and mode state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
+| `/api/civilization/os/recover` | GET/HEAD | Civilization operating-system scheduler and recovery state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/os/start` | POST | Civilization operating-system scheduler and daemon state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
+| `/api/civilization/os/status` | GET/HEAD | Civilization operating-system scheduler and projection state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/civilization/os/stop` | POST | Civilization operating-system scheduler and daemon state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
+| `/api/civilization/os/tick` | POST | Civilization operating-system scheduler and tick state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
+| `/api/civilization/os/ticks` | GET/HEAD | Civilization operating-system scheduler and tick log state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/policies` | POST | Civilization governance/runtime/reputation/work state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
 | `/api/civilization/policies/:policyId` | GET/HEAD | Civilization governance/runtime/reputation/work state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/civilization/policies/:policyId/approve` | POST | Civilization governance/runtime/reputation/work state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |

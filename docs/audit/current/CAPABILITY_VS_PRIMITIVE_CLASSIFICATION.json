@@ -1,0 +1,51 @@
+{
+  "classification_version": "capability-vs-primitive-v1",
+  "campaigns": {
+    "subject-native-cross-version-v1": {
+      "status": "VALID_PROCESS_EXECUTION_EVIDENCE",
+      "classification": "runtime_primitive_compatibility",
+      "operation": "durable_calibration_brier_score",
+      "not_capability_claims": [
+        "prediction capability",
+        "reasoning capability",
+        "calibration judgment",
+        "model calibration improvement"
+      ],
+      "rationale": "The adapter supplies confidence and outcome; the subject calculates a Brier score."
+    },
+    "subject-native-cross-version-v2": {
+      "status": "VALID_PRIMITIVE_COMPATIBILITY_EVIDENCE",
+      "classification": "mixed_runtime_primitives",
+      "operations": [
+        {
+          "domain": "calibration",
+          "operation_name": "calibration_calculation",
+          "operation": "durable_calibration_brier_score",
+          "classification": "runtime_primitive"
+        },
+        {
+          "domain": "evidence_shaped_storage_input",
+          "operation_name": "durable_observation_recording",
+          "operation": "durable_record_observation",
+          "classification": "storage_write",
+          "excluded_benchmark_domain": "evidence_evaluation",
+          "exclusion_reason": "record_observation stores supplied observation payloads and does not evaluate conflicting evidence or produce a truth conclusion"
+        }
+      ],
+      "common_capability_task_domains": 0,
+      "common_benchmark_capability_domains": 0,
+      "primitive_compatibility_operations": 2
+    }
+  },
+  "allowed_operation_classifications": [
+    "capability_task",
+    "runtime_primitive",
+    "governance_control",
+    "resource_control",
+    "storage_write",
+    "recovery_control",
+    "health_check",
+    "unsupported"
+  ],
+  "capability_claim_rule": "Only operation_classification=capability_task may enter reasoning or broad capability-improvement claims."
+}

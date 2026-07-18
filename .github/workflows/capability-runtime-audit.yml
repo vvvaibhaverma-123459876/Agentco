@@ -1,0 +1,143 @@
+name: Capability Runtime Audit
+
+on:
+  pull_request:
+    branches: [audit/remediation-07-cross-version-civilization-evaluation, main]
+    paths:
+      - "agentco_capability/**"
+      - "backend/src/routes/capabilities.routes.ts"
+      - "backend/src/services/capability-runtime.service.ts"
+      - "backend/src/types/capability.types.ts"
+      - "backend/src/db/migrations/140_governed_capability_runtime.sql"
+      - "schemas/agentco_capability_*.schema.json"
+      - "scripts/run_governed_capability_genesis.py"
+      - "tests/test_capability_runtime.py"
+      - "backend/tests/capability-runtime.test.ts"
+      - "Makefile"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Capability audit mode"
+        required: true
+        default: "protocol-baseline-v3"
+        type: choice
+        options:
+          - protocol-baseline-v3
+          - real-capability-genesis-v5
+      provider:
+        description: "Optional provider id for real-capability-provider mode"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: capability-runtime-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  capability-runtime:
+    name: Capability runtime audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      EXPECTED_AUDIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      GENESIS_MODE: ${{ github.event.inputs.mode || 'protocol-reference' }}
+      CAPABILITY_MODE: ${{ github.event.inputs.mode || 'protocol-baseline-v3' }}
+      GENESIS_PROVIDER: ${{ github.event.inputs.provider || '' }}
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: requirements/requirements.lock.txt
+
+      - name: Install locked Python dependencies
+        run: python3.13 -m pip install -r requirements/requirements.lock.txt
+
+      - name: Install backend dependencies
+        run: cd backend && npm ci
+
+      - name: Verify exact checkout
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_AUDIT_SHA"
+
+      - name: Capability runtime Python tests
+        run: |
+          python3.13 -m pytest \
+            tests/test_protocol_baseline_v3.py \
+            tests/test_capability_genesis_v5.py \
+            tests/test_capability_freeze_binding.py \
+            tests/test_capability_freeze_integrity.py \
+            tests/test_protocol_schema_validation.py \
+            tests/test_protocol_persistence_reinitialization.py \
+            tests/test_protocol_secret_redaction.py \
+            tests/test_protocol_budget_settlement.py \
+            tests/test_capability_preflight.py \
+            tests/test_protocol_control_execution.py \
+            tests/test_capability_anti_hardcoding.py \
+            tests/test_domain_scorers.py \
+            tests/test_software_capability_workspace.py \
+            tests/test_data_capability_workspace.py \
+            tests/test_capability_provider_adapters.py \
+            tests/test_capability_runtime.py \
+            -q
+
+      - name: Capability freeze verifier
+        run: python3.13 scripts/verify_capability_genesis_freeze.py --check
+
+      - name: Capability runtime backend tests
+        run: cd backend && npm test -- capability-runtime.test.ts --runInBand
+
+      - name: Backend build
+        run: cd backend && npm run build
+
+      - name: Capability genesis campaign
+        run: |
+          if [ -n "$GENESIS_PROVIDER" ]; then
+            python3.13 scripts/run_governed_capability_genesis.py --mode "$CAPABILITY_MODE" --provider "$GENESIS_PROVIDER"
+          else
+            python3.13 scripts/run_governed_capability_genesis.py --mode "$CAPABILITY_MODE"
+          fi
+
+      - name: Verify genesis commit binding
+        run: |
+          python3.13 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          mode = os.environ["CAPABILITY_MODE"]
+          if mode == "protocol-baseline-v3":
+              manifest_path = Path("artifacts/capability-runtime/governed-capability-protocol-baseline-v3/PROTOCOL_BASELINE_MANIFEST.json")
+          else:
+              manifest_path = Path("artifacts/capability-runtime/governed-capability-genesis-v5/GENESIS_V5_MANIFEST.json")
+          manifest = json.loads(manifest_path.read_text())
+          if manifest["campaign_execution_sha"] != os.environ["EXPECTED_AUDIT_SHA"]:
+              raise SystemExit("genesis manifest SHA does not match workflow head")
+          if mode == "protocol-baseline-v3" and manifest["decision"] != "PROTOCOL_BASELINE_ACCEPTED":
+              raise SystemExit("protocol baseline did not pass")
+          if mode == "real-capability-genesis-v5" and manifest["decision"] not in {"CAPABILITY_GENESIS_ACCEPTED", "HOLD_FOR_MORE_EVIDENCE"}:
+              raise SystemExit("real-capability genesis did not produce a valid decision")
+          PY
+          python3.13 scripts/verify_capability_genesis_artifact.py --check
+
+      - name: Upload capability runtime artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capability-runtime-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            artifacts/capability-runtime/**
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.*
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_*
+            docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.*
+            docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V5_FREEZE_*.json
+          if-no-files-found: warn
+          retention-days: 120

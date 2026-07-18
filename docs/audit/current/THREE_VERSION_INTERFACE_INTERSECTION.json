@@ -1,0 +1,91 @@
+{
+  "intersection_version": "three-version-interface-intersection-v1",
+  "subjects": {
+    "version_a": "fb27dc0529d3c5d11480503bfbcf6f2d156f5b04",
+    "version_b": "651794a41513db1e40930f08c253ef261af7c1e7",
+    "version_c": "81cd17431f826d9d3cda06b9127758751e44b798"
+  },
+  "candidates": [
+    {
+      "interface_id": "durable-calibration-task",
+      "domain": "calibration",
+      "a_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=calibration)",
+      "b_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=calibration)",
+      "c_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=calibration)",
+      "semantic_equivalence": "equivalent Brier-score calculation over supplied confidence and outcome",
+      "input_contract": "prediction_id, confidence, outcome",
+      "output_contract": "calibration_score with brier_score",
+      "provider_requirement": "none",
+      "database_requirement": "none for direct subject function path",
+      "redis_requirement": "none",
+      "kafka_requirement": "none",
+      "authentication_requirement": "none for direct subject function path",
+      "runtime_evidence": "development and V1 process execution evidence",
+      "development_case_result": "supported",
+      "common_core_eligibility": true,
+      "operation_classification": "runtime_primitive",
+      "rejection_rationale": null
+    },
+    {
+      "interface_id": "durable-record-observation-task",
+      "domain": "evidence_shaped_storage_input",
+      "a_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=record_observation)",
+      "b_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=record_observation)",
+      "c_implementation": "scripts/execute_durable_task.py:execute_task_logic(Task task_type=record_observation)",
+      "semantic_equivalence": "equivalent storage-write primitive for supplied observation payload",
+      "input_contract": "observation object",
+      "output_contract": "observation_recorded with observation",
+      "provider_requirement": "none",
+      "database_requirement": "none for direct subject function path",
+      "redis_requirement": "none",
+      "kafka_requirement": "none",
+      "authentication_requirement": "none for direct subject function path",
+      "runtime_evidence": "development process execution evidence",
+      "development_case_result": "supported",
+      "common_core_eligibility": false,
+      "primitive_compatibility_eligibility": true,
+      "operation_name": "durable_observation_recording",
+      "operation_classification": "storage_write",
+      "excluded_benchmark_domain": "evidence_evaluation",
+      "rejection_rationale": "not eligible for evidence_evaluation benchmark support because it stores supplied observations but does not evaluate conflicting evidence or produce a conclusion"
+    },
+    {
+      "interface_id": "durable-llm-review-decision",
+      "domain": "reasoning/planning/evidence_evaluation",
+      "semantic_equivalence": "subject function exists but requires live LLM provider credentials",
+      "provider_requirement": "LLM_API_KEY or OPENAI_API_KEY",
+      "common_core_eligibility": false,
+      "operation_classification": "unsupported",
+      "rejection_rationale": "live provider boundary unavailable and not allowed as local common-core proof"
+    },
+    {
+      "interface_id": "backend-http-routes",
+      "domain": "governance/memory/resource/runtime",
+      "semantic_equivalence": "route sets diverge across A, B and C; authentication/bootstrap contracts are not equivalent",
+      "provider_requirement": "varies",
+      "database_requirement": "PostgreSQL",
+      "redis_requirement": "varies",
+      "kafka_requirement": "varies",
+      "common_core_eligibility": false,
+      "operation_classification": "unsupported",
+      "rejection_rationale": "no stable common provider-free API contract across immutable subjects"
+    },
+    {
+      "interface_id": "mission-civilization-runtime",
+      "domain": "civilization",
+      "semantic_equivalence": "not present in Version A",
+      "common_core_eligibility": false,
+      "operation_classification": "unsupported",
+      "rejection_rationale": "subject-specific to B/C and cannot enter A/B/C common-core comparison"
+    }
+  ],
+  "summary": {
+    "candidate_interfaces_discovered": 5,
+    "common_interfaces": 1,
+    "primitive_compatibility_operations": 2,
+    "common_capability_task_domains": 0,
+    "common_control_domains": 0,
+    "common_primitive_domains": 2,
+    "rejected_candidates": 3
+  }
+}

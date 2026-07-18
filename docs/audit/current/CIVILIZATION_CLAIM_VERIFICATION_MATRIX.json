@@ -1,0 +1,32 @@
+{
+  "matrix_version": "civilization-claim-verification-v1",
+  "source_files": [
+    "CIVILIZATION_BUILD_LEDGER.yaml",
+    "docs/civilization/PLAN_AND_PROGRESS.md",
+    "docs/civilization/CANONICAL_RUNTIME_MAP.md"
+  ],
+  "claims": [
+    {"claim_id": "C0", "claimed_status": "implemented", "implementation_paths": ["docs/civilization/CANONICAL_RUNTIME_MAP.md"], "focused_test_evidence": [], "end_to_end_evidence": [], "actual_status": "static_only", "limitations": "Canonical map exists; runtime authority conflicts still require deeper audit."},
+    {"claim_id": "C1", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/civilization-kernel.service.ts", "backend/src/routes/civilization-kernel.routes.ts"], "focused_test_evidence": ["backend/tests/civilization-kernel.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Focused service/route tests exist; no hosted or long-run proof."},
+    {"claim_id": "C2", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/citizenship.service.ts", "backend/src/routes/citizenship.routes.ts"], "focused_test_evidence": ["backend/tests/citizenship.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Citizenship lifecycle tested locally only."},
+    {"claim_id": "C3", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/society.service.ts", "backend/src/services/institution-governance.service.ts"], "focused_test_evidence": ["backend/tests/societies-institutions.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Institution governance is not proven across deployment boundaries."},
+    {"claim_id": "C4", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/coalition.service.ts"], "focused_test_evidence": ["backend/tests/coalitions.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Coalition tests are focused; no independent mission lifecycle proof."},
+    {"claim_id": "C5", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/mission.service.ts"], "focused_test_evidence": ["backend/tests/missions.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Mission lifecycle integration remains partial."},
+    {"claim_id": "C6", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/treasury.service.ts"], "focused_test_evidence": ["backend/tests/treasury.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Economy path is local and not linked to hosted billing controls."},
+    {"claim_id": "C7", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/governance.service.ts"], "focused_test_evidence": ["backend/tests/governance.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Runtime policy effect and rollback require further E2E proof."},
+    {"claim_id": "C8", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/judiciary-case.service.ts"], "focused_test_evidence": ["backend/tests/judiciary-case.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Appeal and independent review are not fully end-to-end verified."},
+    {"claim_id": "C9", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/collective-knowledge.service.ts"], "focused_test_evidence": ["backend/tests/collective-knowledge.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Collective epistemics is not proven as a longitudinal learning loop."},
+    {"claim_id": "C10", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/safe-evolution.service.ts"], "focused_test_evidence": ["backend/tests/safe-evolution.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Safe evolution does not auto-promote; full governed improvement loop remains bounded."},
+    {"claim_id": "C11", "claimed_status": "implemented", "implementation_paths": ["backend/src/services/capability-expansion.service.ts"], "focused_test_evidence": ["backend/tests/capability-expansion.test.ts"], "end_to_end_evidence": [], "actual_status": "unit_verified", "limitations": "Capability grants are not proven through hosted or long-running operations."},
+    {"claim_id": "C12", "claimed_status": "incomplete", "implementation_paths": [], "focused_test_evidence": [], "end_to_end_evidence": [], "actual_status": "not_implemented", "limitations": "Operating-system loop remains outside Batch 07 evidence."},
+    {"claim_id": "C13", "claimed_status": "incomplete", "implementation_paths": [], "focused_test_evidence": [], "end_to_end_evidence": [], "actual_status": "not_implemented", "limitations": "Operator plane is not complete."},
+    {"claim_id": "C14", "claimed_status": "incomplete", "implementation_paths": [], "focused_test_evidence": [], "end_to_end_evidence": [], "actual_status": "partial", "limitations": "Local staging controls exist from Batch 04; hosted reliability/security/deployment remains blocked."},
+    {"claim_id": "C15", "claimed_status": "incomplete", "implementation_paths": [], "focused_test_evidence": [], "end_to_end_evidence": [], "actual_status": "not_implemented", "limitations": "Completion proof is not established."}
+  ],
+  "status_counts": {
+    "unit_verified": 11,
+    "static_only": 1,
+    "partial": 1,
+    "not_implemented": 3
+  }
+}

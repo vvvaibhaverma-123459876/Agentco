@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentco.local/schemas/subject_benchmark_response.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "run_id", "case_id", "status", "answer", "confidence", "evidence_refs", "tool_calls", "authorization_events", "budget_usage", "runtime_events", "audit_refs", "error"],
+  "properties": {
+    "protocol_version": { "const": "subject-benchmark-v1" },
+    "run_id": { "type": "string" },
+    "case_id": { "type": "string" },
+    "status": { "enum": ["completed", "failed", "timeout", "unsupported"] },
+    "answer": {},
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "evidence_refs": { "type": "array", "items": { "type": "string" } },
+    "tool_calls": { "type": "array" },
+    "authorization_events": { "type": "array" },
+    "budget_usage": { "type": "object" },
+    "runtime_events": { "type": "array" },
+    "audit_refs": { "type": "array", "items": { "type": "string" } },
+    "error": { "type": ["string", "null"] }
+  }
+}

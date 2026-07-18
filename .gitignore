@@ -198,6 +198,8 @@ artifacts/audit/
 artifacts/runtime-integration/
 artifacts/staging-deployment/
 artifacts/hosted-staging/
+artifacts/cross-version/
+artifacts/capability-runtime/
 artifacts/longitudinal/
 backend/.runtime-integration/
 

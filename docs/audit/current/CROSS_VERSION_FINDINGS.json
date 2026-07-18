@@ -1,0 +1,34 @@
+{
+  "findings": [
+    {
+      "finding_id": "CVF-001",
+      "severity": "S2",
+      "subject_version": "version-b",
+      "component": "database migrations",
+      "domain": "migration identity",
+      "evidence": "Version B has both 129_civilization_kernel.sql and 129_longitudinal_mission_evidence.sql while the runner tracks only filename/applied_at.",
+      "reproduction": "Inspect backend/src/db/migrations and backend/src/db/migrate.ts at 651794a41513db1e40930f08c253ef261af7c1e7.",
+      "root_cause": "Parallel branch migration prefix allocation.",
+      "impact": "Migration ordering remains deterministic but identity is ambiguous for audit and already-applied content changes.",
+      "remediation": "Version C adds migration content_hash and sequence_num tracking plus migration identity ledger validation.",
+      "regression_test": "python3.13 scripts/verify_migration_identity.py --check",
+      "status": "resolved_in_version_c",
+      "remaining_risk": "Legacy rows with null content_hash are backfilled only when Version C migration runner is executed."
+    },
+    {
+      "finding_id": "CVF-002",
+      "severity": "S1",
+      "subject_version": "all",
+      "component": "cross-version campaign harness",
+      "domain": "evidence integrity",
+      "evidence": "Batch 07 deterministic_output() produced answers from subject labels and feature flags rather than subject-native runtime behavior.",
+      "reproduction": "Inspect scripts/run_cross_version_campaign.py at f7fabf28b6c992080c1bacee44e533db275c501a.",
+      "root_cause": "The first harness was a measurement scaffold but was incorrectly reported as behavioral paired evidence.",
+      "impact": "Unsupported Version C promotion proposal could have been created from synthetic evidence.",
+      "remediation": "Batch 07B invalidates the old campaign and replaces it with real subject process invocation and runtime-origin evidence checks.",
+      "regression_test": "python3.13 scripts/verify_cross_version_harness_independence.py --check",
+      "status": "resolved_in_07b_harness",
+      "remaining_risk": "Immutable subjects currently lack subject-benchmark-v1, so corrected behavioral capability remains unsupported rather than positive."
+    }
+  ]
+}

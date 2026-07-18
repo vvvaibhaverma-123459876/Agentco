@@ -1,0 +1,56 @@
+{
+  "fixture-claim_grounding": {
+    "content_hash": "d4e59c29df3c2983b18a3cdc83ed8ddc4324bbf441b820d9e3bf41982f501f6e",
+    "domain": "claim_grounding",
+    "fixture_id": "fixture-claim_grounding",
+    "provider_visible": false
+  },
+  "fixture-cross_domain_synthesis": {
+    "content_hash": "84e3d5223ccc1ffb44350b263b4f97df806f92f929aa49cc4c4ad6d0e3f54835",
+    "domain": "cross_domain_synthesis",
+    "fixture_id": "fixture-cross_domain_synthesis",
+    "provider_visible": false
+  },
+  "fixture-data_analysis": {
+    "content_hash": "556c67314e7e033283f8fdcb2cd38911fa8a1e26f45b46b86928f119da9791bf",
+    "domain": "data_analysis",
+    "fixture_id": "fixture-data_analysis",
+    "provider_visible": true
+  },
+  "fixture-evidence_evaluation": {
+    "content_hash": "c0d06daf73570dd3501ec3276b00e25e8537d03789a835da37f8ceed61c6ce71",
+    "domain": "evidence_evaluation",
+    "fixture_id": "fixture-evidence_evaluation",
+    "provider_visible": false
+  },
+  "fixture-planning": {
+    "content_hash": "e9e856d9dbc206efbdf9dcf43eae6d452ca82748ab5d0b04a403d7ad78f32762",
+    "domain": "planning",
+    "fixture_id": "fixture-planning",
+    "provider_visible": false
+  },
+  "fixture-reasoning": {
+    "content_hash": "58afd1055f66d780905da20299019359f96c894331283e18811349f57ff7aad3",
+    "domain": "reasoning",
+    "fixture_id": "fixture-reasoning",
+    "provider_visible": false
+  },
+  "fixture-safe_tool_selection": {
+    "content_hash": "a712628d0a832335a4026939289e7edb1fc1bcb1fdf1cf93de9c6937fc8c0029",
+    "domain": "safe_tool_selection",
+    "fixture_id": "fixture-safe_tool_selection",
+    "provider_visible": false
+  },
+  "fixture-software_engineering": {
+    "content_hash": "3d111841c58ae2876380e953b52e9b7f5687029ed62c7ca71279c35e740f780a",
+    "domain": "software_engineering",
+    "fixture_id": "fixture-software_engineering",
+    "provider_visible": true
+  },
+  "fixture-structured_transformation": {
+    "content_hash": "f686ae705dc896c9e05f3110c2e5bbd457e2e90ee580801cacf656555e6833d5",
+    "domain": "structured_transformation",
+    "fixture_id": "fixture-structured_transformation",
+    "provider_visible": false
+  }
+}

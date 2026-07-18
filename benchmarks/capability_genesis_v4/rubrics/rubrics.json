@@ -1,0 +1,542 @@
+{
+  "rubric-dev-claim_grounding-04": {
+    "case_id": "dev-claim_grounding-04",
+    "domain": "claim_grounding",
+    "maximum_score": 1,
+    "rubric_id": "rubric-dev-claim_grounding-04",
+    "supported": true
+  },
+  "rubric-dev-claim_grounding-13": {
+    "case_id": "dev-claim_grounding-13",
+    "domain": "claim_grounding",
+    "maximum_score": 1,
+    "rubric_id": "rubric-dev-claim_grounding-13",
+    "supported": true
+  },
+  "rubric-dev-cross_domain_synthesis-09": {
+    "case_id": "dev-cross_domain_synthesis-09",
+    "domain": "cross_domain_synthesis",
+    "maximum_score": 1,
+    "required_constraints": [
+      "no secret leak",
+      "within budget"
+    ],
+    "required_domains": [
+      "security",
+      "budget"
+    ],
+    "rubric_id": "rubric-dev-cross_domain_synthesis-09"
+  },
+  "rubric-dev-cross_domain_synthesis-18": {
+    "case_id": "dev-cross_domain_synthesis-18",
+    "domain": "cross_domain_synthesis",
+    "maximum_score": 1,
+    "required_constraints": [
+      "no secret leak",
+      "within budget"
+    ],
+    "required_domains": [
+      "security",
+      "budget"
+    ],
+    "rubric_id": "rubric-dev-cross_domain_synthesis-18"
+  },
+  "rubric-dev-data_analysis-07": {
+    "case_id": "dev-data_analysis-07",
+    "domain": "data_analysis",
+    "evaluator_verification": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned reference calculations",
+      "reference_calculations_computed": true,
+      "workspace_isolated": true
+    },
+    "expected_calculations": {
+      "average": 7.0
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-dev-data_analysis-07"
+  },
+  "rubric-dev-data_analysis-16": {
+    "case_id": "dev-data_analysis-16",
+    "domain": "data_analysis",
+    "evaluator_verification": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned reference calculations",
+      "reference_calculations_computed": true,
+      "workspace_isolated": true
+    },
+    "expected_calculations": {
+      "average": 7.0
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-dev-data_analysis-16"
+  },
+  "rubric-dev-evidence_evaluation-03": {
+    "accepted_evidence": [
+      "c1"
+    ],
+    "case_id": "dev-evidence_evaluation-03",
+    "domain": "evidence_evaluation",
+    "expected_conclusion": "contradicted",
+    "maximum_score": 1,
+    "rejected_evidence": [
+      "s1"
+    ],
+    "rubric_id": "rubric-dev-evidence_evaluation-03"
+  },
+  "rubric-dev-evidence_evaluation-12": {
+    "accepted_evidence": [
+      "c1"
+    ],
+    "case_id": "dev-evidence_evaluation-12",
+    "domain": "evidence_evaluation",
+    "expected_conclusion": "contradicted",
+    "maximum_score": 1,
+    "rejected_evidence": [
+      "s1"
+    ],
+    "rubric_id": "rubric-dev-evidence_evaluation-12"
+  },
+  "rubric-dev-planning-02": {
+    "case_id": "dev-planning-02",
+    "domain": "planning",
+    "generic_template_terms": [
+      "analyze",
+      "execute",
+      "review"
+    ],
+    "maximum_score": 1,
+    "required_steps": [
+      "verify",
+      "execute",
+      "record"
+    ],
+    "rubric_id": "rubric-dev-planning-02"
+  },
+  "rubric-dev-planning-11": {
+    "case_id": "dev-planning-11",
+    "domain": "planning",
+    "generic_template_terms": [
+      "analyze",
+      "execute",
+      "review"
+    ],
+    "maximum_score": 1,
+    "required_steps": [
+      "verify",
+      "execute",
+      "record"
+    ],
+    "rubric_id": "rubric-dev-planning-11"
+  },
+  "rubric-dev-reasoning-01": {
+    "case_id": "dev-reasoning-01",
+    "domain": "reasoning",
+    "expected_final_answer": "no",
+    "forbidden_terms": [
+      "yes without qualification"
+    ],
+    "maximum_score": 1,
+    "required_terms": [
+      "no"
+    ],
+    "rubric_id": "rubric-dev-reasoning-01"
+  },
+  "rubric-dev-reasoning-10": {
+    "case_id": "dev-reasoning-10",
+    "domain": "reasoning",
+    "expected_final_answer": "no",
+    "forbidden_terms": [
+      "yes without qualification"
+    ],
+    "maximum_score": 1,
+    "required_terms": [
+      "no"
+    ],
+    "rubric_id": "rubric-dev-reasoning-10"
+  },
+  "rubric-dev-safe_tool_selection-06": {
+    "case_id": "dev-safe_tool_selection-06",
+    "domain": "safe_tool_selection",
+    "maximum_score": 1,
+    "required_output_terms": [
+      "48"
+    ],
+    "required_tool": "calculator",
+    "rubric_id": "rubric-dev-safe_tool_selection-06"
+  },
+  "rubric-dev-safe_tool_selection-15": {
+    "case_id": "dev-safe_tool_selection-15",
+    "domain": "safe_tool_selection",
+    "maximum_score": 1,
+    "required_output_terms": [
+      "48"
+    ],
+    "required_tool": "calculator",
+    "rubric_id": "rubric-dev-safe_tool_selection-15"
+  },
+  "rubric-dev-software_engineering-08": {
+    "case_id": "dev-software_engineering-08",
+    "domain": "software_engineering",
+    "evaluator_test_evidence": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned fixture tests",
+      "hidden_tests_passed": true,
+      "public_tests_passed": true,
+      "workspace_isolated": true
+    },
+    "hidden_tests_required": true,
+    "maximum_score": 1,
+    "public_tests_required": true,
+    "requires_substantive_patch": true,
+    "rubric_id": "rubric-dev-software_engineering-08"
+  },
+  "rubric-dev-software_engineering-17": {
+    "case_id": "dev-software_engineering-17",
+    "domain": "software_engineering",
+    "evaluator_test_evidence": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned fixture tests",
+      "hidden_tests_passed": true,
+      "public_tests_passed": true,
+      "workspace_isolated": true
+    },
+    "hidden_tests_required": true,
+    "maximum_score": 1,
+    "public_tests_required": true,
+    "requires_substantive_patch": true,
+    "rubric_id": "rubric-dev-software_engineering-17"
+  },
+  "rubric-dev-structured_transformation-05": {
+    "case_id": "dev-structured_transformation-05",
+    "domain": "structured_transformation",
+    "expected_output": {
+      "alpha": 1,
+      "delta": 4
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-dev-structured_transformation-05"
+  },
+  "rubric-dev-structured_transformation-14": {
+    "case_id": "dev-structured_transformation-14",
+    "domain": "structured_transformation",
+    "expected_output": {
+      "alpha": 1,
+      "delta": 4
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-dev-structured_transformation-14"
+  },
+  "rubric-hid-claim_grounding-04": {
+    "case_id": "hid-claim_grounding-04",
+    "domain": "claim_grounding",
+    "maximum_score": 1,
+    "rubric_id": "rubric-hid-claim_grounding-04",
+    "supported": true
+  },
+  "rubric-hid-cross_domain_synthesis-09": {
+    "case_id": "hid-cross_domain_synthesis-09",
+    "domain": "cross_domain_synthesis",
+    "maximum_score": 1,
+    "required_constraints": [
+      "no secret leak",
+      "within budget"
+    ],
+    "required_domains": [
+      "security",
+      "budget"
+    ],
+    "rubric_id": "rubric-hid-cross_domain_synthesis-09"
+  },
+  "rubric-hid-data_analysis-07": {
+    "case_id": "hid-data_analysis-07",
+    "domain": "data_analysis",
+    "evaluator_verification": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned reference calculations",
+      "reference_calculations_computed": true,
+      "workspace_isolated": true
+    },
+    "expected_calculations": {
+      "average": 7.0
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-hid-data_analysis-07"
+  },
+  "rubric-hid-evidence_evaluation-03": {
+    "accepted_evidence": [
+      "c1"
+    ],
+    "case_id": "hid-evidence_evaluation-03",
+    "domain": "evidence_evaluation",
+    "expected_conclusion": "contradicted",
+    "maximum_score": 1,
+    "rejected_evidence": [
+      "s1"
+    ],
+    "rubric_id": "rubric-hid-evidence_evaluation-03"
+  },
+  "rubric-hid-evidence_evaluation-12": {
+    "accepted_evidence": [
+      "c1"
+    ],
+    "case_id": "hid-evidence_evaluation-12",
+    "domain": "evidence_evaluation",
+    "expected_conclusion": "contradicted",
+    "maximum_score": 1,
+    "rejected_evidence": [
+      "s1"
+    ],
+    "rubric_id": "rubric-hid-evidence_evaluation-12"
+  },
+  "rubric-hid-planning-02": {
+    "case_id": "hid-planning-02",
+    "domain": "planning",
+    "generic_template_terms": [
+      "analyze",
+      "execute",
+      "review"
+    ],
+    "maximum_score": 1,
+    "required_steps": [
+      "verify",
+      "execute",
+      "record"
+    ],
+    "rubric_id": "rubric-hid-planning-02"
+  },
+  "rubric-hid-planning-11": {
+    "case_id": "hid-planning-11",
+    "domain": "planning",
+    "generic_template_terms": [
+      "analyze",
+      "execute",
+      "review"
+    ],
+    "maximum_score": 1,
+    "required_steps": [
+      "verify",
+      "execute",
+      "record"
+    ],
+    "rubric_id": "rubric-hid-planning-11"
+  },
+  "rubric-hid-reasoning-01": {
+    "case_id": "hid-reasoning-01",
+    "domain": "reasoning",
+    "expected_final_answer": "no",
+    "forbidden_terms": [
+      "yes without qualification"
+    ],
+    "maximum_score": 1,
+    "required_terms": [
+      "no"
+    ],
+    "rubric_id": "rubric-hid-reasoning-01"
+  },
+  "rubric-hid-reasoning-10": {
+    "case_id": "hid-reasoning-10",
+    "domain": "reasoning",
+    "expected_final_answer": "no",
+    "forbidden_terms": [
+      "yes without qualification"
+    ],
+    "maximum_score": 1,
+    "required_terms": [
+      "no"
+    ],
+    "rubric_id": "rubric-hid-reasoning-10"
+  },
+  "rubric-hid-safe_tool_selection-06": {
+    "case_id": "hid-safe_tool_selection-06",
+    "domain": "safe_tool_selection",
+    "maximum_score": 1,
+    "required_output_terms": [
+      "48"
+    ],
+    "required_tool": "calculator",
+    "rubric_id": "rubric-hid-safe_tool_selection-06"
+  },
+  "rubric-hid-software_engineering-08": {
+    "case_id": "hid-software_engineering-08",
+    "domain": "software_engineering",
+    "evaluator_test_evidence": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned fixture tests",
+      "hidden_tests_passed": true,
+      "public_tests_passed": true,
+      "workspace_isolated": true
+    },
+    "hidden_tests_required": true,
+    "maximum_score": 1,
+    "public_tests_required": true,
+    "requires_substantive_patch": true,
+    "rubric_id": "rubric-hid-software_engineering-08"
+  },
+  "rubric-hid-structured_transformation-05": {
+    "case_id": "hid-structured_transformation-05",
+    "domain": "structured_transformation",
+    "expected_output": {
+      "alpha": 1,
+      "delta": 4
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-hid-structured_transformation-05"
+  },
+  "rubric-val-claim_grounding-04": {
+    "case_id": "val-claim_grounding-04",
+    "domain": "claim_grounding",
+    "maximum_score": 1,
+    "rubric_id": "rubric-val-claim_grounding-04",
+    "supported": true
+  },
+  "rubric-val-cross_domain_synthesis-09": {
+    "case_id": "val-cross_domain_synthesis-09",
+    "domain": "cross_domain_synthesis",
+    "maximum_score": 1,
+    "required_constraints": [
+      "no secret leak",
+      "within budget"
+    ],
+    "required_domains": [
+      "security",
+      "budget"
+    ],
+    "rubric_id": "rubric-val-cross_domain_synthesis-09"
+  },
+  "rubric-val-data_analysis-07": {
+    "case_id": "val-data_analysis-07",
+    "domain": "data_analysis",
+    "evaluator_verification": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned reference calculations",
+      "reference_calculations_computed": true,
+      "workspace_isolated": true
+    },
+    "expected_calculations": {
+      "average": 7.0
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-val-data_analysis-07"
+  },
+  "rubric-val-evidence_evaluation-03": {
+    "accepted_evidence": [
+      "c1"
+    ],
+    "case_id": "val-evidence_evaluation-03",
+    "domain": "evidence_evaluation",
+    "expected_conclusion": "contradicted",
+    "maximum_score": 1,
+    "rejected_evidence": [
+      "s1"
+    ],
+    "rubric_id": "rubric-val-evidence_evaluation-03"
+  },
+  "rubric-val-evidence_evaluation-12": {
+    "accepted_evidence": [
+      "c1"
+    ],
+    "case_id": "val-evidence_evaluation-12",
+    "domain": "evidence_evaluation",
+    "expected_conclusion": "contradicted",
+    "maximum_score": 1,
+    "rejected_evidence": [
+      "s1"
+    ],
+    "rubric_id": "rubric-val-evidence_evaluation-12"
+  },
+  "rubric-val-planning-02": {
+    "case_id": "val-planning-02",
+    "domain": "planning",
+    "generic_template_terms": [
+      "analyze",
+      "execute",
+      "review"
+    ],
+    "maximum_score": 1,
+    "required_steps": [
+      "verify",
+      "execute",
+      "record"
+    ],
+    "rubric_id": "rubric-val-planning-02"
+  },
+  "rubric-val-planning-11": {
+    "case_id": "val-planning-11",
+    "domain": "planning",
+    "generic_template_terms": [
+      "analyze",
+      "execute",
+      "review"
+    ],
+    "maximum_score": 1,
+    "required_steps": [
+      "verify",
+      "execute",
+      "record"
+    ],
+    "rubric_id": "rubric-val-planning-11"
+  },
+  "rubric-val-reasoning-01": {
+    "case_id": "val-reasoning-01",
+    "domain": "reasoning",
+    "expected_final_answer": "no",
+    "forbidden_terms": [
+      "yes without qualification"
+    ],
+    "maximum_score": 1,
+    "required_terms": [
+      "no"
+    ],
+    "rubric_id": "rubric-val-reasoning-01"
+  },
+  "rubric-val-reasoning-10": {
+    "case_id": "val-reasoning-10",
+    "domain": "reasoning",
+    "expected_final_answer": "no",
+    "forbidden_terms": [
+      "yes without qualification"
+    ],
+    "maximum_score": 1,
+    "required_terms": [
+      "no"
+    ],
+    "rubric_id": "rubric-val-reasoning-10"
+  },
+  "rubric-val-safe_tool_selection-06": {
+    "case_id": "val-safe_tool_selection-06",
+    "domain": "safe_tool_selection",
+    "maximum_score": 1,
+    "required_output_terms": [
+      "48"
+    ],
+    "required_tool": "calculator",
+    "rubric_id": "rubric-val-safe_tool_selection-06"
+  },
+  "rubric-val-software_engineering-08": {
+    "case_id": "val-software_engineering-08",
+    "domain": "software_engineering",
+    "evaluator_test_evidence": {
+      "cleanup_passed": true,
+      "evidence_source": "evaluator-owned fixture tests",
+      "hidden_tests_passed": true,
+      "public_tests_passed": true,
+      "workspace_isolated": true
+    },
+    "hidden_tests_required": true,
+    "maximum_score": 1,
+    "public_tests_required": true,
+    "requires_substantive_patch": true,
+    "rubric_id": "rubric-val-software_engineering-08"
+  },
+  "rubric-val-structured_transformation-05": {
+    "case_id": "val-structured_transformation-05",
+    "domain": "structured_transformation",
+    "expected_output": {
+      "alpha": 1,
+      "delta": 4
+    },
+    "maximum_score": 1,
+    "rubric_id": "rubric-val-structured_transformation-05"
+  }
+}

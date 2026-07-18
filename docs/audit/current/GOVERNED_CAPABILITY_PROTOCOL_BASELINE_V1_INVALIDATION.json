@@ -1,0 +1,30 @@
+{
+  "finding": {
+    "finding_id": "GCR-003",
+    "severity": "S1",
+    "component": "governed capability protocol baseline",
+    "status": "recorded",
+    "root_cause": "Batch 08B protocol evidence accepted control-family labels and completed statuses without executing all named failure behaviors or enforcing every frozen file.",
+    "impact": "The Protocol Baseline V1 decision could overstate protocol-control evidence and must not be used as accepted baseline evidence."
+  },
+  "invalidated_campaign": "governed-capability-protocol-baseline-v1",
+  "corrected_decision": "INVALID_CAMPAIGN",
+  "withdrawn_decision": "PROTOCOL_BASELINE_ACCEPTED",
+  "preserved_real_provider_decision": {
+    "campaign": "governed-capability-genesis-v3",
+    "decision": "HOLD_FOR_MORE_EVIDENCE"
+  },
+  "reasons": [
+    "the freeze candidate was followed by modifications to a declared frozen file",
+    "the freeze verifier did not inspect every declared frozen path",
+    "multiple protocol failure cases were hardcoded to pass",
+    "the protocol artifact did not execute malformed-response, transport-failure or oversized-response behavior",
+    "timeout, retry, redaction and audit-reference cases did not prove their named controls",
+    "the real capability acceptance predicate omitted mandatory governance and evidence conditions",
+    "software scoring trusted provider-declared test results"
+  ],
+  "replacement_campaigns": {
+    "protocol": "governed-capability-protocol-baseline-v2",
+    "real_capability": "governed-capability-genesis-v4"
+  }
+}

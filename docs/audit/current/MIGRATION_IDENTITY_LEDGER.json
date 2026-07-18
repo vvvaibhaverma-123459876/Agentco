@@ -1,0 +1,2816 @@
+{
+  "conflicting_object_creations": {
+    "agent_memories": [
+      {
+        "filename": "015_agent_memories.sql",
+        "guarded": true,
+        "kind": "table",
+        "sequence": 15
+      },
+      {
+        "filename": "017_agent_memories_lifecycle.sql",
+        "guarded": true,
+        "kind": "table",
+        "sequence": 17
+      }
+    ],
+    "autonomy_outcomes": [
+      {
+        "filename": "023_autonomy_episodes.sql",
+        "guarded": true,
+        "kind": "table",
+        "sequence": 23
+      },
+      {
+        "filename": "025_goal_management_clean.sql",
+        "guarded": false,
+        "kind": "table",
+        "sequence": 25
+      }
+    ],
+    "idx_audit_events_type": [
+      {
+        "filename": "058_bounded_learning.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 58
+      },
+      {
+        "filename": "097_self_modification_validation_compatibility.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 97
+      }
+    ],
+    "idx_authority_decision_chains_requested_actor": [
+      {
+        "filename": "084_authority_chain.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 84
+      },
+      {
+        "filename": "085_authority_chain_decision_actor_compatibility.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 85
+      }
+    ],
+    "idx_autonomy_goals_depth": [
+      {
+        "filename": "061_add_goal_depth_column.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 61
+      },
+      {
+        "filename": "121_runtime_schema_drift_repairs.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 121
+      }
+    ],
+    "idx_autonomy_outcomes_task_id": [
+      {
+        "filename": "023_autonomy_episodes.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 23
+      },
+      {
+        "filename": "025_goal_management_clean.sql",
+        "guarded": false,
+        "kind": "index",
+        "sequence": 25
+      }
+    ],
+    "idx_departments_institution_id": [
+      {
+        "filename": "052b_institutions.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": null
+      },
+      {
+        "filename": "089_department_institution_compatibility.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 89
+      },
+      {
+        "filename": "090_department_parent_type_compatibility.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 90
+      }
+    ],
+    "idx_memories_agent_ns": [
+      {
+        "filename": "015_agent_memories.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 15
+      },
+      {
+        "filename": "017_agent_memories_lifecycle.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 17
+      }
+    ],
+    "idx_memories_domain": [
+      {
+        "filename": "015_agent_memories.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 15
+      },
+      {
+        "filename": "017_agent_memories_lifecycle.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 17
+      }
+    ],
+    "idx_memories_type": [
+      {
+        "filename": "015_agent_memories.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 15
+      },
+      {
+        "filename": "017_agent_memories_lifecycle.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 17
+      }
+    ],
+    "idx_metrics_name": [
+      {
+        "filename": "021_observability_traces.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 21
+      },
+      {
+        "filename": "056_production_deployment.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 56
+      }
+    ],
+    "idx_reward_functions_name_version": [
+      {
+        "filename": "066_reward_schema_compatibility.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 66
+      },
+      {
+        "filename": "122_reward_schema_drift_repairs.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 122
+      }
+    ],
+    "idx_role_permissions_permission": [
+      {
+        "filename": "040_governance_rbac.sql",
+        "guarded": false,
+        "kind": "index",
+        "sequence": 40
+      },
+      {
+        "filename": "084_authority_chain.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 84
+      }
+    ],
+    "idx_role_permissions_role": [
+      {
+        "filename": "040_governance_rbac.sql",
+        "guarded": false,
+        "kind": "index",
+        "sequence": 40
+      },
+      {
+        "filename": "084_authority_chain.sql",
+        "guarded": true,
+        "kind": "index",
+        "sequence": 84
+      }
+    ],
+    "risk_level": [
+      {
+        "filename": "025_goal_management_clean.sql",
+        "guarded": false,
+        "kind": "type",
+        "sequence": 25
+      },
+      {
+        "filename": "121_runtime_schema_drift_repairs.sql",
+        "guarded": false,
+        "kind": "type",
+        "sequence": 121
+      }
+    ]
+  },
+  "ledger_version": "migration-identity-ledger-v1",
+  "migration_count": 131,
+  "migration_directory": "backend/src/db/migrations",
+  "migrations": [
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "adb9a2ae0a5f54d54d8e91b251416dc1f7d942658cabcd4d6a5c630a9601ad2e",
+      "filename": "001_agent_state.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_agent_state_dept",
+        "idx_agent_state_lifecycle",
+        "agent_state"
+      ],
+      "sequence": 1,
+      "stable_migration_id": "001_agent_state.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "e80d491c31026c6fab1bdd1ffe762db070e4a7d3dcaf2d331c689043aa4b55de",
+      "filename": "002_agent_memory.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_agent_memory_agent",
+        "idx_agent_memory_expires",
+        "idx_agent_memory_ns_key",
+        "agent_memory"
+      ],
+      "sequence": 2,
+      "stable_migration_id": "002_agent_memory.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "24d87e400671decc04f54d53da03ed60a5e5687d8349eb9836fef58c8dec712b",
+      "filename": "003_shared_knowledge.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_shared_knowledge_confidence",
+        "idx_shared_knowledge_source",
+        "idx_shared_knowledge_tags",
+        "shared_knowledge"
+      ],
+      "sequence": 3,
+      "stable_migration_id": "003_shared_knowledge.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "beefb9e1ac6984c231b5ca567b15aa673144d2540c6b40e3a423dce1f9e4e35f",
+      "filename": "004_decision_log.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_decision_log_agent",
+        "idx_decision_log_human_approved",
+        "idx_decision_log_risk",
+        "idx_decision_log_session",
+        "idx_decision_log_timestamp",
+        "decision_log"
+      ],
+      "sequence": 4,
+      "stable_migration_id": "004_decision_log.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "72716013716452cff5e6c186953d394a7b9704c68a171327ca3390c301337ee1",
+      "filename": "005_event_history.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_event_history_correlation",
+        "idx_event_history_producer",
+        "idx_event_history_risk",
+        "idx_event_history_timestamp",
+        "idx_event_history_type",
+        "event_history"
+      ],
+      "sequence": 5,
+      "stable_migration_id": "005_event_history.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "f856751509485962f06b8123a07e478cf282775834c21fcbcc4b794477f57993",
+      "filename": "006_prompt_registry.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_prompt_registry_active",
+        "idx_prompt_registry_agent",
+        "idx_prompt_registry_created",
+        "prompt_registry"
+      ],
+      "sequence": 6,
+      "stable_migration_id": "006_prompt_registry.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "97f24b12db99a7b7abedfc43aaece4cac5bbb949868b20566beef479d9a55027",
+      "filename": "007_performance_metrics.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_perf_metrics_agent",
+        "idx_perf_metrics_error_rate",
+        "idx_perf_metrics_period",
+        "performance_metrics"
+      ],
+      "sequence": 7,
+      "stable_migration_id": "007_performance_metrics.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "c5518e5fc0c6a20f6063085e3c34c23da5e8a8e84dd28fa6d0dc3a8b4f660974",
+      "filename": "008_customer_data.sql",
+      "origin_commit": "2bf252788ad5deda21e10de28bcdf33bb9a8de8a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_customer_arr",
+        "idx_customer_contract_end",
+        "idx_customer_health",
+        "customer_data"
+      ],
+      "sequence": 8,
+      "stable_migration_id": "008_customer_data.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "1829e6342b49f9b791249ac9cf82cf28fe114c13556ba3259c08881240e4f491",
+      "filename": "009_trust_scores.sql",
+      "origin_commit": "0e14f1e71c049809a2ee06e1993a77a8ecb794c9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_trust_scores_subject",
+        "idx_trust_scores_window",
+        "trust_scores"
+      ],
+      "sequence": 9,
+      "stable_migration_id": "009_trust_scores.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "5f77a216250b69e5eec7a3876b6d8e9e05e5295718fa73725f839e85277cf6e8",
+      "filename": "010_beliefs.sql",
+      "origin_commit": "0e14f1e71c049809a2ee06e1993a77a8ecb794c9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_beliefs_agent",
+        "idx_beliefs_domain_status",
+        "beliefs"
+      ],
+      "sequence": 10,
+      "stable_migration_id": "010_beliefs.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6586155263954b31a12f7ec9588de295a4f874707878421a926a532ff01e9d18",
+      "filename": "011_prediction_ledger.sql",
+      "origin_commit": "12a0fa446aa439bfd8dc2b92a6a57967bd3da8b3",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_prediction_ledger_agent",
+        "idx_prediction_ledger_posthoc",
+        "idx_prediction_ledger_unresolved",
+        "prediction_ledger"
+      ],
+      "sequence": 11,
+      "stable_migration_id": "011_prediction_ledger.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "9707338b91149c8fc9a125083899b701b704ced18c6362535210175ddf21a703",
+      "filename": "012_decision_log_chain.sql",
+      "origin_commit": "75fcf09e39c8e2398f7ffa0bfababef710083da0",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_decision_log_chain"
+      ],
+      "sequence": 12,
+      "stable_migration_id": "012_decision_log_chain.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "78502180cdfb5748c2b5a585c85a996f1ffe8ec98e11b72a3efce674d2db0227",
+      "filename": "013_override_queue.sql",
+      "origin_commit": "75fcf09e39c8e2398f7ffa0bfababef710083da0",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_override_queue_agent",
+        "idx_override_queue_created",
+        "idx_override_queue_expires",
+        "idx_override_queue_status",
+        "override_queue"
+      ],
+      "sequence": 13,
+      "stable_migration_id": "013_override_queue.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "9cd7299b0f48195933fb07367fcd6abb050f14b055016c4429ada1491716cf83",
+      "filename": "014_decision_log_immutability_triggers.sql",
+      "origin_commit": "75fcf09e39c8e2398f7ffa0bfababef710083da0",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 14,
+      "stable_migration_id": "014_decision_log_immutability_triggers.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6316d41ce98faf1eb9c6198eb11002bd0050d0c164e6ee06a4678db35e3016b7",
+      "filename": "015_agent_memories.sql",
+      "origin_commit": "44f25ed8ca13182c0cf6a805461c1cb8a6501eac",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_memories_agent_ns",
+        "idx_memories_created",
+        "idx_memories_domain",
+        "idx_memories_prediction",
+        "idx_memories_summary_fts",
+        "idx_memories_type",
+        "agent_memories"
+      ],
+      "sequence": 15,
+      "stable_migration_id": "015_agent_memories.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "767b3647aece057f2821694a4b7e4693f62bb7d3448eb5945d2a54adaca0f50f",
+      "filename": "016_resolution_service_role.sql",
+      "origin_commit": "0548de116d56858eebe3e9326e3a6b1fb583709c",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 16,
+      "stable_migration_id": "016_resolution_service_role.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "9aaa72de10b028d1b84a7e031fe18c33a479ce3eda4a84fc52835d608c65631e",
+      "filename": "017_agent_memories_lifecycle.sql",
+      "origin_commit": "3783cc138bed0f7f32aa9efe5c265cc3dd382023",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_memories_agent_ns",
+        "idx_memories_created_at",
+        "idx_memories_domain",
+        "idx_memories_type",
+        "agent_memories"
+      ],
+      "sequence": 17,
+      "stable_migration_id": "017_agent_memories_lifecycle.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b657263ec370e4a3e7cc49091abd55f062d8f14fc85655d8da3bddf18776504b",
+      "filename": "018_refoundation_canonical_schema.sql",
+      "origin_commit": "b34f009ef8ce3bc3c9820f98f5b1aaed20b23afb",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "action_attestations",
+        "benchmark_eval_runs",
+        "calibration_cells",
+        "claims",
+        "constitutions",
+        "evidence_artifacts",
+        "memory_events",
+        "override_cases",
+        "policies",
+        "principals",
+        "resolutions",
+        "sources",
+        "workflow_intents"
+      ],
+      "sequence": 18,
+      "stable_migration_id": "018_refoundation_canonical_schema.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "90b62817f9f1720fcc890c7f81061a2c3e2d033f76b37a628c1847c64f4047f5",
+      "filename": "019_durable_execution.sql",
+      "origin_commit": "b34f009ef8ce3bc3c9820f98f5b1aaed20b23afb",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_workflow_tasks_agent",
+        "idx_workflow_tasks_status",
+        "workflow_tasks"
+      ],
+      "sequence": 19,
+      "stable_migration_id": "019_durable_execution.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "54942adc4645100e570b788deb75c2dcd27748f84d1c114a5cf8932aa4f55a7d",
+      "filename": "021_observability_traces.sql",
+      "origin_commit": "e7da371fcf4f416e22dd39c1797a6adae4f60a41",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_metric_snapshots_metric_name",
+        "idx_metric_snapshots_snapshot_time",
+        "idx_metrics_name",
+        "idx_metrics_recorded_at",
+        "idx_metrics_trace_id",
+        "idx_spans_created_at",
+        "idx_spans_span_type",
+        "idx_spans_status",
+        "idx_spans_trace_id",
+        "idx_structured_logs_created_at",
+        "idx_structured_logs_log_level",
+        "idx_structured_logs_task_id",
+        "idx_structured_logs_trace_id",
+        "idx_trace_audit_events_actor_id",
+        "idx_trace_audit_events_created_at",
+        "idx_trace_audit_events_event_type",
+        "idx_trace_audit_events_trace_id",
+        "idx_trace_contexts_agent_id",
+        "idx_trace_contexts_created_at",
+        "idx_trace_contexts_run_id",
+        "idx_trace_contexts_status",
+        "idx_trace_contexts_task_id",
+        "metric_snapshots",
+        "metrics",
+        "spans",
+        "structured_logs",
+        "trace_audit_events",
+        "trace_contexts"
+      ],
+      "sequence": 21,
+      "stable_migration_id": "021_observability_traces.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b2433c19d31b769f128dc55f162285000b356a5dfdfe8cd502a3a358eeaa987b",
+      "filename": "022_autonomy_tasks.sql",
+      "origin_commit": "e7da371fcf4f416e22dd39c1797a6adae4f60a41",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_autonomy_dead_letters_created_at",
+        "idx_autonomy_dead_letters_failure_type",
+        "idx_autonomy_dead_letters_task_id",
+        "idx_autonomy_task_events_created_at",
+        "idx_autonomy_task_events_event_type",
+        "idx_autonomy_task_events_task_id",
+        "idx_autonomy_tasks_agent_id",
+        "idx_autonomy_tasks_created_at",
+        "idx_autonomy_tasks_idempotency",
+        "idx_autonomy_tasks_parent_task_id",
+        "idx_autonomy_tasks_risk_level",
+        "idx_autonomy_tasks_status",
+        "idx_autonomy_tasks_trace_id",
+        "idx_autonomy_workflow_checkpoints_created_at",
+        "idx_autonomy_workflow_checkpoints_task_id",
+        "idx_worker_leases_expires_at",
+        "idx_worker_leases_status",
+        "idx_worker_leases_task_id",
+        "idx_worker_leases_worker_id",
+        "autonomy_dead_letters",
+        "autonomy_task_events",
+        "autonomy_tasks",
+        "autonomy_workflow_checkpoints",
+        "worker_leases"
+      ],
+      "sequence": 22,
+      "stable_migration_id": "022_autonomy_tasks.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "8669b598fd849f2b271a9b30fe7dc99a6737b4934ae6b01c4c1d8b71f798bdc8",
+      "filename": "023_autonomy_episodes.sql",
+      "origin_commit": "e7da371fcf4f416e22dd39c1797a6adae4f60a41",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_autonomy_actions_action_type",
+        "idx_autonomy_actions_created_at",
+        "idx_autonomy_actions_episode_id",
+        "idx_autonomy_episodes_agent_id",
+        "idx_autonomy_episodes_created_at",
+        "idx_autonomy_episodes_outcome_status",
+        "idx_autonomy_episodes_regret_score",
+        "idx_autonomy_episodes_run_id",
+        "idx_autonomy_episodes_task_id",
+        "idx_autonomy_interventions_created_at",
+        "idx_autonomy_interventions_episode_id",
+        "idx_autonomy_interventions_intervention_type",
+        "idx_autonomy_interventions_severity",
+        "idx_autonomy_outcomes_created_at",
+        "idx_autonomy_outcomes_episode_id",
+        "idx_autonomy_outcomes_outcome_type",
+        "idx_autonomy_outcomes_task_id",
+        "idx_memory_retrieval_events_created_at",
+        "idx_memory_retrieval_events_query_hash",
+        "idx_memory_retrieval_events_used_in_task",
+        "idx_replay_batches_batch_hash",
+        "idx_replay_batches_created_at",
+        "idx_trajectory_store_created_at",
+        "idx_trajectory_store_episode_id",
+        "idx_trajectory_store_task_id",
+        "autonomy_actions",
+        "autonomy_episodes",
+        "autonomy_interventions",
+        "autonomy_outcomes",
+        "memory_retrieval_events",
+        "replay_batches",
+        "trajectory_store"
+      ],
+      "sequence": 23,
+      "stable_migration_id": "023_autonomy_episodes.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "8160dcfb98c8673ce1b5330cbfef3fd1c57fd87a2a74c63390aa8a9a6caed972",
+      "filename": "024_perception_infrastructure.sql",
+      "origin_commit": "e7da371fcf4f416e22dd39c1797a6adae4f60a41",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_perception_adapter_runs_created_at",
+        "idx_perception_adapter_runs_source_id",
+        "idx_perception_adapter_runs_status",
+        "idx_perception_artifacts_artifact_hash",
+        "idx_perception_artifacts_artifact_type",
+        "idx_perception_artifacts_event_id",
+        "idx_perception_events_created_at",
+        "idx_perception_events_source_fingerprint",
+        "idx_perception_events_source_id",
+        "idx_perception_events_task_id",
+        "idx_perception_sources_active",
+        "idx_perception_sources_source_type",
+        "perception_adapter_runs",
+        "perception_artifacts",
+        "perception_events",
+        "perception_sources"
+      ],
+      "sequence": 24,
+      "stable_migration_id": "024_perception_infrastructure.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "5861fe205b1196cce0a3cfe1fe020bc0801d60c2ffc5818a8674d8c0e954786b",
+      "filename": "025_goal_management_clean.sql",
+      "origin_commit": "0d9ccc14f70df763a495d1d16b16ba0dec874445",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_autonomy_goals_domain",
+        "idx_autonomy_goals_owning_agent",
+        "idx_autonomy_goals_owning_institution",
+        "idx_autonomy_goals_parent",
+        "idx_autonomy_goals_risk_level",
+        "idx_autonomy_goals_simulation",
+        "idx_autonomy_goals_status",
+        "idx_autonomy_outcomes_goal_id",
+        "idx_autonomy_outcomes_plan_id",
+        "idx_autonomy_outcomes_task_id",
+        "idx_autonomy_plan_steps_plan_id",
+        "idx_autonomy_plan_steps_status",
+        "idx_autonomy_plans_goal_id",
+        "idx_autonomy_plans_risk_level",
+        "idx_autonomy_plans_status",
+        "idx_eval_cases_suite_id",
+        "idx_eval_failures_eval_run_id",
+        "idx_eval_results_eval_run_id",
+        "idx_eval_runs_status",
+        "idx_eval_runs_suite_id",
+        "idx_eval_scorecards_eval_run_id",
+        "idx_eval_scorecards_promotion_eligible",
+        "idx_eval_suites_domain",
+        "idx_eval_suites_name",
+        "idx_goal_budgets_goal_id",
+        "idx_goal_conflicts_conflicting_goal_id",
+        "idx_goal_conflicts_goal_id",
+        "idx_goal_evidence_goal_id",
+        "idx_goal_evidence_type",
+        "idx_goal_reviews_goal_id",
+        "idx_goal_reviews_reviewer_id",
+        "idx_goal_status_events_created_at",
+        "idx_goal_status_events_goal_id",
+        "idx_goal_status_events_new_status",
+        "idx_plan_status_events_plan_id",
+        "idx_reward_audit_function_id",
+        "idx_reward_calculations_function_id",
+        "idx_reward_calculations_outcome_id",
+        "idx_reward_functions_name",
+        "autonomy_goals",
+        "autonomy_outcomes",
+        "autonomy_plan_steps",
+        "autonomy_plans",
+        "eval_cases",
+        "eval_failures",
+        "eval_results",
+        "eval_runs",
+        "eval_scorecards",
+        "eval_suites",
+        "goal_budgets",
+        "goal_conflicts",
+        "goal_evidence",
+        "goal_reviews",
+        "goal_status_events",
+        "plan_reviews",
+        "plan_status_events",
+        "reward_audit",
+        "reward_calculations",
+        "reward_functions",
+        "autonomy_level",
+        "goal_status",
+        "plan_status",
+        "plan_step_status",
+        "risk_level"
+      ],
+      "sequence": 25,
+      "stable_migration_id": "025_goal_management_clean.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "ce3b049cafb65ef202d0d5f52535d70ce1e0c366cad900d951c3127a516288f5",
+      "filename": "026_civilization_learning_entities.sql",
+      "origin_commit": "0c98c13e315a47c7bc09b76a8762e2e9f1b7622d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civilization_entities_domain",
+        "idx_civilization_entities_parent",
+        "idx_civilization_entities_status",
+        "idx_civilization_entities_type",
+        "idx_civilization_governance_reviews_decision",
+        "idx_civilization_governance_reviews_target",
+        "idx_civilization_learning_events_entity",
+        "idx_civilization_learning_events_level",
+        "idx_civilization_learning_events_simulation",
+        "idx_civilization_learning_events_source",
+        "idx_civilization_memberships_child",
+        "idx_civilization_memberships_parent",
+        "idx_institutional_knowledge_institution",
+        "idx_institutional_knowledge_simulation",
+        "idx_institutional_knowledge_society",
+        "idx_institutional_knowledge_status",
+        "idx_institutional_knowledge_type",
+        "idx_society_disputes_society",
+        "idx_society_disputes_status",
+        "civilization_entities",
+        "civilization_governance_reviews",
+        "civilization_learning_events",
+        "civilization_memberships",
+        "institutional_knowledge_items",
+        "society_disputes",
+        "dispute_status",
+        "entity_type",
+        "knowledge_type",
+        "learning_level"
+      ],
+      "sequence": 26,
+      "stable_migration_id": "026_civilization_learning_entities.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "920ae3ffcf067042daed518c2336e3c5937ff2c5d84fd09531356c1e39c71f6e",
+      "filename": "027_calibration_constitution.sql",
+      "origin_commit": "9f64e618bf64209997c7adb69e76e27f2abb031b",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_active_constitution_version",
+        "idx_allowed_change_types_constitution",
+        "idx_calibration_constitution_created_at",
+        "idx_calibration_constitution_version",
+        "idx_constitution_verifications_constitution",
+        "idx_constitution_verifications_result",
+        "idx_prohibited_change_types_constitution",
+        "idx_protected_surfaces_constitution",
+        "idx_protected_surfaces_type",
+        "active_constitution",
+        "allowed_change_types",
+        "calibration_constitution_versions",
+        "constitution_verifications",
+        "prohibited_change_types",
+        "protected_surfaces"
+      ],
+      "sequence": 27,
+      "stable_migration_id": "027_calibration_constitution.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "2b4a6856b8ccf7a0f8516b56c5cb70b5602e134bd586ff1fc0031793583e0a5e",
+      "filename": "028_trust_policy_versions.sql",
+      "origin_commit": "b659bf51d2dcfded4ef8c8ab31027fa00fa7ed99",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_active_trust_policies_activated_at",
+        "idx_active_trust_policies_scope",
+        "idx_active_trust_policies_type",
+        "idx_policy_canary_policy",
+        "idx_policy_canary_status",
+        "idx_policy_change_events_policy",
+        "idx_policy_change_events_status",
+        "idx_policy_change_events_type",
+        "idx_policy_evaluations_passed",
+        "idx_policy_evaluations_policy",
+        "idx_policy_reviews_decision",
+        "idx_policy_reviews_policy",
+        "idx_trust_policy_activated_at",
+        "idx_trust_policy_constitution",
+        "idx_trust_policy_created_at",
+        "idx_trust_policy_parent",
+        "idx_trust_policy_scope",
+        "idx_trust_policy_status",
+        "idx_trust_policy_type",
+        "active_trust_policies",
+        "policy_canary_deployments",
+        "policy_change_events",
+        "policy_evaluations",
+        "policy_reviews",
+        "trust_policy_versions",
+        "policy_promotion_scope",
+        "policy_status",
+        "policy_type"
+      ],
+      "sequence": 28,
+      "stable_migration_id": "028_trust_policy_versions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "7acca1af24173da437d3cc8f3348e86da9474ce37f66d93e17b7cf2a84e28a62",
+      "filename": "029_calibration_change_requests.sql",
+      "origin_commit": "f4d92b1fb04774626e7d34c6667ef812581a36f9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_approvals_approver",
+        "idx_approvals_decision",
+        "idx_approvals_request",
+        "idx_change_events_request",
+        "idx_change_events_status",
+        "idx_change_events_type",
+        "idx_change_requests_created_at",
+        "idx_change_requests_requester",
+        "idx_change_requests_risk",
+        "idx_change_requests_status",
+        "idx_change_requests_type",
+        "idx_compliance_checks_constitution",
+        "idx_compliance_checks_request",
+        "idx_compliance_checks_result",
+        "idx_conversions_change",
+        "idx_conversions_policy",
+        "calibration_change_requests",
+        "change_approvals",
+        "change_request_events",
+        "change_to_policy_conversions",
+        "constitution_compliance_checks",
+        "change_request_status",
+        "change_risk_level"
+      ],
+      "sequence": 29,
+      "stable_migration_id": "029_calibration_change_requests.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "2f915085d0d5482851613a33a72c13b80c84ccc7dc38f15445b174791c4fff93",
+      "filename": "030_trust_impact_assessment.sql",
+      "origin_commit": "e004309d2f5da204d9582bd9ad9f502c415a61ed",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_baseline_metrics_name",
+        "idx_baseline_metrics_policy",
+        "idx_baseline_metrics_timestamp",
+        "idx_impact_assessments_baseline",
+        "idx_impact_assessments_change",
+        "idx_impact_assessments_policy",
+        "idx_impact_assessments_recommendation",
+        "baseline_metrics",
+        "trust_impact_assessments"
+      ],
+      "sequence": 30,
+      "stable_migration_id": "030_trust_impact_assessment.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b74c425cb1f0f0d268df20084d63d4e1c5ae89013bb7ab313961ea3f8dfd789b",
+      "filename": "031_trust_reputation_ledger.sql",
+      "origin_commit": "012a1b7137bc422e0e3df40024e4a598091bd028",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_reputation_context",
+        "idx_reputation_correction",
+        "idx_reputation_created_at",
+        "idx_reputation_entity",
+        "idx_reputation_event_type",
+        "idx_snapshots_context",
+        "idx_snapshots_entity",
+        "idx_snapshots_timestamp",
+        "idx_weights_event_type",
+        "reputation_impact_weights",
+        "reputation_snapshots",
+        "trust_reputation_ledger",
+        "reputation_context",
+        "reputation_event_type"
+      ],
+      "sequence": 31,
+      "stable_migration_id": "031_trust_reputation_ledger.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d459e11e034344925a065cd6f72ee8c38056ea2fea6e8a0f7dfb7d3174964366",
+      "filename": "032_calibration_drift_monitor.sql",
+      "origin_commit": "3f025477001354e00d57e39021a0088dffa22737",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_drift_events_created_at",
+        "idx_drift_events_resolved",
+        "idx_drift_events_severity",
+        "idx_drift_events_type",
+        "idx_resolutions_drift",
+        "idx_thresholds_type",
+        "calibration_drift_events",
+        "drift_resolutions",
+        "drift_thresholds",
+        "drift_severity",
+        "drift_type"
+      ],
+      "sequence": 32,
+      "stable_migration_id": "032_calibration_drift_monitor.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b2d6d305552d92e9a44bb7a7a916cf688909aec23abfd301bcf1e9b4b899034b",
+      "filename": "033_artifacts.sql",
+      "origin_commit": "75b06063b65d28621a7416ee5ddf3e37f7fa444a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_artifacts_artifact_hash",
+        "idx_artifacts_artifact_type",
+        "idx_artifacts_created_at",
+        "idx_artifacts_status",
+        "artifacts"
+      ],
+      "sequence": 33,
+      "stable_migration_id": "033_artifacts.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "7f83e4060f30a5bc378d72640fb53772c0255620024c402ac77857a0035374e1",
+      "filename": "034_learner_infrastructure.sql",
+      "origin_commit": "590a906a73241e2aeeb345ba9791d724fbce280a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_learner_candidates_artifact_id",
+        "idx_learner_candidates_learner_run_id",
+        "idx_learner_candidates_status",
+        "idx_learner_runs_created_at",
+        "idx_learner_runs_replay_batch_id",
+        "idx_learner_runs_status",
+        "learner_candidates",
+        "learner_runs"
+      ],
+      "sequence": 34,
+      "stable_migration_id": "034_learner_infrastructure.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "0ec1ba357ecab1182ae85bb7a8403f1ee690e13a3f4d827f3c933c10ec4eb82e",
+      "filename": "040_governance_rbac.sql",
+      "origin_commit": "86b39c53a0240b6275df92cf0f79701b9c649880",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_entity_roles_active",
+        "idx_entity_roles_entity",
+        "idx_entity_roles_role",
+        "idx_governance_permissions_action",
+        "idx_governance_permissions_resource",
+        "idx_governance_roles_level",
+        "idx_governance_roles_name",
+        "idx_rbac_audit_action",
+        "idx_rbac_audit_actor",
+        "idx_rbac_audit_created",
+        "idx_rbac_audit_granted",
+        "idx_role_permissions_permission",
+        "idx_role_permissions_role",
+        "governance_entity_roles",
+        "governance_permissions",
+        "governance_rbac_audit",
+        "governance_role_permissions",
+        "governance_roles"
+      ],
+      "sequence": 40,
+      "stable_migration_id": "040_governance_rbac.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "7037848105c4f63a9fe814e03628472595cbee3270b272b1d57d2b5dfc98e3d1",
+      "filename": "050_autonomy_action_loop.sql",
+      "origin_commit": "7fbf7e7b0fb3976827c09e05d8a49ea04ed686db",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_claims_action_id",
+        "idx_claims_derived_from",
+        "idx_claims_generated_at",
+        "idx_claims_status",
+        "idx_claims_support_sources",
+        "idx_evidence_action_id",
+        "idx_evidence_source_id",
+        "idx_goal_actions_goal",
+        "idx_goal_actions_status",
+        "idx_goal_actions_type",
+        "idx_loop_detection_goal_id",
+        "idx_searches_action_id",
+        "autonomy_claims",
+        "autonomy_evidence",
+        "autonomy_goal_actions",
+        "autonomy_loop_detection",
+        "autonomy_memory",
+        "autonomy_searches"
+      ],
+      "sequence": 50,
+      "stable_migration_id": "050_autonomy_action_loop.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b2434750b9b217a3fb0b94de00ef4e8bfeeec42cc193f6ba6b2fdfd5a59f4778",
+      "filename": "051_fix_fk_constraints.sql",
+      "origin_commit": "13cb51974055500cb748adf3768cd4afa833f55a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 51,
+      "stable_migration_id": "051_fix_fk_constraints.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d6f91160e2ada005ae836b9fb78f824aa0fbd10b01246d7a6cc53657c15798eb",
+      "filename": "051_team_activations.sql",
+      "origin_commit": "b20798a003fc1d14688d740943e973964fc7249d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_team_activations_parent",
+        "idx_team_activations_role",
+        "idx_team_activations_specialist",
+        "idx_team_activations_status",
+        "autonomy_team_activations"
+      ],
+      "sequence": 51,
+      "stable_migration_id": "051_team_activations.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "13598984be6bbcb71a9dc47dd8af7884d2a61bee8c14e24f23d6058423562bf8",
+      "filename": "052_specialist_http_endpoint.sql",
+      "origin_commit": "b20798a003fc1d14688d740943e973964fc7249d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_team_activations_http_endpoint",
+        "idx_team_activations_process_pid"
+      ],
+      "sequence": 52,
+      "stable_migration_id": "052_specialist_http_endpoint.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "c3559d8da5f3a6623783aee8af848425ef9e33ca3e7968b52f81cbf2682abdf5",
+      "filename": "052b_institutions.sql",
+      "origin_commit": "aaf0ea1641e416fa9f5c42b91fa35b6128eddc4f",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_departments_institution_id",
+        "idx_departments_name",
+        "idx_departments_status",
+        "idx_entity_reputation_audit_entity_id",
+        "idx_entity_reputation_audit_recorded_at",
+        "idx_entity_reputation_entity_id",
+        "idx_entity_reputation_entity_type",
+        "idx_entity_reputation_score",
+        "idx_institution_consistency_audit_checked_at",
+        "idx_institution_consistency_audit_institution_id",
+        "idx_institutions_entity_type",
+        "idx_institutions_name",
+        "idx_institutions_parent_id",
+        "idx_institutions_status",
+        "idx_specialists_current_reputation",
+        "idx_specialists_institution_id",
+        "idx_specialists_role",
+        "idx_specialists_status",
+        "departments",
+        "entity_reputation_audit_log",
+        "entity_reputation_baseline",
+        "institution_consistency_audit",
+        "institutions",
+        "specialists"
+      ],
+      "sequence": null,
+      "stable_migration_id": "052b_institutions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "77f76a3651d3cba3f4a39d6f5aaf653612584e974271352ea88a3351bcf3985f",
+      "filename": "053_work_assignment_schema.sql",
+      "origin_commit": "212ebabad0e65d89ad736fc0425c5698701373d6",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_assignments_department",
+        "idx_assignments_institution",
+        "idx_assignments_role",
+        "idx_cycle_timestamp",
+        "idx_cycle_work_request",
+        "idx_perf_overall_score",
+        "idx_perf_specialist",
+        "idx_perf_work_request",
+        "idx_work_requests_department",
+        "idx_work_requests_goal",
+        "idx_work_requests_institution",
+        "idx_work_requests_status",
+        "institution_specialist_assignments",
+        "institution_work_requests",
+        "specialist_performance_history",
+        "work_cycle_events"
+      ],
+      "sequence": 53,
+      "stable_migration_id": "053_work_assignment_schema.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6180db0b189dfd9df27998b2136987285a670293211af5fcd55bdb509f503e70",
+      "filename": "054_goal_hierarchies.sql",
+      "origin_commit": "939281c1beb49279695d9e0848865198146466be",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_access_evidence",
+        "idx_access_requesting_inst",
+        "idx_access_source_inst",
+        "idx_access_status",
+        "idx_alloc_department",
+        "idx_alloc_specialist",
+        "idx_alloc_work_request",
+        "idx_dedup_active",
+        "idx_dedup_canonical",
+        "idx_dedup_source",
+        "idx_goals_depth",
+        "idx_goals_parent",
+        "idx_goals_path",
+        "idx_rollup_completeness",
+        "idx_rollup_parent",
+        "idx_team_pattern_performance",
+        "cross_institutional_evidence_access",
+        "evidence_deduplication_map",
+        "goal_rollup_results",
+        "specialist_allocation_history",
+        "specialist_team_patterns"
+      ],
+      "sequence": 54,
+      "stable_migration_id": "054_goal_hierarchies.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "78ce7f8e007feb122642761112d07e5941009d0d63cfd633db6972ae902b6a07",
+      "filename": "055_deadlock_prevention.sql",
+      "origin_commit": "0684432a1e4ca86367b1882f0461d2b5647f4891",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_consistency_goal",
+        "idx_consistency_institution",
+        "idx_consistency_type",
+        "idx_deadlock_institution",
+        "idx_deadlock_status",
+        "idx_dep_source",
+        "idx_dep_target",
+        "idx_exec_locks_goal",
+        "idx_exec_locks_institution",
+        "idx_exec_locks_status",
+        "idx_violation_institution",
+        "idx_violation_severity",
+        "idx_violation_type",
+        "consistency_checks",
+        "deadlock_incidents",
+        "goal_dependency_graph",
+        "goal_execution_locks",
+        "governance_constraint_violations"
+      ],
+      "sequence": 55,
+      "stable_migration_id": "055_deadlock_prevention.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "f285732142ce51f2ce0f117ad43c6c67368049bf6ccba96495bf5b9d61d8634b",
+      "filename": "056_production_deployment.sql",
+      "origin_commit": "8655b69c3238b34b90dd823548d2792f4640acaf",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_backup_id",
+        "idx_backup_timestamp",
+        "idx_cutover_blocking",
+        "idx_cutover_status",
+        "idx_deployment_event_type",
+        "idx_deployment_id",
+        "idx_deployment_status",
+        "idx_failure_institution",
+        "idx_failure_severity",
+        "idx_failure_type",
+        "idx_load_scenario",
+        "idx_load_status",
+        "idx_load_test_scenario",
+        "idx_load_test_status",
+        "idx_load_test_timestamp",
+        "idx_metrics_institution",
+        "idx_metrics_name",
+        "idx_metrics_timestamp",
+        "idx_metrics_type",
+        "idx_snapshot_timestamp",
+        "idx_snapshot_type",
+        "backup_recovery_log",
+        "cutover_checklist",
+        "deployment_events",
+        "disaster_recovery_snapshots",
+        "failure_recovery_incidents",
+        "load_test_results",
+        "production_metrics"
+      ],
+      "sequence": 56,
+      "stable_migration_id": "056_production_deployment.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "4c37110e0c8e3c8cbe41f8dabb09bb68d997ff20f22b2136aa1331dc57b8c349",
+      "filename": "057_reputation_learning.sql",
+      "origin_commit": "57d245a9874c83e113c700516deef6d751d37083",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_audit_entity",
+        "idx_audit_event_type",
+        "idx_audit_timestamp",
+        "idx_hierarchy_child",
+        "idx_hierarchy_parent",
+        "idx_hierarchy_type",
+        "idx_reputation_entity_type",
+        "idx_reputation_last_updated",
+        "idx_reputation_score",
+        "idx_specialization_domain",
+        "idx_specialization_entity",
+        "idx_specialization_proficiency",
+        "entity_hierarchy",
+        "reputation_audit_log",
+        "reputation_scores",
+        "specialization_records"
+      ],
+      "sequence": 57,
+      "stable_migration_id": "057_reputation_learning.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "1b579944431c511578e55e16af21e772b10bdb79e41ad2e6c81ccbe07ead226a",
+      "filename": "058_adaptive_strategy.sql",
+      "origin_commit": "57d245a9874c83e113c700516deef6d751d37083",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_alloc_agent",
+        "idx_alloc_strategy",
+        "idx_alloc_timestamp",
+        "idx_assignment_agent",
+        "idx_assignment_priority",
+        "idx_assignment_status",
+        "idx_assignment_strategy",
+        "idx_pivot_created",
+        "idx_pivot_strategy",
+        "idx_query_goal",
+        "idx_query_source_type",
+        "idx_query_strategy",
+        "idx_query_success",
+        "idx_strategy_goal",
+        "idx_strategy_status",
+        "idx_strategy_updated",
+        "adaptive_strategies",
+        "resource_allocation_history",
+        "search_query_history",
+        "strategy_pivots",
+        "task_assignments"
+      ],
+      "sequence": 58,
+      "stable_migration_id": "058_adaptive_strategy.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "681b6746ec43e13eec140bca20c502e85931320d5c5f9862f30f571dfc234065",
+      "filename": "058_bounded_learning.sql",
+      "origin_commit": "fbe3918be729e6bafeb8e6ad9451ef02bd89a96f",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_audit_events_run_id",
+        "idx_audit_events_timestamp",
+        "idx_audit_events_type",
+        "idx_discovery_runs_run_id",
+        "idx_discovery_runs_source_pack",
+        "idx_discovery_runs_status",
+        "idx_routed_claims_claim_id",
+        "idx_routed_claims_society",
+        "idx_routed_claims_status",
+        "autonomy_audit_events",
+        "autonomy_routed_claims",
+        "autonomy_source_discovery_runs"
+      ],
+      "sequence": 58,
+      "stable_migration_id": "058_bounded_learning.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "1577b274efd9e3568fa8e48542be62ee7bb9797f7907bb06d2abfed2723c5178",
+      "filename": "059_calibration_framework.sql",
+      "origin_commit": "4715852450fb7dad6ddf912bfeccb51dbc455281",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_calib_events_timestamp",
+        "idx_calib_events_type",
+        "idx_calibration_period",
+        "idx_calibration_provider",
+        "idx_calibration_source_pack",
+        "idx_gates_enabled",
+        "idx_gates_passes",
+        "idx_reports_period",
+        "idx_reports_ready",
+        "idx_trustworthiness_domain",
+        "idx_trustworthiness_tier",
+        "idx_validations_claim_id",
+        "idx_validations_outcome",
+        "idx_validations_timestamp",
+        "autonomy_calibration_events",
+        "autonomy_calibration_reports",
+        "autonomy_claim_validations",
+        "autonomy_provider_calibration",
+        "autonomy_self_mod_gates",
+        "autonomy_source_trustworthiness"
+      ],
+      "sequence": 59,
+      "stable_migration_id": "059_calibration_framework.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "c3cb9e4c9cb4a3a4f1607a4a8705c532266d1689dc72d8dbdbdead15061ffa98",
+      "filename": "059_governance_reputation_integration.sql",
+      "origin_commit": "6cccb037df72c84487ea7aaa46bea0b144b201e9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_governance_audit_proposal",
+        "idx_governance_audit_timestamp",
+        "idx_governance_audit_voter",
+        "idx_governance_decisions_made",
+        "idx_governance_decisions_proposal",
+        "idx_governance_decisions_proposer",
+        "idx_governance_decisions_type",
+        "idx_governance_votes_created",
+        "idx_governance_votes_proposal",
+        "idx_governance_votes_voter",
+        "governance_reputation_audit",
+        "governance_reputation_decisions",
+        "governance_reputation_votes"
+      ],
+      "sequence": 59,
+      "stable_migration_id": "059_governance_reputation_integration.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "bbca13e398e8b57d07afea28ba8cc1ce0fc576ef44c78e87141ac30548018d39",
+      "filename": "060_coalition_formation.sql",
+      "origin_commit": "6cccb037df72c84487ea7aaa46bea0b144b201e9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_coalition_created",
+        "idx_coalition_lead",
+        "idx_coalition_score",
+        "idx_coalition_status",
+        "idx_coalition_task",
+        "idx_collab_coalition",
+        "idx_collab_timestamp",
+        "idx_collab_type",
+        "idx_member_agent",
+        "idx_member_assigned",
+        "idx_member_coalition",
+        "idx_member_role",
+        "idx_perf_coalition",
+        "idx_perf_evaluated",
+        "idx_perf_metric",
+        "idx_recommend_created",
+        "coalition_collaboration_events",
+        "coalition_composition_recommendations",
+        "coalition_formations",
+        "coalition_member_assignments",
+        "coalition_performance"
+      ],
+      "sequence": 60,
+      "stable_migration_id": "060_coalition_formation.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a6a96b56e9f9ecd619cb7a3a6e550c38a6bb79555907ea26f960be8c8da90dc4",
+      "filename": "061_add_goal_depth_column.sql",
+      "origin_commit": "36899f75c9b0957c2392deecf4f0f9ebe6605b74",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "for",
+        "idx_autonomy_goals_depth"
+      ],
+      "sequence": 61,
+      "stable_migration_id": "061_add_goal_depth_column.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "61f5c261845df5061b9405f2f0bea5109128a98ba6e118ffbb66fe9613958d73",
+      "filename": "062_runtime_schema_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "IF"
+      ],
+      "sequence": 62,
+      "stable_migration_id": "062_runtime_schema_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "82def716b358e9b0936c40d773e858ffe4aa9985d9d75b2eb57662b36b9de571",
+      "filename": "063_runtime_schema_compatibility_followup.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 63,
+      "stable_migration_id": "063_runtime_schema_compatibility_followup.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d5fe1582e3b724dfc0b7b997449be9645ae6d643a9eada3b832b14976662ff38",
+      "filename": "064_department_reputation_score.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 64,
+      "stable_migration_id": "064_department_reputation_score.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "de2fd3ce9fd9957c0cc13778dc57c489511b19790de3c4a175d453cc3817ee7f",
+      "filename": "065_reputation_audit_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 65,
+      "stable_migration_id": "065_reputation_audit_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "1c5d32adb2253df1ab3513d7f3b60da8d8ab459938e2b697ab635a54226ee60e",
+      "filename": "066_reward_schema_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_reward_functions_name_version"
+      ],
+      "sequence": 66,
+      "stable_migration_id": "066_reward_schema_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "fece078d223daba7390f4ea7c1e6fd248dba013fd8df4fde43ef9842b237877f",
+      "filename": "067_reward_legacy_defaults.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 67,
+      "stable_migration_id": "067_reward_legacy_defaults.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "e8c1da9954e7f7dc2629206cfd4957c8d59c79ac4c98f31f21050e891d5cf24f",
+      "filename": "068_learner_schema_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_replay_training_metrics_learner_run_id",
+        "replay_training_metrics"
+      ],
+      "sequence": 68,
+      "stable_migration_id": "068_learner_schema_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "1ec084550f48b9fce9129d0b47f48c87f59302749e77fb4953e246a48003974f",
+      "filename": "069_trajectory_success_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 69,
+      "stable_migration_id": "069_trajectory_success_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "66ad7e7806cb77dca38c5a34d1f7eb375dceafa1af1fd20638ec693b8f39a5d9",
+      "filename": "070_eval_schema_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 70,
+      "stable_migration_id": "070_eval_schema_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "912b148498cca246f9a36c1462a0b8ebe68f5d6fa25bc31f7476a1a55486f766",
+      "filename": "071_eval_run_timestamp_default.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 71,
+      "stable_migration_id": "071_eval_run_timestamp_default.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "cfdefe3ff9cc020694bd5d7fe3ddf9960038e4e1df8cd873857f780cbf76b7a3",
+      "filename": "072_specialist_schema_compatibility.sql",
+      "origin_commit": "aa5e6c334cda1a960ab1cd863fd3d50bb28128cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 72,
+      "stable_migration_id": "072_specialist_schema_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "e6a00ebc3cc5955d3ac6d3c455e8eb1d02a209bd8c6e100ac61b9c97c983123e",
+      "filename": "073_evidence_content_text.sql",
+      "origin_commit": "ec06e0b4a073838d6888a5515e77c9b68709cc9c",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 73,
+      "stable_migration_id": "073_evidence_content_text.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "2929f6ee444d1e4ca1c92414c0052437151781d7b9f5186b33b86ca15a661687",
+      "filename": "074_governance_coalition_formations.sql",
+      "origin_commit": "86193656494a135434be43c62d29ba2402ec671a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_governance_coalition_created",
+        "idx_governance_coalition_initiator",
+        "idx_governance_coalition_status",
+        "governance_coalition_formations"
+      ],
+      "sequence": 74,
+      "stable_migration_id": "074_governance_coalition_formations.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "895bbacb2dfacc5ed1c57b963881adc8a77f9add3ed9f4625657921deb02441c",
+      "filename": "075_agent_tasks_canonical_view.sql",
+      "origin_commit": "c3cbfabe008679962cd7286b452f1dd4835cd3cd",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 75,
+      "stable_migration_id": "075_agent_tasks_canonical_view.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "0097222b92784f4d5cd1759670a5266c8e1d0b8b4910252f1e4c9e86d57b70cb",
+      "filename": "076_build_ledger.sql",
+      "origin_commit": "389da5c5e9b801694fc6b10b194705aad729ab97",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_build_ledger_layer",
+        "idx_build_ledger_status",
+        "build_ledger"
+      ],
+      "sequence": 76,
+      "stable_migration_id": "076_build_ledger.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "63aabd8d186abde5453b08da98312fb985a7ddb375d155e04abd33dd96f055b4",
+      "filename": "077_civilization_vertical_slice.sql",
+      "origin_commit": "e938a634d755c99e0e23251e3dfb1582a775e2f2",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_coordinator_ticks_run",
+        "idx_civ_generality_metric",
+        "idx_civ_generality_run",
+        "idx_civ_vector_index_dimension_value",
+        "idx_civ_vector_index_run_dimension",
+        "idx_civ_vertical_slice_started",
+        "idx_civ_vertical_slice_status",
+        "civilization_coordinator_ticks",
+        "civilization_generality_metrics",
+        "civilization_vector_documents",
+        "civilization_vector_index",
+        "civilization_vertical_slice_runs"
+      ],
+      "sequence": 77,
+      "stable_migration_id": "077_civilization_vertical_slice.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b946de2cb16d9c753a412d9ee28113a54fa2d9dd1db3081e722f85185d5234a2",
+      "filename": "078_agent_membership_id_compatibility.sql",
+      "origin_commit": "e938a634d755c99e0e23251e3dfb1582a775e2f2",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_agent_membership_edges_id",
+        "agent_membership_edges"
+      ],
+      "sequence": 78,
+      "stable_migration_id": "078_agent_membership_id_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "530c85bcd252544ca7cbe695e3a2a85e6a41445eb3da84160587973b934f4d6c",
+      "filename": "079_identity_authority.sql",
+      "origin_commit": "c79f12674fa2f7253d584122b664705b5141c38a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_actor_permissions_active_unique",
+        "idx_actor_permissions_actor",
+        "idx_actor_permissions_permission",
+        "idx_actors_active_name_type",
+        "idx_actors_status",
+        "idx_actors_type",
+        "idx_agent_identities_status",
+        "idx_role_assignments_active_unique",
+        "idx_role_assignments_actor",
+        "idx_role_assignments_role",
+        "idx_service_identities_status",
+        "actor_permissions",
+        "actors",
+        "agent_identities",
+        "permissions",
+        "role_assignments",
+        "roles",
+        "service_identities"
+      ],
+      "sequence": 79,
+      "stable_migration_id": "079_identity_authority.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6eb2460a4e6d4d9f715ec239f44e1e3f2412af265a20d1c866a757df28d75a97",
+      "filename": "080_event_log.sql",
+      "origin_commit": "69469e6dad5b7cb5a7c2ad69000f6178e7b3935c",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_event_log_actor",
+        "idx_event_log_correlation",
+        "idx_event_log_object",
+        "idx_event_log_occurred",
+        "idx_event_log_type",
+        "event_log"
+      ],
+      "sequence": 80,
+      "stable_migration_id": "080_event_log.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "0a887a1f1e8073377f46616ba4561b4e98b64b4725d7bc47ea0c083ee46ac397",
+      "filename": "081_resource_ledger.sql",
+      "origin_commit": "58683b35b4d1af9018c106a50793f6911f6b86b7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_resource_accounts_owner",
+        "idx_civ_resource_accounts_status",
+        "idx_civ_resource_accounts_type",
+        "idx_civ_resource_transactions_account",
+        "idx_civ_resource_transactions_actor",
+        "idx_civ_resource_transactions_event",
+        "civilization_resource_accounts",
+        "civilization_resource_transactions"
+      ],
+      "sequence": 81,
+      "stable_migration_id": "081_resource_ledger.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b66205bf799b06ac7b33bc89356c7d8f74d9f210eb4a58d6d50baf82d433a891",
+      "filename": "082_resource_reservations.sql",
+      "origin_commit": "bd1f4a5707dd8c13359910868f4a17918c4f654d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_resource_reservations_account",
+        "idx_civ_resource_reservations_actor",
+        "idx_civ_resource_reservations_expires",
+        "civilization_resource_reservations"
+      ],
+      "sequence": 82,
+      "stable_migration_id": "082_resource_reservations.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d65797783a11c8ca432eca1d04e69949ad561ec132b84bd12428afaaa5d7c57b",
+      "filename": "083_transactional_outbox.sql",
+      "origin_commit": "a9c45607e9a0d9c78ff2d973d770462ee313e1de",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_event_dead_letters_event",
+        "idx_event_outbox_event",
+        "idx_event_outbox_pending",
+        "event_dead_letters",
+        "event_outbox"
+      ],
+      "sequence": 83,
+      "stable_migration_id": "083_transactional_outbox.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "ffdca49e4c378721e2f85061af77a81827262fc435568633f845af5ef4b4fca4",
+      "filename": "084_authority_chain.sql",
+      "origin_commit": "b86ff333f75594ef12df8553021f091265d7878a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_authority_decision_chains_actor",
+        "idx_authority_decision_chains_permission",
+        "idx_authority_decision_chains_requested_actor",
+        "idx_authority_delegations_delegate",
+        "idx_authority_delegations_principal",
+        "idx_role_permissions_permission",
+        "idx_role_permissions_role",
+        "authority_decision_chains",
+        "authority_delegation_grants",
+        "role_permissions"
+      ],
+      "sequence": 84,
+      "stable_migration_id": "084_authority_chain.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "7f35560a7029ee564b78aa9d6f1b5b73bea057cad9501c5987b8682b5b0bf761",
+      "filename": "085_authority_chain_decision_actor_compatibility.sql",
+      "origin_commit": "b86ff333f75594ef12df8553021f091265d7878a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_authority_decision_chains_requested_actor"
+      ],
+      "sequence": 85,
+      "stable_migration_id": "085_authority_chain_decision_actor_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "ab6755e6c0307a77a6d4c808699a9fe3f77e27c8a77abe3996d8da54ef73ee74",
+      "filename": "086_key_ring.sql",
+      "origin_commit": "fcfb1ce8e5319528d2deefe038c5d8de0a30841d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_actor_key_ring_actor",
+        "idx_actor_key_ring_fingerprint",
+        "idx_actor_key_ring_one_active",
+        "actor_key_ring"
+      ],
+      "sequence": 86,
+      "stable_migration_id": "086_key_ring.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "3ed2922677df92e5fbd2b5709b0cea025d9aca12677bd32ea810b5f19391526f",
+      "filename": "087_hash_chain_anchors.sql",
+      "origin_commit": "009cde52e02b34f1ed7d6778ecc497c3b81168da",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_hash_chain_anchors_created",
+        "hash_chain_anchors"
+      ],
+      "sequence": 87,
+      "stable_migration_id": "087_hash_chain_anchors.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "65ba045eb50e3ae326383b00c0fcf3f959b560ab4de6d924b23a3f7cbee47ddb",
+      "filename": "088_evidence_registry_events.sql",
+      "origin_commit": "1e1b0a0a88d39e4fe817b70ea6f5222bf17c34b4",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_evidence_event_log_id",
+        "idx_evidence_registered_by"
+      ],
+      "sequence": 88,
+      "stable_migration_id": "088_evidence_registry_events.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "bbc313706ebae3ecee4edc53e9b013c538eea5a7337930075bb74af7cb1fadcc",
+      "filename": "089_department_institution_compatibility.sql",
+      "origin_commit": "95757385b0e4f8d6b6bb6c2a91841b65c4f318fa",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_departments_institution_id"
+      ],
+      "sequence": 89,
+      "stable_migration_id": "089_department_institution_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "0c7fb0ebe92c2a2c5d350c54b5cadeb351e4e3c56584ad671a965fd9bf9d8dca",
+      "filename": "090_department_parent_type_compatibility.sql",
+      "origin_commit": "95757385b0e4f8d6b6bb6c2a91841b65c4f318fa",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_departments_institution_id"
+      ],
+      "sequence": 90,
+      "stable_migration_id": "090_department_parent_type_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "31ec16499cfffa61684521e6f01ca34c7f5048c1988b7c83db452b7fa9254c7c",
+      "filename": "091_department_institution_trigger_restore.sql",
+      "origin_commit": "95757385b0e4f8d6b6bb6c2a91841b65c4f318fa",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 91,
+      "stable_migration_id": "091_department_institution_trigger_restore.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6bcd01f688423fe5133206153770130833b2d110cfcd3171679c937fcbaf1e0f",
+      "filename": "092_agent_task_events_canonical_view.sql",
+      "origin_commit": "95757385b0e4f8d6b6bb6c2a91841b65c4f318fa",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 92,
+      "stable_migration_id": "092_agent_task_events_canonical_view.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "acc198d6df386b0b3cb96bf165033b89a8ecdc4c29bdf4360f522b011a928040",
+      "filename": "093_resolution_service_role_grant_repair.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 93,
+      "stable_migration_id": "093_resolution_service_role_grant_repair.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "4448081dbbf9121f0552ae4287310c82a0350cffe711791b64511d396dd1b7b7",
+      "filename": "094_prediction_ledger_hardness_compatibility.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 94,
+      "stable_migration_id": "094_prediction_ledger_hardness_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "1a4d9424685ac49477e463e328949c025b1db72807b472fe70ff4d6bbec0402d",
+      "filename": "095_prediction_ledger_reserve_fields_compatibility.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 95,
+      "stable_migration_id": "095_prediction_ledger_reserve_fields_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "ef0b89559c5bd213477668d97b75b520f0abea881436c4cba68db6e02cd0c34c",
+      "filename": "096_idempotency_store.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_idempotency_records_actor",
+        "idx_idempotency_records_scope_status",
+        "idempotency_records"
+      ],
+      "sequence": 96,
+      "stable_migration_id": "096_idempotency_store.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "854d8ceef2e8c925e20af3520dd65540a08ab886cfbd0d97a7d44ed3076d5ea5",
+      "filename": "097_self_modification_validation_compatibility.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_audit_events_entity",
+        "idx_audit_events_type",
+        "idx_self_mod_validations_candidate",
+        "idx_self_mod_validations_status",
+        "audit_events",
+        "self_modification_validations"
+      ],
+      "sequence": 97,
+      "stable_migration_id": "097_self_modification_validation_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "ea6349806e7171d904c520fd0b553e6b9dbe70cdca48e9bd222b37cea9c53efb",
+      "filename": "098_governance_kill_switch.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_governance_kill_switch_active_scope",
+        "idx_governance_kill_switch_scope",
+        "governance_kill_switches"
+      ],
+      "sequence": 98,
+      "stable_migration_id": "098_governance_kill_switch.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "f9166a0b73154cffcfc7eb3262eb44f7eac09975f31d7a4ab705addab7c118c6",
+      "filename": "099_trajectory_simulation_compatibility.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_trajectory_store_is_simulation"
+      ],
+      "sequence": 99,
+      "stable_migration_id": "099_trajectory_simulation_compatibility.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "40c7ea68835f77f92cf924aa6e582112fd871801f38abbd47424b2ef31c7e114",
+      "filename": "100_saga_coordinator.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_saga_executions_actor",
+        "idx_saga_executions_status_created",
+        "idx_saga_steps_saga_order",
+        "idx_saga_steps_status",
+        "saga_executions",
+        "saga_steps"
+      ],
+      "sequence": 100,
+      "stable_migration_id": "100_saga_coordinator.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "9aa6a1c0c10d9d512169a0e7501dfb05b8d433da5bcb75e80c9f93f6eeccc15d",
+      "filename": "101_evidence_vector_index.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_evidence_vector_documents_dimensions",
+        "idx_evidence_vector_documents_event",
+        "idx_evidence_vector_documents_source",
+        "idx_evidence_vector_index_dimension",
+        "evidence_vector_documents",
+        "evidence_vector_index"
+      ],
+      "sequence": 101,
+      "stable_migration_id": "101_evidence_vector_index.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "66f484ea8a1d6d15a731abf9eef348899f5d5c634c8aecf54e64f7010d54aa19",
+      "filename": "102_domain_registry.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_domain_registry_institution",
+        "idx_domain_registry_status",
+        "idx_domain_registry_trust",
+        "domain_registry"
+      ],
+      "sequence": 102,
+      "stable_migration_id": "102_domain_registry.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "73672768002bb4c846f21482ce5cfe3eef1f68f9d579b8cda0669f727486d2e4",
+      "filename": "103_generality_metric_tracker.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_generality_domain_scores_domain",
+        "idx_generality_domain_scores_run",
+        "idx_generality_metric_runs_benchmark",
+        "generality_domain_scores",
+        "generality_metric_runs"
+      ],
+      "sequence": 103,
+      "stable_migration_id": "103_generality_metric_tracker.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "4d925b5f27653ef2a8444033ef111c8f31a1ab76bc78a06ccc4535150b72e7dc",
+      "filename": "104_candidate_regression_tests.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_candidate_regression_tests_candidate",
+        "idx_candidate_regression_tests_run",
+        "idx_candidate_regression_tests_type",
+        "candidate_regression_tests"
+      ],
+      "sequence": 104,
+      "stable_migration_id": "104_candidate_regression_tests.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "abdc3e5ee4854ec9bbfe85fa62a348100773b2c86239972bf060c2848c635f8c",
+      "filename": "105_skill_library.sql",
+      "origin_commit": "bea00fbf7040fccea80120f3a866d78a6f7f88a9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_skill_library_entries_status",
+        "idx_skill_library_versions_artifact_hash",
+        "idx_skill_library_versions_candidate",
+        "idx_skill_library_versions_skill",
+        "skill_library_entries",
+        "skill_library_versions"
+      ],
+      "sequence": 105,
+      "stable_migration_id": "105_skill_library.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a79c087df95a7fcfa4783d6226a125ed569b8bda079cf29032dc31ae2e407d94",
+      "filename": "106_proof_of_competence.sql",
+      "origin_commit": "bea00fbf7040fccea80120f3a866d78a6f7f88a9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_proof_of_competence_passed",
+        "idx_proof_of_competence_skill",
+        "idx_proof_of_competence_version",
+        "proof_of_competence"
+      ],
+      "sequence": 106,
+      "stable_migration_id": "106_proof_of_competence.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6060624afd87cc7b24ea88ab118ca175e27bb0077349c210e57f15a28329b604",
+      "filename": "107_capability_expansion_gate.sql",
+      "origin_commit": "bea00fbf7040fccea80120f3a866d78a6f7f88a9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_capability_expansion_decision",
+        "idx_capability_expansion_domain",
+        "idx_capability_expansion_skill",
+        "capability_expansion_decisions"
+      ],
+      "sequence": 107,
+      "stable_migration_id": "107_capability_expansion_gate.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d1289dd53078df9220ce2417211c328e708b2402ad0731d66c6a116ba1208e31",
+      "filename": "108_skill_promotion_loop.sql",
+      "origin_commit": "bea00fbf7040fccea80120f3a866d78a6f7f88a9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_skill_promotion_loop_skill",
+        "idx_skill_promotion_loop_status",
+        "skill_promotion_loop_runs"
+      ],
+      "sequence": 108,
+      "stable_migration_id": "108_skill_promotion_loop.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "f500fd22257239aa76bff9669b7dcbc8bf771d7c65097c99e38409aa12b315e4",
+      "filename": "109_judiciary.sql",
+      "origin_commit": "bea00fbf7040fccea80120f3a866d78a6f7f88a9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_disputes_counter_claim",
+        "idx_disputes_status",
+        "idx_disputes_subject_claim",
+        "idx_precedents_type_outcome",
+        "idx_rulings_dispute",
+        "idx_rulings_outcome",
+        "disputes",
+        "precedents",
+        "rulings"
+      ],
+      "sequence": 109,
+      "stable_migration_id": "109_judiciary.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "43d209f112b9aba69a982eb9543d77740dbe63735e4eae8331ee62a76a90f196",
+      "filename": "110_skill_usage_events.sql",
+      "origin_commit": "6e5eab446e6cf44c5117c40e948a5ac7f4e20ada",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_skill_usage_events_goal",
+        "idx_skill_usage_events_skill",
+        "idx_skill_usage_events_usage",
+        "skill_usage_events"
+      ],
+      "sequence": 110,
+      "stable_migration_id": "110_skill_usage_events.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "c32b4215104010ae1aa4499c23dbecab582c11c03cc62c423b78e2b558dd2259",
+      "filename": "111_self_improvement_loop.sql",
+      "origin_commit": "c21803276ea32b23566c8a173db4999d60e08332",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_candidate_evaluations_candidate",
+        "idx_candidate_evaluations_passed",
+        "idx_longitudinal_cycles_label",
+        "idx_skill_canary_runs_candidate",
+        "candidate_evaluations",
+        "longitudinal_learning_cycles",
+        "skill_canary_runs"
+      ],
+      "sequence": 111,
+      "stable_migration_id": "111_self_improvement_loop.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "55250346749f9da50596e171f56664af253f590c6967ac13f55b8d3b481208eb",
+      "filename": "112_fix_goal_completion_metric_uuid.sql",
+      "origin_commit": "e5c7d7ab2cbbf698f1ae077e5a39371d9a4b143b",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 112,
+      "stable_migration_id": "112_fix_goal_completion_metric_uuid.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "2a992788e5aadbe92711fc62c5d213c326a3c876e83f7f56a158986c586572de",
+      "filename": "113_institutional_knowledge_promotions.sql",
+      "origin_commit": "071959f38f3632043225b2091453d4feb31ae882",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_institutional_knowledge_promotions_domain",
+        "idx_institutional_knowledge_promotions_promoted",
+        "institutional_knowledge_promotions"
+      ],
+      "sequence": 113,
+      "stable_migration_id": "113_institutional_knowledge_promotions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a207f86e8336512f7eda320cd6a5583e85bd3aa0e4680c3f065f797c7c72e536",
+      "filename": "114_self_memory_retrievable.sql",
+      "origin_commit": "23645bab44d2cbbd2277f285e04c9a7dc95d75a3",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 114,
+      "stable_migration_id": "114_self_memory_retrievable.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a143723cd8fb93afde17d928b5b4efcba94947a170b312142812db6f18c29b0b",
+      "filename": "115_autonomous_promotions.sql",
+      "origin_commit": "a787770d9e80eec2cf9d975ed8beb53dc9151179",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_autonomous_promotions_promoted",
+        "idx_autonomous_promotions_run",
+        "autonomous_promotions"
+      ],
+      "sequence": 115,
+      "stable_migration_id": "115_autonomous_promotions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "f18a7927e71078cf98a9dae58e7c62cd18dc13c833da2ca127ee99150d84ac3f",
+      "filename": "116_persistent_agents.sql",
+      "origin_commit": "f60c22e688b89e700e2e54f6de8c955f2fe446fe",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_persistent_agents_role",
+        "persistent_agents"
+      ],
+      "sequence": 116,
+      "stable_migration_id": "116_persistent_agents.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "859b58652216218ab09c5ba6e224c5ddcada9629663407515f968d38b23900d6",
+      "filename": "117_artifact_lineage_identity.sql",
+      "origin_commit": "cfb9870c5555c4ec076366dc6401ceddc6d755d5",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "artifacts_hash_lineage_key"
+      ],
+      "sequence": 117,
+      "stable_migration_id": "117_artifact_lineage_identity.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "e0000c7d568c9509c11fab66044a4e57fbacbd8e2f7e8776eba0cc9f684ceced",
+      "filename": "118_contradictions_and_demotions.sql",
+      "origin_commit": "32429da8b6a665cbf06da98422648bb010ad1173",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_contradictions_claim",
+        "idx_contradictions_prediction",
+        "idx_memory_demotions_memory",
+        "contradictions",
+        "memory_demotions"
+      ],
+      "sequence": 118,
+      "stable_migration_id": "118_contradictions_and_demotions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "fc7a7d0278223e1ef3c6ccf9983e6535299ff4e1bbcef6ee201ab94e3cddfa1d",
+      "filename": "119_source_relevance.sql",
+      "origin_commit": "4b3d4a2d4525175599a5de5f4360a38d6c179514",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_source_candidates_goal",
+        "autonomy_source_candidates"
+      ],
+      "sequence": 119,
+      "stable_migration_id": "119_source_relevance.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "e9cb5c22c2cb57a9a9cb62411cdab7dd8291856c58eb0823794f2807802bf5bc",
+      "filename": "120_prediction_ledger_registration_invariants.sql",
+      "origin_commit": "69394a993b416ec2c4ae9e8f9ed1205dd9a5bcd7",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 120,
+      "stable_migration_id": "120_prediction_ledger_registration_invariants.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "e85e55a45e942a7f620f1203483a1e615a783de02c38526c4e5357ae694d7546",
+      "filename": "121_runtime_schema_drift_repairs.sql",
+      "origin_commit": "c26d4f6ec6f70bdcf92dc0ee844ad8b91447d6ec",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_autonomy_goals_depth",
+        "risk_level"
+      ],
+      "sequence": 121,
+      "stable_migration_id": "121_runtime_schema_drift_repairs.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b1e17f7bccdf36221df67d9f3534635444a8987964f65e331e47a1a2ddc9ade4",
+      "filename": "122_reward_schema_drift_repairs.sql",
+      "origin_commit": "c26d4f6ec6f70bdcf92dc0ee844ad8b91447d6ec",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_reward_functions_name_version"
+      ],
+      "sequence": 122,
+      "stable_migration_id": "122_reward_schema_drift_repairs.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "6203538e7707fda1803e2dc86f2ea08ac0dc71af740b08b30743de84fc1310a0",
+      "filename": "123_reward_calculation_schema_drift_repairs.sql",
+      "origin_commit": "c26d4f6ec6f70bdcf92dc0ee844ad8b91447d6ec",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_reward_calculations_reward_function_id"
+      ],
+      "sequence": 123,
+      "stable_migration_id": "123_reward_calculation_schema_drift_repairs.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "0e73db82d917a6f44b2ac34b314fa4904c9866e14401b6787ddc52765d0409a4",
+      "filename": "124_eval_schema_drift_repairs.sql",
+      "origin_commit": "c26d4f6ec6f70bdcf92dc0ee844ad8b91447d6ec",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 124,
+      "stable_migration_id": "124_eval_schema_drift_repairs.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "efd7af2253e02bad6acac9c4d531000fe8853d9a730b36c70d278b3d529ae1a5",
+      "filename": "125_decision_log_protocol_version.sql",
+      "origin_commit": "bdfab886b6ef91b5f9a9bac96e2ac27305379d01",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_decision_log_serialization_version",
+        "decision_log_protocol_cutoff"
+      ],
+      "sequence": 125,
+      "stable_migration_id": "125_decision_log_protocol_version.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d3421b1b5324f9ed84271b4c1329875f032540a26e89a8534de19bc554e1cd44",
+      "filename": "126_decision_log_attempt_id.sql",
+      "origin_commit": "9636eb382b21cb03217c3fbb6ab2a03291ef97c2",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_decision_log_attempt_id",
+        "idx_decision_log_attempt_id_unique"
+      ],
+      "sequence": 126,
+      "stable_migration_id": "126_decision_log_attempt_id.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "2d8b26dee8ed6f9fb9276f1d14bfabb5df14f3d8e0c7352125741392ae640f47",
+      "filename": "127_runtime_governance_artifacts.sql",
+      "origin_commit": "84c382f4ba8e1c6dc49a6b94c440beffae51d09d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_runtime_eval_attempt",
+        "idx_runtime_eval_subject",
+        "idx_runtime_experiment_outcome",
+        "idx_runtime_learning_active_surface",
+        "idx_runtime_learning_state",
+        "runtime_evaluation_records",
+        "runtime_improvement_experiments",
+        "runtime_learning_artifacts"
+      ],
+      "sequence": 127,
+      "stable_migration_id": "127_runtime_governance_artifacts.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d2ef6ca40bbc8a336ee2834310ce02b6a9007bad8d2d98be63509b818319a905",
+      "filename": "128_event_bus_outbox.sql",
+      "origin_commit": "8216f493b319501863c4b9c2761d350e59a830e1",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_event_bus_outbox_pending",
+        "event_bus_dead_letters",
+        "event_bus_outbox"
+      ],
+      "sequence": 128,
+      "stable_migration_id": "128_event_bus_outbox.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "8f64e6d2b1c40fbde772bfd76b878a755836dc8dc36f24d83cb08b25ffd998bb",
+      "filename": "129_civilization_kernel.sql",
+      "origin_commit": "b693aaf36b955d1a6bce16b283dbeb575c17c054",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_emergency_due",
+        "idx_civ_objectives_status",
+        "idx_civ_transitions_civ",
+        "uq_civ_emergency_active_scope",
+        "uq_civilization_charter_single_active",
+        "uq_civilizations_single_active",
+        "civilization_charters",
+        "civilization_emergency_states",
+        "civilization_jurisdictions",
+        "civilization_objectives",
+        "civilization_protected_invariants",
+        "civilization_state_transitions",
+        "civilization_versions",
+        "civilizations"
+      ],
+      "sequence": 129,
+      "stable_migration_id": "129_civilization_kernel.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "382c99634e6f87feb5ea09bd31aa90a8dfad2e4de70c512fa5574f7921cfaf9b",
+      "filename": "129_longitudinal_mission_evidence.sql",
+      "origin_commit": "b0bad61da2808695e49b5d8fdfad277ef9abd34d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_longitudinal_chain_campaign",
+        "idx_longitudinal_failures_run",
+        "idx_longitudinal_metrics_run",
+        "idx_longitudinal_runs_campaign",
+        "longitudinal_approvals",
+        "longitudinal_campaigns",
+        "longitudinal_comparisons",
+        "longitudinal_evidence_chain",
+        "longitudinal_promotions",
+        "longitudinal_run_failures",
+        "longitudinal_run_metrics",
+        "longitudinal_runs"
+      ],
+      "sequence": 129,
+      "stable_migration_id": "129_longitudinal_mission_evidence.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "b95ce86ac9f9f744c9eba17cad7cbd4e47062b67084fb510b3caa8224aa0ffdc",
+      "filename": "130_citizenship.sql",
+      "origin_commit": "ec168d271e9eb215d8bcfad5aa4b8260b3e47c60",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_citizen_sanctions_citizen",
+        "idx_citizens_status",
+        "idx_citizenship_records_citizen",
+        "uq_citizen_envelope_active",
+        "uq_citizen_role_eligibility_active",
+        "citizen_autonomy_envelopes",
+        "citizen_role_eligibility",
+        "citizen_sanctions",
+        "citizen_successions",
+        "citizens",
+        "citizenship_records"
+      ],
+      "sequence": 130,
+      "stable_migration_id": "130_citizenship.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "52a2f3a1049147fe5cbe004823843538b97dbf4ec9919d3dc4b3479f52fdc36d",
+      "filename": "131_societies_and_institution_charters.sql",
+      "origin_commit": "37b9e8c6f3bf06fd1c1ec6b5b92a801dfa8a514a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_inter_institution_contracts_status",
+        "idx_societies_status",
+        "uq_institution_charter_single_active",
+        "uq_institution_limit_active",
+        "uq_institution_mandate_active",
+        "uq_institution_power_active",
+        "uq_institution_society_active",
+        "uq_society_charter_single_active",
+        "uq_society_membership_active",
+        "institution_charters",
+        "institution_jurisdiction_grants",
+        "institution_limits",
+        "institution_mandates",
+        "institution_powers",
+        "institution_society_memberships",
+        "inter_institution_contracts",
+        "societies",
+        "society_charters",
+        "society_jurisdictions",
+        "society_memberships",
+        "society_state_transitions"
+      ],
+      "sequence": 131,
+      "stable_migration_id": "131_societies_and_institution_charters.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "300e56299083c1f8a21b37c2b8e2f768c815cda0e26e06f451340e43a35c47af",
+      "filename": "132_institution_coalitions.sql",
+      "origin_commit": "37b9e8c6f3bf06fd1c1ec6b5b92a801dfa8a514a",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_coalition_commitments_coalition",
+        "idx_coalition_messages_coalition",
+        "idx_coalition_proposals_round",
+        "uq_coalition_delegation_active",
+        "coalition_commitments",
+        "coalition_consensus_results",
+        "coalition_delegations",
+        "coalition_dissents",
+        "coalition_escalations",
+        "coalition_members",
+        "coalition_messages",
+        "coalition_negotiation_rounds",
+        "coalition_proposals",
+        "coalition_settlements",
+        "coalition_state_transitions",
+        "coalition_threads",
+        "institution_coalitions"
+      ],
+      "sequence": 132,
+      "stable_migration_id": "132_institution_coalitions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "ef7f08dbbf206c652dc841cb6393f9c1ddb53c4ffea222736f892be70c6b1073",
+      "filename": "133_missions.sql",
+      "origin_commit": "4c7a2e47cad6cc781d7d9e5689dd8caa5a8c0b4c",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_mission_tasks_mission",
+        "idx_missions_status",
+        "idx_strategic_goals_status",
+        "idx_workstreams_mission",
+        "mission_action_attempts",
+        "mission_attestations",
+        "mission_dependencies",
+        "mission_evidence_bundle",
+        "mission_outcomes",
+        "mission_settlements",
+        "mission_state_transitions",
+        "mission_tasks",
+        "missions",
+        "strategic_goals",
+        "workstreams"
+      ],
+      "sequence": 133,
+      "stable_migration_id": "133_missions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "5b07422d439a98ba29b577a39bd5da46b13e88066f918f5e155e6e33c021fb93",
+      "filename": "134_civilization_economy.sql",
+      "origin_commit": "bc86859d09b188b45923dbe78a30b0f0697295b9",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_budget_proposals_status",
+        "idx_cost_attribution_institution",
+        "idx_cost_attribution_mission",
+        "idx_penalties_target",
+        "idx_treasury_accounts_scope",
+        "uq_resource_policy_active",
+        "budget_allocations",
+        "budget_proposals",
+        "cost_attribution_records",
+        "penalties",
+        "reconciliation_runs",
+        "resource_policies",
+        "treasury_accounts"
+      ],
+      "sequence": 134,
+      "stable_migration_id": "134_civilization_economy.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "c84b7b96f91b1d204082a30e6efb8827c8661eb06f2b4b8812a88c8525745cb6",
+      "filename": "135_governance.sql",
+      "origin_commit": "aea45a95027e6dca83a2aec18723e57d06de50ec",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_governance_proposals_status",
+        "idx_runtime_policies_active",
+        "uq_gov_emergency_active",
+        "uq_runtime_policy_key_active",
+        "deliberations",
+        "governance_decisions",
+        "governance_emergency_powers",
+        "governance_proposals",
+        "governance_votes",
+        "impact_assessments",
+        "policy_activations",
+        "proposal_sponsors",
+        "runtime_policies"
+      ],
+      "sequence": 135,
+      "stable_migration_id": "135_governance.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "d8209f81dcb95f5ab38a3e90fd2a5ab1c1464b59fea5ecfab0d3516f82c1a004",
+      "filename": "136_judiciary.sql",
+      "origin_commit": "a2cc3f652f1f7271a800f2b493e811497a09ca2e",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_judiciary_cases_status",
+        "idx_judiciary_precedents_type",
+        "idx_judiciary_rulings_case",
+        "uq_judiciary_appellate_ruling",
+        "uq_judiciary_trial_ruling",
+        "judiciary_appeals",
+        "judiciary_case_transitions",
+        "judiciary_cases",
+        "judiciary_dissents",
+        "judiciary_enforcement_orders",
+        "judiciary_evidence_submissions",
+        "judiciary_hearings",
+        "judiciary_precedents",
+        "judiciary_rulings"
+      ],
+      "sequence": 136,
+      "stable_migration_id": "136_judiciary.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "2e8f5b628748b851d17154c14c6b2448be019de3daeff3a1d80531f133efe70d",
+      "filename": "137_collective_epistemics.sql",
+      "origin_commit": "6a0806dd45a0e6b76a1c9c137cde58fa01b50890",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_knowledge_edges_from",
+        "idx_knowledge_edges_to",
+        "idx_knowledge_retractions_subject",
+        "idx_retraction_propagations_retraction",
+        "decision_retraction_flags",
+        "knowledge_provenance_edges",
+        "knowledge_retractions",
+        "retraction_propagations"
+      ],
+      "sequence": 137,
+      "stable_migration_id": "137_collective_epistemics.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "669cbeb3b1f2e5e4d0c067d592fdd9e8065c05c046f1d660c3dc4a087f77741f",
+      "filename": "138_safe_evolution.sql",
+      "origin_commit": "4cea7ad642d0c1a1e1f2ba3e973d6f16440a1f57",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_canary_candidate",
+        "idx_civ_learning_candidates_status",
+        "civ_canary_runs",
+        "civ_candidate_transitions",
+        "civ_evaluations",
+        "civ_failure_analyses",
+        "civ_improvement_lineage",
+        "civ_learning_candidates",
+        "civ_regression_cases"
+      ],
+      "sequence": 138,
+      "stable_migration_id": "138_safe_evolution.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "269da9571bc96d27dd12ac77fbf5d9cb4bb64c68354d0ccb3755a8281ed49354",
+      "filename": "139_capability_expansion.sql",
+      "origin_commit": "75406a50882ad84bd7a5a18ee84b6309d908a034",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_capability_grants_lookup",
+        "idx_expansion_proposals_status",
+        "uq_capability_grant_live",
+        "capabilities",
+        "capability_grants",
+        "expansion_proposal_transitions",
+        "expansion_proposals",
+        "expansion_stage_records"
+      ],
+      "sequence": 139,
+      "stable_migration_id": "139_capability_expansion.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a7d9cfbbdbc4c439e05dec1bd8438031303651d1d8597856f72c50e3a2b79b02",
+      "filename": "140_civilization_os.sql",
+      "origin_commit": "1a3dc570cd76d0b1e6c83408ecaf9cbd3ebcc73e",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_civ_os_ticks_number",
+        "civ_os_state",
+        "civ_os_ticks"
+      ],
+      "sequence": 140,
+      "stable_migration_id": "140_civilization_os.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "a0232191fa205f66aaf1d446c75b157afd58ee5dcea5ece3416aa1d0b1363240",
+      "filename": "140_governed_capability_runtime.sql",
+      "origin_commit": "8c0e4e9874cfb7652989724123a6110ea5313369",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [
+        "idx_capability_attempts_request_id",
+        "capability_attempts",
+        "capability_authorization_events",
+        "capability_budget_ledger",
+        "capability_memory_events",
+        "capability_provider_calls",
+        "capability_recovery_events",
+        "capability_result_artifacts",
+        "capability_tool_calls"
+      ],
+      "sequence": 140,
+      "stable_migration_id": "140_governed_capability_runtime.sql",
+      "upgrade_prerequisites": []
+    }
+  ],
+  "reused_sequence_contracts": {
+    "129": {
+      "contract": "Batch 07 reconciliation contract: Version B preserved raw duplicate sequence; Version C treats full filename as stable ID, applies lexicographic order, and requires content-hash tracking",
+      "filenames": [
+        "129_civilization_kernel.sql",
+        "129_longitudinal_mission_evidence.sql"
+      ]
+    },
+    "140": {
+      "contract": "Batch 08A reconciliation contract: Batch 07 civilization OS and Batch 08 governed capability runtime are independent domains; full filename plus content hash is the stable identity and lexicographic ordering applies both guarded migrations",
+      "filenames": [
+        "140_civilization_os.sql",
+        "140_governed_capability_runtime.sql"
+      ]
+    },
+    "51": {
+      "contract": "legacy_parallel_sequence_before Batch 02 controls; lexicographic order is stable and both are already part of the audited baseline",
+      "filenames": [
+        "051_fix_fk_constraints.sql",
+        "051_team_activations.sql"
+      ]
+    },
+    "58": {
+      "contract": "legacy_parallel_sequence_before Batch 02 controls; independent tables and stable lexicographic order",
+      "filenames": [
+        "058_adaptive_strategy.sql",
+        "058_bounded_learning.sql"
+      ]
+    },
+    "59": {
+      "contract": "legacy_parallel_sequence_before Batch 02 controls; independent tables and stable lexicographic order",
+      "filenames": [
+        "059_calibration_framework.sql",
+        "059_governance_reputation_integration.sql"
+      ]
+    }
+  }
+}

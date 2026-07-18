@@ -1,0 +1,88 @@
+{
+  "ledger_id": "governed-capability-runtime-findings",
+  "updated_for_batch": "09B",
+  "audited_pr": 29,
+  "audited_sha": "98eb1b9c04604e84770c7bdd286f9bbbfdbec663",
+  "findings": [
+    {
+      "finding_id": "GCR-001",
+      "severity": "S1",
+      "component": "genesis-v1",
+      "status": "resolved_invalidated",
+      "summary": "Genesis V1 acceptance was withdrawn and corrected to INVALID_CAMPAIGN.",
+      "evidence": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V1_INVALIDATION.json",
+      "remaining_risk": "Historical artifact must remain excluded from future capability baselines."
+    },
+    {
+      "finding_id": "GCR-002",
+      "severity": "S1",
+      "component": "genesis-v2",
+      "status": "resolved_reclassified",
+      "summary": "Genesis V2 was reclassified as protocol execution and protocol/capability separation evidence only.",
+      "evidence": "docs/audit/current/GOVERNED_CAPABILITY_GENESIS_V2_LIMITATIONS.json",
+      "remaining_risk": "Historical artifact must not be used as frozen-campaign or capability baseline evidence."
+    },
+    {
+      "finding_id": "GCR-003",
+      "severity": "S1",
+      "component": "protocol-baseline-v1",
+      "status": "resolved_invalidated",
+      "summary": "Protocol Baseline V1 acceptance was withdrawn and corrected to INVALID_CAMPAIGN.",
+      "evidence": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V1_INVALIDATION.json",
+      "remaining_risk": "Historical artifact must remain excluded from current protocol readiness."
+    },
+    {
+      "finding_id": "GCR-004",
+      "severity": "S1",
+      "component": "protocol-baseline-v2",
+      "status": "resolved_by_protocol_baseline_v3",
+      "summary": "Protocol Baseline V2 acceptance was withdrawn because freeze binding, artifact verification, schema validation, persistence, redaction, budget settlement and preflight evidence were incomplete.",
+      "evidence": "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V2_INVALIDATION.json",
+      "remaining_risk": "Search results still expose historical V2 targets, but current workflow acceptance selects V3 artifacts only."
+    },
+    {
+      "finding_id": "GCR-005",
+      "severity": "S3",
+      "component": "provider-trust-boundary",
+      "status": "resolved_batch_08f",
+      "summary": "Provider host allowlisting is hostname-string based and does not resolve DNS to block rebinding or private-range targets for non-local provider endpoints.",
+      "evidence": "agentco_capability/providers.py _validate_provider_url, _resolve_provider_addresses, _reject_forbidden_ip and tests/test_capability_provider_adapters.py provider-boundary negative tests",
+      "impact": "A future live-provider configuration could overtrust a hostname if DNS resolution changes after allowlist validation.",
+      "remediation": "Resolve provider hostnames at execution time, reject private/link-local/loopback addresses except explicit local-development providers, and record resolved address evidence.",
+      "remaining_risk": "Live-provider execution still requires explicit credentials and preflight; remediation blocks known hostname-only/private-range/rebinding boundary gaps before live execution."
+    },
+    {
+      "finding_id": "GCR-006",
+      "severity": "S3",
+      "component": "provider-trust-boundary",
+      "status": "resolved_batch_08f",
+      "summary": "Provider HTTP transport uses urllib default redirect behavior without an explicit post-redirect host allowlist check.",
+      "evidence": "agentco_capability/providers.py _NoRedirectHandler and tests/test_capability_provider_adapters.py redirect-blocking test",
+      "impact": "A configured provider endpoint could redirect to a different host unless urllib behavior is constrained or revalidated.",
+      "remediation": "Install a redirect handler that blocks redirects by default or revalidates scheme, host allowlist and resolved address on every redirect.",
+      "remaining_risk": "Redirects are blocked by default. If future redirect support is introduced, every hop must re-run scheme, host allowlist and resolved-address validation."
+    },
+    {
+      "finding_id": "GCR-007",
+      "severity": "S3",
+      "component": "real-provider-baseline-readiness",
+      "status": "resolved_batch_09a_readiness_contract",
+      "summary": "Real-provider Genesis execution previously lacked a complete pre-execution readiness contract for configuration, authorization, case manifest, thresholds, semantic hashes and operator runbooks.",
+      "evidence": "docs/capability/BATCH_09A_READINESS_REPORT.json and scripts/verify_real_provider_readiness.py",
+      "impact": "A future real-provider campaign could be attempted with incomplete authorization, ambiguous provider identity, stale cases, or insufficient evidence binding.",
+      "remediation": "Batch 09A adds fail-closed provider configuration validation, campaign authorization schema, frozen case manifest, evaluator protocol, threshold specification, semantic hash contract, dry-run/preflight modes and readiness gates.",
+      "remaining_risk": "Real provider capability remains unverified until a separately authorized Batch 09B supplies credentials, passes preflight, executes the live campaign and produces scored evidence."
+    },
+    {
+      "finding_id": "GCR-008",
+      "severity": "S3",
+      "component": "real-provider-genesis-baseline",
+      "status": "open_hold_for_more_evidence",
+      "summary": "Batch 09B could not attempt the first real-provider baseline because no executable campaign authorization artifact exists and the active process environment lacks provider model, endpoint, credential reference and host allowlist configuration.",
+      "evidence": "docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json",
+      "impact": "No real-provider capability baseline, supported domains, aggregate correctness, capability improvement, hosted staging readiness or production readiness can be claimed.",
+      "remediation": "Provide a machine-verifiable authorization artifact bound to the exact source commit, source tree, provider, model, endpoint, case manifest and budgets; expose provider configuration through the approved environment or secret manager; then run a separately authorized real-provider campaign.",
+      "remaining_risk": "Until authorization and preflight pass, real-provider capability evidence remains unavailable."
+    }
+  ]
+}

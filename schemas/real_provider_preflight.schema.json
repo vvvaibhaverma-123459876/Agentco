@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentco.local/schemas/real_provider_preflight.schema.json",
+  "title": "AgentCo Real Provider Preflight Result",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "provider_name",
+    "provider_preflight",
+    "configuration_present",
+    "endpoint_valid",
+    "TLS_policy_valid",
+    "host_allowlisted",
+    "model_configured",
+    "credentials_present",
+    "network_check_permitted",
+    "provider_reachable",
+    "model_access_verified",
+    "execution_attempted",
+    "failure_codes",
+    "configuration_hash"
+  ],
+  "properties": {
+    "provider_name": {"type": ["string", "null"]},
+    "provider_preflight": {
+      "type": "string",
+      "enum": ["invalid_configuration", "unavailable", "unavailable_external_verification", "ready_for_authorized_identity_check", "available"]
+    },
+    "configuration_present": {"type": "boolean"},
+    "endpoint_valid": {"type": "boolean"},
+    "TLS_policy_valid": {"type": "boolean"},
+    "host_allowlisted": {"type": "boolean"},
+    "model_configured": {"type": "boolean"},
+    "credentials_present": {"type": "boolean"},
+    "network_check_permitted": {"type": "boolean"},
+    "provider_reachable": {"type": ["boolean", "string"]},
+    "model_access_verified": {"type": ["boolean", "string"]},
+    "execution_attempted": {"type": "boolean"},
+    "failure_codes": {"type": "array", "items": {"type": "string"}},
+    "configuration_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "endpoint_identity": {"type": "object"}
+  }
+}

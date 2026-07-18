@@ -1,0 +1,530 @@
+[
+  {
+    "case_id": "protocol-01-request-schema-validation",
+    "control_type": "request_schema_validation",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "request_schema_validation",
+      "prompt": "Validate control: request_schema_validation",
+      "variant": 1
+    },
+    "input_hash": "1f8b9616b73264ee01a42dc15d5324da9059bf10636dfd94d82d35e20fca2633",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-02-response-schema-validation",
+    "control_type": "response_schema_validation",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "response_schema_validation",
+      "prompt": "Validate control: response_schema_validation",
+      "variant": 2
+    },
+    "input_hash": "b12cd60f44334b8f0beef0fc8db9e3c5a93cd9d88902c2ebe629e402dc96ca36",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-03-authentication-allow",
+    "control_type": "authentication_allow",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "authentication_allow",
+      "prompt": "Validate control: authentication_allow",
+      "variant": 3
+    },
+    "input_hash": "00b659b9a26e7edd7e55c040e6af51a27ea07e60c77705256440b7001a9b8203",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-04-authentication-deny",
+    "control_type": "authentication_deny",
+    "expectation_hash": "7634c12e20e6186b57f0ef23071a863179adc182eddd7bfab9468de1cc4d63c1",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": false,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "denied",
+    "input": {
+      "control_type": "authentication_deny",
+      "prompt": "Validate control: authentication_deny",
+      "variant": 4
+    },
+    "input_hash": "765cf3866fa55ea7aeef70cfa40393c0852d43673b9e6f4fe3d8a46dec5114fd",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-05-tenant-isolation",
+    "control_type": "tenant_isolation",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "tenant_isolation",
+      "prompt": "Validate control: tenant_isolation",
+      "variant": 5
+    },
+    "input_hash": "42346a45ba1930a487a040e5ba3031a02cd5f8fb11bdafcc79f7d05ee7ca6c7f",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-06-provider-allow",
+    "control_type": "provider_allow",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "provider_allow",
+      "prompt": "Validate control: provider_allow",
+      "variant": 6
+    },
+    "input_hash": "6d8c1f82beb574b0c81d63703a15cddae28c8d76039e236ccdda57a1cb01096b",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-07-provider-deny",
+    "control_type": "provider_deny",
+    "expectation_hash": "7634c12e20e6186b57f0ef23071a863179adc182eddd7bfab9468de1cc4d63c1",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": false,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "denied",
+    "input": {
+      "control_type": "provider_deny",
+      "prompt": "Validate control: provider_deny",
+      "variant": 7
+    },
+    "input_hash": "855202444f16994d59b14eda5482d69364b1ea20a03e1766329e1bfc5a6d0fcc",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-08-tool-allow",
+    "control_type": "tool_allow",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "tool_allow",
+      "prompt": "Validate control: tool_allow",
+      "variant": 8
+    },
+    "input_hash": "04f2b55da9b1a62a3e8eb5a409dd820e77413f908c8b5ed51a14d4196546c998",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-09-tool-deny",
+    "control_type": "tool_deny",
+    "expectation_hash": "7634c12e20e6186b57f0ef23071a863179adc182eddd7bfab9468de1cc4d63c1",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": false,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "denied",
+    "input": {
+      "control_type": "tool_deny",
+      "prompt": "Validate control: tool_deny",
+      "variant": 9
+    },
+    "input_hash": "8d44daaf039d4b5e0c242742e2cf913469cfe8c96762d06f276a6d13ebdb82d0",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-10-budget-reservation",
+    "control_type": "budget_reservation",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "budget_reservation",
+      "prompt": "Validate control: budget_reservation",
+      "variant": 10
+    },
+    "input_hash": "9dc82ce56fc4610d97fb331b478e79b8493794a93be455c57afaa0d53235d18a",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-11-budget-settlement",
+    "control_type": "budget_settlement",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "budget_settlement",
+      "prompt": "Validate control: budget_settlement",
+      "variant": 11
+    },
+    "input_hash": "cf43de2b23421cff19cf85bd8c11d3acc99336b209d42ef2ea4250b9fa55f6fd",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-12-budget-exceeded",
+    "control_type": "budget_exceeded",
+    "expectation_hash": "482c10994db28b060ca51d1276b1b0e0b0c36239d86d477ba409a8fe1835f98c",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "rejected",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "failed_closed",
+    "input": {
+      "control_type": "budget_exceeded",
+      "prompt": "Validate control: budget_exceeded",
+      "variant": 12
+    },
+    "input_hash": "9c83231d70b2cca88f05b9e5e8e8e90bc4d07b7f06bb789a748da2f194e4d351",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-13-idempotent-replay",
+    "control_type": "idempotent_replay",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "idempotent_replay",
+      "prompt": "Validate control: idempotent_replay",
+      "variant": 13
+    },
+    "input_hash": "6767aa5dc685498b315bbd36d6baad5cd8ab1267ff894f23f564fe9112aed7a8",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-14-attempt-retrieval",
+    "control_type": "attempt_retrieval",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "attempt_retrieval",
+      "prompt": "Validate control: attempt_retrieval",
+      "variant": 14
+    },
+    "input_hash": "6d5ea817c5a1383af828ed0c1e062214c2f72d454df6249b76dc0fc9e5e1319f",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-15-attempt-cancellation",
+    "control_type": "attempt_cancellation",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "attempt_cancellation",
+      "prompt": "Validate control: attempt_cancellation",
+      "variant": 15
+    },
+    "input_hash": "b001fbc0f7b186257ca2ed9551b0b60ba3814e583fc802054745d39ac4a74923",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-16-timeout-terminal-state",
+    "control_type": "timeout_terminal_state",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "timeout_terminal_state",
+      "prompt": "Validate control: timeout_terminal_state",
+      "variant": 16
+    },
+    "input_hash": "8695ff05c62687c2a956917043d978b2ac9a6f0f7b1969d8b50b044da7a87f05",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-17-malformed-provider-response",
+    "control_type": "malformed_provider_response",
+    "expectation_hash": "a1356fe2776616cad6380057cfd365337f8640e0b1ecabc586f5bc5d2aeec9d7",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "failed_closed",
+    "input": {
+      "control_type": "malformed_provider_response",
+      "prompt": "Validate control: malformed_provider_response",
+      "variant": 17
+    },
+    "input_hash": "506944e81fef72651acb9591fbe52af983bcf089b993a4116fdd299ee60ecce7",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-18-provider-transport-failure",
+    "control_type": "provider_transport_failure",
+    "expectation_hash": "d844387f3d80c2c216941aa6e44a7746a878a7e2195e52e75c3a3b9748487191",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "recorded",
+    "expected_status": "failed_closed",
+    "input": {
+      "control_type": "provider_transport_failure",
+      "prompt": "Validate control: provider_transport_failure",
+      "variant": 18
+    },
+    "input_hash": "ba3295aa6f5bd601cd152338400e0c8d88ca6b62afebad49d40df0504dbd4aff",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-19-response-size-rejection",
+    "control_type": "response_size_rejection",
+    "expectation_hash": "a1356fe2776616cad6380057cfd365337f8640e0b1ecabc586f5bc5d2aeec9d7",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "failed_closed",
+    "input": {
+      "control_type": "response_size_rejection",
+      "prompt": "Validate control: response_size_rejection",
+      "variant": 19
+    },
+    "input_hash": "fdd026211e8cb6c7aba726cdaf8618952b4db4f594c845988b85aa38a0f9149d",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-20-secret-redaction",
+    "control_type": "secret_redaction",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "secret_redaction",
+      "prompt": "Validate control: secret_redaction",
+      "variant": 20
+    },
+    "input_hash": "e2e3c7bee09878da67b863341320cf00eb70cc5177cb6b8e98d5ac6d2e095dae",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-21-audit-reference-resolution",
+    "control_type": "audit_reference_resolution",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "audit_reference_resolution",
+      "prompt": "Validate control: audit_reference_resolution",
+      "variant": 21
+    },
+    "input_hash": "13020e95c349297855689c1cd488e37b76e5032cf46aed98e1b752211fd1f128",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-22-storage-persistence",
+    "control_type": "storage_persistence",
+    "expectation_hash": "4dd292b2f57468ae6233353316e7da0e9c77116365af8d0ff3760e122234c073",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "storage_persistence",
+      "prompt": "Validate control: storage_persistence",
+      "variant": 22
+    },
+    "input_hash": "f799aa7e3b97d950d6cec3cf3f27f4020a095bd33d331a4a8b2282a4a4a5d494",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-23-retry-accounting",
+    "control_type": "retry_accounting",
+    "expectation_hash": "210dde716e544906b761e4081d8162358c280727813db9028a9569c9cf8f7142",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "recorded",
+    "expected_status": "completed",
+    "input": {
+      "control_type": "retry_accounting",
+      "prompt": "Validate control: retry_accounting",
+      "variant": 23
+    },
+    "input_hash": "22e627c9def762646e8d80357892439753f4dfa620597032f3846d7c3077a3c9",
+    "timeout": 10
+  },
+  {
+    "case_id": "protocol-24-no-silent-provider-fallback",
+    "control_type": "no_silent_provider_fallback",
+    "expectation_hash": "a1356fe2776616cad6380057cfd365337f8640e0b1ecabc586f5bc5d2aeec9d7",
+    "expected_audit_events": [
+      "authorization",
+      "budget",
+      "attempt"
+    ],
+    "expected_authorization_result": true,
+    "expected_budget_result": "settled",
+    "expected_persistence_result": "stored",
+    "expected_retry_result": "not_required",
+    "expected_status": "failed_closed",
+    "input": {
+      "control_type": "no_silent_provider_fallback",
+      "prompt": "Validate control: no_silent_provider_fallback",
+      "variant": 24
+    },
+    "input_hash": "0ebaf840f737e7e83242ed921883786d6eb6522c9687c9e0d973775c8f861e04",
+    "timeout": 10
+  }
+]
