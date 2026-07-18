@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2060`
+- Tracked files: `2065`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 144 |
-| Documentation | 467 |
+| Documentation | 472 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 394 |
+| `docs` | 399 |
 | `evals` | 180 |
 | `scripts` | 156 |
 | `agents` | 111 |
@@ -1271,6 +1271,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.json` | Documentation |
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/REAL_PROVIDER_BASELINE_READINESS.json` | Documentation |
+| `docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
@@ -1312,6 +1313,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/capability/BATCH_09A_BASELINE.md` | Documentation |
 | `docs/capability/BATCH_09A_READINESS_REPORT.json` | Documentation |
 | `docs/capability/BATCH_09A_READINESS_REPORT.md` | Documentation |
+| `docs/capability/BATCH_09B_EXECUTION_BASELINE.md` | Documentation |
+| `docs/capability/BATCH_09B_OPERATOR_INCIDENT_LOG.md` | Documentation |
+| `docs/capability/BATCH_09B_REAL_PROVIDER_BASELINE_REPORT.md` | Documentation |
+| `docs/capability/BATCH_09B_REPOSITORY_INTEGRITY_ATTESTATION.md` | Documentation |
 | `docs/capability/CAPABILITY_THRESHOLDS.md` | Documentation |
 | `docs/capability/EVALUATOR_INTEGRITY_PROTOCOL.md` | Documentation |
 | `docs/capability/REAL_PROVIDER_CAMPAIGN_AUTHORIZATION.md` | Documentation |
