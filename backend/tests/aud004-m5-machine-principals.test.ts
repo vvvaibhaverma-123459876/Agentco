@@ -166,11 +166,18 @@ describe('AUD-004 M5: initiating human/agent identity is preserved through orche
       [escalationId, coalition.rows[0].id, creator]
     );
 
-    await civilizationOs.tick(); // drives layerOrchestrator -> routeEscalationsToJudiciary
-
-    const routed = await db.query<{ complainant_actor_id: string }>(
-      `SELECT complainant_actor_id FROM judiciary_cases WHERE source_dispute_id = $1`, [escalationId]
-    );
+    // Drives layerOrchestrator -> routeEscalationsToJudiciary. Retried: tick() short-circuits to
+    // 'not leader' if another session holds the leader-election advisory lock at that instant
+    // (e.g. a background daemon interval started by an earlier test file in the same jest
+    // process); a few retries make this test robust to that unrelated, pre-existing race
+    // without weakening what it actually proves.
+    let routed = { rowCount: 0 as number | null, rows: [] as Array<{ complainant_actor_id: string }> };
+    for (let attempt = 0; attempt < 5 && !routed.rowCount; attempt++) {
+      await civilizationOs.tick();
+      routed = await db.query<{ complainant_actor_id: string }>(
+        `SELECT complainant_actor_id FROM judiciary_cases WHERE source_dispute_id = $1`, [escalationId]
+      );
+    }
     expect(routed.rowCount).toBe(1);
     // The complainant is the REAL human who created the escalation -- never a civilization-os
     // machine principal, even though a machine principal executed the routing itself.
