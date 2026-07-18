@@ -1,8 +1,8 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2081,
+  "tracked_file_count": 2082,
   "category_counts": {
-    "Database migration": 142,
+    "Database migration": 143,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 145,
@@ -15,7 +15,7 @@
     "Unknown purpose": 134
   },
   "top_level_counts": {
-    "backend": 519,
+    "backend": 520,
     "docs": 402,
     "evals": 180,
     "scripts": 157,
@@ -86,7 +86,7 @@
     ".md": 514,
     ".ts": 351,
     ".json": 249,
-    ".sql": 143,
+    ".sql": 144,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 24,
@@ -3028,6 +3028,12 @@
     },
     {
       "path": "backend/src/db/migrations/143_aud004_m3_breadth_permissions.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
+      "path": "backend/src/db/migrations/144_aud004_capability_runtime_permissions.sql",
       "category": "Database migration",
       "top_level": "backend",
       "extension": ".sql"

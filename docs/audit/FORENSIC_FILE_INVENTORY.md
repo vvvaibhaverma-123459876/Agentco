@@ -2,13 +2,13 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2081`
+- Tracked files: `2082`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
-| Database migration | 142 |
+| Database migration | 143 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 145 |
@@ -24,7 +24,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 
 | Path | Count |
 |---|---:|
-| `backend` | 519 |
+| `backend` | 520 |
 | `docs` | 402 |
 | `evals` | 180 |
 | `scripts` | 157 |
@@ -581,6 +581,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/db/migrations/141_aud004_principal_permissions.sql` | Database migration |
 | `backend/src/db/migrations/142_aud004_independence_backstops.sql` | Database migration |
 | `backend/src/db/migrations/143_aud004_m3_breadth_permissions.sql` | Database migration |
+| `backend/src/db/migrations/144_aud004_capability_runtime_permissions.sql` | Database migration |
 | `backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql` | Production runtime code |
 | `backend/src/db/run_migrations.py` | Production runtime code |
 | `backend/src/db/unsupported_migrations/020_evaluation_manifests.sql.disabled` | Production runtime code |
