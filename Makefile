@@ -133,6 +133,10 @@ verify-advertised-targets:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@$(PYTHON) scripts/verify_make_targets.py --check
 
+migration-naming-check:
+	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
+	@$(PYTHON) scripts/verify_migration_naming.py --check
+
 release-gate:
 	@command -v $(PYTHON) >/dev/null || (echo "Python 3.13 is required. Install the configured interpreter or run with PYTHON=/path/to/interpreter"; exit 1)
 	@echo "== [0/12] clean tree before gate =="
@@ -155,6 +159,8 @@ release-gate:
 	cd backend && npm run agentco:score-validation -- --check
 	@echo "== [1f/12] real-provider baseline readiness check =="
 	@$(MAKE) real-provider-baseline-readiness
+	@echo "== [1g/12] migration naming/ordering governance check =="
+	@$(MAKE) migration-naming-check
 	@echo "== [2/12] backend install =="
 	cd backend && npm ci
 	@echo "== [3/12] backend migrations =="
