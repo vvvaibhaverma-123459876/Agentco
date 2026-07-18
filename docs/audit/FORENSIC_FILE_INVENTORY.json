@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2065,
+  "tracked_file_count": 2086,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 144,
-    "Documentation": 472,
+    "Documentation": 493,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
@@ -16,7 +16,7 @@
   },
   "top_level_counts": {
     "backend": 507,
-    "docs": 399,
+    "docs": 420,
     "evals": 180,
     "scripts": 156,
     "agents": 111,
@@ -83,9 +83,9 @@
   },
   "extension_counts": {
     ".py": 614,
-    ".md": 511,
+    ".md": 515,
     ".ts": 342,
-    ".json": 249,
+    ".json": 266,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -7179,6 +7179,12 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/REAL_PROVIDER_GENESIS_V7_HOLD.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -7449,6 +7455,24 @@
       "extension": ".md"
     },
     {
+      "path": "docs/capability/BATCH_09C_EXECUTION_BASELINE.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/BATCH_09C_OPENAI_REAL_BASELINE_REPORT.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/BATCH_09C_REPOSITORY_INTEGRITY_ATTESTATION.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/capability/CAPABILITY_THRESHOLDS.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -7477,6 +7501,108 @@
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/AGGREGATE_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/AUTHORIZATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/CLEAN_CLONE_VERIFICATION_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/COST_TOKEN_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/CREDENTIAL_REDACTION_ATTESTATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/DOMAIN_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/EVALUATOR_CALIBRATION_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/EXECUTION_BASELINE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/FAILURE_RETRY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/FINAL_REPOSITORY_INTEGRITY_ATTESTATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/GENESIS_V7_CAMPAIGN_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/LATENCY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/OPERATOR_INCIDENT_LOG.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/PROVIDER_CANARY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/RESERVATION_SETTLEMENT_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/SECRET_SCAN_RESULT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/SEMANTIC_HASH_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
     },
     {
       "path": "docs/civilization/CANONICAL_RUNTIME_MAP.md",

@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2065`
+- Tracked files: `2086`
 
 ## Category Counts
 
@@ -12,7 +12,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 144 |
-| Documentation | 472 |
+| Documentation | 493 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
@@ -25,7 +25,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 399 |
+| `docs` | 420 |
 | `evals` | 180 |
 | `scripts` | 156 |
 | `agents` | 111 |
@@ -1272,6 +1272,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/REAL_PROVIDER_BASELINE_READINESS.json` | Documentation |
 | `docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json` | Documentation |
+| `docs/audit/current/REAL_PROVIDER_GENESIS_V7_HOLD.json` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
 | `docs/audit/current/REMEDIATION_02B_CLEAN_ROOM_CLOSURE.md` | Documentation |
@@ -1317,11 +1318,31 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/capability/BATCH_09B_OPERATOR_INCIDENT_LOG.md` | Documentation |
 | `docs/capability/BATCH_09B_REAL_PROVIDER_BASELINE_REPORT.md` | Documentation |
 | `docs/capability/BATCH_09B_REPOSITORY_INTEGRITY_ATTESTATION.md` | Documentation |
+| `docs/capability/BATCH_09C_EXECUTION_BASELINE.md` | Documentation |
+| `docs/capability/BATCH_09C_OPENAI_REAL_BASELINE_REPORT.md` | Documentation |
+| `docs/capability/BATCH_09C_REPOSITORY_INTEGRITY_ATTESTATION.md` | Documentation |
 | `docs/capability/CAPABILITY_THRESHOLDS.md` | Documentation |
 | `docs/capability/EVALUATOR_INTEGRITY_PROTOCOL.md` | Documentation |
 | `docs/capability/REAL_PROVIDER_CAMPAIGN_AUTHORIZATION.md` | Documentation |
 | `docs/capability/REAL_PROVIDER_GENESIS_RUNBOOK.md` | Documentation |
 | `docs/capability/SEMANTIC_HASH_SPECIFICATION.md` | Documentation |
+| `docs/capability/batch_09c_evidence/AGGREGATE_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/AUTHORIZATION.json` | Documentation |
+| `docs/capability/batch_09c_evidence/CLEAN_CLONE_VERIFICATION_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/COST_TOKEN_LEDGER.json` | Documentation |
+| `docs/capability/batch_09c_evidence/CREDENTIAL_REDACTION_ATTESTATION.json` | Documentation |
+| `docs/capability/batch_09c_evidence/DOMAIN_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/EVALUATOR_CALIBRATION_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/EXECUTION_BASELINE.json` | Documentation |
+| `docs/capability/batch_09c_evidence/FAILURE_RETRY_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/FINAL_REPOSITORY_INTEGRITY_ATTESTATION.json` | Documentation |
+| `docs/capability/batch_09c_evidence/GENESIS_V7_CAMPAIGN_MANIFEST.json` | Documentation |
+| `docs/capability/batch_09c_evidence/LATENCY_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/OPERATOR_INCIDENT_LOG.md` | Documentation |
+| `docs/capability/batch_09c_evidence/PROVIDER_CANARY_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/RESERVATION_SETTLEMENT_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/SECRET_SCAN_RESULT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/SEMANTIC_HASH_LEDGER.json` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
