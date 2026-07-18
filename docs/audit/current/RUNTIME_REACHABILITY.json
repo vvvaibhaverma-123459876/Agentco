@@ -8,7 +8,7 @@
       "first_handler": "websocket",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:61",
+      "registration_location": "backend/src/server.ts:62",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -23,7 +23,7 @@
       "first_handler": "agentRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:119",
+      "registration_location": "backend/src/server.ts:125",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -38,7 +38,7 @@
       "first_handler": "overrideRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:120",
+      "registration_location": "backend/src/server.ts:126",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -53,7 +53,7 @@
       "first_handler": "auditRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:121",
+      "registration_location": "backend/src/server.ts:127",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -68,7 +68,7 @@
       "first_handler": "credentialRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:122",
+      "registration_location": "backend/src/server.ts:128",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -83,7 +83,7 @@
       "first_handler": "learningRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:123",
+      "registration_location": "backend/src/server.ts:129",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -98,7 +98,7 @@
       "first_handler": "autonomyTaskRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:124",
+      "registration_location": "backend/src/server.ts:130",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -113,7 +113,7 @@
       "first_handler": "autonomyOrchestratorRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:125",
+      "registration_location": "backend/src/server.ts:131",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -128,7 +128,7 @@
       "first_handler": "autonomyDashboardRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:126",
+      "registration_location": "backend/src/server.ts:132",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -143,7 +143,7 @@
       "first_handler": "civilizationGovernanceRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:127",
+      "registration_location": "backend/src/server.ts:133",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -158,7 +158,7 @@
       "first_handler": "civilizationKernelRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:128",
+      "registration_location": "backend/src/server.ts:134",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -173,7 +173,7 @@
       "first_handler": "citizenshipRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:129",
+      "registration_location": "backend/src/server.ts:135",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -188,7 +188,7 @@
       "first_handler": "societyRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:130",
+      "registration_location": "backend/src/server.ts:136",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -203,7 +203,7 @@
       "first_handler": "coalitionRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:131",
+      "registration_location": "backend/src/server.ts:137",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -218,7 +218,7 @@
       "first_handler": "missionRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:132",
+      "registration_location": "backend/src/server.ts:138",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -233,7 +233,7 @@
       "first_handler": "treasuryRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:133",
+      "registration_location": "backend/src/server.ts:139",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -248,7 +248,7 @@
       "first_handler": "governanceProposalRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:134",
+      "registration_location": "backend/src/server.ts:140",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -263,7 +263,7 @@
       "first_handler": "judiciaryCaseRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:135",
+      "registration_location": "backend/src/server.ts:141",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -278,7 +278,7 @@
       "first_handler": "collectiveKnowledgeRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:136",
+      "registration_location": "backend/src/server.ts:142",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -293,7 +293,7 @@
       "first_handler": "safeEvolutionRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:137",
+      "registration_location": "backend/src/server.ts:143",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -308,7 +308,7 @@
       "first_handler": "capabilityExpansionRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:138",
+      "registration_location": "backend/src/server.ts:144",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -323,7 +323,7 @@
       "first_handler": "civilizationOsRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:139",
+      "registration_location": "backend/src/server.ts:145",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -338,7 +338,7 @@
       "first_handler": "civilizationOperatorRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:140",
+      "registration_location": "backend/src/server.ts:146",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -353,7 +353,7 @@
       "first_handler": "governanceRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:141",
+      "registration_location": "backend/src/server.ts:147",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -368,7 +368,7 @@
       "first_handler": "institutionWorkAssignmentRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:142",
+      "registration_location": "backend/src/server.ts:148",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -383,7 +383,7 @@
       "first_handler": "goalHierarchyRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:143",
+      "registration_location": "backend/src/server.ts:149",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -398,7 +398,7 @@
       "first_handler": "phase3HardeningRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:144",
+      "registration_location": "backend/src/server.ts:150",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -413,7 +413,7 @@
       "first_handler": "identityRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:145",
+      "registration_location": "backend/src/server.ts:151",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -428,7 +428,7 @@
       "first_handler": "resourceLedgerRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:146",
+      "registration_location": "backend/src/server.ts:152",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -443,7 +443,7 @@
       "first_handler": "capabilityRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:147",
+      "registration_location": "backend/src/server.ts:153",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -458,7 +458,7 @@
       "first_handler": "systemRoutes",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/server.ts:148",
+      "registration_location": "backend/src/server.ts:154",
       "runtime_trace": "make audit-runtime-integration",
       "service_chain": [],
       "status": "verified_static_registration",
@@ -473,7 +473,7 @@
       "first_handler": "backend/src/routes/agents.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/agents.routes.ts:14",
+      "registration_location": "backend/src/routes/agents.routes.ts:15",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "learningService"
@@ -490,7 +490,7 @@
       "first_handler": "backend/src/routes/agents.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/agents.routes.ts:143",
+      "registration_location": "backend/src/routes/agents.routes.ts:144",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "learningService"
@@ -564,7 +564,7 @@
         "autonomy_evidence",
         "request"
       ],
-      "registration_location": "backend/src/routes/autonomy-orchestrator.routes.ts:16",
+      "registration_location": "backend/src/routes/autonomy-orchestrator.routes.ts:17",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -579,7 +579,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:15",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -594,7 +594,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:25",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:27",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -609,7 +609,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:34",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:36",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -624,7 +624,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:46",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:49",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -639,7 +639,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:55",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:58",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -654,7 +654,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:66",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:70",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -669,7 +669,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:76",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:81",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -684,7 +684,7 @@
       "first_handler": "backend/src/routes/capability-expansion.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/capability-expansion.routes.ts:86",
+      "registration_location": "backend/src/routes/capability-expansion.routes.ts:92",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -699,7 +699,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:16",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:22",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -716,7 +716,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:35",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:41",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -733,7 +733,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:42",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:48",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -750,7 +750,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:51",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:57",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -767,7 +767,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:70",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:76",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -784,7 +784,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:90",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:96",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -801,7 +801,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:101",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:107",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -818,7 +818,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:117",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:123",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -835,7 +835,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:136",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:142",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -852,7 +852,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:150",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:156",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -869,7 +869,7 @@
       "first_handler": "backend/src/routes/citizenship.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/citizenship.routes.ts:169",
+      "registration_location": "backend/src/routes/citizenship.routes.ts:175",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "citizenshipService"
@@ -886,7 +886,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:18",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:19",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -911,7 +911,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:29",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:31",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -936,7 +936,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:40",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:42",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -961,7 +961,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:50",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:52",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -986,7 +986,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:61",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:63",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1011,7 +1011,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:75",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:77",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1036,7 +1036,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:86",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:92",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1061,7 +1061,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:98",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:104",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1086,7 +1086,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:110",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:116",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1111,7 +1111,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:122",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:129",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1136,7 +1136,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:132",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:139",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1161,7 +1161,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:147",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:154",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1186,7 +1186,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:163",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:171",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1211,7 +1211,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:175",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:183",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1236,7 +1236,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:186",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:194",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1261,7 +1261,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:204",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:213",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1286,7 +1286,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:218",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:227",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1311,7 +1311,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:256",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:265",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1336,7 +1336,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:268",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:277",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1361,7 +1361,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:284",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:293",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1386,7 +1386,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:303",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:312",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1411,7 +1411,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:315",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:324",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1436,7 +1436,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:326",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:335",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1461,7 +1461,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:341",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:350",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1486,7 +1486,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:370",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:379",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1511,7 +1511,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:381",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:390",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1536,7 +1536,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:391",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:400",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1561,7 +1561,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:407",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:417",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1586,7 +1586,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:424",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:434",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1611,7 +1611,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:436",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:446",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1636,7 +1636,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:448",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:458",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1661,7 +1661,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:464",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:474",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1686,7 +1686,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:482",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:492",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1711,7 +1711,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:487",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:497",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1736,7 +1736,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:495",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:505",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1761,7 +1761,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:506",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:516",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1786,7 +1786,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:533",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:543",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1811,7 +1811,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:538",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:548",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1836,7 +1836,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:552",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:562",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1861,7 +1861,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:562",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:572",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1886,7 +1886,7 @@
       "first_handler": "backend/src/routes/civilization-governance.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-governance.routes.ts:567",
+      "registration_location": "backend/src/routes/civilization-governance.routes.ts:577",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationChangeGovernanceService",
@@ -1911,7 +1911,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:20",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:21",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -1926,7 +1926,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:29",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:30",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -1941,7 +1941,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:36",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:37",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -1956,7 +1956,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:51",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:53",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -1971,7 +1971,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:59",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:61",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -1986,7 +1986,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:78",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:80",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2001,7 +2001,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:96",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:98",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2016,7 +2016,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:110",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:112",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2031,7 +2031,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:114",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:116",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2046,7 +2046,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:135",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:137",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2061,7 +2061,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:144",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:146",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2076,7 +2076,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:151",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:153",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2091,7 +2091,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:167",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:169",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2106,7 +2106,7 @@
       "first_handler": "backend/src/routes/civilization-kernel.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:182",
+      "registration_location": "backend/src/routes/civilization-kernel.routes.ts:184",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2136,7 +2136,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:15",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:19",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2151,7 +2151,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:19",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:23",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2166,7 +2166,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:23",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:27",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2181,7 +2181,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:30",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:34",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2196,7 +2196,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:34",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:38",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2211,7 +2211,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:41",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:47",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2226,7 +2226,7 @@
       "first_handler": "backend/src/routes/civilization-os.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/civilization-os.routes.ts:48",
+      "registration_location": "backend/src/routes/civilization-os.routes.ts:54",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2241,14 +2241,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:15",
+      "registration_location": "backend/src/routes/coalition.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2258,14 +2260,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:25",
+      "registration_location": "backend/src/routes/coalition.routes.ts:26",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2275,14 +2279,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:34",
+      "registration_location": "backend/src/routes/coalition.routes.ts:35",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2299,7 +2305,9 @@
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2309,14 +2317,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:54",
+      "registration_location": "backend/src/routes/coalition.routes.ts:55",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2326,14 +2336,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:65",
+      "registration_location": "backend/src/routes/coalition.routes.ts:67",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2343,14 +2355,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:76",
+      "registration_location": "backend/src/routes/coalition.routes.ts:79",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2360,14 +2374,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:87",
+      "registration_location": "backend/src/routes/coalition.routes.ts:91",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2377,14 +2393,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:96",
+      "registration_location": "backend/src/routes/coalition.routes.ts:99",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2394,14 +2412,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:105",
+      "registration_location": "backend/src/routes/coalition.routes.ts:107",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2411,14 +2431,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:116",
+      "registration_location": "backend/src/routes/coalition.routes.ts:119",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2428,14 +2450,16 @@
       "first_handler": "backend/src/routes/coalition.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/coalition.routes.ts:127",
+      "registration_location": "backend/src/routes/coalition.routes.ts:131",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "coalitionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -2445,7 +2469,7 @@
       "first_handler": "backend/src/routes/collective-knowledge.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:15",
+      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2460,7 +2484,7 @@
       "first_handler": "backend/src/routes/collective-knowledge.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:25",
+      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:27",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2475,7 +2499,7 @@
       "first_handler": "backend/src/routes/collective-knowledge.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:35",
+      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:38",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2490,7 +2514,7 @@
       "first_handler": "backend/src/routes/collective-knowledge.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:44",
+      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:47",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2505,7 +2529,7 @@
       "first_handler": "backend/src/routes/collective-knowledge.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:51",
+      "registration_location": "backend/src/routes/collective-knowledge.routes.ts:54",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -2522,7 +2546,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:11",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:12",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2541,7 +2565,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:35",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:36",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2560,7 +2584,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:59",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:60",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2579,7 +2603,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:83",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:84",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2598,7 +2622,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:102",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:103",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2617,7 +2641,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:125",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:126",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2636,7 +2660,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:160",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:161",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2655,7 +2679,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:195",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:196",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2674,7 +2698,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:215",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:216",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2693,7 +2717,7 @@
       "persistence_effects": [
         "completed"
       ],
-      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:246",
+      "registration_location": "backend/src/routes/goal-hierarchy.routes.ts:247",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "goalHierarchyService"
@@ -2710,7 +2734,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:16",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:17",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2727,7 +2751,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:24",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:26",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2744,7 +2768,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:33",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:35",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2761,7 +2785,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:43",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:44",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2778,7 +2802,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:53",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:55",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2795,7 +2819,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:63",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:64",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2812,7 +2836,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:73",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:75",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2829,7 +2853,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:83",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:84",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2846,7 +2870,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:93",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:95",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2863,7 +2887,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:102",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:103",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2897,7 +2921,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:121",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:122",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2914,7 +2938,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:129",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:130",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2931,7 +2955,7 @@
       "first_handler": "backend/src/routes/governance-proposals.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/governance-proposals.routes.ts:141",
+      "registration_location": "backend/src/routes/governance-proposals.routes.ts:143",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "governanceService"
@@ -2949,9 +2973,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:57",
+      "registration_location": "backend/src/routes/governance.routes.ts:61",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -2971,9 +2996,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:79",
+      "registration_location": "backend/src/routes/governance.routes.ts:83",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -2993,9 +3019,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:101",
+      "registration_location": "backend/src/routes/governance.routes.ts:105",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3015,9 +3042,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:125",
+      "registration_location": "backend/src/routes/governance.routes.ts:129",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3037,9 +3065,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:154",
+      "registration_location": "backend/src/routes/governance.routes.ts:158",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3059,9 +3088,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:175",
+      "registration_location": "backend/src/routes/governance.routes.ts:179",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3081,9 +3111,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:202",
+      "registration_location": "backend/src/routes/governance.routes.ts:206",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3103,9 +3134,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:238",
+      "registration_location": "backend/src/routes/governance.routes.ts:243",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3125,9 +3157,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:270",
+      "registration_location": "backend/src/routes/governance.routes.ts:276",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3147,9 +3180,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:296",
+      "registration_location": "backend/src/routes/governance.routes.ts:302",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3169,9 +3203,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:345",
+      "registration_location": "backend/src/routes/governance.routes.ts:352",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3191,9 +3226,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:392",
+      "registration_location": "backend/src/routes/governance.routes.ts:400",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3213,9 +3249,10 @@
       "outbound_calls": [],
       "persistence_effects": [
         "action_attestations",
-        "entity"
+        "entity",
+        "the"
       ],
-      "registration_location": "backend/src/routes/governance.routes.ts:412",
+      "registration_location": "backend/src/routes/governance.routes.ts:420",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "calibrationConstitutionService",
@@ -3233,8 +3270,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:34",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:43",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3250,8 +3289,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:46",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:55",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3267,8 +3308,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:58",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:70",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3284,8 +3327,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:70",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:85",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3301,8 +3346,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:82",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:100",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3318,8 +3365,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:94",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:115",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3335,8 +3384,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:106",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:129",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3352,8 +3403,10 @@
       "events_emitted": [],
       "first_handler": "backend/src/routes/identity.routes.ts",
       "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/identity.routes.ts:118",
+      "persistence_effects": [
+        "the"
+      ],
+      "registration_location": "backend/src/routes/identity.routes.ts:141",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "identityAuthorityService"
@@ -3372,7 +3425,7 @@
       "persistence_effects": [
         "institution"
       ],
-      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:11",
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:12",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "institutionWorkAssignmentService"
@@ -3391,7 +3444,7 @@
       "persistence_effects": [
         "institution"
       ],
-      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:68",
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:69",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "institutionWorkAssignmentService"
@@ -3410,7 +3463,7 @@
       "persistence_effects": [
         "institution"
       ],
-      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:91",
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:92",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "institutionWorkAssignmentService"
@@ -3429,7 +3482,7 @@
       "persistence_effects": [
         "institution"
       ],
-      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:118",
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:119",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "institutionWorkAssignmentService"
@@ -3448,7 +3501,7 @@
       "persistence_effects": [
         "institution"
       ],
-      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:150",
+      "registration_location": "backend/src/routes/institution-work-assignment.routes.ts:152",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "institutionWorkAssignmentService"
@@ -3465,7 +3518,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:15",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3482,7 +3535,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:25",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:27",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3499,7 +3552,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:34",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:36",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3516,7 +3569,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:44",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:47",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3533,7 +3586,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:54",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:56",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3550,7 +3603,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:63",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:66",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3567,7 +3620,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:72",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:76",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3584,7 +3637,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:81",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:86",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3601,7 +3654,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:92",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:98",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3618,7 +3671,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:101",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:108",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3635,7 +3688,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:110",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:118",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3652,7 +3705,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:119",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:128",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3669,7 +3722,7 @@
       "first_handler": "backend/src/routes/judiciary-case.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/judiciary-case.routes.ts:128",
+      "registration_location": "backend/src/routes/judiciary-case.routes.ts:136",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "judiciaryCaseService"
@@ -3686,14 +3739,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:15",
+      "registration_location": "backend/src/routes/mission.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3703,14 +3758,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:24",
+      "registration_location": "backend/src/routes/mission.routes.ts:25",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3720,14 +3777,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:33",
+      "registration_location": "backend/src/routes/mission.routes.ts:34",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3737,14 +3796,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:42",
+      "registration_location": "backend/src/routes/mission.routes.ts:43",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3754,14 +3815,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:51",
+      "registration_location": "backend/src/routes/mission.routes.ts:52",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3771,14 +3834,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:58",
+      "registration_location": "backend/src/routes/mission.routes.ts:59",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3788,14 +3853,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:68",
+      "registration_location": "backend/src/routes/mission.routes.ts:69",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3805,14 +3872,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:82",
+      "registration_location": "backend/src/routes/mission.routes.ts:83",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3822,14 +3891,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:92",
+      "registration_location": "backend/src/routes/mission.routes.ts:93",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3839,14 +3910,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:102",
+      "registration_location": "backend/src/routes/mission.routes.ts:103",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3856,14 +3929,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:112",
+      "registration_location": "backend/src/routes/mission.routes.ts:113",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3873,14 +3948,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:121",
+      "registration_location": "backend/src/routes/mission.routes.ts:123",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3890,14 +3967,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:130",
+      "registration_location": "backend/src/routes/mission.routes.ts:133",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3907,14 +3986,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:140",
+      "registration_location": "backend/src/routes/mission.routes.ts:144",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3924,14 +4005,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:150",
+      "registration_location": "backend/src/routes/mission.routes.ts:155",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3941,14 +4024,16 @@
       "first_handler": "backend/src/routes/mission.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/mission.routes.ts:159",
+      "registration_location": "backend/src/routes/mission.routes.ts:165",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "missionService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -3958,7 +4043,7 @@
       "first_handler": "backend/src/routes/override.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/override.routes.ts:7",
+      "registration_location": "backend/src/routes/override.routes.ts:8",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -3973,7 +4058,7 @@
       "first_handler": "backend/src/routes/override.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/override.routes.ts:14",
+      "registration_location": "backend/src/routes/override.routes.ts:15",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -3990,7 +4075,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:12",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:13",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4010,7 +4095,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:53",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:55",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4030,7 +4115,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:80",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:82",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4050,7 +4135,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:105",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:107",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4070,7 +4155,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:138",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:140",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4090,7 +4175,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:163",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:165",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4110,7 +4195,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:184",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:186",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4130,7 +4215,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:211",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:213",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4150,7 +4235,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:238",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:240",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4170,7 +4255,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:263",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:265",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4190,7 +4275,7 @@
       "persistence_effects": [
         "multiple"
       ],
-      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:299",
+      "registration_location": "backend/src/routes/phase3-hardening.routes.ts:301",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "deadlockDetectorService",
@@ -4208,7 +4293,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:30",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:31",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4223,7 +4308,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:42",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:45",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4238,7 +4323,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:55",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:58",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4253,7 +4338,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:67",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:72",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4268,7 +4353,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:79",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:86",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4283,7 +4368,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:91",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:100",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4298,7 +4383,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:114",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:125",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4313,7 +4398,7 @@
       "first_handler": "backend/src/routes/resource-ledger.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/resource-ledger.routes.ts:129",
+      "registration_location": "backend/src/routes/resource-ledger.routes.ts:142",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
@@ -4328,12 +4413,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:15",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4343,12 +4430,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:25",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:27",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4358,12 +4447,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:34",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:36",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4373,12 +4464,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:44",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:47",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4388,12 +4481,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:53",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:55",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4403,12 +4498,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:63",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:64",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4418,12 +4515,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:77",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:79",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4433,12 +4532,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:86",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:87",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4448,12 +4549,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:95",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:97",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4463,12 +4566,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:104",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:107",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4478,12 +4583,14 @@
       "first_handler": "backend/src/routes/safe-evolution.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/safe-evolution.routes.ts:113",
+      "registration_location": "backend/src/routes/safe-evolution.routes.ts:117",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-conditions-16-25.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4493,14 +4600,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:19",
+      "registration_location": "backend/src/routes/society.routes.ts:20",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4510,14 +4619,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:27",
+      "registration_location": "backend/src/routes/society.routes.ts:29",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4527,14 +4638,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:31",
+      "registration_location": "backend/src/routes/society.routes.ts:33",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4544,14 +4657,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:38",
+      "registration_location": "backend/src/routes/society.routes.ts:40",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4561,14 +4676,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:42",
+      "registration_location": "backend/src/routes/society.routes.ts:44",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4578,14 +4695,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:55",
+      "registration_location": "backend/src/routes/society.routes.ts:57",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4595,14 +4714,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:69",
+      "registration_location": "backend/src/routes/society.routes.ts:71",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4612,14 +4733,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:82",
+      "registration_location": "backend/src/routes/society.routes.ts:84",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4629,14 +4752,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:94",
+      "registration_location": "backend/src/routes/society.routes.ts:96",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4646,14 +4771,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:108",
+      "registration_location": "backend/src/routes/society.routes.ts:110",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4663,14 +4790,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:115",
+      "registration_location": "backend/src/routes/society.routes.ts:117",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4680,14 +4809,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:134",
+      "registration_location": "backend/src/routes/society.routes.ts:136",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4697,14 +4828,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:141",
+      "registration_location": "backend/src/routes/society.routes.ts:143",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4714,14 +4847,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:158",
+      "registration_location": "backend/src/routes/society.routes.ts:160",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4731,14 +4866,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:175",
+      "registration_location": "backend/src/routes/society.routes.ts:177",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4748,14 +4885,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:190",
+      "registration_location": "backend/src/routes/society.routes.ts:192",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4765,14 +4904,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:206",
+      "registration_location": "backend/src/routes/society.routes.ts:208",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4782,14 +4923,16 @@
       "first_handler": "backend/src/routes/society.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/society.routes.ts:228",
+      "registration_location": "backend/src/routes/society.routes.ts:229",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "societyService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4952,14 +5095,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:15",
+      "registration_location": "backend/src/routes/treasury.routes.ts:16",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4969,14 +5114,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:25",
+      "registration_location": "backend/src/routes/treasury.routes.ts:27",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -4986,14 +5133,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:34",
+      "registration_location": "backend/src/routes/treasury.routes.ts:36",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5003,14 +5152,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:44",
+      "registration_location": "backend/src/routes/treasury.routes.ts:47",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5020,14 +5171,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:54",
+      "registration_location": "backend/src/routes/treasury.routes.ts:58",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5037,14 +5190,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:64",
+      "registration_location": "backend/src/routes/treasury.routes.ts:68",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5054,14 +5209,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:74",
+      "registration_location": "backend/src/routes/treasury.routes.ts:79",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5071,14 +5228,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:83",
+      "registration_location": "backend/src/routes/treasury.routes.ts:89",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5088,14 +5247,16 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:92",
+      "registration_location": "backend/src/routes/treasury.routes.ts:97",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
@@ -5105,36 +5266,21 @@
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
       "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:102",
+      "registration_location": "backend/src/routes/treasury.routes.ts:110",
       "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
       "service_chain": [
         "treasuryService"
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "protected unless explicitly public",
       "authorization_requirement": "handler/service specific",
       "entry_point": "GET /api/civilization/treasury/costs/rollup/:dimension",
-      "events_emitted": [],
-      "first_handler": "backend/src/routes/treasury.routes.ts",
-      "outbound_calls": [],
-      "persistence_effects": [],
-      "registration_location": "backend/src/routes/treasury.routes.ts:112",
-      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
-      "service_chain": [
-        "treasuryService"
-      ],
-      "status": "verified_static_route",
-      "terminal_output": "HTTP response",
-      "tests": []
-    },
-    {
-      "authentication_requirement": "protected unless explicitly public",
-      "authorization_requirement": "handler/service specific",
-      "entry_point": "POST /api/civilization/treasury/reconcile",
       "events_emitted": [],
       "first_handler": "backend/src/routes/treasury.routes.ts",
       "outbound_calls": [],
@@ -5146,7 +5292,28 @@
       ],
       "status": "verified_static_route",
       "terminal_output": "HTTP response",
-      "tests": []
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
+    },
+    {
+      "authentication_requirement": "protected unless explicitly public",
+      "authorization_requirement": "handler/service specific",
+      "entry_point": "POST /api/civilization/treasury/reconcile",
+      "events_emitted": [],
+      "first_handler": "backend/src/routes/treasury.routes.ts",
+      "outbound_calls": [],
+      "persistence_effects": [],
+      "registration_location": "backend/src/routes/treasury.routes.ts:130",
+      "runtime_trace": "make audit-runtime-integration for health/agents/outbox paths",
+      "service_chain": [
+        "treasuryService"
+      ],
+      "status": "verified_static_route",
+      "terminal_output": "HTTP response",
+      "tests": [
+        "backend/tests/aud004-m3-breadth.test.ts"
+      ]
     },
     {
       "authentication_requirement": "process env",
@@ -5199,5 +5366,5 @@
       ]
     }
   ],
-  "source_input_hash": "128f7ad3c2968d18f91c243c9ce7e359c5670c31d57003eff776933749fcfc8f"
+  "source_input_hash": "12f2ee6d915b4986f3c3d0fbc4f1e39a5a4bc9cfea3877a0ddba6a877fcc1c35"
 }
