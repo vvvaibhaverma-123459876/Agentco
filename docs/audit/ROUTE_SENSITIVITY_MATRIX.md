@@ -17,8 +17,8 @@ Public browser access must not receive a privileged service API key. Browser das
 |---|---:|
 | PUBLIC | 4 |
 | AUTH-READ | 104 |
-| AUTH-WRITE | 13 |
-| AUTH-PRINCIPAL | 181 |
+| AUTH-WRITE | 10 |
+| AUTH-PRINCIPAL | 184 |
 | TOTAL | 302 |
 
 ## Matrix
@@ -34,9 +34,9 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/api/audit` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/audit/integrity` | GET/HEAD | Audit trail, trace, or integrity state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/v1/capabilities/attempts/:attemptId` | GET/HEAD | Capability attempt lifecycle, audit and result state | AUTH-READ | Exposes non-liveness capability execution state; default stance is authenticated read. |
-| `/v1/capabilities/attempts/:attemptId/cancel` | POST | Capability attempt lifecycle and cancellation state | AUTH-WRITE | Mutates or terminates capability execution state; must require API key. |
-| `/v1/capabilities/execute` | POST | Capability execution request/result state | AUTH-WRITE | Starts governed capability work; must require API key. |
-| `/v1/capabilities/execute-async` | POST | Capability execution request/attempt state | AUTH-WRITE | Starts governed capability work; must require API key. |
+| `/v1/capabilities/attempts/:attemptId/cancel` | POST | Capability attempt lifecycle and cancellation state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
+| `/v1/capabilities/execute` | POST | Capability execution request/result state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal; caller-supplied actor.id and authorization_context.permissions are ignored (API key alone is insufficient). |
+| `/v1/capabilities/execute-async` | POST | Capability execution request/attempt state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal; caller-supplied actor.id and authorization_context.permissions are ignored (API key alone is insufficient). |
 | `/api/autonomy/action-loop` | POST | Autonomy run/task/candidate/evidence/action state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
 | `/api/autonomy/actions` | GET/HEAD | Autonomy run/task/candidate/evidence/action state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/api/autonomy/allocation/record-decision` | POST | Autonomy run/task/candidate/evidence/action state | AUTH-PRINCIPAL | AUD-004: requires a signed, credential-bound principal (API key alone is insufficient). |
