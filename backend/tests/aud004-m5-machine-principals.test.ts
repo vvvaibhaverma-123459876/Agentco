@@ -153,6 +153,12 @@ describe('AUD-004 M5: initiating human/agent identity is preserved through orche
     // initiating actor recorded on the coalition escalation.
     const creator = await humanActor('m5-escalation-creator');
     const civ = await civilizationKernel.ensureCivilizationRoot();
+    // This test's own precondition, not ambient state left by another test file: civ_os_state.mode
+    // determines whether tick() drives layerOrchestrator() -> routeEscalationsToJudiciary() at all.
+    // Without this, the test silently depended on whichever mode-touching test file Jest's default
+    // sequencer happened to run last in the full suite -- which shifted (and broke) once the merged
+    // governed-capability-runtime commits changed the backend/tests/ file roster.
+    await civilizationOs.setMode('running');
     const escalationId = crypto.randomUUID();
     // Minimal direct fixture: insert an open escalation as if a real coalition flow produced it.
     const coalition = await db.query<{ id: string }>(
