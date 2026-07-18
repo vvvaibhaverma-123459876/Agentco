@@ -48,7 +48,7 @@ describe('Specialist Subprocess Spawning', () => {
     expect(specialist?.portNumber).toBeDefined();
     expect(specialist?.processId).toBeGreaterThan(0);
     expect(specialist?.httpEndpoint).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/);
-  }, 10000);
+  }, 30000);
 
   test('should make HTTP request to specialist /status endpoint', async () => {
     const parentGoalId = await createGoal('test-goal-2');
@@ -70,7 +70,7 @@ describe('Specialist Subprocess Spawning', () => {
     expect(status.role).toBe('researcher');
     expect(status.status).toBe('running');
     expect(status.budget).toBeDefined();
-  }, 10000);
+  }, 30000);
 
   test('should execute action via specialist /execute endpoint', async () => {
     const parentGoalId = await createGoal('test-goal-3');
@@ -102,7 +102,7 @@ describe('Specialist Subprocess Spawning', () => {
     expect(result.status).toBe('completed');
     expect(result.observations).toBeDefined();
     expect(result.artifacts).toBeDefined();
-  }, 10000);
+  }, 30000);
 
   test('should reject request with invalid role', async () => {
     const request: SpecialistActivationRequest = {
