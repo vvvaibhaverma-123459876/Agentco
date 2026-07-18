@@ -1,0 +1,32 @@
+{
+  "allowed_hostname": "api.openai.com",
+  "artifact_type": "real_provider_campaign_authorization",
+  "authorization_expiry": "2026-07-19T00:00:00Z",
+  "authorization_hash": "9171d5c1dfefd4479cf771da2d76f96370cad66112b9f6d0f8d43f546a61e01f",
+  "authorization_timestamp": "2026-07-18T12:26:03.346146+00:00",
+  "authorized_operator": "user_authorized_codex_operator",
+  "batch_09a_readiness_identity": "real-provider-baseline-readiness",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "canary_sub_budget_usd": 0.25,
+  "case_manifest_hash": "39546df51028c55473e366ac2545dc555765ee3e398ec7d7e76b8df8bd5cb1d1",
+  "endpoint": "https://api.openai.com/v1",
+  "evaluator_protocol_hash": "2a60dc7e55d03d9e8a69800286fb00ac6ceda574e63004b981e2cb2ae75d93a4",
+  "fallback_model_allowed": false,
+  "fallback_provider_allowed": false,
+  "full_baseline_sub_budget_usd": 2.75,
+  "limitations": [
+    "no hosted deployment authorized",
+    "no production deployment authorized",
+    "no capability improvement claim authorized"
+  ],
+  "maximum_cases": 24,
+  "maximum_concurrency": 1,
+  "maximum_retries_per_case": 1,
+  "maximum_total_spend_usd": 3.0,
+  "model": "gpt-5.6-luna",
+  "protocol_v3_campaign_identity": "governed-capability-protocol-baseline-v3",
+  "provider": "OpenAI",
+  "source_commit": "9bfad8e79d494b84ab869f09032d1bdfa3e97c0d",
+  "source_tree": "c82e35a1379c77b8426271d66612ba6e7c886800",
+  "threshold_specification_hash": "66c99fdd87b114584077d6815684bbd51221d82c45c907e5ca2b4772da43d4b6"
+}

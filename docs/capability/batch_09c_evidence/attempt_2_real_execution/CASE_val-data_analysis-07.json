@@ -1,0 +1,79 @@
+{
+  "artifact_type": "genesis_v7_case_evidence",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+  "case_id": "val-data_analysis-07",
+  "completed_at": "2026-07-18T12:26:24.078299+00:00",
+  "cost": {
+    "consumed_usd": 0.00874,
+    "released_usd": 0.00027,
+    "reserved_usd": 0.00901,
+    "unreleased_amount": 0
+  },
+  "domain": "data_analysis",
+  "evaluator_result": null,
+  "evidence_complete": false,
+  "failure_category": "structured_parse_failed:JSONDecodeError",
+  "latency_ms": 2615.945,
+  "normalized_response": null,
+  "provider": "OpenAI",
+  "provider_request_id_captured": true,
+  "provider_response_hash": "594a1148781a488935ff0e0dfe347b95f8aca819ce9a1a1f3e22546a9121c316",
+  "provider_visible_request": {
+    "campaign_id": "governed-capability-genesis-v7-openai-real-baseline-attempt-2",
+    "case_id": "val-data_analysis-07",
+    "domain": "data_analysis",
+    "output_contract": {
+      "allowed_top_level_fields": [
+        "final_answer",
+        "supported_claims",
+        "unsupported_claims",
+        "evidence_refs",
+        "goal",
+        "assumptions",
+        "constraints",
+        "ordered_steps",
+        "dependencies",
+        "risks",
+        "success_criteria",
+        "fallbacks",
+        "conclusion",
+        "confidence",
+        "accepted_evidence",
+        "rejected_evidence",
+        "uncertainties",
+        "contradictions",
+        "provenance_refs",
+        "claims",
+        "result",
+        "findings",
+        "calculations",
+        "queries_or_operations",
+        "patch",
+        "changed_files",
+        "tests_requested",
+        "rationale_summary"
+      ],
+      "format": "JSON object"
+    },
+    "structured_input": {
+      "domain": "data_analysis",
+      "split_marker": "validation",
+      "variant": 7
+    },
+    "task": "validation data_analysis task 7: produce structured output for evaluator scoring."
+  },
+  "redacted_request_hash": "9677ef824dd5512707b5be4736c00807dd08620fbf4ace572717593dd323b205",
+  "requested_model": "gpt-5.6-luna",
+  "retry_count": 0,
+  "returned_model_identity": "gpt-5.6-luna",
+  "schema_valid": false,
+  "semantic_hash": "bb50f87fda89bd6c31a74360cf713ffdff2b1143e342d552fe50c057b5250cca",
+  "split": "validation",
+  "started_at": "2026-07-18T12:26:21.436917+00:00",
+  "terminal_status": "INVALID_RESPONSE",
+  "usage": {
+    "cached_input_tokens": 0,
+    "input_tokens": 212,
+    "output_reasoning_tokens": 256
+  }
+}

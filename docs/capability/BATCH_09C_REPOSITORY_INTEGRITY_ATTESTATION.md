@@ -3,13 +3,17 @@
 | Field | Value |
 | --- | --- |
 | branch | `audit/remediation-09-openai-genesis-v7-baseline` |
-| source commit | `4705815cc3a4a7275a1d2002c1c12a0ab49a0a55` |
-| source tree | `9f247133e3adb8ee4e8d1876660d27565a1a35d8` |
-| campaign | `governed-capability-genesis-v7-openai-real-baseline` |
+| execution source commit | `9bfad8e79d494b84ab869f09032d1bdfa3e97c0d` |
+| execution source tree | `c82e35a1379c77b8426271d66612ba6e7c886800` |
+| campaign | `governed-capability-genesis-v7-openai-real-baseline-attempt-2` |
 | credentials committed | `false` |
 | provider fallback used | `false` |
-| baseline cases started | `false` |
+| model fallback used | `false` |
+| baseline cases started | `true` |
+| baseline cases completed | `0` |
+| invalid-response cases | `24` |
 | hosted deployment attempted | `false` |
 | production deployment attempted | `false` |
+| secret scan | `passed` |
 
-The Batch 09C real-provider baseline stopped after the authorized canary failed for the exact model. The repository evidence contains only sanitized metadata and no provider credential values.
+Attempt 2 executed the authorized OpenAI canary and all 24 frozen baseline cases from the recorded execution source commit. The baseline remains `HOLD_FOR_MORE_EVIDENCE` because no case produced schema-valid, scorable capability evidence. Repository evidence contains sanitized metadata and no provider credential values.
