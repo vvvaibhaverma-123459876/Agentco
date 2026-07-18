@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-07-16T03:42:05.344Z",
-  "commit": "297f4403944ed8bcd5d039b8627db6251af8488a",
-  "inputHash": "4f7e607458d8535f30d9d43527f2b8ecbeb08e93d1c1a26e244c5b925fab0b60",
+  "generatedAt": "2026-07-18T05:06:45.031Z",
+  "commit": "02e2bc6b5a790b674bdcdce2ee9a4a412567c467",
+  "inputHash": "94e20893c1a0697b7e98828fe9f6e349d2c52bfa312047a130d4dce463857f29",
   "note": "This report separates structural acceptance from verified behaviour. The structural score is based on repository signals. This command does NOT execute the test suites and therefore does not emit an overall production-readiness score; run `make release-gate` and clean-room/staging commands for behavioural proof.",
   "acceptanceChecks": [
     {
