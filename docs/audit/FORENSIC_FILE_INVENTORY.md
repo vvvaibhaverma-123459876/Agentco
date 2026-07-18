@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2086`
+- Tracked files: `2129`
 
 ## Category Counts
 
@@ -11,8 +11,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Database migration | 139 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
-| Development tooling | 144 |
-| Documentation | 493 |
+| Development tooling | 145 |
+| Documentation | 535 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 490 |
@@ -25,9 +25,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Path | Count |
 |---|---:|
 | `backend` | 507 |
-| `docs` | 420 |
+| `docs` | 462 |
 | `evals` | 180 |
-| `scripts` | 156 |
+| `scripts` | 157 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
@@ -1272,6 +1272,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/REAL_CROSS_VERSION_DECISION.md` | Documentation |
 | `docs/audit/current/REAL_PROVIDER_BASELINE_READINESS.json` | Documentation |
 | `docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json` | Documentation |
+| `docs/audit/current/REAL_PROVIDER_GENESIS_V7_ATTEMPT_2_RESULTS.json` | Documentation |
 | `docs/audit/current/REAL_PROVIDER_GENESIS_V7_HOLD.json` | Documentation |
 | `docs/audit/current/RECONCILED_SUBJECT_MANIFEST.json` | Documentation |
 | `docs/audit/current/REMEDIATION_02A_CLEAN_ROOM_EVIDENCE.md` | Documentation |
@@ -1343,6 +1344,47 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/capability/batch_09c_evidence/RESERVATION_SETTLEMENT_REPORT.json` | Documentation |
 | `docs/capability/batch_09c_evidence/SECRET_SCAN_RESULT.json` | Documentation |
 | `docs/capability/batch_09c_evidence/SEMANTIC_HASH_LEDGER.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/AGGREGATE_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/AUTHORIZATION.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-claim_grounding-04.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-cross_domain_synthesis-09.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-data_analysis-07.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-evidence_evaluation-03.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-evidence_evaluation-12.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-planning-02.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-planning-11.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-reasoning-01.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-reasoning-10.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-safe_tool_selection-06.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-software_engineering-08.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-structured_transformation-05.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-claim_grounding-04.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-cross_domain_synthesis-09.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-data_analysis-07.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-evidence_evaluation-03.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-evidence_evaluation-12.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-planning-02.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-planning-11.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-reasoning-01.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-reasoning-10.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-safe_tool_selection-06.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-software_engineering-08.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-structured_transformation-05.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CLEAN_CLONE_VERIFICATION_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/COST_ESTIMATE.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/COST_TOKEN_LEDGER.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/CREDENTIAL_REDACTION_ATTESTATION.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/DOMAIN_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/EVALUATOR_CALIBRATION_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/FAILURE_RETRY_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/FINAL_REPOSITORY_INTEGRITY_ATTESTATION.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/GENESIS_V7_CAMPAIGN_MANIFEST.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/LATENCY_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/OPERATOR_INCIDENT_LOG.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/PROVIDER_CANARY_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/RESERVATION_SETTLEMENT_REPORT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/SECRET_SCAN_RESULT.json` | Documentation |
+| `docs/capability/batch_09c_evidence/attempt_2_real_execution/SEMANTIC_HASH_LEDGER.json` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
@@ -2002,6 +2044,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/run_level4_phase3_tests.sh` | Development tooling |
 | `scripts/run_local_agent.py` | Development tooling |
 | `scripts/run_longitudinal_campaign.py` | Development tooling |
+| `scripts/run_openai_genesis_v7_baseline.py` | Development tooling |
 | `scripts/run_pawdent_business_simulation.py` | Development tooling |
 | `scripts/run_real_world_validation.py` | Development tooling |
 | `scripts/run_staging_validation_gate.sh` | Development tooling |

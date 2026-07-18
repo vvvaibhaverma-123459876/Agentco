@@ -1,12 +1,12 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2086,
+  "tracked_file_count": 2129,
   "category_counts": {
     "Database migration": 139,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
-    "Development tooling": 144,
-    "Documentation": 493,
+    "Development tooling": 145,
+    "Documentation": 535,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 490,
@@ -16,9 +16,9 @@
   },
   "top_level_counts": {
     "backend": 507,
-    "docs": 420,
+    "docs": 462,
     "evals": 180,
-    "scripts": 156,
+    "scripts": 157,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
@@ -82,10 +82,10 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 614,
+    ".py": 615,
     ".md": 515,
     ".ts": 342,
-    ".json": 266,
+    ".json": 308,
     ".sql": 140,
     ".jsonl": 40,
     ".csv": 38,
@@ -7179,6 +7179,12 @@
       "extension": ".json"
     },
     {
+      "path": "docs/audit/current/REAL_PROVIDER_GENESIS_V7_ATTEMPT_2_RESULTS.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
       "path": "docs/audit/current/REAL_PROVIDER_GENESIS_V7_HOLD.json",
       "category": "Documentation",
       "top_level": "docs",
@@ -7600,6 +7606,252 @@
     },
     {
       "path": "docs/capability/batch_09c_evidence/SEMANTIC_HASH_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/AGGREGATE_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/AUTHORIZATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-claim_grounding-04.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-cross_domain_synthesis-09.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-data_analysis-07.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-evidence_evaluation-03.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-evidence_evaluation-12.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-planning-02.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-planning-11.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-reasoning-01.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-reasoning-10.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-safe_tool_selection-06.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-software_engineering-08.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_hid-structured_transformation-05.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-claim_grounding-04.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-cross_domain_synthesis-09.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-data_analysis-07.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-evidence_evaluation-03.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-evidence_evaluation-12.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-planning-02.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-planning-11.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-reasoning-01.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-reasoning-10.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-safe_tool_selection-06.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-software_engineering-08.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CASE_val-structured_transformation-05.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CLEAN_CLONE_VERIFICATION_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/COST_ESTIMATE.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/COST_TOKEN_LEDGER.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/CREDENTIAL_REDACTION_ATTESTATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/DOMAIN_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/EVALUATOR_CALIBRATION_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/FAILURE_RETRY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/FINAL_REPOSITORY_INTEGRITY_ATTESTATION.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/GENESIS_V7_CAMPAIGN_MANIFEST.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/LATENCY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/OPERATOR_INCIDENT_LOG.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/PROVIDER_CANARY_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/RESERVATION_SETTLEMENT_REPORT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/SECRET_SCAN_RESULT.json",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".json"
+    },
+    {
+      "path": "docs/capability/batch_09c_evidence/attempt_2_real_execution/SEMANTIC_HASH_LEDGER.json",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".json"
@@ -11554,6 +11806,12 @@
     },
     {
       "path": "scripts/run_longitudinal_campaign.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/run_openai_genesis_v7_baseline.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"
