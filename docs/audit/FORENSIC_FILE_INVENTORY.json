@@ -1,24 +1,24 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 1865,
+  "tracked_file_count": 1881,
   "category_counts": {
-    "Database migration": 138,
+    "Database migration": 141,
     "Deployment infrastructure": 32,
     "Deprecated code": 48,
-    "Development tooling": 129,
-    "Documentation": 377,
+    "Development tooling": 130,
+    "Documentation": 380,
     "Experimental code": 151,
     "Generated artifact": 116,
-    "Production runtime code": 487,
+    "Production runtime code": 490,
     "Prompt/template": 29,
-    "Test infrastructure": 283,
+    "Test infrastructure": 289,
     "Unknown purpose": 75
   },
   "top_level_counts": {
-    "backend": 502,
-    "docs": 304,
+    "backend": 514,
+    "docs": 307,
     "evals": 180,
-    "scripts": 141,
+    "scripts": 142,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
@@ -80,11 +80,11 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 556,
-    ".md": 454,
-    ".ts": 338,
+    ".py": 557,
+    ".md": 457,
+    ".ts": 347,
     ".json": 171,
-    ".sql": 139,
+    ".sql": 142,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 24,
@@ -2053,6 +2053,24 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/src/auth/identity-lookup.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/auth/principal-context.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/auth/request-principal.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/src/cli/autonomy.ts",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -2912,6 +2930,24 @@
     },
     {
       "path": "backend/src/db/migrations/140_civilization_os.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
+      "path": "backend/src/db/migrations/141_aud004_principal_permissions.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
+      "path": "backend/src/db/migrations/142_aud004_independence_backstops.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
+      "path": "backend/src/db/migrations/143_aud004_m3_breadth_permissions.sql",
       "category": "Database migration",
       "top_level": "backend",
       "extension": ".sql"
@@ -4183,6 +4219,24 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/aud004-conditions-16-25.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/aud004-m3-breadth.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/aud004-m5-machine-principals.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/audit-chain-cross-writer.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
@@ -4531,6 +4585,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/helpers/sign-request.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/idempotency-store.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
@@ -4699,6 +4759,12 @@
       "extension": ".ts"
     },
     {
+      "path": "backend/tests/principal-boundary.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
       "path": "backend/tests/prompt-injection-e2e.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
@@ -4736,6 +4802,12 @@
     },
     {
       "path": "backend/tests/reputation-adaptive-integration.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/request-principal.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -6577,6 +6649,12 @@
       "extension": ".md"
     },
     {
+      "path": "docs/civilization/CONDITIONS_16_25_EVIDENCE_MAP.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
       "path": "docs/civilization/OUTSTANDING_GATES.md",
       "category": "Documentation",
       "top_level": "docs",
@@ -7304,6 +7382,18 @@
     },
     {
       "path": "docs/runtime_capability_contract.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/security/AUD-004-DESIGN.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/security/AUD-004-MACHINE-PRINCIPAL-REGISTRY.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -10718,6 +10808,12 @@
     },
     {
       "path": "scripts/verify_agentco_multidomain_live_run.py",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".py"
+    },
+    {
+      "path": "scripts/verify_aud004_conditions_16_25.py",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".py"

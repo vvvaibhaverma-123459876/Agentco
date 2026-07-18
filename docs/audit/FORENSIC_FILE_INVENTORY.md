@@ -2,32 +2,32 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `1865`
+- Tracked files: `1881`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
-| Database migration | 138 |
+| Database migration | 141 |
 | Deployment infrastructure | 32 |
 | Deprecated code | 48 |
-| Development tooling | 129 |
-| Documentation | 377 |
+| Development tooling | 130 |
+| Documentation | 380 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
-| Production runtime code | 487 |
+| Production runtime code | 490 |
 | Prompt/template | 29 |
-| Test infrastructure | 283 |
+| Test infrastructure | 289 |
 | Unknown purpose | 75 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 502 |
-| `docs` | 304 |
+| `backend` | 514 |
+| `docs` | 307 |
 | `evals` | 180 |
-| `scripts` | 141 |
+| `scripts` | 142 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
@@ -416,6 +416,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/adapters/url-safety.ts` | Production runtime code |
 | `backend/src/adapters/web-adapter.ts` | Production runtime code |
 | `backend/src/agent-registry.ts` | Production runtime code |
+| `backend/src/auth/identity-lookup.ts` | Production runtime code |
+| `backend/src/auth/principal-context.ts` | Production runtime code |
+| `backend/src/auth/request-principal.ts` | Production runtime code |
 | `backend/src/cli/autonomy.ts` | Production runtime code |
 | `backend/src/cli/db-table-usage.ts` | Production runtime code |
 | `backend/src/cli/run-bounded-learning.ts` | Production runtime code |
@@ -560,6 +563,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/db/migrations/138_safe_evolution.sql` | Database migration |
 | `backend/src/db/migrations/139_capability_expansion.sql` | Database migration |
 | `backend/src/db/migrations/140_civilization_os.sql` | Database migration |
+| `backend/src/db/migrations/141_aud004_principal_permissions.sql` | Database migration |
+| `backend/src/db/migrations/142_aud004_independence_backstops.sql` | Database migration |
+| `backend/src/db/migrations/143_aud004_m3_breadth_permissions.sql` | Database migration |
 | `backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql` | Production runtime code |
 | `backend/src/db/run_migrations.py` | Production runtime code |
 | `backend/src/db/unsupported_migrations/020_evaluation_manifests.sql.disabled` | Production runtime code |
@@ -771,6 +777,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/agent-registry.test.ts` | Test infrastructure |
 | `backend/tests/agentco-5min-vetting.test.ts` | Test infrastructure |
 | `backend/tests/api-safety-gates.test.ts` | Test infrastructure |
+| `backend/tests/aud004-conditions-16-25.test.ts` | Test infrastructure |
+| `backend/tests/aud004-m3-breadth.test.ts` | Test infrastructure |
+| `backend/tests/aud004-m5-machine-principals.test.ts` | Test infrastructure |
 | `backend/tests/audit-chain-cross-writer.test.ts` | Test infrastructure |
 | `backend/tests/autonomous-promotion.test.ts` | Test infrastructure |
 | `backend/tests/autonomy-action-planner-env.test.ts` | Test infrastructure |
@@ -829,6 +838,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/hash-chain-anchor.test.ts` | Test infrastructure |
 | `backend/tests/health-contract.test.ts` | Test infrastructure |
 | `backend/tests/helm-deployment-contract.test.ts` | Test infrastructure |
+| `backend/tests/helpers/sign-request.ts` | Test infrastructure |
 | `backend/tests/idempotency-store.test.ts` | Test infrastructure |
 | `backend/tests/identity-authority.test.ts` | Test infrastructure |
 | `backend/tests/institution-claim-vetting.test.ts` | Test infrastructure |
@@ -857,6 +867,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/phase4-production-deployment.test.ts` | Test infrastructure |
 | `backend/tests/phase5-calibration-groundwork.test.ts` | Test infrastructure |
 | `backend/tests/planner-claim-bias.test.ts` | Test infrastructure |
+| `backend/tests/principal-boundary.test.ts` | Test infrastructure |
 | `backend/tests/prompt-injection-e2e.test.ts` | Test infrastructure |
 | `backend/tests/proof-of-competence.test.ts` | Test infrastructure |
 | `backend/tests/protected-surface-enforcer.test.ts` | Test infrastructure |
@@ -864,6 +875,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/red-team-corpus.test.ts` | Test infrastructure |
 | `backend/tests/regression-test-generator.test.ts` | Test infrastructure |
 | `backend/tests/reputation-adaptive-integration.test.ts` | Test infrastructure |
+| `backend/tests/request-principal.test.ts` | Test infrastructure |
 | `backend/tests/resource-ledger.test.ts` | Test infrastructure |
 | `backend/tests/risk-tier-classifier.test.ts` | Test infrastructure |
 | `backend/tests/route-auth-contract.test.ts` | Test infrastructure |
@@ -1170,6 +1182,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/current/TEST_SKIP_ALLOWLIST.json` | Documentation |
 | `docs/civilization/CANONICAL_RUNTIME_MAP.md` | Documentation |
 | `docs/civilization/COMPLETION_PREDICATE_WALK.md` | Documentation |
+| `docs/civilization/CONDITIONS_16_25_EVIDENCE_MAP.md` | Documentation |
 | `docs/civilization/OUTSTANDING_GATES.md` | Documentation |
 | `docs/civilization/PLAN_AND_PROGRESS.md` | Documentation |
 | `docs/civilization/canonical_runtime_map.json` | Documentation |
@@ -1292,6 +1305,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/refoundation/VALIDATION_PLAN.md` | Documentation |
 | `docs/runnability_audit.md` | Documentation |
 | `docs/runtime_capability_contract.md` | Documentation |
+| `docs/security/AUD-004-DESIGN.md` | Documentation |
+| `docs/security/AUD-004-MACHINE-PRINCIPAL-REGISTRY.md` | Documentation |
 | `evals/__init__.py` | Experimental code |
 | `evals/acceptance/__init__.py` | Experimental code |
 | `evals/acceptance/accelerated_business_agent_calls.csv` | Experimental code |
@@ -1861,6 +1876,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/true_autonomy_test.py` | Development tooling |
 | `scripts/verify_agentco_goal_run.py` | Development tooling |
 | `scripts/verify_agentco_multidomain_live_run.py` | Development tooling |
+| `scripts/verify_aud004_conditions_16_25.py` | Development tooling |
 | `scripts/verify_benchmark_governance.py` | Development tooling |
 | `scripts/verify_civilization_vertical_slice.py` | Development tooling |
 | `scripts/verify_docker_startup.py` | Development tooling |
