@@ -1,8 +1,8 @@
 {
   "ledger_id": "governed-capability-runtime-findings",
-  "updated_for_batch": "09B",
-  "audited_pr": 29,
-  "audited_sha": "98eb1b9c04604e84770c7bdd286f9bbbfdbec663",
+  "updated_for_batch": "09C",
+  "audited_pr": 30,
+  "audited_sha": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
   "findings": [
     {
       "finding_id": "GCR-001",
@@ -83,6 +83,17 @@
       "impact": "No real-provider capability baseline, supported domains, aggregate correctness, capability improvement, hosted staging readiness or production readiness can be claimed.",
       "remediation": "Provide a machine-verifiable authorization artifact bound to the exact source commit, source tree, provider, model, endpoint, case manifest and budgets; expose provider configuration through the approved environment or secret manager; then run a separately authorized real-provider campaign.",
       "remaining_risk": "Until authorization and preflight pass, real-provider capability evidence remains unavailable."
+    },
+    {
+      "finding_id": "GCR-009",
+      "severity": "S3",
+      "component": "openai-real-provider-genesis-v7",
+      "status": "open_hold_for_more_evidence",
+      "summary": "Batch 09C attempted the authorized OpenAI canary but the exact authorized model was unavailable for the request, so the 24-case baseline was not started.",
+      "evidence": "docs/audit/current/REAL_PROVIDER_GENESIS_V7_HOLD.json",
+      "impact": "No Genesis V7 real-provider capability baseline, supported domains, aggregate correctness, capability improvement, hosted staging readiness or production readiness can be claimed.",
+      "remediation": "Provide a new explicit authorization bound to an available official model, endpoint, case manifest and budgets; rerun preflight and a new canary before any 24-case baseline execution.",
+      "remaining_risk": "Until an authorized model passes canary and cost controls, real-provider capability evidence remains unavailable."
     }
   ]
 }

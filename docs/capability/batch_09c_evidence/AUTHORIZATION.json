@@ -1,0 +1,48 @@
+{
+  "artifact_type": "real_provider_campaign_authorization",
+  "authorization_artifact_hash": "a5545e2d5062b5e23bfa02c23e753c647485ec7f00588d102f8c935889d1f678",
+  "authorization_expiry": "2026-07-19T23:59:59Z",
+  "authorization_status": "created_from_user_prompt",
+  "authorized_operator_context": "user_explicit_batch_09c_authorization",
+  "batch_09a_readiness_identity": "real-provider-baseline-readiness",
+  "branch": "audit/remediation-09-openai-genesis-v7-baseline",
+  "campaign_id": "governed-capability-genesis-v7-openai-real-baseline",
+  "capability_improvement_claim_authorized": false,
+  "case_manifest": "8f843e7cbca082d9e430fd8550ce5f84981d3df3ebee108c6779e44611a408c6",
+  "case_manifest_file_sha256": "39546df51028c55473e366ac2545dc555765ee3e398ec7d7e76b8df8bd5cb1d1",
+  "credential_values_recorded": false,
+  "endpoint": "https://api.openai.com/v1",
+  "endpoint_hostname": "api.openai.com",
+  "evaluator_protocol_sha256": "2a60dc7e55d03d9e8a69800286fb00ac6ceda574e63004b981e2cb2ae75d93a4",
+  "evidence_destination": "artifacts/capability-runtime/governed-capability-genesis-v7-openai-real-baseline",
+  "execution_timeout_seconds": 30,
+  "fallback_policy": {
+    "model_fallback": "prohibited",
+    "provider_fallback": "prohibited"
+  },
+  "generated_at": "2026-07-18T05:44:45Z",
+  "genesis_v5_hold_identity": "governed-capability-genesis-v5",
+  "genesis_v6_hold_identity": "governed-capability-genesis-v6-real-baseline",
+  "hosted_deployment_authorized": false,
+  "immutable_after_first_provider_request": true,
+  "maximum_concurrency": 1,
+  "maximum_full_baseline_spend_after_canary_usd": "2.75",
+  "maximum_planned_genesis_cases": 24,
+  "maximum_preliminary_canary_spend_usd": "0.25",
+  "maximum_total_spend_usd": "3.00",
+  "pr30_merge_commit": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
+  "production_deployment_authorized": false,
+  "protocol_v3_campaign_identity": "governed-capability-protocol-baseline-v3",
+  "provider": "OpenAI",
+  "provider_host_allowlist": [
+    "api.openai.com"
+  ],
+  "requested_model": "gpt-5.6-luna",
+  "retry_policy": {
+    "max_retries_per_case": 1,
+    "retryable_errors_only": true
+  },
+  "source_commit": "4705815cc3a4a7275a1d2002c1c12a0ab49a0a55",
+  "source_tree": "9f247133e3adb8ee4e8d1876660d27565a1a35d8",
+  "threshold_specification_sha256": "66c99fdd87b114584077d6815684bbd51221d82c45c907e5ca2b4772da43d4b6"
+}
