@@ -218,7 +218,7 @@
     ]
   },
   "ledger_version": "migration-identity-ledger-v1",
-  "migration_count": 131,
+  "migration_count": 135,
   "migration_directory": "backend/src/db/migrations",
   "migrations": [
     {
@@ -2773,6 +2773,50 @@
       ],
       "sequence": 140,
       "stable_migration_id": "140_governed_capability_runtime.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "3d94701ce1306835aef792454f9e1b67c7c001d9e43a2aeefa6722e113d5ea67",
+      "filename": "141_aud004_principal_permissions.sql",
+      "origin_commit": "811c538c2f7a454d11887c92853eefc25625d3e8",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 141,
+      "stable_migration_id": "141_aud004_principal_permissions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "252b984822062064f199f89d90f93c7fd281cc37ce4104fc54d8389634bebae3",
+      "filename": "142_aud004_independence_backstops.sql",
+      "origin_commit": "11db20d19806129687a08acca568868250aaa65d",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 142,
+      "stable_migration_id": "142_aud004_independence_backstops.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "7e1b0bdc4caf268c76b3720a5c7566b0731203ed62fede7c9410bb4393669401",
+      "filename": "143_aud004_m3_breadth_permissions.sql",
+      "origin_commit": "023614f2e5c08f7a73a77d07c4ea73b6ce202d3c",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 143,
+      "stable_migration_id": "143_aud004_m3_breadth_permissions.sql",
+      "upgrade_prerequisites": []
+    },
+    {
+      "already_applied_compatibility_rule": "filename and content_hash must match; legacy null hashes are backfilled once by the migration runner",
+      "content_hash": "591077bc7b7d42e823b1336add64d8162a43146fd1229ab62a1bf8971b9595ee",
+      "filename": "144_aud004_capability_runtime_permissions.sql",
+      "origin_commit": "e724aa9cbbc7371a1aa96e2c06b884a7d28f70d1",
+      "rollback_classification": "forward_fix_required",
+      "schema_objects_created": [],
+      "sequence": 144,
+      "stable_migration_id": "144_aud004_capability_runtime_permissions.sql",
       "upgrade_prerequisites": []
     }
   ],
