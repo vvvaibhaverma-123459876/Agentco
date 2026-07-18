@@ -23,6 +23,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from agentco_capability.evidence import payload_manifest
+
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs" / "capability"
 EVIDENCE_DIR = DOCS / "batch_09c_evidence" / "attempt_2_real_execution"
@@ -917,7 +919,6 @@ def write_reports(aggregate: dict[str, Any], records: list[dict[str, Any]], doma
         "authorization_headers_written_to_artifacts": False,
         "secret_scan": scan,
     })
-    write_json(EVIDENCE_DIR / "GENESIS_V7_CAMPAIGN_MANIFEST.json", aggregate)
     write_json(EVIDENCE_DIR / "FINAL_REPOSITORY_INTEGRITY_ATTESTATION.json", {
         "campaign_id": CAMPAIGN_ID,
         "source_commit": aggregate["source_commit"],
@@ -925,6 +926,32 @@ def write_reports(aggregate: dict[str, Any], records: list[dict[str, Any]], doma
         "working_tree_clean_before_execution": True,
     })
     write_json(EVIDENCE_DIR / "OPERATOR_INCIDENT_LOG.json", {"campaign_id": CAMPAIGN_ID, "incidents": []})
+    payload_files = [
+        path
+        for path in EVIDENCE_DIR.glob("*.json")
+        if path.name not in {"GENESIS_V7_CAMPAIGN_MANIFEST.json", "INTERNAL_PAYLOAD_MANIFEST.json"}
+    ]
+    internal_payload, internal_payload_hash = payload_manifest(
+        EVIDENCE_DIR,
+        payload_files,
+        campaign_execution_sha=aggregate["source_commit"],
+        workflow_head_sha=aggregate["source_commit"],
+        campaign_id=aggregate["campaign_id"],
+        hash_fields={
+            "source_tree": aggregate["source_tree"],
+            "provider": aggregate["provider"],
+            "requested_model": aggregate["requested_model"],
+            "authorization_hash": aggregate["authorization_hash"],
+            "case_manifest_hash": aggregate.get("case_manifest_hash"),
+            "evaluator_protocol_hash": aggregate.get("evaluator_protocol_hash"),
+            "threshold_specification_hash": aggregate.get("threshold_specification_hash"),
+            "aggregate_semantic_hash": aggregate["semantic_hash"],
+        },
+    )
+    write_json(EVIDENCE_DIR / "INTERNAL_PAYLOAD_MANIFEST.json", internal_payload)
+    campaign_manifest = dict(aggregate)
+    campaign_manifest["internal_payload_manifest_hash"] = internal_payload_hash
+    write_json(EVIDENCE_DIR / "GENESIS_V7_CAMPAIGN_MANIFEST.json", campaign_manifest)
     for path in EVIDENCE_DIR.glob("*.json"):
         target = ARTIFACT_DIR / path.name
         target.parent.mkdir(parents=True, exist_ok=True)

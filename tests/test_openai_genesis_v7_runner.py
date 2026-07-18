@@ -4,6 +4,7 @@ import json
 
 import pytest
 
+from agentco_capability.evidence import reproduce_payload_hash
 import scripts.run_openai_genesis_v7_baseline as runner
 
 
@@ -204,3 +205,51 @@ def test_clean_clone_recomputation_passes_with_diagnosable_provider_evidence(mon
     assert report["verification_result"] == "passed"
     assert report["case_hashes_match"] is True
     assert report["decision_recomputable_without_provider_credentials"] is True
+
+
+def test_write_reports_adds_reproducible_internal_payload_manifest(monkeypatch, tmp_path):
+    evidence_dir = tmp_path / "evidence"
+    artifact_dir = tmp_path / "artifact"
+    monkeypatch.setattr(runner, "EVIDENCE_DIR", evidence_dir)
+    monkeypatch.setattr(runner, "ARTIFACT_DIR", artifact_dir)
+    record = {
+        "campaign_id": runner.CAMPAIGN_ID,
+        "case_id": "case-1",
+        "domain": "reasoning",
+        "terminal_status": "EVIDENCE_UNAVAILABLE",
+        "failure_category": "budget_guard_refused_start",
+        "semantic_hash": "a" * 64,
+        "latency_ms": 0,
+        "cost": {"reserved_usd": 0.1, "consumed_usd": 0, "released_usd": 0.1, "unreleased_amount": 0},
+    }
+    aggregate = {
+        "campaign_id": runner.CAMPAIGN_ID,
+        "source_commit": "1" * 40,
+        "source_tree": "2" * 40,
+        "provider": "OpenAI",
+        "requested_model": "gpt-authorized",
+        "authorization_hash": "b" * 64,
+        "case_manifest_hash": "c" * 64,
+        "evaluator_protocol_hash": "d" * 64,
+        "threshold_specification_hash": "e" * 64,
+        "executed_cases": 1,
+        "decision": "HOLD_FOR_MORE_EVIDENCE",
+        "total_input_tokens": 0,
+        "total_cached_input_tokens": 0,
+        "total_output_reasoning_tokens": 0,
+        "total_campaign_cost_usd": 0,
+        "remaining_authorized_campaign_budget_usd": 3,
+        "retry_count": 0,
+        "generated_at": "volatile",
+    }
+
+    runner.write_reports(aggregate, [record], {"reasoning": {"planned_cases": 1}})
+
+    payload = json.loads((evidence_dir / "INTERNAL_PAYLOAD_MANIFEST.json").read_text())
+    manifest = json.loads((evidence_dir / "GENESIS_V7_CAMPAIGN_MANIFEST.json").read_text())
+
+    assert reproduce_payload_hash(payload, evidence_dir) == payload["aggregate_payload_hash"]
+    assert manifest["internal_payload_manifest_hash"] == payload["aggregate_payload_hash"]
+    assert (artifact_dir / "INTERNAL_PAYLOAD_MANIFEST.json").exists()
+    assert (artifact_dir / "GENESIS_V7_CAMPAIGN_MANIFEST.json").exists()
+    assert "internal_payload_manifest_hash" not in json.loads((evidence_dir / "AGGREGATE_REPORT.json").read_text())

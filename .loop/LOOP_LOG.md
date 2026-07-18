@@ -170,3 +170,22 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Strengthen the future V7 runner/evidence path so a new authorized real-provider run can close `GCR-011`, or prepare hosted staging prerequisites until human infrastructure is available.
+
+## Iteration 9 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `80dfc8f02170ae53f76b3d0accb317f8e0506e9e`
+- Selected item: strengthen future Genesis V7 evidence binding by making the real-provider runner emit a reproducible internal payload manifest.
+- Claude/Duet: attempted `duet talk ... claude`; still unavailable due Claude session limit resetting at `4am (Asia/Calcutta)`.
+- Changed:
+  - `scripts/run_openai_genesis_v7_baseline.py` now writes `INTERNAL_PAYLOAD_MANIFEST.json` for future V7 runs and binds its aggregate hash into `GENESIS_V7_CAMPAIGN_MANIFEST.json`.
+  - The aggregate report remains non-recursive; the payload hash is stored only in the excluded campaign manifest.
+  - Added a focused unit test proving the payload hash reproduces and is copied to the artifact directory.
+- Evidence:
+  - `python3.13 -m pytest tests/test_openai_genesis_v7_runner.py tests/test_capability_genesis_artifact_verifier.py -q` -> `13 passed`
+  - `python3.13 -m py_compile scripts/run_openai_genesis_v7_baseline.py scripts/verify_capability_genesis_artifact.py` -> passed
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on historical frozen-file changes, missing historical V7 payload manifests, and non-diagnosable attempt-2 provider evidence.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue strengthening future V7 diagnosability and verifier coverage that does not require a new live-provider authorization.
