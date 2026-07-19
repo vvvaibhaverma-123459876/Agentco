@@ -375,3 +375,27 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue addressing integration-debt findings that do not require hosted infrastructure or a new authorized provider campaign, likely learning/regression measurement or the autonomous driver path.
+
+## Iteration 19 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `b43bb8788312290954ae91ae9fef5a22473f8002`
+- Selected item: address Claude's learning/regression gap where promotion proof could be minted from caller-supplied booleans instead of evaluator-owned results.
+- Claude/Duet: `duet doctor` still reports Claude unavailable due session limit; used the user-supplied full-audit summary as external input.
+- Changed:
+  - `SkillDeploymentService.promoteCandidate()` now requires the latest passing `candidate_evaluations` row and derives proof-of-competence regression results from its persisted `case_results_json`.
+  - Promotion now refuses candidates with missing or failing evaluator-owned regression results even when status and canary records otherwise look promotable.
+  - Added a self-improvement regression that tampers a persisted evaluator result to failing and proves promotion stops before caller-invented success can mint proof.
+  - Refreshed subsystem audit results; current blockers remain limited to `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+- Evidence:
+  - `cd backend && npm test -- self-improvement-closed-loop-e2e.test.ts --runInBand` -> `4 passed`
+  - `cd backend && npm test -- skill-promotion-loop.test.ts --runInBand` -> `1 passed`
+  - `cd backend && npm test -- skill-consumption-e2e.test.ts --runInBand` -> `3 passed`
+  - `cd backend && npm run build` -> passed
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`)
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue with remaining non-blocked integration gaps, especially the continuous autonomous driver path that bypasses the governed task engine.

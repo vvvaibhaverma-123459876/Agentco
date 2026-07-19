@@ -246,6 +246,33 @@ describe('self-improvement closed loop', () => {
     await expect(skillCanary.runCanary({ candidateId })).rejects.toThrow(/only evaluated candidates/);
   });
 
+  test('promotion refuses caller-invented success when evaluator-owned regression results fail', async () => {
+    const candidateId = await createCandidateFromObservations('non_independent_sources');
+    const evaluation = await candidateEvaluation.evaluateCandidate(candidateId);
+    expect(evaluation.passed).toBe(true);
+    const canary = await skillCanary.runCanary({ candidateId, maxIterations: 15 });
+    expect(canary.passed).toBe(true);
+
+    const tamperedResults = evaluation.caseResults.map((result, index) => ({
+      ...result,
+      passed: index === 0 ? false : result.passed,
+      detail: index === 0 ? 'forced failure for evaluator-owned proof test' : result.detail,
+    }));
+    await db.query(
+      `UPDATE candidate_evaluations SET case_results_json = $2::jsonb WHERE id = $1`,
+      [evaluation.id, JSON.stringify(tamperedResults)]
+    );
+
+    const domainKey = `selfimpfail_${Date.now()}`;
+    await activateDomain(domainKey);
+    await expect(skillDeployment.promoteCandidate({
+      candidateId,
+      skillKey: `tampered_success_${Date.now()}`,
+      domainKey,
+      description: 'This promotion must not pass from caller-supplied booleans.',
+    })).rejects.toThrow(/failing evaluator-owned regression results/);
+  }, 30000);
+
   test('rollback retires the skill and removes it from retrieval', async () => {
     const candidateId = await createCandidateFromObservations('ungrounded_snippets');
     const evaluation = await candidateEvaluation.evaluateCandidate(candidateId);

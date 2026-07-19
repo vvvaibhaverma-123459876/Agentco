@@ -16,6 +16,13 @@ import { proofOfCompetence } from './proof-of-competence.service';
 import { skillLibrary } from './skill-library.service';
 import { skillPromotionLoop } from './skill-promotion-loop.service';
 
+type EvaluationCaseResult = {
+  caseName: string;
+  testType: string;
+  passed: boolean;
+  detail: string;
+};
+
 export interface DeployResult {
   candidateId: string;
   skillVersionId: string;
@@ -27,6 +34,12 @@ export interface RollbackResult {
   candidateId: string;
   skillVersionId: string | null;
   status: 'rolled_back';
+}
+
+function parseEvaluationCases(value: unknown): EvaluationCaseResult[] {
+  const raw = typeof value === 'string' ? JSON.parse(value) : value;
+  if (!Array.isArray(raw)) return [];
+  return raw.map((row) => row as EvaluationCaseResult);
 }
 
 export class SkillDeploymentService {
@@ -47,12 +60,18 @@ export class SkillDeploymentService {
       canary_score: number | null;
       baseline_score: number | null;
       artifact_json: Record<string, unknown> | string;
+      evaluation_id: string | null;
+      evaluation_passed: boolean | null;
+      case_results_json: unknown;
     }>(
       `SELECT c.status,
               k.passed AS canary_passed,
               k.canary_score,
               k.baseline_score,
-              c.artifact_json
+              c.artifact_json,
+              e.id AS evaluation_id,
+              e.passed AS evaluation_passed,
+              e.case_results_json
          FROM learner_candidates c
          LEFT JOIN LATERAL (
               SELECT passed, canary_score, baseline_score
@@ -61,6 +80,13 @@ export class SkillDeploymentService {
                ORDER BY created_at DESC
                LIMIT 1
          ) k ON TRUE
+         LEFT JOIN LATERAL (
+              SELECT id, passed, case_results_json
+                FROM candidate_evaluations
+               WHERE candidate_id = c.id
+               ORDER BY created_at DESC
+               LIMIT 1
+         ) e ON TRUE
         WHERE c.id = $1`,
       [input.candidateId]
     );
@@ -74,16 +100,42 @@ export class SkillDeploymentService {
     if (row.canary_passed !== true) {
       throw new Error(`candidate ${input.candidateId} has no passing canary run; promotion refused`);
     }
+    if (row.evaluation_passed !== true || !row.evaluation_id) {
+      throw new Error(`candidate ${input.candidateId} has no passing evaluator-owned regression result; promotion refused`);
+    }
 
     const artifact: Record<string, unknown> =
       typeof row.artifact_json === 'string' ? JSON.parse(row.artifact_json) : row.artifact_json ?? {};
 
-    const regressionCases = await db.query<{ id: string }>(
-      `SELECT id FROM candidate_regression_tests WHERE candidate_id = $1`,
+    const regressionCases = await db.query<{ id: string; case_name: string; test_type: string }>(
+      `SELECT id, case_name, test_type FROM candidate_regression_tests WHERE candidate_id = $1`,
       [input.candidateId]
     );
     if ((regressionCases.rowCount ?? 0) === 0) {
       throw new Error(`candidate ${input.candidateId} has no regression coverage; promotion refused`);
+    }
+    const evaluationCases = parseEvaluationCases(row.case_results_json);
+    const resultsByCase = new Map(evaluationCases.map((result) => [`${result.caseName}:${result.testType}`, result]));
+    const proofResults = regressionCases.rows.map(caseRow => {
+      const measured = resultsByCase.get(`${caseRow.case_name}:${caseRow.test_type}`);
+      if (!measured) {
+        throw new Error(`candidate ${input.candidateId} missing evaluator result for ${caseRow.case_name}`);
+      }
+      return {
+        regression_test_id: caseRow.id,
+        passed: measured.passed === true,
+        score: measured.passed === true ? 1 : 0,
+        evidence: {
+          evaluator: 'candidate_evaluation_service',
+          evaluation_id: row.evaluation_id,
+          case_name: measured.caseName,
+          test_type: measured.testType,
+          detail: measured.detail,
+        },
+      };
+    });
+    if (proofResults.some(result => !result.passed)) {
+      throw new Error(`candidate ${input.candidateId} has failing evaluator-owned regression results; promotion refused`);
     }
 
     const version = await skillLibrary.registerSkillVersion({
@@ -107,12 +159,8 @@ export class SkillDeploymentService {
     await proofOfCompetence.mintProof({
       skill_key: input.skillKey,
       evaluation_label: 'canary_promotion_eval',
-      threshold: 0.5,
-      results: regressionCases.rows.map(caseRow => ({
-        regression_test_id: caseRow.id,
-        passed: true,
-        score: Number(row.canary_score),
-      })),
+      threshold: 1.0,
+      results: proofResults,
     });
 
     const promotion = await skillPromotionLoop.promote({
