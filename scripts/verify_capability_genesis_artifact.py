@@ -24,6 +24,7 @@ DEFAULT_ROOTS = [
     Path("artifacts/capability-runtime"),
     Path("docs/capability"),
 ]
+FROZEN_CASE_MANIFEST = ROOT / "benchmarks" / "capability_genesis_v5" / "manifests" / "frozen_case_manifest.json"
 
 TOTAL_CAP_USD = 3.00
 MAX_CASES = 24
@@ -38,6 +39,7 @@ TERMINAL_COUNT_FIELDS = {
     "infrastructure_failure_cases": "INFRASTRUCTURE_FAILURE",
 }
 TERMINAL_STATUSES = set(TERMINAL_COUNT_FIELDS.values())
+FROZEN_EXECUTION_SPLITS = {"validation", "hidden"}
 
 
 def load(path: Path):
@@ -166,7 +168,73 @@ def _aggregate_semantic_hash(manifest: dict[str, Any]) -> str:
     return _sha256_text(_canonical({key: value for key, value in manifest.items() if key not in volatile_or_late_bound}))
 
 
-def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) -> list[str]:
+def _load_expected_case_population(path: Path) -> tuple[dict[str, dict[str, str]], list[str]]:
+    findings: list[str] = []
+    try:
+        manifest = load(path)
+    except (OSError, ValueError) as exc:
+        return {}, [f"GENESIS_V7_FROZEN_CASE_MANIFEST_INVALID:{path}:{type(exc).__name__}"]
+    if not isinstance(manifest, dict):
+        return {}, [f"GENESIS_V7_FROZEN_CASE_MANIFEST_NOT_OBJECT:{path}"]
+    cases = manifest.get("cases")
+    if not isinstance(cases, list):
+        return {}, [f"GENESIS_V7_FROZEN_CASE_MANIFEST_CASES_INVALID:{path}"]
+    expected: dict[str, dict[str, str]] = {}
+    for index, case in enumerate(cases):
+        if not isinstance(case, dict):
+            findings.append(f"GENESIS_V7_FROZEN_CASE_RECORD_NOT_OBJECT:{path}:index={index}")
+            continue
+        split = case.get("split")
+        if split not in FROZEN_EXECUTION_SPLITS:
+            continue
+        case_id = case.get("case_id")
+        domain = case.get("domain")
+        if not isinstance(case_id, str) or not isinstance(domain, str):
+            findings.append(f"GENESIS_V7_FROZEN_CASE_RECORD_INVALID:{path}:index={index}")
+            continue
+        if case_id in expected:
+            findings.append(f"GENESIS_V7_FROZEN_CASE_DUPLICATE:{path}:{case_id}")
+        expected[case_id] = {"split": split, "domain": domain}
+    if len(expected) != MAX_CASES:
+        findings.append(f"GENESIS_V7_FROZEN_CASE_COUNT_MISMATCH:{path}:expected={MAX_CASES}:actual={len(expected)}")
+    return expected, findings
+
+
+def _verify_case_population(
+    manifest_path: Path,
+    case_records: list[dict[str, Any]],
+    frozen_case_manifest_path: Path,
+) -> list[str]:
+    expected_cases, findings = _load_expected_case_population(frozen_case_manifest_path)
+    if findings:
+        return findings
+    observed_ids = {record.get("case_id") for record in case_records if isinstance(record.get("case_id"), str)}
+    expected_ids = set(expected_cases)
+    for case_id in sorted(expected_ids - observed_ids):
+        findings.append(f"GENESIS_V7_FROZEN_CASE_MISSING:{manifest_path}:{case_id}")
+    for case_id in sorted(observed_ids - expected_ids):
+        findings.append(f"GENESIS_V7_UNREGISTERED_CASE_RECORD:{manifest_path}:{case_id}")
+    for record in case_records:
+        case_id = record.get("case_id")
+        if case_id not in expected_cases:
+            continue
+        expected = expected_cases[case_id]
+        if record.get("split") != expected["split"]:
+            findings.append(
+                f"GENESIS_V7_CASE_SPLIT_MISMATCH:{manifest_path}:{case_id}:expected={expected['split']}:actual={record.get('split')}"
+            )
+        if record.get("domain") != expected["domain"]:
+            findings.append(
+                f"GENESIS_V7_CASE_DOMAIN_MISMATCH:{manifest_path}:{case_id}:expected={expected['domain']}:actual={record.get('domain')}"
+            )
+    return findings
+
+
+def verify_genesis_v7_evidence(
+    manifest_path: Path,
+    manifest: dict[str, Any],
+    frozen_case_manifest_path: Path | None = None,
+) -> list[str]:
     findings: list[str] = []
     if manifest.get("artifact_type") != "real_provider_genesis_v7_aggregate":
         return findings
@@ -230,6 +298,9 @@ def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) ->
                 findings.append(f"GENESIS_V7_HOLD_TERMINAL_COUNT_NONZERO:{manifest_path}:{field}={manifest.get(field)}")
         return findings
 
+    if frozen_case_manifest_path is not None:
+        findings.extend(_verify_case_population(manifest_path, case_records, frozen_case_manifest_path))
+
     required_count_fields = ["planned_cases", "executed_cases", *TERMINAL_COUNT_FIELDS]
     for field in required_count_fields:
         if field not in manifest:
@@ -285,7 +356,7 @@ def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) ->
     return findings
 
 
-def verify_artifacts(root: Path) -> list[str]:
+def verify_artifacts(root: Path, frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST) -> list[str]:
     findings: list[str] = []
     manifests = find_manifests(root)
     if not manifests:
@@ -321,15 +392,15 @@ def verify_artifacts(root: Path) -> list[str]:
             findings.append(f"SHA_BINDING_MISMATCH:{manifest_path}")
         if manifest.get("campaign_id") in CURRENT_FREEZE_CAMPAIGNS:
             findings.extend(verify_manifest(manifest_path))
-        findings.extend(verify_genesis_v7_evidence(manifest_path, manifest))
+        findings.extend(verify_genesis_v7_evidence(manifest_path, manifest, frozen_case_manifest_path=frozen_case_manifest_path))
     return findings
 
 
-def verify_roots(roots: list[Path]) -> list[str]:
+def verify_roots(roots: list[Path], frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST) -> list[str]:
     findings: list[str] = []
     seen: set[str] = set()
     for root in roots:
-        for finding in verify_artifacts(root):
+        for finding in verify_artifacts(root, frozen_case_manifest_path=frozen_case_manifest_path):
             if finding not in seen:
                 seen.add(finding)
                 findings.append(finding)

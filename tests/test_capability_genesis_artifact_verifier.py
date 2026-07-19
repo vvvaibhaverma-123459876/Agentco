@@ -59,6 +59,26 @@ def _case(**overrides):
     return record
 
 
+def _frozen_case_manifest(path, cases):
+    path.write_text(
+        json.dumps(
+            {
+                "case_count": len(cases),
+                "cases": cases,
+                "validation_errors": [],
+            }
+        )
+    )
+
+
+def _expected_frozen_cases():
+    cases = []
+    for split in ("validation", "hidden"):
+        for index in range(12):
+            cases.append({"case_id": f"{split}-case-{index}", "split": split, "domain": "reasoning"})
+    return cases
+
+
 def test_genesis_v7_verifier_rejects_hash_only_provider_evidence(tmp_path):
     campaign = tmp_path / "campaign"
     campaign.mkdir()
@@ -129,6 +149,59 @@ def test_genesis_v7_verifier_accepts_diagnosable_invalid_response(tmp_path):
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
 
     assert findings == []
+
+
+def test_genesis_v7_verifier_rejects_case_population_not_in_frozen_manifest(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    frozen_manifest = tmp_path / "frozen_case_manifest.json"
+    _frozen_case_manifest(frozen_manifest, _expected_frozen_cases())
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest(executed_cases=24, invalid_response_cases=24)
+    manifest_path.write_text(json.dumps(manifest))
+    for index in range(23):
+        case_id = f"validation-case-{index}" if index < 12 else f"hidden-case-{index - 12}"
+        (campaign / f"CASE_{case_id}.json").write_text(
+            json.dumps(_case(case_id=case_id, split="validation" if index < 12 else "hidden", domain="reasoning", provider_response_hash=f"{index:064x}"))
+        )
+    (campaign / "CASE_extra-case.json").write_text(
+        json.dumps(_case(case_id="extra-case", split="hidden", domain="reasoning", provider_response_hash=f"{23:064x}"))
+    )
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest, frozen_case_manifest_path=frozen_manifest)
+
+    assert any(item.startswith("GENESIS_V7_FROZEN_CASE_MISSING") and item.endswith(":hidden-case-11") for item in findings)
+    assert any(item.startswith("GENESIS_V7_UNREGISTERED_CASE_RECORD") and item.endswith(":extra-case") for item in findings)
+
+
+def test_genesis_v7_verifier_rejects_split_and_domain_drift_from_frozen_manifest(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    frozen_manifest = tmp_path / "frozen_case_manifest.json"
+    cases = _expected_frozen_cases()
+    _frozen_case_manifest(frozen_manifest, cases)
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest(executed_cases=24, invalid_response_cases=24)
+    manifest_path.write_text(json.dumps(manifest))
+    for index, frozen_case in enumerate(cases):
+        overrides = {}
+        if frozen_case["case_id"] == "validation-case-0":
+            overrides = {"split": "hidden", "domain": "planning"}
+        (campaign / f"CASE_{frozen_case['case_id']}.json").write_text(
+            json.dumps(
+                _case(
+                    case_id=frozen_case["case_id"],
+                    split=overrides.get("split", frozen_case["split"]),
+                    domain=overrides.get("domain", frozen_case["domain"]),
+                    provider_response_hash=f"{index:064x}",
+                )
+            )
+        )
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest, frozen_case_manifest_path=frozen_manifest)
+
+    assert any(item.startswith("GENESIS_V7_CASE_SPLIT_MISMATCH") for item in findings)
+    assert any(item.startswith("GENESIS_V7_CASE_DOMAIN_MISMATCH") for item in findings)
 
 
 def test_genesis_v7_verifier_rejects_identical_hash_only_response_pattern(tmp_path):

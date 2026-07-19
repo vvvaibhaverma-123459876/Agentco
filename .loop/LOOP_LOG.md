@@ -268,3 +268,23 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Cross-check V7 case IDs against the frozen case manifest, or move to other non-human-blocked audit tooling gaps.
+
+## Iteration 14 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `7f57ce648b9162984c36d8055916a29b28b92b8d`
+- Selected item: bind Genesis V7 baseline case evidence to the frozen validation/hidden case population.
+- Claude/Duet: attempted to resume the Claude review session; unavailable due Claude session limit resetting at `1:50pm (Asia/Calcutta)`.
+- Changed:
+  - `scripts/verify_capability_genesis_artifact.py` now loads `benchmarks/capability_genesis_v5/manifests/frozen_case_manifest.json` for executed Genesis V7 baseline artifacts.
+  - Baseline artifacts must contain exactly the frozen validation/hidden case IDs; missing or unregistered case records now fail verification.
+  - Case record `split` and `domain` values must match the frozen manifest for each case ID.
+  - Added focused tests for wrong case population and split/domain drift.
+- Evidence:
+  - `python3.13 -m pytest tests/test_capability_genesis_artifact_verifier.py tests/test_openai_genesis_v7_runner.py -q` -> `27 passed`
+  - `python3.13 -m py_compile scripts/verify_capability_genesis_artifact.py` -> passed
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on preserved historical V7 evidence; the real attempt-2 case population matches the frozen validation/hidden set, so no new population findings were introduced.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue verifier hardening around independently diagnosable provider evidence and clean-clone recomputation until a new authorized real-provider rerun is available.
