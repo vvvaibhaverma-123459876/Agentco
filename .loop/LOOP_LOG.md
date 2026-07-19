@@ -288,3 +288,25 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue verifier hardening around independently diagnosable provider evidence and clean-clone recomputation until a new authorized real-provider rerun is available.
+
+## Iteration 15 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `b10588e2c3e78e54571d69c0c4c6212db126d1e1`
+- Selected item: repair stale subsystem audit record metadata and linked finding summary.
+- Claude/Duet:
+  - `duet doctor` reports Claude is currently rate-limited until `1:50pm (Asia/Calcutta)`.
+  - Read-only `duet peek` of the latest Claude session showed the accessible Claude report was a verifier review, not a completed full subsystem audit.
+  - Claude’s reported verifier gaps were: independent artifact recomputation, malformed JSON/case-file hygiene, and frozen case-population binding; those are now implemented across iterations 12-14.
+- Changed:
+  - Regenerated `docs/audit/current/SUBSYSTEM_AUDIT_RESULTS.json` and `.md` from the current branch head.
+  - Removed stale Markdown linkage to superseded `GCR-008`; current failed subsystems remain `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+- Evidence:
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`.
+  - `python3.13 -m pytest tests/test_run_subsystem_audit_results.py tests/test_verify_subsystem_audit_results.py tests/test_verify_no_blocking_findings.py -q` -> `11 passed`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue non-provider verifier hardening, or prepare a new authorized Genesis rerun path that can collect diagnostically complete response evidence.
