@@ -310,3 +310,25 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue non-provider verifier hardening, or prepare a new authorized Genesis rerun path that can collect diagnostically complete response evidence.
+
+## Iteration 16 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `392691b967860ab2ceec9450bff527d5f568179e`
+- Selected item: address the read-only Claude full-audit finding that frontend operational pages displayed hardcoded green/static evidence.
+- Claude/Duet:
+  - User supplied Claude's completed full-subsystem audit summary from artifact `939f6d8e-2f0f-442a-a076-9a0558b2ddbe`.
+  - Headline recorded from that audit: all 18 subsystems have genuine DB-verified cores; zero are production-ready; 9 production-blocking findings across 7 subsystems; a recurring self-grading issue was that frontend completion predicates cited backend-only tests while Performance and Incidents shipped fake/static green states.
+- Changed:
+  - Replaced the Performance page's static green metric cards with evidence-derived signals loaded from `/api/audit`, `/api/audit/integrity`, and `/api/validation/reports`.
+  - Replaced the Incidents page's hardcoded "No active incidents" banner with an audit-derived incident-like record view and an explicit "not proof" empty state.
+  - Added a static regression test preventing these pages from reintroducing hardcoded operational-success claims without backend evidence.
+- Evidence:
+  - `python3.13 -m pytest tests/test_frontend_operational_evidence.py -q` -> `2 passed`
+  - `cd frontend && npm run build` -> passed
+  - `cd frontend && npm test` -> frontend smoke check passed
+  - `cd frontend && npm run lint` -> passed
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue addressing Claude's integration-debt findings with locally verifiable production-path fixes, prioritizing governance/judiciary/learning gaps that do not require hosted infrastructure or a new provider campaign.
