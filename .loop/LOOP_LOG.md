@@ -422,3 +422,21 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue with non-blocked production-path gaps surfaced by the audit, or harden subsystem audit checks so integration claims require these runtime-linkage tests.
+
+## Iteration 21 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `7b639d6f52248aef9af2d83043e9ca621f72cb9e`
+- Selected item: persist Continuous Completion Loop v2 autonomy/provisioning protocol in repository memory before further iterations.
+- Claude/Duet: `duet doctor` still reports Claude unavailable due session limit; provisioning gap recorded.
+- Changed:
+  - `.loop/DECISIONS.md` now records `DEC-002`, adopting the v2 authority model: autonomous decisions replace approval waits, but evidence claims remain unchanged.
+  - `.loop/BLOCKED.md` was converted to legacy context and points to provisioning/resource records instead of active approval gates.
+  - Added `.loop/PROVISIONING.md` for Claude availability, real-provider baseline requirements, and hosted staging external-resource status.
+  - Existing non-claims remain unchanged: real capability baseline not established, hosted staging unverified, production readiness unverified, capability improvement not claimed.
+- Evidence:
+  - `duet doctor` -> Claude unavailable due session limit; Codex round-trip passed.
+  - `rg -n "Human action required|approval-gated|Ask only when|requires a human|wait for" .loop` -> no active approval-gated instructions remain; only rejected-alternative wording in `DEC-002`.
+  - `git diff -- .loop/DECISIONS.md .loop/BLOCKED.md .loop/PROVISIONING.md` -> reviewed protocol-memory-only changes.
+- Next candidate item:
+  - Continue with non-blocked production-path gaps, prioritizing claim/audit verifiers that ensure integration claims require runtime-linkage tests already added for governance, judiciary, learning and free-run execution.
