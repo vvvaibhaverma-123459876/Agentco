@@ -332,3 +332,23 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue addressing Claude's integration-debt findings with locally verifiable production-path fixes, prioritizing governance/judiciary/learning gaps that do not require hosted infrastructure or a new provider campaign.
+
+## Iteration 17 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `67b3ecf0cf8ed828a7de30e60360d234fe436ab2`
+- Selected item: address Claude's judiciary gap where sanctions were recorded but not proven to change runtime behavior.
+- Claude/Duet: `duet doctor` still reports Claude unavailable due session limit; used the user-supplied full-audit summary as external input.
+- Changed:
+  - `JudiciaryCaseService.issueEnforcement()` now applies status-changing citizen sanctions: `suspension` uses `citizenshipService.suspendCitizen()` and `restriction` transitions the citizen to `restricted`.
+  - The enforcement `applied_ref` records the resulting citizen status for independent audit.
+  - Added a judiciary regression proving a judicial suspension against a registry agent citizen blocks future durable task enqueue through the existing citizenship gate.
+  - Regenerated forensic inventory/control ledgers.
+- Evidence:
+  - `cd backend && npm test -- judiciary-case.test.ts --runInBand` -> `5 passed`
+  - `cd backend && npm test -- citizenship.test.ts --runInBand` -> `7 passed`
+  - `cd backend && npm run build` -> passed
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue with Claude's governance or learning integration gaps that can be proven by DB-backed behavior, while leaving hosted staging and real-provider rerun blockers open.

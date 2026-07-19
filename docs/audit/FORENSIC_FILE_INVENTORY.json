@@ -1,6 +1,6 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2165,
+  "tracked_file_count": 2166,
   "category_counts": {
     "Database migration": 143,
     "Deployment infrastructure": 34,
@@ -11,7 +11,7 @@
     "Generated artifact": 116,
     "Production runtime code": 493,
     "Prompt/template": 29,
-    "Test infrastructure": 320,
+    "Test infrastructure": 321,
     "Unknown purpose": 140
   },
   "top_level_counts": {
@@ -21,7 +21,7 @@
     "scripts": 162,
     "agents": 111,
     "audit_artifacts": 99,
-    "tests": 69,
+    "tests": 70,
     "reports": 64,
     "runtime": 51,
     "archive": 48,
@@ -83,7 +83,7 @@
     "pytest_skip_report_plugin.py": 1
   },
   "extension_counts": {
-    ".py": 626,
+    ".py": 627,
     ".md": 525,
     ".ts": 351,
     ".json": 309,
@@ -12863,6 +12863,12 @@
     },
     {
       "path": "tests/test_forensic_inventory.py",
+      "category": "Test infrastructure",
+      "top_level": "tests",
+      "extension": ".py"
+    },
+    {
+      "path": "tests/test_frontend_operational_evidence.py",
       "category": "Test infrastructure",
       "top_level": "tests",
       "extension": ".py"

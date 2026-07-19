@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2165`
+- Tracked files: `2166`
 
 ## Category Counts
 
@@ -17,7 +17,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 320 |
+| Test infrastructure | 321 |
 | Unknown purpose | 140 |
 
 ## Top-Level Counts
@@ -30,7 +30,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts` | 162 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
-| `tests` | 69 |
+| `tests` | 70 |
 | `reports` | 64 |
 | `runtime` | 51 |
 | `archive` | 48 |
@@ -2221,6 +2221,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `tests/test_durable_runtime_cleanup.py` | Test infrastructure |
 | `tests/test_execute_durable_task.py` | Test infrastructure |
 | `tests/test_forensic_inventory.py` | Test infrastructure |
+| `tests/test_frontend_operational_evidence.py` | Test infrastructure |
 | `tests/test_gate_integrity_controls.py` | Test infrastructure |
 | `tests/test_hosted_staging_controls.py` | Test infrastructure |
 | `tests/test_longitudinal_foundation.py` | Test infrastructure |

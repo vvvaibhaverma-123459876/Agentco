@@ -7,6 +7,7 @@ import { civilizationKernel } from '../src/services/civilization-kernel.service'
 import { citizenshipService } from '../src/services/citizenship.service';
 import { treasuryService } from '../src/services/treasury.service';
 import { judiciaryCaseService } from '../src/services/judiciary-case.service';
+import { durableExecution } from '../src/services/durable-execution.service';
 
 async function applyMigrations() {
   for (const file of [
@@ -144,5 +145,56 @@ describe('civilization judiciary (C8)', () => {
     const dismissed = await judiciaryCaseService.getCase(c.id);
     expect(dismissed!.status).toBe('dismissed');
     await expect(judiciaryCaseService.openEvidenceCollection(c.id, judge)).rejects.toThrow(/terminal|must be jurisdiction_check/);
+  });
+
+  test('judiciary suspension enforcement blocks durable dispatch for the sanctioned agent citizen', async () => {
+    const complainant = await actor('jud-suspend-complainant');
+    const judge = await actor('jud-suspend-judge');
+
+    // Auto-enroll a runnable registry agent as an active citizen through the
+    // governed durable gateway, then target that citizen in a judiciary case.
+    const before = await durableExecution.enqueue('devops-agent', 'health_check', { probe: 'before-judiciary-sanction' });
+    expect(before.status).toBe('queued');
+    const respondent = await citizenshipService.getCitizenByAgentKey('devops-agent');
+    expect(respondent).not.toBeNull();
+    expect(respondent!.status).toBe('active');
+
+    const c = await judiciaryCaseService.openCase({
+      dispute_type: 'citizen_misconduct',
+      title: `Dispatch suspension ${Date.now()}`,
+      complainant_actor_id: complainant,
+      respondent_scope_type: 'citizen',
+      respondent_scope_id: respondent!.id,
+    });
+    await judiciaryCaseService.checkJurisdiction({ case_id: c.id, actor_id: judge, accept: true });
+    await judiciaryCaseService.openEvidenceCollection(c.id, judge);
+    await judiciaryCaseService.submitEvidence({
+      case_id: c.id,
+      submitted_by_actor_id: complainant,
+      statement: 'agent violated protected deployment policy',
+    });
+    await judiciaryCaseService.holdHearing({ case_id: c.id, presiding_actor_id: judge, summary: 'sanction warranted' });
+    await judiciaryCaseService.issueRuling({
+      case_id: c.id,
+      ruling_actor_id: judge,
+      outcome: 'upheld',
+      rationale: 'misconduct substantiated',
+    });
+
+    const enforcement = await judiciaryCaseService.issueEnforcement({
+      case_id: c.id,
+      issued_by_actor_id: judge,
+      order_type: 'citizen_sanction',
+      target_scope_type: 'citizen',
+      target_scope_id: respondent!.id,
+      detail: { sanction_type: 'suspension', reason: 'judiciary dispatch containment' },
+    });
+    expect(enforcement.applied_ref).toContain('citizen_status:suspended');
+
+    const suspended = await citizenshipService.getCitizenByAgentKey('devops-agent');
+    expect(suspended!.status).toBe('suspended');
+    await expect(
+      durableExecution.enqueue('devops-agent', 'health_check', { probe: 'after-judiciary-sanction' })
+    ).rejects.toThrow(/suspended/);
   });
 });

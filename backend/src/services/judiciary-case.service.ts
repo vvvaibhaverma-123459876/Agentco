@@ -230,14 +230,36 @@ export class JudiciaryCaseService {
       });
       appliedRef = `penalty:${penalty.id}`;
     } else if (input.order_type === 'citizen_sanction') {
-      const sanction = await citizenshipService.imposeSanction({
-        citizen_id: input.target_scope_id,
-        sanction_type: (detail.sanction_type as any) ?? 'restriction',
-        reason: (detail.reason as string) ?? `judiciary enforcement for case ${input.case_id}`,
-        imposed_by_actor_id: input.issued_by_actor_id,
-        authorized_decision_ref: `ruling:${ruling.rows[0].id}`,
-      });
-      appliedRef = `sanction:${sanction.id}`;
+      const sanctionType = (detail.sanction_type as any) ?? 'restriction';
+      const reason = (detail.reason as string) ?? `judiciary enforcement for case ${input.case_id}`;
+      if (sanctionType === 'suspension') {
+        const result = await citizenshipService.suspendCitizen({
+          citizen_id: input.target_scope_id,
+          reason,
+          imposed_by_actor_id: input.issued_by_actor_id,
+          authorized_decision_ref: `ruling:${ruling.rows[0].id}`,
+        });
+        appliedRef = `sanction:${result.sanction_id};citizen_status:${result.citizen.status}`;
+      } else {
+        const sanction = await citizenshipService.imposeSanction({
+          citizen_id: input.target_scope_id,
+          sanction_type: sanctionType,
+          reason,
+          imposed_by_actor_id: input.issued_by_actor_id,
+          authorized_decision_ref: `ruling:${ruling.rows[0].id}`,
+        });
+        if (sanctionType === 'restriction') {
+          const citizen = await citizenshipService.transitionCitizen({
+            citizen_id: input.target_scope_id,
+            to_status: 'restricted',
+            actor_id: input.issued_by_actor_id,
+            reason,
+          });
+          appliedRef = `sanction:${sanction.id};citizen_status:${citizen.status}`;
+        } else {
+          appliedRef = `sanction:${sanction.id}`;
+        }
+      }
     }
 
     const client = await db.connect();
