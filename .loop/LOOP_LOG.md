@@ -399,3 +399,26 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue with remaining non-blocked integration gaps, especially the continuous autonomous driver path that bypasses the governed task engine.
+
+## Iteration 20 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `5cf8eab6b9347ad99036d59108436b66467549aa`
+- Selected item: address Claude's autonomous driver gap where the supervised free-run path executed approved goals directly instead of entering the governed task engine.
+- Claude/Duet: `duet doctor` still reports Claude unavailable due session limit; used the user-supplied full-audit summary as external input.
+- Changed:
+  - `SupervisedFreeRunService` now enqueues and runs a durable `review` task envelope before executing each approved free-run goal.
+  - The envelope uses existing `DurableExecutionService` controls: registry/citizenship checks, provenance attestation, audit log, workflow task terminal state, and event publication where available.
+  - Free-run outcomes now include the `workflowTaskId`; run-stop event payloads include that task reference.
+  - Added e2e assertions that a completed free-run goal has a terminal `workflow_tasks` row, audit log reference, and payload correlation to the free-run run/goal.
+  - Refreshed subsystem audit results; current blockers remain limited to `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+- Evidence:
+  - `cd backend && npm test -- goal-formation-supervised-free-run.test.ts --runInBand` -> `3 passed`
+  - `cd backend && npm run build` -> passed
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`)
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue with non-blocked production-path gaps surfaced by the audit, or harden subsystem audit checks so integration claims require these runtime-linkage tests.

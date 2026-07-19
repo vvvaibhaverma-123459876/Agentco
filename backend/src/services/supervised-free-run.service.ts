@@ -26,6 +26,7 @@ import { goalFormation } from './goal-formation.service';
 import { GoalManager } from './goal-manager.service';
 import { civilizationLiveFlow } from './civilization-live-flow.service';
 import { killSwitchService } from './kill-switch.service';
+import { durableExecution } from './durable-execution.service';
 import crypto from 'crypto';
 
 export const FREE_RUN_KILL_SCOPE = 'autonomy.supervised_free_run';
@@ -40,7 +41,7 @@ export interface FreeRunResult {
   goalsHeldForReview: number;
   goalsCompleted: number;
   goalsFailed: number;
-  outcomes: Array<{ goalId: string; title: string; status: string; detail: string }>;
+  outcomes: Array<{ goalId: string; title: string; status: string; detail: string; workflowTaskId?: string }>;
 }
 
 export class SupervisedFreeRunService {
@@ -124,9 +125,16 @@ export class SupervisedFreeRunService {
         }
         const proposal = proposals.find(p => p.goalId === goalId)!;
         try {
+          const envelope = await this.executeGovernedGoalEnvelope({
+            runId,
+            goalId,
+            title: proposal.title,
+            sourceObjects: proposal.sourceObjects,
+            domainKey: options.domainKey,
+          });
           const detail = await this.executeGoal(proposal.sourceObjects, options.domainKey);
           await this.goalManager.completeGoal(goalId, `free_run:${runId}`);
-          outcomes.push({ goalId, title: proposal.title, status: 'completed', detail });
+          outcomes.push({ goalId, title: proposal.title, status: 'completed', detail, workflowTaskId: envelope.task_id });
         } catch (error) {
           await this.goalManager.pauseGoal(goalId, `free-run execution failed: ${error}`);
           outcomes.push({
@@ -151,7 +159,7 @@ export class SupervisedFreeRunService {
       goals_completed: completed,
       goals_failed: failed,
       duration_ms: endedAt.getTime() - startedAt.getTime(),
-      outcomes: outcomes.map(o => ({ goal_id: o.goalId, status: o.status, detail: o.detail.slice(0, 300) })),
+      outcomes: outcomes.map(o => ({ goal_id: o.goalId, status: o.status, detail: o.detail.slice(0, 300), workflow_task_id: o.workflowTaskId ?? null })),
     });
 
     return {
@@ -166,6 +174,37 @@ export class SupervisedFreeRunService {
       goalsFailed: failed,
       outcomes,
     };
+  }
+
+  /**
+   * Record a governed durable task envelope before executing the domain
+   * service. This keeps the free-run loop inside the same citizenship,
+   * provenance, audit, and workflow-task controls as other protected work.
+   */
+  private async executeGovernedGoalEnvelope(input: {
+    runId: string;
+    goalId: string;
+    title: string;
+    sourceObjects: Array<{ table: string; id: string }>;
+    domainKey: string;
+  }): Promise<{ task_id: string }> {
+    const task = await durableExecution.enqueue('reviewer-agent', 'review', {
+      subject: `supervised free-run goal ${input.goalId}: ${input.title}`,
+      criteria: [
+        'goal has source DB evidence',
+        'goal is approved for supervised execution',
+        'execution remains bounded by the free-run budget',
+      ],
+      run_id: input.runId,
+      goal_id: input.goalId,
+      domain_key: input.domainKey,
+      source_objects: input.sourceObjects,
+    });
+    const completed = await durableExecution.run(task.task_id);
+    if (completed.status !== 'done') {
+      throw new Error(`governed task envelope ${task.task_id} failed: ${completed.error ?? completed.status}`);
+    }
+    return { task_id: task.task_id };
   }
 
   /**

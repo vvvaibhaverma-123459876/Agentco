@@ -191,6 +191,20 @@ describe('goal formation and supervised free run', () => {
     expect(ourOutcome).toBeDefined();
     expect(ourOutcome!.status).toBe('completed');
     expect(ourOutcome!.detail).toContain(candidateId);
+    expect(ourOutcome!.workflowTaskId).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
+
+    const workflowTask = await db.query<{ status: string; payload: any; audit_log_id: string | null }>(
+      `SELECT status, payload, audit_log_id FROM workflow_tasks WHERE task_id = $1`,
+      [ourOutcome!.workflowTaskId]
+    );
+    expect(workflowTask.rowCount).toBe(1);
+    expect(workflowTask.rows[0].status).toBe('done');
+    expect(workflowTask.rows[0].audit_log_id).toEqual(expect.stringMatching(/^[0-9a-f-]{36}$/));
+    const taskPayload = typeof workflowTask.rows[0].payload === 'string'
+      ? JSON.parse(workflowTask.rows[0].payload)
+      : workflowTask.rows[0].payload;
+    expect(taskPayload.goal_id).toBe(proposal.goalId);
+    expect(taskPayload.run_id).toBe(result.runId);
 
     // Goal lifecycle completed with an outcome reference.
     const goal = await db.query<{ status: string }>(
