@@ -15,6 +15,7 @@ def _manifest(**overrides):
         "artifact_type": "real_provider_genesis_v7_aggregate",
         "campaign_id": "governed-capability-genesis-v7-test",
         "decision": "HOLD_FOR_MORE_EVIDENCE",
+        "planned_cases": 24,
         "executed_cases": 1,
         "completed_cases": 0,
         "failed_cases": 0,
@@ -191,6 +192,75 @@ def test_genesis_v7_verifier_rejects_case_semantic_hash_tampering(tmp_path):
     assert any(item.startswith("GENESIS_V7_CASE_SEMANTIC_HASH_MISMATCH") for item in findings)
 
 
+def test_genesis_v7_verifier_rejects_case_id_filename_mismatch(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest()
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_expected-id.json").write_text(json.dumps(_case(case_id="different-id")))
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_CASE_ID_FILENAME_MISMATCH") for item in findings)
+
+
+def test_genesis_v7_verifier_rejects_duplicate_case_ids(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest(executed_cases=2, invalid_response_cases=2)
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_case-1.json").write_text(json.dumps(_case(case_id="duplicate")))
+    (campaign / "CASE_case-2.json").write_text(json.dumps(_case(case_id="duplicate", provider_response_hash="d" * 64)))
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_DUPLICATE_CASE_ID") for item in findings)
+
+
+def test_genesis_v7_verifier_rejects_case_campaign_mismatch(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest()
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_case-1.json").write_text(json.dumps(_case(campaign_id="other-campaign")))
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_CASE_CAMPAIGN_ID_MISMATCH") for item in findings)
+
+
+def test_genesis_v7_verifier_rejects_unknown_terminal_status(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest()
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_case-1.json").write_text(json.dumps(_case(terminal_status="Completed")))
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_UNKNOWN_TERMINAL_STATUS") for item in findings)
+    assert any(item.startswith("GENESIS_V7_TERMINAL_BUCKET_TOTAL_MISMATCH") for item in findings)
+
+
+def test_genesis_v7_verifier_requires_baseline_count_fields(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest()
+    del manifest["planned_cases"]
+    manifest["semantic_hash"] = _aggregate_semantic_hash(manifest)
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_case-1.json").write_text(json.dumps(_case()))
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_REQUIRED_COUNT_FIELD_MISSING") and item.endswith(":planned_cases") for item in findings)
+
+
 def test_genesis_v7_verifier_accepts_prebaseline_hold_without_case_records(tmp_path):
     campaign = tmp_path / "campaign"
     campaign.mkdir()
@@ -235,3 +305,27 @@ def test_artifact_verifier_scans_multiple_evidence_roots(tmp_path):
     findings = verify_roots([artifact_root, docs_root])
 
     assert any(str(bad_campaign) in item and item.startswith("GENESIS_V7_PROVIDER_EVIDENCE_NOT_DIAGNOSABLE") for item in findings)
+
+
+def test_artifact_verifier_reports_malformed_manifest_json(tmp_path):
+    root = tmp_path / "artifacts"
+    campaign = root / "campaign"
+    campaign.mkdir(parents=True)
+    (campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text("{not-json")
+
+    findings = verify_roots([root])
+
+    assert any(item.startswith("CAPABILITY_MANIFEST_JSON_INVALID") for item in findings)
+
+
+def test_artifact_verifier_reports_payload_manifest_json_error(tmp_path):
+    root = tmp_path / "artifacts"
+    campaign = root / "campaign"
+    campaign.mkdir(parents=True)
+    manifest = _manifest(baseline_execution_attempted=False, executed_cases=0, evidence_unavailable_cases=24, invalid_response_cases=0)
+    (campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(manifest))
+    (campaign / "INTERNAL_PAYLOAD_MANIFEST.json").write_text("{not-json")
+
+    findings = verify_roots([root])
+
+    assert any(item.startswith("PAYLOAD_MANIFEST_JSON_INVALID") for item in findings)

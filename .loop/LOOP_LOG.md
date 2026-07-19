@@ -247,3 +247,24 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue verifier hardening around malformed JSON and case-file hygiene, or prepare the next authorized rerun path once human provider authorization is available.
+
+## Iteration 13 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `f4735d55ea2e0f85cab6006d9e55aa0f00bd590b`
+- Selected item: harden Genesis V7 artifact verification against malformed JSON and case-file hygiene failures.
+- Claude/Duet: available. Claude flagged malformed manifest/payload parsing, non-object case records, filename/case-id binding, campaign-id binding, unknown terminal statuses, and missing aggregate count fields.
+- Changed:
+  - `scripts/verify_capability_genesis_artifact.py` now reports malformed manifest and payload JSON as findings instead of crashing.
+  - V7 case records must be JSON objects; case filenames must match `case_id`; `case_id` values must be unique; case `campaign_id` must match the manifest.
+  - Unknown terminal statuses now fail verification and bucket totals must reconcile to case records.
+  - Baseline execution manifests must include `planned_cases`, `executed_cases`, and every terminal-state count field.
+  - Added focused tests for malformed payload manifests, filename mismatch, duplicate IDs, campaign mismatch, unknown terminal status, and missing required count fields.
+- Evidence:
+  - `python3.13 -m pytest tests/test_capability_genesis_artifact_verifier.py tests/test_openai_genesis_v7_runner.py -q` -> `25 passed`
+  - `python3.13 -m py_compile scripts/verify_capability_genesis_artifact.py` -> passed
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on preserved historical V7 evidence.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Cross-check V7 case IDs against the frozen case manifest, or move to other non-human-blocked audit tooling gaps.

@@ -27,6 +27,17 @@ DEFAULT_ROOTS = [
 
 TOTAL_CAP_USD = 3.00
 MAX_CASES = 24
+TERMINAL_COUNT_FIELDS = {
+    "completed_cases": "COMPLETED",
+    "failed_cases": "FAILED",
+    "timed_out_cases": "TIMED_OUT",
+    "denied_cases": "DENIED",
+    "evidence_unavailable_cases": "EVIDENCE_UNAVAILABLE",
+    "evaluator_unavailable_cases": "EVALUATOR_UNAVAILABLE",
+    "invalid_response_cases": "INVALID_RESPONSE",
+    "infrastructure_failure_cases": "INFRASTRUCTURE_FAILURE",
+}
+TERMINAL_STATUSES = set(TERMINAL_COUNT_FIELDS.values())
 
 
 def load(path: Path):
@@ -164,9 +175,26 @@ def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) ->
     case_records: list[dict[str, Any]] = []
     for case_path in case_paths:
         try:
-            case_records.append(load(case_path))
-        except json.JSONDecodeError as exc:
-            findings.append(f"GENESIS_V7_CASE_JSON_INVALID:{case_path}:{exc.msg}")
+            record = load(case_path)
+        except (OSError, ValueError) as exc:
+            findings.append(f"GENESIS_V7_CASE_JSON_INVALID:{case_path}:{type(exc).__name__}")
+            continue
+        if not isinstance(record, dict):
+            findings.append(f"GENESIS_V7_CASE_RECORD_NOT_OBJECT:{case_path}")
+            continue
+        case_id = record.get("case_id")
+        expected_case_id = case_path.name.removeprefix("CASE_").removesuffix(".json")
+        if case_id != expected_case_id:
+            findings.append(f"GENESIS_V7_CASE_ID_FILENAME_MISMATCH:{case_path}:case_id={case_id}:filename={expected_case_id}")
+        if record.get("campaign_id") != manifest.get("campaign_id"):
+            findings.append(f"GENESIS_V7_CASE_CAMPAIGN_ID_MISMATCH:{case_path}:case={record.get('campaign_id')}:manifest={manifest.get('campaign_id')}")
+        if record.get("terminal_status") not in TERMINAL_STATUSES:
+            findings.append(f"GENESIS_V7_UNKNOWN_TERMINAL_STATUS:{case_path}:{record.get('terminal_status')}")
+        case_records.append(record)
+
+    case_ids = [record.get("case_id") for record in case_records]
+    for case_id in sorted({case_id for case_id in case_ids if case_ids.count(case_id) > 1}):
+        findings.append(f"GENESIS_V7_DUPLICATE_CASE_ID:{manifest_path}:{case_id}")
 
     executed_cases = manifest.get("executed_cases")
     if executed_cases is not None and executed_cases != len(case_records):
@@ -202,23 +230,20 @@ def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) ->
                 findings.append(f"GENESIS_V7_HOLD_TERMINAL_COUNT_NONZERO:{manifest_path}:{field}={manifest.get(field)}")
         return findings
 
-    terminal_statuses = {
-        "completed_cases": "COMPLETED",
-        "failed_cases": "FAILED",
-        "timed_out_cases": "TIMED_OUT",
-        "denied_cases": "DENIED",
-        "evidence_unavailable_cases": "EVIDENCE_UNAVAILABLE",
-        "evaluator_unavailable_cases": "EVALUATOR_UNAVAILABLE",
-        "invalid_response_cases": "INVALID_RESPONSE",
-        "infrastructure_failure_cases": "INFRASTRUCTURE_FAILURE",
-    }
-    for aggregate_field, status in terminal_statuses.items():
+    required_count_fields = ["planned_cases", "executed_cases", *TERMINAL_COUNT_FIELDS]
+    for field in required_count_fields:
+        if field not in manifest:
+            findings.append(f"GENESIS_V7_REQUIRED_COUNT_FIELD_MISSING:{manifest_path}:{field}")
+    for aggregate_field, status in TERMINAL_COUNT_FIELDS.items():
         expected = manifest.get(aggregate_field)
         if expected is None:
             continue
         actual = sum(1 for record in case_records if record.get("terminal_status") == status)
         if expected != actual:
             findings.append(f"GENESIS_V7_TERMINAL_TOTAL_MISMATCH:{manifest_path}:{aggregate_field}:manifest={expected}:files={actual}")
+    terminal_bucket_total = sum(sum(1 for record in case_records if record.get("terminal_status") == status) for status in TERMINAL_STATUSES)
+    if terminal_bucket_total != len(case_records):
+        findings.append(f"GENESIS_V7_TERMINAL_BUCKET_TOTAL_MISMATCH:{manifest_path}:bucketed={terminal_bucket_total}:records={len(case_records)}")
 
     for record in case_records:
         expected_hash = record.get("semantic_hash")
@@ -266,13 +291,28 @@ def verify_artifacts(root: Path) -> list[str]:
     if not manifests:
         findings.append("NO_CAPABILITY_GENESIS_ARTIFACT_MANIFEST")
     for manifest_path in manifests:
-        manifest = load(manifest_path)
+        try:
+            manifest = load(manifest_path)
+        except (OSError, ValueError) as exc:
+            findings.append(f"CAPABILITY_MANIFEST_JSON_INVALID:{manifest_path}:{type(exc).__name__}")
+            continue
+        if not isinstance(manifest, dict):
+            findings.append(f"CAPABILITY_MANIFEST_NOT_OBJECT:{manifest_path}")
+            continue
         payload_path = manifest_path.parent / "INTERNAL_PAYLOAD_MANIFEST.json"
         payload = None
         if not payload_path.exists():
             findings.append(f"PAYLOAD_MANIFEST_MISSING:{manifest_path}")
         else:
-            payload = load(payload_path)
+            try:
+                payload = load(payload_path)
+            except (OSError, ValueError) as exc:
+                findings.append(f"PAYLOAD_MANIFEST_JSON_INVALID:{manifest_path}:{type(exc).__name__}")
+                payload = None
+            if payload is not None and not isinstance(payload, dict):
+                findings.append(f"PAYLOAD_MANIFEST_NOT_OBJECT:{manifest_path}")
+                payload = None
+        if payload is not None:
             if reproduce_payload_hash(payload, manifest_path.parent) != payload.get("aggregate_payload_hash"):
                 findings.append(f"PAYLOAD_HASH_MISMATCH:{manifest_path}")
             if manifest.get("internal_payload_manifest_hash") != payload.get("aggregate_payload_hash"):
