@@ -227,3 +227,23 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Implement independent V7 semantic-hash and decision recomputation in `verify_capability_genesis_artifact.py`, as identified by Claude, without relying on runner self-attestation.
+
+## Iteration 12 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `8f4c6ab27401b7943cea16ae8e27abc7440fc80f`
+- Selected item: implement external Genesis V7 semantic-hash and decision recomputation in the artifact verifier.
+- Claude/Duet: available. Claude flagged edge cases around `internal_payload_manifest_hash`, prebaseline HOLD artifacts, exact decision semantics, and tamper-safe findings.
+- Changed:
+  - `scripts/verify_capability_genesis_artifact.py` now recomputes V7 case semantic hashes, aggregate semantic hash, aggregate correctness, supported domains, and final decision from evidence records.
+  - Prebaseline HOLD manifests with `baseline_execution_attempted = false` are validated as HOLD artifacts instead of being forced through the 24-case baseline decision path.
+  - Aggregation tolerates null evaluator results as unscored evidence rather than crashing.
+  - Added tests for semantic-hash tampering, accepted-decision mismatch, and prebaseline HOLD validation.
+- Evidence:
+  - `python3.13 -m pytest tests/test_capability_genesis_artifact_verifier.py tests/test_openai_genesis_v7_runner.py -q` -> `18 passed`
+  - `python3.13 -m py_compile scripts/verify_capability_genesis_artifact.py` -> passed
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on historical V7 artifacts, now including semantic-hash mismatch findings in addition to missing payload and non-diagnosable evidence.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue verifier hardening around malformed JSON and case-file hygiene, or prepare the next authorized rerun path once human provider authorization is available.

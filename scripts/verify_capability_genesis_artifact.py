@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -24,6 +25,9 @@ DEFAULT_ROOTS = [
     Path("docs/capability"),
 ]
 
+TOTAL_CAP_USD = 3.00
+MAX_CASES = 24
+
 
 def load(path: Path):
     return json.loads(path.read_text())
@@ -41,6 +45,14 @@ def find_manifests(root: Path) -> list[Path]:
 
 def _is_sha256(value: object) -> bool:
     return isinstance(value, str) and len(value) == 64 and all(char in "0123456789abcdef" for char in value)
+
+
+def _canonical(data: Any) -> str:
+    return json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+
+
+def _sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode()).hexdigest()
 
 
 def _case_requires_diagnosable_provider_evidence(record: dict[str, Any]) -> bool:
@@ -67,6 +79,82 @@ def _has_diagnosable_provider_evidence(record: dict[str, Any]) -> bool:
     )
 
 
+def _case_semantic_hash(record: dict[str, Any]) -> str:
+    fields = [
+        "campaign_id",
+        "case_id",
+        "domain",
+        "terminal_status",
+        "failure_category",
+        "requested_model",
+        "returned_model_identity",
+        "redacted_request_hash",
+        "provider_response_hash",
+        "finish_reason",
+        "parser_input_hash",
+        "usage",
+        "cost",
+        "evaluator_result",
+    ]
+    return _sha256_text(_canonical({key: record.get(key) for key in fields}))
+
+
+def _aggregate_records(records: list[dict[str, Any]]) -> dict[str, Any]:
+    completed = [record for record in records if record.get("terminal_status") == "COMPLETED"]
+    scored = [record for record in completed if isinstance(record.get("evaluator_result"), dict) and record["evaluator_result"].get("scorable") is True]
+    scores = [float(record["evaluator_result"]["score"]) for record in scored]
+    domain_report: dict[str, Any] = {}
+    supported: list[str] = []
+    for domain in sorted({record.get("domain") for record in records if record.get("domain")}):
+        domain_records = [record for record in records if record.get("domain") == domain]
+        domain_completed = [record for record in domain_records if record.get("terminal_status") == "COMPLETED"]
+        domain_scored = [
+            record
+            for record in domain_completed
+            if isinstance(record.get("evaluator_result"), dict) and record["evaluator_result"].get("scorable") is True
+        ]
+        domain_scores = [float(record["evaluator_result"]["score"]) for record in domain_scored]
+        mean = round(sum(domain_scores) / len(domain_scores), 6) if domain_scores else None
+        threshold_passed = bool(domain_scored) and mean is not None and mean >= 0.6 and len(domain_scored) == len(domain_records)
+        if threshold_passed:
+            supported.append(domain)
+        domain_report[domain] = {
+            "planned_cases": len(domain_records),
+            "executed_cases": len(domain_records),
+            "completed_cases": len(domain_completed),
+            "scored_cases": len(domain_scored),
+            "mean_correctness": mean,
+            "threshold_verdict": "passed" if threshold_passed else "not_established",
+        }
+    return {
+        "completed": len(completed),
+        "scored": len(scored),
+        "aggregate_correctness": round(sum(scores) / len(scores), 6) if scores else None,
+        "domain_report": domain_report,
+        "supported_domains": supported,
+    }
+
+
+def _recompute_decision(manifest: dict[str, Any], records: list[dict[str, Any]], rolled: dict[str, Any]) -> str:
+    if len(records) != MAX_CASES:
+        return "INVALID_CAMPAIGN"
+    actual_spend = manifest.get("total_campaign_cost_usd") or 0
+    if actual_spend > TOTAL_CAP_USD:
+        return "INVALID_CAMPAIGN"
+    if any(record.get("cost", {}).get("unreleased_amount") != 0 for record in records):
+        return "INVALID_CAMPAIGN"
+    if rolled["completed"] < 18 or rolled["scored"] < 18:
+        return "HOLD_FOR_MORE_EVIDENCE"
+    if (rolled["aggregate_correctness"] or 0) >= 0.70 and len(rolled["supported_domains"]) >= 8:
+        return "REAL_CAPABILITY_BASELINE_ACCEPTED"
+    return "REAL_CAPABILITY_BASELINE_REJECTED"
+
+
+def _aggregate_semantic_hash(manifest: dict[str, Any]) -> str:
+    volatile_or_late_bound = {"generated_at", "semantic_hash", "internal_payload_manifest_hash"}
+    return _sha256_text(_canonical({key: value for key, value in manifest.items() if key not in volatile_or_late_bound}))
+
+
 def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) -> list[str]:
     findings: list[str] = []
     if manifest.get("artifact_type") != "real_provider_genesis_v7_aggregate":
@@ -83,6 +171,36 @@ def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) ->
     executed_cases = manifest.get("executed_cases")
     if executed_cases is not None and executed_cases != len(case_records):
         findings.append(f"GENESIS_V7_CASE_TOTAL_MISMATCH:{manifest_path}:manifest={executed_cases}:files={len(case_records)}")
+
+    manifest_semantic_hash = manifest.get("semantic_hash")
+    recomputed_manifest_semantic_hash = _aggregate_semantic_hash(manifest)
+    if not _is_sha256(manifest_semantic_hash):
+        findings.append(f"GENESIS_V7_AGGREGATE_SEMANTIC_HASH_MISSING:{manifest_path}")
+    elif manifest_semantic_hash != recomputed_manifest_semantic_hash:
+        findings.append(f"GENESIS_V7_AGGREGATE_SEMANTIC_HASH_MISMATCH:{manifest_path}")
+
+    if manifest.get("baseline_execution_attempted") is False:
+        if case_records:
+            findings.append(f"GENESIS_V7_HOLD_HAS_CASE_RECORDS:{manifest_path}:count={len(case_records)}")
+        if manifest.get("decision") != "HOLD_FOR_MORE_EVIDENCE":
+            findings.append(f"GENESIS_V7_HOLD_DECISION_MISMATCH:{manifest_path}:decision={manifest.get('decision')}")
+        planned = manifest.get("planned_cases", MAX_CASES)
+        if manifest.get("evidence_unavailable_cases") != planned:
+            findings.append(
+                f"GENESIS_V7_HOLD_EVIDENCE_UNAVAILABLE_MISMATCH:{manifest_path}:expected={planned}:actual={manifest.get('evidence_unavailable_cases')}"
+            )
+        for field in (
+            "completed_cases",
+            "failed_cases",
+            "timed_out_cases",
+            "denied_cases",
+            "evaluator_unavailable_cases",
+            "invalid_response_cases",
+            "infrastructure_failure_cases",
+        ):
+            if manifest.get(field, 0) != 0:
+                findings.append(f"GENESIS_V7_HOLD_TERMINAL_COUNT_NONZERO:{manifest_path}:{field}={manifest.get(field)}")
+        return findings
 
     terminal_statuses = {
         "completed_cases": "COMPLETED",
@@ -101,6 +219,25 @@ def verify_genesis_v7_evidence(manifest_path: Path, manifest: dict[str, Any]) ->
         actual = sum(1 for record in case_records if record.get("terminal_status") == status)
         if expected != actual:
             findings.append(f"GENESIS_V7_TERMINAL_TOTAL_MISMATCH:{manifest_path}:{aggregate_field}:manifest={expected}:files={actual}")
+
+    for record in case_records:
+        expected_hash = record.get("semantic_hash")
+        actual_hash = _case_semantic_hash(record)
+        if not _is_sha256(expected_hash):
+            findings.append(f"GENESIS_V7_CASE_SEMANTIC_HASH_MISSING:{manifest_path}:{record.get('case_id')}")
+        elif expected_hash != actual_hash:
+            findings.append(f"GENESIS_V7_CASE_SEMANTIC_HASH_MISMATCH:{manifest_path}:{record.get('case_id')}")
+
+    rolled = _aggregate_records(case_records)
+    if manifest.get("aggregate_correctness") != rolled["aggregate_correctness"]:
+        findings.append(
+            f"GENESIS_V7_AGGREGATE_CORRECTNESS_MISMATCH:{manifest_path}:manifest={manifest.get('aggregate_correctness')}:files={rolled['aggregate_correctness']}"
+        )
+    if sorted(manifest.get("supported_domains") or []) != rolled["supported_domains"]:
+        findings.append(f"GENESIS_V7_SUPPORTED_DOMAINS_MISMATCH:{manifest_path}")
+    expected_decision = _recompute_decision(manifest, case_records, rolled)
+    if manifest.get("decision") != expected_decision:
+        findings.append(f"GENESIS_V7_DECISION_MISMATCH:{manifest_path}:manifest={manifest.get('decision')}:recomputed={expected_decision}")
 
     for record in case_records:
         if _case_requires_diagnosable_provider_evidence(record) and not _has_diagnosable_provider_evidence(record):
