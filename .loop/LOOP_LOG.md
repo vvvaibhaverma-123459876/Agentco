@@ -208,3 +208,22 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue removing verifier gaps around real-provider evidence diagnosability, or move to hosted-staging prerequisite documentation until human infrastructure is supplied.
+
+## Iteration 11 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `471c817cec177e4b83430998079307b77e6431e7`
+- Selected item: strengthen the external Genesis artifact verifier so bad committed evidence copies cannot be hidden by artifact-directory scope or by stripped provider fields.
+- Claude/Duet: available this iteration. Claude reviewed the V7 runner and verifier and identified three local gaps; this increment implemented the diagnosability and verifier-scope parts.
+- Changed:
+  - `scripts/verify_capability_genesis_artifact.py` now verifies both `artifacts/capability-runtime` and `docs/capability` by default.
+  - Provider-response statuses `COMPLETED`, `INVALID_RESPONSE`, and `EVALUATOR_UNAVAILABLE` now require diagnosable provider evidence even if a record omits all provider-identifying fields.
+  - Added tests proving multi-root verification and rejecting completed provider-response records with stripped provider evidence.
+- Evidence:
+  - `python3.13 -m pytest tests/test_capability_genesis_artifact_verifier.py tests/test_openai_genesis_v7_runner.py -q` -> `16 passed`
+  - `python3.13 -m py_compile scripts/verify_capability_genesis_artifact.py` -> passed
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure now covers both artifact and committed docs copies of historical V7 missing payload/non-diagnosable evidence.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Implement independent V7 semantic-hash and decision recomputation in `verify_capability_genesis_artifact.py`, as identified by Claude, without relying on runner self-attestation.

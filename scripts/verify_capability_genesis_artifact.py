@@ -19,6 +19,11 @@ CURRENT_FREEZE_CAMPAIGNS = {
     "governed-capability-genesis-v5",
 }
 
+DEFAULT_ROOTS = [
+    Path("artifacts/capability-runtime"),
+    Path("docs/capability"),
+]
+
 
 def load(path: Path):
     return json.loads(path.read_text())
@@ -41,6 +46,8 @@ def _is_sha256(value: object) -> bool:
 def _case_requires_diagnosable_provider_evidence(record: dict[str, Any]) -> bool:
     if record.get("terminal_status") == "EVIDENCE_UNAVAILABLE":
         return False
+    if record.get("terminal_status") in {"COMPLETED", "INVALID_RESPONSE", "EVALUATOR_UNAVAILABLE"}:
+        return True
     return bool(
         record.get("provider_request_id_captured")
         or record.get("provider_response_hash")
@@ -141,12 +148,28 @@ def verify_artifacts(root: Path) -> list[str]:
     return findings
 
 
+def verify_roots(roots: list[Path]) -> list[str]:
+    findings: list[str] = []
+    seen: set[str] = set()
+    for root in roots:
+        for finding in verify_artifacts(root):
+            if finding not in seen:
+                seen.add(finding)
+                findings.append(finding)
+    return findings
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
-    parser.add_argument("--root", default="artifacts/capability-runtime")
+    parser.add_argument(
+        "--root",
+        action="append",
+        help="Artifact/evidence root to verify. May be supplied multiple times. Defaults to local artifacts and committed docs evidence.",
+    )
     args = parser.parse_args()
-    findings = verify_artifacts(ROOT / args.root)
+    roots = [ROOT / root for root in (args.root or DEFAULT_ROOTS)]
+    findings = verify_roots(roots)
     print(json.dumps({"success": not findings, "findings": findings}, indent=2, sort_keys=True))
     return 1 if findings else 0
 

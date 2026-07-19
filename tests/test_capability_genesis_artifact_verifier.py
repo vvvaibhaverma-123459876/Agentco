@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 
-from scripts.verify_capability_genesis_artifact import verify_genesis_v7_evidence
+from scripts.verify_capability_genesis_artifact import verify_genesis_v7_evidence, verify_roots
 
 
 def _manifest(**overrides):
@@ -57,6 +57,38 @@ def test_genesis_v7_verifier_rejects_hash_only_provider_evidence(tmp_path):
     (campaign / "CASE_case-1.json").write_text(
         json.dumps(
             _case(
+                redacted_provider_response=None,
+                provider_request_id_hash=None,
+                finish_reason=None,
+                parser_input_hash=None,
+                parser_input_redacted=None,
+                audit_references=[],
+            )
+        )
+    )
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_PROVIDER_EVIDENCE_NOT_DIAGNOSABLE") for item in findings)
+
+
+def test_genesis_v7_verifier_rejects_provider_response_status_without_evidence(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest(
+        completed_cases=1,
+        invalid_response_cases=0,
+        aggregate_correctness=0.75,
+    )
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_case-1.json").write_text(
+        json.dumps(
+            _case(
+                terminal_status="COMPLETED",
+                provider_request_id_captured=False,
+                provider_response_hash=None,
+                returned_model_identity=None,
                 redacted_provider_response=None,
                 provider_request_id_hash=None,
                 finish_reason=None,
@@ -130,3 +162,32 @@ def test_genesis_v7_verifier_rejects_capability_decision_without_scores(tmp_path
 
     assert any(item.startswith("GENESIS_V7_DECISION_WITHOUT_SCORABLE_COMPLETIONS") for item in findings)
     assert any(item.startswith("GENESIS_V7_SUPPORTED_DOMAINS_WITHOUT_CORRECTNESS") for item in findings)
+
+
+def test_artifact_verifier_scans_multiple_evidence_roots(tmp_path):
+    artifact_root = tmp_path / "artifacts" / "capability-runtime"
+    docs_root = tmp_path / "docs" / "capability"
+    good_campaign = artifact_root / "good"
+    bad_campaign = docs_root / "bad"
+    good_campaign.mkdir(parents=True)
+    bad_campaign.mkdir(parents=True)
+    manifest = _manifest()
+    (good_campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(manifest))
+    (good_campaign / "CASE_case-1.json").write_text(json.dumps(_case()))
+    (bad_campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(manifest))
+    (bad_campaign / "CASE_case-1.json").write_text(
+        json.dumps(
+            _case(
+                redacted_provider_response=None,
+                provider_request_id_hash=None,
+                finish_reason=None,
+                parser_input_hash=None,
+                parser_input_redacted=None,
+                audit_references=[],
+            )
+        )
+    )
+
+    findings = verify_roots([artifact_root, docs_root])
+
+    assert any(str(bad_campaign) in item and item.startswith("GENESIS_V7_PROVIDER_EVIDENCE_NOT_DIAGNOSABLE") for item in findings)
