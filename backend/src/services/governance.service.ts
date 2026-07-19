@@ -5,6 +5,7 @@ import { eventLog } from './event-log.service';
 import { auditLog } from './audit-log.service';
 import { civilizationKernel } from './civilization-kernel.service';
 import { killSwitchService } from './kill-switch.service';
+import { capabilityExpansion } from './capability-expansion.service';
 import { PublicHttpError } from '../http-errors';
 
 /**
@@ -317,11 +318,13 @@ export class GovernanceService {
   }
 
   /**
-   * Activate an approved proposal. For `policy_change` proposals this creates
-   * a runtime_policy that the protected-action path consults, so behaviour
-   * changes immediately. Returns the runtime policy id when one was created.
+   * Activate an approved proposal. `policy_change` proposals create a
+   * runtime_policy that protected-action paths consult. `domain_onboarding`
+   * proposals approve an already gate-reviewed expansion proposal, so the
+   * governance decision changes the domain/capability runtime ledger instead
+   * of stopping at a status label.
    */
-  async activateProposal(input: { proposal_id: string; actor_id: string }): Promise<{ runtime_policy_id: string | null }> {
+  async activateProposal(input: { proposal_id: string; actor_id: string }): Promise<{ runtime_policy_id: string | null; applied_refs: string[] }> {
     const client = await db.connect();
     try {
       await client.query('BEGIN');
@@ -333,12 +336,25 @@ export class GovernanceService {
         await this.setStatus(client, input.proposal_id, 'activation_pending', input.actor_id, 'activation pending');
       }
       let runtimePolicyId: string | null = null;
+      const appliedRefs: string[] = [];
       if (proposal.proposal_type === 'policy_change' || proposal.proposal_type === 'budget_policy_change') {
         runtimePolicyId = await this.createRuntimePolicyWithClient(client, proposal, input.actor_id);
+        appliedRefs.push(`runtime_policy:${runtimePolicyId}`);
+      } else if (proposal.proposal_type === 'domain_onboarding') {
+        const expansionProposalId = (proposal.body_json?.expansion_proposal_id as string | undefined)?.trim();
+        if (!expansionProposalId) {
+          throw new PublicHttpError(400, 'domain_onboarding activation requires body.expansion_proposal_id');
+        }
+        const approvedExpansion = await capabilityExpansion.approveWithClient(client, {
+          proposal_id: expansionProposalId,
+          approver_actor_id: input.actor_id,
+          restricted: proposal.body_json?.restricted === true,
+        });
+        appliedRefs.push(`expansion_proposal:${approvedExpansion.id}:${approvedExpansion.status}`);
       }
       await this.setStatus(client, input.proposal_id, 'active', input.actor_id, 'proposal activated');
       await client.query('COMMIT');
-      return { runtime_policy_id: runtimePolicyId };
+      return { runtime_policy_id: runtimePolicyId, applied_refs: appliedRefs };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

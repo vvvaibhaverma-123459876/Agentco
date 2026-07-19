@@ -352,3 +352,26 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
 - Next candidate item:
   - Continue with Claude's governance or learning integration gaps that can be proven by DB-backed behavior, while leaving hosted staging and real-provider rerun blockers open.
+
+## Iteration 18 — 2026-07-19
+
+- Branch: `loop/completion`
+- Starting HEAD: `8135387afd9a6a80eb0e9b7f49e9f15780795d4e`
+- Selected item: address Claude's governance gap where approved proposal classes could become active without runtime effect.
+- Claude/Duet: `duet doctor` still reports Claude unavailable due session limit; used the user-supplied full-audit summary as external input.
+- Changed:
+  - `GovernanceService.activateProposal()` now applies `domain_onboarding` proposals by approving an existing gate-reviewed expansion proposal through the existing `CapabilityExpansionService` checks.
+  - `CapabilityExpansionService` exposes a transaction-safe approval helper so governance activation can apply the expansion decision inside the same database transaction.
+  - Added a governance regression proving a passed governance vote/activation moves a fully reviewed expansion proposal from `governance_review` to `approved` and records event evidence.
+  - Regenerated subsystem audit results; current blockers remain limited to `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`).
+- Evidence:
+  - `cd backend && npm test -- governance.test.ts --runInBand` -> `7 passed`
+  - `cd backend && npm test -- capability-expansion.test.ts --runInBand` -> `4 passed`
+  - `cd backend && npm run build` -> passed
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on `capability_runtime_protocol` (`GCR-010`, `GCR-011`) and `infra_deployment` (`HST-001`)
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`
+- Next candidate item:
+  - Continue addressing integration-debt findings that do not require hosted infrastructure or a new authorized provider campaign, likely learning/regression measurement or the autonomous driver path.

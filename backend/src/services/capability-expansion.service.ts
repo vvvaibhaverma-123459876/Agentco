@@ -136,42 +136,47 @@ export class CapabilityExpansionService {
     const client = await db.connect();
     try {
       await client.query('BEGIN');
-      const p = await this.lock(client, input.proposal_id);
-      if (p.status !== 'governance_review') {
-        throw new PublicHttpError(409, `approval requires a governance-reviewed proposal (is ${p.status})`);
-      }
-      if (p.proposer_actor_id === input.approver_actor_id) {
-        throw new PublicHttpError(409, 'the proposer cannot approve their own expansion');
-      }
-      if (!p.competence_proof_id) {
-        throw new PublicHttpError(409, 'expansion approval requires a competence proof');
-      }
-      const stages = await client.query<{ count: string }>(
-        `SELECT COUNT(*)::int AS count FROM expansion_stage_records WHERE proposal_id = $1 AND passed = true AND stage = ANY($2::text[])`,
-        [input.proposal_id, [...STAGE_ORDER]]
-      );
-      if (Number(stages.rows[0].count) !== STAGE_ORDER.length) {
-        throw new PublicHttpError(409, 'every gate stage must pass before approval');
-      }
-      const to: ExpansionStatus = input.restricted ? 'restricted' : 'approved';
-      await this.setStatus(client, input.proposal_id, to, input.approver_actor_id, `governance ${to}`);
-      const updated = await client.query<ProposalRecord>(`SELECT ${PROPOSAL_COLUMNS} FROM expansion_proposals WHERE id = $1`, [input.proposal_id]);
-      await auditLog.appendWithClient(client, {
-        agent_id: input.approver_actor_id,
-        action_type: 'decision',
-        input_summary: `expansion ${input.proposal_id} governance decision`,
-        output_summary: `expansion ${to} (proof ${p.competence_proof_id})`,
-        confidence_score: 1, risk_level: 'high', human_approved: true,
-        downstream_events: [],
-      }, { timestamp: new Date().toISOString() });
+      const updated = await this.approveWithClient(client, input);
       await client.query('COMMIT');
-      return updated.rows[0];
+      return updated;
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
     } finally {
       client.release();
     }
+  }
+
+  async approveWithClient(client: PoolClient, input: { proposal_id: string; approver_actor_id: string; restricted?: boolean }): Promise<ProposalRecord> {
+    const p = await this.lock(client, input.proposal_id);
+    if (p.status !== 'governance_review') {
+      throw new PublicHttpError(409, `approval requires a governance-reviewed proposal (is ${p.status})`);
+    }
+    if (p.proposer_actor_id === input.approver_actor_id) {
+      throw new PublicHttpError(409, 'the proposer cannot approve their own expansion');
+    }
+    if (!p.competence_proof_id) {
+      throw new PublicHttpError(409, 'expansion approval requires a competence proof');
+    }
+    const stages = await client.query<{ count: string }>(
+      `SELECT COUNT(*)::int AS count FROM expansion_stage_records WHERE proposal_id = $1 AND passed = true AND stage = ANY($2::text[])`,
+      [input.proposal_id, [...STAGE_ORDER]]
+    );
+    if (Number(stages.rows[0].count) !== STAGE_ORDER.length) {
+      throw new PublicHttpError(409, 'every gate stage must pass before approval');
+    }
+    const to: ExpansionStatus = input.restricted ? 'restricted' : 'approved';
+    await this.setStatus(client, input.proposal_id, to, input.approver_actor_id, `governance ${to}`);
+    const updated = await client.query<ProposalRecord>(`SELECT ${PROPOSAL_COLUMNS} FROM expansion_proposals WHERE id = $1`, [input.proposal_id]);
+    await auditLog.appendWithClient(client, {
+      agent_id: input.approver_actor_id,
+      action_type: 'decision',
+      input_summary: `expansion ${input.proposal_id} governance decision`,
+      output_summary: `expansion ${to} (proof ${p.competence_proof_id})`,
+      confidence_score: 1, risk_level: 'high', human_approved: true,
+      downstream_events: [],
+    }, { timestamp: new Date().toISOString() });
+    return updated.rows[0];
   }
 
   // -------------------------------------------------------------------------

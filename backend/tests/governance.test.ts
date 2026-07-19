@@ -8,12 +8,14 @@ import { governanceService } from '../src/services/governance.service';
 import { policyEnforcement } from '../src/services/policy-enforcement.service';
 import { missionService } from '../src/services/mission.service';
 import { killSwitchService } from '../src/services/kill-switch.service';
+import { capabilityExpansion } from '../src/services/capability-expansion.service';
 
 async function applyMigrations() {
   for (const file of [
     '129_civilization_kernel.sql', '130_citizenship.sql',
     '131_societies_and_institution_charters.sql', '132_institution_coalitions.sql',
     '133_missions.sql', '134_civilization_economy.sql', '135_governance.sql',
+    '139_capability_expansion.sql',
   ]) {
     await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${file}`), 'utf8'));
   }
@@ -28,11 +30,18 @@ async function actor(prefix: string): Promise<string> {
 
 /** Drive an approved policy_change proposal (>=1 yes vote, simple majority). */
 async function passPolicyProposal(body: Record<string, unknown>): Promise<{ proposalId: string; author: string; other: string }> {
+  return passGovernanceProposal('policy_change', body);
+}
+
+async function passGovernanceProposal(
+  proposalType: 'policy_change' | 'domain_onboarding',
+  body: Record<string, unknown>,
+): Promise<{ proposalId: string; author: string; other: string }> {
   const author = await actor('gov-author');
   const sponsor = await actor('gov-sponsor');
   const voter = await actor('gov-voter');
   const proposal = await governanceService.createProposal({
-    title: `Policy ${Date.now()}`, proposal_type: 'policy_change', body, actor_id: author,
+    title: `Governance ${proposalType} ${Date.now()}`, proposal_type: proposalType, body, actor_id: author,
   });
   await governanceService.sponsor({ proposal_id: proposal.id, sponsor_actor_id: sponsor });
   await governanceService.recordImpactAssessment({ proposal_id: proposal.id, assessor_actor_id: sponsor, risk_level: 'medium', summary: 'ok' });
@@ -44,6 +53,14 @@ async function passPolicyProposal(body: Record<string, unknown>): Promise<{ prop
   const decision = await governanceService.closeVoting({ proposal_id: proposal.id, actor_id: sponsor });
   expect(decision.outcome).toBe('approved');
   return { proposalId: proposal.id, author, other: sponsor };
+}
+
+const EXPANSION_STAGES = ['risk_review', 'benchmark_design', 'limited_trial', 'calibration_review', 'governance_review'] as const;
+
+async function driveExpansionToGovernanceReview(proposalId: string, actorId: string): Promise<void> {
+  for (const stage of EXPANSION_STAGES) {
+    await capabilityExpansion.recordStage({ proposal_id: proposalId, stage, passed: true, summary: `${stage} ok`, actor_id: actorId });
+  }
 }
 
 describe('governance and constitution (C7)', () => {
@@ -145,6 +162,40 @@ describe('governance and constitution (C7)', () => {
     const missionActor = await actor('gov-review-mission');
     const mission = await missionService.createMission({ title: `Review-req ${Date.now()}`, risk_level: 'high', actor_id: missionActor });
     expect(mission.status).toBe('proposed');
+  });
+
+  test('domain_onboarding activation approves a gate-reviewed expansion proposal', async () => {
+    const expansionAuthor = await actor('gov-domain-expansion-author');
+    const stageOfficer = await actor('gov-domain-stage-officer');
+    const domain = `governed-domain-${Date.now()}`;
+    const expansion = await capabilityExpansion.propose({
+      expansion_type: 'domain_onboarding',
+      domain_key: domain,
+      title: 'Governed domain onboarding',
+      proposer_actor_id: expansionAuthor,
+      competence_proof_id: 'proof:governed-domain-onboarding',
+    });
+    await driveExpansionToGovernanceReview(expansion.id, stageOfficer);
+    expect((await capabilityExpansion.getProposal(expansion.id))!.status).toBe('governance_review');
+
+    const { proposalId } = await passGovernanceProposal('domain_onboarding', {
+      expansion_proposal_id: expansion.id,
+    });
+    const activator = await actor('gov-domain-activator');
+    const activated = await governanceService.activateProposal({ proposal_id: proposalId, actor_id: activator });
+
+    expect(activated.runtime_policy_id).toBeNull();
+    expect(activated.applied_refs).toContain(`expansion_proposal:${expansion.id}:approved`);
+    expect((await capabilityExpansion.getProposal(expansion.id))!.status).toBe('approved');
+
+    const proposal = await governanceService.getProposal(proposalId);
+    expect(proposal!.status).toBe('active');
+
+    const events = await db.query<{ event_type: string }>(
+      `SELECT event_type FROM event_log WHERE object_type = 'expansion_proposal' AND object_id = $1`,
+      [expansion.id]
+    );
+    expect(events.rows.map(row => row.event_type)).toContain('expansion.status_changed');
   });
 
   test('emergency powers engage the kill switch and auto-expire', async () => {
