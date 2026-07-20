@@ -1,22 +1,22 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2149,
+  "tracked_file_count": 2152,
   "category_counts": {
-    "Database migration": 143,
+    "Database migration": 144,
     "Deployment infrastructure": 34,
     "Deprecated code": 48,
     "Development tooling": 147,
-    "Documentation": 539,
+    "Documentation": 540,
     "Experimental code": 151,
     "Generated artifact": 116,
     "Production runtime code": 493,
     "Prompt/template": 29,
-    "Test infrastructure": 315,
+    "Test infrastructure": 316,
     "Unknown purpose": 134
   },
   "top_level_counts": {
-    "backend": 520,
-    "docs": 466,
+    "backend": 522,
+    "docs": 467,
     "evals": 180,
     "scripts": 159,
     "agents": 111,
@@ -83,10 +83,10 @@
   },
   "extension_counts": {
     ".py": 618,
-    ".md": 519,
-    ".ts": 351,
+    ".md": 520,
+    ".ts": 352,
     ".json": 308,
-    ".sql": 144,
+    ".sql": 145,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 24,
@@ -3039,6 +3039,12 @@
       "extension": ".sql"
     },
     {
+      "path": "backend/src/db/migrations/145_aud013_judiciary_case_idempotency.sql",
+      "category": "Database migration",
+      "top_level": "backend",
+      "extension": ".sql"
+    },
+    {
       "path": "backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql",
       "category": "Production runtime code",
       "top_level": "backend",
@@ -4336,6 +4342,12 @@
     },
     {
       "path": "backend/tests/aud004-m5-machine-principals.test.ts",
+      "category": "Test infrastructure",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/tests/aud013-judiciary-idempotency.test.ts",
       "category": "Test infrastructure",
       "top_level": "backend",
       "extension": ".ts"
@@ -8698,6 +8710,12 @@
     },
     {
       "path": "docs/security/AUD-004-MACHINE-PRINCIPAL-REGISTRY.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/security/AUD-013-DESIGN.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
