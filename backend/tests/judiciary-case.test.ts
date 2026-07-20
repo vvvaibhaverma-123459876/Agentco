@@ -13,6 +13,7 @@ async function applyMigrations() {
     '129_civilization_kernel.sql', '130_citizenship.sql',
     '131_societies_and_institution_charters.sql', '132_institution_coalitions.sql',
     '133_missions.sql', '134_civilization_economy.sql', '135_governance.sql', '136_judiciary.sql',
+    '145_aud013_judiciary_case_idempotency.sql',
   ]) {
     await migrationDb.query(fs.readFileSync(path.resolve(__dirname, `../src/db/migrations/${file}`), 'utf8'));
   }
