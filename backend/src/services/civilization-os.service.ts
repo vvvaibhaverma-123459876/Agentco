@@ -183,9 +183,13 @@ export class CivilizationOsService {
 
   /**
    * Coalition -> judiciary intake: route open escalations that target the
-   * judiciary into real cases. Crash-safe idempotence: the case is keyed by
-   * source_dispute_id = escalation id, so a tick interrupted after opening the
-   * case but before marking the escalation routed never opens a duplicate.
+   * judiciary into real cases, keyed by source_dispute_id = escalation id.
+   * The `existing` check below is a fast-path optimization, not the real
+   * guarantee -- it runs on this transaction's connection while openCase()
+   * commits on its own separate one, so it cannot by itself prevent a
+   * concurrent duplicate. The actual idempotency backstop is AUD-013's
+   * migration 145 partial unique index on judiciary_cases.source_dispute_id,
+   * which openCase() catches and resolves to the existing case.
    */
   private async routeEscalationsToJudiciary(): Promise<number> {
     const client = await db.connect();

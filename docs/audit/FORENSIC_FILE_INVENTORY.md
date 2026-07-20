@@ -2,30 +2,30 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2149`
+- Tracked files: `2152`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
-| Database migration | 143 |
+| Database migration | 144 |
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 147 |
-| Documentation | 539 |
+| Documentation | 540 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 315 |
+| Test infrastructure | 316 |
 | Unknown purpose | 134 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 520 |
-| `docs` | 466 |
+| `backend` | 522 |
+| `docs` | 467 |
 | `evals` | 180 |
 | `scripts` | 159 |
 | `agents` | 111 |
@@ -582,6 +582,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/db/migrations/142_aud004_independence_backstops.sql` | Database migration |
 | `backend/src/db/migrations/143_aud004_m3_breadth_permissions.sql` | Database migration |
 | `backend/src/db/migrations/144_aud004_capability_runtime_permissions.sql` | Database migration |
+| `backend/src/db/migrations/145_aud013_judiciary_case_idempotency.sql` | Database migration |
 | `backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql` | Production runtime code |
 | `backend/src/db/run_migrations.py` | Production runtime code |
 | `backend/src/db/unsupported_migrations/020_evaluation_manifests.sql.disabled` | Production runtime code |
@@ -799,6 +800,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/aud004-conditions-16-25.test.ts` | Test infrastructure |
 | `backend/tests/aud004-m3-breadth.test.ts` | Test infrastructure |
 | `backend/tests/aud004-m5-machine-principals.test.ts` | Test infrastructure |
+| `backend/tests/aud013-judiciary-idempotency.test.ts` | Test infrastructure |
 | `backend/tests/audit-chain-cross-writer.test.ts` | Test infrastructure |
 | `backend/tests/autonomous-promotion.test.ts` | Test infrastructure |
 | `backend/tests/autonomy-action-planner-env.test.ts` | Test infrastructure |
@@ -1526,6 +1528,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/runtime_capability_contract.md` | Documentation |
 | `docs/security/AUD-004-DESIGN.md` | Documentation |
 | `docs/security/AUD-004-MACHINE-PRINCIPAL-REGISTRY.md` | Documentation |
+| `docs/security/AUD-013-DESIGN.md` | Documentation |
 | `evals/__init__.py` | Experimental code |
 | `evals/acceptance/__init__.py` | Experimental code |
 | `evals/acceptance/accelerated_business_agent_calls.csv` | Experimental code |

@@ -50,6 +50,8 @@ export interface CaseRecord {
 const CASE_COLUMNS =
   'id, civilization_id, dispute_type, title, complainant_actor_id, respondent_scope_type, respondent_scope_id, status, assigned_institution_id';
 
+const JUDICIARY_SOURCE_DISPUTE_UNIQUE_CONSTRAINT = 'uq_judiciary_cases_source_dispute_id';
+
 export class JudiciaryCaseService {
   async openCase(input: {
     dispute_type: DisputeType; title: string; complainant_actor_id: string;
@@ -83,6 +85,22 @@ export class JudiciaryCaseService {
       return inserted.rows[0];
     } catch (error) {
       await client.query('ROLLBACK');
+      // AUD-013: migration 145's partial unique index (source_dispute_id IS NOT NULL) is the real
+      // idempotency backstop -- it fires regardless of caller (retried HTTP request, a racing
+      // orchestration tick, a direct-SQL writer), unlike a caller-side check-then-act guard split
+      // across separate connections/transactions. On a genuine collision, return the case that
+      // already exists for this dispute instead of surfacing a raw constraint-violation error.
+      if (
+        input.source_dispute_id &&
+        (error as { code?: string; constraint?: string }).code === '23505' &&
+        (error as { code?: string; constraint?: string }).constraint === JUDICIARY_SOURCE_DISPUTE_UNIQUE_CONSTRAINT
+      ) {
+        const existing = await db.query<CaseRecord>(
+          `SELECT ${CASE_COLUMNS} FROM judiciary_cases WHERE source_dispute_id = $1`,
+          [input.source_dispute_id]
+        );
+        if (existing.rowCount) return existing.rows[0];
+      }
       throw error;
     } finally {
       client.release();
