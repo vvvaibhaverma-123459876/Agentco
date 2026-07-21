@@ -34,6 +34,7 @@
     "backend/src/cli/run-bounded-learning.ts",
     "backend/src/cli/run-longitudinal-learning.ts",
     "backend/src/cli/score-validation.ts",
+    "backend/src/cli/seed-live.ts",
     "backend/src/cli/smoke-durable-execution.ts",
     "backend/src/cli/supervised-free-run.ts",
     "backend/src/cli/supervised-runtime.ts",
@@ -298,5 +299,5 @@
     "runtime/tests/test_spend_guardrail_ledger.py",
     "runtime/tool_registry/__init__.py"
   ],
-  "source_input_hash": "5fb6528e6b23795e8922ba9c6bde4510d949f64d0653b5b7a3c38d0863078978"
+  "source_input_hash": "8e5c6fc35cf48724e0e13c8c1e28c31f638bcac7bf988b576f4d555704cc985c"
 }

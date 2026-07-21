@@ -1,24 +1,24 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2149,
+  "tracked_file_count": 2157,
   "category_counts": {
     "Database migration": 143,
-    "Deployment infrastructure": 34,
+    "Deployment infrastructure": 35,
     "Deprecated code": 48,
-    "Development tooling": 147,
-    "Documentation": 539,
+    "Development tooling": 149,
+    "Documentation": 540,
     "Experimental code": 151,
     "Generated artifact": 116,
-    "Production runtime code": 493,
+    "Production runtime code": 494,
     "Prompt/template": 29,
     "Test infrastructure": 315,
-    "Unknown purpose": 134
+    "Unknown purpose": 137
   },
   "top_level_counts": {
-    "backend": 520,
-    "docs": 466,
+    "backend": 521,
+    "docs": 467,
     "evals": 180,
-    "scripts": 159,
+    "scripts": 161,
     "agents": 111,
     "audit_artifacts": 99,
     "reports": 64,
@@ -44,6 +44,7 @@
     "ingestion": 9,
     "requirements": 4,
     "validation": 4,
+    "deploy": 3,
     "agentco_security": 2,
     "dashboard": 2,
     "data": 2,
@@ -74,6 +75,7 @@
     "SYSTEM.md": 1,
     "SYSTEM_CIVILIZATION.md": 1,
     "conftest.py": 1,
+    "docker-compose.live.yml": 1,
     "docker-compose.staging.yml": 1,
     "docker-compose.yml": 1,
     "pg_test_isolation.py": 1,
@@ -83,24 +85,25 @@
   },
   "extension_counts": {
     ".py": 618,
-    ".md": 519,
-    ".ts": 351,
+    ".md": 520,
+    ".ts": 352,
     ".json": 308,
     ".sql": 144,
     ".jsonl": 40,
     ".csv": 38,
     ".yaml": 24,
     ".disabled": 21,
+    ".sh": 18,
     ".tsx": 18,
+    ".yml": 16,
     ".txt": 16,
-    ".yml": 15,
-    ".sh": 14,
     "(none)": 8,
     ".example": 3,
     ".mjs": 2,
     ".test": 1,
     ".toml": 1,
     ".zip": 1,
+    ".runtime": 1,
     ".js": 1,
     ".css": 1,
     ".lock": 1,
@@ -2170,6 +2173,12 @@
     },
     {
       "path": "backend/src/cli/score-validation.ts",
+      "category": "Production runtime code",
+      "top_level": "backend",
+      "extension": ".ts"
+    },
+    {
+      "path": "backend/src/cli/seed-live.ts",
       "category": "Production runtime code",
       "top_level": "backend",
       "extension": ".ts"
@@ -5895,6 +5904,30 @@
       "extension": ".csv"
     },
     {
+      "path": "deploy/local/Dockerfile.runtime",
+      "category": "Unknown purpose",
+      "top_level": "deploy",
+      "extension": ".runtime"
+    },
+    {
+      "path": "deploy/local/backend-entrypoint.sh",
+      "category": "Unknown purpose",
+      "top_level": "deploy",
+      "extension": ".sh"
+    },
+    {
+      "path": "deploy/local/worker-entrypoint.sh",
+      "category": "Unknown purpose",
+      "top_level": "deploy",
+      "extension": ".sh"
+    },
+    {
+      "path": "docker-compose.live.yml",
+      "category": "Deployment infrastructure",
+      "top_level": "docker-compose.live.yml",
+      "extension": ".yml"
+    },
+    {
       "path": "docker-compose.staging.yml",
       "category": "Deployment infrastructure",
       "top_level": "docker-compose.staging.yml",
@@ -6268,6 +6301,12 @@
     },
     {
       "path": "docs/REAL_WORLD_PROOF_PLAN.md",
+      "category": "Documentation",
+      "top_level": "docs",
+      "extension": ".md"
+    },
+    {
+      "path": "docs/RUN_LIVE.md",
       "category": "Documentation",
       "top_level": "docs",
       "extension": ".md"
@@ -11710,6 +11749,18 @@
     },
     {
       "path": "scripts/hourly_codex_resume.sh",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".sh"
+    },
+    {
+      "path": "scripts/live/generate_env.sh",
+      "category": "Development tooling",
+      "top_level": "scripts",
+      "extension": ".sh"
+    },
+    {
+      "path": "scripts/live/smoke.sh",
       "category": "Development tooling",
       "top_level": "scripts",
       "extension": ".sh"

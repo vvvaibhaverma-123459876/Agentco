@@ -2,32 +2,32 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2149`
+- Tracked files: `2157`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
 | Database migration | 143 |
-| Deployment infrastructure | 34 |
+| Deployment infrastructure | 35 |
 | Deprecated code | 48 |
-| Development tooling | 147 |
-| Documentation | 539 |
+| Development tooling | 149 |
+| Documentation | 540 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
-| Production runtime code | 493 |
+| Production runtime code | 494 |
 | Prompt/template | 29 |
 | Test infrastructure | 315 |
-| Unknown purpose | 134 |
+| Unknown purpose | 137 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 520 |
-| `docs` | 466 |
+| `backend` | 521 |
+| `docs` | 467 |
 | `evals` | 180 |
-| `scripts` | 159 |
+| `scripts` | 161 |
 | `agents` | 111 |
 | `audit_artifacts` | 99 |
 | `reports` | 64 |
@@ -53,6 +53,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `ingestion` | 9 |
 | `requirements` | 4 |
 | `validation` | 4 |
+| `deploy` | 3 |
 | `agentco_security` | 2 |
 | `dashboard` | 2 |
 | `data` | 2 |
@@ -83,6 +84,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `SYSTEM.md` | 1 |
 | `SYSTEM_CIVILIZATION.md` | 1 |
 | `conftest.py` | 1 |
+| `docker-compose.live.yml` | 1 |
 | `docker-compose.staging.yml` | 1 |
 | `docker-compose.yml` | 1 |
 | `pg_test_isolation.py` | 1 |
@@ -438,6 +440,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/cli/run-bounded-learning.ts` | Production runtime code |
 | `backend/src/cli/run-longitudinal-learning.ts` | Production runtime code |
 | `backend/src/cli/score-validation.ts` | Production runtime code |
+| `backend/src/cli/seed-live.ts` | Production runtime code |
 | `backend/src/cli/smoke-durable-execution.ts` | Production runtime code |
 | `backend/src/cli/supervised-free-run.ts` | Production runtime code |
 | `backend/src/cli/supervised-runtime.ts` | Production runtime code |
@@ -1058,6 +1061,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `dashboard/src/types/calibration.ts` | Production runtime code |
 | `data/external/bike_sharing/bike_sharing_dataset.zip` | Generated artifact |
 | `data/external/bike_sharing/hour.csv` | Generated artifact |
+| `deploy/local/Dockerfile.runtime` | Unknown purpose |
+| `deploy/local/backend-entrypoint.sh` | Unknown purpose |
+| `deploy/local/worker-entrypoint.sh` | Unknown purpose |
+| `docker-compose.live.yml` | Deployment infrastructure |
 | `docker-compose.staging.yml` | Deployment infrastructure |
 | `docker-compose.yml` | Deployment infrastructure |
 | `docs/AGENTCO_OPEN_WORLD_5MIN_ANALYSIS.md` | Documentation |
@@ -1121,6 +1128,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/PRODUCTION_READINESS_SUMMARY.md` | Documentation |
 | `docs/RBAC_AND_WEB_SAFETY.md` | Documentation |
 | `docs/REAL_WORLD_PROOF_PLAN.md` | Documentation |
+| `docs/RUN_LIVE.md` | Documentation |
 | `docs/STAGING_48_HOUR_BURN_IN_PLAN.md` | Documentation |
 | `docs/STAGING_DEPLOYMENT_GUIDE.md` | Documentation |
 | `docs/STAGING_VALIDATION_SCORECARD.json` | Documentation |
@@ -2028,6 +2036,8 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `scripts/generate_status.py` | Development tooling |
 | `scripts/hosted_staging_audit.py` | Development tooling |
 | `scripts/hourly_codex_resume.sh` | Development tooling |
+| `scripts/live/generate_env.sh` | Development tooling |
+| `scripts/live/smoke.sh` | Development tooling |
 | `scripts/longitudinal_foundation.py` | Development tooling |
 | `scripts/nse_canonical_trust_weighting_test.py` | Development tooling |
 | `scripts/nse_data_fetcher.py` | Development tooling |

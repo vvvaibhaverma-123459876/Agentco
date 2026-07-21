@@ -1,6 +1,6 @@
 # Runtime Component Ledger
 
-Tracked structural snapshot input hash `5fb6528e6b23795e8922ba9c6bde4510d949f64d0653b5b7a3c38d0863078978`.
+Tracked structural snapshot input hash `8e5c6fc35cf48724e0e13c8c1e28c31f638bcac7bf988b576f4d555704cc985c`.
 
 | component_id | path | classification | authoritative_status | process_type | entrypoint | external_dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -36,6 +36,7 @@ Tracked structural snapshot input hash `5fb6528e6b23795e8922ba9c6bde4510d949f64d
 | backend-src-cli-run-bounded-learning-ts | backend/src/cli/run-bounded-learning.ts | runtime_support | support | library | None | ['LLM provider'] |
 | backend-src-cli-run-longitudinal-learning-ts | backend/src/cli/run-longitudinal-learning.ts | runtime_support | support | library | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-cli-score-validation-ts | backend/src/cli/score-validation.ts | runtime_support | support | library | None | ['LLM provider'] |
+| backend-src-cli-seed-live-ts | backend/src/cli/seed-live.ts | runtime_support | support | library | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-cli-smoke-durable-execution-ts | backend/src/cli/smoke-durable-execution.ts | runtime_support | support | library | None | [] |
 | backend-src-cli-supervised-free-run-ts | backend/src/cli/supervised-free-run.ts | runtime_support | support | library | None | ['LLM provider'] |
 | backend-src-cli-supervised-runtime-ts | backend/src/cli/supervised-runtime.ts | runtime_support | support | library | None | [] |
