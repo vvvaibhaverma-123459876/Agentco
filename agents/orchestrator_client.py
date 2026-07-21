@@ -10,6 +10,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 from typing import Dict, Any, Optional
 import http.client
 from urllib.parse import urlparse
@@ -22,13 +23,17 @@ logger = logging.getLogger(__name__)
 class OrchestratorClient:
     """HTTP client for autonomy orchestrator."""
 
-    def __init__(self, base_url: str = "http://localhost:3000"):
+    def __init__(self, base_url: Optional[str] = None):
         """Initialize orchestrator client.
 
         Args:
-            base_url: Base URL of autonomy orchestrator (default: localhost:3000)
+            base_url: Base URL of autonomy orchestrator. Defaults to
+                AGENTCO_API_URL (falling back to the backend's default port
+                3001 — port 3000 is the Next.js frontend, not the API).
         """
-        self.base_url = base_url.rstrip("/")
+        resolved = base_url or os.environ.get("AGENTCO_API_URL") or "http://localhost:3001"
+        self.base_url = resolved.rstrip("/")
+        self.api_key = os.environ.get("AGENTCO_API_KEY")
         self.db = get_db()
 
     async def execute_autonomy_loop(
@@ -150,6 +155,8 @@ class OrchestratorClient:
                 "Content-Type": "application/json",
                 "Accept": "application/json",
             }
+            if self.api_key:
+                headers["x-api-key"] = self.api_key
 
             body = json.dumps(payload)
             conn.request("POST", endpoint, body, headers)

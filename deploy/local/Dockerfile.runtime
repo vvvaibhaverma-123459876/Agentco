@@ -1,0 +1,71 @@
+# Combined Node + Python runtime image for the local live stack.
+#
+# The plain backend/Dockerfile is Node-only, but the backend spawns Python at
+# runtime (specialist agents via `python3.13 -m agents.autonomy.<role>`, durable
+# tasks via `scripts/execute_durable_task.py`), and the compiled repoRoot
+# resolution (team-activation.service.ts: path.resolve(__dirname, '../../..'))
+# requires the backend package to live at <root>/backend with the Python
+# packages at <root>. This image reproduces that layout at /app.
+
+FROM node:20-bookworm-slim AS backend-build
+WORKDIR /build
+COPY backend/package*.json ./
+RUN npm ci
+COPY backend/tsconfig.json ./
+COPY backend/src ./src
+RUN npm run build
+
+FROM node:20-bookworm-slim AS backend-deps
+WORKDIR /deps
+COPY backend/package*.json ./
+RUN npm ci --omit=dev
+
+FROM python:3.13-slim-bookworm AS runtime
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
+  && mkdir -p /etc/apt/keyrings \
+  && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key \
+     | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+  && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
+     > /etc/apt/sources.list.d/nodesource.list \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends nodejs \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY agents/requirements.txt /app/agents-requirements.txt
+RUN pip install --no-cache-dir -r /app/agents-requirements.txt
+
+# Python runtime packages, laid out exactly as in the repo root.
+COPY agents ./agents
+COPY runtime ./runtime
+COPY calibration ./calibration
+COPY autonomy ./autonomy
+COPY scripts ./scripts
+COPY requirements ./requirements
+
+# Backend package at /app/backend so compiled __dirname/../../.. == /app.
+COPY --from=backend-deps /deps/node_modules ./backend/node_modules
+COPY --from=backend-build /build/dist ./backend/dist
+COPY backend/package*.json ./backend/
+COPY backend/src/db/migrations ./backend/src/db/migrations
+
+COPY deploy/local/backend-entrypoint.sh /usr/local/bin/backend-entrypoint.sh
+COPY deploy/local/worker-entrypoint.sh /usr/local/bin/worker-entrypoint.sh
+RUN chmod +x /usr/local/bin/backend-entrypoint.sh /usr/local/bin/worker-entrypoint.sh \
+  && groupadd --system --gid 1001 agentco \
+  && useradd --system --uid 1001 --gid agentco --home-dir /app agentco \
+  && mkdir -p /shared \
+  && chown -R agentco:agentco /app /shared
+
+USER agentco
+ENV NODE_ENV=production \
+    PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    AGENTCO_PYTHON=python3.13
+
+WORKDIR /app/backend
+EXPOSE 3001
+CMD ["/usr/local/bin/backend-entrypoint.sh"]
