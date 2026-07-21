@@ -20,8 +20,7 @@ ENV_FILE=".env.live"
 
 if [[ -f "$ENV_FILE" && "${1:-}" != "--force" ]]; then
   echo "[live-init] $ENV_FILE already exists; keeping it (use --force to rotate all secrets)" >&2
-  exit 0
-fi
+else
 
 rand() { openssl rand -hex "$1"; }
 
@@ -92,3 +91,5 @@ FRONTEND_URL=http://localhost:3000
 EOF
 
 echo "[live-init] wrote $ENV_FILE (mode 600)" >&2
+
+fi

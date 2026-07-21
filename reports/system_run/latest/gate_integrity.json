@@ -1,22 +1,32 @@
 {
-  "branch": "main",
-  "commit": "bb23cd8a267e57c6955223a5d63fd3aac981846f",
+  "branch": "deploy/local-live-stack",
+  "commit": "94d15a0d4166cc43a40df805055885a65c5a055b",
   "exception_count": 10,
   "exception_file": "docs/audit/current/GATE_INTEGRITY_EXCEPTIONS.json",
-  "findings": [],
-  "generated_at": "2026-07-15T04:03:01Z",
+  "findings": [
+    {
+      "detail": "Protected gate exits success unconditionally.",
+      "line": 23,
+      "path": "scripts/live/generate_env.sh",
+      "rule": "UNCONDITIONAL_EXIT_ZERO"
+    }
+  ],
+  "generated_at": "2026-07-21T15:16:24Z",
   "protected_files": [
     "Makefile",
     "backend/Dockerfile",
     "backend/jest.config.ts",
     "backend/package.json",
+    "docker-compose.live.yml",
     "docker-compose.staging.yml",
     "docker-compose.yml",
     "frontend/Dockerfile",
     "frontend/package.json",
     "pytest.ini",
-    "scripts/constitution/check_constitution.py"
+    "scripts/constitution/check_constitution.py",
+    "scripts/live/generate_env.sh",
+    "scripts/live/smoke.sh"
   ],
-  "success": true,
-  "working_tree": "dirty"
+  "success": false,
+  "working_tree": "clean"
 }
