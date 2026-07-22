@@ -86,6 +86,13 @@ LLM_SEED_BUDGET_TOKENS=5000000
 # LLM_RESOURCE_ACTOR_ID / LLM_RESOURCE_ACCOUNT_ID are intentionally absent:
 # the backend entrypoint seeds them at boot (dist/cli/seed-live.js --emit-env).
 
+# ----- decision receipts -----
+RECEIPT_SIGNING_SEED=$(rand 32)
+# The bundled /app/demo-fixture-repo is trusted (baked into the image), so
+# local_copy mode and fixture test execution are enabled for the demo flow.
+AGENTCO_REVIEW_ALLOW_LOCAL=1
+AGENTCO_REVIEW_RUN_TESTS=1
+
 # ----- frontend -----
 FRONTEND_URL=http://localhost:3000
 EOF

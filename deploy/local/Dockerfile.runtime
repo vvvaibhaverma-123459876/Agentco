@@ -30,7 +30,7 @@ RUN apt-get update \
   && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" \
      > /etc/apt/sources.list.d/nodesource.list \
   && apt-get update \
-  && apt-get install -y --no-install-recommends nodejs \
+  && apt-get install -y --no-install-recommends nodejs git \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -51,6 +51,9 @@ COPY --from=backend-deps /deps/node_modules ./backend/node_modules
 COPY --from=backend-build /build/dist ./backend/dist
 COPY backend/package*.json ./backend/
 COPY backend/src/db/migrations ./backend/src/db/migrations
+
+# Trusted demo fixture for the decision-receipt flow (local_copy source mode).
+COPY deploy/local/demo-fixture-repo /app/demo-fixture-repo
 
 COPY deploy/local/backend-entrypoint.sh /usr/local/bin/backend-entrypoint.sh
 COPY deploy/local/worker-entrypoint.sh /usr/local/bin/worker-entrypoint.sh

@@ -36,6 +36,7 @@ import { institutionWorkAssignmentRoutes } from './routes/institution-work-assig
 import { goalHierarchyRoutes } from './routes/goal-hierarchy.routes';
 import { phase3HardeningRoutes } from './routes/phase3-hardening.routes';
 import { systemRoutes } from './routes/system.routes';
+import { repoReviewRoutes } from './routes/repo-review.routes';
 import { identityRoutes } from './routes/identity.routes';
 import { resourceLedgerRoutes } from './routes/resource-ledger.routes';
 import { capabilityRoutes } from './routes/capabilities.routes';
@@ -152,6 +153,7 @@ export async function build() {
   await app.register(resourceLedgerRoutes);
   await app.register(capabilityRoutes);
   await app.register(systemRoutes);
+  await app.register(repoReviewRoutes);
 
   // Public health probes. These intentionally bypass normal API auth so
   // orchestrators can make liveness/readiness decisions before routing traffic.

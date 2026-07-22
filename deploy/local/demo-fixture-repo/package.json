@@ -1,0 +1,9 @@
+{
+  "name": "checkout-pricing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tiny checkout pricing library used as the AgentCo review-demo fixture.",
+  "scripts": {
+    "test": "node test.js"
+  }
+}
