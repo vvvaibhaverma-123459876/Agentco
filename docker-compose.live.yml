@@ -178,7 +178,9 @@ services:
       - "127.0.0.1:3000:3000"
     networks: [agentco-live]
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/health > /dev/null"]
+      # 127.0.0.1 explicitly: Next standalone binds IPv4 0.0.0.0, and busybox
+      # wget resolves localhost to ::1 without falling back -> false unhealthy.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health > /dev/null"]
       interval: 15s
       timeout: 5s
       retries: 5
