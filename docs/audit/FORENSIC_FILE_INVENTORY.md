@@ -2,29 +2,29 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2157`
+- Tracked files: `2165`
 
 ## Category Counts
 
 | Category | Count |
 |---|---:|
-| Database migration | 143 |
+| Database migration | 144 |
 | Deployment infrastructure | 35 |
 | Deprecated code | 48 |
 | Development tooling | 149 |
 | Documentation | 540 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
-| Production runtime code | 494 |
+| Production runtime code | 497 |
 | Prompt/template | 29 |
-| Test infrastructure | 315 |
-| Unknown purpose | 137 |
+| Test infrastructure | 316 |
+| Unknown purpose | 140 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 521 |
+| `backend` | 526 |
 | `docs` | 467 |
 | `evals` | 180 |
 | `scripts` | 161 |
@@ -51,9 +51,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
+| `deploy` | 6 |
 | `requirements` | 4 |
 | `validation` | 4 |
-| `deploy` | 3 |
 | `agentco_security` | 2 |
 | `dashboard` | 2 |
 | `data` | 2 |
@@ -585,6 +585,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/db/migrations/142_aud004_independence_backstops.sql` | Database migration |
 | `backend/src/db/migrations/143_aud004_m3_breadth_permissions.sql` | Database migration |
 | `backend/src/db/migrations/144_aud004_capability_runtime_permissions.sql` | Database migration |
+| `backend/src/db/migrations/146_decision_receipts.sql` | Database migration |
 | `backend/src/db/rollbacks/018_refoundation_canonical_schema.down.sql` | Production runtime code |
 | `backend/src/db/run_migrations.py` | Production runtime code |
 | `backend/src/db/unsupported_migrations/020_evaluation_manifests.sql.disabled` | Production runtime code |
@@ -639,6 +640,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/routes/phase3-hardening.routes.ts` | Production runtime code |
 | `backend/src/routes/phases-6-8.routes.ts.disabled` | Production runtime code |
 | `backend/src/routes/phases-9-13.routes.ts.disabled` | Production runtime code |
+| `backend/src/routes/repo-review.routes.ts` | Production runtime code |
 | `backend/src/routes/resource-ledger.routes.ts` | Production runtime code |
 | `backend/src/routes/safe-evolution.routes.ts` | Production runtime code |
 | `backend/src/routes/society.routes.ts` | Production runtime code |
@@ -750,8 +752,10 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/src/services/provenance.service.ts` | Production runtime code |
 | `backend/src/services/rag.service.ts` | Production runtime code |
 | `backend/src/services/rate-limiter.service.ts` | Production runtime code |
+| `backend/src/services/receipt-signer.ts` | Production runtime code |
 | `backend/src/services/reflection.service.ts` | Production runtime code |
 | `backend/src/services/regression-test-generator.service.ts` | Production runtime code |
+| `backend/src/services/repo-review.service.ts` | Production runtime code |
 | `backend/src/services/reputation-learning.service.ts` | Production runtime code |
 | `backend/src/services/reputation-scale.service.ts` | Production runtime code |
 | `backend/src/services/resolution-service.service.ts` | Production runtime code |
@@ -897,6 +901,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/rag-real-retrieval.test.ts` | Test infrastructure |
 | `backend/tests/red-team-corpus.test.ts` | Test infrastructure |
 | `backend/tests/regression-test-generator.test.ts` | Test infrastructure |
+| `backend/tests/repo-review-receipt.test.ts` | Test infrastructure |
 | `backend/tests/reputation-adaptive-integration.test.ts` | Test infrastructure |
 | `backend/tests/request-principal.test.ts` | Test infrastructure |
 | `backend/tests/resource-ledger.test.ts` | Test infrastructure |
@@ -1063,6 +1068,9 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `data/external/bike_sharing/hour.csv` | Generated artifact |
 | `deploy/local/Dockerfile.runtime` | Unknown purpose |
 | `deploy/local/backend-entrypoint.sh` | Unknown purpose |
+| `deploy/local/demo-fixture-repo/package.json` | Unknown purpose |
+| `deploy/local/demo-fixture-repo/pricing.js` | Unknown purpose |
+| `deploy/local/demo-fixture-repo/test.js` | Unknown purpose |
 | `deploy/local/worker-entrypoint.sh` | Unknown purpose |
 | `docker-compose.live.yml` | Deployment infrastructure |
 | `docker-compose.staging.yml` | Deployment infrastructure |

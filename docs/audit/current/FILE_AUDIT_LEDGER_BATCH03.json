@@ -1,5 +1,5 @@
 {
-  "active_runtime_files_reviewed": 64,
+  "active_runtime_files_reviewed": 65,
   "note": "Batch 03 reviews active runtime scope only; this is not a full repository line audit.",
   "reviewed_files": [
     "agents/autonomy/__init__.py",
@@ -75,6 +75,7 @@
     "backend/src/routes/override.routes.ts",
     "backend/src/routes/param-validation.ts",
     "backend/src/routes/phase3-hardening.routes.ts",
+    "backend/src/routes/repo-review.routes.ts",
     "backend/src/routes/resource-ledger.routes.ts",
     "backend/src/routes/safe-evolution.routes.ts",
     "backend/src/routes/society.routes.ts",
@@ -186,8 +187,10 @@
     "backend/src/services/provenance.service.ts",
     "backend/src/services/rag.service.ts",
     "backend/src/services/rate-limiter.service.ts",
+    "backend/src/services/receipt-signer.ts",
     "backend/src/services/reflection.service.ts",
     "backend/src/services/regression-test-generator.service.ts",
+    "backend/src/services/repo-review.service.ts",
     "backend/src/services/reputation-learning.service.ts",
     "backend/src/services/reputation-scale.service.ts",
     "backend/src/services/resolution-service.service.ts",
@@ -299,5 +302,5 @@
     "runtime/tests/test_spend_guardrail_ledger.py",
     "runtime/tool_registry/__init__.py"
   ],
-  "source_input_hash": "8e5c6fc35cf48724e0e13c8c1e28c31f638bcac7bf988b576f4d555704cc985c"
+  "source_input_hash": "57b96c248c3ab254eef56abbf0e0881723336bedf1584e7d17a7f2edfe31cea9"
 }
