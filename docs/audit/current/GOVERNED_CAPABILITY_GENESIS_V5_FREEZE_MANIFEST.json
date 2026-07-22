@@ -5,7 +5,7 @@
     "real_provider_requires_scored_execution": true
   },
   "bundle_hashes": {
-    "acceptance_thresholds": "24fd06ac4cc39519bf73841d3e172031138226800499d33987ef5fde2ac06bfb",
+    "acceptance_thresholds": "d955c0dfbad9a49c482a535d0d9d0fe1e7f1725bae08b577b3d01b4ec3c98ed3",
     "artifact_verifier": "31591cf893d7d0540b39c09e3f84f1efce6b485a9d84caf580c0674fc34fa487",
     "dependency_locks": "92693d0bb1a7f5b5b66dcd51eeb3bd2ac0dda1c5b5fc42c96aea682869212692",
     "evaluator_runner": "74f4a1ad675e73e20d31c6a7383e5143fa3dfbae5ae7e0da2c7df662b2f0ec72",
@@ -22,8 +22,8 @@
     "tools": "6e9a9b1dee1dd981ee0b65627a980f59195fa2a75991b594be41a1840c30e5cd",
     "workflow_execution_logic": "f83cc17cd02498e3311c904fbee9e1b53a45f7cf4d5ee398b2684cf2981885de"
   },
-  "freeze_candidate_sha": "17ea9f94df647527afe4416d7e04d8b6cde85f87",
-  "freeze_candidate_tree_hash": "fb216dd300ff847ce69ca4eca43ea4c12b2deb78",
+  "freeze_candidate_sha": "30f6f63015ee48dcd6c7253dc1550554a51226f9",
+  "freeze_candidate_tree_hash": "4c13c4817f31a86aee0a87429301e63a11940b1b",
   "freeze_schema_version": "governed-capability-genesis-v5-freeze-manifest-v1",
   "frozen_directories": [
     ".github/workflows",
@@ -122,12 +122,12 @@
       "size_bytes_at_candidate": 3207
     },
     {
-      "blob_sha_at_candidate": "4b8d11a71d8809777d63187060ab36f189bb5d03",
+      "blob_sha_at_candidate": "58d66eeff83ed43d875909ff154987bdef945108",
       "bundle": "acceptance_thresholds",
       "path": "Makefile",
       "required_at_final_head": true,
-      "sha256_at_candidate": "a661dd198d2e02093b1d96308ea39e115d7cbbf75d4a24df6d8c057344f5bde6",
-      "size_bytes_at_candidate": 36811
+      "sha256_at_candidate": "9fe92d7eb9998b47ea85e0f6110b1508e29770a8b9d4d537da34847e9ce7b2f5",
+      "size_bytes_at_candidate": 37682
     },
     {
       "blob_sha_at_candidate": "4eef704539b371d39dfcbb0559535aadfafe7595",
@@ -530,7 +530,7 @@
       "size_bytes_at_candidate": 1258
     }
   ],
-  "manifest_logical_hash": "1e9e73390c1565bce404f31f0dc4fece13befd9b505000890e5d9e2f07690a2e",
+  "manifest_logical_hash": "dfdc07cf460fd656543821ae1d34f4cddb40c2ee6d75f6213fc37f57fea7649f",
   "protocol_campaign_id": "governed-capability-protocol-baseline-v3",
   "real_capability_campaign_id": "governed-capability-genesis-v5"
 }

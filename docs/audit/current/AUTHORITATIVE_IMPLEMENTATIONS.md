@@ -1,6 +1,6 @@
 # Authoritative Implementations
 
-Tracked structural snapshot input hash: `5fb6528e6b23795e8922ba9c6bde4510d949f64d0653b5b7a3c38d0863078978`
+Tracked structural snapshot input hash: `57b96c248c3ab254eef56abbf0e0881723336bedf1584e7d17a7f2edfe31cea9`
 
 | Concept | Implementation | Decision | Evidence |
 | --- | --- | --- | --- |

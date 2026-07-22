@@ -1,0 +1,187 @@
+# ============================================================
+# AgentCo Local LIVE Stack — the whole product, one command.
+# ============================================================
+# Unlike docker-compose.yml (infrastructure only), this file runs the
+# complete system: PostgreSQL, Kafka, the backend API (which migrates and
+# seeds itself on boot), the three worker processes, and the frontend.
+#
+# Usage (via Makefile):
+#   make live-up      # generate .env.live if absent, build, boot everything
+#   make live-smoke   # verify the running stack end to end
+#   make live-down    # stop (data volumes persist; live-destroy removes them)
+#
+# All ports bind to 127.0.0.1 ONLY: the frontend has no human login and its
+# server-side proxy holds the privileged API key, so this stack must not be
+# exposed beyond loopback as-is.
+# ============================================================
+
+networks:
+  agentco-live:
+    driver: bridge
+
+volumes:
+  live-postgres-data:
+  live-shared-runtime:
+
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: agentco-live-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: agentco
+      POSTGRES_PASSWORD: ${LIVE_POSTGRES_PASSWORD:?run `make live-init` to generate .env.live}
+      POSTGRES_DB: agentco
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "127.0.0.1:5442:5432"
+    volumes:
+      - live-postgres-data:/var/lib/postgresql/data
+    networks: [agentco-live]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentco -d agentco"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: agentco-live-zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks: [agentco-live]
+    healthcheck:
+      test: ["CMD-SHELL", "bash -ec 'cat < /dev/null > /dev/tcp/localhost/2181'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: agentco-live-kafka
+    restart: unless-stopped
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks: [agentco-live]
+    healthcheck:
+      # Generous start window: on first boot the broker can crash-loop for
+      # ~30-60s on a stale ZooKeeper ephemeral registration (restart policy
+      # rides through it); compose must not give up during that window.
+      test: ["CMD-SHELL", "kafka-topics --bootstrap-server localhost:29092 --list"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+      start_period: 90s
+
+  backend:
+    build:
+      context: .
+      dockerfile: deploy/local/Dockerfile.runtime
+    image: agentco-live-runtime
+    container_name: agentco-live-backend
+    restart: unless-stopped
+    env_file: [.env.live]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - live-shared-runtime:/shared
+    networks: [agentco-live]
+    healthcheck:
+      # /health/ready requires Postgres + Kafka + real providers; migrations and
+      # the bootstrap seed run first in the entrypoint, hence the long start_period.
+      test: ["CMD-SHELL", "curl -fsS http://localhost:3001/health/ready > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 240s
+
+  outbox-worker:
+    image: agentco-live-runtime
+    container_name: agentco-live-outbox-worker
+    restart: unless-stopped
+    env_file: [.env.live]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: ["/usr/local/bin/worker-entrypoint.sh", "dist/workers/outbox-worker.js"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - live-shared-runtime:/shared:ro
+    networks: [agentco-live]
+
+  civilization-scheduler:
+    image: agentco-live-runtime
+    container_name: agentco-live-civ-scheduler
+    restart: unless-stopped
+    env_file: [.env.live]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: ["/usr/local/bin/worker-entrypoint.sh", "dist/workers/civilization-scheduler-worker.js"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - live-shared-runtime:/shared:ro
+    networks: [agentco-live]
+
+  task-worker:
+    image: agentco-live-runtime
+    container_name: agentco-live-task-worker
+    restart: unless-stopped
+    env_file: [.env.live]
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    entrypoint: ["/usr/local/bin/worker-entrypoint.sh", "dist/workers/task-worker.js"]
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      - live-shared-runtime:/shared:ro
+    networks: [agentco-live]
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: agentco-live-frontend
+    restart: unless-stopped
+    environment:
+      AGENTCO_API_URL: http://backend:3001
+      AGENTCO_API_KEY: ${AGENTCO_API_KEY:?run `make live-init` to generate .env.live}
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks: [agentco-live]
+    healthcheck:
+      # 127.0.0.1 explicitly: Next standalone binds IPv4 0.0.0.0, and busybox
+      # wget resolves localhost to ::1 without falling back -> false unhealthy.
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health > /dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

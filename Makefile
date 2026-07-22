@@ -224,6 +224,33 @@ dev:
 	cd backend && npm install
 	cd frontend && npm install
 
+# ----- local LIVE stack: the whole product on localhost (docker-compose.live.yml) -----
+.PHONY: live-init live-up live-down live-destroy live-smoke live-logs live-ps
+
+live-init:
+	bash scripts/live/generate_env.sh
+
+live-up: live-init
+	docker compose --env-file .env.live -f docker-compose.live.yml up -d --build
+	@echo ""
+	@echo "AgentCo live stack starting. Frontend: http://localhost:3000  API: http://localhost:3001"
+	@echo "Watch progress:  make live-logs    Verify:  make live-smoke"
+
+live-down:
+	docker compose --env-file .env.live -f docker-compose.live.yml down
+
+live-destroy:
+	docker compose --env-file .env.live -f docker-compose.live.yml down -v
+
+live-smoke:
+	bash scripts/live/smoke.sh
+
+live-logs:
+	docker compose --env-file .env.live -f docker-compose.live.yml logs -f --tail=100
+
+live-ps:
+	docker compose --env-file .env.live -f docker-compose.live.yml ps
+
 migrate:
 	cd backend && npm run build && npm run db:migrate
 

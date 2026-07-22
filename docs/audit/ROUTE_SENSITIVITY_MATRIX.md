@@ -16,10 +16,10 @@ Public browser access must not receive a privileged service API key. Browser das
 | classification | routes |
 |---|---:|
 | PUBLIC | 4 |
-| AUTH-READ | 104 |
-| AUTH-WRITE | 10 |
+| AUTH-READ | 107 |
+| AUTH-WRITE | 11 |
 | AUTH-PRINCIPAL | 184 |
-| TOTAL | 302 |
+| TOTAL | 306 |
 
 ## Matrix
 
@@ -327,6 +327,10 @@ Public browser access must not receive a privileged service API key. Browser das
 | `/system/runtime-mode` | GET/HEAD | System mode, build, migration, readiness, or capability state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/system/version` | GET/HEAD | System mode, build, migration, readiness, or capability state | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 | `/ws/events` | GET/HEAD | Realtime event stream | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/repo-review` | POST | Starts a repository review pipeline (clones/reads an external repo, spends LLM budget) | AUTH-WRITE | Starts work and consumes budgeted resources; requires the API key. |
+| `/api/repo-review/:id` | GET/HEAD | Repository review run status and stage payloads | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/repo-review/:id/receipt` | GET/HEAD | Signed decision receipt for a review run | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
+| `/api/repo-review/:id/verify` | GET/HEAD | Recomputes hash chain + Ed25519 signature for a receipt | AUTH-READ | Exposes non-liveness system/application state; default stance is authenticated read. |
 
 ## Uncertain Classifications
 

@@ -1,6 +1,6 @@
 # Runtime Component Ledger
 
-Tracked structural snapshot input hash `5fb6528e6b23795e8922ba9c6bde4510d949f64d0653b5b7a3c38d0863078978`.
+Tracked structural snapshot input hash `57b96c248c3ab254eef56abbf0e0881723336bedf1584e7d17a7f2edfe31cea9`.
 
 | component_id | path | classification | authoritative_status | process_type | entrypoint | external_dependencies |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -36,6 +36,7 @@ Tracked structural snapshot input hash `5fb6528e6b23795e8922ba9c6bde4510d949f64d
 | backend-src-cli-run-bounded-learning-ts | backend/src/cli/run-bounded-learning.ts | runtime_support | support | library | None | ['LLM provider'] |
 | backend-src-cli-run-longitudinal-learning-ts | backend/src/cli/run-longitudinal-learning.ts | runtime_support | support | library | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-cli-score-validation-ts | backend/src/cli/score-validation.ts | runtime_support | support | library | None | ['LLM provider'] |
+| backend-src-cli-seed-live-ts | backend/src/cli/seed-live.ts | runtime_support | support | library | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-cli-smoke-durable-execution-ts | backend/src/cli/smoke-durable-execution.ts | runtime_support | support | library | None | [] |
 | backend-src-cli-supervised-free-run-ts | backend/src/cli/supervised-free-run.ts | runtime_support | support | library | None | ['LLM provider'] |
 | backend-src-cli-supervised-runtime-ts | backend/src/cli/supervised-runtime.ts | runtime_support | support | library | None | [] |
@@ -76,6 +77,7 @@ Tracked structural snapshot input hash `5fb6528e6b23795e8922ba9c6bde4510d949f64d
 | backend-src-routes-override-routes-ts | backend/src/routes/override.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-param-validation-ts | backend/src/routes/param-validation.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-phase3-hardening-routes-ts | backend/src/routes/phase3-hardening.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
+| backend-src-routes-repo-review-routes-ts | backend/src/routes/repo-review.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-resource-ledger-routes-ts | backend/src/routes/resource-ledger.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-safe-evolution-routes-ts | backend/src/routes/safe-evolution.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
 | backend-src-routes-society-routes-ts | backend/src/routes/society.routes.ts | authoritative_runtime | authoritative | http_route_module | backend/src/server.ts route registration | [] |
@@ -187,8 +189,10 @@ Tracked structural snapshot input hash `5fb6528e6b23795e8922ba9c6bde4510d949f64d
 | backend-src-services-provenance-service-ts | backend/src/services/provenance.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-rag-service-ts | backend/src/services/rag.service.ts | runtime_support | support | service | None | [] |
 | backend-src-services-rate-limiter-service-ts | backend/src/services/rate-limiter.service.ts | runtime_support | support | service | None | [] |
+| backend-src-services-receipt-signer-ts | backend/src/services/receipt-signer.ts | runtime_support | support | service | None | [] |
 | backend-src-services-reflection-service-ts | backend/src/services/reflection.service.ts | runtime_support | support | service | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-services-regression-test-generator-service-ts | backend/src/services/regression-test-generator.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
+| backend-src-services-repo-review-service-ts | backend/src/services/repo-review.service.ts | runtime_support | support | service | None | ['LLM provider', 'PostgreSQL'] |
 | backend-src-services-reputation-learning-service-ts | backend/src/services/reputation-learning.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-reputation-scale-service-ts | backend/src/services/reputation-scale.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
 | backend-src-services-resolution-service-service-ts | backend/src/services/resolution-service.service.ts | runtime_support | support | service | None | ['PostgreSQL'] |
