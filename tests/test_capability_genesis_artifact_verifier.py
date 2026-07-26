@@ -59,6 +59,17 @@ def _case(**overrides):
     return record
 
 
+def _clean_clone_report(**overrides):
+    report = {
+        "verification_result": "passed",
+        "decision_recomputable_without_provider_credentials": True,
+        "aggregate_hash_matches": True,
+        "terminal_totals_reconcile": True,
+    }
+    report.update(overrides)
+    return report
+
+
 def _frozen_case_manifest(path, cases):
     path.write_text(
         json.dumps(
@@ -85,6 +96,7 @@ def test_genesis_v7_verifier_rejects_hash_only_provider_evidence(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest()
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(
         json.dumps(
             _case(
@@ -113,6 +125,7 @@ def test_genesis_v7_verifier_rejects_provider_response_status_without_evidence(t
         aggregate_correctness=0.75,
     )
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(
         json.dumps(
             _case(
@@ -141,6 +154,7 @@ def test_genesis_v7_verifier_accepts_diagnosable_invalid_response(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest(executed_cases=24, invalid_response_cases=24)
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     for index in range(24):
         (campaign / f"CASE_case-{index}.json").write_text(
             json.dumps(_case(case_id=f"case-{index}", provider_response_hash=f"{index:064x}"))
@@ -151,6 +165,40 @@ def test_genesis_v7_verifier_accepts_diagnosable_invalid_response(tmp_path):
     assert findings == []
 
 
+def test_genesis_v7_verifier_rejects_missing_clean_clone_report(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest()
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CASE_case-1.json").write_text(json.dumps(_case()))
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_CLEAN_CLONE_REPORT_MISSING") for item in findings)
+
+
+def test_genesis_v7_verifier_rejects_placeholder_clean_clone_report(tmp_path):
+    campaign = tmp_path / "campaign"
+    campaign.mkdir()
+    manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
+    manifest = _manifest(
+        baseline_execution_attempted=False,
+        executed_cases=0,
+        evidence_unavailable_cases=24,
+        invalid_response_cases=0,
+    )
+    manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(
+        json.dumps({"status": "not_run_after_canary_failed", "verification_result": None})
+    )
+
+    findings = verify_genesis_v7_evidence(manifest_path, manifest)
+
+    assert any(item.startswith("GENESIS_V7_CLEAN_CLONE_REPORT_PLACEHOLDER") for item in findings)
+    assert any(item.startswith("GENESIS_V7_CLEAN_CLONE_REPORT_NOT_PASSED") for item in findings)
+
+
 def test_genesis_v7_verifier_rejects_case_population_not_in_frozen_manifest(tmp_path):
     campaign = tmp_path / "campaign"
     campaign.mkdir()
@@ -159,6 +207,7 @@ def test_genesis_v7_verifier_rejects_case_population_not_in_frozen_manifest(tmp_
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest(executed_cases=24, invalid_response_cases=24)
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     for index in range(23):
         case_id = f"validation-case-{index}" if index < 12 else f"hidden-case-{index - 12}"
         (campaign / f"CASE_{case_id}.json").write_text(
@@ -183,6 +232,7 @@ def test_genesis_v7_verifier_rejects_split_and_domain_drift_from_frozen_manifest
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest(executed_cases=24, invalid_response_cases=24)
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     for index, frozen_case in enumerate(cases):
         overrides = {}
         if frozen_case["case_id"] == "validation-case-0":
@@ -210,6 +260,7 @@ def test_genesis_v7_verifier_rejects_identical_hash_only_response_pattern(tmp_pa
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest(executed_cases=2, invalid_response_cases=2)
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     for case_id in ("case-1", "case-2"):
         (campaign / f"CASE_{case_id}.json").write_text(
             json.dumps(
@@ -243,6 +294,7 @@ def test_genesis_v7_verifier_rejects_capability_decision_without_scores(tmp_path
         supported_domains=["reasoning"],
     )
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(json.dumps(_case(terminal_status="COMPLETED")))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
@@ -258,6 +310,7 @@ def test_genesis_v7_verifier_rejects_case_semantic_hash_tampering(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest()
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(json.dumps(_case(semantic_hash="f" * 64)))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
@@ -271,6 +324,7 @@ def test_genesis_v7_verifier_rejects_case_id_filename_mismatch(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest()
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_expected-id.json").write_text(json.dumps(_case(case_id="different-id")))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
@@ -284,6 +338,7 @@ def test_genesis_v7_verifier_rejects_duplicate_case_ids(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest(executed_cases=2, invalid_response_cases=2)
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(json.dumps(_case(case_id="duplicate")))
     (campaign / "CASE_case-2.json").write_text(json.dumps(_case(case_id="duplicate", provider_response_hash="d" * 64)))
 
@@ -298,6 +353,7 @@ def test_genesis_v7_verifier_rejects_case_campaign_mismatch(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest()
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(json.dumps(_case(campaign_id="other-campaign")))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
@@ -311,6 +367,7 @@ def test_genesis_v7_verifier_rejects_unknown_terminal_status(tmp_path):
     manifest_path = campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json"
     manifest = _manifest()
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(json.dumps(_case(terminal_status="Completed")))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
@@ -327,6 +384,7 @@ def test_genesis_v7_verifier_requires_baseline_count_fields(tmp_path):
     del manifest["planned_cases"]
     manifest["semantic_hash"] = _aggregate_semantic_hash(manifest)
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (campaign / "CASE_case-1.json").write_text(json.dumps(_case()))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
@@ -345,6 +403,7 @@ def test_genesis_v7_verifier_accepts_prebaseline_hold_without_case_records(tmp_p
         invalid_response_cases=0,
     )
     manifest_path.write_text(json.dumps(manifest))
+    (campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
 
     findings = verify_genesis_v7_evidence(manifest_path, manifest)
 
@@ -360,8 +419,10 @@ def test_artifact_verifier_scans_multiple_evidence_roots(tmp_path):
     bad_campaign.mkdir(parents=True)
     manifest = _manifest()
     (good_campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(manifest))
+    (good_campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (good_campaign / "CASE_case-1.json").write_text(json.dumps(_case()))
     (bad_campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(manifest))
+    (bad_campaign / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
     (bad_campaign / "CASE_case-1.json").write_text(
         json.dumps(
             _case(

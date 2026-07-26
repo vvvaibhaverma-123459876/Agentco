@@ -489,3 +489,24 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
 - Next candidate item:
   - Continue reducing `GCR-011` risk by ensuring any next authorized V7 attempt writes payload manifests and semantic hashes consistently, or move to another non-provider blocker if provider execution remains unavailable.
+
+## Iteration 24 — 2026-07-26
+
+- Branch: `loop/completion`
+- Starting HEAD: `25fe3e451ab4e7b0314c1a01a91251f6227a7c2d`
+- Selected item: require real clean-clone recomputation evidence for future Genesis V7 artifacts.
+- Changed:
+  - `scripts/run_openai_genesis_v7_baseline.py` now has an explicit clean-clone recomputation branch for pre-baseline `HOLD_FOR_MORE_EVIDENCE` artifacts, avoiding `not_run_*` placeholders while preserving the distinction that no provider cases ran.
+  - `scripts/verify_capability_genesis_artifact.py` now requires every V7 campaign manifest to have a `CLEAN_CLONE_VERIFICATION_REPORT.json` with `verification_result=passed`, recomputable decision evidence, aggregate hash match, and reconciled totals.
+  - Added tests proving placeholder clean-clone reports are rejected and no-execution HOLD artifacts can still be recomputed without credentials.
+  - Regenerated subsystem audit results and forensic ledgers.
+- Evidence:
+  - `python3.13 -m pytest tests/test_openai_genesis_v7_runner.py tests/test_capability_genesis_artifact_verifier.py -q` -> `34 passed`.
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`.
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on historical V7 artifacts, including old placeholder/mismatched clean-clone evidence and non-diagnosable provider records.
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on active `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`.
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
+- Next candidate item:
+  - Continue hardening real-provider readiness without executing a live campaign, likely by making the V7 verifier enforce current-run payload manifests and reject stale historical artifacts from satisfying future acceptance.

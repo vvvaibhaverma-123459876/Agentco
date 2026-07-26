@@ -905,6 +905,48 @@ def has_diagnosable_provider_evidence(record: dict[str, Any]) -> bool:
 
 
 def clean_clone_verification_report(aggregate: dict[str, Any], records: list[dict[str, Any]]) -> dict[str, Any]:
+    if aggregate.get("baseline_execution_attempted") is False:
+        recomputed_aggregate_hash = sha256_text(
+            canonical({k: v for k, v in aggregate.items() if k not in {"generated_at", "semantic_hash"}})
+        )
+        aggregate_hash_matches = recomputed_aggregate_hash == aggregate.get("semantic_hash")
+        planned = aggregate.get("planned_cases", MAX_CASES)
+        hold_counts_reconcile = (
+            not records
+            and aggregate.get("decision") == "HOLD_FOR_MORE_EVIDENCE"
+            and aggregate.get("executed_cases") == 0
+            and aggregate.get("evidence_unavailable_cases") == planned
+            and all(
+                aggregate.get(field, 0) == 0
+                for field in (
+                    "completed_cases",
+                    "failed_cases",
+                    "timed_out_cases",
+                    "denied_cases",
+                    "evaluator_unavailable_cases",
+                    "invalid_response_cases",
+                    "infrastructure_failure_cases",
+                )
+            )
+        )
+        passed = aggregate_hash_matches and hold_counts_reconcile
+        return {
+            "campaign_id": aggregate["campaign_id"],
+            "verification_result": "passed" if passed else "failed",
+            "decision_recomputable_without_provider_credentials": passed,
+            "case_hashes_match": True,
+            "aggregate_hash_matches": aggregate_hash_matches,
+            "terminal_totals_reconcile": hold_counts_reconcile,
+            "terminal_count_recomputation": {
+                "planned_cases": {"expected": planned, "actual": planned},
+                "executed_cases": {"expected": aggregate.get("executed_cases"), "actual": 0},
+                "evidence_unavailable_cases": {"expected": aggregate.get("evidence_unavailable_cases"), "actual": planned},
+            },
+            "diagnosable_provider_attempts": True,
+            "recomputed_aggregate_semantic_hash": recomputed_aggregate_hash,
+            "case_semantic_hash_recomputation": [],
+        }
+
     recomputed_case_hashes = [
         {
             "case_id": record["case_id"],

@@ -168,6 +168,32 @@ def _aggregate_semantic_hash(manifest: dict[str, Any]) -> str:
     return _sha256_text(_canonical({key: value for key, value in manifest.items() if key not in volatile_or_late_bound}))
 
 
+def _verify_clean_clone_report(manifest_path: Path) -> list[str]:
+    findings: list[str] = []
+    report_path = manifest_path.parent / "CLEAN_CLONE_VERIFICATION_REPORT.json"
+    if not report_path.exists():
+        return [f"GENESIS_V7_CLEAN_CLONE_REPORT_MISSING:{manifest_path}"]
+    try:
+        report = load(report_path)
+    except (OSError, ValueError) as exc:
+        return [f"GENESIS_V7_CLEAN_CLONE_REPORT_INVALID:{manifest_path}:{type(exc).__name__}"]
+    if not isinstance(report, dict):
+        return [f"GENESIS_V7_CLEAN_CLONE_REPORT_NOT_OBJECT:{manifest_path}"]
+    for field in ("verification_result", "status"):
+        value = report.get(field)
+        if isinstance(value, str) and value.startswith("not_run"):
+            findings.append(f"GENESIS_V7_CLEAN_CLONE_REPORT_PLACEHOLDER:{manifest_path}:{field}={value}")
+    if report.get("verification_result") != "passed":
+        findings.append(f"GENESIS_V7_CLEAN_CLONE_REPORT_NOT_PASSED:{manifest_path}:{report.get('verification_result')}")
+    if report.get("decision_recomputable_without_provider_credentials") is not True:
+        findings.append(f"GENESIS_V7_CLEAN_CLONE_DECISION_NOT_RECOMPUTABLE:{manifest_path}")
+    if report.get("aggregate_hash_matches") is not True:
+        findings.append(f"GENESIS_V7_CLEAN_CLONE_AGGREGATE_HASH_MISMATCH:{manifest_path}")
+    if report.get("terminal_totals_reconcile") is not True:
+        findings.append(f"GENESIS_V7_CLEAN_CLONE_TOTALS_NOT_RECONCILED:{manifest_path}")
+    return findings
+
+
 def _load_expected_case_population(path: Path) -> tuple[dict[str, dict[str, str]], list[str]]:
     findings: list[str] = []
     try:
@@ -238,6 +264,8 @@ def verify_genesis_v7_evidence(
     findings: list[str] = []
     if manifest.get("artifact_type") != "real_provider_genesis_v7_aggregate":
         return findings
+
+    findings.extend(_verify_clean_clone_report(manifest_path))
 
     case_paths = sorted(manifest_path.parent.glob("CASE_*.json"))
     case_records: list[dict[str, Any]] = []

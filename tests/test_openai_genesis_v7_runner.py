@@ -335,6 +335,36 @@ def test_clean_clone_recomputation_allows_failed_before_provider_attempt():
     assert report["diagnosable_provider_attempts"] is True
 
 
+def test_clean_clone_recomputation_passes_prebaseline_hold_without_placeholder():
+    aggregate = {
+        "campaign_id": runner.CAMPAIGN_ID,
+        "baseline_execution_attempted": False,
+        "planned_cases": 24,
+        "executed_cases": 0,
+        "completed_cases": 0,
+        "failed_cases": 0,
+        "timed_out_cases": 0,
+        "denied_cases": 0,
+        "evidence_unavailable_cases": 24,
+        "evaluator_unavailable_cases": 0,
+        "invalid_response_cases": 0,
+        "infrastructure_failure_cases": 0,
+        "decision": "HOLD_FOR_MORE_EVIDENCE",
+        "generated_at": "volatile",
+    }
+    aggregate["semantic_hash"] = runner.sha256_text(
+        runner.canonical({k: v for k, v in aggregate.items() if k not in {"generated_at", "semantic_hash"}})
+    )
+
+    report = runner.clean_clone_verification_report(aggregate, [])
+
+    assert report["verification_result"] == "passed"
+    assert report["decision_recomputable_without_provider_credentials"] is True
+    assert report["terminal_totals_reconcile"] is True
+    assert report["diagnosable_provider_attempts"] is True
+    assert not any(str(value).startswith("not_run") for value in report.values())
+
+
 def test_clean_clone_recomputation_passes_with_diagnosable_provider_evidence(monkeypatch, tmp_path):
     auth = tmp_path / "authorization.json"
     _auth(auth)
