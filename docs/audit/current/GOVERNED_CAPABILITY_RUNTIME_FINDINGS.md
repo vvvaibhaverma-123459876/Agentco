@@ -65,7 +65,10 @@ outputs.
 
 `scripts/verify_capability_genesis_artifact.py --check` now rejects this
 non-diagnosable V7 evidence shape and reports the shared provider-response hash
-across all 24 cases. A future real-provider run must preserve redacted response
-content, provider request ID hash, finish reason, parser input, parser input
-hash and audit references before it can satisfy the real capability evidence
-predicate.
+across all 24 cases. The V7 runner now also carries size-limited HTTP error
+bodies and provider request-id headers into redacted, hash-bound failed-case
+diagnostics. This prepares the next authorized run but does not repair the
+historical attempt-2 artifacts. A future real-provider run must preserve
+redacted response content, provider request ID hash, finish reason, parser input,
+parser input hash and audit references before it can satisfy the real capability
+evidence predicate.

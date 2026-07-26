@@ -463,3 +463,29 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
 - Next candidate item:
   - Address `GCR-011` by making real-provider Genesis evidence independently diagnosable: preserve redacted response bodies, finish reasons, provider request ID hashes, parser inputs, and audit references before another real baseline attempt.
+
+## Iteration 23 — 2026-07-26
+
+- Branch: `loop/completion`
+- Starting HEAD: `4da7f14047f5e31c13b7b93b667ef13731ceff8e`
+- Selected item: strengthen future Genesis V7 provider-attempt diagnostics for `GCR-011` without altering historical attempt-2 evidence.
+- Claude/Duet: Claude was available and provided a read-only review. It identified that HTTP provider errors discarded response bodies and request-id headers before case evidence was written.
+- Changed:
+  - `scripts/run_openai_genesis_v7_baseline.py` now captures size-limited HTTP error response bodies and request-id headers in a dedicated `ProviderHTTPError`.
+  - Failed provider round-trips now flow through the same redacted response, provider request ID hash, finish-reason sentinel, parser input, parser input hash, audit reference and semantic-hash pipeline as invalid/completed provider responses.
+  - Clean-clone recomputation now rejects `FAILED` records that show provider-attempt markers but lack diagnosable provider evidence, while still allowing failures that occurred before provider contact.
+  - Added non-network regressions for HTTP error redaction, provider request-id hashing, failed provider-attempt diagnostics, and pre-provider failures.
+  - Updated the open `GCR-011` remediation text to record the future-run tooling fix while leaving the historical attempt-2 blocker open.
+  - Regenerated subsystem audit results and forensic ledgers.
+- Evidence:
+  - `duet talk --repo /Users/Zet/Agentco --new claude ...` -> read-only review completed; no file edits by Claude.
+  - `python3.13 -m pytest tests/test_openai_genesis_v7_runner.py tests/test_capability_genesis_artifact_verifier.py -q` -> `31 passed`.
+  - `python3.13 -m pytest tests/test_run_subsystem_audit_results.py tests/test_verify_subsystem_audit_results.py -q` -> `9 passed`.
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`.
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --check` -> expected failure on historical V7 attempt artifacts and stale freeze binding; future-run evidence capture tests now pass.
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on active `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`.
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
+- Next candidate item:
+  - Continue reducing `GCR-011` risk by ensuring any next authorized V7 attempt writes payload manifests and semantic hashes consistently, or move to another non-provider blocker if provider execution remains unavailable.

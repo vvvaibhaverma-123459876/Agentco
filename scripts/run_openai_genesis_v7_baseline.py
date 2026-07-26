@@ -62,6 +62,26 @@ class ExecutionConfig:
     authorization_input_hash: str
 
 
+class ProviderHTTPError(RuntimeError):
+    def __init__(self, status_code: int, body: bytes, request_id: str | None):
+        super().__init__(f"http_{status_code}")
+        self.status_code = status_code
+        self.body = body
+        self.request_id = request_id
+
+    def provider_data(self) -> dict[str, Any]:
+        text = self.body.decode(errors="replace")
+        try:
+            parsed: Any = json.loads(text) if text.strip() else {}
+        except json.JSONDecodeError:
+            parsed = {"raw_error_body": text}
+        data = parsed if isinstance(parsed, dict) else {"raw_error_body": parsed}
+        data["_raw_body_redacted"] = redact_text(text)
+        data["_request_id_hint"] = self.request_id
+        data["_provider_http_status"] = self.status_code
+        return data
+
+
 def canonical(data: Any) -> str:
     return json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
 
@@ -193,6 +213,16 @@ def redact_text(text: str | None) -> str | None:
     return redacted
 
 
+def redact_json(value: Any) -> Any:
+    if isinstance(value, str):
+        return redact_text(value)
+    if isinstance(value, list):
+        return [redact_json(item) for item in value]
+    if isinstance(value, dict):
+        return {key: redact_json(item) for key, item in value.items()}
+    return value
+
+
 def first_choice(provider_data: dict[str, Any] | None) -> dict[str, Any]:
     if not provider_data:
         return {}
@@ -205,24 +235,33 @@ def first_choice(provider_data: dict[str, Any] | None) -> dict[str, Any]:
 def parser_input(provider_data: dict[str, Any] | None) -> str | None:
     choice = first_choice(provider_data)
     message = choice.get("message")
-    if not isinstance(message, dict):
-        return None
-    content = message.get("content")
-    return content if isinstance(content, str) else None
+    if isinstance(message, dict):
+        content = message.get("content")
+        if isinstance(content, str):
+            return content
+    raw_body = provider_data.get("_raw_body_redacted") if provider_data else None
+    return raw_body if isinstance(raw_body, str) else None
 
 
 def finish_reason(provider_data: dict[str, Any] | None) -> str | None:
     value = first_choice(provider_data).get("finish_reason")
-    return value if isinstance(value, str) else None
+    if isinstance(value, str):
+        return value
+    if provider_data and provider_data.get("_provider_http_status") is not None:
+        return "provider_error"
+    return None
 
 
 def redacted_provider_response(provider_data: dict[str, Any] | None) -> dict[str, Any] | None:
     if provider_data is None:
         return None
-    response = copy.deepcopy(provider_data)
+    response = redact_json(copy.deepcopy(provider_data))
     if response.get("id"):
         response["id_hash"] = sha256_text(str(response["id"]))
         response["id"] = "[REDACTED_PROVIDER_REQUEST_ID]"
+    if response.get("_request_id_hint"):
+        response["_request_id_hint_hash"] = sha256_text(str(response["_request_id_hint"]))
+        response["_request_id_hint"] = "[REDACTED_PROVIDER_REQUEST_ID]"
     choices = response.get("choices")
     if isinstance(choices, list):
         for choice in choices:
@@ -346,7 +385,15 @@ def openai_chat(config: ExecutionConfig, payload: dict[str, Any], *, max_complet
                 raise RuntimeError("provider response exceeded size limit")
             return json.loads(raw.decode()), time.perf_counter() - started
     except urllib.error.HTTPError as exc:
-        raise RuntimeError(f"http_{exc.code}") from exc
+        raw = exc.read(1_000_001)
+        if len(raw) > 1_000_000:
+            raise RuntimeError("provider error response exceeded size limit") from exc
+        request_id = None
+        for header in ("x-request-id", "request-id", "openai-request-id"):
+            request_id = exc.headers.get(header)
+            if request_id:
+                break
+        raise ProviderHTTPError(exc.code, raw, request_id) from exc
     except urllib.error.URLError as exc:
         raise RuntimeError(f"transport_error:{exc.reason}") from exc
 
@@ -557,6 +604,9 @@ def main() -> int:
             else:
                 score = score_case(case, normalized, provider_data)
                 record = terminal_record(config, case, "COMPLETED", None, payload, reservation, consumed, latency, prompt_tokens, cached_tokens, completion_tokens, provider_data, score, started, normalized)
+        except ProviderHTTPError as exc:
+            provider_data = exc.provider_data()
+            record = terminal_record(config, case, "FAILED", f"http_{exc.status_code}", payload, reservation, 0.0, 0.0, 0, 0, 0, provider_data, None, started)
         except Exception as exc:  # noqa: BLE001
             record = terminal_record(config, case, "FAILED", str(exc).splitlines()[0][:120], payload, reservation, 0.0, 0.0, 0, 0, 0, None, None, started)
         records.append(record)
@@ -586,7 +636,7 @@ def terminal_record(
     released = round(max(0.0, reserved - consumed), 8)
     redacted_response = redacted_provider_response(provider_data)
     response_text = parser_input(provider_data)
-    provider_id = provider_data.get("id") if provider_data else None
+    provider_id = (provider_data.get("id") or provider_data.get("_request_id_hint")) if provider_data else None
     record = {
         "artifact_type": "genesis_v7_case_evidence",
         "campaign_id": CAMPAIGN_ID,
@@ -827,6 +877,33 @@ def recompute_case_semantic_hash(record: dict[str, Any]) -> str:
     return sha256_text(canonical({key: record.get(key) for key in fields}))
 
 
+def case_requires_diagnosable_provider_evidence(record: dict[str, Any]) -> bool:
+    if record.get("terminal_status") == "EVIDENCE_UNAVAILABLE":
+        return False
+    if record.get("terminal_status") in {"COMPLETED", "INVALID_RESPONSE", "EVALUATOR_UNAVAILABLE"}:
+        return True
+    return bool(
+        record.get("provider_request_id_captured")
+        or record.get("provider_response_hash")
+        or record.get("returned_model_identity")
+    )
+
+
+def has_diagnosable_provider_evidence(record: dict[str, Any]) -> bool:
+    return bool(
+        isinstance(record.get("provider_response_hash"), str)
+        and len(record["provider_response_hash"]) == 64
+        and isinstance(record.get("redacted_provider_response"), dict)
+        and isinstance(record.get("provider_request_id_hash"), str)
+        and len(record["provider_request_id_hash"]) == 64
+        and record.get("finish_reason") is not None
+        and isinstance(record.get("parser_input_hash"), str)
+        and len(record["parser_input_hash"]) == 64
+        and record.get("parser_input_redacted") is not None
+        and record.get("audit_references")
+    )
+
+
 def clean_clone_verification_report(aggregate: dict[str, Any], records: list[dict[str, Any]]) -> dict[str, Any]:
     recomputed_case_hashes = [
         {
@@ -862,16 +939,7 @@ def clean_clone_verification_report(aggregate: dict[str, Any], records: list[dic
         and terminal_counts_match
     )
     diagnosable_provider_attempts = all(
-        record.get("terminal_status") in {"EVIDENCE_UNAVAILABLE", "FAILED"}
-        or (
-            record.get("provider_response_hash")
-            and record.get("redacted_provider_response") is not None
-            and record.get("provider_request_id_hash")
-            and record.get("finish_reason") is not None
-            and record.get("parser_input_hash")
-            and record.get("parser_input_redacted") is not None
-            and record.get("audit_references")
-        )
+        not case_requires_diagnosable_provider_evidence(record) or has_diagnosable_provider_evidence(record)
         for record in records
     )
     recomputed_aggregate_hash = sha256_text(canonical({k: v for k, v in aggregate.items() if k not in {"generated_at", "semantic_hash"}}))

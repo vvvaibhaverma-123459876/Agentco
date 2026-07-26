@@ -109,8 +109,8 @@
       "evidence": "scripts/verify_capability_genesis_artifact.py --check",
       "finding_id": "GCR-011",
       "impact": "The committed Genesis V7 attempt-2 case records cannot be independently diagnosed because the artifacts preserve only response hashes and status metadata for provider outputs.",
-      "remaining_risk": "A future run must preserve redacted provider responses, finish reasons, provider request ID hashes, parser inputs, parser input hashes and audit references before any real capability baseline can be accepted or rejected.",
-      "remediation": "Strengthened the capability genesis artifact verifier to reject hash-only V7 provider evidence, missing V7 payload manifests and identical response-hash patterns across provider-attempted cases.",
+      "remaining_risk": "A future authorized run must use the strengthened runner and preserve redacted provider responses, finish reasons, provider request ID hashes, parser inputs, parser input hashes and audit references before any real capability baseline can be accepted or rejected.",
+      "remediation": "Strengthened the capability genesis artifact verifier to reject hash-only V7 provider evidence, missing V7 payload manifests and identical response-hash patterns across provider-attempted cases. The V7 runner now also preserves size-limited HTTP error bodies and provider request-id headers as redacted, hash-bound diagnostics for failed provider round-trips. This prepares the next authorized run but does not repair the historical attempt-2 artifacts.",
       "severity": "S2",
       "status": "open_blocking",
       "summary": "Genesis V7 attempt 2 case evidence is hash-only for provider responses: all 24 case records lack redacted response bodies, finish reasons, provider request ID hashes, parser inputs and audit references required for independent diagnosis."
