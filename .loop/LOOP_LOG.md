@@ -440,3 +440,26 @@
   - `git diff -- .loop/DECISIONS.md .loop/BLOCKED.md .loop/PROVISIONING.md` -> reviewed protocol-memory-only changes.
 - Next candidate item:
   - Continue with non-blocked production-path gaps, prioritizing claim/audit verifiers that ensure integration claims require runtime-linkage tests already added for governance, judiciary, learning and free-run execution.
+
+## Iteration 22 — 2026-07-26
+
+- Branch: `loop/completion`
+- Starting HEAD: `8ec97a66558285eea718f986b3781df2ba5312db`
+- Selected item: fix stale subsystem-audit finding presentation so historical `GCR-008` is preserved without being reported as an active current blocker.
+- Claude/Duet: `duet doctor` passed with Claude and Codex round trips; Claude remains optional acceleration and is never a loop blocker.
+- Changed:
+  - `scripts/run_subsystem_audit_results.py` now emits separate `active_findings` and `historical_findings` for each subsystem while preserving the complete `findings` list.
+  - `SUBSYSTEM_AUDIT_RESULTS.md` now shows active and historical finding columns; `capability_runtime_protocol` lists active `GCR-010`, `GCR-011` and historical `GCR-008`.
+  - Added a regression proving superseded findings remain historical-only and do not drive current blocker presentation.
+  - Updated `.loop/PROVISIONING.md` to record current Duet availability and the standing rule that Claude unavailability is not a blocker.
+  - Regenerated subsystem audit results and forensic ledgers.
+- Evidence:
+  - `duet doctor` -> passed.
+  - `python3.13 -m pytest tests/test_run_subsystem_audit_results.py tests/test_verify_subsystem_audit_results.py -q` -> `9 passed`.
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`; failed subsystems remain `capability_runtime_protocol` and `infra_deployment`.
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on active `GCR-010`, `GCR-011`, and `HST-001`; superseded `GCR-008` is not reported as active.
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`.
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
+- Next candidate item:
+  - Address `GCR-011` by making real-provider Genesis evidence independently diagnosable: preserve redacted response bodies, finish reasons, provider request ID hashes, parser inputs, and audit references before another real baseline attempt.

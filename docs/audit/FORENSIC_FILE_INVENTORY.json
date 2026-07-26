@@ -1,6 +1,6 @@
 {
   "generated_by": "scripts/generate_forensic_inventory.py",
-  "tracked_file_count": 2166,
+  "tracked_file_count": 2167,
   "category_counts": {
     "Database migration": 143,
     "Deployment infrastructure": 34,
@@ -12,7 +12,7 @@
     "Production runtime code": 493,
     "Prompt/template": 29,
     "Test infrastructure": 321,
-    "Unknown purpose": 140
+    "Unknown purpose": 141
   },
   "top_level_counts": {
     "backend": 520,
@@ -42,7 +42,7 @@
     "synthesis": 10,
     "cross_version_adapters": 9,
     "ingestion": 9,
-    ".loop": 6,
+    ".loop": 7,
     "requirements": 4,
     "validation": 4,
     "agentco_security": 2,
@@ -84,7 +84,7 @@
   },
   "extension_counts": {
     ".py": 627,
-    ".md": 525,
+    ".md": 526,
     ".ts": 351,
     ".json": 309,
     ".sql": 144,
@@ -227,6 +227,12 @@
     },
     {
       "path": ".loop/LOOP_LOG.md",
+      "category": "Unknown purpose",
+      "top_level": ".loop",
+      "extension": ".md"
+    },
+    {
+      "path": ".loop/PROVISIONING.md",
       "category": "Unknown purpose",
       "top_level": ".loop",
       "extension": ".md"

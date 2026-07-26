@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2166`
+- Tracked files: `2167`
 
 ## Category Counts
 
@@ -18,7 +18,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Production runtime code | 493 |
 | Prompt/template | 29 |
 | Test infrastructure | 321 |
-| Unknown purpose | 140 |
+| Unknown purpose | 141 |
 
 ## Top-Level Counts
 
@@ -51,7 +51,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `synthesis` | 10 |
 | `cross_version_adapters` | 9 |
 | `ingestion` | 9 |
-| `.loop` | 6 |
+| `.loop` | 7 |
 | `requirements` | 4 |
 | `validation` | 4 |
 | `agentco_security` | 2 |
@@ -115,6 +115,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `.loop/DECISIONS.md` | Unknown purpose |
 | `.loop/FINAL_VERIFICATION.md` | Unknown purpose |
 | `.loop/LOOP_LOG.md` | Unknown purpose |
+| `.loop/PROVISIONING.md` | Unknown purpose |
 | `.loop/STUCK.md` | Unknown purpose |
 | `.loop/status` | Unknown purpose |
 | `.python-version` | Development tooling |

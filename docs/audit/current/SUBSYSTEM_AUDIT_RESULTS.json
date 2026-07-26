@@ -1,18 +1,44 @@
 {
   "completed_subsystem_count": 18,
   "failed_subsystem_count": 2,
-  "generated_at": "2026-07-19T05:08:58Z",
+  "generated_at": "2026-07-26T14:55:55Z",
   "passed_subsystem_count": 16,
   "required_subsystem_count": 18,
   "schema_version": 1,
-  "source_commit": "5cf8eab6b9347ad99036d59108436b66467549aa",
-  "source_tree": "cda8b26503ee5fe31f2ee5ae4ef7a05e7345f8e7",
+  "source_commit": "8ec97a66558285eea718f986b3781df2ba5312db",
+  "source_tree": "1e014b80074c248d43677b6042231f529e93689e",
   "subsystems": {
     "capability_runtime_protocol": {
-      "agent_output_tokens": 9,
+      "active_findings": [
+        {
+          "component": "openai-real-provider-genesis-v7",
+          "evidence": "docs/audit/current/REAL_PROVIDER_GENESIS_V7_ATTEMPT_2_RESULTS.json",
+          "finding_id": "GCR-010",
+          "impact": "No cases were completed or scored, no domains were supported, aggregate correctness is unavailable, and no real capability baseline can be claimed.",
+          "remaining_risk": "Real-provider capability remains unestablished until valid, scorable provider outputs are produced and thresholds are evaluated.",
+          "remediation": "Prepared a source-bound request contract with domain-specific required JSON fields and a larger visible-output cap that remains under the local USD 3.00 hard cap. A future authorized campaign must rerun the frozen baseline under a new campaign identity and produce schema-valid, scorable outputs.",
+          "severity": "S3",
+          "source_path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
+          "status": "open_hold_for_more_evidence",
+          "summary": "Genesis V7 attempt 2 established OpenAI gpt-5.6-luna reachability and model identity, but all 24 baseline cases produced schema-invalid structured outputs under the frozen evaluator contract."
+        },
+        {
+          "component": "openai-real-provider-genesis-v7",
+          "evidence": "scripts/verify_capability_genesis_artifact.py --check",
+          "finding_id": "GCR-011",
+          "impact": "The committed Genesis V7 attempt-2 case records cannot be independently diagnosed because the artifacts preserve only response hashes and status metadata for provider outputs.",
+          "remaining_risk": "A future run must preserve redacted provider responses, finish reasons, provider request ID hashes, parser inputs, parser input hashes and audit references before any real capability baseline can be accepted or rejected.",
+          "remediation": "Strengthened the capability genesis artifact verifier to reject hash-only V7 provider evidence, missing V7 payload manifests and identical response-hash patterns across provider-attempted cases.",
+          "severity": "S2",
+          "source_path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
+          "status": "open_blocking",
+          "summary": "Genesis V7 attempt 2 case evidence is hash-only for provider responses: all 24 case records lack redacted response bodies, finish reasons, provider request ID hashes, parser inputs and audit references required for independent diagnosis."
+        }
+      ],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "failed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "docs/audit/current/GOVERNED_CAPABILITY_PROTOCOL_BASELINE_V3_RESULTS.json",
         "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
@@ -56,34 +82,67 @@
           "summary": "Genesis V7 attempt 2 case evidence is hash-only for provider responses: all 24 case records lack redacted response bodies, finish reasons, provider request ID hashes, parser inputs and audit references required for independent diagnosis."
         }
       ],
+      "historical_findings": [
+        {
+          "component": "real-provider-genesis-baseline",
+          "evidence": "docs/audit/current/REAL_PROVIDER_GENESIS_V6_HOLD.json",
+          "finding_id": "GCR-008",
+          "impact": "No real-provider capability baseline, supported domains, aggregate correctness, capability improvement, hosted staging readiness or production readiness can be claimed.",
+          "remaining_risk": "The Batch 09B no-authorization blocker is superseded by later Genesis V7 attempt-2 evidence. Real-provider capability remains unestablished because GCR-010 and GCR-011 remain open.",
+          "remediation": "Preserve the Genesis V6 HOLD artifact as historical evidence. Use the later Genesis V7 attempt-2 evidence for current real-provider execution state, while leaving capability evidence blocked by invalid structured outputs and non-diagnosable provider-response records.",
+          "severity": "S3",
+          "source_path": "docs/audit/current/GOVERNED_CAPABILITY_RUNTIME_FINDINGS.json",
+          "status": "superseded_by_v7_attempt_2",
+          "summary": "Batch 09B could not attempt real-provider execution, but this historical blocker was superseded by Genesis V7 attempt 2, which had a source-bound authorization, passed canary, and executed all 24 provider cases before reaching current evidence blockers."
+        }
+      ],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "capability_runtime_protocol",
-      "summary": "capability_runtime_protocol audited against 3 committed evidence paths; missing_paths=0; blocking_findings=2.",
+      "summary": "capability_runtime_protocol audited against 3 committed evidence paths; missing_paths=0; active_findings=2; historical_findings=1.",
       "tool_exit_code": 0
     },
     "frontend": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "frontend/package.json",
         "frontend/src/app/api/[...path]/route.ts",
         "scripts/smoke_frontend_auth.sh"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "frontend",
-      "summary": "frontend audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "frontend audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "infra_deployment": {
-      "agent_output_tokens": 9,
+      "active_findings": [
+        {
+          "component": "hosted-staging-execution",
+          "evidence": "HOSTED_STAGING_EXECUTION_CONTRACT.json execution_status=BLOCKED",
+          "finding_id": "HST-001",
+          "hosted_resource": "cloud account / IaC / DNS / provider credentials",
+          "impact": "Batch 05 cannot produce hosted staging evidence.",
+          "regression_test": "tests/test_hosted_staging_controls.py",
+          "remaining_risk": "Hosted production remains entirely unverified.",
+          "remediation": "Bind a dedicated staging cloud account, IaC state backend, DNS zone, workload identity, registry, and bounded provider credentials.",
+          "reproduction": "run scripts/verify_hosted_staging_budget.py --check-prerequisites",
+          "root_cause": "No hosted cloud toolchain or account binding is available in the current environment.",
+          "severity": "S2",
+          "source_path": "docs/audit/current/HOSTED_STAGING_FINDINGS.json",
+          "status": "open_blocking"
+        }
+      ],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "failed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "docs/audit/current/HOSTED_STAGING_FINDINGS.json",
         "docs/audit/current/DEPLOYMENT_COMPONENT_LEDGER.json",
@@ -106,265 +165,296 @@
           "status": "open_blocking"
         }
       ],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "infra_deployment",
-      "summary": "infra_deployment audited against 3 committed evidence paths; missing_paths=0; blocking_findings=1.",
+      "summary": "infra_deployment audited against 3 committed evidence paths; missing_paths=0; active_findings=1; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l0_runtime_substrate": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "docs/audit/current/RUNTIME_COMPONENT_LEDGER.json",
         "tests/test_db_client_runtime_config.py",
         "backend/tests/runtime-mode.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l0_runtime_substrate",
-      "summary": "l0_runtime_substrate audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l0_runtime_substrate audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l10_governance_safety": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/governance.service.ts",
         "backend/tests/civilization-adversarial.test.ts",
         "tests/civilization/test_governance.py"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l10_governance_safety",
-      "summary": "l10_governance_safety audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l10_governance_safety audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l11_judiciary": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/judiciary-case.service.ts",
         "backend/tests/judiciary-case.test.ts",
         "backend/tests/judiciary.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l11_judiciary",
-      "summary": "l11_judiciary audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l11_judiciary audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l12_learning_memory": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/learning.service.ts",
         "backend/tests/learning-candidate-registry.test.ts",
         "backend/tests/self-memory-loop.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l12_learning_memory",
-      "summary": "l12_learning_memory audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l12_learning_memory audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l13_capability_expansion": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/capability-expansion.service.ts",
         "backend/tests/capability-expansion.test.ts",
         "backend/tests/capability-expansion-gate.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l13_capability_expansion",
-      "summary": "l13_capability_expansion audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l13_capability_expansion audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l14_civilization_os": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/civilization-os.service.ts",
         "backend/tests/civilization-os.test.ts",
         "backend/tests/civilization-runtime-reachability.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l14_civilization_os",
-      "summary": "l14_civilization_os audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l14_civilization_os audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l1_identity_authority": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "docs/audit/current/RUNTIME_COMPONENT_LEDGER.json",
         "backend/tests/identity-authority.test.ts",
         "backend/src/auth/principal-context.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l1_identity_authority",
-      "summary": "l1_identity_authority audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l1_identity_authority audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l2_resource_budgeting": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/resource-ledger.service.ts",
         "backend/tests/resource-ledger.test.ts",
         "tests/test_protocol_budget_settlement.py"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l2_resource_budgeting",
-      "summary": "l2_resource_budgeting audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l2_resource_budgeting audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l3_event_memory": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/event-bus.service.ts",
         "backend/tests/integration/memory-store.test.ts",
         "tests/e2e/test_memory_lifecycle.py"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l3_event_memory",
-      "summary": "l3_event_memory audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l3_event_memory audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l4_evidence_retrieval": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/evidence-registry.service.ts",
         "backend/tests/evidence-registry.test.ts",
         "backend/tests/claim-grounding.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l4_evidence_retrieval",
-      "summary": "l4_evidence_retrieval audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l4_evidence_retrieval audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l5_claim_prediction": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/falsifiable-prediction.service.ts",
         "backend/tests/falsifiable-calibration-e2e.test.ts",
         "backend/tests/claim-grounding.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l5_claim_prediction",
-      "summary": "l5_claim_prediction audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l5_claim_prediction audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l6_calibration_trust": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/tests/calibration-registration-invariants.test.ts",
         "backend/tests/calibration-constitution.test.ts",
         "backend/tests/falsifiable-calibration-e2e.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l6_calibration_trust",
-      "summary": "l6_calibration_trust audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l6_calibration_trust audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l7_agent_citizenship": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/tests/citizenship.test.ts",
         "backend/src/services/citizenship.service.ts",
         "backend/tests/citizenship.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l7_agent_citizenship",
-      "summary": "l7_agent_citizenship audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l7_agent_citizenship audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l8_autonomy_tasks": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/routes/autonomy-tasks.routes.ts",
         "backend/src/services/autonomy-run.service.ts",
         "backend/tests/autonomy-run-reuse.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l8_autonomy_tasks",
-      "summary": "l8_autonomy_tasks audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l8_autonomy_tasks audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     },
     "l9_institutions": {
-      "agent_output_tokens": 9,
+      "active_findings": [],
+      "agent_output_tokens": 10,
       "audit_method": "committed_evidence_inventory",
       "audit_status": "passed",
-      "completed_at": "2026-07-19T05:08:58Z",
+      "completed_at": "2026-07-26T14:55:54Z",
       "evidence_paths": [
         "backend/src/services/institutions.service.ts",
         "backend/tests/institution-claim-vetting.test.ts",
         "backend/tests/civilization-kernel.test.ts"
       ],
       "findings": [],
+      "historical_findings": [],
       "missing_evidence_paths": [],
-      "started_at": "2026-07-19T05:08:58Z",
+      "started_at": "2026-07-26T14:55:54Z",
       "subsystem_id": "l9_institutions",
-      "summary": "l9_institutions audited against 3 committed evidence paths; missing_paths=0; blocking_findings=0.",
+      "summary": "l9_institutions audited against 3 committed evidence paths; missing_paths=0; active_findings=0; historical_findings=0.",
       "tool_exit_code": 0
     }
   },
@@ -372,7 +462,7 @@
     "agent_output_tokens": 11,
     "audit_method": "deterministic_synthesis",
     "audit_status": "failed",
-    "completed_at": "2026-07-19T05:08:58Z",
+    "completed_at": "2026-07-26T14:55:54Z",
     "evidence_paths": [
       "docs/audit/current/SUBSYSTEM_AUDIT_RESULTS.json"
     ],
@@ -380,7 +470,7 @@
       "capability_runtime_protocol",
       "infra_deployment"
     ],
-    "started_at": "2026-07-19T05:08:58Z",
+    "started_at": "2026-07-26T14:55:54Z",
     "summary": "Subsystem audit runner evaluated 18 subsystems from committed evidence. Passed=16; failed=2.",
     "tool_exit_code": 0
   }

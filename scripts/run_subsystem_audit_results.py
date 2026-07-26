@@ -161,10 +161,12 @@ def subsystem_entry(subsystem_id: str, findings_by_id: dict[str, dict[str, Any]]
         if owner == subsystem_id and finding_id in findings_by_id
     ]
     blocking = [item for item in linked_findings if item.get("status") in BLOCKING_STATUSES]
+    historical = [item for item in linked_findings if item.get("status") not in BLOCKING_STATUSES]
     status = "passed" if not missing_paths and not blocking else "failed"
     summary = (
         f"{subsystem_id} audited against {len(evidence_paths)} committed evidence paths; "
-        f"missing_paths={len(missing_paths)}; blocking_findings={len(blocking)}."
+        f"missing_paths={len(missing_paths)}; active_findings={len(blocking)}; "
+        f"historical_findings={len(historical)}."
     )
     return {
         "subsystem_id": subsystem_id,
@@ -177,6 +179,8 @@ def subsystem_entry(subsystem_id: str, findings_by_id: dict[str, dict[str, Any]]
         "evidence_paths": evidence_paths,
         "missing_evidence_paths": missing_paths,
         "findings": linked_findings,
+        "active_findings": blocking,
+        "historical_findings": historical,
         "summary": summary,
     }
 
@@ -224,12 +228,17 @@ def write_markdown(results: dict[str, Any]) -> None:
         f"- Passed subsystems: `{results['passed_subsystem_count']}`",
         f"- Failed subsystems: `{results['failed_subsystem_count']}`",
         "",
-        "| Subsystem | Status | Evidence Paths | Linked Findings |",
-        "| --- | --- | ---: | --- |",
+        "| Subsystem | Status | Evidence Paths | Active Findings | Historical Findings |",
+        "| --- | --- | ---: | --- | --- |",
     ]
     for subsystem_id, entry in results["subsystems"].items():
-        linked = ", ".join(item.get("finding_id", "UNKNOWN") for item in entry.get("findings", [])) or "none"
-        rows.append(f"| `{subsystem_id}` | `{entry['audit_status']}` | {len(entry['evidence_paths'])} | {linked} |")
+        active = ", ".join(item.get("finding_id", "UNKNOWN") for item in entry.get("active_findings", [])) or "none"
+        historical = (
+            ", ".join(item.get("finding_id", "UNKNOWN") for item in entry.get("historical_findings", [])) or "none"
+        )
+        rows.append(
+            f"| `{subsystem_id}` | `{entry['audit_status']}` | {len(entry['evidence_paths'])} | {active} | {historical} |"
+        )
     rows.extend(
         [
             "",

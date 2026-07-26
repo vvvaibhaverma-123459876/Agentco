@@ -7,9 +7,9 @@ core item becomes unachievable.
 
 ## Claude Via Duet
 
-- Status: unavailable.
-- Last check: `duet doctor` failed with Claude session limit resetting at `1:50pm (Asia/Calcutta)`.
-- Current action: keep probing once per iteration; use Claude for bounded review/tasks when it becomes available.
+- Status: available as optional acceleration.
+- Last check: `duet doctor` passed with Claude and Codex round trips.
+- Current action: use Claude for bounded review/tasks when helpful, but never treat Claude unavailability as a loop blocker.
 - Claims affected: none.
 
 ## Real Provider Capability Baseline
