@@ -99,6 +99,35 @@ def test_authorization_is_mandatory_and_commit_model_endpoint_bound():
     assert "endpoint_mismatch" in readiness.validate_authorization(bad_endpoint, config)["failure_codes"]
 
 
+def test_authorization_campaign_identity_is_explicitly_bound(monkeypatch):
+    config = _valid_config()
+    auth = _authorization(config)
+    auth["campaign_id"] = "governed-capability-genesis-v7-openai-real-baseline-next"
+    auth["genesis_version"] = auth["campaign_id"]
+
+    stale_result = readiness.validate_authorization(auth, config, expected_campaign=readiness.GENESIS_IDENTITY)
+    current_result = readiness.validate_authorization(auth, config, expected_campaign=auth["campaign_id"])
+
+    assert "campaign_mismatch" in stale_result["failure_codes"]
+    assert current_result["status"] == "valid"
+
+    monkeypatch.setenv("AGENTCO_REAL_PROVIDER_CAMPAIGN_ID", auth["campaign_id"])
+    assert readiness.validate_authorization(auth, config)["status"] == "valid"
+    assert readiness.genesis_case_manifest()["genesis_campaign_id"] == auth["campaign_id"]
+    assert readiness.real_provider_hold_result(config)["campaign_id"] == auth["campaign_id"]
+
+
+def test_authorization_rejects_stale_genesis_version_for_selected_campaign():
+    config = _valid_config()
+    auth = _authorization(config)
+    auth["campaign_id"] = "governed-capability-genesis-v7-openai-real-baseline-next"
+    auth["genesis_version"] = readiness.GENESIS_IDENTITY
+
+    result = readiness.validate_authorization(auth, config, expected_campaign=auth["campaign_id"])
+
+    assert "genesis_version_mismatch" in result["failure_codes"]
+
+
 def test_expired_authorization_fails():
     config = _valid_config()
     auth = _authorization(config)

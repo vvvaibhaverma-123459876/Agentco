@@ -27,6 +27,7 @@ EXECUTION_EVIDENCE_SCHEMA = ROOT / "schemas" / "real_provider_execution_evidence
 
 PROTOCOL_IDENTITY = "governed-capability-protocol-baseline-v3"
 GENESIS_IDENTITY = "governed-capability-genesis-v5"
+DEFAULT_REAL_PROVIDER_CAMPAIGN_ID = GENESIS_IDENTITY
 
 
 class ReadinessError(RuntimeError):
@@ -227,13 +228,28 @@ def current_source_identity() -> dict[str, str]:
     return {"commit": git("rev-parse", "HEAD"), "tree": git("rev-parse", "HEAD^{tree}")}
 
 
-def validate_authorization(authorization: dict[str, Any], config: dict[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
+def expected_campaign_id(authorization: dict[str, Any] | None = None) -> str:
+    if authorization and isinstance(authorization.get("campaign_id"), str):
+        return str(authorization["campaign_id"])
+    return os.getenv("AGENTCO_REAL_PROVIDER_CAMPAIGN_ID") or DEFAULT_REAL_PROVIDER_CAMPAIGN_ID
+
+
+def validate_authorization(
+    authorization: dict[str, Any],
+    config: dict[str, Any],
+    *,
+    now: datetime | None = None,
+    expected_campaign: str | None = None,
+) -> dict[str, Any]:
     schema_validate(AUTHORIZATION_SCHEMA, authorization)
     now = now or datetime.now(timezone.utc)
     source = current_source_identity()
     failures: list[dict[str, str]] = []
-    if authorization.get("campaign_id") != GENESIS_IDENTITY:
-        failures.append({"code": "campaign_mismatch", "message": "authorization campaign does not match Genesis V5"})
+    expected = expected_campaign or expected_campaign_id()
+    if authorization.get("campaign_id") != expected:
+        failures.append({"code": "campaign_mismatch", "message": f"authorization campaign does not match {expected}"})
+    if authorization.get("genesis_version") != authorization.get("campaign_id"):
+        failures.append({"code": "genesis_version_mismatch", "message": "authorization genesis_version must match campaign_id"})
     if authorization.get("source_commit") != source["commit"]:
         failures.append({"code": "source_commit_mismatch", "message": "authorization source commit does not match current HEAD"})
     if authorization.get("source_tree") != source["tree"]:
@@ -269,6 +285,7 @@ def load_genesis_cases() -> list[dict[str, Any]]:
 
 
 def genesis_case_manifest() -> dict[str, Any]:
+    campaign_id = os.getenv("AGENTCO_REAL_PROVIDER_CAMPAIGN_ID") or GENESIS_IDENTITY
     cases = load_genesis_cases()
     seen: set[str] = set()
     entries: list[dict[str, Any]] = []
@@ -310,7 +327,8 @@ def genesis_case_manifest() -> dict[str, Any]:
     domains = sorted({entry["domain"] for entry in entries})
     manifest = {
         "manifest_id": "capability-genesis-v5-case-manifest-real-provider-readiness-v1",
-        "genesis_campaign_id": GENESIS_IDENTITY,
+        "genesis_campaign_id": campaign_id,
+        "case_source_identity": GENESIS_IDENTITY,
         "protocol_identity": PROTOCOL_IDENTITY,
         "case_count": len(entries),
         "domains": domains,
@@ -366,8 +384,9 @@ def dry_run_result(config: dict[str, Any] | None = None) -> dict[str, Any]:
 def real_provider_hold_result(config: dict[str, Any] | None = None) -> dict[str, Any]:
     config = config or provider_config_from_env()
     preflight = provider_preflight(config, resolve_dns=False)
+    campaign_id = os.getenv("AGENTCO_REAL_PROVIDER_CAMPAIGN_ID") or GENESIS_IDENTITY
     return {
-        "campaign_id": GENESIS_IDENTITY,
+        "campaign_id": campaign_id,
         "decision": "HOLD_FOR_MORE_EVIDENCE",
         "provider_preflight": preflight["provider_preflight"],
         "execution_attempted": False,
@@ -393,8 +412,9 @@ def budget_settlement_valid(record: dict[str, Any]) -> bool:
 
 def execution_evidence_example() -> dict[str, Any]:
     source = current_source_identity()
+    campaign_id = os.getenv("AGENTCO_REAL_PROVIDER_CAMPAIGN_ID") or GENESIS_IDENTITY
     evidence = {
-        "campaign_id": GENESIS_IDENTITY,
+        "campaign_id": campaign_id,
         "case_id": "example",
         "attempt_id": "example-attempt",
         "source_commit": source["commit"],

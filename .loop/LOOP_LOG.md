@@ -510,3 +510,24 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
 - Next candidate item:
   - Continue hardening real-provider readiness without executing a live campaign, likely by making the V7 verifier enforce current-run payload manifests and reject stale historical artifacts from satisfying future acceptance.
+
+## Iteration 25 — 2026-07-26
+
+- Branch: `loop/completion`
+- Starting HEAD: `499e6f3a7fc0a5ca61c3f469207900bc3c9261d0`
+- Selected item: prevent stale real-provider campaign identities from satisfying future authorization/readiness checks.
+- Changed:
+  - `agentco_capability.real_provider_readiness` now accepts an explicit real-provider campaign identity through `expected_campaign` or `AGENTCO_REAL_PROVIDER_CAMPAIGN_ID` instead of validating every authorization against the stale default Genesis V5 identity.
+  - Authorization validation now requires `genesis_version` to match the selected campaign ID, preventing a V7/V8 authorization from carrying stale V5 campaign semantics.
+  - Case manifests, HOLD results and execution-evidence examples now bind to the selected real-provider campaign ID while preserving the V5 frozen case source identity.
+  - Added tests proving stale V5 binding fails for a selected V7 campaign and selected V7 authorization passes only when the campaign identity is explicit.
+  - Regenerated subsystem audit results and forensic ledgers.
+- Evidence:
+  - `python3.13 -m pytest tests/test_real_provider_readiness.py tests/test_openai_genesis_v7_runner.py tests/test_capability_genesis_artifact_verifier.py -q` -> `54 passed`.
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`.
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on active `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`.
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
+- Next candidate item:
+  - Continue hardening the real-provider path, especially verifier enforcement that only the selected campaign ID and its bound artifacts can satisfy acceptance.
