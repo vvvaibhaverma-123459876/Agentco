@@ -531,3 +531,27 @@
   - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
 - Next candidate item:
   - Continue hardening the real-provider path, especially verifier enforcement that only the selected campaign ID and its bound artifacts can satisfy acceptance.
+
+## Iteration 26 — 2026-07-27
+
+- Branch: `loop/completion`
+- Starting HEAD: `ed78997ad8a1821ce3328f23d8770416166041d2`
+- Selected item: make real-provider Genesis artifact verification campaign-selectable so stale artifacts cannot satisfy a future selected campaign predicate.
+- Claude/Duet: `duet doctor` passed. A narrow read-only Claude review was started but did not return within the useful window and was stopped; Claude availability remains optional and not a blocker.
+- Changed:
+  - `scripts/verify_capability_genesis_artifact.py` now accepts `--campaign-id` and verifies only manifests whose `campaign_id` matches the selected value.
+  - Selected-campaign verification now fails with `SELECTED_CAMPAIGN_MANIFEST_MISSING:<campaign>` when no matching manifest exists, even if stale campaign artifacts are present.
+  - Default verification remains global and continues to scan all local capability artifacts.
+  - Added tests proving stale artifacts are ignored for a selected campaign and cannot satisfy a missing selected campaign.
+  - Regenerated subsystem audit results.
+- Evidence:
+  - `duet doctor` -> passed.
+  - `python3.13 -m pytest tests/test_capability_genesis_artifact_verifier.py tests/test_real_provider_readiness.py tests/test_openai_genesis_v7_runner.py -q` -> `56 passed`.
+  - `python3.13 scripts/run_subsystem_audit_results.py` -> completed with `16 passed`, `2 failed`; failed subsystems remain `capability_runtime_protocol` and `infra_deployment`.
+  - `python3.13 scripts/verify_capability_genesis_artifact.py --campaign-id governed-capability-genesis-v7-openai-real-baseline --check` -> expected failure on selected historical V7 artifacts missing `INTERNAL_PAYLOAD_MANIFEST.json`; this confirms the selected-campaign path binds to the intended campaign and exposes its current artifact gap.
+  - `python3.13 scripts/verify_subsystem_audit_results.py --check` -> expected failure on active `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/verify_no_blocking_findings.py --check` -> expected failure on active `GCR-010`, `GCR-011`, and `HST-001`.
+  - `python3.13 scripts/generate_forensic_inventory.py --check` -> `forensic inventory current`.
+  - `python3.13 scripts/generate_forensic_audit_controls.py --check` -> `forensic audit controls current`.
+- Next candidate item:
+  - Continue toward `GCR-011` closure by ensuring the next real-provider campaign writes `INTERNAL_PAYLOAD_MANIFEST.json` and complete diagnosable case evidence, without modifying historical invalid attempt artifacts.

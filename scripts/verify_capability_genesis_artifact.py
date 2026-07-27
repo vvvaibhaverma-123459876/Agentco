@@ -384,8 +384,13 @@ def verify_genesis_v7_evidence(
     return findings
 
 
-def verify_artifacts(root: Path, frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST) -> list[str]:
+def _verify_artifacts(
+    root: Path,
+    frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST,
+    campaign_id: str | None = None,
+) -> tuple[list[str], int]:
     findings: list[str] = []
+    matched_manifests = 0
     manifests = find_manifests(root)
     if not manifests:
         findings.append("NO_CAPABILITY_GENESIS_ARTIFACT_MANIFEST")
@@ -398,6 +403,9 @@ def verify_artifacts(root: Path, frozen_case_manifest_path: Path | None = FROZEN
         if not isinstance(manifest, dict):
             findings.append(f"CAPABILITY_MANIFEST_NOT_OBJECT:{manifest_path}")
             continue
+        if campaign_id is not None and manifest.get("campaign_id") != campaign_id:
+            continue
+        matched_manifests += 1
         payload_path = manifest_path.parent / "INTERNAL_PAYLOAD_MANIFEST.json"
         payload = None
         if not payload_path.exists():
@@ -421,17 +429,35 @@ def verify_artifacts(root: Path, frozen_case_manifest_path: Path | None = FROZEN
         if manifest.get("campaign_id") in CURRENT_FREEZE_CAMPAIGNS:
             findings.extend(verify_manifest(manifest_path))
         findings.extend(verify_genesis_v7_evidence(manifest_path, manifest, frozen_case_manifest_path=frozen_case_manifest_path))
+    return findings, matched_manifests
+
+
+def verify_artifacts(
+    root: Path,
+    frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST,
+    campaign_id: str | None = None,
+) -> list[str]:
+    findings, _matched_manifests = _verify_artifacts(root, frozen_case_manifest_path=frozen_case_manifest_path, campaign_id=campaign_id)
     return findings
 
 
-def verify_roots(roots: list[Path], frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST) -> list[str]:
+def verify_roots(
+    roots: list[Path],
+    frozen_case_manifest_path: Path | None = FROZEN_CASE_MANIFEST,
+    campaign_id: str | None = None,
+) -> list[str]:
     findings: list[str] = []
     seen: set[str] = set()
+    matched_manifests = 0
     for root in roots:
-        for finding in verify_artifacts(root, frozen_case_manifest_path=frozen_case_manifest_path):
+        root_findings, root_matches = _verify_artifacts(root, frozen_case_manifest_path=frozen_case_manifest_path, campaign_id=campaign_id)
+        matched_manifests += root_matches
+        for finding in root_findings:
             if finding not in seen:
                 seen.add(finding)
                 findings.append(finding)
+    if campaign_id is not None and matched_manifests == 0:
+        findings.append(f"SELECTED_CAMPAIGN_MANIFEST_MISSING:{campaign_id}")
     return findings
 
 
@@ -443,9 +469,13 @@ def main() -> int:
         action="append",
         help="Artifact/evidence root to verify. May be supplied multiple times. Defaults to local artifacts and committed docs evidence.",
     )
+    parser.add_argument(
+        "--campaign-id",
+        help="Verify only artifacts whose manifest campaign_id matches this value; fail if none are found.",
+    )
     args = parser.parse_args()
     roots = [ROOT / root for root in (args.root or DEFAULT_ROOTS)]
-    findings = verify_roots(roots)
+    findings = verify_roots(roots, campaign_id=args.campaign_id)
     print(json.dumps({"success": not findings, "findings": findings}, indent=2, sort_keys=True))
     return 1 if findings else 0
 

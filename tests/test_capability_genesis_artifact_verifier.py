@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 
+from agentco_capability.evidence import payload_manifest
 from scripts.verify_capability_genesis_artifact import (
     _aggregate_semantic_hash,
     _case_semantic_hash,
@@ -68,6 +69,21 @@ def _clean_clone_report(**overrides):
     }
     report.update(overrides)
     return report
+
+
+def _write_manifest_with_payload(campaign, manifest):
+    payload, aggregate = payload_manifest(
+        campaign,
+        [],
+        campaign_execution_sha="test-sha",
+        workflow_head_sha="test-sha",
+        campaign_id=manifest["campaign_id"],
+        hash_fields={},
+    )
+    manifest["internal_payload_manifest_hash"] = aggregate
+    manifest["semantic_hash"] = _aggregate_semantic_hash(manifest)
+    (campaign / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(manifest))
+    (campaign / "INTERNAL_PAYLOAD_MANIFEST.json").write_text(json.dumps(payload))
 
 
 def _frozen_case_manifest(path, cases):
@@ -463,3 +479,64 @@ def test_artifact_verifier_reports_payload_manifest_json_error(tmp_path):
     findings = verify_roots([root])
 
     assert any(item.startswith("PAYLOAD_MANIFEST_JSON_INVALID") for item in findings)
+
+
+def test_artifact_verifier_can_pin_selected_campaign_and_ignore_stale_artifacts(tmp_path):
+    root = tmp_path / "artifacts"
+    selected = root / "selected"
+    stale = root / "stale"
+    selected.mkdir(parents=True)
+    stale.mkdir(parents=True)
+
+    selected_manifest = _manifest(
+        campaign_id="governed-capability-genesis-v7-selected",
+        baseline_execution_attempted=False,
+        executed_cases=0,
+        evidence_unavailable_cases=24,
+        invalid_response_cases=0,
+    )
+    _write_manifest_with_payload(selected, selected_manifest)
+    (selected / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
+
+    stale_manifest = _manifest(campaign_id="governed-capability-genesis-v7-stale")
+    (stale / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(stale_manifest))
+    (stale / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
+    (stale / "CASE_case-1.json").write_text(
+        json.dumps(
+            _case(
+                campaign_id="governed-capability-genesis-v7-stale",
+                redacted_provider_response=None,
+                provider_request_id_hash=None,
+                finish_reason=None,
+                parser_input_hash=None,
+                parser_input_redacted=None,
+                audit_references=[],
+            )
+        )
+    )
+
+    findings = verify_roots(
+        [root],
+        frozen_case_manifest_path=None,
+        campaign_id="governed-capability-genesis-v7-selected",
+    )
+
+    assert findings == []
+
+
+def test_artifact_verifier_rejects_missing_selected_campaign_even_when_stale_artifacts_exist(tmp_path):
+    root = tmp_path / "artifacts"
+    stale = root / "stale"
+    stale.mkdir(parents=True)
+    stale_manifest = _manifest(campaign_id="governed-capability-genesis-v7-stale")
+    (stale / "GENESIS_V7_CAMPAIGN_MANIFEST.json").write_text(json.dumps(stale_manifest))
+    (stale / "CLEAN_CLONE_VERIFICATION_REPORT.json").write_text(json.dumps(_clean_clone_report()))
+    (stale / "CASE_case-1.json").write_text(json.dumps(_case(campaign_id="governed-capability-genesis-v7-stale")))
+
+    findings = verify_roots(
+        [root],
+        frozen_case_manifest_path=None,
+        campaign_id="governed-capability-genesis-v7-selected",
+    )
+
+    assert findings == ["SELECTED_CAMPAIGN_MANIFEST_MISSING:governed-capability-genesis-v7-selected"]
