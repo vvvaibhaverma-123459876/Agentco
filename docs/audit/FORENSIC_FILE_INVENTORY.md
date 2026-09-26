@@ -2,7 +2,7 @@
 
 Machine-derived inventory of tracked files. Generated from `git ls-files`; untracked local caches and dependency directories are intentionally excluded.
 
-- Tracked files: `2149`
+- Tracked files: `2151`
 
 ## Category Counts
 
@@ -12,20 +12,20 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | Deployment infrastructure | 34 |
 | Deprecated code | 48 |
 | Development tooling | 147 |
-| Documentation | 539 |
+| Documentation | 540 |
 | Experimental code | 151 |
 | Generated artifact | 116 |
 | Production runtime code | 493 |
 | Prompt/template | 29 |
-| Test infrastructure | 315 |
+| Test infrastructure | 316 |
 | Unknown purpose | 134 |
 
 ## Top-Level Counts
 
 | Path | Count |
 |---|---:|
-| `backend` | 520 |
-| `docs` | 466 |
+| `backend` | 521 |
+| `docs` | 467 |
 | `evals` | 180 |
 | `scripts` | 159 |
 | `agents` | 111 |
@@ -800,6 +800,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `backend/tests/aud004-m3-breadth.test.ts` | Test infrastructure |
 | `backend/tests/aud004-m5-machine-principals.test.ts` | Test infrastructure |
 | `backend/tests/audit-chain-cross-writer.test.ts` | Test infrastructure |
+| `backend/tests/audit-hardening-2026-09.test.ts` | Test infrastructure |
 | `backend/tests/autonomous-promotion.test.ts` | Test infrastructure |
 | `backend/tests/autonomy-action-planner-env.test.ts` | Test infrastructure |
 | `backend/tests/autonomy-run-reuse.test.ts` | Test infrastructure |
@@ -1144,6 +1145,7 @@ Machine-derived inventory of tracked files. Generated from `git ls-files`; untra
 | `docs/audit/FORENSIC_FILE_INVENTORY.json` | Documentation |
 | `docs/audit/FORENSIC_FILE_INVENTORY.md` | Documentation |
 | `docs/audit/FORENSIC_REMEDIATION_STATUS_2026_07_12.md` | Documentation |
+| `docs/audit/FULL_AUDIT_2026-09.md` | Documentation |
 | `docs/audit/MIGRATION_GOVERNANCE.md` | Documentation |
 | `docs/audit/PHASE10_NOTES.md` | Documentation |
 | `docs/audit/PHASE11_NOTES.md` | Documentation |
