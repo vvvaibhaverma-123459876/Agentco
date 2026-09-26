@@ -221,6 +221,17 @@ def verify_request_signature(payload_bytes: bytes, signature: str, timestamp: st
     return is_valid
 
 
+def sign_request_headers(payload_bytes: bytes) -> Dict[str, str]:
+    """Build X-Signature/X-Timestamp headers for an /execute call (caller side of
+    verify_request_signature; mirrors TeamActivationService.signedExecuteHeaders)."""
+    secret = os.environ.get('SPECIALIST_SHARED_SECRET')
+    if not secret or secret == 'default-insecure-secret':
+        secret = 'development-only-specialist-secret'
+    timestamp = str(int(time.time()))
+    signature = hmac.new(secret.encode(), payload_bytes + b':' + timestamp.encode(), hashlib.sha256).hexdigest()
+    return {'Content-Type': 'application/json', 'X-Signature': signature, 'X-Timestamp': timestamp}
+
+
 class SpecialistAgent(BaseAgent):
     """Base specialist agent with HTTP server for orchestrator communication"""
 
@@ -289,18 +300,21 @@ class SpecialistAgent(BaseAgent):
                         'rate_limit': rate_info
                     }), 429  # 429 Too Many Requests
 
-                # SECURITY: Verify HMAC signature if headers present
+                # SECURITY: every request must carry a valid HMAC signature.
+                # An optional check would let any local process (or an SSRF
+                # hop onto 127.0.0.1) drive the specialist unsigned.
                 signature = request.headers.get('X-Signature')
                 timestamp = request.headers.get('X-Timestamp')
-
-                if signature and timestamp:
-                    # Signature provided, verify it
-                    payload = request.get_data()
-                    if not verify_request_signature(payload, signature, timestamp):
-                        return jsonify({
-                            'status': 'failed',
-                            'errors': ['Invalid request signature']
-                        }), 401  # 401 Unauthorized
+                if not signature or not timestamp:
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': ['Missing request signature']
+                    }), 401  # 401 Unauthorized
+                if not verify_request_signature(request.get_data(), signature, timestamp):
+                    return jsonify({
+                        'status': 'failed',
+                        'errors': ['Invalid request signature']
+                    }), 401  # 401 Unauthorized
 
                 # VALIDATION: Check request body
                 action_spec = request.json

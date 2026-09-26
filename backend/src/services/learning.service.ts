@@ -43,6 +43,16 @@ export interface AdaptationProposal {
   timestamp: string;
 }
 
+/** Retention cap per in-memory store; oldest entries are evicted first. */
+const MAX_RETAINED = 5_000;
+
+function retain<V>(store: Map<string, V>, key: string, value: V): void {
+  store.set(key, value);
+  while (store.size > MAX_RETAINED) {
+    store.delete(store.keys().next().value as string);
+  }
+}
+
 class LearningService extends EventEmitter {
   private signals: Map<string, LearningSignal> = new Map();
   private insights: Map<string, LearningInsight> = new Map();
@@ -73,7 +83,7 @@ class LearningService extends EventEmitter {
       provenance_ref: provenanceRef,
     };
 
-    this.signals.set(signal.signal_id, signal);
+    retain(this.signals, signal.signal_id, signal);
     this.processingQueue.push(signal);
     this.emit('signal_captured', signal);
 
@@ -101,13 +111,13 @@ class LearningService extends EventEmitter {
       try {
         // Extract actionable insights from the signal
         const insight = await this.analyzeSignal(signal);
-        this.insights.set(insight.insight_id, insight);
+        retain(this.insights, insight.insight_id, insight);
         this.emit('insight_generated', insight);
 
         // Generate adaptation proposal if insight quality is high
         if (insight.analysis.confidence > 0.7) {
           const proposal = this.proposeAdaptation(signal, insight);
-          this.proposals.set(proposal.proposal_id, proposal);
+          retain(this.proposals, proposal.proposal_id, proposal);
           this.emit('proposal_generated', proposal);
         }
       } catch (error) {

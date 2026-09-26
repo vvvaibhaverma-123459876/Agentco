@@ -112,6 +112,9 @@ export async function capturePreSignal(request: FastifyRequest, reply: FastifyRe
  */
 export function capturePostSignal(fastify: FastifyInstance) {
   return fastify.addHook('onResponse', async (request: FastifyRequest, reply: FastifyReply) => {
+    // onResponse fires even for requests the auth/rate-limit hook rejected;
+    // those carry caller-controlled bodies and must not become signals.
+    if (reply.statusCode === 401 || reply.statusCode === 429) return;
     const context = analyzeRequest(request);
 
     if (context.operationType !== 'unknown' && context.agentId) {

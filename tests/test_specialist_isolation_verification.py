@@ -25,6 +25,7 @@ from datetime import datetime
 from pathlib import Path
 
 import pytest
+from agents.autonomy.specialist_agent import sign_request_headers
 from agents.db import get_db
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -209,9 +210,11 @@ class SpecialistIsolationVerifier:
         print(f"   Action ID: {action_spec['actionId']}")
         print(f"   Evidence source_id: {action_spec['args']['sourceId']}")
 
+        body = json.dumps(action_spec).encode()
         response = requests.post(
             f"http://127.0.0.1:{self.specialist_port}/execute",
-            json=action_spec,
+            data=body,
+            headers=sign_request_headers(body),
             timeout=10
         )
 

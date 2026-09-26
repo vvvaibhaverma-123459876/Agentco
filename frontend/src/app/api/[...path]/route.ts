@@ -38,8 +38,19 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path?: s
   if (csrf) return csrf;
 
   const params = await context.params;
-  const path = `/${params.path?.join('/') ?? ''}`;
+  // Route params arrive decoded, so `/api/..%2fidentity` yields the segment
+  // `../identity`; URL parsing would then resolve it out of the /api prefix
+  // and the proxy would attach the service key to any backend path. Reject
+  // dot segments and embedded separators, and re-encode what remains.
+  const segments = params.path ?? [];
+  if (segments.some((s) => s === '.' || s === '..' || /[/\\]/.test(s))) {
+    return new Response(JSON.stringify({ error: 'invalid path' }), { status: 400 });
+  }
+  const path = `/${segments.map(encodeURIComponent).join('/')}`;
   const upstream = new URL(`${backendOrigin()}/api${path}`);
+  if (!upstream.pathname.startsWith('/api/') && upstream.pathname !== '/api') {
+    return new Response(JSON.stringify({ error: 'invalid path' }), { status: 400 });
+  }
   upstream.search = request.nextUrl.search;
 
   const headers = new Headers();

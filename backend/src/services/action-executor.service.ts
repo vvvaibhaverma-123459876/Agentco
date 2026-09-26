@@ -594,11 +594,14 @@ export class ActionExecutorService {
         specialistId: specialist.specialistId,
       };
 
+      // Signed (the specialist rejects unsigned requests) and bounded by the
+      // specialist's own time budget rather than a fixed timeout.
+      const body = JSON.stringify(taskPayload);
       const execResponse = await fetch(`${specialist.httpEndpoint}/execute`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(taskPayload),
-        signal: AbortSignal.timeout(25000),
+        headers: this.teamActivation.signedExecuteHeaders(body),
+        body,
+        signal: AbortSignal.timeout(specialist.secondsBudget * 1000),
       });
 
       if (!execResponse.ok) {

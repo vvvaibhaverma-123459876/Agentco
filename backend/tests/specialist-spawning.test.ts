@@ -91,10 +91,19 @@ describe('Specialist Subprocess Spawning', () => {
       args: { query: 'test search' },
     };
 
-    const response = await fetch(`${specialist!.httpEndpoint}/execute`, {
+    // Unsigned requests are rejected outright.
+    const unsigned = await fetch(`${specialist!.httpEndpoint}/execute`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(actionSpec),
+    });
+    expect(unsigned.status).toBe(401);
+
+    const body = JSON.stringify(actionSpec);
+    const response = await fetch(`${specialist!.httpEndpoint}/execute`, {
+      method: 'POST',
+      headers: teamActivation.signedExecuteHeaders(body),
+      body,
     });
 
     expect(response.ok).toBe(true);
@@ -114,6 +123,21 @@ describe('Specialist Subprocess Spawning', () => {
     const specialist = await teamActivation.activateSpecialist(request);
     expect(specialist).toBeNull();
   });
+
+  test('concurrent activations cannot exceed the per-parent cap', async () => {
+    const parentGoalId = await createGoal('test-goal-concurrent');
+    const roles = ['researcher', 'fetcher', 'evidence_summarizer', 'claim_validator', 'researcher'];
+    // Fired together, every call reads the DB count before any row is
+    // inserted; only the in-flight reservation keeps this at 3.
+    const results = await Promise.all(
+      roles.map((role, i) => teamActivation.activateSpecialist({ parentGoalId, role, objective: `concurrent ${i}` }))
+    );
+    const spawned = results.filter((r) => r !== null);
+    expect(spawned).toHaveLength(3);
+    for (const s of spawned) {
+      await teamActivation.terminateSpecialist(s!.specialistId, { artifacts: [], evidence: [], claims: [] });
+    }
+  }, 60000);
 
   test('should enforce max concurrent specialists per goal', async () => {
     const parentGoalId = await createGoal('test-goal-5');

@@ -61,12 +61,9 @@ export async function build() {
   await app.register(cors, { origin: process.env.FRONTEND_URL ?? 'http://localhost:3000' });
   await app.register(websocket);
 
-  // Register learning middleware (captures all signals across the system)
-  await registerLearningMiddleware(app);
-
-  // Register civilization request validator (body size, rate limiting)
-  await civilizationRequestValidator(app);
-
+  // Auth + rate limiting run FIRST: preHandler hooks execute in registration
+  // order, so hooks registered after this one (learning capture, civilization
+  // validator) never see unauthenticated or rate-limited requests.
   app.addHook('preHandler', async (request, reply) => {
     const apiKey = process.env.AGENTCO_API_KEY;
     const provided = getProvidedApiKey(request);
@@ -75,9 +72,11 @@ export async function build() {
       | undefined;
     const isPublicRoute = routeConfig?.auth?.public === true;
 
-    // Rate limiting applies to EVERY request (E4/G11), keyed by API key when
-    // presented, else client IP; shared token-bucket service.
-    const identifier = provided ? `key:${provided}` : `ip:${request.ip}`;
+    // Rate limiting applies to EVERY request (E4/G11). Only a key that matches
+    // the configured one earns its own bucket; an unverified key is keyed by
+    // client IP, so rotating bogus keys cannot mint fresh buckets.
+    const keyVerified = Boolean(apiKey && provided === apiKey);
+    const identifier = keyVerified ? `key:${provided}` : `ip:${request.ip}`;
     if (!rateLimiterService.isAllowed(identifier, 'api')) {
       return reply.status(429).send({
         error: 'Rate limit exceeded',
@@ -88,13 +87,19 @@ export async function build() {
     // API auth: route configs may explicitly mark liveness-only probes public.
     // Every other route defaults protected for reads and writes whenever a key
     // is configured. Key-less operation remains loopback-only development.
-    if (!apiKey || isPublicRoute) return;
-    if (provided !== apiKey) {
+    if (isPublicRoute) return;
+    if (apiKey && !keyVerified) {
       return reply.status(401).send({ error: 'unauthorized' });
     }
 
     validateUuidPathParams(request);
   });
+
+  // Register learning middleware (captures all signals across the system)
+  await registerLearningMiddleware(app);
+
+  // Register civilization request validator (body size, rate limiting)
+  await civilizationRequestValidator(app);
 
   // AUD-004: resolve an authenticated RequestPrincipal from signed requests (Ed25519 over the
   // canonical string, via the existing actor key ring) and fail closed on routes that declare

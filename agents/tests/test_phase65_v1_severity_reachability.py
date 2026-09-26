@@ -7,7 +7,10 @@ the new V2 escalation path instead of deleting the coverage.
 
 from __future__ import annotations
 
+import json
+
 from agents.autonomy.quality_auditor import QualityAuditorAgent
+from agents.autonomy.specialist_agent import sign_request_headers
 from agents.core.base_agent import BaseAgent
 
 
@@ -29,14 +32,16 @@ def test_quality_auditor_standard_execute_path_does_not_touch_v1_governance(monk
         {"tokens": 1000, "iterations": 10, "seconds": 60},
     )
 
+    body = json.dumps({
+        "actionId": "phase65-action",
+        "actionType": "EXTRACT_EVIDENCE",
+        "objective": "audit evidence quality",
+        "args": {"sourceId": "phase65-source"},
+    }).encode()
     response = agent.app.test_client().post(
         "/execute",
-        json={
-            "actionId": "phase65-action",
-            "actionType": "EXTRACT_EVIDENCE",
-            "objective": "audit evidence quality",
-            "args": {"sourceId": "phase65-source"},
-        },
+        data=body,
+        headers=sign_request_headers(body),
     )
 
     assert response.status_code == 200

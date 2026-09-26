@@ -304,10 +304,10 @@ class ReputationScaleService {
          FROM reputation_audit_log
          WHERE entity_id = $1
            AND entity_type = $2
-           AND audit_timestamp >= NOW() - INTERVAL '${windowDays} days'
+           AND audit_timestamp >= NOW() - make_interval(days => $3)
          GROUP BY DATE_TRUNC('day', audit_timestamp), entity_id, entity_type
          ORDER BY day ASC`,
-        [entityId, entityType]
+        [entityId, entityType, Math.trunc(windowDays)]
       );
 
       return result.rows.map((row) => ({

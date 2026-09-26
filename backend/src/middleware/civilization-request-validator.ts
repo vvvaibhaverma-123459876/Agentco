@@ -3,6 +3,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 const MAX_BODY_SIZE = 10 * 1024; // 10KB
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
 const RATE_LIMIT_MAX = 100; // max requests per window per entity
+const MAX_TRACKED_ENTITIES = 10_000; // prune expired windows beyond this size
 
 interface RateLimitEntry {
   count: number;
@@ -21,6 +22,9 @@ function checkRateLimit(entityId: string): boolean {
   const entry = rateLimitMap.get(entityId);
 
   if (!entry || entry.resetTime < now) {
+    if (!entry && rateLimitMap.size >= MAX_TRACKED_ENTITIES) {
+      for (const [id, e] of rateLimitMap) if (e.resetTime < now) rateLimitMap.delete(id);
+    }
     rateLimitMap.set(entityId, {
       count: 1,
       resetTime: now + RATE_LIMIT_WINDOW,
