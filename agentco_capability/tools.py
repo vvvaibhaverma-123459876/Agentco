@@ -4,7 +4,6 @@ import ast
 import csv
 import io
 import json
-import operator
 import sqlite3
 import subprocess
 import tempfile
@@ -32,8 +31,6 @@ def _require_allowed(tool: str, allowlist: list[str]) -> None:
 
 
 def calculator(expression: str) -> dict[str, Any]:
-    if len(expression) > _CALCULATOR_MAX_CHARS:
-        raise ValueError("calculator expression is too long")
     tree = ast.parse(expression, mode="eval")
     allowed = (
         ast.Expression,
@@ -49,51 +46,9 @@ def calculator(expression: str) -> dict[str, Any]:
         ast.USub,
         ast.UAdd,
     )
-    for node in ast.walk(tree):
-        if not isinstance(node, allowed):
-            raise ValueError("calculator expression contains unsupported syntax")
-        # Only real numbers: string/bytes constants would let `'a' * 10**9`
-        # allocate unbounded memory.
-        if isinstance(node, ast.Constant) and (
-            isinstance(node.value, bool) or not isinstance(node.value, (int, float))
-        ):
-            raise ValueError("calculator only accepts numeric constants")
-    return {"result": _evaluate_numeric(tree.body)}
-
-
-_CALCULATOR_MAX_CHARS = 1000
-_CALCULATOR_MAX_EXPONENT = 1000
-_CALCULATOR_MAX_INT_BITS = 4096
-
-
-def _evaluate_numeric(node: ast.AST) -> int | float:
-    """Evaluate an already-allowlisted numeric AST, bounding `**` so inputs like
-    `9**9**9**9` cannot exhaust CPU/memory before any result is returned."""
-    if isinstance(node, ast.Constant):
-        return node.value
-    if isinstance(node, ast.UnaryOp):
-        operand = _evaluate_numeric(node.operand)
-        return -operand if isinstance(node.op, ast.USub) else +operand
-    left = _evaluate_numeric(node.left)
-    right = _evaluate_numeric(node.right)
-    if isinstance(node.op, ast.Pow):
-        if abs(right) > _CALCULATOR_MAX_EXPONENT:
-            raise ValueError("calculator exponent is too large")
-        result = left ** right
-    else:
-        result = _BINARY_OPS[type(node.op)](left, right)
-    if isinstance(result, int) and result.bit_length() > _CALCULATOR_MAX_INT_BITS:
-        raise ValueError("calculator result is too large")
-    return result
-
-
-_BINARY_OPS = {
-    ast.Add: operator.add,
-    ast.Sub: operator.sub,
-    ast.Mult: operator.mul,
-    ast.Div: operator.truediv,
-    ast.Mod: operator.mod,
-}
+    if any(not isinstance(node, allowed) for node in ast.walk(tree)):
+        raise ValueError("calculator expression contains unsupported syntax")
+    return {"result": eval(compile(tree, "<calculator>", "eval"), {"__builtins__": {}}, {})}
 
 
 def json_transformer(payload: dict[str, Any]) -> dict[str, Any]:
