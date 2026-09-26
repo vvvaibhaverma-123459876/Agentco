@@ -373,19 +373,27 @@ export class RealWebAdapter implements WebAdapter {
       let currentUrl = (await assertPublicHttpUrl(url, { allowLoopback })).toString();
 
       // Uses the Node built-in fetch (undici); node-fetch v2 raises "Premature
-      // close" on Node 24. SSRF defense: the initial URL is validated above
-      // (blocks direct fetches to loopback/private/metadata); redirects are
-      // followed, then the FINAL resolved URL is re-validated so a public page
-      // cannot land the fetch on an internal service.
-      const response: Response = await globalThis.fetch(currentUrl, {
-        headers: { 'User-Agent': USER_AGENT },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-        redirect: 'follow',
-      });
-      if (response.redirected) {
-        await assertPublicHttpUrl(response.url, { allowLoopback });
+      // close" on Node 24. SSRF defense: redirects are followed MANUALLY and
+      // every hop is validated BEFORE it is requested, so a public page cannot
+      // bounce a request onto an internal service (validating only the final
+      // URL would still have sent the request to each intermediate hop).
+      const signal = AbortSignal.timeout(FETCH_TIMEOUT_MS);
+      let response: Response | null = null;
+      for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+        response = await globalThis.fetch(currentUrl, {
+          headers: { 'User-Agent': USER_AGENT },
+          signal,
+          redirect: 'manual',
+        });
+        const location = response.headers.get('location');
+        if (response.status < 300 || response.status >= 400 || !location) break;
+        if (hop === MAX_REDIRECTS) {
+          console.warn(`Fetch failed: more than ${MAX_REDIRECTS} redirects`);
+          return null;
+        }
+        currentUrl = (await assertPublicHttpUrl(new URL(location, currentUrl).toString(), { allowLoopback })).toString();
       }
-      currentUrl = response.url || currentUrl;
+      if (!response) return null;
 
       if (!response.ok) {
         console.warn(`Fetch failed: ${response.status}`);

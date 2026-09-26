@@ -10,6 +10,9 @@ export interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
 }
 
+/** Upper bound on tracked identifiers (API clients, specialists). */
+const MAX_BUCKETS = 10_000;
+
 interface TokenBucket {
   tokens: number;
   lastRefillTime: number;
@@ -46,6 +49,7 @@ export class RateLimitService {
     // Get or create bucket for this specialist
     let bucket = this.buckets.get(specialistId);
     if (!bucket) {
+      if (this.buckets.size >= MAX_BUCKETS) this.pruneIdleBuckets(now);
       bucket = {
         tokens: config.maxRequests,
         lastRefillTime: now,
@@ -72,6 +76,23 @@ export class RateLimitService {
     }
 
     return false;
+  }
+
+  /**
+   * Bound memory: drop buckets idle long enough to have fully refilled (they
+   * are indistinguishable from a fresh bucket). If every bucket is still
+   * active, evict the oldest-inserted ones so the map can never grow without
+   * limit under a flood of distinct identifiers.
+   */
+  private pruneIdleBuckets(now: number): void {
+    const longestWindow = Math.max(this.defaultConfig.windowMs, ...Array.from(this.configs.values(), c => c.windowMs));
+    for (const [id, bucket] of this.buckets) {
+      if (now - bucket.lastRefillTime >= longestWindow) this.buckets.delete(id);
+    }
+    for (const id of this.buckets.keys()) {
+      if (this.buckets.size < MAX_BUCKETS) break;
+      this.buckets.delete(id);
+    }
   }
 
   /**

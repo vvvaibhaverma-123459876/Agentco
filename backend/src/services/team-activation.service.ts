@@ -61,9 +61,24 @@ export interface ActivationResult {
   error?: string;
 }
 
+/**
+ * `ChildProcess.killed` only records that a signal was SENT, so it is true
+ * right after the first SIGTERM even if the process ignores it. Liveness must
+ * come from the exit status instead.
+ */
+function isProcessRunning(childProcess: ChildProcess): boolean {
+  return childProcess.exitCode === null && childProcess.signalCode === null;
+}
+
+const MAX_SPECIALISTS_PER_PARENT = 3;
+
 export class TeamActivationService {
   private activeSpecialists = new Map<string, SpecialistInstance>();
   private activeProcesses = new Map<string, ChildProcess>();
+  /** Activations past the limit check but not yet recorded as 'active' in the DB, per parent goal. */
+  private pendingActivations = new Map<string, number>();
+  /** Hard wall-clock kill timers, per specialist. */
+  private wallClockTimers = new Map<string, NodeJS.Timeout>();
 
   constructor() {
     // Graceful shutdown handlers to prevent orphaned processes
@@ -96,7 +111,7 @@ export class TeamActivationService {
     // Step 1: Signal all specialists to terminate gracefully (SIGTERM)
     for (const [specialistId, childProcess] of this.activeProcesses) {
       try {
-        if (!childProcess.killed) {
+        if (isProcessRunning(childProcess)) {
           childProcess.kill('SIGTERM');
           structuredLogger.log('info', 'Sent SIGTERM to specialist', {
             specialistId,
@@ -118,7 +133,7 @@ export class TeamActivationService {
 
     // Step 3: Force kill any remaining processes (SIGKILL)
     for (const [specialistId, childProcess] of this.activeProcesses) {
-      if (!childProcess.killed) {
+      if (isProcessRunning(childProcess)) {
         try {
           childProcess.kill('SIGKILL');
           structuredLogger.log('warn', 'Force-killed specialist', {
@@ -196,12 +211,32 @@ export class TeamActivationService {
       return null;
     }
 
-    // Check concurrent specialist limit (max 3 per parent)
+    // Check concurrent specialist limit (max 3 per parent). Activations that
+    // passed this check but are still spawning are not yet 'active' rows, so
+    // they are counted from pendingActivations; the check and the reservation
+    // run with no await in between, so concurrent callers cannot both pass.
     const activeCount = await this.getActiveSpecialistCount(request.parentGoalId);
-    if (activeCount >= 3) {
-      console.warn(`Cannot activate specialist: parent already has ${activeCount} active specialists (limit 3)`);
+    const pendingCount = this.pendingActivations.get(request.parentGoalId) ?? 0;
+    if (activeCount + pendingCount >= MAX_SPECIALISTS_PER_PARENT) {
+      console.warn(
+        `Cannot activate specialist: parent has ${activeCount} active + ${pendingCount} pending specialists (limit ${MAX_SPECIALISTS_PER_PARENT})`
+      );
       return null;
     }
+    this.pendingActivations.set(request.parentGoalId, pendingCount + 1);
+    try {
+      return await this.spawnReservedSpecialist(request, roleSpec);
+    } finally {
+      const remaining = (this.pendingActivations.get(request.parentGoalId) ?? 1) - 1;
+      if (remaining > 0) this.pendingActivations.set(request.parentGoalId, remaining);
+      else this.pendingActivations.delete(request.parentGoalId);
+    }
+  }
+
+  private async spawnReservedSpecialist(
+    request: SpecialistActivationRequest,
+    roleSpec: NonNullable<ReturnType<typeof getSpecialistRole>>
+  ): Promise<SpecialistInstance | null> {
 
     // Create specialist instance
     const specialistId = uuidv4();
@@ -254,7 +289,8 @@ export class TeamActivationService {
     specialist.processId = childProcess.pid;
     metricsService.recordSpecialistSpawn(request.role, true);
 
-    // Store in database
+    // Store in database. A failed insert must not orphan the running child.
+    try {
     await db.query(
       `INSERT INTO autonomy_team_activations (
         id, parent_goal_id, specialist_id, specialist_role, objective,
@@ -276,10 +312,27 @@ export class TeamActivationService {
         portNumber,
       ]
     );
+    } catch (error) {
+      childProcess.kill('SIGKILL');
+      throw error;
+    }
 
     // Track in memory
     this.activeSpecialists.set(specialistId, specialist);
     this.activeProcesses.set(specialistId, childProcess);
+
+    // Hard wall-clock limit (AGENTS.md invariant 4): the time budget is
+    // enforced by killing the process, not only checked when someone asks.
+    const wallClockTimer = setTimeout(() => {
+      this.terminateSpecialist(specialistId, {
+        artifacts: [],
+        evidence: [],
+        claims: [],
+        error: `Time budget exceeded: ${budget.seconds}s wall clock`,
+      }).catch((err) => console.error(`[TeamActivation] wall-clock termination failed for ${specialistId}:`, err));
+    }, budget.seconds * 1000);
+    wallClockTimer.unref();
+    this.wallClockTimers.set(specialistId, wallClockTimer);
 
     // Handle process termination
     childProcess.on('exit', (code) => {
@@ -384,18 +437,22 @@ export class TeamActivationService {
     const completedAt = new Date();
     const status = results.error ? 'failed' : 'completed';
 
+    const wallClockTimer = this.wallClockTimers.get(specialistId);
+    if (wallClockTimer) clearTimeout(wallClockTimer);
+    this.wallClockTimers.delete(specialistId);
+
     // Kill subprocess if still running
     const childProcess = this.activeProcesses.get(specialistId);
-    if (childProcess && !childProcess.killed) {
+    if (childProcess && isProcessRunning(childProcess)) {
       try {
         childProcess.kill('SIGTERM');
         console.log(`[TeamActivation] Sent SIGTERM to specialist ${specialistId} (PID: ${childProcess.pid})`);
 
-        // Wait up to 2 seconds for graceful shutdown
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            // If still running, force kill with SIGKILL
-            if (!childProcess.killed) {
+        // Wait up to 2 seconds for graceful exit, then force kill with SIGKILL.
+        await new Promise<void>((resolve) => {
+          const graceTimer = setTimeout(() => {
+            childProcess.off('exit', onExit);
+            if (isProcessRunning(childProcess)) {
               try {
                 childProcess.kill('SIGKILL');
                 console.warn(`[TeamActivation] Force-killed specialist ${specialistId} (PID: ${childProcess.pid})`);
@@ -403,8 +460,13 @@ export class TeamActivationService {
                 console.warn(`[TeamActivation] Error force-killing specialist ${specialistId}:`, err);
               }
             }
-            resolve(undefined);
+            resolve();
           }, 2000);
+          const onExit = () => {
+            clearTimeout(graceTimer);
+            resolve();
+          };
+          childProcess.once('exit', onExit);
         });
       } catch (err) {
         console.error(`[TeamActivation] Error killing process for specialist ${specialistId}:`, err);
@@ -493,21 +555,30 @@ export class TeamActivationService {
     signature: string;
     timestamp: string;
   } {
-    const secret = process.env.SPECIALIST_SHARED_SECRET;
+    return this.signBody(JSON.stringify(payload));
+  }
+
+  private signBody(body: string): { signature: string; timestamp: string } {
+    let secret = process.env.SPECIALIST_SHARED_SECRET;
     if (!secret || secret === 'default-insecure-secret') {
       if (isProductionEnv()) {
         throw new Error('SPECIALIST_SHARED_SECRET must be configured with a non-default value in staging/production');
       }
+      // Must match the development fallback in agents/autonomy/specialist_agent.py.
+      secret = 'development-only-specialist-secret';
     }
     const timestamp = Math.floor(Date.now() / 1000).toString();
-    const payloadStr = JSON.stringify(payload);
-    const message = payloadStr + ':' + timestamp;
-
-    const signature = createHmac('sha256', secret || 'development-only-specialist-secret')
-      .update(message)
-      .digest('hex');
-
+    const signature = createHmac('sha256', secret).update(`${body}:${timestamp}`).digest('hex');
     return { signature, timestamp };
+  }
+
+  /**
+   * Headers for a POST to a specialist's /execute endpoint. The specialist
+   * rejects unsigned requests, so every caller must send exactly `body`.
+   */
+  signedExecuteHeaders(body: string): Record<string, string> {
+    const { signature, timestamp } = this.signBody(body);
+    return { 'Content-Type': 'application/json', 'X-Signature': signature, 'X-Timestamp': timestamp };
   }
 
   /**

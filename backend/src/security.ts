@@ -28,6 +28,8 @@ export function assertProductionSecrets(env: NodeJS.ProcessEnv = process.env): v
   if (hasDevPassword(env.DATABASE_URL)) failures.push('DATABASE_URL');
   if (hasDevPassword(env.AGENTCO_TEST_DATABASE_URL)) failures.push('AGENTCO_TEST_DATABASE_URL');
   if (env.RESERVE_SIGNING_KEY === 'dev-insecure-key') failures.push('RESERVE_SIGNING_KEY');
+  // Test-fixture escape hatch for the SSRF guard; never valid in a production-like env.
+  if (env.AGENTCO_ALLOW_LOOPBACK_FETCH === '1') failures.push('AGENTCO_ALLOW_LOOPBACK_FETCH');
   if (hasLlmCredentials(env)) {
     if (env.LLM_BUDGET_ENFORCEMENT === 'disabled') failures.push('LLM_BUDGET_ENFORCEMENT');
     if (!env.LLM_RESOURCE_ACTOR_ID) failures.push('LLM_RESOURCE_ACTOR_ID');
